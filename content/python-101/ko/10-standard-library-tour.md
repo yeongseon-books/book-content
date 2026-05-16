@@ -247,11 +247,11 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 
 ## 참고 자료
 
-- [Python tutorial — Brief tour of the standard library](https://docs.python.org/3/tutorial/stdlib.html)
-- [Python library — datetime](https://docs.python.org/3/library/datetime.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [Python library — json](https://docs.python.org/3/library/json.html)
-- [Python library — collections](https://docs.python.org/3/library/collections.html)
-- [Python library — itertools](https://docs.python.org/3/library/itertools.html)
+- [Python 튜토리얼 — Brief Tour of the Standard Library](https://docs.python.org/3/tutorial/stdlib.html) — 표준 라이브러리의 “batteries included” 철학과 모듈 선택 감각을 잡게 해 줍니다.
+- [Python 공식 문서 — `datetime`](https://docs.python.org/3/library/datetime.html) — 날짜·시간 객체, `timedelta`, `strftime`/`strptime` 사용의 기준 문서입니다.
+- [Python 공식 문서 — `pathlib`](https://docs.python.org/3/library/pathlib.html) — 경로를 문자열 대신 객체로 다루는 API와 파일 조작 메서드를 설명합니다.
+- [Python 공식 문서 — `json`](https://docs.python.org/3/library/json.html) — `dump`/`load`/`dumps`/`loads`와 JSON 인코딩 제약을 다룹니다.
+- [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `Counter`, `defaultdict`, `deque` 같은 보강 자료구조의 핵심 동작을 확인할 수 있습니다.
+- [Python 공식 문서 — `itertools`](https://docs.python.org/3/library/itertools.html) — lazy iterator 도구들의 의도와 조합 방식을 설명합니다.
 
 Tags: standard-library, datetime-module, pathlib-module, json-module, collections-module, itertools-module

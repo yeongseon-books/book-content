@@ -325,9 +325,10 @@ done
 
 ## 참고 자료
 
-- [Python tutorial — Reading and writing files](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files)
-- [Python tutorial — Errors and exceptions](https://docs.python.org/3/tutorial/errors.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [PEP 343 — The "with" statement](https://peps.python.org/pep-0343/)
+- [Python 튜토리얼 — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — `open()`, 읽기/쓰기 메서드, 텍스트 vs 바이너리 모드의 기본 흐름을 설명합니다.
+- [Python 튜토리얼 — Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html) — `try`/`except`/`else`/`finally`, 예외 전파, 좁은 예외 처리의 예시를 제공합니다.
+- [Python 공식 문서 — `open()`](https://docs.python.org/3/library/functions.html#open) — mode, encoding, text/binary 구분의 세부 규칙을 확인할 수 있습니다.
+- [Python 공식 문서 — `pathlib`](https://docs.python.org/3/library/pathlib.html) — `Path`, `/` 연산자, `read_text()`/`write_text()` 같은 경로 기반 API를 다룹니다.
+- [PEP 343 — The "with" Statement](https://peps.python.org/pep-0343/) — 컨텍스트 매니저와 `with` 문이 자원 정리를 어떻게 표준화했는지 설명합니다.
 
 Tags: file-io, context-manager, text-vs-binary, exception-handling, try-except-finally, pathlib

@@ -376,9 +376,10 @@ The next chapter covers file I/O and exception handling, where the modules you j
 
 ## References
 
-- [Python tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
-- [Python tutorial — Packages](https://docs.python.org/3/tutorial/modules.html#packages)
-- [Python reference — The import system](https://docs.python.org/3/reference/import.html)
-- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/)
+- [Python tutorial — Modules](https://docs.python.org/3/tutorial/modules.html) — Practical introduction to module execution, import caching, and `sys.path` lookup order.
+- [Python Language Reference — The import system](https://docs.python.org/3/reference/import.html) — Formal description of finders, loaders, module caching, and package imports.
+- [Python docs — `__main__`](https://docs.python.org/3/library/__main__.html) — Clarifies the `if __name__ == "__main__"` guard and package entry-point behavior.
+- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/) — Primary source for absolute imports and leading-dot relative imports.
+- [PEP 420 — Implicit Namespace Packages](https://peps.python.org/pep-0420/) — Relevant for the chapter’s note on packages that do not rely on `__init__.py`.
 
 Tags: import-system, module-vs-package, init-py, name-main-guard, relative-imports, namespace-packages

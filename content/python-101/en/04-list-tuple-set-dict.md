@@ -383,10 +383,11 @@ The next chapter covers control flow — `if`, `for`, `while` — and shows how 
 
 ## References
 
-- Python docs — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python docs — `collections` module: https://docs.python.org/3/library/collections.html
-- Python docs — Data Structures tutorial: https://docs.python.org/3/tutorial/datastructures.html
-- PEP 274 — Dict Comprehensions: https://peps.python.org/pep-0274/
-- TimeComplexity (CPython collection complexity): https://wiki.python.org/moin/TimeComplexity
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Official behavior reference for list, tuple, set, dict, and hashability constraints.
+- [Python tutorial — Data Structures](https://docs.python.org/3/tutorial/datastructures.html) — Walks through list methods, tuples, sets, dictionaries, and comprehensions with beginner-friendly examples.
+- [PEP 274 — Dict Comprehensions](https://peps.python.org/pep-0274/) — Primary source for the dict-comprehension syntax discussed in the chapter.
+- [Python Wiki — TimeComplexity](https://wiki.python.org/moin/TimeComplexity) — Useful for the chapter’s performance comparison between linear list membership and average O(1) dict/set lookups.
+- [Python docs — `collections`](https://docs.python.org/3/library/collections.html) — Introduces supporting containers such as `namedtuple` and `deque` that refine data-structure choices.
+- [Python docs — Data Model](https://docs.python.org/3/reference/datamodel.html) — Adds formal background on mutable versus immutable objects.
 
 Tags: list-and-tuple, dict, set, mutability, comprehensions, hashable

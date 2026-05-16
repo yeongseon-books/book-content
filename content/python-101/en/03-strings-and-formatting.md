@@ -399,10 +399,11 @@ The next chapter compares the four core collections — list, tuple, set, dict �
 
 ## References
 
-- Python docs — Built-in Types `str`: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str
-- Python docs — Format Specification Mini-Language: https://docs.python.org/3/library/string.html#format-specification-mini-language
-- PEP 498 — Literal String Interpolation (f-strings): https://peps.python.org/pep-0498/
-- Python docs — `re` module: https://docs.python.org/3/library/re.html
-- Unicode HOWTO: https://docs.python.org/3/howto/unicode.html
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Canonical reference for `str`, `bytes`, immutability, and core text methods.
+- [Unicode HOWTO](https://docs.python.org/3/howto/unicode.html) — Explains code points, encodings, and the `encode`/`decode` boundary model used throughout the chapter.
+- [Python docs — `string`](https://docs.python.org/3/library/string.html) — Documents format string syntax and the format specification mini-language behind aligned output.
+- [PEP 498 — Literal String Interpolation](https://peps.python.org/pep-0498/) — Defines f-strings, expression interpolation, and format specifier behavior.
+- [Python docs — `re`](https://docs.python.org/3/library/re.html) — Relevant for the chapter’s raw-string and backslash guidance around regular expressions.
+- [Python docs — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — Adds official examples for `repr()`, `str()`, and text formatting in I/O contexts.
 
 Tags: strings, f-string, format-spec, unicode, string-methods, bytes-and-str

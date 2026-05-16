@@ -361,10 +361,11 @@ The next article covers variables, types, and operators: what dynamic typing rea
 
 ## References
 
-- Python official docs — venv: https://docs.python.org/3/library/venv.html
-- Python official docs — pip user guide: https://pip.pypa.io/en/stable/user_guide/
-- PEP 405 — Python Virtual Environments: https://peps.python.org/pep-0405/
-- Python.org downloads: https://www.python.org/downloads/
-- Real Python — Python Virtual Environments Primer: https://realpython.com/python-virtual-environments-a-primer/
+- [Python docs — venv](https://docs.python.org/3/library/venv.html) — Authoritative reference for `python -m venv`, activation scripts, and environment isolation.
+- [PEP 405 — Python Virtual Environments](https://peps.python.org/pep-0405/) — Explains the design behind venv, including `sys.prefix` and site-packages separation.
+- [pip User Guide](https://pip.pypa.io/en/stable/user_guide/) — Canonical guide for `python -m pip`, `pip freeze`, and requirements-based installs.
+- [Python Packaging User Guide — Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) — Maps directly to the project-level `.venv` workflow used in the chapter.
+- [Python.org Downloads](https://www.python.org/downloads/) — Official source for installer downloads and supported release lines.
+- [Python docs — Using Python on Windows](https://docs.python.org/3/using/windows.html) — Covers the Windows launcher, install manager, and venv usage described for Windows users.
 
 Tags: Python, virtual-environments, environment-isolation, python-installation, package-management, developer-setup

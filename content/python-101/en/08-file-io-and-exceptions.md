@@ -325,9 +325,10 @@ The next chapter covers classes and objects. The functions and modules from earl
 
 ## References
 
-- [Python tutorial — Reading and writing files](https://docs.python.org/3/tutorial/inputoutput.html#reading-and-writing-files)
-- [Python tutorial — Errors and exceptions](https://docs.python.org/3/tutorial/errors.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [PEP 343 — The "with" statement](https://peps.python.org/pep-0343/)
+- [Python tutorial — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — Covers `open()`, core read/write methods, and text-versus-binary file handling.
+- [Python tutorial — Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html) — Official walkthrough of `try`/`except`/`else`/`finally`, propagation, and exception design.
+- [Python docs — `open()`](https://docs.python.org/3/library/functions.html#open) — Precise reference for file modes, encodings, and text/binary semantics.
+- [Python docs — `pathlib`](https://docs.python.org/3/library/pathlib.html) — Documents `Path`, path composition, and convenience helpers like `read_text()` and `write_text()`.
+- [PEP 343 — The "with" Statement](https://peps.python.org/pep-0343/) — Defines the context-manager protocol that makes `with open(...)` safe and idiomatic.
 
 Tags: file-io, context-manager, text-vs-binary, exception-handling, try-except-finally, pathlib

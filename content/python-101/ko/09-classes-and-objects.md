@@ -371,9 +371,10 @@ True
 
 ## 참고 자료
 
-- [Python tutorial — Classes](https://docs.python.org/3/tutorial/classes.html)
-- [Python data model — Special method names](https://docs.python.org/3/reference/datamodel.html#special-method-names)
-- [Python library — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/)
+- [Python 튜토리얼 — Classes](https://docs.python.org/3/tutorial/classes.html) — `class`, 인스턴스, 메서드, 상속, 클래스/인스턴스 변수의 기본 구조를 설명합니다.
+- [Python 공식 문서 — Data model](https://docs.python.org/3/reference/datamodel.html) — 객체, 메서드 바인딩, special method 이름, attribute lookup의 언어 모델을 제공합니다.
+- [Python 공식 문서 — Built-in Functions](https://docs.python.org/3/library/functions.html) — `isinstance()`, `super()` 같은 클래스 관련 내장 함수의 정의를 확인할 수 있습니다.
+- [Python 공식 문서 — `dataclasses`](https://docs.python.org/3/library/dataclasses.html) — 반복적인 `__init__`, `__repr__`, 비교 메서드를 자동 생성하는 표준 도구입니다.
+- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/) — dataclass 설계 목적과 생성되는 dunder 메서드의 배경을 설명합니다.
 
 Tags: class-and-instance, init-method, self-parameter, dunder-methods, inheritance, dataclass

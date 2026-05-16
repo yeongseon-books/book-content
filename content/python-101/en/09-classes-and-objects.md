@@ -372,9 +372,10 @@ The next chapter is a tour of the standard library. Now that functions, modules,
 
 ## References
 
-- [Python tutorial — Classes](https://docs.python.org/3/tutorial/classes.html)
-- [Python data model — Special method names](https://docs.python.org/3/reference/datamodel.html#special-method-names)
-- [Python library — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/)
+- [Python tutorial — Classes](https://docs.python.org/3/tutorial/classes.html) — Core guide to `class`, instances, methods, inheritance, and class-versus-instance variables.
+- [Python docs — Data model](https://docs.python.org/3/reference/datamodel.html) — Formal source for attribute lookup, method binding, and special method behavior.
+- [Python docs — Built-in Functions](https://docs.python.org/3/library/functions.html) — Useful reference for `isinstance()`, `super()`, and related builtins used with classes.
+- [Python docs — `dataclasses`](https://docs.python.org/3/library/dataclasses.html) — Standard-library tool for generating `__init__`, `__repr__`, and comparison methods automatically.
+- [PEP 557 — Data Classes](https://peps.python.org/pep-0557/) — Explains the rationale and semantics behind dataclass generation.
 
 Tags: class-and-instance, init-method, self-parameter, dunder-methods, inheritance, dataclass

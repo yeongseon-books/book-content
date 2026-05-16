@@ -363,10 +363,11 @@ def with_logging(fn):
 
 ## 참고 자료
 
-- Python 공식 튜토리얼 — Defining Functions: https://docs.python.org/3/tutorial/controlflow.html#defining-functions
-- Python 공식 문서 — Function Definitions: https://docs.python.org/3/reference/compound_stmts.html#function-definitions
-- PEP 3102 — Keyword-Only Arguments: https://peps.python.org/pep-3102/
-- PEP 570 — Python Positional-Only Parameters: https://peps.python.org/pep-0570/
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
+- [Python 공식 튜토리얼 — More on Defining Functions](https://docs.python.org/3/tutorial/controlflow.html) — 기본값, keyword 인자, `*args`, `**kwargs`, `lambda`까지 함수 설계 전반을 다룹니다.
+- [Python 공식 문서 — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — 함수 정의 문법, parameter kind, `return`의 언어 명세를 확인할 수 있습니다.
+- [Python 공식 문서 — Expressions](https://docs.python.org/3/reference/expressions.html) — `lambda`가 표현식으로 어떻게 정의되는지 설명합니다.
+- [PEP 3102 — Keyword-Only Arguments](https://peps.python.org/pep-3102/) — `*` 뒤 인자를 keyword-only로 강제하는 설계 배경입니다.
+- [PEP 570 — Python Positional-Only Parameters](https://peps.python.org/pep-0570/) — `/` 구분자의 의미와 API 안정성 이유를 설명합니다.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 시그니처에 타입 힌트를 붙이는 표준 근거입니다.
 
 Tags: function-definition, default-arguments, args-kwargs, keyword-only, lambda, type-hints
