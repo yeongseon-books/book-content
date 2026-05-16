@@ -293,10 +293,10 @@ branch는 commit을 가리키는 가벼운 포인터이고, `HEAD`는 현재 작
 
 ## 참고 자료
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
-- [git-branch manual](https://git-scm.com/docs/git-branch)
-- [git-switch manual](https://git-scm.com/docs/git-switch)
-- [git-checkout manual](https://git-scm.com/docs/git-checkout)
-
+- [Pro Git — Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell) — branch와 `HEAD`를 포인터로 이해하는 이 글의 핵심 멘탈 모델을 뒷받침합니다.
+- [git-branch manual](https://git-scm.com/docs/git-branch) — branch 만들기, 목록 보기, 이름 변경, 삭제 문법의 기준 문서입니다.
+- [git-switch manual](https://git-scm.com/docs/git-switch) — `git switch`와 `git switch -c`로 전환하는 최신 흐름을 공식적으로 확인할 수 있습니다.
+- [git-checkout manual](https://git-scm.com/docs/git-checkout) — 예전 문법이 branch 전환과 파일 복원을 함께 맡았던 이유를 이해하는 데 도움이 됩니다.
+- [git-log manual](https://git-scm.com/docs/git-log) — `main..feature/login`, `--graph --decorate --all`처럼 branch 차이를 읽는 명령과 연결됩니다.
+- [git-diff manual](https://git-scm.com/docs/git-diff) — `git diff main feature/login`으로 branch 간 파일 차이를 비교하는 단계의 기준이 됩니다.
 Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch

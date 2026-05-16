@@ -309,12 +309,10 @@ The next post stitches the tools from this series into one realistic workflow. W
 
 ## References
 
-- Conventional Commits, "Conventional Commits 1.0.0": <https://www.conventionalcommits.org/en/v1.0.0/>
-- Tim Pope, "A Note About Git Commit Messages": <https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>
-- Git docs, `git commit --amend`: <https://git-scm.com/docs/git-commit>
-- Git docs, `git rebase -i`: <https://git-scm.com/docs/git-rebase>
-- Git docs, "githooks - commit-msg": <https://git-scm.com/docs/githooks#_commit_msg>
-- Git docs, `git show`: <https://git-scm.com/docs/git-show>
-- GitHub Docs, "About merge methods on GitHub": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
-
+- [Conventional Commits — Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) — The original specification for the `type(scope): subject` structure, body/footer layout, and SemVer connection used in this chapter.
+- [Tim Pope — A Note About Git Commit Messages](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) — The classic reference behind the 50-character subject, 72-character wrapping, and imperative-mood guidance.
+- [git-commit manual](https://git-scm.com/docs/git-commit) — The authoritative source for message entry, `--amend`, and editor-based commit flows.
+- [git-rebase manual](https://git-scm.com/docs/git-rebase) — Backs up the `rebase -i` and `reword` workflow for polishing older commit messages.
+- [githooks manual — commit-msg](https://git-scm.com/docs/githooks#_commit_msg) — Documents how a `commit-msg` hook can enforce the message format automatically.
+- [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — Useful context for how squash merges turn PR titles into the default-branch history your teammates will read later.
 Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame

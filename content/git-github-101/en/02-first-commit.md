@@ -274,11 +274,10 @@ The next post takes a closer look at `git status` output and uses `git diff` and
 
 ## References
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository)
-- [git-init manual](https://git-scm.com/docs/git-init)
-- [git-status manual](https://git-scm.com/docs/git-status)
-- [git-add manual](https://git-scm.com/docs/git-add)
-- [git-commit manual](https://git-scm.com/docs/git-commit)
-
+- [Pro Git — Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository) — The clearest canonical walkthrough of moving a change from working directory to staging and into a commit.
+- [git-init manual](https://git-scm.com/docs/git-init) — Documents exactly how `git init` creates a repository and which defaults it uses.
+- [git-status manual](https://git-scm.com/docs/git-status) — The source for status terms like `Untracked`, `modified`, and `Changes to be committed` used in the examples.
+- [git-add manual](https://git-scm.com/docs/git-add) — Explains why `git add` means “stage this change” rather than merely “add a file.”
+- [git-commit manual](https://git-scm.com/docs/git-commit) — The authoritative reference for `git commit -m` and the act of recording a snapshot.
+- [git-log manual](https://git-scm.com/docs/git-log) — Connects to the final verification step where the article confirms the first two commits with `git log --oneline`.
 Tags: git-init, git-status, git-add, git-commit, staging-area, first-repository

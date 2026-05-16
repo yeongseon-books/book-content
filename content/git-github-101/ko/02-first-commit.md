@@ -254,11 +254,10 @@ $ git log --oneline
 
 ## 참고 자료
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository)
-- [git-init manual](https://git-scm.com/docs/git-init)
-- [git-status manual](https://git-scm.com/docs/git-status)
-- [git-add manual](https://git-scm.com/docs/git-add)
-- [git-commit manual](https://git-scm.com/docs/git-commit)
-
+- [Pro Git — Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository) — working directory에서 staging, commit으로 넘어가는 첫 저장 흐름을 가장 직접적으로 설명합니다.
+- [git-init manual](https://git-scm.com/docs/git-init) — `git init`이 저장소를 어떻게 만들고 어떤 옵션을 갖는지 확인할 수 있습니다.
+- [git-status manual](https://git-scm.com/docs/git-status) — `Untracked`, `modified`, `Changes to be committed` 같은 상태 문구의 기준 문서입니다.
+- [git-add manual](https://git-scm.com/docs/git-add) — `git add`가 단순 추가가 아니라 staging을 채우는 동작임을 정확히 짚어 줍니다.
+- [git-commit manual](https://git-scm.com/docs/git-commit) — `git commit -m`과 첫 snapshot 저장 규칙을 공식 문법으로 확인할 수 있습니다.
+- [git-log manual](https://git-scm.com/docs/git-log) — 실습 마지막의 `git log --oneline`으로 첫 두 commit을 확인하는 단계와 연결됩니다.
 Tags: git-init, git-status, git-add, git-commit, staging-area, first-repository

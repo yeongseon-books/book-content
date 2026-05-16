@@ -276,12 +276,10 @@ issue는 할 일, PR은 그 일을 끝내는 변경, Project는 현재 상태를
 
 ## 참고 자료
 
-- GitHub Docs, "About issues": <https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues>
-- GitHub Docs, "Linking a pull request to an issue": <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>
-- GitHub Docs, "About Projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects>
-- GitHub Docs, "Managing labels": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels>
-- GitHub Docs, "About milestones": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones>
-- GitHub Docs, "Using keywords in issues and pull requests": <https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests>
-- GitHub Docs, "About automation for projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/about-automation-for-projects>
-
+- [GitHub Docs — About issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues) — issue를 commit·PR과 다른 작업 단위로 이해하는 출발점입니다.
+- [GitHub Docs — Managing labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels) — label을 분류 체계로 쓰는 방법을 확인할 수 있습니다.
+- [GitHub Docs — About milestones](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones) — milestone으로 여러 issue와 PR을 일정 단위로 묶는 개념을 보강합니다.
+- [GitHub Docs — Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) — `Closes #N`이 default branch merge와 함께 issue를 닫는 규칙을 설명합니다.
+- [GitHub Docs — Using keywords in issues and pull requests](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests) — closing keyword 문법과 여러 issue를 함께 닫는 표기법의 기준 문서입니다.
+- [GitHub Docs — About Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) — board, custom field, automation을 포함한 Projects의 기본 개념을 정리합니다.
 Tags: github-issue, github-project, issue-tracking, kanban-board, issue-pr-linking, closes-keyword

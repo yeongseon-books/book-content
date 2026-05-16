@@ -381,10 +381,10 @@ The next post moves into branches: how to start a parallel line of work in the s
 
 ## References
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History)
-- [git-status manual](https://git-scm.com/docs/git-status)
-- [git-diff manual](https://git-scm.com/docs/git-diff)
-- [git-log manual](https://git-scm.com/docs/git-log)
-
+- [Pro Git — Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) — Provides the bigger picture behind `git log --oneline`, `--graph`, `--stat`, and `-p` in this chapter.
+- [git-status manual](https://git-scm.com/docs/git-status) — The canonical explanation of long-form status output and the `-s` short format.
+- [git-diff manual](https://git-scm.com/docs/git-diff) — The source of truth for what `git diff`, `git diff --cached`, and `git diff HEAD` compare.
+- [git-log manual](https://git-scm.com/docs/git-log) — Backs up the different log shapes and option combinations shown in the walkthrough.
+- [git-show manual](https://git-scm.com/docs/git-show) — Covers the single-commit inspection shortcut the article suggests as an alternative.
+- [gitrevisions manual](https://git-scm.com/docs/gitrevisions) — Defines revision and range notation such as `HEAD` and two-commit comparisons like `<old> <new>`.
 Tags: git-status, git-diff, git-log, change-history, working-tree-vs-index, log-formatting

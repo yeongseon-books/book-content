@@ -358,12 +358,10 @@ Episode 7 picks up where this one leaves off: the most common collaboration unit
 
 ## References
 
-- [git-remote manual](https://git-scm.com/docs/git-remote)
-- [git-push manual](https://git-scm.com/docs/git-push)
-- [git-fetch manual](https://git-scm.com/docs/git-fetch)
-- [git-pull manual](https://git-scm.com/docs/git-pull)
-- [git-clone manual](https://git-scm.com/docs/git-clone)
-- GitHub Docs, "About remote repositories": <https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories>
-- GitHub Docs, "Connecting to GitHub with SSH": <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>
-
+- [Pro Git — Working with Remotes](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) — The best single mental-model reference for remotes, `origin`, fetch, push, and pull together.
+- [git-push manual](https://git-scm.com/docs/git-push) — The canonical source for what `git push -u origin main` configures when it sets upstream tracking.
+- [git-fetch manual](https://git-scm.com/docs/git-fetch) — Explains why fetching downloads remote commits without moving your local branch.
+- [git-pull manual](https://git-scm.com/docs/git-pull) — Backs up the chapter's central distinction that pull is fetch followed by merge or rebase.
+- [git-clone manual](https://git-scm.com/docs/git-clone) — Documents how clone creates a working copy, copies `.git`, checks out the default branch, and registers `origin`.
+- [GitHub Docs — About remote repositories](https://docs.github.com/en/get-started/git-basics/about-remote-repositories) — Covers HTTPS vs SSH URLs, the `origin` alias, and GitHub-specific remote setup choices.
 Tags: github-remote, git-push, git-pull, git-clone, git-fetch, origin

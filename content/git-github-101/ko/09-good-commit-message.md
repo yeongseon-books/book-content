@@ -275,12 +275,10 @@ Subject does not match the Conventional Commits format.
 
 ## 참고 자료
 
-- Conventional Commits, "Conventional Commits 1.0.0": <https://www.conventionalcommits.org/en/v1.0.0/>
-- Tim Pope, "A Note About Git Commit Messages": <https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>
-- Git docs, `git commit --amend`: <https://git-scm.com/docs/git-commit>
-- Git docs, `git rebase -i`: <https://git-scm.com/docs/git-rebase>
-- Git docs, "githooks - commit-msg": <https://git-scm.com/docs/githooks#_commit_msg>
-- Git docs, `git show`: <https://git-scm.com/docs/git-show>
-- GitHub Docs, "About squash merges": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
-
+- [Conventional Commits — Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) — `type(scope): subject`와 body/footer 구조, SemVer 연결 규칙의 원문 사양입니다.
+- [Tim Pope — A Note About Git Commit Messages](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) — 50자 subject, 72자 줄바꿈, 명령형 문체 같은 실무 규칙의 고전적인 기준입니다.
+- [git-commit manual](https://git-scm.com/docs/git-commit) — 메시지 작성, `--amend`, editor 기반 입력 흐름을 공식 문법으로 확인할 수 있습니다.
+- [git-rebase manual](https://git-scm.com/docs/git-rebase) — `rebase -i`와 `reword`로 이전 commit message를 다듬는 단계와 연결됩니다.
+- [githooks manual — commit-msg](https://git-scm.com/docs/githooks#_commit_msg) — `commit-msg` hook으로 메시지 형식을 강제하는 방법의 기준 문서입니다.
+- [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — squash merge 시 PR 제목이 기본 branch history에 어떤 형태로 남는지 이해하는 데 도움이 됩니다.
 Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame

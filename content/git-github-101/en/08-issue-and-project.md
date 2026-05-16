@@ -318,12 +318,10 @@ The next article looks at something even shorter than a PR body: the commit mess
 
 ## References
 
-- GitHub Docs, "About issues": <https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues>
-- GitHub Docs, "Linking a pull request to an issue": <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>
-- GitHub Docs, "About Projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects>
-- GitHub Docs, "Managing labels": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels>
-- GitHub Docs, "About milestones": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones>
-- GitHub Docs, "Using keywords in issues and pull requests": <https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests>
-- GitHub Docs, "About automation for projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/about-automation-for-projects>
-
+- [GitHub Docs — About issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues) — Establishes issues as a planning object distinct from commits and pull requests.
+- [GitHub Docs — Managing labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels) — Supports the chapter's use of labels as a lightweight classification system.
+- [GitHub Docs — About milestones](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones) — Covers the milestone concept used to group related issues and PRs into a release or time box.
+- [GitHub Docs — Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) — Explains the exact rules behind `Closes #N` and default-branch auto-close behavior.
+- [GitHub Docs — Using keywords in issues and pull requests](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests) — The canonical syntax reference for closing keywords and multi-issue linkage.
+- [GitHub Docs — About Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) — Summarizes board views, fields, and automation for the Projects workflow used here.
 Tags: github-issue, github-project, issue-tracking, kanban-board, issue-pr-linking, closes-keyword
