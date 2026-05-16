@@ -28,13 +28,13 @@ That is why continuous delivery is not just about automation. It is about making
 
 This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of *CD* and its relationship with *CI*
-- A comparison of *Rolling, Blue-Green, and Canary* strategies
-- *Feature flags* to separate *code deploy* from *feature activation*
-- *Rollback* strategies
-- Five common pitfalls
+- What does *CD* share with *CI*, and how is it different?
+- What risks are *Rolling*, *Blue-Green*, and *Canary* strategies each meant to reduce?
+- Why should *code deployment* be separated from *feature activation*?
+- Why is *rollback* a core requirement in deployment design rather than an afterthought?
+- What traps do teams still miss in practice even after they automate deployment?
 
 ## Why It Matters
 

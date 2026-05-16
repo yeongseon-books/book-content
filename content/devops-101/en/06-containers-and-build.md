@@ -28,13 +28,13 @@ Containers reduce that gap by freezing the runtime environment into an image. On
 
 This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
 
-## What You Will Learn
+## Questions this article answers
 
-- The difference between *containers* and *VMs*
-- The core *Dockerfile* commands
-- Shrinking images with *multi-stage builds*
-- Leveraging *layer caching*
-- Five common pitfalls
+- How are *containers* different from *VMs*, and why do they improve deployment repeatability?
+- Which basic *Dockerfile* instructions do you need to understand first?
+- How do *multi-stage builds* change image size and security?
+- Why does a *Dockerfile* that uses *layer caching* well also speed up development?
+- What traps commonly appear when *container images* move into production?
 
 ## Why It Matters
 

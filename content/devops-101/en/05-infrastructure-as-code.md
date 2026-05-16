@@ -28,13 +28,13 @@ Infrastructure as Code fixes that by moving cloud changes into the same review-a
 
 This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition and benefits of *IaC*
-- The basic *Terraform* workflow
-- The meaning and management of the *state* file
-- *Reuse* with *modules*
-- Five common pitfalls
+- Why is *console-created infrastructure* so hard to reproduce in another environment?
+- How does *IaC* improve change quality for the whole team rather than just making life easier for operators?
+- How should you understand the basic *Terraform* flow around *plan* and *apply*?
+- What is the *state* file, and why should it be managed in a *remote backend*?
+- What traps still show up in practice after a team adopts *IaC*?
 
 ## Why It Matters
 

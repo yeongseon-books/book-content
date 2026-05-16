@@ -28,13 +28,13 @@ Good monitoring shortens two loops at once: how quickly you notice trouble and h
 
 This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
 
-## What You Will Learn
+## Questions this article answers
 
-- The *three signals* of monitoring (logs, metrics, traces)
-- The basic flow of *Prometheus* and *Grafana*
-- The *RED / USE* metric patterns
-- Designing *meaningful alerts*
-- Five common pitfalls
+- How do *logs*, *metrics*, and *traces* play different roles as the *three signals* of monitoring?
+- How do *Prometheus* and *Grafana* work together in practice?
+- Why do patterns like *RED* and *USE* come up so often in operations?
+- How do you design alerts that really deserve action?
+- What traps do teams keep falling into even after they add monitoring?
 
 ## Why It Matters
 
