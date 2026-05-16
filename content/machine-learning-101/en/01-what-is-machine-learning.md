@@ -34,6 +34,8 @@ This is the first post in the Machine Learning 101 series. Here we will pin the 
 - What do `fit`, `predict`, and `score` really mean in scikit-learn?
 - Which beginner mistakes break this mental model first?
 
+> The core of machine learning is not the model name. The starting point is to first build the operating picture in your head: learn a function `f` from data, then apply that function to inputs it has never seen.
+
 ## Why It Matters
 
 Recommendation, medicine, finance, autonomous driving — *every industry* is being *reshaped* by ML. Weak fundamentals make *every model collapse* later.

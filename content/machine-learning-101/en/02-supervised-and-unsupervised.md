@@ -34,6 +34,8 @@ This is post 2 in the Machine Learning 101 series. Here we will separate supervi
 - What should you do when only part of the dataset is labeled?
 - Which framing checks belong at the beginning of the project?
 
+> Supervised learning fits a function from `(X, y)` pairs, while unsupervised learning discovers structure from `X` alone. Even under the same machine learning umbrella, once the starting question changes, the evaluation method and success criteria change with it.
+
 ## Why It Matters
 
 Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.

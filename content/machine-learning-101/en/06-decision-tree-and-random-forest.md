@@ -34,6 +34,8 @@ This is post 6 in the Machine Learning 101 series. Here we will look at what a s
 - What does bagging fix when we move to a random forest?
 - How far can you trust feature importance numbers?
 
+> A decision tree is an interpretable nonlinear model. A random forest is what you get when you collect many such trees and trade their individual volatility for a sturdier ensemble.
+
 ## Why It Matters
 
 Random forests and gradient-boosted trees still dominate tabular data. They belong in every baseline before you reach for deep learning.

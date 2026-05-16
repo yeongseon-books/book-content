@@ -34,6 +34,8 @@ This is post 5 in the Machine Learning 101 series. Here we will treat logistic r
 - What do precision, recall, and F1 tell you that accuracy cannot?
 - How should you think about the multiclass extension?
 
+> Logistic regression predicts a continuous probability first, then turns that probability into a class with a threshold. Once you see a classifier as a probability engine instead of a scoreboard, the downstream decision rules start to make sense.
+
 ## Why It Matters
 
 Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.
