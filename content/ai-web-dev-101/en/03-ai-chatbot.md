@@ -231,9 +231,11 @@ The next chapter moves from chat UI to retrieval, where your app answers from yo
 
 ## References
 
-- [Vercel AI SDK docs: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot)
-- [Vercel AI SDK docs: useChat](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat)
-- [Next.js docs: Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
-- [Vercel AI SDK examples repository](https://github.com/vercel/ai/tree/main/examples)
+- [Vercel AI SDK: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot) — canonical walkthrough of `useChat` + route handler
+- [Vercel AI SDK: `useChat` reference](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat) — message state and `status` semantics
+- [Vercel AI SDK: `streamText` reference](https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text) — server-side streaming API used in this chapter
+- [Next.js: Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) — App Router conventions that `app/api/chat/route.ts` follows
+- [Next.js: Edge Runtime](https://nextjs.org/docs/app/api-reference/edge) — what `export const runtime = "edge"` actually changes
+- [Vercel AI SDK examples repository](https://github.com/vercel/ai/tree/main/examples) — additional chatbot and tool-use patterns
 
 Tags: AI, LLM, Web Development, Python, Tutorial

@@ -384,7 +384,11 @@ print(f"최종 답변: {run_agent(prompt)}")
 
 ## 참고 자료
 
-- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
-- [JSON Schema Documentation](https://json-schema.org/)
+- [OpenAI: Function calling guide](https://platform.openai.com/docs/guides/function-calling) — `tools`, `tool_choice`, `tool_calls` 응답 흐름의 정식 명세
+- [OpenAI: Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs) — 도구 스키마와 응답 스키마를 JSON Schema로 강제하는 방법
+- [OpenAI Cookbook: function calling and tools](https://cookbook.openai.com/topic/tools) — 실제 도구 호출 루프 코드 예제
+- [Anthropic: Tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — 동일한 도구 호출 패턴을 다른 모델 공급자가 어떻게 정의하는지 비교용
+- [LangGraph: Agent runtime](https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/) — 직접 짠 루프 대신 프레임워크가 제공하는 에이전트 런타임의 구성 요소
+- [JSON Schema specification](https://json-schema.org/specification.html) — `parameters` 스키마 작성에 필요한 키워드와 검증 규칙
 
 Tags: AI, LLM, 웹 개발, Python, Tutorial

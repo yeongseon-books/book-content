@@ -318,8 +318,11 @@ The next chapter shifts from tool use to deployment, where these AI features hav
 
 ## References
 
-- [OpenAI function calling guide](https://platform.openai.com/docs/guides/function-calling)
-- [JSON Schema](https://json-schema.org/)
-- [OpenAI Cookbook: tool calling examples](https://cookbook.openai.com/)
+- [OpenAI: Function calling guide](https://platform.openai.com/docs/guides/function-calling) — canonical spec for `tools`, `tool_choice`, and the `tool_calls` response flow
+- [OpenAI: Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs) — enforcing tool and response schemas with JSON Schema
+- [OpenAI Cookbook: function calling and tools](https://cookbook.openai.com/topic/tools) — runnable examples of the tool-calling loop
+- [Anthropic: Tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — how a different provider defines the same tool-use pattern, useful for cross-checking
+- [LangGraph: Agent runtime](https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/) — what a framework-managed agent loop looks like when you stop hand-rolling it
+- [JSON Schema specification](https://json-schema.org/specification.html) — keywords and validation rules behind the `parameters` schema
 
 Tags: AI, LLM, Web Development, Python, Tutorial
