@@ -37,6 +37,8 @@ This is the first post in the RAG Evaluation and Benchmarking 101 series.
 
 *Questions this post answers*
 
+> The core mental model for retrieval metrics is to separate the gold set from the ranked result list. Even on the same data, Precision@k, Recall@k, and MRR expose different kinds of failure.
+
 ## Questions this post answers
 
 - What does Precision@k, Recall@k, and MRR each measure, and what question does each answer?
