@@ -28,13 +28,13 @@ Distributed tracing answers that by breaking one request into spans, preserving 
 
 This is post 5 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of *span* and *trace*
-- What *context propagation* means
-- *Sampling* strategies
-- Your first trace with *OpenTelemetry*
-- Five common pitfalls
+- What is a span, and what is a trace?
+- Why does context propagation matter when a request crosses services?
+- Why is sampling central to cost control?
+- How do you build your first trace with OpenTelemetry?
+- What is hardest about operating without distributed tracing?
 
 ## Why It Matters
 

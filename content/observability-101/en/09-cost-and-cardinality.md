@@ -28,13 +28,13 @@ The answer is usually structural, not accidental: too many unique labels, too mu
 
 This is post 9 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- How *cardinality* drives cost
-- Tiered *retention* policy
-- Two models of *sampling*
-- The *cost curve* of each signal
-- Five common pitfalls
+- Why is cardinality directly tied to cost?
+- Why should retention be split into tiers?
+- How do head sampling and tail sampling differ?
+- What cost curve does each signal — metrics, logs, and traces — follow?
+- Why does a team need its own observability cost budget?
 
 ## Why It Matters
 

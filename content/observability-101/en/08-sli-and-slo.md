@@ -28,13 +28,13 @@ SLIs and SLOs solve that by turning service quality into a number, a target, and
 
 This is post 8 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of *SLI* ("good / total")
-- The *language* an *SLO* creates
-- The meaning of *error budget*
-- *Burn-rate* alerts
-- Five common pitfalls
+- What does an SLI measure, and how should you measure it?
+- What kind of promise does an SLO create?
+- Why does the error budget become the balance point between feature delivery and reliability work?
+- What kinds of conditions do burn-rate alerts catch early?
+- Why should you separate internal metrics from user-facing metrics?
 
 ## Why It Matters
 

@@ -28,13 +28,13 @@ Good dashboard design fixes that. The first screen should compress the system in
 
 This is post 6 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- *USE* (Utilization, Saturation, Errors)
-- *RED* (Rate, Errors, Duration)
-- The four *Golden signals*
-- Building dashboards as *question units*
-- Five common pitfalls
+- What separates a good dashboard from one that is just wallpaper?
+- What questions do the RED and USE patterns answer?
+- Why should you look at distributions instead of averages?
+- Which panels belong on the first screen?
+- How should you show context such as deploy timestamps alongside the charts?
 
 ## Why It Matters
 

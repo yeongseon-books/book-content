@@ -28,13 +28,13 @@ That is why alerting design is partly a technical problem and partly a human one
 
 This is post 7 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- The three conditions of a *good alert*
-- The cost of *alert fatigue*
-- *Symptom* vs *cause* alerts
-- The basics of *on-call*
-- Five common pitfalls
+- What makes an alert worth waking someone up at 3 a.m.?
+- Why does alert fatigue happen, and how do you reduce it?
+- What is the difference between symptom alerts and cause alerts?
+- Why does severity separation matter?
+- What role should a runbook play in on-call operations?
 
 ## Why It Matters
 
