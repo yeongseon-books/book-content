@@ -29,12 +29,12 @@ This is post 2 in the Programming Languages 101 series.
 
 In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
 
-## What You Will Learn
+## Questions this article answers
 
-- The exact boundary between syntax and semantics
-- The pipeline from tokens to grammar to an AST
-- Why "syntactically valid but meaningfully wrong" code happens
-- The difference between static and dynamic semantics
+- Where exactly is the boundary between syntax and semantics?
+- How do tokens, grammar, and an AST connect in sequence?
+- Why can code be valid yet still behave differently from what you intended?
+- How do static semantics and dynamic semantics differ?
 
 ## Why It Matters
 

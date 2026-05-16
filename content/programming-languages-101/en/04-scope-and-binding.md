@@ -29,13 +29,12 @@ This is post 4 in the Programming Languages 101 series.
 
 In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
 
-## What You Will Learn
+## Questions this article answers
 
-- Precise definitions of scope and binding
-- Lexical vs dynamic scope
-- The intent and danger of variable shadowing
-- Python's LEGB rule
-- The foundation needed for closures (next episode)
+- What is the precise difference between scope and binding?
+- How do lexical scope and dynamic scope change the result?
+- Why can shadowing the same name in an inner scope be risky?
+- In what order does Python's LEGB rule resolve names?
 
 ## Why It Matters
 

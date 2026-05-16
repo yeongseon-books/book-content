@@ -29,13 +29,12 @@ This is post 9 in the Programming Languages 101 series.
 
 In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
 
-## What You Will Learn
+## Questions this article answers
 
-- A one-line definition of static vs dynamic
-- The difference shown by the same function with and without hints
-- What mypy/pyright catches and what it cannot
-- What gradual typing makes possible
-- The limits of the "static is safe, dynamic is fast" myth
+- What is the shortest definition of static vs dynamic?
+- How is the same code validated differently under the two models?
+- What can mypy or pyright catch, and what can they not catch?
+- What kind of compromise does gradual typing make possible?
 
 ## Why It Matters
 

@@ -29,13 +29,12 @@ This is post 7 in the Programming Languages 101 series.
 
 In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
 
-## What You Will Learn
+## Questions this article answers
 
-- Stack vs heap in one sentence
-- How Python's reference counting works
-- How a garbage collector untangles cycles
-- Why "memory leaks" still happen in GC languages
-- The tradeoffs between manual free, RAII, and GC
+- How are the stack and the heap different?
+- When does Python's reference counting free an object immediately?
+- Why do cyclic references require a separate garbage collector?
+- Why do memory leaks still happen even in GC languages?
 
 ## Why It Matters
 

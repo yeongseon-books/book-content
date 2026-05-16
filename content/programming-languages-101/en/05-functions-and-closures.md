@@ -29,13 +29,12 @@ This is post 5 in the Programming Languages 101 series.
 
 In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
 
-## What You Will Learn
+## Questions this article answers
 
-- What first-class functions are and why they matter
-- The exact definition and behavior of a closure
-- That closures capture references, not copies
-- The classic late-binding pitfall
-- Small design patterns built on closures (callbacks, factories, memoization)
+- What is the difference between first-class functions and higher-order functions?
+- What exactly does a closure capture?
+- Why do lambdas created inside a loop print the same value?
+- In what way are closures similar to objects?
 
 ## Why It Matters
 

@@ -29,13 +29,12 @@ This is post 6 in the Programming Languages 101 series.
 
 In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
 
-## What You Will Learn
+## Questions this article answers
 
-- A precise definition of "object" under two models
-- The method-lookup difference between class-based and prototype-based
-- That Python classes are themselves objects
-- The relationship between inheritance and delegation
-- That closures and objects are two views of the same idea
+- What is the simplest way to define an object?
+- How do class-based and prototype-based models differ in method lookup?
+- What does it mean when people say that classes themselves are objects in Python?
+- What is the relationship between inheritance and delegation?
 
 ## Why It Matters
 

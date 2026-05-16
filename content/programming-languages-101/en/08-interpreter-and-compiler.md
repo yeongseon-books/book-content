@@ -29,13 +29,12 @@ This is post 8 in the Programming Languages 101 series.
 
 In this post, we will treat interpreters and compilers as two strategies for the same translation problem. We will use Python bytecode as the concrete example, then connect that path to AOT and JIT so the execution model feels like an engineering choice instead of a slogan.
 
-## What You Will Learn
+## Questions this article answers
 
-- The one-line distinction between interpreter and compiler
-- Python's actual execution model: source → bytecode → VM
-- How to read bytecode with the `dis` module
-- The difference between AOT and JIT compilation
-- What "Python is slow" really means and where it stops being true
+- What is the shortest way to explain the difference between an interpreter and a compiler?
+- What execution path does Python actually follow?
+- What exactly is a `.pyc` file?
+- Why is JIT considered a middle strategy between the two?
 
 ## Why It Matters
 
