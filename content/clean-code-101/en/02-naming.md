@@ -31,13 +31,15 @@ Here we will look at the signals of a strong name, how variable, function, and c
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- Six signals of a good name
-- The differences between variable, function, and class names
-- Bringing domain terms into code
-- The most common naming mistakes
-- A safe procedure for renaming
+- What signals tell you a name is actually a good one?
+- How should variable, function, and class names differ in the role they play?
+- How do you bring domain language into code without making it sound forced?
+- What naming mistakes show up again and again in real codebases?
+- What is the safest order for a rename?
+
+> Good names do not make code shorter. They make intent visible sooner.
 
 ## Why It Matters
 

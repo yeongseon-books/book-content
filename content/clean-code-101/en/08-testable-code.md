@@ -31,13 +31,15 @@ Here we will push time, IO, and randomness to the boundaries, then use seams, fa
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- Separating pure logic from side effects
-- Creating seams with dependency injection
-- Fakes and spies as test doubles
-- Handling non-deterministic dependencies (time, randomness)
-- Refactorings that improve testability
+- How should you separate pure logic from side effects?
+- How does dependency injection create seams for testing?
+- When should you use a fake, and when should you use a spy?
+- How do you handle non-deterministic dependencies such as time and randomness?
+- Which refactorings directly improve testability?
+
+> Testability is not an after-the-fact outcome. It is a byproduct of design, shaped by how well you push side effects and dependencies outward.
 
 ## Why It Matters
 

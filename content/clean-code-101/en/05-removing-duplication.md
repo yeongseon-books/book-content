@@ -31,13 +31,15 @@ Here we will separate shared change reasons from accidental similarity, then ver
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- The real meaning of DRY
-- Coincidental versus essential duplication
-- Extract and parameterize techniques
-- Removing data duplication via tables
-- The cost of premature abstraction
+- What does DRY actually mean?
+- How do you tell accidental similarity from essential duplication?
+- In what order should you apply extraction and parameterization?
+- How can you move data duplication into tables?
+- Why does premature abstraction create a more expensive form of coupling?
+
+> Once the same knowledge starts living in two places, it eventually drifts apart.
 
 ## Why It Matters
 
