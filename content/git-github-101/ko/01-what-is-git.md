@@ -207,9 +207,10 @@ Git은 파일의 스냅샷을 시간 순서대로 저장하는 분산 버전 관
 
 ## 참고 자료
 
-- [Git docs — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control)
-- [Git docs — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
-- [Git downloads](https://git-scm.com/downloads)
-- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
-
+- [Pro Git — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control) — 버전 관리 도구가 해결하는 문제와 중앙집중형·분산형 차이를 글의 출발점으로 잡아 줍니다.
+- [Pro Git — What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) — 스냅샷 모델과 분산 저장소 구조를 이 글의 멘탈 모델과 직접 연결해 읽을 수 있습니다.
+- [Pro Git — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) — `user.name`, `user.email` 같은 첫 설정 흐름을 공식 예시로 확인할 수 있습니다.
+- [git-config manual](https://git-scm.com/docs/git-config) — `git config --global`과 `init.defaultBranch` 문법을 정확히 확인할 때 기준이 되는 문서입니다.
+- [Git downloads](https://git-scm.com/downloads) — 운영체제별 공식 설치 경로를 확인할 수 있습니다.
+- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git) — GitHub와 함께 쓸 때 필요한 초기 설정을 한 번에 정리한 문서입니다.
 Tags: git-basics, version-control, distributed-vcs, snapshot-model, git-install, git-config

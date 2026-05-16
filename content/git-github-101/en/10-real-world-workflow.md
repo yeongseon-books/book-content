@@ -341,14 +341,10 @@ This post closes the Git & GitHub 101 series. The natural next step is automatio
 
 ## References
 
-- GitHub Docs, "GitHub flow": <https://docs.github.com/en/get-started/using-github/github-flow>
-- Semantic Versioning 2.0.0: <https://semver.org/spec/v2.0.0.html>
-- Git docs, `git tag`: <https://git-scm.com/docs/git-tag>
-- Git docs, `git push --force-with-lease`: <https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease>
-- Git docs, `git revert -m`: <https://git-scm.com/docs/git-revert>
-- GitHub Docs, "About protected branches": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches>
-- GitHub Docs, "About code owners": <https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners>
-- GitHub Docs, "About merge methods on GitHub": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
-- GitHub Docs, "About required status checks": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging>
-
+- [GitHub Docs — GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) — The official end-to-end description of the issue → branch → PR → merge → branch cleanup loop this chapter teaches.
+- [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — The direct reference for choosing between squash, merge-commit, and rebase-merge workflows.
+- [git-push manual](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease) — Explains why `--force-with-lease` is safer than plain `--force` in the recovery section.
+- [git-tag manual](https://git-scm.com/docs/git-tag) — The canonical reference for creating and publishing annotated release tags.
+- [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) — Defines the `MAJOR.MINOR.PATCH` rules the release-tag examples rely on.
+- [GitHub Docs — About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) — Covers the branch-protection guardrails behind no-direct-push, review, and status-check requirements.
 Tags: github-flow, git-workflow, conventional-commits, semantic-versioning, code-review, release-tag

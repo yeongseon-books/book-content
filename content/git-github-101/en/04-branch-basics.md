@@ -346,10 +346,10 @@ The next article picks up from a diverged history and walks through `git merge`,
 
 ## References
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
-- [git-branch manual](https://git-scm.com/docs/git-branch)
-- [git-switch manual](https://git-scm.com/docs/git-switch)
-- [git-checkout manual](https://git-scm.com/docs/git-checkout)
-
+- [Pro Git — Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell) — Supports the chapter's central mental model of branches and `HEAD` as pointers rather than folder copies.
+- [git-branch manual](https://git-scm.com/docs/git-branch) — The canonical reference for creating, listing, renaming, and deleting branches.
+- [git-switch manual](https://git-scm.com/docs/git-switch) — Documents the modern branch-switching flow, including `git switch -c`.
+- [git-checkout manual](https://git-scm.com/docs/git-checkout) — Useful for understanding the older command whose mixed responsibilities the article contrasts with `switch` and `restore`.
+- [git-log manual](https://git-scm.com/docs/git-log) — Backs up branch-comparison patterns such as `main..feature/login` and `--graph --decorate --all`.
+- [git-diff manual](https://git-scm.com/docs/git-diff) — Covers the file-level comparison step shown with `git diff main feature/login`.
 Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch

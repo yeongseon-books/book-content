@@ -321,10 +321,10 @@ PR 설명을 쓸 때도 `git log --oneline origin/main..HEAD`와 `git log -p ori
 
 ## 참고 자료
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History)
-- [git-status manual](https://git-scm.com/docs/git-status)
-- [git-diff manual](https://git-scm.com/docs/git-diff)
-- [git-log manual](https://git-scm.com/docs/git-log)
-
+- [Pro Git — Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) — `git log --oneline`, `--graph`, `--stat`, `-p`를 어떤 상황에서 읽는지 큰 그림을 제공합니다.
+- [git-status manual](https://git-scm.com/docs/git-status) — 긴 형식과 `-s` 짧은 형식이 무엇을 보여 주는지 확인할 수 있습니다.
+- [git-diff manual](https://git-scm.com/docs/git-diff) — `git diff`, `git diff --cached`, `git diff HEAD`가 각각 무엇을 비교하는지의 기준 문서입니다.
+- [git-log manual](https://git-scm.com/docs/git-log) — log 옵션 조합과 출력 형태를 공식 문법으로 다시 확인할 수 있습니다.
+- [git-show manual](https://git-scm.com/docs/git-show) — 글에서 언급한 “한 commit만 짧게 보기” 대안 명령을 보강합니다.
+- [gitrevisions manual](https://git-scm.com/docs/gitrevisions) — `HEAD`, `<old> <new>`, range 표기처럼 비교 대상을 지정하는 규칙을 정리한 문서입니다.
 Tags: git-status, git-diff, git-log, change-history, working-tree-vs-index, log-formatting

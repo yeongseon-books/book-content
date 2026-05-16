@@ -291,12 +291,10 @@ remote는 다른 위치의 저장소를 가리키는 별칭이고, 첫 이름은
 
 ## 참고 자료
 
-- Git docs, `git remote`: <https://git-scm.com/docs/git-remote>
-- Git docs, `git push`: <https://git-scm.com/docs/git-push>
-- Git docs, `git fetch`: <https://git-scm.com/docs/git-fetch>
-- Git docs, `git pull`: <https://git-scm.com/docs/git-pull>
-- Git docs, `git clone`: <https://git-scm.com/docs/git-clone>
-- GitHub Docs, "About remote repositories": <https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories>
-- GitHub Docs, "Connecting to GitHub with SSH": <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>
-
+- [Pro Git — Working with Remotes](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) — remote, origin, fetch, push, pull을 하나의 멘탈 모델로 묶어 이해하는 데 가장 적합합니다.
+- [git-push manual](https://git-scm.com/docs/git-push) — `git push -u origin main`이 upstream을 어떻게 설정하는지 공식 문법으로 확인할 수 있습니다.
+- [git-fetch manual](https://git-scm.com/docs/git-fetch) — remote commit을 내려받기만 하고 로컬 branch는 움직이지 않는 이유를 설명합니다.
+- [git-pull manual](https://git-scm.com/docs/git-pull) — `pull = fetch + merge/rebase`라는 글의 핵심 구분을 뒷받침합니다.
+- [git-clone manual](https://git-scm.com/docs/git-clone) — clone이 새 디렉터리, `.git`, 기본 branch checkout, `origin` 등록까지 함께 처리함을 확인할 수 있습니다.
+- [GitHub Docs — About remote repositories](https://docs.github.com/en/get-started/git-basics/about-remote-repositories) — HTTPS와 SSH URL 형식, `origin` 별칭, remote URL 선택 기준을 GitHub 기준으로 정리합니다.
 Tags: github-remote, git-push, git-pull, git-clone, git-fetch, origin

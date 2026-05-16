@@ -428,9 +428,9 @@ In the next chapter we'll connect the local repo to a GitHub remote and walk thr
 
 ## References
 
-- [Git Reference Manual](https://git-scm.com/doc)
-- [Pro Git Book - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
-- [git-merge manual](https://git-scm.com/docs/git-merge)
-- [git-mergetool manual](https://git-scm.com/docs/git-mergetool)
-
+- [Pro Git — Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) — The clearest beginner-level walkthrough of fast-forward merges and basic merge flow.
+- [Pro Git — Advanced Merging](https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging) — Adds deeper context for how to read and resolve conflicts once the automatic merge stops.
+- [git-merge manual](https://git-scm.com/docs/git-merge) — The authoritative source for `git merge`, `--no-ff`, and `--abort` semantics.
+- [git-mergetool manual](https://git-scm.com/docs/git-mergetool) — Connects to the practical note about using dedicated merge tools or IDE support during conflict resolution.
+- [git-status manual](https://git-scm.com/docs/git-status) — The reference behind status messages such as `unmerged paths` and `both modified` during a conflict.
 Tags: git-merge, fast-forward, three-way-merge, merge-conflict, merge-abort, conflict-markers

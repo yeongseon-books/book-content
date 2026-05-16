@@ -235,9 +235,10 @@ In the next post we start from an empty directory and build the first commit. `g
 
 ## References
 
-- [Git docs — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control)
-- [Git docs — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
-- [Git downloads](https://git-scm.com/downloads)
-- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
-
+- [Pro Git — About Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control) — Grounds the chapter's opening problem statement by explaining what version control solves and how centralized and distributed models differ.
+- [Pro Git — What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) — Maps directly to the snapshot model and distributed-repository mental model used throughout the article.
+- [Pro Git — First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) — Backs up the first-run configuration flow for `user.name` and `user.email` with the canonical walkthrough.
+- [git-config manual](https://git-scm.com/docs/git-config) — The precise reference for `git config --global` syntax and `init.defaultBranch` settings.
+- [Git downloads](https://git-scm.com/downloads) — The official installation entry point for each operating system.
+- [GitHub Docs — Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git) — Summarizes the first-time Git setup steps in a GitHub-oriented workflow.
 Tags: git-basics, version-control, distributed-vcs, snapshot-model, git-install, git-config
