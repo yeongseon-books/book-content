@@ -34,6 +34,14 @@ An image is a single frame; a video is a frame sequence with a time axis. A one-
 
 This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.
 
+## Questions this article answers
+
+- Why is frame sampling the first key decision in video understanding?
+- When are PyAV and scene-change-based keyframe extraction each useful?
+- What trade-offs do video encoders like VideoMAE, TimeSformer, and X-CLIP make?
+- What frame grouping is most practical for Video-LLaVA Q&A?
+- Why do fps confusion, codec dependence, ignoring audio, and memory management often become operational issues?
+
 ## 1. Why Frame Sampling Is the Core Decision
 
 Suppose we want to process a 10-minute 1080p clip at 30fps end-to-end:
