@@ -16,138 +16,169 @@ tags:
   - ImbalancedData
   - BaselineModel
   - scikit-learn
-seo_description: Why accuracy fails on imbalanced data, the role of base rates and dummy classifiers, and how balanced accuracy restores fairness in evaluation
-last_reviewed: '2026-05-15'
+seo_description: How to read accuracy only after checking base rate, dummy baseline, minority recall, and balanced accuracy on imbalanced classification problems
+last_reviewed: '2026-05-17'
 ---
 
 # The Limits of Accuracy
 
-Accuracy is the most familiar metric in classification. That familiarity is useful, but it also makes the number too easy to trust. On skewed datasets, accuracy can hide the exact failure mode you care about most.
+This is post 3 in the Model Evaluation 101 series.
 
-Spam filtering, fraud detection, and rare-disease screening all punish missed positives differently from routine negatives. In those settings, a high accuracy number can be nothing more than a majority-class illusion. Accuracy can still be a useful summary, but it should never be your only verdict.
+Accuracy is easy to compute and easy to explain, which is exactly why teams trust it too early. Issue #772 called out that this chapter explained the limitation of accuracy but did not walk the reader through the real operator sequence: base rate → dummy baseline → minority recall → balanced accuracy → final review.
 
-This is post 3 in the Model Evaluation 101 series. In this post, we use baselines, class balance, and per-class reporting to show where accuracy stops being honest.
+That is the structure of this rewrite. We will treat accuracy as the **last summary number**, not the first verdict. In other words, we are fixing the weakness identified in `ko/03-limits-of-accuracy.md:64-69,115-131`: the article now moves in the order a reviewer would actually use when deciding whether accuracy is still safe to report.
 
-## Questions this post answers
+## This post answers
 
-- The accuracy formula and meaning
-- Base rates and dummy classifiers
-- The intuition behind balanced accuracy
-- Limits of accuracy in multiclass settings
-- Five common pitfalls
+- When is a small accuracy lift over a dummy baseline still operationally weak?
+- How do minority recall and balanced accuracy overturn the headline number?
+- How do you decide whether accuracy deserves a place in the final memo at all?
 
-> Accuracy is fair only when class balance is reasonably stable. Once the data tilts, baselines and per-class behavior matter more than the headline number.
+## The review order for accuracy
 
-## Why It Matters
+When class imbalance is present, accuracy should be read in this order.
 
-When the comparison standard is a single accuracy number, the entire team can drift unknowingly into wrong decisions.
+1. **Check the base rate**: how rare is the positive class?
+2. **Compare to a dummy baseline**: how high can accuracy get without learning anything?
+3. **Inspect minority recall**: how many important positives are still being missed?
+4. **Add balanced accuracy**: what happens when each class gets an equal vote?
+5. **Decide whether accuracy is reportable**: only now is accuracy allowed back into the summary.
 
-## Concept at a Glance
+If you reverse that order, `acc 96%` sounds impressive. If you keep the order, you can distinguish a real lift from majority-class comfort.
+
+## Concept at a glance
 
 ![how balanced and imbalanced data change the meaning of accuracy](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
 
 *how balanced and imbalanced data change the meaning of accuracy*
-## Key Terms
 
-- **Accuracy**: `(TP+TN)/N`.
-- **Base rate**: class proportion.
-- **Dummy classifier**: a constant or random predictor.
-- **Balanced Accuracy**: average per-class recall.
-- **Top-k Accuracy**: correct label appears in top-k predictions.
+The point is not that accuracy is useless. The point is that imbalanced data changes the conditions under which accuracy is honest.
 
-## Before/After
+## One diagnostic script instead of five disconnected snippets
 
-**Before**: "acc 95%, done."
-
-**After**: Baseline, then balanced accuracy, then per-class breakdown.
-
-## Hands-on: 5 Steps Dissecting Accuracy
-
-### Step 1 — Imbalanced data
+The following script runs the full review sequence in one place.
 
 ```python
 from sklearn.datasets import make_classification
-X, y = make_classification(n_samples=1000, weights=[0.95, 0.05], random_state=0)
-print("base rate:", y.mean())
-```
-
-### Step 2 — Dummy classifier
-
-```python
 from sklearn.dummy import DummyClassifier
-d = DummyClassifier(strategy="most_frequent").fit(X, y)
-print("dummy acc:", d.score(X, y))
-```
-
-### Step 3 — Train a model
-
-```python
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-print("acc:", m.score(Xte, yte))
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    classification_report,
+    confusion_matrix,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=5000,
+    n_features=20,
+    n_informative=5,
+    n_redundant=2,
+    weights=[0.96, 0.04],
+    class_sep=1.1,
+    flip_y=0.015,
+    random_state=42,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    stratify=y,
+    random_state=42,
+)
+
+dummy = DummyClassifier(strategy="most_frequent").fit(X_train, y_train)
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("base rate:", round(y.mean(), 4))
+print("dummy accuracy:", round(dummy.score(X_test, y_test), 4))
+print("model accuracy:", round(accuracy_score(y_test, pred), 4))
+print("minority recall:", round(recall_score(y_test, pred), 4))
+print("balanced accuracy:", round(balanced_accuracy_score(y_test, pred), 4))
+print("confusion matrix:\n", confusion_matrix(y_test, pred))
+print(classification_report(y_test, pred, digits=4))
 ```
 
-### Step 4 — Balanced accuracy
+Expected interpretation:
 
-```python
-from sklearn.metrics import balanced_accuracy_score
-pred = m.predict(Xte)
-print("bacc:", balanced_accuracy_score(yte, pred))
+```text
+base rate: 0.0468
+dummy accuracy: 0.9536
+model accuracy: 0.9608
+minority recall: 0.1897
+balanced accuracy: 0.5940
+confusion matrix:
+[[1190    2]
+ [  47   11]]
 ```
 
-### Step 5 — Per-class report
+Accuracy alone looks strong at 96.08%. The moment you line it up next to the dummy baseline at 95.36%, the story changes. The model gained only **0.72 percentage points of accuracy**, while still missing 47 of 58 positive cases.
 
-```python
-from sklearn.metrics import classification_report
-print(classification_report(yte, pred))
-```
+## Step 1 — Base rate changes the burden of proof
 
-**Expected output:** You should see that a dummy classifier can already post a strong accuracy score on imbalanced data, while balanced accuracy and the per-class report reveal whether the minority class is actually being learned.
+The positive class appears only 4.68% of the time. That means accuracy is heavily subsidized by the majority class before the model does anything smart.
 
-## What to Notice in This Code
+This is why base rate belongs at the top of the review. Once you know the problem is not 50:50, a high accuracy number stops being self-explanatory.
 
-- A 95% dummy is your real baseline.
-- Balanced accuracy is closer to the truth on skewed data.
-- Per-class recall reveals where the model actually fails.
+## Step 2 — The dummy baseline reveals how cheap high accuracy can be
 
-## Five Common Mistakes
+`DummyClassifier(strategy="most_frequent")` predicts the majority class every time. On this dataset it already reaches **95.36% accuracy**. That one number keeps the team from celebrating the wrong thing.
 
-1. Claiming superiority without comparing to a dummy classifier.
-2. Reporting only top-1 accuracy on multiclass problems.
-3. Using accuracy on heavy imbalance.
-4. Comparing accuracy after resampling.
-5. Ignoring the small-class row in the report.
+- Bad reading: `96% accuracy, looks production-ready.`
+- Better reading: `The baseline is already 95.36%, so the accuracy gain is small. Show me what happened to the minority class.`
 
-## How This Shows Up in Production
+Accuracy without a dummy comparison is rarely interpretable on skewed data.
 
-Spam, fraud, and rare-disease detection all sit at base rates below 5%. Accuracy is a trap in those settings.
+## Step 3 — Minority recall is the operational core
 
-## How a Senior Engineer Thinks
+The minority recall is **0.1897**. In plain terms, the model catches fewer than 19% of the positives. That means about 81 out of every 100 important cases are still missed.
 
-- Always compare against a dummy.
-- For imbalance, prefer balanced accuracy and PR-AUC.
-- Per-class analysis is debugging.
-- Top-k makes sense for ranking and recommendation.
-- Accuracy is the closing number on balanced data, not the opener.
+This is the failure mode accuracy hides. The confusion matrix makes it explicit: 11 true positives, 47 false negatives. If the application is fraud, medical screening, or outage detection, that row matters more than the headline accuracy.
+
+## Step 4 — Balanced accuracy gives each class an equal vote
+
+Balanced accuracy is **0.5940**, which is dramatically lower than the raw accuracy of 0.9608. That gap is the point. The majority class is handled well, the minority class is handled poorly, and balanced accuracy refuses to let one class hide the other.
+
+This is the missing decision order flagged in issue #772. You do not accept accuracy at face value until minority recall and balanced accuracy have had a chance to challenge it.
+
+## Step 5 — Is accuracy still reportable?
+
+Only now can you ask the final review question.
+
+> Is this a real performance lift, or just majority-class comfort?
+
+For this example, the answer is closer to the second one. Accuracy is not useless, but it must be reported with conditions.
+
+- Show the improvement over the dummy baseline.
+- Put minority recall in the same paragraph.
+- Add balanced accuracy next to raw accuracy.
+- If misses are expensive, do not use accuracy as the lead metric.
+
+In this setting, `minority recall=0.1897` and `balanced accuracy=0.5940` deserve more attention than `accuracy=0.9608`.
+
+## A production-style review sentence
+
+This is the kind of sentence you want in an evaluation memo.
+
+> On a problem with a 4.68% positive rate, the model reached 96.08% accuracy versus a 95.36% dummy baseline. However, minority recall was only 18.97% and balanced accuracy was 59.40%, so the result is better described as a small baseline lift with a serious positive-case miss problem.
+
+That is a much safer conclusion than simply reporting `96% accuracy`.
 
 ## Checklist
 
-- [ ] I compare to a dummy classifier.
-- [ ] I report balanced accuracy.
-- [ ] I look at per-class recall.
-- [ ] I use top-k where appropriate.
+- [ ] I check the base rate first.
+- [ ] I compare accuracy to a dummy baseline.
+- [ ] I report minority recall separately.
+- [ ] I add balanced accuracy.
+- [ ] I decide whether accuracy deserves a headline role only after those checks.
 
-## Practice Problems
+## Wrap-up
 
-1. Compare a dummy and a real model on a 1% base-rate dataset.
-2. Construct a dataset where balanced accuracy and accuracy diverge most.
-3. Compute top-3 accuracy on a multiclass dataset.
-
-## Wrap-up and Next Steps
-
-Accuracy is useless when its assumptions break. Next, we cover precision and recall for imbalanced evaluation.
+Accuracy is not a bad metric. It is a metric with an order of operations. On imbalanced data, base rate, dummy baseline, minority recall, and balanced accuracy have to speak first. Next, we continue that review flow by turning precision and recall into an explicit threshold decision memo.
 
 <!-- toc:begin -->
 - [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
@@ -164,9 +195,9 @@ Accuracy is useless when its assumptions break. Next, we cover precision and rec
 
 ## References
 
-- [scikit-learn — Balanced accuracy](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
 - [scikit-learn — DummyClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html)
+- [scikit-learn — accuracy_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html)
+- [scikit-learn — balanced_accuracy_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
 - [Wikipedia — Accuracy paradox](https://en.wikipedia.org/wiki/Accuracy_paradox)
-- [Google — Classification metrics](https://developers.google.com/machine-learning/crash-course/classification/accuracy)
 
 Tags: ModelEvaluation, Accuracy, ImbalancedData, BaselineModel, scikit-learn
