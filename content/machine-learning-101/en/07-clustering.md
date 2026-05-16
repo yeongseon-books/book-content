@@ -34,6 +34,8 @@ This is post 7 in the Machine Learning 101 series. Here we will compare KMeans a
 - Why does standardization change the result so dramatically?
 - Why should cluster labels be treated as hypotheses rather than truth?
 
+> Clustering exposes the latent structure in data through similarity. But validation does not end with a metric; the result only becomes meaningful when the numbers and the interpretation agree.
+
 ## Why It Matters
 
 Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.

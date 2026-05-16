@@ -34,6 +34,8 @@ This is the final post in the Machine Learning 101 series. Here we will connect 
 - Why do reproducibility and model cards matter after the experiment phase?
 - Why is monitoring the beginning of operations rather than the end of modeling?
 
+> ML success does not come from maximizing a score alone. Real success means completing the loop from problem definition through monitoring.
+
 ## Why It Matters
 
 A 0.95 score in a notebook is worth zero if the model never reaches users. Owning the full loop is what creates impact.

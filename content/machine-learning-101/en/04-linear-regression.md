@@ -34,6 +34,8 @@ This is post 4 in the Machine Learning 101 series. Here we will treat linear reg
 - Why are residuals the fastest way to test the model story?
 - Which failure modes show up before you ever need a more complex model?
 
+> Linear regression is the simplest model and still one of the strongest baselines. It also remains one of the most trustworthy reference points when interpretability matters.
+
 ## Why It Matters
 
 Linear regression is interpretable, fast, and surprisingly strong. Always run it first. Without a baseline, no complex model is justified.

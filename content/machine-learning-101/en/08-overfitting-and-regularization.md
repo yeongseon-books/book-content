@@ -34,6 +34,8 @@ This is post 8 in the Machine Learning 101 series. Here we will diagnose underfi
 - What can learning curves tell you that one score cannot?
 - Which regularization mistakes show up first in beginner workflows?
 
+> Overfitting means the model has memorized noise. Regularization is the mechanism that reduces model freedom so it can recover generalization.
+
 ## Why It Matters
 
 Half of every model improvement is regularization. The more capacity a model has, the more regularization keeps it alive.

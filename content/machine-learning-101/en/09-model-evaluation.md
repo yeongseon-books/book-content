@@ -34,6 +34,8 @@ This is post 9 in the Machine Learning 101 series. Here we will connect confusio
 - Why do MAE, RMSE, and `R^2` answer different questions?
 - Which evaluation mistakes quietly leak into model selection?
 
+> Model evaluation is a procedure you prove with code. One lesson here is that choosing the metric comes before choosing the model.
+
 ## Why It Matters
 
 Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.

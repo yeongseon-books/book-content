@@ -34,6 +34,8 @@ This is post 3 in the Machine Learning 101 series. Here we will use train/test s
 - When does K-fold cross-validation add signal over a single split?
 - Which leakage patterns usually show up before model tuning even begins?
 
+> A train/test split is not just cutting the data in two. It is the minimum experimental setup for measuring how the model behaves on data it has not seen yet.
+
 ## Why It Matters
 
 Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.
