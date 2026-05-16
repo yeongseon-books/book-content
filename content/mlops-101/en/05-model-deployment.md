@@ -30,7 +30,7 @@ This is post 5 in the MLOps 101 series.
 
 Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.
 
-## What This Post Answers
+## Questions this article answers
 
 - How do you connect a trained model file to a real user request?
 - How should you distinguish online, batch, and streaming inference?

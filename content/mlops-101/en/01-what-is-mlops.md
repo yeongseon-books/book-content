@@ -30,7 +30,7 @@ This is the first post in the MLOps 101 series.
 
 Here, we will treat MLOps not as a list of tool names, but as the operational loop that lets a model stay alive in production.
 
-## What This Post Answers
+## Questions this article answers
 
 - What makes MLOps different from simply attaching DevOps habits to ML?
 - Why do even accurate models break down quickly in real production systems?

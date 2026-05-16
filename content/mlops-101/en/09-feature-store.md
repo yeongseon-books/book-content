@@ -30,7 +30,7 @@ This is post 9 in the MLOps 101 series.
 
 Here, we will treat a feature store not as a storage box for features, but as the contract layer that lets training and serving share the same definitions.
 
-## What This Post Answers
+## Questions this article answers
 
 - Why does train-serve skew keep reappearing in ML systems?
 - What are the distinct roles of online and offline stores?
