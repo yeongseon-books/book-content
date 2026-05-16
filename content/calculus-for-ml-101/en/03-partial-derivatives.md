@@ -30,13 +30,13 @@ In this post, we'll use multivariable functions, fixed variables, and per-parame
 
 > A partial derivative is the rule that lets you ask one focused question at a time: if only this variable moved, how would the loss respond?
 
-## What You Will Learn
+## Questions this article answers
 
-- *Multivariable* functions
-- The definition of a *partial derivative*
-- The intuition of *holding variables*
-- *Per-variable* slopes
-- The meaning of ML *weights*
+- Why do you need to look at slopes one variable at a time in a function with multiple inputs?
+- In a partial derivative, what does it really mean to "hold the other variables fixed"?
+- Why can the same function produce different derivative values depending on which variable you differentiate with respect to?
+- Why do you need a clear variable order before you can build a gradient vector?
+- How do partial derivatives divide responsibility across weights in ML?
 
 ## Why It Matters
 

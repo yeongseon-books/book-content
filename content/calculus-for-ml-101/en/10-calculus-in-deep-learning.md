@@ -30,13 +30,13 @@ In this post, we'll walk through the forward pass, loss computation, backward pa
 
 > In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.
 
-## What You Will Learn
+## Questions this article answers
 
-- The *5 stages* of the training loop
-- *Forward pass*
-- *Loss computation*
-- *Backward pass*
-- *Weight update*
+- What stages make up the deep learning training loop, and where does calculus appear in each one?
+- How do the forward pass and loss computation prepare the work that backward needs to do?
+- How do gradient computation and the optimizer update connect?
+- Why do practical details such as `zero_grad`, eval/train mode, and reproducibility belong inside this loop?
+- How do all the calculus ideas from this series collapse into one final picture?
 
 ## Why It Matters
 

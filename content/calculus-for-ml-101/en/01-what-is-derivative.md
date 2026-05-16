@@ -30,13 +30,13 @@ In this post, we'll connect average rate of change, tangent lines, limits, and n
 
 > A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.
 
-## What You Will Learn
+## Questions this article answers
 
-- The *intuition* behind a derivative
-- *Rate of change* and the *tangent line*
-- The role of *limits*
-- *Numerical differentiation*
-- The *link to ML*
+- Why is learning in ML directly tied to derivatives?
+- What is the difference between average rate of change and instantaneous rate of change, and why does that distinction matter?
+- What is the most practical way to relate the slope of a tangent line to the derivative?
+- Why are limits indispensable in the definition of a derivative?
+- When is numerical differentiation useful, and how much should you trust it?
 
 ## Why It Matters
 

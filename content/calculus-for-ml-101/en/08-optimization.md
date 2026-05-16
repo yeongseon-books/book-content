@@ -30,13 +30,13 @@ In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization
 
 > Modern optimizers do not replace gradient descent with unrelated magic. They are gradient descent with extra machinery for stability, scale mismatch, and stage-specific control.
 
-## What You Will Learn
+## Questions this article answers
 
-- *Momentum*
-- *RMSProp*
-- *Adam*
-- *Learning-rate schedules*
-- Intuition for *regularization*
+- Where does plain gradient descent start to break down in real deep learning training?
+- Why is momentum easiest to understand through the metaphor of inertia?
+- How do RMSProp and Adam reduce coordinate-wise differences in gradient scale?
+- Why are learning-rate schedules and warmup as important as the optimizer itself?
+- How does regularization act as a control mechanism for generalization rather than just a penalty term?
 
 ## Why It Matters
 
