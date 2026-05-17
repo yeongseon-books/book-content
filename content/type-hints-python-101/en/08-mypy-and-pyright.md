@@ -18,43 +18,29 @@ tags:
   - Static Analysis
   - CI
 seo_description: Set up mypy and pyright for Python projects with gradual adoption, strict mode, and CI integration strategies.
-last_reviewed: '2026-05-15'
+last_reviewed: '2026-05-17'
 ---
 
 # Using mypy and pyright
 
-Writing type hints is only the first half of the job. Until a checker runs, a wrong return type and a missing `None` check are still just one merge away from production.
+Writing type hints is only half the job. If nobody runs a checker, a wrong return type or a missing `None` guard can sit quietly in the repository until runtime finally exposes it.
 
-This is post 8 in the Type Hints in Python 101 series. In this article, we will turn type hints into an actual engineering gate with mypy and pyright, then walk through the repository-scale rollout patterns that keep teams from drowning in hundreds of new errors.
+This is post 8 in the Type Hints in Python 101 series. In this article, we will follow one small repository from broken code to mypy output, pyright output, stricter configuration, and finally a CI gate so the same workflow stays enforceable after the first local fix.
 
 ## What You Will Learn
 
-- Differences between mypy and pyright and how to choose
-- Installing and configuring mypy for your project
-- Strict mode and gradual adoption strategies
-- Integrating type checking into CI pipelines
+- How to verify type hints without executing the program
+- How mypy and pyright report the same bug on the same codebase
+- How to tighten configuration gradually instead of enabling strict mode everywhere
+- How to turn local type checking into a team-wide CI rule
+
+> Type hints become valuable when they fail the build before production does.
 
 ## Why It Matters
 
-Type hints without verification are comments with extra syntax. A function signature might say `-> str` but return `None` — and nobody notices until production. Static analysis tools close this gap by catching type errors at development time, before tests, before code review, before deployment.
+Python does not enforce type hints at runtime. A function can declare `-> str` and still return `None`, and the interpreter will not object. Static type checkers close that gap by turning annotations into pre-runtime feedback.
 
-> Type checking = bugs caught before your code runs.
-
-mypy and pyright are the two most widely used type checkers for Python.
-
-## Concept at a Glance
-
-> Static type checkers analyze source code without executing it. They read type hints and report mismatches.
-
-```text
-Source code (.py)
-     │
-     ├─── mypy ──── type error report
-     │
-     └─── pyright ── type error report
-              │
-         VS Code real-time display
-```
+mypy and pyright both do that, but the useful operational question is bigger than tool choice. You need one example that fails, gets fixed, becomes stricter, and then gets enforced in CI. Otherwise the article stops at installation commands instead of giving readers a runnable workflow.
 
 ![Type-check feedback loop from local editing to the CI gate](../../../assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
 
@@ -64,259 +50,307 @@ Source code (.py)
 
 | Term | Description |
 | --- | --- |
-| mypy | The official Python type checker, maintained by the mypy team |
-| pyright | A fast type checker by Microsoft, built into Pylance for VS Code |
-| strict mode | Configuration that requires type hints on all functions |
-| stub file | A `.pyi` file providing type information for untyped libraries |
-| type: ignore | A comment that suppresses a type error on a specific line |
+| mypy | The most widely used static type checker in the Python ecosystem |
+| pyright | A fast type checker by Microsoft and the engine behind Pylance |
+| strict mode | A tighter configuration that treats missing annotations and loose inference more aggressively |
+| override | Per-module configuration that lets one directory be stricter than another |
+| CI gate | An automated step that blocks merges when type checking fails |
 
 ## Before / After
 
-**Before — No type checking:**
-
 ```python
-def get_user_name(user_id: int) -> str:
-    return None  # No error until runtime
+def normalize_user_id(raw_user_id: str) -> int:
+    return raw_user_id
 
 
-name = get_user_name(1)
-print(name.upper())  # AttributeError: NoneType
+def build_greeting(name: str | None) -> str:
+    return "Hello, " + name.upper()
 ```
 
-**After — mypy catches it:**
-
-```python
-def get_user_name(user_id: int) -> str:
-    return None  # mypy: error: Incompatible return value type
-    # (got "None", expected "str")
+```text
+$ mypy src
+src/accounts.py:5: error: Incompatible return value type (got "str", expected "int")
+src/accounts.py:9: error: Item "None" of "str | None" has no attribute "upper"
+Found 2 errors in 1 file (checked 1 source file)
 ```
 
-## Hands-On Steps
+That transition is the whole point: the code looked fine until a checker turned the contract into a failing workflow.
 
-### Step 1: Install and Run mypy
+## Follow One Mini Repository End to End
+
+This entire article uses the same example structure.
+
+```text
+typecheck-demo/
+├── pyproject.toml
+├── pyrightconfig.json
+├── src/
+│   └── accounts.py
+└── .github/
+    └── workflows/
+        └── type-check.yml
+```
+
+### Step 1: Start with a file that contains real type bugs
+
+```python
+# src/accounts.py
+from typing import TypedDict
+
+
+class UserRow(TypedDict):
+    id: int
+    email: str
+    display_name: str | None
+
+
+def normalize_user_id(raw_user_id: str) -> int:
+    return raw_user_id
+
+
+def build_greeting(user: UserRow) -> str:
+    return "Hello, " + user["display_name"].upper()
+
+
+def list_admin_emails(rows: list[UserRow]) -> list[str]:
+    return [row["email"] for row in rows if row["id"] in {1, 2, 3}]
+```
+
+Two deliberate problems are doing the teaching work here.
+
+- `normalize_user_id()` promises `int` but returns `str`.
+- `build_greeting()` assumes `display_name` is always present even though the type says `str | None`.
+
+### Step 2: Run mypy on that exact file
 
 ```bash
-pip install mypy
-mypy app.py
+python -m pip install mypy
+mypy src
 ```
+
+```text
+src/accounts.py:10: error: Incompatible return value type (got "str", expected "int")  [return-value]
+src/accounts.py:14: error: Item "None" of "str | None" has no attribute "upper"  [union-attr]
+Found 2 errors in 1 file (checked 1 source file)
+```
+
+mypy separates the return-type mismatch from the missing `None` handling. That is already more useful than “run a checker sometime” because the failure is concrete and reproducible.
+
+### Step 3: Run pyright on the same file
+
+```bash
+python -m pip install pyright
+pyright src
+```
+
+```text
+/Users/example/typecheck-demo/src/accounts.py
+  /Users/example/typecheck-demo/src/accounts.py:10:12 - error: Type "str" is not assignable to return type "int"
+    "str" is not assignable to "int" (reportReturnType)
+  /Users/example/typecheck-demo/src/accounts.py:14:38 - error: "upper" is not a known attribute of "None" (reportOptionalMemberAccess)
+2 errors, 0 warnings, 0 informations
+```
+
+pyright catches the same two bugs but formats them differently. That is why many teams use **pyright for editor feedback** and **mypy for the merge gate**, or vice versa. The point is not to force both as equals everywhere; it is to give each tool a clear role.
+
+### Step 4: Fix the code and confirm both checkers pass
 
 ```python
-# app.py
-def greet(name: str) -> str:
-    return "Hello, " + name
+# src/accounts.py
+from typing import TypedDict
 
 
-greet(42)  # mypy: error: Argument 1 has incompatible type "int"
+class UserRow(TypedDict):
+    id: int
+    email: str
+    display_name: str | None
+
+
+def normalize_user_id(raw_user_id: str) -> int:
+    return int(raw_user_id)
+
+
+def build_greeting(user: UserRow) -> str:
+    display_name = user["display_name"]
+    if display_name is None:
+        return "Hello, anonymous"
+    return "Hello, " + display_name.upper()
+
+
+def list_admin_emails(rows: list[UserRow]) -> list[str]:
+    return [row["email"] for row in rows if row["id"] in {1, 2, 3}]
 ```
 
-mypy works on files or directories. `mypy .` checks the entire project.
+```text
+$ mypy src
+Success: no issues found in 1 source file
 
-### Step 2: Configure mypy in pyproject.toml
+$ pyright src
+0 errors, 0 warnings, 0 informations
+```
+
+Now the annotations are not just documentation. They are a verified contract that fails when the implementation drifts.
+
+### Step 5: Establish a loose but repeatable baseline
+
+Do not begin with repository-wide strict mode. First, make sure the checker always looks at the same code and reports the same class of failures.
 
 ```toml
 # pyproject.toml
 [tool.mypy]
 python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+files = ["src"]
 check_untyped_defs = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-```
-
-Key options:
-
-- `disallow_untyped_defs`: flags functions without type hints as errors
-- `warn_return_any`: warns when a function returns Any
-- `overrides`: per-module configuration overrides
-
-### Step 3: Install and Configure pyright
-
-```bash
-pip install pyright
-pyright app.py
+warn_return_any = true
+warn_unused_ignores = true
 ```
 
 ```json
-// pyrightconfig.json
 {
-    "pythonVersion": "3.11",
-    "typeCheckingMode": "basic",
-    "reportMissingImports": true,
-    "reportMissingTypeStubs": false,
-    "include": ["src"],
-    "exclude": ["tests"]
+  "include": ["src"],
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false
 }
 ```
 
-pyright is built into VS Code's Pylance extension, providing real-time type feedback in the editor.
+This baseline does two jobs.
 
-### Step 4: Gradual Adoption Strategy
+- It makes the tool target explicit.
+- It gives the team a stable “this must pass” starting point before stricter rollout begins.
+
+### Step 6: Tighten one important module first
+
+The most common migration mistake is enabling strict mode for the entire repository in one shot. A safer pattern is to harden high-value paths first.
 
 ```toml
-# Phase 1: Basic checking
 [tool.mypy]
+python_version = "3.11"
+files = ["src"]
 check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
 
-# Phase 2: Require types on new code
-# disallow_untyped_defs = true
-
-# Phase 3: Full strict mode
-# strict = true
-```
-
-For existing projects, applying strict mode all at once can produce hundreds of errors. Adopt incrementally, module by module:
-
-```toml
-# Strict for core modules
 [[tool.mypy.overrides]]
-module = "src.core.*"
+module = "src.accounts"
 strict = true
 
-# Ignore legacy modules
 [[tool.mypy.overrides]]
 module = "src.legacy.*"
 ignore_errors = true
 ```
 
-### Step 5: CI Pipeline Integration
+```json
+{
+  "include": ["src"],
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "basic",
+  "strict": ["src/accounts.py"],
+  "exclude": ["src/legacy"]
+}
+```
+
+That is the practical rollout pattern: new or important modules fail harder first, while legacy code gets a temporary quarantine rather than blocking all progress.
+
+### Step 7: Put the same workflow into CI
 
 ```yaml
 # .github/workflows/type-check.yml
 name: Type Check
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
-  mypy:
+  static-type-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pip install mypy
-      - run: mypy src/
+      - name: Install checkers
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install mypy pyright
+      - name: Run mypy
+        run: mypy src
+      - name: Run pyright
+        run: pyright src
 ```
 
-Adding type checking to CI prevents type errors from being merged into the main branch.
+At this point the article finally reaches the operational finish line. The same repository that failed locally now fails automatically in pull requests, which is what turns type hints into a team standard rather than a personal preference.
 
-### Step 6: Ratchet Strictness One Directory at a Time
+### Step 8: Add operating rules so the workflow stays useful
 
-The most common migration failure is enabling strict mode for the entire repository in one shot. The error count spikes, the team loses trust, and type checking becomes "that thing we will clean up later." A better pattern is to measure the current baseline, then tighten one high-value directory at a time.
+Once checkers are in place, the next failure mode is noise. A few lightweight rules prevent that.
 
-```bash
-# Measure the current state
-mypy src/
-
-# Inspect only the modules you want to harden next
-mypy src/core src/api
-```
-
-```toml
-[tool.mypy]
-python_version = "3.11"
-check_untyped_defs = true
-
-[[tool.mypy.overrides]]
-module = "src.core.*"
-strict = true
-
-[[tool.mypy.overrides]]
-module = "src.integrations.*"
-disallow_any_generics = true
-
-[[tool.mypy.overrides]]
-module = "src.legacy.*"
-ignore_errors = true
-```
-
-The important part is governance, not just config. `legacy` should be a temporary quarantine zone, not a permanent hiding place. Teams that succeed revisit which package graduates to strict next instead of leaving the rollout frozen for months.
-
-### Step 7: Quarantine `type: ignore` and Record Why
-
-Some ignores are legitimate: a third-party package has no stubs yet, a plugin uses dynamic metaprogramming, or a framework pattern defeats the checker. The mistake is leaving bare `type: ignore` comments with no explanation.
+1. **Choose one merge gate.** For example, block PRs on mypy and keep pyright as fast editor feedback.
+2. **Require reasons for `type: ignore`.** Distinguish between missing stubs, tool limitations, and temporary exceptions.
+3. **Review strict-scope growth regularly.** `legacy` should be a migration zone, not a permanent exemption.
 
 ```python
 from third_party_sdk import build_client
 
 
-client = build_client()  # type: ignore[no-untyped-call]  # SDK v2 has no stubs yet
+client = build_client()  # type: ignore[no-untyped-call]  # SDK v2 still has no type stubs
 ```
-
-Treat these as debt items with metadata.
-
-- Include the error code so the suppression scope is explicit.
-- Note the reason in the code review or PR body.
-- Keep `warn_unused_ignores = true` enabled so stale ignores do not accumulate silently.
-
-### Step 8: Triage False Positives in a Fixed Order
-
-When a checker reports something suspicious, do not jump straight to suppression. The safest order is:
-
-1. Confirm whether it is a real bug.
-2. Check whether the signature is too broad (`Any`, `object`, oversized Union).
-3. Verify whether missing stubs or a version mismatch caused the noise.
-4. Only then add the narrowest possible ignore.
-
-When mypy and pyright disagree, the operational question is not "which tool is philosophically correct?" It is "which tool is our merge gate?" Pick one standard for CI, then use the other as editor support if it still adds value.
 
 ## What to Notice in This Code
 
-- mypy uses `pyproject.toml`; pyright uses `pyrightconfig.json`
-- Strict mode is adopted gradually, module by module
-- CI integration enforces type checking across the entire team
-- `type: ignore` is a last resort, not a first option
+- The important upgrade is not “install mypy” but “watch the same file fail, then pass”
+- mypy and pyright surface the same bug with different wording and error codes
+- Strictness scales better per module than per repository
+- CI is what turns static checking into an enforced workflow
 
 ## 5 Common Mistakes
 
 | Mistake | Problem | Fix |
 | --- | --- | --- |
-| Overusing `type: ignore` | Defeats the purpose of type checking | Fix the root cause; use ignore minimally |
-| Missing stub packages | Errors on third-party imports | Install `types-requests`, etc. |
-| Strict mode all at once | Hundreds of errors overwhelm the team | Adopt per-module over time |
-| Ignoring mypy cache | Slow runs on large projects | Keep `.mypy_cache/` in `.gitignore` but do not delete it |
-| Running both mypy and pyright as gates | Tools disagree on edge cases | Pick one as the CI standard |
+| Documenting commands without showing real failures | Readers never see what the checker actually catches | Use one broken file and include the output |
+| Enabling strict mode everywhere at once | Error volume overwhelms the team | Tighten one directory or module at a time |
+| Making both tools equal required gates | Edge-case differences create friction | Choose one merge gate and one support role |
+| Leaving bare `type: ignore` comments | Exceptions become invisible debt | Include the error code and the reason |
+| Relying on local runs only | Enforcement varies by developer habit | Run the checker in PR and push workflows |
 
 ## Real-World Applications
 
-- CI/CD pipelines with mypy as a required gate blocking PRs with type errors
-- VS Code + Pylance (pyright) for real-time type feedback during development
-- pre-commit hooks running mypy before every commit
-- Monorepos with per-module strict levels for gradual migration
-- Custom stub files for internal C extensions without type information
+- VS Code + Pylance showing pyright feedback while code is being written
+- GitHub Actions blocking PRs when mypy fails on service modules
+- Gradual strict-mode rollout that starts with `src/core` or `src/api`
+- Legacy directories quarantined temporarily while the team reduces debt in batches
 
 ## How Senior Engineers Think About This
 
-Senior engineers treat type checking as infrastructure, not a nice-to-have. It sits alongside tests, linting, and formatting as a non-negotiable CI gate. New projects start with strict mode on day one. Existing projects adopt it gradually, with new code held to a higher standard than legacy code.
+Senior engineers treat type checking as infrastructure, not decoration. The first question is not “which checker is cooler?” but “where does failure happen, and is that failure reproducible in CI?” New projects can start with the baseline immediately. Existing projects need a ratcheting strategy that keeps error counts survivable.
 
-Tool choice matters less than consistency. mypy and pyright occasionally disagree on edge cases. Requiring both to pass creates unnecessary friction. Pick one as the team standard, configure it in CI, and use the other as a supplementary editor tool.
+Consistency matters more than theoretical purity. Decide which tool is the merge gate, which packages get strict treatment next, and what counts as an acceptable suppression. Once those rules exist, type hints stop being optional metadata and start functioning as an engineering control.
 
 ## Checklist
 
-- [ ] Installed mypy or pyright and verified it runs
-- [ ] Added configuration to pyproject.toml or pyrightconfig.json
-- [ ] Established a gradual adoption strategy
-- [ ] Added type checking to the CI pipeline
-- [ ] Minimized `type: ignore` usage
+- [ ] Ran mypy and pyright on the same example module
+- [ ] Captured real failure output and verified the fixed success output
+- [ ] Added a baseline `pyproject.toml` and `pyrightconfig.json`
+- [ ] Chosen which module gets stricter checking first
+- [ ] Added a CI workflow that fails automatically on type errors
 
 ## Exercises
 
-1. Create a Python file with three intentional type errors. Run mypy, observe the error messages, and fix each one.
+1. Add one return-type bug and one missing-`None` guard to a file under `src/`, then compare the mypy and pyright messages.
 
-2. Configure `pyproject.toml` with strict mode for `src/` and relaxed rules for `tests/`. Verify that mypy applies different rules to each.
+2. Write a config where `src/core` is strict and `src/legacy` is temporarily relaxed.
 
-3. Write a GitHub Actions workflow that runs mypy on push and pull request events.
+3. Document an operating policy where mypy blocks merges but pyright remains an editor-first feedback tool.
 
 ## Summary and Next Steps
 
-mypy and pyright verify type hints statically, catching errors before runtime. Configure them in `pyproject.toml` or `pyrightconfig.json`, adopt strict mode gradually, and integrate into CI to enforce team-wide type safety. Pick one tool as the standard and use `type: ignore` sparingly.
+mypy and pyright matter when they participate in one continuous workflow: a broken file, a reproducible error report, a fixed implementation, stricter config, and an automated CI gate. That end-to-end path is what turns type hints into an actual quality barrier.
 
-In the next article, we will explore Pydantic — a library that uses type hints for runtime data validation.
+In the next article, we will move from static verification to runtime validation with Pydantic.
 
 <!-- toc:begin -->
 - [What Are Python Type Hints?](./01-what-is-type-hint.md)
@@ -337,7 +371,7 @@ In the next article, we will explore Pydantic — a library that uses type hints
 - [pyright documentation](https://github.com/microsoft/pyright)
 - [mypy configuration reference](https://mypy.readthedocs.io/en/stable/config_file.html)
 - [mypy docs — Using mypy with an existing codebase](https://mypy.readthedocs.io/en/stable/existing_code.html)
-- [mypy docs — Error codes and ignores](https://mypy.readthedocs.io/en/stable/error_codes.html)
+- [pyright configuration docs](https://microsoft.github.io/pyright/#/configuration)
 - [Real Python — Python Type Checking](https://realpython.com/python-type-checking/)
 
 Tags: Python, Type Hints, mypy, pyright, Static Analysis, CI
