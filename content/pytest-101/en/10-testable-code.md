@@ -22,9 +22,9 @@ title: Writing Testable Code
 
 # Writing Testable Code
 
-When testing feels painful, the problem is often not pytest. It is that one function is trying to calculate totals, call a payment API, write to storage, stamp the current time, and notify a user all at once. In this article, we'll make that pain concrete and then show how to redraw the boundary so the important rules become easy to verify.
-
 This is the final post in the pytest 101 series.
+
+When testing feels painful, the problem is often not pytest. It is that one function is trying to calculate totals, call a payment API, write to storage, stamp the current time, and notify a user all at once. In this article, we'll make that pain concrete and then show how to redraw the boundary so the important rules become easy to verify.
 
 ## What This Article Covers
 
