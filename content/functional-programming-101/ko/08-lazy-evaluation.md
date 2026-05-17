@@ -22,9 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 지연 평가와 제너레이터
 
-이 글은 Functional Programming 101 시리즈의 여덟 번째 글입니다.
-
 작은 데이터만 다룰 때는 리스트를 한 번에 만들어도 문제가 없습니다. 하지만 입력이 커지는 순간 이야기가 달라집니다. 로그 파일, 이벤트 스트림, 대용량 CSV처럼 전부 메모리에 올릴 수 없는 데이터를 다루기 시작하면 계산 시점을 늦추는 설계가 필요합니다.
+
+이 글은 Functional Programming 101 시리즈의 여덟 번째 글입니다.
 
 지연 평가는 "값이 정말 필요해질 때까지 계산하지 않는다"는 전략입니다. Python에서는 제너레이터와 iterator 프로토콜이 이 전략의 핵심 도구입니다. 이 글을 이해하면 `range`, `map`, `filter`, 파일 객체가 왜 메모리 효율적인지까지 함께 연결됩니다.
 
@@ -47,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 > eager는 값을 즉시 만들고, lazy는 필요해질 때까지 미룹니다.
 
-```text
-Eager Evaluation               Lazy Evaluation
-─────────────────             ─────────────────
-[1, 4, 9, 16, 25]            (waiting to compute...)
-Everything in memory          Produces one value at a time
-list()                        generator / iterator
-```
+![소비자가 끌어당기는 지연 파이프라인 흐름](../../../assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
+
+*지연 파이프라인에서는 소비자가 다음 값을 요청할 때만 각 단계가 한 레코드씩 움직입니다. 그래서 입력이 커져도 중간 결과 전체를 메모리에 쌓아 둘 필요가 없습니다.*
 
 ## 핵심 개념
 
@@ -216,19 +212,22 @@ for key, group in groupby(data):
 ### Step 5: 지연 파이프라인 만들기
 
 ```python
+from itertools import chain
+from pathlib import Path
 from typing import Iterator
 
 
-def read_lines(text: str) -> Iterator[str]:
-    """Yields lines from a text block."""
-    for line in text.strip().split("\n"):
-        yield line.strip()
+def read_lines(path: Path) -> Iterator[str]:
+    """Yields lines from a CSV file one at a time."""
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            yield line.rstrip("\n")
 
 def parse_csv(lines: Iterator[str]) -> Iterator[dict]:
     """Converts CSV lines into dictionaries."""
-    headers = next(lines).split(",")
+    headers = [header.strip() for header in next(lines).split(",")]
     for line in lines:
-        values = line.split(",")
+        values = [value.strip() for value in line.split(",")]
         yield dict(zip(headers, values))
 
 def filter_by_score(records: Iterator[dict], min_score: int) -> Iterator[dict]:
@@ -243,30 +242,66 @@ def format_output(records: Iterator[dict]) -> Iterator[str]:
         yield f"{r['name']}: {r['score']} points"
 
 
-# run the pipeline — every stage is lazy
-csv_text = """name,score
-Alice,85
-Bob,92
-Charlie,78
-Diana,95
-Eve,60"""
-
-pipeline = format_output(
-    filter_by_score(
-        parse_csv(read_lines(csv_text)),
-        min_score=80,
-    )
+# create a tiny sample file so the pipeline behaves like a real stream
+sample_path = Path("scores.csv")
+sample_path.write_text(
+    "\n".join(
+        [
+            "name,score",
+            "Alice,85",
+            "Bob,92",
+            "Charlie,78",
+            "Diana,95",
+            "Eve,60",
+        ]
+    ),
+    encoding="utf-8",
 )
 
-# consume results one at a time
-for line in pipeline:
-    print(line)
-# Alice: 85 points
-# Bob: 92 points
-# Diana: 95 points
+try:
+    # keep stage handles separate so you can inspect them in isolation
+    lines_stage = read_lines(sample_path)
+    header = next(lines_stage)
+    print(f"Header preview: {header}")
+
+    pipeline = format_output(
+        filter_by_score(
+            parse_csv(chain([header], lines_stage)),
+            min_score=80,
+        )
+    )
+
+    # consume results one at a time
+    for line in pipeline:
+        print(line)
+    # Alice: 85 points
+    # Bob: 92 points
+    # Diana: 95 points
+
+    print(list(pipeline))
+    # []
+finally:
+    sample_path.unlink(missing_ok=True)
 ```
 
 좋은 지연 파이프라인은 각 단계가 입력 iterator를 받아 출력 iterator를 돌려주는 형태를 유지합니다. 그 덕분에 단계별 테스트와 재조합이 쉬워집니다.
+
+#### 예상 출력
+
+```text
+Header preview: name,score
+Alice: 85 points
+Bob: 92 points
+Diana: 95 points
+[]
+```
+
+#### 결과가 다르면 먼저 확인할 점
+
+- 헤더가 `name,score`로 읽혔는지 확인합니다. 첫 줄을 잘못 건너뛰면 `score` 컬럼을 찾을 수 없습니다.
+- `min_score=80` 비교가 `>=`인지 확인합니다. `>`로 바뀌면 `Alice`가 빠집니다.
+- `rstrip("\n")`이나 `strip()`이 빠지면 이름 끝 개행 때문에 출력이 어긋날 수 있습니다.
+- 마지막 `print(list(pipeline))`가 `[]`인지 확인합니다. generator는 한 번 소비하면 다시 비어 있어야 정상입니다.
 
 ## 이 코드에서 주목할 점
 

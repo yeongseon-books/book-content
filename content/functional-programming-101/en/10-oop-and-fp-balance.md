@@ -24,9 +24,9 @@ last_reviewed: '2026-05-04'
 
 Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.
 
-Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.
-
 This is the final post in the Functional Programming 101 series.
+
+Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.
 
 ## What You Will Learn
 
@@ -317,44 +317,35 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 # After discount: 945
 ```
 
-### Step 5: Design Decision Checklist
+### Step 5: Executable Hybrid Workflow
 
 ```python
-"""
-Paradigm selection checklist:
-
-1. Does state change together with behavior?
-   -> Yes: class (OOP)
-   -> No: function (FP)
-
-2. Do you need multiple instances?
-   -> Yes: class (OOP)
-   -> No: module-level function (FP)
-
-3. Is data transformation the main goal?
-   -> Yes: pure function pipeline (FP)
-   -> No: judge by context
-
-4. Does the framework require classes?
-   -> Yes: class (OOP) + internal logic as FP
-   -> No: choose freely
-
-5. Is testability a priority?
-   -> Yes: pure functions first (FP)
-   -> State testing needed: class (OOP)
-"""
-
-# practical hybrid pattern: immutable value objects + pure functions + thin class shell
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class Config:
+class RawConfig:
+    host: str
+    port: str
+    debug: str
+
+
+@dataclass(frozen=True)
+class AppConfig:
     host: str
     port: int
     debug: bool
 
-def validate_config(config: Config) -> list[str]:
+
+def normalize_config(raw: RawConfig) -> AppConfig:
+    return AppConfig(
+        host=raw.host.strip(),
+        port=int(raw.port),
+        debug=raw.debug.strip().lower() in {"1", "true", "yes"},
+    )
+
+
+def validate_config(config: AppConfig) -> list[str]:
     errors = []
     if not config.host:
         errors.append("host is required")
@@ -363,12 +354,58 @@ def validate_config(config: Config) -> list[str]:
     return errors
 
 
-config = Config(host="localhost", port=8080, debug=True)
-errors = validate_config(config)
-if not errors:
-    print(f"Config valid: {config}")
-# Config valid: Config(host='localhost', port=8080, debug=True)
+class AppServer:
+    def __init__(self, config: AppConfig) -> None:
+        self.config = config
+
+    def start(self) -> str:
+        mode = "debug" if self.config.debug else "prod"
+        return f"starting server on {self.config.host}:{self.config.port} ({mode})"
+
+
+def boot(raw: RawConfig) -> str:
+    normalized = normalize_config(raw)
+    errors = validate_config(normalized)
+    if errors:
+        return f"validation failed: {errors}"
+    server = AppServer(normalized)
+    return server.start()
+
+
+good = RawConfig(host=" localhost ", port="8080", debug="yes")
+bad_host = RawConfig(host="   ", port="8080", debug="yes")
+bad_port = RawConfig(host="api.internal", port="70000", debug="no")
+
+assert normalize_config(good) == AppConfig(host="localhost", port=8080, debug=True)
+assert boot(good) == "starting server on localhost:8080 (debug)"
+assert boot(bad_host) == "validation failed: ['host is required']"
+assert boot(bad_port) == "validation failed: ['port must be 1-65535']"
+
+print("Normalized config:", normalize_config(good))
+print("Success run:", boot(good))
+print("Missing host:", boot(bad_host))
+print("Bad port:", boot(bad_port))
+# Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+# Success run: starting server on localhost:8080 (debug)
+# Missing host: validation failed: ['host is required']
+# Bad port: validation failed: ['port must be 1-65535']
 ```
+
+#### Expected output
+
+```text
+Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+Success run: starting server on localhost:8080 (debug)
+Missing host: validation failed: ['host is required']
+Bad port: validation failed: ['port must be 1-65535']
+```
+
+#### If your result differs, inspect this first
+
+- Make sure `normalize_config()` still calls `host.strip()`. A host made of whitespace should become an empty string before validation.
+- Check that `port` is converted to `int` before range validation. Comparing the raw string can let invalid ports slip through.
+- Make sure validation failure stops before `AppServer` is constructed. That edge is the whole point of keeping shell code outside the functional core.
+- Confirm the success path lives in the thin class shell while normalization and validation stay pure. That separation is the design rule the example is trying to prove.
 
 ## What to Notice in This Code
 

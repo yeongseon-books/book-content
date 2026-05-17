@@ -325,44 +325,35 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 
 이 예제는 패러다임 선택이 정체성이 아니라 상황 판단임을 잘 보여 줍니다. 상태를 오래 들고 있어야 하면 OOP, 데이터만 바꾸면 되면 FP가 더 자연스럽습니다.
 
-### Step 5: 설계 판단 체크리스트
+### Step 5: 실행 가능한 하이브리드 설계 워크플로
 
 ```python
-"""
-Paradigm selection checklist:
-
-1. Does state change together with behavior?
-   -> Yes: class (OOP)
-   -> No: function (FP)
-
-2. Do you need multiple instances?
-   -> Yes: class (OOP)
-   -> No: module-level function (FP)
-
-3. Is data transformation the main goal?
-   -> Yes: pure function pipeline (FP)
-   -> No: judge by context
-
-4. Does the framework require classes?
-   -> Yes: class (OOP) + internal logic as FP
-   -> No: choose freely
-
-5. Is testability a priority?
-   -> Yes: pure functions first (FP)
-   -> State testing needed: class (OOP)
-"""
-
-# practical hybrid pattern: immutable value objects + pure functions + thin class shell
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class Config:
+class RawConfig:
+    host: str
+    port: str
+    debug: str
+
+
+@dataclass(frozen=True)
+class AppConfig:
     host: str
     port: int
     debug: bool
 
-def validate_config(config: Config) -> list[str]:
+
+def normalize_config(raw: RawConfig) -> AppConfig:
+    return AppConfig(
+        host=raw.host.strip(),
+        port=int(raw.port),
+        debug=raw.debug.strip().lower() in {"1", "true", "yes"},
+    )
+
+
+def validate_config(config: AppConfig) -> list[str]:
     errors = []
     if not config.host:
         errors.append("host is required")
@@ -371,14 +362,60 @@ def validate_config(config: Config) -> list[str]:
     return errors
 
 
-config = Config(host="localhost", port=8080, debug=True)
-errors = validate_config(config)
-if not errors:
-    print(f"Config valid: {config}")
-# Config valid: Config(host='localhost', port=8080, debug=True)
+class AppServer:
+    def __init__(self, config: AppConfig) -> None:
+        self.config = config
+
+    def start(self) -> str:
+        mode = "debug" if self.config.debug else "prod"
+        return f"starting server on {self.config.host}:{self.config.port} ({mode})"
+
+
+def boot(raw: RawConfig) -> str:
+    normalized = normalize_config(raw)
+    errors = validate_config(normalized)
+    if errors:
+        return f"validation failed: {errors}"
+    server = AppServer(normalized)
+    return server.start()
+
+
+good = RawConfig(host=" localhost ", port="8080", debug="yes")
+bad_host = RawConfig(host="   ", port="8080", debug="yes")
+bad_port = RawConfig(host="api.internal", port="70000", debug="no")
+
+assert normalize_config(good) == AppConfig(host="localhost", port=8080, debug=True)
+assert boot(good) == "starting server on localhost:8080 (debug)"
+assert boot(bad_host) == "validation failed: ['host is required']"
+assert boot(bad_port) == "validation failed: ['port must be 1-65535']"
+
+print("Normalized config:", normalize_config(good))
+print("Success run:", boot(good))
+print("Missing host:", boot(bad_host))
+print("Bad port:", boot(bad_port))
+# Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+# Success run: starting server on localhost:8080 (debug)
+# Missing host: validation failed: ['host is required']
+# Bad port: validation failed: ['port must be 1-65535']
 ```
 
 팀 차원의 기준을 만들 때도 결국 이런 질문이 필요합니다. 상태가 핵심인가, 변환이 핵심인가, 테스트 우선순위는 무엇인가. 이 기준이 없으면 패러다임 논쟁은 금방 취향 싸움이 됩니다.
+
+#### 예상 출력
+
+```text
+Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+Success run: starting server on localhost:8080 (debug)
+Missing host: validation failed: ['host is required']
+Bad port: validation failed: ['port must be 1-65535']
+```
+
+#### 결과가 다르면 먼저 확인할 점
+
+- `normalize_config()`가 `host.strip()`을 호출하는지 확인합니다. 공백만 있는 호스트는 정규화 뒤 빈 문자열이어야 합니다.
+- `port`를 `int`로 바꾼 뒤 범위를 검사하는지 확인합니다. 문자열 상태로 비교하면 잘못된 포트가 통과할 수 있습니다.
+- 검증 실패 시 `AppServer`를 만들지 않는지 확인합니다. 이 경계가 무너지면 shell이 core의 오류를 무시하게 됩니다.
+- 성공 경로는 클래스 셸이 맡고, 정규화와 검증은 순수 함수가 맡는지 확인합니다. 이 역할 분리가 하이브리드 설계의 핵심입니다.
 
 ## 이 코드에서 주목할 점
 

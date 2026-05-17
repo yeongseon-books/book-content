@@ -427,11 +427,62 @@ events = [
     OrderEvent("A-4", "busan", 27000, "KRW", "paid", "direct"),
 ]
 
-print(settle_orders(events))
-# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+normalized = normalize_currency(events)
+assert [(e.order_id, e.amount, e.currency) for e in normalized] == [
+    ("A-1", 48000, "KRW"),
+    ("A-2", 57960, "KRW"),
+    ("A-3", 31000, "KRW"),
+    ("A-4", 27000, "KRW"),
+]
+
+active = drop_cancelled(normalized)
+assert [e.order_id for e in active] == ["A-1", "A-2", "A-4"]
+
+marketplace_only = keep_marketplace(active)
+assert [e.order_id for e in marketplace_only] == ["A-1", "A-2"]
+
+with_margin = enrich_margin(marketplace_only)
+assert [(e.order_id, e.margin) for e in with_margin] == [
+    ("A-1", 8640),
+    ("A-2", 10432),
+]
+
+report = to_store_report(with_margin)
+assert report == {
+    "seoul": {"revenue": 105960, "margin": 19072, "orders": 2}
+}
+
+print("Normalized IDs:", [e.order_id for e in normalized])
+print("After cancellation filter:", [e.order_id for e in active])
+print("Marketplace IDs:", [e.order_id for e in marketplace_only])
+print("Store report:", report)
+
+print("Pipeline report:", settle_orders(events))
+# Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+# After cancellation filter: ['A-1', 'A-2', 'A-4']
+# Marketplace IDs: ['A-1', 'A-2']
+# Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+# Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 ```
 
 이 예시는 장난감 문자열 변환보다 실무에 더 가깝습니다. 통화 정규화, 취소 주문 제외, 채널 필터링, 마진 보강, 매장별 집계가 순차적으로 드러나기 때문에, 장애가 나도 어느 단계에서 값이 달라졌는지 바로 추적할 수 있습니다.
+
+#### 예상 출력
+
+```text
+Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+After cancellation filter: ['A-1', 'A-2', 'A-4']
+Marketplace IDs: ['A-1', 'A-2']
+Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+```
+
+#### 결과가 다르면 먼저 확인할 점
+
+- USD 환율이 `1380`인지 확인합니다. 여기 값이 달라지면 `A-2` 금액과 최종 집계가 모두 달라집니다.
+- `drop_cancelled()`가 `cancelled` 상태를 정확히 제외하는지 확인합니다. `A-3`가 남아 있으면 부산 매장이 보고서에 등장합니다.
+- `keep_marketplace()`가 `source == "marketplace"`만 남기는지 확인합니다. `A-4`가 남아 있으면 direct 주문이 섞입니다.
+- 마진 공식이 `int(e.amount * 0.18)`인지 확인합니다. 반올림 방식이 달라지면 `19072`가 맞지 않을 수 있습니다.
 
 ## 이 코드에서 주목할 점
 
