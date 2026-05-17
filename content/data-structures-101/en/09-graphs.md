@@ -110,15 +110,23 @@ class Graph:
         return iter(self._adj)
 
 
-g = Graph()
-for u, v in [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E")]:
-    g.add_edge(u, v)
+service_graph = Graph(directed=True)
+for u, v in [
+    ("api-gateway", "auth-service"),
+    ("api-gateway", "catalog-service"),
+    ("auth-service", "user-db"),
+    ("catalog-service", "inventory-service"),
+    ("inventory-service", "warehouse-db"),
+    ("inventory-service", "cache"),
+    ("cache", "warehouse-db"),
+]:
+    service_graph.add_edge(u, v)
 
-for node in g:
-    print(node, g.neighbors(node))
+for node in service_graph:
+    print(node, service_graph.neighbors(node))
 ```
 
-This stores the adjacency list as dict + list. Memory usage is O(V + E).
+This stores the adjacency list as dict + list. Memory usage is O(V + E), which is why it is the right default for sparse real-world graphs such as service dependencies.
 
 ### Step 2: Represent a graph with an adjacency matrix
 
@@ -138,105 +146,127 @@ class MatrixGraph:
         return self.matrix[u][v] != 0
 
 
-g = MatrixGraph(5)
-g.add_edge(0, 1); g.add_edge(0, 2); g.add_edge(1, 3); g.add_edge(2, 3); g.add_edge(3, 4)
-print(g.has_edge(0, 1))   # True
-print(g.has_edge(1, 2))   # False
+matrix_graph = MatrixGraph(4, directed=True)
+matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
+print(matrix_graph.has_edge(0, 1))   # True
+print(matrix_graph.has_edge(1, 0))   # False
 ```
 
 The matrix uses O(V^2) memory but answers "is there an edge?" in O(1). It is a good fit when the vertex count is small and the graph is dense.
 
-### Step 3: BFS (shortest path length)
+### Step 3: BFS (shortest path)
 
 ```python
 from collections import deque
 
 
-def bfs_shortest(g, start, target):
-    visited = {start: 0}
+def bfs_path(g, start, target):
+    visited = {start}
+    prev = {start: None}
     queue = deque([start])
     while queue:
         u = queue.popleft()
         if u == target:
-            return visited[u]
+            path = []
+            while u is not None:
+                path.append(u)
+                u = prev[u]
+            return list(reversed(path))
         for v, _ in g.neighbors(u):
             if v not in visited:
-                visited[v] = visited[u] + 1
+                visited.add(v)
+                prev[v] = u
                 queue.append(v)
-    return -1
+    return []
 
 
-print(bfs_shortest(g, "A", "E"))   # 3
+path = bfs_path(service_graph, "api-gateway", "warehouse-db")
+print(path)
+print(f"hop count: {len(path) - 1}")
+
+expected = [
+    "api-gateway",
+    "catalog-service",
+    "inventory-service",
+    "warehouse-db",
+]
+print(f"path matches expectation: {path == expected}")
+
+# ['api-gateway', 'catalog-service', 'inventory-service', 'warehouse-db']
+# hop count: 3
+# path matches expectation: True
 ```
 
-BFS visits closer vertices first, so it naturally yields the shortest path in an unweighted graph.
+BFS visits closer vertices first, so it naturally yields the shortest path in an unweighted graph. If this path or hop count differs, you probably lost the queue discipline, marked `visited` too late, or mixed edge direction by mistake.
 
 ### Step 4: DFS (recursive)
 
 ```python
-def dfs(g, start, visited=None):
+def dfs(g, start, visited=None, order=None):
     if visited is None:
         visited = set()
+    if order is None:
+        order = []
     visited.add(start)
-    print(start, end=" ")
+    order.append(start)
     for v, _ in g.neighbors(start):
         if v not in visited:
-            dfs(g, v, visited)
+            dfs(g, v, visited, order)
+    return order
 
 
-dfs(g, "A")   # e.g. A B D C E
-print()
+print(dfs(service_graph, "api-gateway"))
+# ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
 ```
 
 DFS walks one branch all the way down before backtracking. It is the workhorse of cycle detection, topological sort, and connected-component traversal.
 
-### Step 5: Cycle detection and connected components
+### Step 5: Cycle detection in a dependency graph
 
 ```python
-def has_cycle(g, start, visited=None, parent=None):
-    if visited is None:
-        visited = set()
-    visited.add(start)
-    for v, _ in g.neighbors(start):
-        if v not in visited:
-            if has_cycle(g, v, visited, start):
-                return True
-        elif v != parent:
-            return True
-    return False
-
-
-
-def connected_components(g):
+def has_cycle_directed(g):
     visited = set()
-    components = []
-    for node in g:
-        if node not in visited:
-            comp = set()
-            stack = [node]
-            while stack:
-                u = stack.pop()
-                if u in comp:
-                    continue
-                comp.add(u)
-                for v, _ in g.neighbors(u):
-                    stack.append(v)
-            components.append(comp)
-            visited.update(comp)
-    return components
+    active = set()
+
+    def walk(node):
+        visited.add(node)
+        active.add(node)
+        for neighbor, _ in g.neighbors(node):
+            if neighbor not in visited and walk(neighbor):
+                return True
+            if neighbor in active:
+                return True
+        active.remove(node)
+        return False
+
+    return any(node not in visited and walk(node) for node in g)
 
 
-print(has_cycle(g, "A"))           # True (A-B-D-C-A)
-print(connected_components(g))     # [{'A','B','C','D','E'}]
+dependency_graph = Graph(directed=True)
+for u, v in [
+    ("web", "auth"),
+    ("auth", "payments"),
+    ("payments", "ledger"),
+    ("ledger", "web"),
+]:
+    dependency_graph.add_edge(u, v)
+
+
+cycle_found = has_cycle_directed(dependency_graph)
+print(cycle_found)
+print(f"topological traversal possible: {not cycle_found}")
+
+# True
+# topological traversal possible: False
 ```
 
-Both are applications of DFS. Cycle detection shows up in friend-network validation and dependency-graph validation; connected components power clustering and network analysis.
+This is the DFS-style verification loop you need in practice: a back edge means the dependency graph cannot be topologically ordered. If `cycle_found` is `False` here, you probably treated a directed graph as undirected or forgot to track the active recursion stack.
 
 ## Notable Points
 
 - An adjacency list suits sparse graphs, while a matrix suits dense graphs
-- BFS and DFS share the same code; only the data structure changes (queue vs stack)
-- In an undirected graph, cycle detection has to track the parent vertex to be correct
+- BFS and DFS share the same traversal skeleton; queue vs recursion/stack changes the behaviour
+- In a directed graph, cycle detection has to track the active recursion stack to be correct
 - A graph is the generalisation of a tree and is the basic vocabulary of relational modelling
 
 ## Five Common Mistakes
