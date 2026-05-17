@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Binary Search Trees
 
-> Data Structures 101 series (7/10)
+This is the seventh post in the Data Structures 101 series.
 
 <!-- a-grade-intro:begin -->
 
@@ -32,8 +32,6 @@ last_reviewed: '2026-05-04'
 > A binary search tree (BST) is a binary tree with one simple rule: the left child is smaller than its parent and the right child is larger. That single rule gives you average O(log n) search, insert, and delete. But when the tree leans to one side, performance collapses to O(n), which is why production systems use balanced variants such as AVL or red-black trees. This article walks through how a BST works, where it breaks, and why balanced trees exist.
 
 <!-- a-grade-intro:end -->
-
-This is post 7 in the Data Structures 101 series.
 
 ## What You Will Learn
 
@@ -52,19 +50,10 @@ BSTs are the foundation of database indexes, file system metadata, memory alloca
 
 > A BST is a "sorted tree". Every node maintains an invariant: the entire left subtree is smaller than the node, and the entire right subtree is larger. That invariant lets you discard half the data at every step, which is what makes average O(log n) search possible.
 
-```text
-Balanced BST (height 2)        Skewed BST (height 4)
-        50                          10
-       /  \                          \
-      30   70                        20
-     / \   / \                        \
-    20 40 60 80                       30
-                                       \
-                                       40
-                                        \
-                                        50
-Search O(log n)                Search O(n)
-```
+### BST balanced vs skewed
+
+![BST balanced vs skewed](../../../assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
+*Figure. With the same seven keys, the balanced BST keeps the search path short while the skewed BST stretches the path almost linearly. That difference in height is why a BST can deliver average O(log n) search yet still collapse to O(n) in the worst case.*
 
 ## Key Terms
 
@@ -197,33 +186,65 @@ Delete splits into three cases based on the number of children, and the two-chil
 ### Step 5: The tragedy of an unbalanced BST
 
 ```python
-# Inserting sorted input produces a tree that leans entirely to one side
-import time
+from random import Random
 
-skewed = None
-for v in range(10_000):
-    skewed = insert(skewed, v)
 
-start = time.perf_counter()
-search(skewed, 9999)
-print(f"Skewed BST search: {(time.perf_counter() - start) * 1e6:.0f} us")
+def build_bst(values):
+    root = None
+    for value in values:
+        root = insert(root, value)
+    return root
 
-# Shuffling restores natural balance
-import random
 
-values = list(range(10_000))
-random.shuffle(values)
+def tree_height(node):
+    if node is None:
+        return -1
+    return 1 + max(tree_height(node.left), tree_height(node.right))
 
-balanced = None
-for v in values:
-    balanced = insert(balanced, v)
 
-start = time.perf_counter()
-search(balanced, 9999)
-print(f"Balanced BST search: {(time.perf_counter() - start) * 1e6:.0f} us")
+def search_steps(root, key):
+    steps = 0
+    while root is not None:
+        steps += 1
+        if key == root.key:
+            return steps
+        root = root.left if key < root.key else root.right
+    return steps
+
+
+values = list(range(31))
+shuffled_values = values[:]
+Random(42).shuffle(shuffled_values)
+
+skewed = build_bst(values)
+less_skewed = build_bst(shuffled_values)
+target = values[-1]
+
+skewed_height = tree_height(skewed)
+less_skewed_height = tree_height(less_skewed)
+skewed_steps = search_steps(skewed, target)
+less_skewed_steps = search_steps(less_skewed, target)
+
+print({
+    "skewed_height": skewed_height,
+    "shuffled_height": less_skewed_height,
+    "skewed_steps": skewed_steps,
+    "shuffled_steps": less_skewed_steps,
+})
+
+shape_check = (
+    skewed_height == len(values) - 1
+    and less_skewed_height < skewed_height
+    and less_skewed_steps < skewed_steps
+)
+print(f"shape check passed: {shape_check}")
+
+# Expected shape:
+# {'skewed_height': 30, 'shuffled_height': <much smaller>, 'skewed_steps': 31, 'shuffled_steps': <smaller>}
+# shape check passed: True
 ```
 
-If you feed sorted data straight in, the BST degenerates into a linked list. That limitation is exactly why balanced trees (AVL, red-black) were invented.
+If you feed sorted data straight in, the BST degenerates into a linked list. The verification above checks shape directly, not just timing noise. If the gap does not appear, you probably shuffled incorrectly, introduced balancing logic by accident, or counted search steps incorrectly.
 
 ## Notable Points
 
