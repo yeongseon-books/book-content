@@ -18,246 +18,393 @@ tags:
   - Code Quality
   - Team Guidelines
 seo_description: Practical guidelines for applying type hints effectively with gradual typing, team standards, and anti-patterns to avoid.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-17'
 ---
 
 # Type Hint Best Practices
 
-This is the final post in the Type Hints in Python 101 series.
+Type hints do not improve code just because there are more of them. But if the important signatures stay vague, the static checks from the previous article and the runtime boundaries from Pydantic never get enough structure to help. The real question is where to harden first.
 
-> Type Hints in Python 101 Series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Where, how much, and at what level should you apply type hints to maximize return on investment?
-
-> Annotating every variable makes code verbose. Annotating nothing makes large projects unmaintainable. The sweet spot is somewhere in between, and it depends on your project size, team experience, and code lifespan. This final article establishes practical guidelines for applying type hints effectively — where to focus, what to avoid, and how to scale type safety across a team.
-
-<!-- a-grade-intro:end -->
+This is the final post in the Type Hints in Python 101 series. In this article, we will take one loose `order_service.py` module and run a full hardening pass on it: replacing `Any`, making return types explicit, narrowing unions with helper functions, and verifying the result with a checker so the advice ends as runnable code rather than placeholders.
 
 ## What You Will Learn
 
-- Gradual typing principles and strategy
-- Where to prioritize type hint investment
-- Team-level guidelines and configuration
-- Anti-patterns to avoid
+- Where type hint investment pays off first
+- How to shrink `Any` without trying to annotate every local variable
+- Why return types and public APIs should be hardened before internal details
+- How to turn team guidelines into actual checker configuration
+
+> Good type-hint strategy is not “annotate everything.” It is “make high-cost failure paths fail early.”
 
 ## Why It Matters
 
-Type hints are a tool, and tools require strategy. Blindly applying strict mode to a legacy codebase creates hundreds of errors and demoralizes the team. Applying no type hints at all wastes the opportunity to catch bugs early. A balanced approach — focused on high-value locations with gradual expansion — delivers the most benefit with the least friction.
+Legacy Python modules usually combine two problems. First, public function signatures are vague enough that callers do not know the contract. Second, one `Any` return type leaks into half the file and quietly disables the checker downstream.
 
-> Type hints = code contracts. The scope of the contract depends on the situation.
-
-Gradual typing is a core philosophy of Python's type system.
+This article is meant to close the loop from episodes 8 and 9. If type hints are going to become a real engineering habit, you need more than principles. You need a repeatable way to take a messy module, harden it in the right order, and verify that the new contract actually holds.
 
 ## Concept at a Glance
 
-> Type hint investment flows from the outside in: public APIs first, then core logic, then internal helpers.
-
 ```text
-Public API (function signatures)     ← Priority 1
-     │
-Core business logic                  ← Priority 2
-     │
-Internal utilities / helpers         ← Priority 3
-     │
-Test code                            ← Optional
-     │
-Scripts / one-off code               ← Not needed
+Loose signatures / Any spread
+            │
+Public API + return types hardened
+            │
+Inputs and outputs made explicit
+            │
+Union narrowing moved into helpers
+            │
+Checker passes + team rules recorded
 ```
 
 ## Key Concepts
 
 | Term | Description |
 | --- | --- |
-| Gradual typing | Adopting type hints incrementally, expanding coverage over time |
-| Public API | Functions, classes, and methods called by external code |
-| Return type | The type annotation on a function's return value |
-| Type narrowing | Using checks like `isinstance` to refine a Union to a specific type |
-| Any | Compatible with every type — effectively disables type checking |
+| Gradual typing | Strengthening types incrementally instead of all at once |
+| Public API | Functions, methods, or classes called from other modules |
+| Type narrowing | Refining a Union with checks such as `isinstance` or `is None` |
+| Any | Compatible with every type, which also means it can cut off type-checker visibility |
+| hardening pass | A focused refactor that strengthens contracts and validates them |
 
 ## Before / After
 
-**Before — Undisciplined type hints:**
-
 ```python
 from typing import Any
 
 
-def process(data: Any) -> Any:
-    result: Any = data.get("value")
-    items: list[Any] = result.split(",")
-    count: int = len(items)
-    return count
+def process_order(payload: Any) -> Any:
+    order_id = payload.get("order_id")
+    user = payload.get("user")
+    return {"order_id": order_id, "email": user.get("email")}
 ```
 
-**After — Purposeful type hints:**
-
 ```python
-def process(data: dict[str, str]) -> int:
-    result = data.get("value", "")
-    items = result.split(",")
-    return len(items)
+class OrderPayload(TypedDict):
+    order_id: int | str
+    user: dict[str, str | None]
+
+
+def process_order(payload: OrderPayload) -> dict[str, str]:
+    order_id = parse_order_id(payload["order_id"])
+    email = require_user_email(payload["user"])
+    return {"order_id": str(order_id), "email": email}
 ```
 
-Precise types on the signature, inferred types for locals.
+The important move is not “add more annotations everywhere.” It is “make the boundary contract precise and move uncertainty into explicit helpers.”
 
-## Hands-On Steps
+## Run One Module Through a Hardening Pass
 
-### Step 1: Start with Function Signatures
+This entire article uses a single `order_service.py` example.
 
-```python
-# Priority 1: Public function parameters and return types
-def calculate_total(prices: list[int], tax_rate: float) -> int:
-    subtotal = sum(prices)  # local — let type checker infer
-    tax = int(subtotal * tax_rate)
-    return subtotal + tax
-
-
-# Public methods too
-class OrderService:
-    def create_order(self, items: list[str], customer_id: int) -> dict[str, object]:
-        ...
-
-    def _validate_items(self, items):
-        # Private methods are lower priority
-        ...
-```
-
-Function signatures deliver the highest ROI. They tell callers what to pass and what to expect.
-
-### Step 2: Always Annotate Return Types
+### Step 1: Start with a loose module
 
 ```python
-# Good: return type is explicit
-def find_user(user_id: int) -> User | None:
-    ...
-
-
-# Bad: caller must read the implementation to know the return type
-def find_user(user_id: int):
-    ...
-```
-
-Return types matter more than parameter types. Callers know what they are passing but not what they are getting back.
-
-### Step 3: Minimize Any
-
-```python
+# order_service.py
 from typing import Any
 
-# Bad: Any propagates and disables type checking
+
+def find_user(user_id):
+    if user_id == 1:
+        return {"id": 1, "email": "buyer@example.com", "is_active": True}
+    return None
+
+
 def get_config() -> Any:
-    ...
-
-value = get_config()  # value: Any — everything downstream loses type info
+    return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
 
 
-# Good: specific types
-def get_config() -> dict[str, str | int | bool]:
-    ...
+class OrderService:
+    def create_order(self, payload):
+        user = find_user(payload.get("user_id"))
+        config = get_config()
+        total = sum(item["price"] * item["quantity"] for item in payload.get("items", []))
+        return {
+            "order_id": payload.get("order_id"),
+            "user_email": user.get("email"),
+            "currency": config["currency"],
+            "total": total,
+        }
 ```
 
-`Any` is a declaration of surrender. Use `object` or specific types instead. Reserve `Any` for genuinely unavoidable cases.
+This file has multiple structural problems.
 
-### Step 4: Use Type Narrowing
+- `find_user()` and `create_order()` barely describe their contract.
+- `get_config()` returns `Any`, so downstream checking goes soft immediately.
+- `payload.get()` means required fields can silently disappear.
+- `user` may be `None`, but `user.get()` assumes the opposite.
+
+### Step 2: Harden public signatures and return types first
+
+In practice, signatures matter more than local variables because they define what every caller is allowed to do.
 
 ```python
-def process(value: str | int | None) -> str:
-    if value is None:
-        return "default"
+from typing import TypedDict
 
-    if isinstance(value, int):
-        return str(value)
 
-    # value is narrowed to str
-    return value.upper()
+class UserRecord(TypedDict):
+    id: int
+    email: str
+    is_active: bool
+
+
+class OrderItem(TypedDict):
+    name: str
+    price: int
+    quantity: int
+
+
+class OrderPayload(TypedDict):
+    order_id: int | str
+    user_id: int
+    items: list[OrderItem]
+
+
+def find_user(user_id: int) -> UserRecord | None:
+    if user_id == 1:
+        return {"id": 1, "email": "buyer@example.com", "is_active": True}
+    return None
+
+
+def get_config() -> dict[str, str | int | bool]:
+    return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
 ```
 
-Union types require narrowing. `isinstance` and `is None` are the standard patterns that mypy and pyright recognize.
+This already tells the checker three crucial things.
 
-### Step 5: Establish Team Guidelines
+- `find_user()` can legitimately return `None`.
+- `order_id` is still flexible, but only within a known union.
+- `get_config()` no longer erases all type information.
+
+### Step 3: Replace `Any` with explicit helpers
+
+The next job is not to annotate every intermediate variable. It is to isolate the uncertain boundary decisions into named helpers.
+
+```python
+from typing import TypedDict
+
+
+class UserRecord(TypedDict):
+    id: int
+    email: str
+    is_active: bool
+
+
+class OrderItem(TypedDict):
+    name: str
+    price: int
+    quantity: int
+
+
+class OrderPayload(TypedDict):
+    order_id: int | str
+    user_id: int
+    items: list[OrderItem]
+
+
+class OrderSummary(TypedDict):
+    order_id: str
+    user_email: str
+    currency: str
+    total: int
+
+
+def find_user(user_id: int) -> UserRecord | None:
+    if user_id == 1:
+        return {"id": 1, "email": "buyer@example.com", "is_active": True}
+    return None
+
+
+def get_config() -> dict[str, str | int | bool]:
+    return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
+
+
+def parse_order_id(order_id: int | str) -> int:
+    if isinstance(order_id, int):
+        return order_id
+    if order_id.isdigit():
+        return int(order_id)
+    raise ValueError("order_id must be an int or numeric string")
+
+
+def require_user_email(user: UserRecord | None) -> str:
+    if user is None:
+        raise LookupError("user not found")
+    if not user["is_active"]:
+        raise ValueError("inactive user cannot create orders")
+    return user["email"]
+```
+
+Notice what changed compared with the old placeholder style.
+
+- `find_user`, `get_config`, and `parse_order_id` now contain real code.
+- The “best practice” is executable, not rhetorical.
+- Union handling moved into a helper where the narrowing logic is easy to review.
+
+### Step 4: Rewrite the service method around the hardened contract
+
+```python
+from typing import TypedDict
+
+
+class UserRecord(TypedDict):
+    id: int
+    email: str
+    is_active: bool
+
+
+class OrderItem(TypedDict):
+    name: str
+    price: int
+    quantity: int
+
+
+class OrderPayload(TypedDict):
+    order_id: int | str
+    user_id: int
+    items: list[OrderItem]
+
+
+class OrderSummary(TypedDict):
+    order_id: str
+    user_email: str
+    currency: str
+    total: int
+
+
+def find_user(user_id: int) -> UserRecord | None:
+    if user_id == 1:
+        return {"id": 1, "email": "buyer@example.com", "is_active": True}
+    return None
+
+
+def get_config() -> dict[str, str | int | bool]:
+    return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
+
+
+def parse_order_id(order_id: int | str) -> int:
+    if isinstance(order_id, int):
+        return order_id
+    if order_id.isdigit():
+        return int(order_id)
+    raise ValueError("order_id must be an int or numeric string")
+
+
+def require_user_email(user: UserRecord | None) -> str:
+    if user is None:
+        raise LookupError("user not found")
+    if not user["is_active"]:
+        raise ValueError("inactive user cannot create orders")
+    return user["email"]
+
+
+class OrderService:
+    def create_order(self, payload: OrderPayload) -> OrderSummary:
+        order_id = parse_order_id(payload["order_id"])
+        user_email = require_user_email(find_user(payload["user_id"]))
+        config = get_config()
+        currency_value = config["currency"]
+        if not isinstance(currency_value, str):
+            raise ValueError("currency config must be a string")
+
+        total = sum(item["price"] * item["quantity"] for item in payload["items"])
+        return {
+            "order_id": str(order_id),
+            "user_email": user_email,
+            "currency": currency_value,
+            "total": total,
+        }
+```
+
+This is the real before/after payoff.
+
+- The input contract is explicit.
+- Optionality and unions are handled intentionally, not accidentally.
+- The output contract is explicit too, so callers know exactly what comes back.
+
+### Step 5: Verify the hardening pass with a checker
+
+The article should not stop at “this looks cleaner.” It should end with verification.
 
 ```toml
-# pyproject.toml — team standard
+# pyproject.toml
 [tool.mypy]
 python_version = "3.11"
-
-# New code standards
+files = ["order_service.py"]
 disallow_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
-
-# Legacy code tolerance
-[[tool.mypy.overrides]]
-module = "legacy.*"
-ignore_errors = true
-
-# Test code relaxation
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
+no_implicit_optional = true
 ```
 
-Core team guidelines:
+```text
+$ mypy order_service.py
+Success: no issues found in 1 source file
+```
 
-- New code requires type hints — no exceptions
-- Existing code gets type hints when modified (boy scout rule)
-- Test code has relaxed rules
-- `type: ignore` requires a comment explaining why in PR reviews
+That passing output is what turns the module from “example advice” into “copyable standard.”
+
+### Step 6: Extract the practical prioritization rule
+
+From this one refactor, the prioritization rule becomes concrete.
+
+1. **Start with public signatures and return types.** `find_user()` and `create_order()` are the highest-value contracts.
+2. **Cut off `Any` at the source.** `get_config()` is more important than annotating ten local variables downstream.
+3. **Move unions into named narrowing helpers.** `parse_order_id()` makes the branch logic reusable and readable.
+4. **Record the rule in tool config.** `disallow_untyped_defs` and `warn_return_any` make the standard repeatable.
+
+That is what best practices should mean: not abstract slogans, but a reliable order for hardening real modules.
 
 ## What to Notice in This Code
 
-- Function signatures (parameters + return) are the top priority
-- Local variables rely on type inference — do not annotate them
-- Any disables type checking propagatively — minimize its use
-- Team config uses per-module overrides for gradual adoption
+- Public signatures and return types create more safety than annotating every local
+- `Any` is most dangerous where it enters the module, not where it is already spreading
+- Helper functions are a good home for union narrowing
+- A hardening pass is incomplete until a checker verifies it
 
 ## 5 Common Mistakes
 
 | Mistake | Problem | Fix |
 | --- | --- | --- |
-| Annotating every local variable | Verbose code with no added safety | Let the type checker infer locals |
-| Any as a quick fix | Type safety disappears downstream | Use specific types or `object` |
-| Refactoring without type hints | Cannot track call-site impact | Add signatures before refactoring |
-| Strict mode all at once | Hundreds of errors demoralize the team | Adopt per-module gradually |
-| Type hints as documentation substitute | Types cannot express intent | Use type hints and docstrings together |
+| Leaving example bodies as `...` | Readers cannot run or copy the pattern | Use complete code with real behavior |
+| Annotating every local variable first | Verbosity rises without strengthening the real contract | Start with public parameters and returns |
+| Keeping `Any` as a temporary shortcut | It weakens everything downstream | Replace it with specific types or a narrow union |
+| Using Optional/Union values without narrowing | Runtime and checker errors pile up together | Isolate narrowing in helper functions |
+| Ending with advice but no verification | Teams cannot operationalize the standard | Show a passing mypy or pyright result |
 
 ## Real-World Applications
 
-- New projects with mypy strict mode in CI from day one
-- Legacy projects with "boy scout rule" — type every file you touch
-- API boundaries with Pydantic models as contracts
-- Library public APIs with py.typed marker and complete annotations
-- Code reviews with type hint coverage as a checklist item
+- New service modules whose public APIs are typed from day one
+- Legacy modules that get a hardening pass whenever they are touched
+- Internal helpers that replace ad-hoc `Any` parsing with specific typed transforms
+- Team-wide `pyproject.toml` rules that prevent new untyped functions from slipping in
 
 ## How Senior Engineers Think About This
 
-Senior engineers apply type hints where they catch real bugs: public APIs, complex data flows, areas where teammates frequently make mistakes. They trust type inference for straightforward local variables and avoid over-annotating obvious code.
+Senior engineers use type hints as refactoring infrastructure. They harden the places where ambiguity is expensive: public APIs, central parsing helpers, and modules that many other files depend on. They do not waste early effort on obvious locals when a missing return type or an `Any` escape hatch is doing more damage.
 
-The type system is a practical safety net, not a pursuit of perfection. 100% coverage matters less than accurate types on critical paths. The goal is to make the team more productive, not to create bureaucratic overhead. When type hints start feeling like a burden rather than a benefit, the strategy needs adjustment.
+Coverage percentage is less important than contract quality on critical paths. One well-hardened module usually delivers more value than dozens of shallow annotations spread across low-risk code.
 
 ## Checklist
 
-- [ ] Annotated public function parameters and return types
-- [ ] Minimized Any usage throughout the codebase
-- [ ] Removed unnecessary type annotations on local variables
-- [ ] Configured team mypy/pyright settings in pyproject.toml
-- [ ] Established a gradual adoption plan
+- [ ] Hardened public function signatures and return types first
+- [ ] Replaced `Any` at the boundary instead of downstream only
+- [ ] Moved union handling into helper functions
+- [ ] Removed placeholder example bodies so the article stays runnable
+- [ ] Verified the final module with checker configuration and passing output
 
 ## Exercises
 
-1. Pick an existing Python file and add type hints only to public function signatures. Run mypy and fix any errors. Do not annotate local variables.
+1. Pick one service module in an existing codebase and add return types only to `find_*`, `get_*`, and `create_*` functions first.
 
-2. Find three uses of `Any` in a codebase and replace them with specific types. Verify that mypy errors decrease.
+2. Find one helper that returns `Any`, replace it with a concrete type or narrow union, and describe how much downstream code becomes more checkable.
 
-3. Write a team mypy config in `pyproject.toml` with three tiers: strict for `src/`, relaxed for `tests/`, and ignored for `legacy/`.
+3. Extend the `order_service.py` example with `coupon_code: str | None` and write a helper that handles it safely.
 
 ## Summary and Next Steps
 
-Type hints deliver the most value on function signatures, especially return types. Minimize `Any`, trust type inference for locals, and adopt strict mode gradually with per-module configuration. Team guidelines in `pyproject.toml` enforce consistency without creating friction.
+The best type-hint practices are not about annotating everything equally. They are about hardening the right path in the right order: public signatures, return types, `Any` boundaries, union narrowing helpers, and final verification with a checker. That is how type hints become a repeatable engineering standard instead of a style preference.
 
-This series covered the full landscape of Python type hints: basic types, Optional, Union, Callable, TypedDict, dataclass, Protocol, Generic, mypy, pyright, and Pydantic. With these tools, your code becomes safer to refactor, faster to review, and easier to maintain.
+This series covered the full working arc: basic annotations, unions, structured data, generics, static checking, runtime validation, and finally how to apply those tools as an operating habit in a real codebase.
 
 <!-- toc:begin -->
 - [What Are Python Type Hints?](./01-what-is-type-hint.md)
@@ -278,5 +425,6 @@ This series covered the full landscape of Python type hints: basic types, Option
 - [mypy docs — Using mypy with an existing codebase](https://mypy.readthedocs.io/en/stable/existing_code.html)
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 - [Google Python Style Guide — Type Annotations](https://google.github.io/styleguide/pyguide.html#319-type-annotations)
+- [Typing Python Libraries](https://typing.python.org/en/latest/guides/libraries.html)
 
 Tags: Python, Type Hints, Best Practices, Gradual Typing, Code Quality, Team Guidelines
