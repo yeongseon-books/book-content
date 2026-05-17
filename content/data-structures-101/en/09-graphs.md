@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Graphs
 
-> Data Structures 101 series (9/10)
+This is the ninth post in the Data Structures 101 series.
 
 <!-- a-grade-intro:begin -->
 
@@ -32,8 +32,6 @@ last_reviewed: '2026-05-04'
 > A graph is a data structure that captures arbitrary relationships between vertices using edges. A tree is just a special case of a graph (a connected, acyclic graph), and graphs are the basic vocabulary of nearly all relational modelling. This article walks through how to represent a graph, the basic properties (direction, weight, connectivity), and the two foundational traversal algorithms — BFS and DFS — by implementing them by hand.
 
 <!-- a-grade-intro:end -->
-
-This is post 9 in the Data Structures 101 series.
 
 ## What You Will Learn
 
@@ -52,19 +50,10 @@ Graphs are the most general and powerful data structure in computer science. Soc
 
 > A graph G = (V, E) is a vertex set V and an edge set E. If edges have direction, you have a directed graph; if they carry weights, you have a weighted graph. Adjacency lists are memory efficient, while adjacency matrices answer "is there an edge between u and v?" in O(1).
 
-```text
-Undirected graph             Directed graph
-    A ─── B                   A ──→ B
-    │     │                   │     ↓
-    C ─── D                   C ←── D
+### Graph representations
 
-Adjacency list               Adjacency matrix
-A: [B, C]                      A B C D
-B: [A, D]                    A 0 1 1 0
-C: [A, D]                    B 1 0 0 1
-D: [B, C]                    C 1 0 0 1
-                             D 0 1 1 0
-```
+![Graph representations](../../../assets/data-structures-101/09/09-01-graph-representations.en.png)
+*Figure. Directed edges capture one-way relationships such as service calls or package dependencies. Adjacency lists are the better default for sparse graphs, while adjacency matrices are the better fit when the graph is dense or you need constant-time edge-existence checks.*
 
 ## Key Terms
 
@@ -135,13 +124,15 @@ This stores the adjacency list as dict + list. Memory usage is O(V + E).
 
 ```python
 class MatrixGraph:
-    def __init__(self, n):
+    def __init__(self, n, directed=False):
         self.n = n
+        self.directed = directed
         self.matrix = [[0] * n for _ in range(n)]
 
     def add_edge(self, u, v, weight=1):
         self.matrix[u][v] = weight
-        self.matrix[v][u] = weight   # undirected
+        if not self.directed:
+            self.matrix[v][u] = weight
 
     def has_edge(self, u, v):
         return self.matrix[u][v] != 0
@@ -213,6 +204,7 @@ def has_cycle(g, start, visited=None, parent=None):
         elif v != parent:
             return True
     return False
+
 
 
 def connected_components(g):
