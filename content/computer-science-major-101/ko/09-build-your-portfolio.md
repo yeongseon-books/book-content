@@ -70,53 +70,105 @@ last_reviewed: '2026-05-14'
 
 **After**: 공개 저장소와 README, 데모로 정리된 결과물이 남습니다.
 
-## 실습: 미니 포트폴리오 셋업
+## 실습: README 초안 생성기
 
-### 1단계 — 저장소 이름
-
-```python
-name = "schedule-checker"
-```
-
-이름은 검색성과 첫인상을 좌우합니다. 기능이 드러나는 간결한 이름이 읽는 사람에게 훨씬 친절합니다.
-
-### 2단계 — README 섹션
+포트폴리오가 약해 보이는 가장 큰 이유는 코드가 없어서가 아니라, 읽는 사람이 무엇을 어떻게 검증해야 하는지 알 수 없어서입니다. 아래 예시는 저장소 정보를 받아 바로 공개 가능한 README 초안을 만드는 간단한 생성기입니다.
 
 ```python
-sections = ["overview", "demo", "stack", "run", "license"]
+from textwrap import dedent
+
+project = {
+    "name": "schedule-checker",
+    "summary": "대학생 시간표 충돌을 찾아 주는 Flask 기반 웹 도구입니다.",
+    "demo_evidence": [
+        "Demo video (recorded walkthrough): docs/demo-walkthrough.mp4",
+        "Local demo GIF: docs/demo.gif",
+    ],
+    "run_steps": [
+        "python -m venv .venv",
+        "source .venv/bin/activate",
+        "pip install -r requirements.txt",
+        "flask --app app run",
+    ],
+    "tech_stack": ["Python", "Flask", "SQLite", "Bootstrap"],
+    "license_note": "MIT License",
+    "learned": [
+        "CSV 입력 검증이 UI보다 먼저 안정화되어야 한다는 점",
+        "시간표 충돌 규칙을 테스트 케이스로 먼저 고정하는 편이 디버깅이 빠르다는 점",
+    ],
+}
+
+
+def build_readme(project):
+    demo_lines = "\n".join(f"- {item}" for item in project["demo_evidence"])
+    run_lines = "\n".join(f"1. {step}" for step in project["run_steps"])
+    stack = ", ".join(project["tech_stack"])
+    learned_lines = "\n".join(f"- {item}" for item in project["learned"])
+
+    return dedent(
+        f"""
+        # {project['name']}
+
+        ## Project Summary
+        {project['summary']}
+
+        ## Demo Evidence
+        {demo_lines}
+
+        ## Setup and Run
+        {run_lines}
+
+        ## Tech Stack
+        {stack}
+
+        ## License
+        {project['license_note']}
+
+        ## What I Learned
+        {learned_lines}
+        """
+    ).strip()
+
+
+print(build_readme(project))
 ```
 
-README는 이 정도 축만 있어도 충분히 읽기 좋아집니다. 개요, 데모, 기술 스택, 실행 방법, 라이선스는 거의 모든 프로젝트에서 기본입니다.
+예시 입력으로 생성되는 출력은 다음과 같습니다.
 
-### 3단계 — 한 줄 소개
+```markdown
+# schedule-checker
 
-```python
-overview = "Conflict checker for course schedules"
+## Project Summary
+대학생 시간표 충돌을 찾아 주는 Flask 기반 웹 도구입니다.
+
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
+
+## Setup and Run
+1. python -m venv .venv
+2. source .venv/bin/activate
+3. pip install -r requirements.txt
+4. flask --app app run
+
+## Tech Stack
+Python, Flask, SQLite, Bootstrap
+
+## License
+MIT License
+
+## What I Learned
+- CSV 입력 검증이 UI보다 먼저 안정화되어야 한다는 점
+- 시간표 충돌 규칙을 테스트 케이스로 먼저 고정하는 편이 디버깅이 빠르다는 점
 ```
 
-한 줄 소개는 프로젝트의 문제 정의를 압축해서 보여 줍니다. 길게 설명하기보다 핵심을 한 문장으로 말하는 편이 더 강합니다.
-
-### 4단계 — 실행 명령
-
-```python
-run = ["pip install -r requirements.txt", "python app.py"]
-```
-
-실행 방법이 없으면 다른 사람이 프로젝트를 검증하기 어렵습니다. README의 친절함은 여기서 크게 갈립니다.
-
-### 5단계 — 데모 링크
-
-```python
-demo = "https://example.com/demo"
-```
-
-데모는 가장 강한 증거입니다. 배포 링크든 짧은 영상이든 실제 실행 모습을 보여 주면 설명보다 훨씬 빠르게 설득됩니다.
+여기서 중요한 것은 `https://example.com/demo` 같은 가짜 느낌의 URL을 넣지 않는다는 점입니다. 실제 배포 링크가 없으면 **녹화 영상**, **로컬 GIF**, **스크린샷 묶음**처럼 검증 가능한 증거의 종류를 정확히 적는 편이 훨씬 신뢰를 줍니다.
 
 ## 이 코드에서 먼저 볼 점
 
-- 이름은 검색성과 기억에 영향을 줍니다.
-- README 섹션이 있어야 읽는 사람이 기대치를 맞출 수 있습니다.
-- 데모는 말보다 강한 증거입니다.
+- README는 소개 문서이면서 재현 문서입니다.
+- 데모 섹션은 링크의 개수보다 증거의 형태가 분명한지가 중요합니다.
+- What I Learned 같은 회고 섹션이 있어야 단순 결과물에서 학습 기록으로 넘어갑니다.
 
 ## 자주 하는 실수 5가지
 
@@ -132,22 +184,26 @@ demo = "https://example.com/demo"
 
 ## README 초안 예시
 
-포트폴리오 초반에는 README를 너무 길게 쓰려다가 오히려 핵심이 흐려지는 경우가 많습니다. 처음에는 아래 네 줄을 채운 뒤, 필요한 내용만 덧붙이는 방식이 더 실용적입니다.
+포트폴리오 초반에는 README를 너무 길게 쓰려다가 오히려 핵심이 흐려지는 경우가 많습니다. 처음에는 검증 가능한 증거와 실행 절차가 보이도록 아래처럼 짧지만 완결된 초안을 만드는 편이 더 실용적입니다.
 
 ```markdown
 # Schedule Checker
 
 대학생 시간표 충돌을 찾아 주는 웹 도구입니다.
 
-## Demo
-- https://example.com/demo
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
 
 ## Run
-- pip install -r requirements.txt
-- python app.py
+1. pip install -r requirements.txt
+2. flask --app app run
+
+## What I Learned
+- 충돌 탐지 규칙을 테스트로 먼저 고정했습니다.
 ```
 
-이 정도만 있어도 읽는 사람은 세 가지를 바로 파악할 수 있습니다. 무엇을 만드는 프로젝트인지, 실제로 어디서 볼 수 있는지, 로컬에서 어떻게 실행하는지입니다. 포트폴리오의 첫 관문은 화려함보다 재현 가능성입니다.
+이 정도만 있어도 읽는 사람은 네 가지를 바로 파악할 수 있습니다. 무엇을 만드는 프로젝트인지, 어떤 형태의 데모 증거가 있는지, 로컬에서 어떻게 실행하는지, 그리고 무엇을 배웠는지입니다. 포트폴리오의 첫 관문은 화려함보다 재현 가능성입니다.
 
 ## 선배 엔지니어는 이렇게 봅니다
 
@@ -189,9 +245,9 @@ demo = "https://example.com/demo"
 
 ## 참고 자료
 
-- [Make a README](https://www.makeareadme.com/)
-- [Choose a License](https://choosealicense.com/)
-- [GitHub Profile README Guide](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)
-- [Awesome README](https://github.com/matiassingers/awesome-readme)
+- [GitHub Docs - About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
+- [Open Source Guides - Starting an Open Source Project](https://opensource.guide/starting-a-project/)
+- [The Turing Way](https://book.the-turing-way.org/)
+- [Good Enough Practices in Scientific Computing](https://doi.org/10.1371/journal.pcbi.1005510)
 
 Tags: CS, Portfolio, GitHub, Career, Beginner

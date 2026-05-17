@@ -70,53 +70,105 @@ An assignment does not automatically become a portfolio piece. You need to organ
 
 **After**: You leave behind a public repository, README, and demo that other people can verify.
 
-## Hands-on: Mini Portfolio Setup
+## Hands-on: A README Starter Generator
 
-### Step 1 — Repo name
-
-```python
-name = "schedule-checker"
-```
-
-Names shape searchability and first impression. A short name that clearly reveals the function is much easier for other people to remember.
-
-### Step 2 — README sections
+Weak portfolios usually do not fail because the code is missing. They fail because the reader cannot tell what to verify, how to run the project, or what counts as real evidence. The example below turns project metadata into a README draft that is ready to publish.
 
 ```python
-sections = ["overview", "demo", "stack", "run", "license"]
+from textwrap import dedent
+
+project = {
+    "name": "schedule-checker",
+    "summary": "A Flask web tool that finds conflicts in a student's class schedule.",
+    "demo_evidence": [
+        "Demo video (recorded walkthrough): docs/demo-walkthrough.mp4",
+        "Local demo GIF: docs/demo.gif",
+    ],
+    "run_steps": [
+        "python -m venv .venv",
+        "source .venv/bin/activate",
+        "pip install -r requirements.txt",
+        "flask --app app run",
+    ],
+    "tech_stack": ["Python", "Flask", "SQLite", "Bootstrap"],
+    "license_note": "MIT License",
+    "learned": [
+        "Input validation had to become stable before UI polish mattered.",
+        "Conflict-detection rules became easier to debug once they were written as tests first.",
+    ],
+}
+
+
+def build_readme(project):
+    demo_lines = "\n".join(f"- {item}" for item in project["demo_evidence"])
+    run_lines = "\n".join(f"1. {step}" for step in project["run_steps"])
+    stack = ", ".join(project["tech_stack"])
+    learned_lines = "\n".join(f"- {item}" for item in project["learned"])
+
+    return dedent(
+        f"""
+        # {project['name']}
+
+        ## Project Summary
+        {project['summary']}
+
+        ## Demo Evidence
+        {demo_lines}
+
+        ## Setup and Run
+        {run_lines}
+
+        ## Tech Stack
+        {stack}
+
+        ## License
+        {project['license_note']}
+
+        ## What I Learned
+        {learned_lines}
+        """
+    ).strip()
+
+
+print(build_readme(project))
 ```
 
-These five sections already make a repository much easier to read. In many student projects, overview, demo, stack, run instructions, and license are enough to establish trust.
+With the sample input, you should get output like this.
 
-### Step 3 — One-line overview
+```markdown
+# schedule-checker
 
-```python
-overview = "Conflict checker for course schedules"
+## Project Summary
+A Flask web tool that finds conflicts in a student's class schedule.
+
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
+
+## Setup and Run
+1. python -m venv .venv
+2. source .venv/bin/activate
+3. pip install -r requirements.txt
+4. flask --app app run
+
+## Tech Stack
+Python, Flask, SQLite, Bootstrap
+
+## License
+MIT License
+
+## What I Learned
+- Input validation had to become stable before UI polish mattered.
+- Conflict-detection rules became easier to debug once they were written as tests first.
 ```
 
-This line compresses the problem definition into a single sentence. A short, sharp description usually works better than a long abstract introduction.
-
-### Step 4 — Run commands
-
-```python
-run = ["pip install -r requirements.txt", "python app.py"]
-```
-
-If there are no run instructions, other people cannot verify the project. This is where README quality often separates one repository from another.
-
-### Step 5 — Demo link
-
-```python
-demo = "https://example.com/demo"
-```
-
-A demo is one of the strongest forms of proof. A live deployment or even a short video often persuades faster than paragraphs of explanation.
+The important part is that there is no fake-looking `https://example.com/demo` link anywhere. If you do not have a live deployment, name the evidence honestly: a recorded walkthrough, a local GIF, a screenshot folder, or a release artifact. Clear evidence is more credible than a placeholder URL.
 
 ## What to Notice in This Code
 
-- The repository name affects searchability and memory.
-- README sections help the reader set expectations quickly.
-- A demo is stronger evidence than explanation alone.
+- A README is both an introduction document and a reproducibility document.
+- Demo sections work only when the evidence type is explicit.
+- A short reflection section turns a repository from a dump of files into a record of engineering judgment.
 
 ## Five Common Mistakes
 
@@ -132,22 +184,26 @@ Interviewers and reviewers often read the README before they open the code. How 
 
 ## README Draft Example
 
-Many students try to write an overly long README and end up burying the essentials. In the beginning, it is often better to fill in the four lines below and then add only what the project truly needs.
+Many students try to write an overly long README and end up burying the essentials. In the beginning, it is usually better to publish a short but complete draft that shows evidence and reproducibility clearly.
 
 ```markdown
 # Schedule Checker
 
 A web tool that finds conflicts in a student's class schedule.
 
-## Demo
-- https://example.com/demo
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
 
 ## Run
-- pip install -r requirements.txt
-- python app.py
+1. pip install -r requirements.txt
+2. flask --app app run
+
+## What I Learned
+- I stabilized the conflict rules by writing tests before polishing the UI.
 ```
 
-Even this small draft already answers three questions for the reader: what the project is, where they can see it, and how they can run it locally. The first gate of a portfolio is not flashiness. It is reproducibility.
+Even this small draft already answers four questions for the reader: what the project is, what kind of evidence exists, how to run it locally, and what the builder learned. The first gate of a portfolio is not flashiness. It is reproducibility.
 
 ## How a Senior Engineer Thinks
 
@@ -189,9 +245,9 @@ A portfolio is not a decorative extra for exceptional students. It is the work o
 
 ## References
 
-- [Make a README](https://www.makeareadme.com/)
-- [Choose a License](https://choosealicense.com/)
-- [GitHub Profile README Guide](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)
-- [Awesome README](https://github.com/matiassingers/awesome-readme)
+- [GitHub Docs - About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
+- [Open Source Guides - Starting an Open Source Project](https://opensource.guide/starting-a-project/)
+- [The Turing Way](https://book.the-turing-way.org/)
+- [Good Enough Practices in Scientific Computing](https://doi.org/10.1371/journal.pcbi.1005510)
 
 Tags: CS, Portfolio, GitHub, Career, Beginner
