@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Lazy Evaluation and Generators
 
+The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.
+
 This is post 8 in the Functional Programming 101 series.
 
-> Functional Programming 101 Series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Can you process data without loading everything into memory at once?
-
-> Lazy evaluation is a strategy that defers computation until the moment a value is actually needed. Python's generators are the primary tool for lazy evaluation, enabling memory-efficient data processing. This article covers how generators work and how to build lazy pipelines with itertools.
-
-<!-- a-grade-intro:end -->
+Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.
 
 ## What You Will Learn
 
@@ -53,13 +47,9 @@ Python's `range()`, `map()`, `filter()`, and file objects all use lazy evaluatio
 
 > Eager vs Lazy Evaluation
 
-```text
-Eager Evaluation               Lazy Evaluation
-─────────────────             ─────────────────
-[1, 4, 9, 16, 25]            (waiting to compute...)
-Everything in memory          Produces one value at a time
-list()                        generator / iterator
-```
+![Pull-based lazy pipeline](../../../assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
+
+*In a lazy pipeline, the consumer pulls one record at a time through every stage. That pull model is why a large input stream does not require every intermediate result to live in memory at once.*
 
 ## Key Concepts
 
@@ -214,19 +204,22 @@ for key, group in groupby(data):
 ### Step 5: Building a Lazy Pipeline
 
 ```python
+from itertools import chain
+from pathlib import Path
 from typing import Iterator
 
 
-def read_lines(text: str) -> Iterator[str]:
-    """Yields lines from a text block."""
-    for line in text.strip().split("\n"):
-        yield line.strip()
+def read_lines(path: Path) -> Iterator[str]:
+    """Yields lines from a CSV file one at a time."""
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            yield line.rstrip("\n")
 
 def parse_csv(lines: Iterator[str]) -> Iterator[dict]:
     """Converts CSV lines into dictionaries."""
-    headers = next(lines).split(",")
+    headers = [header.strip() for header in next(lines).split(",")]
     for line in lines:
-        values = line.split(",")
+        values = [value.strip() for value in line.split(",")]
         yield dict(zip(headers, values))
 
 def filter_by_score(records: Iterator[dict], min_score: int) -> Iterator[dict]:
@@ -241,28 +234,64 @@ def format_output(records: Iterator[dict]) -> Iterator[str]:
         yield f"{r['name']}: {r['score']} points"
 
 
-# run the pipeline — every stage is lazy
-csv_text = """name,score
-Alice,85
-Bob,92
-Charlie,78
-Diana,95
-Eve,60"""
-
-pipeline = format_output(
-    filter_by_score(
-        parse_csv(read_lines(csv_text)),
-        min_score=80,
-    )
+# create a tiny sample file so the pipeline behaves like a real stream
+sample_path = Path("scores.csv")
+sample_path.write_text(
+    "\n".join(
+        [
+            "name,score",
+            "Alice,85",
+            "Bob,92",
+            "Charlie,78",
+            "Diana,95",
+            "Eve,60",
+        ]
+    ),
+    encoding="utf-8",
 )
 
-# consume results one at a time
-for line in pipeline:
-    print(line)
-# Alice: 85 points
-# Bob: 92 points
-# Diana: 95 points
+try:
+    # keep stage handles separate so you can inspect them in isolation
+    lines_stage = read_lines(sample_path)
+    header = next(lines_stage)
+    print(f"Header preview: {header}")
+
+    pipeline = format_output(
+        filter_by_score(
+            parse_csv(chain([header], lines_stage)),
+            min_score=80,
+        )
+    )
+
+    # consume results one at a time
+    for line in pipeline:
+        print(line)
+    # Alice: 85 points
+    # Bob: 92 points
+    # Diana: 95 points
+
+    print(list(pipeline))
+    # []
+finally:
+    sample_path.unlink(missing_ok=True)
 ```
+
+#### Expected output
+
+```text
+Header preview: name,score
+Alice: 85 points
+Bob: 92 points
+Diana: 95 points
+[]
+```
+
+#### If your result differs, inspect this first
+
+- Make sure the header really comes through as `name,score`. If you skip or corrupt the first line, the parser will not find the `score` column.
+- Confirm the threshold check uses `>= 80`. If it becomes `> 80`, `Alice` disappears.
+- Verify newline stripping still happens with `rstrip("\n")` or equivalent. Otherwise names or scores can keep trailing whitespace.
+- The final `print(list(pipeline))` should be `[]`. That empty list confirms the generator was exhausted after the first full pass.
 
 ## What to Notice in This Code
 
