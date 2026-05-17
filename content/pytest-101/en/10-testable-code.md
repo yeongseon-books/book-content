@@ -304,8 +304,6 @@ The Protocol shows the contract. The Fake shows how the contract behaves in test
 
 ```python
 # checkout.py
-from pricing import calculate_order_totals
-
 def build_charge_request(user: dict, items: list[dict], requested_at: str) -> dict:
     subtotal = sum(item["unit_price"] * item["quantity"] for item in items)
     return {
@@ -371,6 +369,8 @@ Once the payload is its own function, your docs and tests stop hiding behind pla
 
 ```python
 from collections.abc import Callable
+
+from pricing import calculate_order_totals
 
 def create_checkout_payload(
     user: dict,
