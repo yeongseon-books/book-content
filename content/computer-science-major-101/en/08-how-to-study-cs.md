@@ -70,54 +70,85 @@ Listening to a lecture is only the beginning. You need to compress the idea into
 
 **After**: You spread lectures, review, and practice across a weekly routine.
 
-## Hands-on: Study Tracking Script
+## Hands-on: A Weekly Review Loop Tracker
 
-### Step 1 — Register subjects
-
-```python
-log = {"algorithms": [], "os": [], "db": []}
-```
-
-First decide what you want to track. The structure does not need to be elaborate. Even a tiny record is enough if it makes your habits visible.
-
-### Step 2 — Record sessions
+Counting hours is not enough for CS study. You also need to know when you heard the concept, when you plan to revisit it, whether the review actually happened, and where your open questions still live. The script below creates a small weekly report around that loop.
 
 ```python
-log["algorithms"].append({"date": "2026-05-01", "hours": 2})
+from collections import defaultdict
+from datetime import date, timedelta
+
+sessions = [
+    {
+        "course": "algorithms",
+        "lecture_date": date(2026, 5, 4),
+        "study_minutes": 100,
+        "review_completed": True,
+        "questions": ["Why does merge sort stay O(n log n)?"],
+    },
+    {
+        "course": "operating-systems",
+        "lecture_date": date(2026, 5, 5),
+        "study_minutes": 60,
+        "review_completed": False,
+        "questions": ["What exactly causes context-switch overhead?"],
+    },
+    {
+        "course": "databases",
+        "lecture_date": date(2026, 5, 6),
+        "study_minutes": 45,
+        "review_completed": False,
+        "questions": [],
+    },
+]
+
+
+def build_weekly_report(entries):
+    totals = defaultdict(int)
+    weak_areas = []
+    lines = []
+
+    for entry in entries:
+        next_review = entry["lecture_date"] + timedelta(days=2)
+        totals[entry["course"]] += entry["study_minutes"]
+        status = "done" if entry["review_completed"] else "pending"
+        lines.append(
+            f"{entry['course']}: lecture={entry['lecture_date']}, "
+            f"next_review={next_review}, review={status}, "
+            f"questions={len(entry['questions'])}"
+        )
+
+    for course, minutes in totals.items():
+        if minutes < 90 or any(
+            e["course"] == course and not e["review_completed"] for e in entries
+        ):
+            weak_areas.append(course)
+
+    summary = ", ".join(f"{course}={minutes}m" for course, minutes in totals.items())
+    weak_summary = ", ".join(weak_areas) if weak_areas else "none"
+    return "\n".join(lines + [f"weekly_totals: {summary}", f"weak_areas: {weak_summary}"])
+
+
+print(build_weekly_report(sessions))
 ```
 
-Writing down when and how long you studied already changes your behavior. Memory alone often distorts how much time you actually spent.
+With the sample input, you should see output like this.
 
-### Step 3 — Mark reviewed
-
-```python
-def reviewed(entry):
-    return entry.get("review", False)
+```text
+algorithms: lecture=2026-05-04, next_review=2026-05-06, review=done, questions=1
+operating-systems: lecture=2026-05-05, next_review=2026-05-07, review=pending, questions=1
+databases: lecture=2026-05-06, next_review=2026-05-08, review=pending, questions=0
+weekly_totals: algorithms=100m, operating-systems=60m, databases=45m
+weak_areas: operating-systems, databases
 ```
 
-Once you track review separately, the log stops being a time sheet and starts becoming a learning-cycle record. That distinction matters a lot in CS study.
-
-### Step 4 — Weekly total
-
-```python
-total = sum(e["hours"] for e in log["algorithms"])
-```
-
-Totals reveal whether one course is quietly receiving too little attention. Time distribution is far easier to judge with numbers than with intuition.
-
-### Step 5 — Find weak subjects
-
-```python
-weak = [c for c, es in log.items() if sum(e["hours"] for e in es) < 5]
-```
-
-The subjects you want to avoid are often the ones that need the clearest label. The earlier you surface a weak area, the cheaper it is to fix.
+This report makes three claims visible at once: when the next review should happen, where unanswered questions are accumulating, and which courses are receiving too little practice. That is the practical link between spaced review, question habits, and weekly planning.
 
 ## What to Notice in This Code
 
-- Logging makes habits visible.
-- Review marks are what make spaced learning possible.
-- Totals reveal imbalance across subjects.
+- Lecture date and next review date turn spaced learning into a concrete schedule.
+- Review status and question count reveal where understanding is still weak.
+- Weekly totals only become useful when you read them together with unfinished reviews.
 
 ## Five Common Mistakes
 
@@ -186,9 +217,9 @@ You cannot sustain CS study for long on motivation alone. Lectures, notes, revie
 
 ## References
 
-- [Make It Stick](https://www.hup.harvard.edu/catalog.php?isbn=9780674729018)
-- [A Mind for Numbers - Barbara Oakley](https://barbaraoakley.com/books/a-mind-for-numbers/)
-- [Learning How to Learn - Coursera](https://www.coursera.org/learn/learning-how-to-learn)
-- [Spaced Repetition - SuperMemo](https://www.supermemo.com/en/articles/theory)
+- [Make It Stick](https://www.hup.harvard.edu/books/9780674729018)
+- [Improving Students' Learning With Effective Learning Techniques](https://journals.sagepub.com/doi/10.1177/1529100612453266)
+- [How Learning Works](https://www.wiley.com/en-us/How+Learning+Works%3A+Eight+Research-Based+Principles+for+Smart+Teaching-p-9780470484104)
+- [ACM/IEEE-CS/AAAI Computer Science Curricula 2023](https://csed.acm.org/cs2023/)
 
 Tags: CS, Study, Habit, Learning, Beginner

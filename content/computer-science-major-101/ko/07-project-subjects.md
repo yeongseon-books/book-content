@@ -70,53 +70,113 @@ last_reviewed: '2026-05-14'
 
 **After**: 작은 제품을 만드는 과정으로 봅니다.
 
-## 실습: 프로젝트 미니 플랜
+## 실습: 제출 가능한 프로젝트 브리프 만들기
 
-### 1단계 — 문제 정의
-
-```python
-problem = "course schedule conflict checker"
-```
-
-프로젝트는 문제 한 줄에서 시작합니다. 무엇을 해결하는지 분명해야 기능과 일정이 흔들리지 않습니다.
-
-### 2단계 — 사용자
+팀 프로젝트가 흔들리는 가장 흔한 이유는 아이디어는 있는데 제출 가능한 계획 문서가 없기 때문입니다. 아래 예시는 짧은 명세를 받아 README나 기획 문서에 바로 붙일 수 있는 프로젝트 브리프를 만드는 스크립트입니다.
 
 ```python
-users = ["student", "advisor"]
+from textwrap import dedent
+
+spec = {
+    "project": "Campus Schedule Checker",
+    "users": ["students", "academic advisors"],
+    "pain_point": "Students discover timetable conflicts too late during course registration.",
+    "mvp_features": [
+        "Upload timetable CSV",
+        "Detect overlapping classes",
+        "Show conflict summary by day",
+    ],
+    "out_of_scope": [
+        "Mobile app",
+        "Automatic enrollment",
+        "Professor recommendation engine",
+    ],
+    "weeks": [
+        (1, "problem validation and sample data collection"),
+        (2, "CSV parser and conflict rules"),
+        (3, "result screen and test fixtures"),
+        (4, "demo script, bug fixes, and README polish"),
+    ],
+    "risks": [
+        ("scope creep", "Freeze feature list after week 1 review"),
+        ("messy input data", "Prepare three validated sample CSV files early"),
+        ("team sync gaps", "Run a 15-minute checkpoint twice a week"),
+    ],
+}
+
+
+def build_brief(spec):
+    problem_statement = (
+        f"{spec['project']} helps {', '.join(spec['users'])} "
+        f"by solving this problem: {spec['pain_point']}"
+    )
+    feature_lines = "\n".join(f"- {feature}" for feature in spec["mvp_features"])
+    scope_lines = "\n".join(f"- {item}" for item in spec["out_of_scope"])
+    week_lines = "\n".join(
+        f"- Week {week}: {goal}" for week, goal in spec["weeks"]
+    )
+    risk_lines = "\n".join(
+        f"- {risk}: {mitigation}" for risk, mitigation in spec["risks"]
+    )
+
+    return dedent(
+        f"""
+        ## Project Brief
+        Problem statement: {problem_statement}
+
+        ### MVP features
+        {feature_lines}
+
+        ### Out of scope
+        {scope_lines}
+
+        ### Week-by-week schedule
+        {week_lines}
+
+        ### Risk register
+        {risk_lines}
+        """
+    ).strip()
+
+
+print(build_brief(spec))
 ```
 
-누가 쓰는지 먼저 정하면 범위를 줄이기 쉽습니다. 사용자 정의가 흐리면 기능도 빠르게 퍼집니다.
+예시 입력을 그대로 실행하면 아래와 같은 출력이 나옵니다.
 
-### 3단계 — 핵심 기능
+```text
+## Project Brief
+Problem statement: Campus Schedule Checker helps students, academic advisors by solving this problem: Students discover timetable conflicts too late during course registration.
 
-```python
-features = ["upload", "detect_conflict", "notify"]
+### MVP features
+- Upload timetable CSV
+- Detect overlapping classes
+- Show conflict summary by day
+
+### Out of scope
+- Mobile app
+- Automatic enrollment
+- Professor recommendation engine
+
+### Week-by-week schedule
+- Week 1: problem validation and sample data collection
+- Week 2: CSV parser and conflict rules
+- Week 3: result screen and test fixtures
+- Week 4: demo script, bug fixes, and README polish
+
+### Risk register
+- scope creep: Freeze feature list after week 1 review
+- messy input data: Prepare three validated sample CSV files early
+- team sync gaps: Run a 15-minute checkpoint twice a week
 ```
 
-이 목록이 사실상 MVP의 뼈대입니다. 아이디어를 모두 넣기보다 핵심 기능부터 고르는 편이 프로젝트를 끝까지 끌고 가기 쉽습니다.
-
-### 4단계 — 일정
-
-```python
-weeks = {"plan": 1, "build": 6, "test": 2, "demo": 1}
-```
-
-일정은 계획을 현실로 바꾸는 장치입니다. 구현만 길게 잡고 테스트와 데모를 뒤로 미루면 막판에 가장 크게 흔들립니다.
-
-### 5단계 — 위험
-
-```python
-risks = ["scope_creep", "team_sync", "data_format"]
-```
-
-위험 요소를 미리 적어 두면 문제가 생겼을 때 훨씬 차분하게 대응할 수 있습니다. 범위 확장과 팀 간 동기화 문제는 학생 프로젝트에서 특히 흔합니다.
+이 출력은 단순한 아이디어 메모가 아니라, 팀 회의록과 README 초안의 출발점이 됩니다. 특히 **out of scope**와 **risk register**가 함께 있어야 무엇을 하지 않을지, 어디서 흔들릴지를 미리 합의할 수 있습니다.
 
 ## 이 코드에서 먼저 볼 점
 
-- 문제 정의가 프로젝트의 출발점입니다.
-- 사용자가 기능을 결정합니다.
-- 일정이 있어야 계획이 실제 작업이 됩니다.
+- 문제 정의가 한 문장으로 고정되어야 팀의 판단 기준이 생깁니다.
+- MVP와 out of scope를 동시에 적어야 범위 확장을 막을 수 있습니다.
+- 일정과 위험 대응이 함께 있어야 마지막 주 데모 품질이 올라갑니다.
 
 ## 자주 하는 실수 5가지
 
@@ -141,9 +201,9 @@ risks = ["scope_creep", "team_sync", "data_format"]
 ## 체크리스트
 
 - [ ] 문제를 한 줄로 설명할 수 있습니다.
-- [ ] 핵심 기능 목록을 적었습니다.
-- [ ] 일정표를 만들었습니다.
-- [ ] 위험 요소를 미리 정리했습니다.
+- [ ] 핵심 기능과 제외 범위를 함께 적었습니다.
+- [ ] 주차별 산출물을 일정표에 넣었습니다.
+- [ ] 위험 요소와 대응 방법을 짝지어 적었습니다.
 
 ## 연습 문제
 
@@ -170,9 +230,9 @@ risks = ["scope_creep", "team_sync", "data_format"]
 
 ## 참고 자료
 
-- [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
-- [Mythical Man-Month](https://www.oreilly.com/library/view/mythical-man-month-the/0201835959/)
-- [Atlassian Project Management Guide](https://www.atlassian.com/agile/project-management)
-- [GitHub Project Boards](https://docs.github.com/en/issues/planning-and-tracking-with-projects)
+- [ACM/IEEE-CS/AAAI Computer Science Curricula 2023](https://csed.acm.org/cs2023/)
+- [ABET Criteria for Accrediting Computing Programs](https://www.abet.org/accreditation/accreditation-criteria/criteria-for-accrediting-computing-programs-2025-2026/)
+- [SWEBOK Guide](https://www.computer.org/education/bodies-of-knowledge/software-engineering)
+- [GitHub Docs - About Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects)
 
 Tags: CS, Project, Capstone, Teamwork, Beginner
