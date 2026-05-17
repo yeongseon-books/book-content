@@ -17,41 +17,33 @@ tags:
   - Set Operations
   - frozenset
 seo_description: Explore Python set internals and practice union, intersection, difference, and symmetric difference operations.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-17'
 ---
 
 # Sets and Set Operations
 
-> Data Structures with Python 101 Series (9/10)
+This is the ninth post in the Data Structures with Python 101 series.
 
-<!-- a-grade-intro:begin -->
+## What This Article Answers
 
-**Key Question**: What data structure gives you O(1) deduplication and membership testing?
+- Why is `set` so strong at deduplication and membership testing?
+- What do collisions and hashability mean for a set, not just for a dict?
+- Why can `frozenset` be a set element or dict key while plain `set` cannot?
+- How do union, intersection, and difference connect back to the storage model?
 
-> Python's set is backed by a hash table, so adding, removing, and checking membership are all O(1). It also provides mathematical set operations — union, intersection, difference, and symmetric difference — out of the box. This article covers set internals and practical usage patterns.
-
-<!-- a-grade-intro:end -->
-
-This is post 9 in the Data Structures with Python 101 series.
-
-## What You Will Learn
-
-- Set internals and performance characteristics
-- Union, intersection, difference, and symmetric difference
-- frozenset use cases
-- Practical patterns using sets
+> Mental model: a Python `set` is a hash table that stores keys only. By giving up duplicates and positional order, it gains fast membership testing and efficient set algebra.
 
 ## Why It Matters
 
-Deduplication, membership checks, and comparing two collections are extremely common in data processing. With a list, these operations are O(n). With a set, they are O(1). The larger the data, the more decisive this difference becomes.
+Deduplication, membership checks, and collection comparison show up everywhere: permissions, tags, already-processed items, feature flags, and data cleaning. If you model those problems with lists, the code still works, but the cost grows much faster than it needs to.
 
-> A set is essentially a dict without values. It is a hash table that stores only keys.
+> `set` belongs to the same hash-table family as `dict`; it simply stores keys without associated values.
 
-Set operations are used heavily in data analysis, permission management, and tag systems.
+That is why the right way to learn sets is not only through operators like `|` and `&`, but also through hashability, collision handling, and uniqueness semantics.
 
 ## Concept Overview
 
-> set = a collection of unique elements, backed by a hash table
+> `set` = a hash-table-backed collection of unique keys
 
 ```text
 A = {1, 2, 3, 4}      B = {3, 4, 5, 6}
@@ -62,118 +54,138 @@ difference   A - B  = {1, 2}
 sym. diff.   A ^ B  = {1, 2, 5, 6}
 ```
 
+## Set Storage and Dedup
+
+![Set Storage and Dedup](../../../assets/data-structures-python-101/09/09-01-set-storage-and-dedup.en.png)
+
+*How a set stores only unique keys in a hash table, making deduplication and set algebra consequences of the same storage model*
+
 ## Key Concepts
 
 | Term | Description |
 |------|------------|
-| set | A hash-based collection that does not allow duplicates |
-| frozenset | An immutable set that can be used as a dict key or set element |
-| union | All elements from both sets combined |
-| intersection | Elements common to both sets |
-| difference | Elements in one set but not the other |
+| set | A hash-based collection that stores unique keys only |
+| Hashability | The requirement that elements have stable hashing and equality semantics |
+| Collision | Different values competing for the same lookup/probe path |
+| `frozenset` | An immutable set that can itself be hashed |
+| Set Algebra | Operations such as union, intersection, difference, and symmetric difference |
 
 ## Before / After
 
-Compare deduplication and finding common elements with a list versus a set.
+Compare list-based deduplication with set-based deduplication.
 
 ```python
-# before: deduplication and intersection with list — O(n^2)
-list_a = [1, 2, 3, 4, 2, 3]
+# before: deduplication and membership with list — O(n^2)
+values = [1, 2, 3, 4, 2, 3]
 unique = []
-for x in list_a:
-    if x not in unique:
-        unique.append(x)
-common = [x for x in list_a if x in [3, 4, 5, 6]]
+for value in values:
+    if value not in unique:
+        unique.append(value)
 ```
 
 ```python
-# after: deduplication and intersection with set — O(n)
-set_a = {1, 2, 3, 4, 2, 3}   # automatic dedup → {1, 2, 3, 4}
-common = set_a & {3, 4, 5, 6}  # O(min(m, n)) intersection
+# after: deduplication with set — average O(n)
+values = [1, 2, 3, 4, 2, 3]
+unique = set(values)
+print(unique)  # {1, 2, 3, 4}
 ```
+
+The gain is not just speed. `set` also states your intent clearly: duplicates do not matter here, only membership does.
 
 ## Hands-On Steps
 
-### Step 1: Basic set operations
+### Step 1: Verify the basic operations
 
 ```python
-# Creation
 fruits = {"apple", "banana", "cherry"}
-numbers = set([1, 2, 3, 2, 1])  # {1, 2, 3}
 
-# Add — O(1)
 fruits.add("date")
+fruits.discard("banana")
 
-# Remove — O(1)
-fruits.discard("banana")  # no error if missing
-# fruits.remove("banana")  # raises KeyError if missing
-
-# Membership test — O(1)
 print("apple" in fruits)  # True
-
-# Size
-print(len(fruits))  # 3
+print(len(fruits))         # 3
 ```
 
-### Step 2: Set operations
+### Step 2: Force collisions and prove dedup still works
+
+```python
+class Tag:
+    def __init__(self, name: str):
+        self.name = name
+
+    def __hash__(self) -> int:
+        return 7
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Tag) and self.name == other.name
+
+    def __repr__(self) -> str:
+        return f"Tag({self.name!r})"
+
+
+seen = {Tag("python"), Tag("api"), Tag("python")}
+
+print(seen)
+print(Tag("python") in seen)  # True
+print(len(seen))               # 2
+```
+
+Example output:
+
+```text
+{Tag('api'), Tag('python')}
+True
+2
+```
+
+#### How to read this result
+
+- All three objects use the same hash value, so collisions are guaranteed.
+- The set still keeps only two logical elements because equality says the two `Tag("python")` objects represent the same key.
+- Speed comes from hash-table lookup, but correctness depends on stable hashing and meaningful equality.
+
+### Step 3: Go beyond "list is unhashable" and prove why `frozenset` works
+
+```python
+try:
+    invalid = {{1, 2}}
+except TypeError as error:
+    print(type(error).__name__, error)
+
+allowed = {frozenset({"read", "write"}), frozenset({"read"})}
+print(frozenset({"read", "write"}) in allowed)  # True
+
+role_map = {frozenset({"read", "write"}): "editor"}
+print(role_map[frozenset({"write", "read"})])   # editor
+```
+
+Example output:
+
+```text
+TypeError unhashable type: 'set'
+True
+editor
+```
+
+#### How to read this result
+
+Plain `set` cannot be nested because it is mutable and therefore unhashable. `frozenset` works because its contents cannot change after creation, so Python can safely derive a stable hash and use it as another set element or as a dict key.
+
+### Step 4: Connect set algebra back to storage behavior
 
 ```python
 a = {1, 2, 3, 4, 5}
 b = {4, 5, 6, 7, 8}
 
-# Union
-print(a | b)          # {1, 2, 3, 4, 5, 6, 7, 8}
-print(a.union(b))     # same result
-
-# Intersection
-print(a & b)              # {4, 5}
-print(a.intersection(b))  # same result
-
-# Difference
-print(a - b)            # {1, 2, 3}
-print(a.difference(b))  # same result
-
-# Symmetric difference (elements in only one set)
-print(a ^ b)                      # {1, 2, 3, 6, 7, 8}
-print(a.symmetric_difference(b))  # same result
+print(a | b)  # union
+print(a & b)  # intersection
+print(a - b)  # difference
+print(a ^ b)  # symmetric difference
 ```
 
-### Step 3: Subsets and supersets
+These operators are compact because the underlying structure already thinks in terms of unique keys and membership.
 
-```python
-a = {1, 2, 3}
-b = {1, 2, 3, 4, 5}
-
-print(a <= b)          # True — a is a subset of b
-print(a.issubset(b))   # True
-
-print(b >= a)            # True — b is a superset of a
-print(b.issuperset(a))   # True
-
-print(a.isdisjoint({6, 7}))  # True — no common elements
-```
-
-### Step 4: frozenset usage
-
-```python
-# frozenset: immutable set — can be used as a dict key
-permissions = frozenset(["read", "write"])
-other = frozenset(["read", "write"])
-
-# Use as dict key
-role_map = {
-    frozenset(["read"]): "viewer",
-    frozenset(["read", "write"]): "editor",
-    frozenset(["read", "write", "admin"]): "admin",
-}
-print(role_map[permissions])  # "editor"
-
-# Use as set element
-set_of_sets = {frozenset([1, 2]), frozenset([3, 4])}
-print(frozenset([1, 2]) in set_of_sets)  # True
-```
-
-### Step 5: Practical pattern — tag filtering
+### Step 5: Keep practical filtering as an application, not the proof
 
 ```python
 articles = [
@@ -183,69 +195,62 @@ articles = [
     {"title": "Flask API", "tags": {"python", "flask", "api"}},
 ]
 
-# Articles with BOTH python AND api tags
 required = {"python", "api"}
-matches = [a for a in articles if required <= a["tags"]]
-for m in matches:
-    print(m["title"])
-# Django REST
-# Flask API
-
-# Articles with python OR javascript tags
-any_of = {"python", "javascript"}
-matches = [a for a in articles if a["tags"] & any_of]
-print([m["title"] for m in matches])
-# ['Python Intro', 'Django REST', 'React Hooks', 'Flask API']
+matches = [article for article in articles if required <= article["tags"]]
+print([article["title"] for article in matches])
 ```
+
+Tag filtering is a great use case, but it matters more once you already trust the internals that make membership and subset checks efficient.
 
 ## What to Notice in This Code
 
-- set's `in` operator is O(1), making it ideal for large-scale data lookups
-- `|`, `&`, `-`, `^` operators express set operations concisely
-- The `<=` operator checks subset relationships
-- frozenset is immutable, so it can serve as a dict key or element of another set
+- `set` is best understood as a key-only hash table.
+- Collisions still happen in sets; they just do not break uniqueness or membership semantics.
+- Deduplication works because hashing narrows the search and equality confirms identity.
+- `frozenset` is not a convenience alias; it is the immutable version that can itself be hashed.
+- Set algebra feels natural because the structure is already optimized for unique-key membership.
 
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
 |---------|-------------------|-----|
-| Creating an empty set with `{}` | `{}` creates an empty dict | Use `set()` to create an empty set |
-| Using a list as a set element | Lists are unhashable — causes TypeError | Convert to tuple first |
-| Relying on set ordering | Sets do not guarantee order | Use sorted() when order matters |
-| Using remove() for a missing element | Raises KeyError | Use discard() to silently ignore missing elements |
-| Expecting duplicates in set comprehensions | Duplicates are automatically removed | Verify this is the intended behavior |
+| Creating an empty set with `{}` | `{}` creates an empty dict | Use `set()` |
+| Treating collisions as impossible | Collisions are normal in hash tables | Design stable `__hash__` and `__eq__` |
+| Using mutable values as set elements | Mutable values are unhashable or unsafe | Use immutable values such as `tuple` or `frozenset` |
+| Assuming set order is meaningful | Set iteration order is not a stable semantic contract | Sort explicitly when presentation order matters |
+| Thinking `frozenset` is only for style | It solves the hashability boundary for nested sets and dict keys | Use it when the element itself must be a set |
 
 ## Real-World Applications
 
-- User permissions are managed as sets, with intersection checks for access control
-- Duplicate data is removed instantly with set conversion
-- Differences between two data sources are computed with set difference
-- Tag-based filtering leverages set operations
-- Already-processed items are tracked in a set to prevent reprocessing
+- Permissions are modeled as sets and compared with intersection/subset logic.
+- Deduplication pipelines often turn raw values into sets first.
+- Processed IDs are tracked in a set to prevent repeated work.
+- Feature flags and tags are naturally modeled as membership sets.
+- Differences between two datasets are often clearer as set difference than as loops.
 
 ## How Senior Engineers Think About This
 
-Sets are underappreciated. Many developers default to lists, but using sets for search and deduplication makes code both cleaner and faster.
+Senior engineers reach for `set` when order is not the product requirement but membership is. That single decision often shortens the code and removes accidental O(n²) behavior.
 
-When the question is "are there duplicates?" or "do these two collections share elements?", set should be the first thing that comes to mind.
+They also know correctness depends on element semantics. If equality or hashing is unstable, the set can no longer give reliable uniqueness or membership answers.
 
 ## Checklist
 
-- [ ] Can use basic set operations (add, discard, in)
-- [ ] Can explain union, intersection, difference, and symmetric difference
-- [ ] Can explain the purpose of frozenset
-- [ ] Can perform O(1) deduplication and membership checks with set
-- [ ] Can check subset and superset relationships
+- [ ] Can explain why `set` belongs to the same hash-table family as `dict`
+- [ ] Can explain how collisions and equality still produce correct deduplication
+- [ ] Can describe the hashability boundary between `set` and `frozenset`
+- [ ] Can use union, intersection, difference, and symmetric difference appropriately
+- [ ] Can choose `set` when membership matters more than order
 
 ## Exercises
 
-1. Write a function that finds common elements of two lists using set operations and returns them in the original order.
-2. Manage course enrollments for multiple students as sets and find courses taken by every student.
-3. Extract words from two text files and find words unique to each file using symmetric difference.
+1. Extend the `Tag` example so five different objects share one hash value, then verify membership still works correctly.
+2. Build a `set` of `frozenset` permission bundles and look up which bundles grant both `read` and `write`.
+3. Compare a list-based deduplication loop with `set(values)` on a large input and explain the runtime difference using the storage model.
 
 ## Summary and Next Steps
 
-Sets are hash-table-backed collections that provide O(1) lookups and rich set operations. They excel at deduplication, membership testing, and data comparison. The next article wraps up the series with a comprehensive guide for choosing the right data structure.
+Python `set` is a key-only hash table. That explains its fast membership checks, automatic deduplication, and expressive set algebra. Once you understand that correctness still depends on stable hashing and equality, `set` stops being a convenient trick and becomes a reliable design tool. The next article closes the series by showing how to choose the right data structure for a given workload.
 
 <!-- toc:begin -->
 - [What Are Data Structures?](./01-what-are-data-structures.md)
@@ -263,8 +268,9 @@ Sets are hash-table-backed collections that provide O(1) lookups and rich set op
 ## References
 
 - [Python Docs — Set Types](https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset)
+- [CPython set implementation (GitHub)](https://github.com/python/cpython/blob/main/Objects/setobject.c)
+- [Python Data Model — `__hash__` and `__eq__`](https://docs.python.org/3/reference/datamodel.html#object.__hash__)
 - [Real Python — Sets in Python](https://realpython.com/python-sets/)
 - [Python TimeComplexity — Set](https://wiki.python.org/moin/TimeComplexity)
-- [GeeksforGeeks — Python Set](https://www.geeksforgeeks.org/python-set/)
 
 Tags: Python, Data Structures, set, Set Operations, frozenset
