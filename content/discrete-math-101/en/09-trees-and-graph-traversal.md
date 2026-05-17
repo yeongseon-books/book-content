@@ -147,7 +147,7 @@ def bfs(graph: dict, start) -> dict:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in distances:
                 distances[u] = distances[v] + 1
                 queue.append(u)
@@ -159,6 +159,15 @@ print(f"distances from 1: {bfs(graph, 1)}")
 ```
 
 BFS visits closer vertices first by using a queue. When all edge weights are equal, BFS finds shortest paths.
+
+**Expected output**
+
+```text
+distances from 1: {1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2}
+```
+
+- Vertices `2` and `3` must be one edge away from `1`, and `4`, `5`, `6` must be two edges away.
+- If the distances are wrong, the usual bug is marking visited too late or accidentally using stack behavior instead of queue behavior.
 
 ### Step 3: DFS — depth-first search
 
@@ -194,6 +203,16 @@ print(f"DFS iterative: {dfs_iterative(graph, 1)}")
 
 DFS goes deep along a single path before backtracking. It is the engine for cycle detection, topological sort, and strongly connected components.
 
+**Expected output**
+
+```text
+DFS recursive: [1, 2, 4, 5, 3, 6]
+DFS iterative: [1, 2, 4, 5, 3, 6]
+```
+
+- In this walkthrough both versions match because neighbor order is fixed with `sorted(...)`.
+- If your order differs, the first thing to inspect is not the DFS idea itself but the neighbor ordering used during traversal.
+
 ### Step 4: Spanning trees from BFS/DFS
 
 ```python
@@ -204,7 +223,7 @@ def spanning_tree_bfs(graph: dict, start) -> list:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in visited:
                 visited.add(u)
                 tree.append((v, u))
@@ -216,6 +235,15 @@ print(f"spanning tree (BFS): {spanning_tree_bfs(graph, 1)}")
 ```
 
 Both BFS and DFS produce a spanning tree of the graph — a subgraph that contains every vertex and has no cycles.
+
+**Expected output**
+
+```text
+spanning tree (BFS): [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
+```
+
+- A BFS spanning tree fixes each parent the first time the vertex is discovered, so this edge list should be stable for the sample graph.
+- The tree must contain exactly `|V| - 1 = 5` edges because it spans 6 vertices.
 
 ### Step 5: Minimum spanning tree (MST) — Kruskal
 
@@ -247,10 +275,23 @@ def kruskal_mst(n_nodes: int, weighted_edges: list) -> list:
 
 
 edges = [(1, 0, 1), (4, 0, 2), (2, 1, 2), (3, 1, 3), (5, 2, 3)]
-print(f"MST: {kruskal_mst(4, edges)}")
+mst = kruskal_mst(4, edges)
+total_weight = sum(w for _, _, w in mst)
+print(f"MST: {mst}")
+print(f"total weight: {total_weight}")
 ```
 
 Kruskal sorts edges by weight and picks each one that does not form a cycle. It is used in network design, clustering, and circuit layout.
+
+**Expected output**
+
+```text
+MST: [(0, 1, 1), (1, 2, 2), (1, 3, 3)]
+total weight: 6
+```
+
+- The algorithm should keep the three cheapest non-cycling edges and stop after `n_nodes - 1` edges.
+- If you get a different answer, inspect the Union-Find cycle check first; that is the most common Kruskal bug.
 
 ## Notable Points
 
@@ -319,8 +360,8 @@ The next article ties everything together: how all the discrete-math topics cove
 ## References
 
 - [Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 11](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
-- [Wikipedia — Tree (graph theory)](https://en.wikipedia.org/wiki/Tree_(graph_theory))
-- [Wikipedia — Minimum Spanning Tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree)
+- [Algorithms — Sedgewick & Wayne, Section 4.1 Undirected Graphs](https://algs4.cs.princeton.edu/41graph/)
 - [Algorithms — Sedgewick & Wayne, Chapter 4.3](https://algs4.cs.princeton.edu/43mst/)
+- [MIT Mathematics for Computer Science — Trees and Graph Traversal](https://courses.csail.mit.edu/6.042/spring18/mcs.pdf)
 
 Tags: Computer Science, Discrete Math, Trees, BFS, DFS, Spanning Trees

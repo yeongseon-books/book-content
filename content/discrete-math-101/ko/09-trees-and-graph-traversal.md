@@ -139,7 +139,7 @@ def bfs(graph: dict, start) -> dict:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in distances:
                 distances[u] = distances[v] + 1
                 queue.append(u)
@@ -151,6 +151,15 @@ print(f"distances from 1: {bfs(graph, 1)}")
 ```
 
 BFS는 큐를 사용해 가까운 정점부터 탐색합니다. 모든 간선 가중치가 같다면 BFS가 최단 경로를 준다는 사실이 실무적으로 특히 중요합니다.
+
+**예상 출력**
+
+```text
+distances from 1: {1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2}
+```
+
+- 정점 `2`, `3`은 시작점 `1`에서 한 간선 거리, `4`, `5`, `6`은 두 간선 거리여야 합니다.
+- BFS에서 거리가 틀리면 보통 `visited` 표시를 늦게 하거나, 큐 대신 스택처럼 동작하게 만든 경우가 많습니다.
 
 ### 3단계: DFS — 깊이 우선 탐색
 
@@ -186,6 +195,16 @@ print(f"DFS iterative: {dfs_iterative(graph, 1)}")
 
 DFS는 한 갈래를 끝까지 따라간 뒤 되돌아옵니다. 그래서 사이클 검출, 위상 정렬, 강한 연결 요소처럼 구조를 깊게 파악하는 문제에 잘 맞습니다.
 
+**예상 출력**
+
+```text
+DFS recursive: [1, 2, 4, 5, 3, 6]
+DFS iterative: [1, 2, 4, 5, 3, 6]
+```
+
+- 이 예제는 이웃을 정렬했기 때문에 재귀 DFS와 반복 DFS의 방문 순서가 같게 고정됩니다.
+- 다른 순서가 나왔다면 알고리즘이 틀렸다기보다 이웃 순서가 달라졌을 가능성이 큽니다. 검증용 예제에서는 항상 `sorted(...)`를 먼저 적용해 보세요.
+
 ### 4단계: BFS/DFS가 만드는 신장 트리
 
 ```python
@@ -196,7 +215,7 @@ def spanning_tree_bfs(graph: dict, start) -> list:
     queue = deque([start])
     while queue:
         v = queue.popleft()
-        for u in graph[v]:
+        for u in sorted(graph[v]):
             if u not in visited:
                 visited.add(u)
                 tree.append((v, u))
@@ -208,6 +227,15 @@ print(f"spanning tree (BFS): {spanning_tree_bfs(graph, 1)}")
 ```
 
 BFS와 DFS는 모두 그래프 전체를 덮는 신장 트리를 만들 수 있습니다. 즉, 탐색 과정 자체가 그래프의 뼈대를 하나 뽑아내는 작업이기도 합니다.
+
+**예상 출력**
+
+```text
+spanning tree (BFS): [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
+```
+
+- BFS 신장 트리는 루트에서 가까운 정점부터 부모가 정해지므로, 같은 그래프를 쓰면 위 간선 집합이 나와야 합니다.
+- 간선 수는 항상 `정점 수 - 1`개여야 합니다. 여기서는 6개 정점을 덮으므로 5개 간선이 맞습니다.
 
 ### 5단계: 최소 신장 트리(MST) — Kruskal
 
@@ -239,10 +267,24 @@ def kruskal_mst(n_nodes: int, weighted_edges: list) -> list:
 
 
 edges = [(1, 0, 1), (4, 0, 2), (2, 1, 2), (3, 1, 3), (5, 2, 3)]
-print(f"MST: {kruskal_mst(4, edges)}")
+mst = kruskal_mst(4, edges)
+total_weight = sum(w for _, _, w in mst)
+print(f"MST: {mst}")
+print(f"total weight: {total_weight}")
 ```
 
 Kruskal은 간선을 가중치 순으로 보되 사이클을 만드는 간선은 건너뜁니다. 통신망 설계, 배선, 클러스터링에서 자주 쓰이는 이유가 바로 이 단순함과 강력함에 있습니다.
+
+**예상 출력**
+
+```text
+MST: [(0, 1, 1), (1, 2, 2), (1, 3, 3)]
+total weight: 6
+```
+
+- 가중치가 가장 작은 간선부터 보되, `(0, 2, 4)`와 `(2, 3, 5)`는 이미 연결된 정점을 다시 잇거나 더 비싸므로 선택되지 않습니다.
+- 결과 간선은 3개여야 하고, 총 가중치는 6이어야 합니다.
+- 값이 다르면 Union-Find의 `find/union`이 사이클을 제대로 막고 있는지 먼저 확인해 보세요.
 
 ## 주목할 점
 
@@ -311,8 +353,8 @@ Kruskal은 간선을 가중치 순으로 보되 사이클을 만드는 간선은
 ## 참고 자료
 
 - [Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 11](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
-- [Wikipedia — Tree (graph theory)](https://en.wikipedia.org/wiki/Tree_(graph_theory))
-- [Wikipedia — Minimum Spanning Tree](https://en.wikipedia.org/wiki/Minimum_spanning_tree)
+- [Algorithms — Sedgewick & Wayne, Section 4.1 Undirected Graphs](https://algs4.cs.princeton.edu/41graph/)
 - [Algorithms — Sedgewick & Wayne, Chapter 4.3](https://algs4.cs.princeton.edu/43mst/)
+- [MIT Mathematics for Computer Science — Trees and Graph Traversal](https://courses.csail.mit.edu/6.042/spring18/mcs.pdf)
 
 Tags: Computer Science, 이산수학, 트리, BFS, DFS, 신장 트리
