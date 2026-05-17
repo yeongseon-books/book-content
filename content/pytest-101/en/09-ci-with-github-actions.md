@@ -148,24 +148,33 @@ jobs:
           pip install -e ".[test]"
 
       - name: Run pytest with coverage gate
+        id: pytest
         run: |
+          set +e
           pytest -q --maxfail=1 \
             --cov=src \
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=80
+          status=$?
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Build HTML coverage report
-        if: matrix.python-version == '3.12'
+        if: ${{ always() && matrix.python-version == '3.12' }}
         run: coverage html
 
       - name: Upload HTML coverage artifact
-        if: matrix.python-version == '3.12'
+        if: ${{ always() && matrix.python-version == '3.12' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html
           path: htmlcov/
           if-no-files-found: error
+
+      - name: Fail job when pytest failed
+        if: ${{ steps.pytest.outputs.exit_code != '0' }}
+        run: exit 1
 ```
 
 This one file is the reference point for everything else in the article. Readers never have to reconstruct the workflow in their heads.
@@ -267,21 +276,40 @@ This one step does four jobs:
 - emits an XML report for later tooling
 - fails the run when coverage drops below the agreed floor
 
-### Step 7: Upload the HTML coverage artifact from one representative job
+### Step 7: Keep the artifact even when tests fail, while still failing the job
 
 ```yaml
+- name: Run pytest with coverage gate
+  id: pytest
+  run: |
+    set +e
+    pytest -q --maxfail=1 \
+      --cov=src \
+      --cov-report=term-missing \
+      --cov-report=xml \
+      --cov-fail-under=80
+    status=$?
+    echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+    exit 0
+
 - name: Build HTML coverage report
-  if: matrix.python-version == '3.12'
+  if: ${{ always() && matrix.python-version == '3.12' }}
   run: coverage html
 
 - name: Upload HTML coverage artifact
-  if: matrix.python-version == '3.12'
+  if: ${{ always() && matrix.python-version == '3.12' }}
   uses: actions/upload-artifact@v4
   with:
     name: coverage-html
     path: htmlcov/
     if-no-files-found: error
+
+- name: Fail job when pytest failed
+  if: ${{ steps.pytest.outputs.exit_code != '0' }}
+  run: exit 1
 ```
+
+GitHub Actions skips later steps after a failed step unless you explicitly use a status function. That means a plain failing `pytest` step usually prevents HTML coverage generation and artifact upload, which breaks the common review workflow of downloading artifacts from a red PR. The pattern above captures the pytest exit code, runs report generation and upload with `always()`, and then fails the job at the end so you get both diagnostics and a red status.
 
 Uploading HTML coverage from every matrix job usually creates more noise than value. One representative Python version is enough for most teams, and here Python 3.12 plays that role.
 
