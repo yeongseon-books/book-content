@@ -23,7 +23,9 @@ last_reviewed: '2026-05-12'
 
 # 레지스터와 ALU
 
-`x = 3` 같은 대입문도 CPU 안에서는 공기처럼 사라지지 않습니다. 이 글은 Computer Architecture 101 시리즈의 네 번째 글입니다. 여기서는 값이 잠깐 머무는 가장 빠른 저장소인 레지스터와, 실제 산술·논리 연산을 수행하는 ALU가 CPU 안에서 어떤 역할을 맡는지 보겠습니다.
+소스 코드는 거의 그대로인데도, 살아 있는 변수가 하나 더 늘었다는 이유만으로 루프가 갑자기 느려질 때가 있습니다. 그때 병목은 단순히 "ALU가 덧셈을 했다"가 아니라, 값이 어디에 머물렀는지, 어떤 명령어가 FLAGS를 세웠는지, 레지스터를 넘친 값이 스택으로 얼마나 흘러갔는지에 달려 있습니다.
+
+이 글은 Computer Architecture 101 시리즈의 네 번째 글입니다. 여기서는 레지스터, FLAGS, ALU를 CPU의 즉시 작업 공간으로 보고, 실제 어셈블리로 레지스터 압박과 스필이 어떤 모양으로 나타나는지 살펴보겠습니다.
 
 레지스터 수와 ALU 처리량은 코드의 성능 상한을 직접 결정합니다. 변수가 레지스터에 머물면 빠르고, 스택이나 메모리로 밀려나면 느려집니다. 그래서 핫 패스 최적화의 출발점은 종종 "이 변수는 지금 레지스터에 있나"입니다.
 
@@ -46,19 +48,10 @@ last_reviewed: '2026-05-12'
 
 레지스터는 코어 내부의 매우 작은 저장소이고, ALU는 두 입력을 받아 한 결과를 내놓는 연산 회로입니다. 비교 결과 같은 상태는 FLAGS 같은 특수 레지스터에 저장됩니다.
 
-```text
-   +----------------------- CPU Core ----------------------+
-   |                                                       |
-   |   +--------+    +-------+    +---------+              |
-   |   |  RAX   |--->|       |    |         |              |
-   |   |  RBX   |--->|  ALU  |--->|  RAX    |              |
-   |   |  RCX   |    |       |    | (result)|              |
-   |   |  ...   |    +-------+    +---------+              |
-   |   +--------+                                          |
-   |                                                       |
-   |   PC | SP | FLAGS  <- special registers               |
-   +-------------------------------------------------------+
-```
+### 레지스터와 ALU 데이터 흐름
+
+![레지스터와 ALU 데이터 흐름](../../../assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
+*빠른 실행은 살아 있는 값이 레지스터 안에 머물고, ALU가 바로 다음 결과를 만들고, 분기가 방금 갱신된 FLAGS를 읽을 때 일어납니다. 레지스터 압박 때문에 스택으로 스필이 생기면, 같은 루프에도 추가 로드와 스토어가 붙습니다.*
 
 ## 핵심 용어
 
@@ -86,144 +79,129 @@ def hot_loop():
 **After — "변수는 레지스터를 차지한다":**
 
 ```text
-On entry the compiler may assign:
+함수 진입 시 컴파일러는 대략 이렇게 둘 수 있습니다:
 - s   -> R0
 - i   -> R1
 - temp (i*2+1) -> R2
 
-One iteration:
-- R2 = R1 << 1    # i * 2 via shift
+한 번의 반복:
+- R2 = R1 << 1    # 시프트로 i * 2 계산
 - R2 = R2 + 1
 - R0 = R0 + R2
 - R1 = R1 + 1
-- compare and branch
+- 비교 후 분기
 ```
 
 루프가 레지스터 안에 머무르면 메모리 접근 없이 돌아갈 수 있습니다.
 
 ## 단계별로 따라가기
 
-### 1단계: 작은 ALU 만들기
+### 1단계: 실제 핫 루프부터 보기
 
-```python
-class ALU:
-    """A few basic arithmetic and logic operations."""
-    def execute(self, op, a, b):
-        if op == "ADD": return a + b
-        if op == "SUB": return a - b
-        if op == "AND": return a & b
-        if op == "OR":  return a | b
-        if op == "XOR": return a ^ b
-        if op == "SHL": return a << b
-        if op == "SHR": return a >> b
-        raise ValueError(op)
+```c
+long low_pressure(long *a, long n) {
+    long acc = 0;
+    for (long i = 0; i < n; ++i) {
+        long x = a[i] + i;
+        long y = x * 3;
+        acc += keep3(x, y, acc);
+    }
+    return acc;
+}
 
-alu = ALU()
-print(alu.execute("ADD", 3, 5))   # 8
-print(alu.execute("SHL", 1, 4))   # 16
+long high_pressure(long *a, long n, long bias) {
+    long acc = bias;
+    for (long i = 0; i < n; ++i) {
+        long v0 = a[i] + bias;
+        long v1 = a[i] + i;
+        long v2 = v0 ^ v1;
+        long v3 = v2 + acc;
+        long v4 = v3 + v1;
+        long v5 = v4 + v0;
+        long v6 = v5 + i;
+        long v7 = v6 + bias;
+        long v8 = v7 ^ acc;
+        long v9 = v8 + v3;
+        acc += keep10(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9);
+    }
+    return acc;
+}
 ```
 
-ALU는 본질적으로 두 입력과 한 출력으로 이뤄진 단순한 함수 모음입니다.
-
-### 2단계: 작은 레지스터 파일 만들기
-
-```python
-class RegisterFile:
-    def __init__(self, n=8):
-        self.regs = [0] * n
-
-    def read(self, idx):
-        return self.regs[idx]
-
-    def write(self, idx, value):
-        self.regs[idx] = value
-
-    def __repr__(self):
-        return " ".join(f"R{i}={v}" for i, v in enumerate(self.regs))
-
-rf = RegisterFile()
-rf.write(0, 3)
-rf.write(1, 5)
-print(rf)   # R0=3 R1=5 R2=0 ...
+```bash
+clang -target x86_64-apple-macos14 -S -O2 -fno-unroll-loops -x c pressure.c -o -
 ```
 
-회로 수준의 레지스터 파일은 배열처럼 보이지만, 여러 포트를 통해 한 사이클에 동시 읽기와 쓰기를 지원합니다.
+두 함수 모두 산술 연산을 하지만, 두 번째 함수는 중간값을 훨씬 많이 동시에 살려 둡니다. 바로 이런 상황에서 레지스터 압박이 실제 기계어에 드러납니다.
 
-### 3단계: ALU와 레지스터, 명령어 결합하기
+### 2단계: FLAGS가 분기를 먹이는 순간 보기
 
-```python
-def run(program, rf, alu):
-    for instr in program:
-        op, dst, src1, src2 = instr
-        a = rf.read(src1)
-        b = src2 if isinstance(src2, int) else rf.read(src2)
-        result = alu.execute(op, a, b)
-        rf.write(dst, result)
+```text
+# x86-64 발췌
+testl   %esi, %esi
+jle     LBB0_1
+...
+cmpq    %r12, %rbx
+jne     LBB2_4
 
-rf, alu = RegisterFile(), ALU()
-rf.write(0, 7)
-rf.write(1, 3)
-
-# R2 = R0 + R1; R3 = R2 << 1; R4 = R3 - R0
-run([
-    ("ADD", 2, 0, 1),
-    ("SHL", 3, 2, 1),     # immediate 1
-    ("SUB", 4, 3, 0),
-], rf, alu)
-print(rf)   # R0=7 R1=3 R2=10 R3=20 R4=13
+# ARM64 발췌
+subs    x9, x9, #1
+b.ne    LBB0_2
 ```
 
-대부분의 명령어는 결국 레지스터에서 값을 읽고, ALU로 계산하고, 다시 레지스터에 씁니다.
+`testl`, `cmpq`, `subs`는 사용자에게 보이는 값을 저장해서 중요한 것이 아닙니다. 조건 코드를 세우고, 바로 다음 분기가 그 FLAGS를 읽는다는 점이 핵심입니다. 이것이 실전 어셈블리에서 FLAGS가 맡는 역할입니다.
 
-### 4단계: FLAGS 레지스터 보기
+### 3단계: 레지스터 압박이 낮을 때의 코드 읽기
 
-```python
-class CPU:
-    def __init__(self):
-        self.rf = RegisterFile()
-        self.alu = ALU()
-        self.flags = {"Z": 0, "N": 0}   # zero, negative
-
-    def cmp(self, src1, src2):
-        diff = self.alu.execute("SUB", self.rf.read(src1), self.rf.read(src2))
-        self.flags["Z"] = int(diff == 0)
-        self.flags["N"] = int(diff < 0)
-
-cpu = CPU()
-cpu.rf.write(0, 10); cpu.rf.write(1, 10)
-cpu.cmp(0, 1); print(cpu.flags)   # Z=1, N=0  (equal)
-cpu.rf.write(1, 11)
-cpu.cmp(0, 1); print(cpu.flags)   # Z=0, N=1  (less)
+```text
+# x86-64, low_pressure (발췌)
+movq    (%r14,%r12,8), %rdi
+addq    %r12, %rdi
+leaq    (%rdi,%rdi,2), %rsi
+movq    %r15, %rdx
+callq   _keep3
+addq    %r15, %rax
+incq    %r12
+movq    %rax, %r15
 ```
 
-`if a == b`나 `if a < b`도 결국 SUB와 FLAGS 검사 조합으로 구현됩니다.
+여기서 중요한 것은 **보이지 않는 것**입니다. 스필 주석도 없고, 임시값을 살리기 위한 추가 push도 거의 없습니다. 로드와 ALU 연산, 함수 호출은 있지만 대부분의 살아 있는 값이 레지스터 안에 들어갑니다.
 
-### 5단계: 레지스터 할당 흉내내기
+### 4단계: 레지스터 압박이 높을 때의 코드 읽기
 
-```python
-def assign_registers(variables, num_regs=4):
-    """Simplest first-fit allocator."""
-    mapping = {}
-    free = list(range(num_regs))
-    for v in variables:
-        if not free:
-            mapping[v] = "STACK"   # spill
-        else:
-            mapping[v] = f"R{free.pop(0)}"
-    return mapping
-
-print(assign_registers(["a", "b", "c", "d"]))
-print(assign_registers(["a", "b", "c", "d", "e", "f"]))
+```text
+# x86-64, high_pressure (발췌)
+movq    %rdx, -48(%rbp)      ## 8-byte Spill
+movq    %rsi, -64(%rbp)      ## 8-byte Spill
+movq    %rdi, -56(%rbp)      ## 8-byte Spill
+...
+pushq   %r14
+pushq   %r11
+pushq   %rax
+pushq   %r10
+callq   _keep10
+addq    $32, %rsp
 ```
 
-레지스터가 부족하면 변수는 스택으로 밀려납니다. 이 스필이 메모리 트래픽을 만들고 성능을 끌어내립니다.
+이 부분이 장난감 할당기가 보여 주지 못하던 실제 증거입니다. `-O2`로 컴파일했는데도, 살아 있는 값이 많아지자 스택 슬롯으로 스필이 생기고 호출 전후에 push/pop 성격의 스택 트래픽이 늘어납니다. 이제 비용은 ALU만의 비용이 아니라 메모리 왕복 비용까지 포함합니다.
+
+### 5단계: 방금 본 어셈블리를 아키텍처 용어로 다시 읽기
+
+| 어셈블리에서 보이는 신호 | 의미 |
+| --- | --- |
+| `movq ... %rdi`, `movq ... %rsi`, `leaq ...` | 호출 전에 레지스터 안에서 값을 준비하는 ALU 경로 |
+| `testl`, `cmpq`, `subs` | 다음 분기를 위한 FLAGS 설정 |
+| `## Spill`, `pushq`, `-48(%rbp)` 같은 스택 슬롯 | 레지스터 압박이 편한 예산을 넘었다는 신호 |
+| `callq _keep3`와 `callq _keep10`의 차이 | 호출이 들어오면 인자 레지스터와 caller-saved 레지스터 관리가 함께 얽히며 압박이 커짐 |
+
+실무에서 레지스터 할당을 본다는 것은 색칠 문제를 떠올리는 것이 아니라, 컴파일러가 작업 집합을 레지스터 안에 붙잡아 둘 수 있는지 아니면 스택을 자꾸 왕복해야 하는지를 읽는 일입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
-- ALU는 두 입력과 한 출력을 갖는 단순한 회로입니다.
+- ALU는 입력값이 이미 레지스터에 있을 때 가장 싸게 느껴집니다.
 - 레지스터는 적지만 매우 빠릅니다.
-- 비교 결과는 FLAGS에 저장되고 분기가 소비합니다.
-- 레지스터에 못 들어간 변수는 스택으로 스필됩니다.
+- 비교 결과는 FLAGS에 저장되고 분기나 조건 이동이 곧바로 소비합니다.
+- 레지스터 압박은 스필 슬롯, push, reload, 추가 메모리 트래픽으로 드러납니다.
 
 ## 자주 하는 실수 5가지
 
@@ -259,11 +237,11 @@ print(assign_registers(["a", "b", "c", "d", "e", "f"]))
 
 ## 연습 문제
 
-1. `RegisterFile` 크기를 2개, 4개, 8개로 바꿔 가며 간단한 변수 목록을 넣어 보고 언제부터 `STACK`이 생기는지 확인해 보세요.
+1. 살아 있는 임시값이 2-3개인 루프와 8-10개인 루프를 각각 컴파일해 보고, high-pressure 버전에만 나타나는 스택 슬롯을 모두 표시해 보세요.
 
-2. `ALU`에 `MUL`과 `DIV`를 추가하고, 산술 연산 종류가 늘어나도 인터페이스는 어떻게 유지되는지 살펴보세요.
+2. 자신의 디스어셈블리에서 `cmp`, `test`, `subs` 중 하나를 찾아, 그 FLAGS를 어느 분기나 조건 이동이 소비하는지 따라가 보세요.
 
-3. 짧은 루프 하나를 어셈블리로 본 뒤, 어떤 값이 레지스터에 머무르고 어떤 값이 메모리에서 다시 읽히는지 추적해 보세요.
+3. godbolt.org나 로컬 컴파일로 함수 하나를 만들고, helper 인자가 3개일 때와 10개일 때를 비교해 보세요. 언제부터 스택 전달 인자와 스필 슬롯이 나타나는지 관찰해 보세요.
 
 ## 정리 및 다음 글
 
@@ -287,8 +265,9 @@ print(assign_registers(["a", "b", "c", "d", "e", "f"]))
 ## 참고 자료
 
 - [Patterson & Hennessy — Computer Organization and Design](https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1)
-- [Wikipedia — Arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit)
-- [Wikipedia — Processor register](https://en.wikipedia.org/wiki/Processor_register)
-- [Intel x86-64 Register Reference](https://wiki.osdev.org/CPU_Registers_x86-64)
+- [Intel 64 and IA-32 Architectures Software Developer's Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
+- [Intel 64 and IA-32 Architectures Optimization Reference Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel64-and-ia32-architectures-optimization.html)
+- [ARM Architecture Reference Manual](https://developer.arm.com/documentation)
+- [Agner Fog — Optimization Manuals](https://www.agner.org/optimize/)
 
 Tags: Computer Science, 컴퓨터 구조, 레지스터, ALU, CPU, 연산
