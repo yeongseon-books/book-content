@@ -22,17 +22,15 @@ last_reviewed: '2026-05-12'
 
 # 코딩 테스트 문제 접근법
 
-알고리즘을 안다는 것과 시간 제한 안에서 적용하는 것은 다른 문제입니다. 코딩 테스트의 진짜 난점은 구현 전에 제약을 빠르게 읽고, 문제를 적절한 패턴에 연결하는 데 있습니다.
+이 글은 Algorithms with Python 101 시리즈의 마지막 글입니다. 알고리즘을 안다는 것과 시간 제한 안에서 적용하는 것은 다른 문제이며, 코딩 테스트의 진짜 난점은 구현 전에 제약을 빠르게 읽고 문제를 적절한 패턴에 연결하는 데 있습니다.
 
-이 글은 Algorithms with Python 101 시리즈의 마지막 글입니다. 여기서는 앞선 글의 내용을 실제 문제 풀이 흐름으로 연결해 보겠습니다.
-
-반복 가능한 접근법이 중요한 이유는 시간을 아끼고, 불필요한 실수를 줄이고, 처음 보는 문제에서도 다시 복구할 수 있게 해 주기 때문입니다.
+이번 글에서는 앞선 내용을 "제약을 먼저 읽고, 틀린 복잡도를 먼저 버린 뒤, 구현과 검증까지 이어 가는 하나의 풀이 흐름"으로 묶어 보겠습니다. 반복 가능한 접근법이 중요한 이유는 시간을 아끼고, 불필요한 실수를 줄이고, 처음 보는 문제에서도 다시 복구할 수 있게 해 주기 때문입니다.
 
 ## 이 글에서 다룰 문제
 
+- 입력 크기 제약을 보고 어떤 알고리즘을 먼저 버려야 할까요?
 - 문제 유형을 알고리즘에 어떻게 연결할까요?
-- 입력 크기 제약을 보고 어떤 알고리즘을 골라야 할까요?
-- 문제를 푸는 네 단계 프레임워크는 무엇일까요?
+- 한 문제를 이해, 계획, 구현, 검증으로 어떻게 끝까지 끌고 갈까요?
 - 제한 시간 안에 도움 되는 Python 패턴은 어떤 것들이 있을까요?
 
 ## 왜 중요한가
@@ -92,152 +90,143 @@ def solve(data):
 
 ## 단계별 실습
 
-### Step 1: The Four-Step Framework
+### Step 1: 제약부터 읽고, 틀린 복잡도를 먼저 버립니다
 
 ```python
-"""
-Four steps for solving any problem:
+problem = {
+    "name": "Two Sum to Target",
+    "input": "정수 배열 nums, 목표값 target",
+    "goal": "합이 target과 정확히 같은 두 수의 인덱스를 반환. 없으면 None 반환",
+    "constraints": {
+        "n_max": 200_000,
+        "time_limit_seconds": 1,
+        "values": "음수와 중복 포함 가능",
+    },
+}
 
-1. Understand
-   - Check input/output format
-   - Check constraints (range of N, time limit)
-   - Trace through examples by hand
-
-2. Plan
-   - Reverse-engineer allowed complexity from input size
-   - Classify the problem type (search, sort, DP, graph, etc.)
-   - Outline the key idea
-
-3. Implement
-   - Write pseudocode first
-   - Implement one step at a time, verifying intermediate results
-   - Handle edge cases
-
-4. Verify
-   - Test with provided examples
-   - Test edge cases: empty input, minimum, maximum, duplicates
-   - Re-check time complexity
-"""
+print(problem)
 ```
 
-이 네 단계는 문제를 빨리 푸는 요령이 아니라, 틀리지 않기 위한 절차입니다. 특히 `Understand`와 `Plan`을 건너뛰면 구현이 빨라도 방향이 틀릴 가능성이 큽니다.
+`N = 200,000`이면 `O(N^2)` 이중 반복은 바로 탈락입니다. 1초 제한에서 4백억 번 비교에 가까운 접근은 구현이 아무리 깔끔해도 시간 초과가 납니다.
 
-### Step 2: Two Pointers Pattern
+### Step 2: 잘못된 접근을 먼저 기각합니다
 
 ```python
-def two_sum_sorted(nums: list[int], target: int) -> tuple[int, int] | None:
-    """Find two numbers in a sorted array that sum to target — O(N)"""
-    left, right = 0, len(nums) - 1
+def wrong_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] + nums[j] == target:
+                return (i, j)
+    return None
+```
+
+이 접근은 정답 자체는 구할 수 있지만, 제약과 맞지 않습니다. 따라서 여기서 중요한 것은 "이 코드는 느리다"가 아니라 "제약을 읽은 순간 이 코드를 쓰지 않기로 결정해야 한다"입니다.
+
+### Step 3: 문제 유형을 분류하고 목표 복잡도를 정합니다
+
+| 질문 | 이번 문제의 답 | 의미 |
+|------|----------------|------|
+| 배열이 정렬되어 있는가? | 아니요 | 먼저 정렬이 필요합니다 |
+| 두 값을 합쳐 목표를 맞추는가? | 예 | 투 포인터 후보입니다 |
+| 모든 조합을 다 봐야 하는가? | 아니요 | 브루트포스 탈락입니다 |
+| 목표 복잡도는 무엇인가? | `O(N log N)` 이하 | 정렬 + 선형 스캔이 가능합니다 |
+
+이 문제는 DP나 그래프가 아닙니다. 상태를 누적해 최적 부분 구조를 쓰는 문제도 아니고, 정점과 간선을 탐색하는 문제도 아니기 때문입니다. 핵심 힌트는 "두 수의 합"과 "정렬 후 양끝에서 좁히기"입니다.
+
+### Step 4: 정렬 + 투 포인터로 구현합니다
+
+```python
+def solve_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
+    indexed = sorted((value, index) for index, value in enumerate(nums))
+    left, right = 0, len(indexed) - 1
 
     while left < right:
-        current_sum = nums[left] + nums[right]
-        if current_sum == target:
-            return (left, right)
-        elif current_sum < target:
+        current = indexed[left][0] + indexed[right][0]
+        if current == target:
+            i, j = indexed[left][1], indexed[right][1]
+            return tuple(sorted((i, j)))
+        if current < target:
             left += 1
         else:
             right -= 1
 
     return None
 
-nums = [1, 2, 4, 6, 8, 10]
-print(two_sum_sorted(nums, 10))  # (1, 4) → 2+8=10
 
+sample_nums = [7, 1, 11, 2, 9]
+sample_target = 10
+sample_answer = solve_two_sum(sample_nums, sample_target)
 
-def remove_duplicates(nums: list[int]) -> int:
-    """Remove duplicates from a sorted array in place — O(N)"""
-    if not nums:
-        return 0
-    write = 1
-    for read in range(1, len(nums)):
-        if nums[read] != nums[read - 1]:
-            nums[write] = nums[read]
-            write += 1
-    return write
-
-nums = [1, 1, 2, 2, 3, 4, 4, 5]
-k = remove_duplicates(nums)
-print(nums[:k])  # [1, 2, 3, 4, 5]
+print(sample_answer)
+assert sample_answer == (0, 3)
 ```
 
-정렬된 배열에서 `O(N^2)`을 `O(N)`으로 줄일 때 가장 먼저 떠올려야 하는 패턴이 두 포인터입니다.
+구현에서 중요한 포인트는 세 가지입니다.
 
-### Step 3: Sliding Window Pattern
+1. 원본 인덱스를 잃지 않으려고 `(값, 원래 인덱스)` 쌍으로 정렬합니다.
+2. 합이 작으면 왼쪽 포인터를 오른쪽으로 움직이고, 합이 크면 오른쪽 포인터를 왼쪽으로 움직입니다.
+3. 답을 찾으면 인덱스를 오름차순으로 정리해 반환합니다.
+
+만약 샘플조차 틀리면 먼저 정렬된 값만 보고 원본 인덱스를 잃어버리지 않았는지 확인하면 됩니다.
+
+### Step 5: 검증 루프로 엣지 케이스까지 닫습니다
 
 ```python
-def max_subarray_sum(nums: list[int], k: int) -> int:
-    """Maximum sum of a contiguous subarray of length k — O(N)"""
-    if len(nums) < k:
-        return 0
+verification_cases = [
+    {
+        "name": "sample",
+        "nums": [7, 1, 11, 2, 9],
+        "target": 10,
+        "expected": (0, 3),
+        "inspect_first": "정렬 후에도 원래 인덱스를 함께 들고 있는지 확인합니다.",
+    },
+    {
+        "name": "no_solution",
+        "nums": [1, 4, 8],
+        "target": 20,
+        "expected": None,
+        "inspect_first": "while left < right 종료 조건과 None 반환 경로를 확인합니다.",
+    },
+    {
+        "name": "duplicates",
+        "nums": [3, 3, 4, 5],
+        "target": 6,
+        "expected": (0, 1),
+        "inspect_first": "같은 값을 두 번 써도 되는 문제인지, 그리고 left < right를 지키는지 확인합니다.",
+    },
+    {
+        "name": "negative_values",
+        "nums": [-5, -1, 2, 8],
+        "target": 3,
+        "expected": (0, 3),
+        "inspect_first": "정렬 후 포인터 이동 조건이 음수에서도 그대로 성립하는지 확인합니다.",
+    },
+    {
+        "name": "minimal_input",
+        "nums": [42],
+        "target": 42,
+        "expected": None,
+        "inspect_first": "원소가 2개 미만일 때 while 루프가 바로 끝나는지 확인합니다.",
+    },
+]
 
-    window_sum = sum(nums[:k])
-    max_sum = window_sum
 
-    for i in range(k, len(nums)):
-        window_sum += nums[i] - nums[i - k]
-        max_sum = max(max_sum, window_sum)
-
-    return max_sum
-
-nums = [2, 1, 5, 1, 3, 2]
-print(max_subarray_sum(nums, 3))  # 9 (5+1+3)
-
-
-def longest_unique_substring(s: str) -> int:
-    """Longest substring without repeating characters — O(N)"""
-    char_index: dict[str, int] = {}
-    max_len = 0
-    left = 0
-
-    for right, char in enumerate(s):
-        if char in char_index and char_index[char] >= left:
-            left = char_index[char] + 1
-        char_index[char] = right
-        max_len = max(max_len, right - left + 1)
-
-    return max_len
-
-print(longest_unique_substring("abcabcbb"))  # 3 ("abc")
-print(longest_unique_substring("pwwkew"))    # 3 ("wke")
+for case in verification_cases:
+    actual = solve_two_sum(case["nums"], case["target"])
+    print(f"{case['name']:>14} | expected={case['expected']} | actual={actual}")
+    assert actual == case["expected"], (
+        f"{case['name']} failed. Inspect first: {case['inspect_first']}"
+    )
 ```
 
-부분 배열, 부분 문자열, 연속 구간 문제에서 슬라이딩 윈도우는 거의 기본 패턴입니다. 매번 구간을 새로 계산하지 않고 이전 상태를 재활용한다는 점이 핵심입니다.
+이 검증 루프가 중요한 이유는 단순히 테스트 개수를 늘리기 위해서가 아닙니다. 실패를 네 가지 유형으로 빠르게 분해하기 위해서입니다.
 
-### Step 4: Problem Type Identification Checklist
+- 해답이 없는데도 무언가 반환하면 종료 조건이 잘못된 경우가 많습니다.
+- 중복 값 케이스가 틀리면 같은 원소를 두 번 쓰는 버그를 먼저 의심해야 합니다.
+- 음수 케이스가 틀리면 포인터 이동 규칙을 값의 크기와 합 관점에서 다시 읽어야 합니다.
+- 최소 입력에서 터지면 구현보다 먼저 경계 조건 처리가 빠졌는지 봐야 합니다.
 
-```python
-"""
-Problem type identification checklist:
-
-[Search / Sort]
-- "Find ~" + sorted data → binary search
-- "Sort ~" → sorted() or custom comparator
-- "k-th largest/smallest" → sorting or heapq.nlargest
-
-[DP]
-- "Find minimum/maximum" + "number of ways" → DP
-- "Number of ways to ~" → DP
-- Recurrence relation visible → DP
-
-[Graph]
-- "Is it connected?" → BFS/DFS
-- "Shortest path" + unweighted → BFS
-- "Shortest path" + weighted → Dijkstra
-- "Cycle detection" → DFS
-
-[Greedy]
-- "Minimum/maximum of ~" + solvable by sorting → greedy
-- Each choice does not affect future choices → greedy
-
-[String]
-- "Substring" → sliding window or two pointers
-- "Pattern matching" → KMP or regex
-"""
-```
-
-문제를 읽고 바로 코드로 들어가기보다, 어떤 범주인지 먼저 분류하면 선택지가 급격히 줄어듭니다. 이 분류 습관이 시간을 가장 많이 절약해 줍니다.
-
-### Step 5: Essential Python Tips for Coding Tests
+### Step 6: 구현 속도를 올려 주는 Python 기본기
 
 ```python
 import sys
@@ -284,7 +273,8 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 ## 이 코드에서 먼저 봐야 할 점
 
 - 입력 크기에서 허용 시간 복잡도를 역산하는 것이 알고리즘 선택의 출발점입니다.
-- 두 포인터와 슬라이딩 윈도우는 `O(N^2)`를 `O(N)`으로 줄일 때 핵심 패턴입니다.
+- 두 포인터는 "정렬 + 양끝 축소" 문제에서 `O(N^2)`를 `O(N log N)` 또는 `O(N)`으로 줄이는 핵심 패턴입니다.
+- 구현이 끝난 뒤에는 샘플, 해답 없음, 중복, 음수, 최소 입력 순으로 검증 루프를 돌리는 편이 안전합니다.
 - `defaultdict`, `Counter`, `heapq` 같은 표준 라이브러리는 구현 시간을 크게 줄여 줍니다.
 - `[[0]*n]*m` 2차원 배열 초기화 버그는 매우 흔하므로 반드시 구분해야 합니다.
 
@@ -292,11 +282,11 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|-------------|-----------|
-| 입력 크기를 확인하지 않음 | 잘못된 복잡도의 알고리즘을 골라 시간 초과가 납니다 | 먼저 `N` 범위를 봅니다 |
+| 입력 크기를 확인하지 않음 | 잘못된 복잡도의 알고리즘을 골라 시간 초과가 납니다 | 먼저 `N` 범위를 보고 탈락시킬 접근부터 정합니다 |
 | 경계 조건을 무시함 | 빈 입력이나 `N=1`에서 런타임 오류가 납니다 | 경계 조건을 먼저 처리합니다 |
-| 브루트포스 없이 바로 최적화 | 기준선이 없어 방향을 잃기 쉽습니다 | 브루트포스로 시작한 뒤 최적화합니다 |
-| 의사코드 없이 바로 구현 | 논리 오류를 늦게 발견합니다 | 먼저 간단한 설계나 의사코드를 씁니다 |
-| 테스트 없이 제출 | 사소한 버그를 놓칩니다 | 예제와 엣지 케이스를 모두 확인합니다 |
+| 문제 유형 분류 없이 바로 구현 | DP, 그래프, 투 포인터 중 엉뚱한 방향으로 갑니다 | 정렬 여부, 목표 연산, 허용 복잡도를 먼저 적습니다 |
+| 원본 인덱스를 잃어버림 | 값은 맞는데 정답 형식이 틀립니다 | 정렬 전에 `(값, 인덱스)` 쌍으로 묶습니다 |
+| 테스트 없이 제출 | 사소한 버그를 놓칩니다 | 예제와 엣지 케이스를 모두 확인하고 실패 시 먼저 볼 지점을 정합니다 |
 
 ## 실무에서는 이렇게 연결됩니다
 
@@ -308,7 +298,7 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 ## 현업에서는 이렇게 생각합니다
 
-코딩 테스트의 본질은 "올바른 알고리즘을 고르고, 시간 안에 정확히 구현하는 것"입니다. 많은 문제를 푸는 것도 중요하지만, 접근을 체계화하는 편이 더 큰 효과를 냅니다.
+코딩 테스트의 본질은 "올바른 알고리즘을 고르고, 시간 안에 정확히 구현하는 것"입니다. 많은 문제를 푸는 것도 중요하지만, 제약을 먼저 읽고 틀린 복잡도를 빨리 버리는 습관을 들이는 편이 더 큰 효과를 냅니다.
 
 이 사고방식은 실무에도 그대로 이어집니다. "이 데이터 크기에서 이 알고리즘이 충분히 빠른가?"라는 질문은 시스템 설계의 기본이기 때문입니다.
 
@@ -316,9 +306,9 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 - [ ] 입력 크기에서 허용 시간 복잡도를 역산할 수 있습니다
 - [ ] 문제를 탐색, DP, 그래프, 그리디 등으로 분류할 수 있습니다
-- [ ] 두 포인터와 슬라이딩 윈도우 패턴을 적용할 수 있습니다
+- [ ] 두 포인터 문제에서 잘못된 `O(N^2)` 접근을 먼저 기각할 수 있습니다
 - [ ] Python 표준 라이브러리로 빠르게 구현할 수 있습니다
-- [ ] 엣지 케이스를 체계적으로 테스트할 수 있습니다
+- [ ] 엣지 케이스를 체계적으로 테스트하고, 실패 시 먼저 볼 지점을 정할 수 있습니다
 
 ## 연습 문제
 
@@ -328,7 +318,7 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 ## 정리와 마무리
 
-코딩 테스트에서 가장 중요한 능력은 문제 유형을 빠르게 알아보는 것입니다. 입력 크기, 시간 복잡도, 알고리즘 선택으로 이어지는 흐름이 몸에 익으면 처음 보는 문제도 체계적으로 접근할 수 있습니다. 이 시리즈에서 다룬 탐색, 정렬, 재귀, DP, 그래프, 그리디는 코딩 테스트의 핵심 도구 상자입니다.
+코딩 테스트에서 가장 중요한 능력은 문제 유형을 빠르게 알아보고, 제약과 맞지 않는 접근을 초반에 버리는 것입니다. 입력 크기, 시간 복잡도, 알고리즘 선택, 구현, 검증으로 이어지는 흐름이 몸에 익으면 처음 보는 문제도 체계적으로 접근할 수 있습니다. 이 시리즈에서 다룬 탐색, 정렬, 재귀, DP, 그래프, 그리디는 코딩 테스트의 핵심 도구 상자이지만, 마지막 완성도는 결국 검증 루프에서 결정됩니다.
 
 <!-- toc:begin -->
 - [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
