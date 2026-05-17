@@ -59,7 +59,7 @@ Stacks naturally use `append()` and `pop()`, and even `heapq` stores its heap in
 
 ## List Capacity Growth
 
-![List Capacity Growth](../../../assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
+![List capacity growth](../../../assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
 
 *How Python lists keep logical length separate from reserved capacity, then reallocate into a larger contiguous block when spare slots run out*
 
