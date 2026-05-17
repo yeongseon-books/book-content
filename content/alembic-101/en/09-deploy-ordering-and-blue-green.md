@@ -87,7 +87,10 @@ phase 1 (now):
   - code: always writes a value into the new column
   - deploy: migration → code
 
-(time passes; verify every row has a value)
+gate before phase 2:
+  - query: SELECT COUNT(*) FROM users WHERE phone IS NULL
+  - pass: null_count == 0
+  - fail: null_count > 0, stop the tighten revision and keep backfilling
 
 phase 2 (next deploy):
   - DB: tighten column to nullable=False
@@ -95,7 +98,7 @@ phase 2 (next deploy):
   - deploy: migration only
 ```
 
-The interval between phases can be short or long, but you only apply phase 2 after you have proved that no row is still NULL.
+Here `users.phone` is the concrete example flow. Even after v2 starts writing `phone`, older rows can remain NULL, so phase 2 is only allowed once the `null_count == 0` gate has been proved.
 
 ### Four phases for a column rename
 
@@ -107,6 +110,17 @@ phase 4: drop the old column (code already stopped using it)
 ```
 
 Each phase is its own PR, and you confirm production stability between phases. It takes time, but it is the safest pattern available.
+
+### Late-stage rollout state table
+
+For changes such as `users.phone`, where add → write → tighten spans multiple deploys, a late-stage state table is often the fastest way to decide whether you may proceed.
+
+| Phase | DB shape | Code behavior | Allowed next action |
+| --- | --- | --- | --- |
+| Right after the expand revision | `phone` exists, nullable | v1 ignores it; v2 not deployed yet | Deploy v2 |
+| Blue/green overlap | `phone` exists, nullable | v1 ignores it; v2 writes `phone` | Keep backfilling and measure NULL rows |
+| Gate passed before tighten | `phone` exists, nullable, zero NULL rows | only v2 is live, write path stable | Apply the `nullable=False` tighten revision |
+| After contract | `phone` exists, NOT NULL | only v2 is live; reads and writes use `phone` | Run smoke tests, then consider dropping the old column in the next deploy cycle |
 
 ### Running once across many instances
 
@@ -135,7 +149,7 @@ Calling `alembic upgrade head` at application startup is fine for single-instanc
 4. blue/green both work correctly
 ```
 
-The After pattern has a zero-incident window. Enforcing this order on every deploy is the operational baseline.
+The After pattern keeps the schema compatible with both v1 and v2 throughout the overlap. Add a NULL-row gate and a smoke test, and you can decide when to tighten based on evidence rather than optimism.
 
 ## Step-by-step walkthrough
 
@@ -201,16 +215,72 @@ stages:
 
 Force `migrate` to always run before `deploy`.
 
-## Verification routine
+## Cutover runbook
 
 ```bash
+set -euo pipefail
+
+export DATABASE_URL="postgresql+psycopg://app:secret@db/prod"
+export GREEN_DEPLOYMENT="api-green"
+export RELEASE_IMAGE="ghcr.io/acme/api:v2"
+export HEALTH_URL="https://api.example.com/health"
+
+echo "[1/5] apply expand revision"
+alembic upgrade add_users_phone
+
+echo "[2/5] deploy the app version that writes users.phone"
+kubectl set image deployment/"$GREEN_DEPLOYMENT" api="${RELEASE_IMAGE}"
+kubectl rollout status deployment/"$GREEN_DEPLOYMENT" --timeout=180s
+
+echo "[3/5] block contract until users.phone has no NULL rows"
+NULL_COUNT="$({ python3 - <<'PY'
+import os
+from sqlalchemy import create_engine, text
+
+engine = create_engine(os.environ["DATABASE_URL"])
+with engine.connect() as conn:
+    count = conn.execute(text("SELECT COUNT(*) FROM users WHERE phone IS NULL")).scalar_one()
+print(count)
+PY
+})"
+[ "$NULL_COUNT" = "0" ] || {
+  echo "Fail: users.phone still has $NULL_COUNT NULL rows; do not run tighten_users_phone_not_null"
+  exit 1
+}
+echo "Pass: users.phone NULL rows = $NULL_COUNT"
+
+echo "[4/5] apply tighten revision"
+alembic upgrade tighten_users_phone_not_null
+
+echo "[5/5] smoke test the live service"
+HEALTH_BODY="$(curl -fsS "$HEALTH_URL")"
+export HEALTH_BODY
 python3 - <<'PY'
-print('migrate -> deploy -> smoke-test')
-print('assert no NULL rows before NOT NULL tighten')
+import json
+import os
+
+payload = json.loads(os.environ["HEALTH_BODY"])
+assert payload["status"] == "ok", payload
+print(f"Pass: status={payload['status']} alembic_version={payload.get('alembic_version', 'unknown')}")
 PY
 ```
 
-**Expected output:** your pipeline always migrates before deploy, and the tightening step is blocked until the NULL-row assertion is clean.
+The observable signals should be explicit.
+
+- If `[3/5]` does not produce `Pass: users.phone NULL rows = 0`, the run stops before the tighten revision.
+- `kubectl rollout status` must finish before you continue the cutover.
+- The final Python check passes only when `/health` returns `status=ok`.
+
+### First checks during a blue/green incident
+
+Before deeper analysis, answer these four questions first.
+
+1. Did the `migrate` stage actually run before `deploy`?
+2. Which application version is live right now: v1 or v2?
+3. Has `tighten_users_phone_not_null` already been applied?
+4. How many rows still match `SELECT COUNT(*) FROM users WHERE phone IS NULL`?
+
+Those four checks quickly narrow the problem to deploy ordering, the live app version, an early tighten, or incomplete data backfill.
 
 ## Common mistakes
 
