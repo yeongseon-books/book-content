@@ -52,21 +52,10 @@ Shortest path in navigation, friend recommendations on Instagram, npm dependency
 
 > Graph G = (V, E). V is the vertex set, E is the edge set. Variants emerge from direction, weight, and multiplicity.
 
-```text
-   undirected graph             directed graph (DAG)
-       A                            A
-      / \                          / \
-     B───C                        ↓   ↓
-     │   │                        B → C
-     D───E                            ↓
-                                      D
-   adjacency list:            weighted graph:
-   A: [B, C]                  A ──5── B
-   B: [A, D]                  │       │
-   C: [A, E]                  3       2
-                              │       │
-                              C ──1── D
-```
+### One graph, three representations
+
+![One undirected graph shown as a drawing, adjacency list, and adjacency matrix](../../../assets/discrete-math-101/08/08-01-graph-representations.en.png)
+*Left: the undirected graph itself. Middle: the same structure written as an adjacency list. Right: the adjacency matrix when the vertex order is fixed to `A, B, C, D`. The important idea is that these are not three different facts — they are three views of the same relationship data.*
 
 ## Key Terms
 
@@ -130,10 +119,10 @@ class Graph:
             self.adj[v].add(u)
 
     def neighbors(self, v):
-        return self.adj[v]
+        return sorted(self.adj[v])
 
     def nodes(self):
-        return set(self.adj.keys())
+        return sorted(self.adj.keys())
 
     def edges(self):
         seen = set()
@@ -141,7 +130,7 @@ class Graph:
             for v in self.adj[u]:
                 e = (u, v) if self.directed else tuple(sorted((u, v)))
                 seen.add(e)
-        return seen
+        return sorted(seen)
 
 
 g = Graph()
@@ -152,17 +141,25 @@ print(f"vertices: {g.nodes()}")
 print(f"edges:    {g.edges()}")
 ```
 
+**Expected output**
+
+```text
+vertices: ['A', 'B', 'C', 'D']
+edges:    [('A', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'D')]
+```
+
+- The vertex set should contain exactly `A, B, C, D`.
+- The edge set should contain four undirected edges, not both `(A, B)` and `(B, A)` separately.
+- If your code still prints raw `set(...)` objects, sort before comparing because set order is not stable.
+
 ### Step 2: Adjacency list vs adjacency matrix
 
 ```python
-import numpy as np
-
-
 def to_adjacency_matrix(g: Graph) -> tuple:
     nodes = sorted(g.nodes())
     n = len(nodes)
     idx = {v: i for i, v in enumerate(nodes)}
-    M = np.zeros((n, n), dtype=int)
+    M = [[0] * n for _ in range(n)]
     for u, v in g.edges():
         M[idx[u]][idx[v]] = 1
         if not g.directed:
@@ -182,6 +179,21 @@ print(f"adjacency matrix:\n{M}")
 
 Sparse graphs (few edges) favor lists; dense graphs (many edges) favor matrices.
 
+**Expected output**
+
+```text
+node order: ['A', 'B', 'C', 'D']
+adjacency matrix:
+[[0, 1, 1, 0],
+ [1, 0, 1, 0],
+ [1, 1, 0, 1],
+ [0, 0, 1, 0]]
+```
+
+- The rows and columns must share the same order, here `['A', 'B', 'C', 'D']`.
+- `M[0][2] = 1` means `A` is adjacent to `C`.
+- If you choose a different vertex order, the matrix layout changes too, so compare the order and the matrix together.
+
 ### Step 3: Degree and the handshake lemma
 
 ```python
@@ -198,6 +210,16 @@ assert total_degree == 2 * edge_count
 ```
 
 The handshake lemma is the intuition that every edge contributes to two vertices. A useful corollary: the number of odd-degree vertices is always even.
+
+**Expected output**
+
+```text
+sum of degrees = 8, 2|E| = 8
+```
+
+- Here the degrees are `A=2`, `B=2`, `C=3`, `D=1`, so the total is 8.
+- With 4 edges, `2|E|` must also be 8.
+- If the two sides differ, suspect duplicated edges or a missing reverse edge in the undirected graph.
 
 ### Step 4: Paths and connectivity
 
@@ -233,14 +255,29 @@ def connected_components(g: Graph) -> list:
             if v in comp:
                 continue
             comp.add(v); visited.add(v)
-            queue.extend(g.adj[v] - comp)
-        components.append(comp)
+            queue.extend(sorted(g.adj[v] - comp))
+        components.append(sorted(comp))
     return components
 
 
+g_disconnected = Graph()
+for u, v in [("A", "B"), ("B", "C"), ("C", "D"), ("X", "Y")]:
+    g_disconnected.add_edge(u, v)
+
 print(f"path A→D exists: {has_path(g, 'A', 'D')}")
-print(f"connected components: {connected_components(g)}")
+print(f"connected components: {connected_components(g_disconnected)}")
 ```
+
+**Expected output**
+
+```text
+path A→D exists: True
+connected components: [['A', 'B', 'C', 'D'], ['X', 'Y']]
+```
+
+- `A` can reach `D` through a path like `A → C → D`, so reachability must be `True`.
+- `g_disconnected` should split into exactly two components: `{A, B, C, D}` and `{X, Y}`.
+- If the component ordering differs, that usually means you skipped sorting during comparison.
 
 ### Step 5: Special graphs
 
@@ -285,6 +322,17 @@ print(f"bipartite: {is_bipartite(bipart)}")
 ```
 
 A DAG (directed acyclic graph) is a directed graph with no cycles, and topological sort applies. Bipartite graphs model matching problems such as assignment.
+
+**Expected output**
+
+```text
+K4 is complete: True
+bipartite: True
+```
+
+- `K4` is complete because every pair of its four vertices is connected.
+- `bipart` is bipartite because its vertices can be split into `{u1, u2}` and `{v1, v2}`.
+- If `bipartite` becomes `False`, check the coloring logic first — especially whether opposite colors are assigned when a neighbor is first discovered.
 
 ## Notable Points
 
@@ -353,8 +401,8 @@ The next article looks at the most important algorithms on graphs — trees, BFS
 ## References
 
 - [Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 10](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
-- [Wikipedia — Graph Theory](https://en.wikipedia.org/wiki/Graph_theory)
-- [NetworkX Documentation](https://networkx.org/documentation/stable/)
 - [Algorithms — Sedgewick & Wayne, Chapter 4](https://algs4.cs.princeton.edu/40graphs/)
+- [MIT Mathematics for Computer Science — Graphs and Trees](https://courses.csail.mit.edu/6.042/spring18/mcs.pdf)
+- [NetworkX Documentation — Graph types and representations](https://networkx.org/documentation/stable/reference/classes/index.html)
 
 Tags: Computer Science, Discrete Math, Graph Theory, Vertices and Edges, Adjacency List, Networks
