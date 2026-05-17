@@ -23,17 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Registers and the ALU
 
-> Computer Architecture 101 series (4/10)
+A loop can look unchanged in source code and still slow down because one more live variable forced the compiler to spill a value to the stack. When that happens, the story is no longer just "the ALU did an add." It is about where values lived, which instruction set FLAGS, and how often execution had to leave the register file.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you run `x = 3`, where does that 3 actually live for a moment, and who carries out the addition?
-
-> Inside a CPU, data shuttles constantly between memory and registers. Registers are the smallest and fastest storage, and the ALU (Arithmetic Logic Unit) is the circuit that actually performs operations. Every add, compare, and bit operation is one ALU cycle, and every variable's temporary home is a register. This article looks inside.
-
-<!-- a-grade-intro:end -->
-
-This is post 4 in the Computer Architecture 101 series.
+This is post 4 in the Computer Architecture 101 series. Here we look at registers, FLAGS, and the ALU as the CPU's immediate working set, then use real assembly to show what register pressure and spills look like in practice.
 
 ## What You Will Learn
 
@@ -52,19 +44,10 @@ The number of registers is the number of variables a CPU can hold at once. Too f
 
 > A register is small storage inside a CPU core: typically a few dozen, each 64 bits wide, and accessible in less than a cycle. The ALU takes two register values as inputs and produces a result in one cycle. All arithmetic and logic happens here.
 
-```text
-   +----------------------- CPU Core ----------------------+
-   |                                                       |
-   |   +--------+    +-------+    +---------+              |
-   |   |  RAX   |--->|       |    |         |              |
-   |   |  RBX   |--->|  ALU  |--->|  RAX    |              |
-   |   |  RCX   |    |       |    | (result)|              |
-   |   |  ...   |    +-------+    +---------+              |
-   |   +--------+                                          |
-   |                                                       |
-   |   PC | SP | FLAGS  <- special registers               |
-   +-------------------------------------------------------+
-```
+### Registers ALU dataflow
+
+![Registers ALU dataflow](../../../assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
+*Fast execution happens when live values stay in registers, the ALU produces the next result, and the branch reads fresh FLAGS. Once register pressure forces spill traffic to the stack, the same source loop acquires extra loads and stores.*
 
 ## Key Terms
 
@@ -109,127 +92,112 @@ When the loop fits in registers, no memory access is needed.
 
 ## Hands-on: Step by Step
 
-### Step 1: Build a tiny ALU
+### Step 1: Start from a real hot loop
 
-```python
-class ALU:
-    """A few basic arithmetic and logic operations."""
-    def execute(self, op, a, b):
-        if op == "ADD": return a + b
-        if op == "SUB": return a - b
-        if op == "AND": return a & b
-        if op == "OR":  return a | b
-        if op == "XOR": return a ^ b
-        if op == "SHL": return a << b
-        if op == "SHR": return a >> b
-        raise ValueError(op)
+```c
+long low_pressure(long *a, long n) {
+    long acc = 0;
+    for (long i = 0; i < n; ++i) {
+        long x = a[i] + i;
+        long y = x * 3;
+        acc += keep3(x, y, acc);
+    }
+    return acc;
+}
 
-alu = ALU()
-print(alu.execute("ADD", 3, 5))   # 8
-print(alu.execute("SHL", 1, 4))   # 16
+long high_pressure(long *a, long n, long bias) {
+    long acc = bias;
+    for (long i = 0; i < n; ++i) {
+        long v0 = a[i] + bias;
+        long v1 = a[i] + i;
+        long v2 = v0 ^ v1;
+        long v3 = v2 + acc;
+        long v4 = v3 + v1;
+        long v5 = v4 + v0;
+        long v6 = v5 + i;
+        long v7 = v6 + bias;
+        long v8 = v7 ^ acc;
+        long v9 = v8 + v3;
+        acc += keep10(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9);
+    }
+    return acc;
+}
 ```
 
-The ALU is a set of simple two-input, one-output functions. Real circuits hew close to this abstraction.
-
-### Step 2: Build a tiny register file
-
-```python
-class RegisterFile:
-    def __init__(self, n=8):
-        self.regs = [0] * n
-
-    def read(self, idx):
-        return self.regs[idx]
-
-    def write(self, idx, value):
-        self.regs[idx] = value
-
-    def __repr__(self):
-        return " ".join(f"R{i}={v}" for i, v in enumerate(self.regs))
-
-rf = RegisterFile()
-rf.write(0, 3)
-rf.write(1, 5)
-print(rf)   # R0=3 R1=5 R2=0 ...
+```bash
+clang -target x86_64-apple-macos14 -S -O2 -fno-unroll-loops -x c pressure.c -o -
 ```
 
-A register file looks like a small array. In hardware it supports several simultaneous reads and writes per cycle through multiple ports.
+Both functions do arithmetic, but the second one keeps far more intermediate values alive at the same time. That is exactly the situation where register pressure becomes visible in emitted code.
 
-### Step 3: Combine ALU, registers, and instructions
+### Step 2: Watch FLAGS feed a control-flow decision
 
-```python
-def run(program, rf, alu):
-    for instr in program:
-        op, dst, src1, src2 = instr
-        a = rf.read(src1)
-        b = src2 if isinstance(src2, int) else rf.read(src2)
-        result = alu.execute(op, a, b)
-        rf.write(dst, result)
+```text
+# x86-64 excerpt
+testl   %esi, %esi
+jle     LBB0_1
+...
+cmpq    %r12, %rbx
+jne     LBB2_4
 
-rf, alu = RegisterFile(), ALU()
-rf.write(0, 7)
-rf.write(1, 3)
-
-# R2 = R0 + R1; R3 = R2 << 1; R4 = R3 - R0
-run([
-    ("ADD", 2, 0, 1),
-    ("SHL", 3, 2, 1),     # immediate 1
-    ("SUB", 4, 3, 0),
-], rf, alu)
-print(rf)   # R0=7 R1=3 R2=10 R3=20 R4=13
+# ARM64 excerpt
+subs    x9, x9, #1
+b.ne    LBB0_2
 ```
 
-Register-to-register instructions dominate any ISA. Code that rarely touches memory is the fastest code.
+`testl`, `cmpq`, and `subs` are not interesting because they store a user-visible value. They are interesting because they set condition codes, and the next branch consumes those flags immediately. That is the practical role of FLAGS in real machine code.
 
-### Step 4: Use a FLAGS register for comparisons
+### Step 3: Read the low-pressure version
 
-```python
-class CPU:
-    def __init__(self):
-        self.rf = RegisterFile()
-        self.alu = ALU()
-        self.flags = {"Z": 0, "N": 0}   # zero, negative
-
-    def cmp(self, src1, src2):
-        diff = self.alu.execute("SUB", self.rf.read(src1), self.rf.read(src2))
-        self.flags["Z"] = int(diff == 0)
-        self.flags["N"] = int(diff < 0)
-
-cpu = CPU()
-cpu.rf.write(0, 10); cpu.rf.write(1, 10)
-cpu.cmp(0, 1); print(cpu.flags)   # Z=1, N=0  (equal)
-cpu.rf.write(1, 11)
-cpu.cmp(0, 1); print(cpu.flags)   # Z=0, N=1  (less)
+```text
+# x86-64, low_pressure (excerpt)
+movq    (%r14,%r12,8), %rdi
+addq    %r12, %rdi
+leaq    (%rdi,%rdi,2), %rsi
+movq    %r15, %rdx
+callq   _keep3
+addq    %r15, %rax
+incq    %r12
+movq    %rax, %r15
 ```
 
-Conditions like `if a == b` and `if a < b` are implemented as a SUB followed by a FLAGS check.
+The key pattern is what you do **not** see: no spill comments, no extra stack pushes for live temporaries, and no reload storm around the call. The compiler is still doing loads, ALU work, and a call, but most live values fit in registers.
 
-### Step 5: Mimic compiler register allocation
+### Step 4: Read the high-pressure version
 
-```python
-def assign_registers(variables, num_regs=4):
-    """Simplest first-fit allocator."""
-    mapping = {}
-    free = list(range(num_regs))
-    for v in variables:
-        if not free:
-            mapping[v] = "STACK"   # spill
-        else:
-            mapping[v] = f"R{free.pop(0)}"
-    return mapping
-
-print(assign_registers(["a", "b", "c", "d"]))
-print(assign_registers(["a", "b", "c", "d", "e", "f"]))
+```text
+# x86-64, high_pressure (excerpt)
+movq    %rdx, -48(%rbp)      ## 8-byte Spill
+movq    %rsi, -64(%rbp)      ## 8-byte Spill
+movq    %rdi, -56(%rbp)      ## 8-byte Spill
+...
+pushq   %r14
+pushq   %r11
+pushq   %rax
+pushq   %r10
+callq   _keep10
+addq    $32, %rsp
 ```
 
-When registers run out, some variables spill to the stack (memory). Deep functions and large expressions therefore see more memory traffic.
+This is the evidence the toy allocator could never show clearly. The function is still compiled at `-O2`, yet extra live values force spills to stack slots and extra push/pop traffic around the call. The ALU is not the only cost anymore; memory traffic entered the hot path.
+
+### Step 5: Translate the listing back into architecture terms
+
+| Signal in the assembly | What it means |
+| --- | --- |
+| `movq ... %rdi`, `movq ... %rsi`, `leaq ...` | Register-to-register ALU setup before the call |
+| `testl`, `cmpq`, `subs` | Set FLAGS for a later branch decision |
+| `## Spill`, `pushq`, stack slot offsets like `-48(%rbp)` | Register pressure exceeded the easy register budget |
+| `callq _keep3` vs `callq _keep10` | Calls amplify pressure because argument registers and caller-saved registers must be managed together |
+
+That is the production meaning of register allocation: not a coloring diagram on a whiteboard, but whether the compiler can keep the working set in registers or has to bounce through the stack.
 
 ## What to Notice in This Code
 
-- The ALU is a simple two-input, one-output circuit
+- The ALU only looks cheap when its operands are already in registers
 - Registers are few and fast (dozens, sub-cycle access)
-- FLAGS is set by comparisons and consumed by branches
-- Variables that do not fit in registers are spilled to the stack
+- FLAGS is set by comparisons and consumed immediately by branches or conditional moves
+- Register pressure shows up as spill slots, pushes, reloads, and extra memory traffic
 
 ## Five Common Mistakes
 
@@ -265,11 +233,11 @@ A senior also remembers that "FLAGS is an invisible byproduct." Branches that de
 
 ## Practice Problems
 
-1. Use `RegisterFile` and `ALU` to compute the sum of 1..N using only registers — no memory access.
+1. Compile one loop with 2-3 live temporaries and another with 8-10 live temporaries. Mark every stack slot that appears only in the high-pressure version.
 
-2. Use FLAGS to implement `c = 1 if a < b else 0` at the instruction level. Combine CMP, JL, and MOV.
+2. Find one `cmp`, `test`, or `subs` instruction in your own disassembly and trace which later branch or conditional move consumes its FLAGS.
 
-3. Compile a function you wrote on godbolt.org and count the registers used. Push variables past 16 and compare -O0 with -O2 output.
+3. Compile a function you wrote on godbolt.org or locally, then compare a version with a helper taking 3 arguments and one taking 10 arguments. Note when stack-passed arguments and spill slots begin to appear.
 
 ## Wrap-up and Next Steps
 
@@ -293,8 +261,9 @@ Next we zoom out to the larger landscape of memory: how RAM is addressed and how
 ## References
 
 - [Patterson & Hennessy — Computer Organization and Design](https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1)
-- [Wikipedia — Arithmetic logic unit](https://en.wikipedia.org/wiki/Arithmetic_logic_unit)
-- [Wikipedia — Processor register](https://en.wikipedia.org/wiki/Processor_register)
-- [Intel x86-64 Register Reference](https://wiki.osdev.org/CPU_Registers_x86-64)
+- [Intel 64 and IA-32 Architectures Software Developer's Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
+- [Intel 64 and IA-32 Architectures Optimization Reference Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel64-and-ia32-architectures-optimization.html)
+- [ARM Architecture Reference Manual](https://developer.arm.com/documentation)
+- [Agner Fog — Optimization Manuals](https://www.agner.org/optimize/)
 
 Tags: Computer Science, Computer Architecture, Registers, ALU, CPU, Computation
