@@ -16,132 +16,173 @@ tags:
   - AUC
   - PRCurve
   - scikit-learn
-seo_description: 임계값 변화에 따른 모델의 변별력을 나타내는 ROC 곡선과 AUC 지표의 의미를 이해하고, 모델 성능을 객관적으로 측정합니다.
-last_reviewed: '2026-05-15'
+seo_description: ROC-AUC와 PR-AUC를 운영 임계값, 혼동 행렬, 비용 판단으로 연결하는 방법을 설명합니다.
+last_reviewed: '2026-05-17'
 ---
 
 # ROC와 AUC 이해하기
 
-임계값을 어디에 둘지 아직 정하지 않았는데도 모델을 비교하고 싶을 때가 있습니다. 이때 자주 등장하는 도구가 ROC 곡선과 AUC입니다. 둘은 특정 기준선 하나에 묶이지 않고, 모델이 양성과 음성을 얼마나 잘 순위화하는지를 보게 해 줍니다.
-
-그래서 AUC는 편리합니다. 하지만 편리함이 곧 배포 기준을 대신해 주지는 않습니다. 실제 운영은 언제나 어떤 임계값 하나에서 동작하고, 그 지점의 false positive와 recall이 비즈니스 결과를 결정합니다. ROC와 AUC는 그 판단을 돕는 요약이지, 배포 버튼을 대신 누르는 숫자는 아닙니다.
-
 이 글은 Model Evaluation 101 시리즈의 6번째 글입니다.
 
----
+ROC와 AUC는 임계값을 아직 고정하지 않았을 때 후보 모델을 비교하는 데 유용합니다. 하지만 issue #772가 정확히 짚었듯이 기존 글의 코드는 `ko/06-roc-and-auc.md:84-115`에서 `thr[:3]`, AUC, PR-AUC, `FPR<=0.05` 조회까지만 보여 주고 끝났습니다. 즉 **곡선 요약에서 실제 운영 결정으로 착지하지 못한 것**입니다.
 
-## 이 글에서 다룰 문제
+이번 글은 그 마지막 단계를 보강합니다. ROC-AUC를 순위화 능력의 요약으로 읽고, 같은 데이터에서 PR-AUC 차이까지 확인한 뒤, 실제로 `FPR <= 0.05` 예산 아래에서 어떤 임계값을 고를지, 그때의 혼동 행렬과 정밀도·재현율·간단한 비용은 얼마인지까지 연결하겠습니다.
 
-- ROC 곡선의 두 축은 각각 무엇을 뜻할까요?
-- AUC는 모델의 어떤 능력을 요약할까요?
-- ROC와 PR 곡선은 언제 다른 결론을 줄까요?
-- 불균형 데이터에서는 왜 PR-AUC도 함께 봐야 할까요?
-- 운영 임계값은 ROC에서 어떻게 고를 수 있을까요?
+## 이 글이 답하는 질문
 
-> ROC는 모든 임계값을 훑으면서 재현율과 거짓 양성 비율의 관계를 그린 곡선입니다. AUC는 그 곡선을 한 숫자로 압축한 값이며, 본질적으로는 모델의 순위화 능력을 요약합니다.
+- ROC-AUC와 PR-AUC가 왜 같은 데이터에서 다른 온도로 들릴까요?
+- `FPR <= 0.05` 같은 정책 제약은 실제 임계값 선택으로 어떻게 연결될까요?
+- AUC가 괜찮아 보여도 어떤 조건에서 “아직 배포 준비가 안 됨” 결론이 나올까요?
 
-## 왜 이 글이 중요한가
+## 이 장의 최종 질문
 
-모델을 비교할 때 임계값 하나에 너무 일찍 묶이면 전체적인 순위 성능을 놓치기 쉽습니다. 반대로 AUC만 보고 배포를 결정하면 특정 운영점에서의 성능을 놓칩니다. 이 둘 사이의 역할 구분을 아는 것이 중요합니다.
+이번 장의 질문은 단순합니다.
 
-특히 불균형 데이터에서는 ROC가 꽤 좋아 보여도 실제 양성 탐지 품질은 기대보다 낮을 수 있습니다. 그래서 ROC-AUC와 함께 PR-AUC, 그리고 실제 운영 임계값에서의 정밀도와 재현율을 함께 보는 습관이 필요합니다.
+> AUC가 괜찮아 보일 때, 실제 배포 임계값에서는 어떤 손해를 감수하게 될까요?
+
+이 질문에 답하지 못하면 ROC-AUC는 “좋아 보이는 요약 숫자”에서 멈춥니다. 이 질문까지 답해야 03~06장의 결정 메트릭 흐름이 완성됩니다.
 
 ## 한눈에 보는 멘탈 모델
 
 ![점수 순위에서 ROC와 PR 비교로 이어지는 평가 흐름](../../../assets/model-evaluation-101/06/06-01-concept-at-a-glance.ko.png)
 
 *점수 순위에서 ROC와 PR 비교로 이어지는 평가 흐름*
-이 그림이 보여 주는 핵심은 점수의 역할입니다. ROC와 PR은 둘 다 확률 점수나 결정 함수 점수를 정렬해 만든 곡선입니다. 즉 이 단계에서는 아직 최종 클래스 예측을 고정하지 않았습니다.
 
-## 핵심 용어
+ROC와 PR은 둘 다 **점수 순위**에서 출발합니다. 하지만 배포는 결국 하나의 임계값에서 일어나므로, 곡선은 마지막에 다시 혼동 행렬과 비용으로 내려와야 합니다.
 
-- **TPR**: 재현율과 같은 값입니다.
-- **FPR**: `FP/(FP+TN)`입니다.
-- **ROC**: 임계값을 바꾸며 TPR과 FPR의 관계를 그린 곡선입니다.
-- **AUC-ROC**: 임의의 양성이 임의의 음성보다 더 높은 점수를 받을 확률로 해석할 수 있습니다.
-- **AUC-PR**: 정밀도-재현율 곡선 아래 면적이며, 불균형 데이터에서 더 민감합니다.
-
-## ROC를 읽는 방식의 전환
-
-좋지 않은 습관은 `AUC 0.9`만 보고 모델이 훌륭하다고 결론 내리는 것입니다. 이 숫자는 분명 유용하지만, 배포 임계값에서의 실제 의사결정 비용을 보여 주지는 않습니다.
-
-좋은 습관은 AUC를 비교용 요약 숫자로 쓰고, 그다음 실제 운영 제한 조건을 곡선 위에 얹어 읽는 것입니다. 예를 들어 false positive 비율을 5% 이하로 제한해야 한다면, 그 조건에서 얻을 수 있는 TPR을 보는 식입니다.
-
-## ROC와 AUC를 보는 다섯 단계
-
-### 1단계 — 데이터와 모델
-
-```python
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-X, y = make_classification(n_samples=2000, weights=[0.9, 0.1], random_state=0)
-Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-proba = m.predict_proba(Xte)[:, 1]
-```
-
-### 2단계 — ROC 곡선
-
-```python
-from sklearn.metrics import roc_curve
-fpr, tpr, thr = roc_curve(yte, proba)
-print("first 3 thresholds:", thr[:3])
-```
-
-### 3단계 — AUC 계산
-
-```python
-from sklearn.metrics import roc_auc_score
-print("AUC-ROC:", roc_auc_score(yte, proba))
-```
-
-### 4단계 — PR-AUC와 비교
-
-```python
-from sklearn.metrics import average_precision_score
-print("AUC-PR:", average_precision_score(yte, proba))
-```
-
-### 5단계 — 운영 임계값 선택
+## 곡선 요약에서 운영 선택까지 가는 코드
 
 ```python
 import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    average_precision_score,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=5000,
+    n_features=12,
+    n_informative=5,
+    n_redundant=3,
+    weights=[0.96, 0.04],
+    class_sep=1.2,
+    flip_y=0.02,
+    random_state=31,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.3,
+    stratify=y,
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+proba = model.predict_proba(X_test)[:, 1]
+
+fpr, tpr, thresholds = roc_curve(y_test, proba)
+print("ROC-AUC:", round(roc_auc_score(y_test, proba), 3))
+print("PR-AUC:", round(average_precision_score(y_test, proba), 3))
+
 target_fpr = 0.05
-idx = np.searchsorted(fpr, target_fpr)
-print("threshold for FPR<=0.05:", thr[idx], "TPR:", tpr[idx])
+idx = max(i for i, value in enumerate(fpr) if value <= target_fpr)
+threshold = thresholds[idx]
+pred = (proba >= threshold).astype(int)
+
+cm = confusion_matrix(y_test, pred)
+tn, fp, fn, tp = cm.ravel()
+precision = precision_score(y_test, pred, zero_division=0)
+recall = recall_score(y_test, pred, zero_division=0)
+decision_cost = fp * 1 + fn * 10
+
+print("chosen threshold:", round(float(threshold), 3))
+print("FPR:", round(fp / (fp + tn), 3))
+print("precision:", round(precision, 3))
+print("recall:", round(recall, 3))
+print("confusion matrix:", cm.tolist())
+print("cost (FP=1, FN=10):", decision_cost)
 ```
 
-**예상 결과:** ROC-AUC는 순위 성능을 요약해 주고, PR-AUC는 불균형 환경에서 더 민감한 경고를 줍니다. 마지막 단계에서는 `FPR <= 0.05` 같은 운영 제약을 실제 임계값으로 연결하는 흐름까지 확인해야 합니다.
+예상 결과는 다음과 같습니다.
 
-## 이 코드에서 먼저 봐야 할 점
+```text
+ROC-AUC: 0.819
+PR-AUC: 0.463
+chosen threshold: 0.141
+FPR: 0.049
+precision: 0.352
+recall: 0.507
+confusion matrix: [[1355, 70], [37, 38]]
+cost (FP=1, FN=10): 440
+```
 
-세 번째 단계는 모델의 전반적인 순위 능력을 요약합니다. 네 번째 단계는 같은 모델이라도 불균형 상황에서 PR-AUC가 훨씬 더 민감하게 반응할 수 있음을 보여 줍니다. 둘을 함께 봐야 곡선을 오해하지 않습니다.
+## 먼저 읽어야 할 첫 번째 결론: ROC-AUC와 PR-AUC는 같은 얘기가 아닙니다
 
-다섯 번째 단계는 운영 관점에서 중요합니다. 실제 배포에서는 대개 `FPR <= 0.05`처럼 허용 가능한 조건이 먼저 정해지고, 그 안에서 얻을 수 있는 재현율을 읽습니다. 곡선을 숫자로 연결하는 순간입니다.
+이 데이터의 ROC-AUC는 **0.819**라서 꽤 괜찮아 보입니다. 하지만 PR-AUC는 **0.463**입니다. 베이스레이트가 낮은 문제에서는 바로 이 차이가 중요합니다. ROC-AUC는 양성과 음성의 순위 분리를 요약하고, PR-AUC는 실제 양성을 얼마나 믿을 만하게 끌어올리는지에 더 민감합니다.
 
-## 자주 헷갈리는 지점
+즉 “ROC-AUC가 좋으니 배포 가능하다”는 결론은 너무 빠릅니다. PR-AUC를 같이 보면 양성 탐지 품질이 기대만큼 강하지 않을 수 있다는 경고를 받습니다.
 
-첫째, AUC만 높으면 좋은 배포라고 생각하기 쉽습니다. 하지만 특정 임계값에서 정밀도나 재현율이 부족하면 운영은 실패합니다. 둘째, ROC와 PR을 섞어 비교하면서도 같은 이야기를 한다고 오해하기 쉽습니다.
+## FPR 예산 아래에서 임계값을 고르면 무슨 일이 생길까요?
 
-셋째, 확률 보정이 충분하지 않은 상태에서 임계값을 세밀하게 고정하면 해석이 흔들릴 수 있습니다. 넷째, 불균형 데이터에서는 AUC-ROC가 낙관적으로 보일 수 있으므로 PR-AUC를 함께 확인해야 합니다.
+운영 정책을 `FPR <= 0.05`로 둔다고 가정하면, 이 예제에서 선택되는 임계값은 **0.141**입니다. 이 지점의 결과는 다음과 같습니다.
 
-## 실무에서는 이렇게 생각한다
+- 정밀도: **0.352**
+- 재현율: **0.507**
+- 혼동 행렬: `[[1355, 70], [37, 38]]`
 
-시니어 엔지니어는 AUC를 비교 요약으로 사용합니다. 여러 후보 모델을 빠르게 줄일 때는 유용하지만, 최종 배포 기준은 항상 별도로 세웁니다. 즉 AUC는 모델의 순위 능력을 말하고, 임계값은 운영 결정을 말합니다.
+즉 거짓 양성 비율 예산은 지켰지만, 실제 양성의 절반가량만 잡았습니다. ROC 곡선 위에서 보던 한 점이 이제 실제 운영 비용으로 번역된 셈입니다.
 
-또한 시간이 지나며 AUC 자체가 드리프트하는지도 봅니다. 같은 모델이라도 데이터 분포가 바뀌면 순위화 능력과 운영 임계값이 함께 흔들릴 수 있기 때문입니다.
+## 임계값 후보를 나란히 놓고 비교해 보겠습니다
+
+| 임계값 | FPR | 정밀도 | 재현율 | 실무 해석 |
+| --- | ---: | ---: | ---: | --- |
+| 0.10 | 0.081 | 0.275 | 0.587 | 재현율은 높지만 FPR 예산 5%를 넘겨 정책 위반입니다. |
+| 0.141 | 0.049 | 0.352 | 0.507 | FPR 예산을 간신히 지키는 최대 재현율 운영점입니다. |
+| 0.20 | 0.023 | 0.500 | 0.440 | 더 보수적이며 정밀도는 오르지만 양성 놓침이 늘어납니다. |
+
+이 표가 중요한 이유는 “곡선이 예쁘다”는 느낌을 실제 선택지 비교로 바꿔 주기 때문입니다.
+
+## 간단한 비용 함수까지 붙이면 더 명확해집니다
+
+위 코드에서는 `FP=1`, `FN=10`이라는 매우 단순한 비용 가정을 두었습니다. 이때 선택된 임계값 0.141의 비용은 **440**입니다.
+
+- false positive 70건 × 1 = 70
+- false negative 37건 × 10 = 370
+- 총 비용 = 440
+
+흥미로운 점은 임계값 0.10이 총비용 **426**으로 더 낮아 보일 수 있다는 점입니다. 하지만 그 임계값은 `FPR=0.081`이라 운영 정책을 위반합니다. 즉 **비용 최소화와 정책 제약은 별개**입니다. 배포 기준은 보통 두 가지를 동시에 만족해야 합니다.
+
+## 그래서 이 모델은 배포 가능한가요?
+
+이제 마지막 질문을 던질 수 있습니다.
+
+> `FPR <= 0.05`라는 정책 아래에서 재현율 0.507이면 충분한가요?
+
+만약 팀의 목표가 “양성의 최소 60%는 잡아야 한다”라면, 이 모델은 아직 준비되지 않았습니다. 현재 정책 예산 안에서 얻을 수 있는 재현율이 약 50.7%에 그치기 때문입니다. 즉 이번 장의 결론은 “ROC-AUC 0.819라서 괜찮다”가 아니라 다음 문장에 가깝습니다.
+
+> 현재 모델은 순위화 품질 자체는 나쁘지 않지만, `FPR <= 0.05` 제약 아래에서는 재현율이 0.507에 머문다. 재현율 목표가 더 엄격하다면 모델 개선이나 다른 정책 설계가 먼저 필요하다.
+
+이것이 곡선 요약에서 운영 판단으로 내려오는 마지막 단계입니다.
 
 ## 점검 목록
 
-- [ ] AUC-ROC를 보고합니다.
-- [ ] 불균형 데이터에서는 AUC-PR도 함께 봅니다.
-- [ ] 운영 임계값과 선택 이유를 남깁니다.
-- [ ] 시간에 따른 AUC 드리프트를 모니터링합니다.
+- [ ] ROC-AUC와 PR-AUC를 함께 봅니다.
+- [ ] 운영 제약(FPR, 리뷰 용량 등)을 먼저 적습니다.
+- [ ] 선택한 임계값의 혼동 행렬을 반드시 남깁니다.
+- [ ] 정밀도와 재현율을 같은 문단에 함께 씁니다.
+- [ ] 가능하면 간단한 비용 함수로 정책 제약과 함께 비교합니다.
 
 ## 정리
 
-ROC와 AUC는 임계값을 고정하지 않은 상태에서 모델의 순위 능력을 비교하게 해 주는 도구입니다. 다만 배포는 결국 특정 임계값에서 이뤄지므로, 곡선 요약과 운영 기준선을 함께 읽어야 합니다. 다음 글에서는 순위를 넘어 확률값 자체를 얼마나 믿을 수 있는지 묻는 보정 문제를 다루겠습니다.
+ROC와 AUC는 임계값을 고르기 전 후보 모델의 순위화 능력을 비교하는 데 유용합니다. 하지만 진짜 배포 판단은 항상 **하나의 임계값, 하나의 혼동 행렬, 하나의 비용 가정**으로 내려와야 합니다. 이렇게 해서 03장의 베이스라인 검토, 04장의 정밀도·재현율 운영점, 05장의 F1 요약 한계를 지나, 06장에서 최종 운영 판단까지 이어지는 메트릭 서사가 완성됩니다.
 
 <!-- toc:begin -->
 - [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
@@ -160,7 +201,7 @@ ROC와 AUC는 임계값을 고정하지 않은 상태에서 모델의 순위 능
 
 - [scikit-learn — roc_curve](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html)
 - [scikit-learn — roc_auc_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html)
+- [scikit-learn — average_precision_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)
 - [Wikipedia — ROC curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
-- [Google — ROC and AUC](https://developers.google.com/machine-learning/crash-course/classification/roc-and-auc)
 
 Tags: ModelEvaluation, ROC, AUC, PRCurve, scikit-learn

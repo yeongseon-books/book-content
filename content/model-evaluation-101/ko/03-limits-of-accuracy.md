@@ -16,130 +16,171 @@ tags:
   - ImbalancedData
   - BaselineModel
   - scikit-learn
-seo_description: 불균형 데이터에서 정확도 지표가 초래하는 오해를 분석하고, 베이스라인 설정을 통해 모델 성능을 객관적으로 파악합니다.
-last_reviewed: '2026-05-15'
+seo_description: 불균형 데이터에서 정확도를 더미 기준선, 소수 클래스 재현율, 균형 정확도와 함께 읽는 방법을 설명합니다.
+last_reviewed: '2026-05-17'
 ---
 
 # 정확도의 한계
 
-정확도는 가장 익숙한 분류 지표입니다. 예측이 맞았는지 틀렸는지를 세면 되니 설명도 쉽고, 숫자도 직관적입니다. 문제는 직관적이라는 이유로 너무 일찍 결론을 내려 버리기 쉽다는 점입니다. 특히 클래스 비율이 기울어진 데이터에서는 정확도가 모델의 실력을 거의 숨겨 버릴 수 있습니다.
-
-스팸, 사기, 희귀 질환 탐지처럼 양성이 적은 문제에서는 더더욱 그렇습니다. 이 영역에서는 대부분을 음성으로 찍기만 해도 정확도는 높게 나옵니다. 그래서 정확도는 출발점일 수는 있어도, 종착점이 되어서는 안 됩니다.
-
 이 글은 Model Evaluation 101 시리즈의 3번째 글입니다.
 
----
+정확도는 계산이 쉽고 설명도 편하지만, 그래서 오히려 너무 일찍 결론을 내리게 만드는 지표입니다. issue #772가 지적한 핵심도 여기에 있습니다. 기존 글은 정확도의 한계를 설명했지만, 실제 판단 순서인 베이스레이트 → 더미 기준선 → 소수 클래스 재현율 → 균형 정확도 → 최종 리뷰 흐름으로 독자를 끌고 가지 못했습니다.
 
-## 이 글에서 다룰 문제
+이번 글에서는 정확도를 맨 앞 숫자가 아니라 **마지막 확인 숫자**로 다루겠습니다. 특히 `ko/03-limits-of-accuracy.md:64-69,115-131`에서 약했던 부분을 보강해, 높은 정확도가 실제 개선인지 아니면 다수 클래스가 만든 착시인지 운영자 관점에서 판정하는 절차로 재구성하겠습니다.
 
-- 정확도는 어떤 상황에서 공정한 지표일까요?
-- 베이스레이트가 낮으면 정확도는 왜 쉽게 오해를 부를까요?
-- 더미 분류기와 비교하는 습관이 왜 중요할까요?
-- 균형 정확도는 무엇을 보완해 줄까요?
-- 다중 분류 문제에서 정확도만 보면 무엇을 놓치게 될까요?
+## 이 글이 답하는 질문
 
-> 정확도는 클래스가 균형 잡혀 있을 때는 유용하지만, 데이터가 한쪽으로 기울기 시작하면 가장 먼저 의심해야 할 숫자가 됩니다. 이때는 기준선과 클래스별 성능을 함께 봐야 합니다.
+- 더미 기준선보다 약간 높은 정확도는 언제 의미가 약할까요?
+- 소수 클래스 재현율과 균형 정확도는 정확도의 착시를 어떻게 벗겨 낼까요?
+- 최종 보고서에서 정확도를 대표 숫자로 써도 되는지 어떻게 판단할까요?
 
-## 왜 이 글이 중요한가
+## 이번 글의 판단 순서
 
-정확도 하나로 모델을 비교하면 팀 전체가 같은 착시를 공유하게 됩니다. 예를 들어 양성 비율이 5%인 문제에서 95% 정확도는 대단한 성능처럼 보이지만, 실제로는 아무 양성도 잡지 못한 모델일 수 있습니다.
+정확도 해석은 다음 다섯 단계로 고정해 두는 편이 안전합니다.
 
-이런 문제는 실무에서 자주 등장합니다. 이상 탐지, 의료 분류, 불량 검출처럼 중요한 이벤트가 드물수록 정확도는 더 위험해집니다. 그래서 정확도를 읽을 때는 반드시 베이스레이트, 더미 모델, 클래스별 재현율을 함께 봐야 합니다.
+1. **베이스레이트 확인**: 양성 비율이 얼마나 낮은지 먼저 봅니다.
+2. **더미 기준선 비교**: 아무것도 학습하지 않은 모델이 이미 몇 점인지 확인합니다.
+3. **소수 클래스 재현율 확인**: 정말 중요한 양성을 얼마나 놓치는지 봅니다.
+4. **균형 정확도 추가**: 다수 클래스와 소수 클래스를 공평하게 평균 냅니다.
+5. **정확도 보고 여부 결정**: 위 네 단계를 통과한 뒤에만 정확도를 요약 숫자로 남깁니다.
+
+이 순서를 거꾸로 읽으면 `acc 96%` 같은 숫자에 속기 쉽습니다. 이 순서를 지키면 같은 96%라도 “실제 개선”과 “다수 클래스 안락함”을 구분할 수 있습니다.
 
 ## 한눈에 보는 멘탈 모델
 
 ![균형 데이터와 불균형 데이터에서 달라지는 정확도 해석](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
 
 *균형 데이터와 불균형 데이터에서 달라지는 정확도 해석*
-이 그림이 말하는 바는 단순합니다. 정확도가 나쁜 지표라는 뜻이 아니라, 공정하게 읽을 조건이 있다는 뜻입니다. 클래스 비율이 크게 기울면 정확도 대신 기준선 비교와 균형 정확도가 먼저 나와야 합니다.
 
-## 핵심 용어
+핵심은 간단합니다. 클래스 비율이 크게 기울어져 있으면 정확도는 바로 읽는 숫자가 아니라, 다른 점검을 마친 뒤에만 참고할 수 있는 숫자입니다.
 
-- **정확도(accuracy)**: `(TP+TN)/N`입니다.
-- **베이스레이트(base rate)**: 각 클래스가 데이터에서 차지하는 비율입니다.
-- **더미 분류기(dummy classifier)**: 상수 예측이나 단순 규칙만 쓰는 기준선 모델입니다.
-- **균형 정확도(balanced accuracy)**: 클래스별 재현율의 평균입니다.
-- **Top-k 정확도**: 정답이 상위 k개 예측 안에 들어오면 맞춘 것으로 보는 방식입니다.
+## 한 번에 끝내는 진단 코드
 
-## 정확도를 보는 방식의 차이
-
-좋지 않은 습관은 정확도만 보고 바로 판단하는 것입니다. `acc 95%`라는 숫자는 문맥 없이 너무 강해 보입니다. 하지만 더미 분류기와 비교하지 않으면 이 숫자가 실제 개선인지, 데이터 분포가 준 착시인지 알 수 없습니다.
-
-좋은 습관은 먼저 기준선을 세우는 것입니다. 더미 분류기가 몇 점인지 확인하고, 그 다음 균형 정확도와 클래스별 리포트를 봅니다. 그래야 모델이 실제로 어느 클래스를 놓치고 있는지 드러납니다.
-
-## 정확도를 해부하는 다섯 단계
-
-### 1단계 — 불균형 데이터
+아래 코드는 정확도를 해석할 때 필요한 순서를 한 번에 보여 줍니다.
 
 ```python
 from sklearn.datasets import make_classification
-X, y = make_classification(n_samples=1000, weights=[0.95, 0.05], random_state=0)
-print("base rate:", y.mean())
-```
-
-### 2단계 — 더미 분류기
-
-```python
 from sklearn.dummy import DummyClassifier
-d = DummyClassifier(strategy="most_frequent").fit(X, y)
-print("dummy acc:", d.score(X, y))
-```
-
-### 3단계 — 모델 학습
-
-```python
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-print("acc:", m.score(Xte, yte))
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    classification_report,
+    confusion_matrix,
+    recall_score,
+)
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=5000,
+    n_features=20,
+    n_informative=5,
+    n_redundant=2,
+    weights=[0.96, 0.04],
+    class_sep=1.1,
+    flip_y=0.015,
+    random_state=42,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    stratify=y,
+    random_state=42,
+)
+
+dummy = DummyClassifier(strategy="most_frequent").fit(X_train, y_train)
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("base rate:", round(y.mean(), 4))
+print("dummy accuracy:", round(dummy.score(X_test, y_test), 4))
+print("model accuracy:", round(accuracy_score(y_test, pred), 4))
+print("minority recall:", round(recall_score(y_test, pred), 4))
+print("balanced accuracy:", round(balanced_accuracy_score(y_test, pred), 4))
+print("confusion matrix:\n", confusion_matrix(y_test, pred))
+print(classification_report(y_test, pred, digits=4))
 ```
 
-### 4단계 — 균형 정확도
+예상 해석은 다음과 같습니다.
 
-```python
-from sklearn.metrics import balanced_accuracy_score
-pred = m.predict(Xte)
-print("bacc:", balanced_accuracy_score(yte, pred))
+```text
+base rate: 0.0468
+dummy accuracy: 0.9536
+model accuracy: 0.9608
+minority recall: 0.1897
+balanced accuracy: 0.5940
+confusion matrix:
+[[1190    2]
+ [  47   11]]
 ```
 
-### 5단계 — 클래스별 리포트
+정확도만 보면 96.08%라서 꽤 좋아 보입니다. 하지만 이 숫자를 더미 기준선 95.36%와 나란히 두는 순간 해석이 달라집니다. **정확도 이득은 0.72%포인트**뿐인데, 실제 양성 58개 중 47개를 놓쳤기 때문입니다.
 
-```python
-from sklearn.metrics import classification_report
-print(classification_report(yte, pred))
-```
+## 1단계 — 베이스레이트를 먼저 보면 무엇이 달라질까요?
 
-**예상 결과:** 정확도는 꽤 높게 나오는데도 더미 기준선과 큰 차이가 없거나, 소수 클래스 재현율이 크게 무너지는 모습을 볼 수 있습니다. 이때 균형 정확도와 클래스별 리포트가 정확도의 착시를 걷어내는 역할을 합니다.
+양성 비율이 4.68%라는 뜻은, 아무 생각 없이 대부분을 음성으로 찍어도 높은 정확도를 얻기 쉽다는 의미입니다. 즉 이 문제에서 정확도는 모델 실력보다 데이터 분포의 도움을 많이 받습니다.
 
-## 이 코드에서 먼저 봐야 할 점
+이 한 줄이 중요한 이유는 이후 숫자들의 기준점을 미리 정해 주기 때문입니다. 베이스레이트가 50:50이 아니라는 사실을 먼저 알면, `96%`라는 숫자를 보는 순간에도 “실력”보다 “분포”를 먼저 의심하게 됩니다.
 
-두 번째 코드의 더미 분류기가 가장 중요합니다. 실제 모델이 더미보다 조금만 높은 정확도를 보인다면, 겉보기 수치가 높아도 실질적인 개선은 작을 수 있습니다. 네 번째 단계의 균형 정확도는 이런 착시를 걷어내는 역할을 합니다.
+## 2단계 — 더미 기준선과의 비교가 왜 필수일까요?
 
-다섯 번째 단계의 클래스별 리포트도 중요합니다. 소수 클래스에서 재현율이 무너지고 있다면, 전체 정확도는 그 사실을 거의 숨겨 버립니다. 운영에서는 바로 이 작은 행 하나가 가장 중요한 신호가 되는 경우가 많습니다.
+`DummyClassifier(strategy="most_frequent")`는 모든 사례를 다수 클래스로 예측합니다. 여기서도 이 더미는 이미 **95.36% 정확도**를 냅니다. 즉 정확도만 놓고 보면 실제 모델은 겨우 조금 더 나아졌을 뿐입니다.
 
-## 자주 헷갈리는 지점
+실무에서 이 비교가 빠지면 팀은 다음처럼 착각하기 쉽습니다.
 
-첫째, 더미와 비교하지 않은 정확도는 해석이 거의 불가능합니다. 둘째, 리샘플링 뒤 정확도만 비교하면 원래 데이터 분포가 가진 의미를 놓치기 쉽습니다. 셋째, 다중 분류 문제에서도 정확도 하나만 보면 어떤 클래스가 계속 무너지는지 보이지 않습니다.
+- 잘못된 해석: `96%니까 충분히 좋다.`
+- 올바른 해석: `기준선이 95.36%인데 96.08%면, 정확도 개선은 작다. 다른 지표를 바로 확인해야 한다.`
 
-또한 추천이나 검색처럼 상위 후보가 중요한 문제에서는 Top-k 정확도가 더 적절할 수 있습니다. 문제의 형태가 바뀌었는데도 정확도만 고집하면 지표가 현실을 설명하지 못합니다.
+정확도는 더미와의 차이까지 붙여 읽어야 의미가 생깁니다.
 
-## 실무에서는 이렇게 생각한다
+## 3단계 — 소수 클래스 재현율이 사실상 본체입니다
 
-시니어 엔지니어는 정확도를 맨 앞에 두지 않습니다. 먼저 더미 기준선, 클래스 불균형 정도, 클래스별 재현율을 봅니다. 그다음에야 정확도를 마무리 숫자로 읽습니다. 순서가 중요합니다.
+이 예제의 소수 클래스 재현율은 **0.1897**입니다. 실제 양성 중 18.97%만 잡았다는 뜻입니다. 다시 말해 양성 100건이 들어오면 약 81건을 놓치는 모델입니다.
 
-또한 정확도는 디버깅 지표가 아니라 요약 지표에 가깝게 다룹니다. 문제를 고치려면 결국 클래스별 성능, 혼동 행렬, 임계값 효과를 더 깊게 봐야 합니다. 그래서 다음 글의 정밀도와 재현율이 자연스럽게 이어집니다.
+이 숫자가 중요한 이유는 정확도가 감추는 실패를 바로 드러내기 때문입니다. 혼동 행렬의 아래 행을 보면 실제 양성 58개 중 11개만 맞히고 47개를 놓쳤습니다. 사기 탐지, 희귀 질환 분류, 장애 경보처럼 놓침이 비싼 문제라면 이 모델은 아직 보고서 첫 줄에 올릴 상태가 아닙니다.
+
+## 4단계 — 균형 정확도가 공평한 요약을 제공합니다
+
+균형 정확도는 각 클래스 재현율의 평균입니다. 이 예제에서는 **0.5940**으로, 정확도 0.9608과 전혀 다른 그림을 보여 줍니다. 다수 클래스는 거의 완벽하게 맞히지만 소수 클래스는 크게 놓치므로, 공평하게 평균 내면 모델의 체감 성능이 급격히 내려갑니다.
+
+이 차이가 바로 issue #772가 요구한 “정확도의 판단 순서”입니다. 정확도를 그대로 읽지 말고, 소수 클래스 재현율과 균형 정확도로 한번 뒤집어 봐야 합니다.
+
+## 5단계 — 그러면 정확도를 보고서에 써도 될까요?
+
+이제 마지막 질문을 던질 수 있습니다.
+
+> 이 정확도는 실제 성능 향상인가, 아니면 다수 클래스를 편하게 맞힌 결과인가?
+
+이 예제의 답은 후자에 가깝습니다. 정확도를 완전히 버릴 필요는 없지만, 최소한 다음 조건이 붙어야 합니다.
+
+- 더미 기준선 대비 개선 폭을 함께 보고합니다.
+- 소수 클래스 재현율을 같은 문단에 함께 둡니다.
+- 균형 정확도를 같이 보고합니다.
+- 운영에서 놓침 비용이 크다면 정확도를 대표 지표로 쓰지 않습니다.
+
+즉 이 문제에서는 `accuracy=0.9608`보다 `minority recall=0.1897, balanced accuracy=0.5940`가 더 먼저 나와야 합니다.
+
+## 실무 결정 리뷰 템플릿
+
+정확도 검토를 보고서 문장으로 남길 때는 아래처럼 쓰면 됩니다.
+
+> 베이스레이트 4.68% 문제에서 모델 정확도는 96.08%로 더미 기준선 95.36%보다 0.72%포인트 높았습니다. 그러나 소수 클래스 재현율은 18.97%, 균형 정확도는 59.40%에 그쳤으므로, 이 모델은 “정확도 개선”보다 “양성 놓침 위험”이 더 큰 상태로 판단합니다.
+
+이 문장 구조를 익혀 두면, 정확도 하나만 강조하는 보고서를 자연스럽게 교정할 수 있습니다.
 
 ## 점검 목록
 
-- [ ] 더미 분류기와 비교합니다.
+- [ ] 베이스레이트를 먼저 확인합니다.
+- [ ] 더미 기준선과 정확도를 나란히 비교합니다.
+- [ ] 소수 클래스 재현율을 별도 숫자로 적습니다.
 - [ ] 균형 정확도를 함께 보고합니다.
-- [ ] 클래스별 재현율을 확인합니다.
-- [ ] 문제 성격에 따라 Top-k 사용 여부를 검토합니다.
+- [ ] 정확도를 대표 지표로 쓸지 마지막에 결정합니다.
 
 ## 정리
 
-정확도는 편리하지만, 편리함 때문에 가장 쉽게 오해되는 지표이기도 합니다. 특히 불균형 데이터에서는 더미 기준선과 균형 정확도, 클래스별 분석이 함께 있어야 비로소 의미가 생깁니다. 다음 글에서는 정확도보다 더 직접적으로 오류의 성격을 보여 주는 정밀도와 재현율을 살펴보겠습니다.
+정확도는 쓸모없는 지표가 아니라 **순서가 중요한 지표**입니다. 베이스레이트와 더미 기준선, 소수 클래스 재현율, 균형 정확도를 거친 뒤에야 비로소 읽을 수 있습니다. 다음 글에서는 이 흐름을 이어 받아, 임계값을 움직일 때 정밀도와 재현율이 어떤 운영 선택으로 연결되는지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
@@ -156,9 +197,9 @@ print(classification_report(yte, pred))
 
 ## 참고 자료
 
-- [scikit-learn — Balanced accuracy](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
 - [scikit-learn — DummyClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html)
+- [scikit-learn — accuracy_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html)
+- [scikit-learn — balanced_accuracy_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html)
 - [Wikipedia — Accuracy paradox](https://en.wikipedia.org/wiki/Accuracy_paradox)
-- [Google — Classification metrics](https://developers.google.com/machine-learning/crash-course/classification/accuracy)
 
 Tags: ModelEvaluation, Accuracy, ImbalancedData, BaselineModel, scikit-learn
