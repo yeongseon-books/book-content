@@ -23,17 +23,16 @@ last_reviewed: '2026-05-14'
 
 # Project Subjects
 
-> Computer Science Major 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: *Why* are *project* courses the *core* of the *later years* of the major?
-
-> Because they *apply* knowledge to *real problems* and create *evidence*.
-
-<!-- a-grade-intro:end -->
+Many students reach the later years of the major and realize that knowing individual subjects is not the same thing as turning them into one working result. Project subjects are where scattered knowledge finally has to survive deadlines, teammates, testing, and a live demo.
 
 This is post 7 in the Computer Science Major 101 series.
+
+## Questions This Post Answers
+
+- Why are project subjects treated as the core of the later years of the major?
+- How is a team project different from an ordinary assignment?
+- Why do problem definition, scope control, scheduling, and demo readiness all matter together?
+- Why do project subjects often become the first serious evidence in a student's portfolio?
 
 ## What You Will Learn
 
@@ -53,6 +52,8 @@ The *start* of your *portfolio* is often a *major project*.
 
 *How a project moves from planning to demo*
 
+> A project subject is not mainly about writing more code. It is about proving that a small team can turn a bounded problem into a demo, documentation, and a result another person can evaluate.
+
 ## Key Terms
 
 - **scope**: project *range*.
@@ -67,43 +68,113 @@ The *start* of your *portfolio* is often a *major project*.
 
 **After**: You see it as a *small product*.
 
-## Hands-on: Project Mini Plan
+## Hands-on: Build a Project Brief You Can Submit
 
-### Step 1 — Define the problem
-
-```python
-problem = "course schedule conflict checker"
-```
-
-### Step 2 — Users
+Student projects usually fail for a boring reason: the team has an idea, but not a concrete planning artifact. The example below turns a short project spec into a brief you can paste into a README, proposal, or checkpoint document.
 
 ```python
-users = ["student", "advisor"]
+from textwrap import dedent
+
+spec = {
+    "project": "Campus Schedule Checker",
+    "users": ["students", "academic advisors"],
+    "pain_point": "Students discover timetable conflicts too late during course registration.",
+    "mvp_features": [
+        "Upload timetable CSV",
+        "Detect overlapping classes",
+        "Show conflict summary by day",
+    ],
+    "out_of_scope": [
+        "Mobile app",
+        "Automatic enrollment",
+        "Professor recommendation engine",
+    ],
+    "weeks": [
+        (1, "problem validation and sample data collection"),
+        (2, "CSV parser and conflict rules"),
+        (3, "result screen and test fixtures"),
+        (4, "demo script, bug fixes, and README polish"),
+    ],
+    "risks": [
+        ("scope creep", "Freeze feature list after the week 1 review"),
+        ("messy input data", "Prepare three validated sample CSV files early"),
+        ("team sync gaps", "Run a 15-minute checkpoint twice a week"),
+    ],
+}
+
+
+def build_brief(spec):
+    problem_statement = (
+        f"{spec['project']} helps {', '.join(spec['users'])} "
+        f"by solving this problem: {spec['pain_point']}"
+    )
+    feature_lines = "\n".join(f"- {feature}" for feature in spec["mvp_features"])
+    scope_lines = "\n".join(f"- {item}" for item in spec["out_of_scope"])
+    week_lines = "\n".join(
+        f"- Week {week}: {goal}" for week, goal in spec["weeks"]
+    )
+    risk_lines = "\n".join(
+        f"- {risk}: {mitigation}" for risk, mitigation in spec["risks"]
+    )
+
+    return dedent(
+        f"""
+        ## Project Brief
+        Problem statement: {problem_statement}
+
+        ### MVP features
+        {feature_lines}
+
+        ### Out of scope
+        {scope_lines}
+
+        ### Week-by-week schedule
+        {week_lines}
+
+        ### Risk register
+        {risk_lines}
+        """
+    ).strip()
+
+
+print(build_brief(spec))
 ```
 
-### Step 3 — Core features
+If you run the sample input as-is, you should get output like this.
 
-```python
-features = ["upload", "detect_conflict", "notify"]
+```text
+## Project Brief
+Problem statement: Campus Schedule Checker helps students, academic advisors by solving this problem: Students discover timetable conflicts too late during course registration.
+
+### MVP features
+- Upload timetable CSV
+- Detect overlapping classes
+- Show conflict summary by day
+
+### Out of scope
+- Mobile app
+- Automatic enrollment
+- Professor recommendation engine
+
+### Week-by-week schedule
+- Week 1: problem validation and sample data collection
+- Week 2: CSV parser and conflict rules
+- Week 3: result screen and test fixtures
+- Week 4: demo script, bug fixes, and README polish
+
+### Risk register
+- scope creep: Freeze feature list after the week 1 review
+- messy input data: Prepare three validated sample CSV files early
+- team sync gaps: Run a 15-minute checkpoint twice a week
 ```
 
-### Step 4 — Schedule
-
-```python
-weeks = {"plan": 1, "build": 6, "test": 2, "demo": 1}
-```
-
-### Step 5 — Risks
-
-```python
-risks = ["scope_creep", "team_sync", "data_format"]
-```
+This is more useful than a loose idea list because it creates something the team can actually review. In particular, the **out of scope** block and **risk register** force the team to agree on what they will not build and what can realistically go wrong.
 
 ## What to Notice in This Code
 
-- The *problem* starts the *project*.
-- *Users* drive *features*.
-- *Schedule* makes the plan *real*.
+- A one-sentence problem statement gives the team a stable decision rule.
+- Writing MVP and out-of-scope items together is what prevents scope creep.
+- Pairing the schedule with explicit mitigation steps makes the final demo more predictable.
 
 ## Five Common Mistakes
 
@@ -128,9 +199,9 @@ A startup *MVP* looks *almost the same* as a major project.
 ## Checklist
 
 - [ ] *Problem* in one line.
-- [ ] *Feature* list.
-- [ ] *Schedule* table.
-- [ ] *Risk* table.
+- [ ] *Feature* list and *out-of-scope* list.
+- [ ] *Schedule* with weekly deliverables.
+- [ ] *Risk* table with mitigation.
 
 ## Practice Problems
 
@@ -157,9 +228,9 @@ Next post: *How to Study Computer Science*.
 
 ## References
 
-- [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
-- [Mythical Man-Month](https://www.oreilly.com/library/view/mythical-man-month-the/0201835959/)
-- [Atlassian Project Management Guide](https://www.atlassian.com/agile/project-management)
-- [GitHub Project Boards](https://docs.github.com/en/issues/planning-and-tracking-with-projects)
+- [ACM/IEEE-CS/AAAI Computer Science Curricula 2023](https://csed.acm.org/cs2023/)
+- [ABET Criteria for Accrediting Computing Programs](https://www.abet.org/accreditation/accreditation-criteria/criteria-for-accrediting-computing-programs-2025-2026/)
+- [SWEBOK Guide](https://www.computer.org/education/bodies-of-knowledge/software-engineering)
+- [GitHub Docs - About Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects)
 
 Tags: CS, Project, Capstone, Teamwork, Beginner
