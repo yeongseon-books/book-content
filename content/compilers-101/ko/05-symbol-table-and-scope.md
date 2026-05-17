@@ -138,17 +138,31 @@ a.exit()
 
 ```python
 # 4_function.py
+def visit(stmt, analyzer):
+    kind, name = stmt
+    if kind == "LET":
+        analyzer.current().define(name, "local")
+
 def visit_function(name, params, body, analyzer):
     analyzer.current().define(name, "fn")
     analyzer.enter()
-    for p in params:
-        analyzer.current().define(p, "param")
-    for stmt in body:
-        visit(stmt, analyzer)
-    analyzer.exit()
+    try:
+        for p in params:
+            analyzer.current().define(p, "param")
+        for stmt in body:
+            visit(stmt, analyzer)
+        print(analyzer.current().resolve("arg"))  # param
+        print(analyzer.current().resolve("tmp"))  # local
+    finally:
+        analyzer.exit()
+
+a = Analyzer()
+visit_function("add_one", ["arg"], [("LET", "tmp")], a)
+print(a.current().resolve("add_one"))  # fn
+print(a.current().resolve("tmp"))      # None
 ```
 
-함수에 들어가면 새 스코프를 만들고, 매개변수를 넣고, 본문을 분석한 뒤 닫습니다. 함수 스코프는 결국 일반 스코프의 한 사례일 뿐입니다.
+함수에 들어가면 새 스코프를 만들고, 매개변수를 넣고, 본문을 분석한 뒤 닫습니다. 위 예제는 `visit(...)`와 `body`까지 포함하므로, 함수 내부의 `arg`와 `tmp`는 보이지만 함수가 끝난 뒤 `tmp`는 사라진다는 점을 그대로 확인할 수 있습니다.
 
 ### 5단계 — go-to-definition을 위한 위치 저장
 
@@ -226,9 +240,9 @@ LSP 서버의 중심 자료구조가 바로 심볼 테이블입니다. “모든
 
 ## 참고 자료
 
-- [Symbol table (Wikipedia)](https://en.wikipedia.org/wiki/Symbol_table)
-- [Scope (Wikipedia)](https://en.wikipedia.org/wiki/Scope_(computer_science))
-- [Crafting Interpreters — Resolving and Binding](https://craftinginterpreters.com/resolving-and-binding.html)
-- [LSP — Document Symbols](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol)
+- Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman, *Compilers: Principles, Techniques, and Tools* (2nd ed.), Section 2.7 “Symbol Tables”.
+- [Shriram Krishnamurthi, *Programming Languages: Application and Interpretation* (3rd ed.)](https://www.plai.org/) — 환경 모델과 정적 스코프 설명.
+- [Robert Nystrom, *Crafting Interpreters* — Chapter 11 “Resolving and Binding”](https://craftinginterpreters.com/resolving-and-binding.html)
+- Keith D. Cooper, Linda Torczon, *Engineering a Compiler* (2nd ed.), name analysis and semantic environment chapters.
 
 Tags: Computer Science, Compilers, SymbolTable, Scope, Lookup
