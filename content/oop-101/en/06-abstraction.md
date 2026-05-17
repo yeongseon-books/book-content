@@ -17,333 +17,384 @@ tags:
   - ABC
   - Interface
 seo_description: Learn how to design abstract classes with Python ABC and define enforced interfaces using abstractmethod.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-17'
 ---
 
 # Abstraction
 
-This is post 6 in the Object-Oriented Programming 101 series.
+Abstraction matters the moment one workflow has multiple implementations and the caller starts guessing which method name to call. This article is the 6th post in the OOP 101 series.
 
-> Object-Oriented Programming 101 Series (6/10)
+In Python, abstraction is not mainly about sounding theoretical. It is about deciding which methods are mandatory, which steps should stay shared, and when a team should require explicit inheritance instead of relying on "it probably has the right shape."
 
-<!-- a-grade-intro:begin -->
+## What This Article Tries to Solve
 
-**Key Question**: How do you define a common interface that cannot be instantiated directly?
+> Abstraction is not the act of removing implementation details. It is the act of making the minimum shared contract explicit before a workflow starts spreading across multiple classes.
 
-> Abstraction exposes only essential interfaces while hiding implementation details. Python's `abc` module lets you define abstract classes and abstract methods that force subclasses to provide implementations.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The purpose of abstraction and the role of abstract classes
-- Using Python `abc.ABC` and `@abstractmethod`
-- Abstract properties and abstract class methods
-- Choosing between abstract classes and Protocol
-
-## Why It Matters
-
-When multiple developers build classes for different data sources (files, databases, APIs) without a shared interface, method names and signatures diverge. Abstract classes enforce a contract — "you must implement these methods" — at instantiation time.
-
-> Abstract class = cannot instantiate + forces method implementation on subclasses
-
-Protocol says "structurally matching is OK," while ABC says "you must explicitly inherit." For larger teams or framework design, ABC's explicitness reduces mistakes.
+- When is a plain duck-typed convention no longer enough?
+- What should an abstract base class force every implementation to provide?
+- Where does the template method pattern help the parent class own the workflow without owning every detail?
+- When should you switch from ABC to Protocol instead of forcing explicit inheritance?
 
 ## Concept Overview
 
-> Abstract class structure
+![Concept Overview](../../../assets/oop-101/06/06-01-concept-overview.en.png)
+*Start by eliminating caller-specific method names, then decide whether the shared contract should be enforced through explicit inheritance (ABC) or structural compatibility (Protocol).* 
 
-```text
-ABC (Abstract Base Class)
-├── @abstractmethod read()     -> must implement
-├── @abstractmethod write()    -> must implement
-├── close()                    -> shared implementation (optional override)
-│
-├── FileStorage(ABC)
-│   ├── read()  implemented
-│   └── write() implemented
-│
-└── MemoryStorage(ABC)
-    ├── read()  implemented
-    └── write() implemented
-```
+Without a contract, one ingestion source exposes `read_file()`, another exposes `fetch_rows()`, and a third exposes `pull()`. The orchestrator becomes a bundle of `if` statements. With abstraction, the team agrees on a small contract first, then lets implementations vary behind it.
 
 ## Key Concepts
 
 | Term | Description |
 |------|-------------|
-| Abstract class | A class that cannot be instantiated and forces subclasses to implement methods |
-| `@abstractmethod` | Marks a method that must be overridden in subclasses |
-| ABC (Abstract Base Class) | The base class provided by Python's `abc` module |
-| Concrete class | A class that implements all abstract methods and can be instantiated |
-| Template method pattern | Defines the algorithm skeleton and delegates specific steps to subclasses |
+| Abstract class | A class that cannot be instantiated directly and can force child classes to implement specific members |
+| `@abstractmethod` | Marks a method or property that subclasses must implement |
+| ABC | Python's explicit contract mechanism from the `abc` module |
+| Template method pattern | A parent class keeps the workflow skeleton while subclasses fill in variable steps |
+| Protocol | A structural contract: matching the required shape is enough, even without inheritance |
 
 ## Before / After
 
-Comparing data source interfaces.
+The design change in this article is small but practical.
 
 ```python
-# before: no interface enforcement — method name mismatch risk
-class FileStorage:
-    def read_file(self, path):
-        pass
+# before: the caller must know each implementation's private vocabulary
+class CsvFeed:
+    def read_file(self, path: str) -> list[dict]:
+        return [{"email": "alice@example.com", "active": True}]
 
-class DbStorage:
-    def fetch_data(self, query):  # different method name
-        pass
+
+class WarehouseFeed:
+    def fetch_rows(self, table: str) -> list[dict]:
+        return [{"email": "bob@example.com", "active": False}]
 ```
 
 ```python
-# after: ABC enforces the interface
-from abc import ABC, abstractmethod
-
-class Storage(ABC):
-    @abstractmethod
-    def read(self, key: str) -> str: ...
-
-    @abstractmethod
-    def write(self, key: str, data: str) -> None: ...
-
-class FileStorage(Storage):
-    def read(self, key: str) -> str:
-        return f"Reading {key} from file"
-
-    def write(self, key: str, data: str) -> None:
-        print(f"Writing {key} to file: {data}")
-```
-
-## Hands-On Steps
-
-### Step 1: Basic Abstract Class
-
-```python
+# after: every source agrees on one contract
 from abc import ABC, abstractmethod
 
 
-class Animal(ABC):
-    def __init__(self, name: str) -> None:
-        self.name = name
+class FeedSource(ABC):
+    @property
+    @abstractmethod
+    def source_name(self) -> str: ...
 
     @abstractmethod
-    def speak(self) -> str:
-        """Return the animal's sound"""
-        ...
-
-    def describe(self) -> str:
-        """Shared implementation — optional override"""
-        return f"{self.name}: {self.speak()}"
-
-
-class Dog(Animal):
-    def speak(self) -> str:
-        return "woof"
-
-class Cat(Animal):
-    def speak(self) -> str:
-        return "meow"
-
-dog = Dog("Buddy")
-print(dog.describe())  # Buddy: woof
-
-# animal = Animal("animal")  # TypeError: Can't instantiate abstract class
+    def fetch_records(self) -> list[dict]: ...
 ```
 
-### Step 2: Abstract Properties
+## One Workflow: Designing an Ingestion Contract
+
+### Step 1: See Where the Caller Starts Breaking
+
+Suppose the team is building one customer-ingestion pipeline, but each developer added a slightly different source class.
 
 ```python
-from abc import ABC, abstractmethod
+class CsvFeed:
+    def read_file(self, path: str) -> list[dict]:
+        return [{"email": "alice@example.com", "active": True}]
 
 
-class Vehicle(ABC):
-    @property
-    @abstractmethod
-    def fuel_type(self) -> str: ...
-
-    @property
-    @abstractmethod
-    def max_speed(self) -> int: ...
-
-    def specs(self) -> str:
-        return f"Fuel: {self.fuel_type}, Max speed: {self.max_speed}km/h"
+class WarehouseFeed:
+    def fetch_rows(self, table: str) -> list[dict]:
+        return [{"email": "bob@example.com", "active": False}]
 
 
-class ElectricCar(Vehicle):
-    @property
-    def fuel_type(self) -> str:
-        return "electric"
-
-    @property
-    def max_speed(self) -> int:
-        return 250
+class PartnerApiFeed:
+    def pull(self) -> list[dict]:
+        return [{"email": "carol@example.com", "active": True}]
 
 
-class GasCar(Vehicle):
-    @property
-    def fuel_type(self) -> str:
-        return "gasoline"
-
-    @property
-    def max_speed(self) -> int:
-        return 220
+def ingest(source: object) -> list[dict]:
+    return source.fetch_records()  # caller assumes a method that does not exist
 
 
-ev = ElectricCar()
-gas = GasCar()
-print(ev.specs())   # Fuel: electric, Max speed: 250km/h
-print(gas.specs())  # Fuel: gasoline, Max speed: 220km/h
+ingest(CsvFeed())
 ```
 
-### Step 3: Template Method Pattern
+#### Failure Signal
+
+```text
+AttributeError: 'CsvFeed' object has no attribute 'fetch_records'
+```
+
+The failure is not really about one missing method. It is about the workflow having no shared language.
+
+### Step 2: Use ABC to Freeze the Team Contract
+
+The next move is not to add more `if isinstance(...)` branches. It is to make the required shape explicit.
 
 ```python
 from abc import ABC, abstractmethod
 
 
-class DataPipeline(ABC):
-    """Data processing pipeline — skeleton fixed, steps delegated to subclasses"""
-
-    def run(self) -> list[str]:
-        raw = self.extract()
-        cleaned = self.transform(raw)
-        self.load(cleaned)
-        return cleaned
+class FeedSource(ABC):
+    @property
+    @abstractmethod
+    def source_name(self) -> str:
+        """Human-readable label for logs and metrics."""
 
     @abstractmethod
-    def extract(self) -> list[str]: ...
-
-    @abstractmethod
-    def transform(self, data: list[str]) -> list[str]: ...
-
-    @abstractmethod
-    def load(self, data: list[str]) -> None: ...
+    def fetch_records(self) -> list[dict]:
+        """Return raw customer rows from this source."""
 
 
-class CsvPipeline(DataPipeline):
-    def extract(self) -> list[str]:
-        return ["  Alice,30  ", "  Bob,25  ", "  Charlie,35  "]
+class CsvFeed(FeedSource):
+    @property
+    def source_name(self) -> str:
+        return "csv"
 
-    def transform(self, data: list[str]) -> list[str]:
-        return [row.strip() for row in data]
-
-    def load(self, data: list[str]) -> None:
-        for row in data:
-            print(f"Saving: {row}")
+    def fetch_records(self) -> list[dict]:
+        return [{"email": "alice@example.com", "active": True}]
 
 
-pipeline = CsvPipeline()
-result = pipeline.run()
-# Saving: Alice,30
-# Saving: Bob,25
-# Saving: Charlie,35
-print(result)  # ['Alice,30', 'Bob,25', 'Charlie,35']
+class WarehouseFeed(FeedSource):
+    @property
+    def source_name(self) -> str:
+        return "warehouse"
+
+    def fetch_records(self) -> list[dict]:
+        return [{"email": "bob@example.com", "active": False}]
 ```
 
-### Step 4: ABC's register()
+At this stage, abstraction does two useful things:
+
+- it forces one method name and one return shape,
+- and it keeps broken implementations from being instantiated quietly.
+
+### Step 3: Keep the Workflow in the Parent with a Template Method
+
+Once several sources follow the same ingestion steps, the parent class should own the skeleton instead of letting every subclass reimplement the same sequence.
 
 ```python
 from abc import ABC, abstractmethod
 
 
-class Drawable(ABC):
+class IngestionPipeline(ABC):
+    def run(self) -> list[dict]:
+        raw = self.fetch_records()
+        normalized = [self.normalize(row) for row in raw]
+        valid = [row for row in normalized if self.is_valid(row)]
+        self.store(valid)
+        print(f"[{self.source_name}] loaded {len(valid)} records")
+        return valid
+
+    @property
     @abstractmethod
-    def draw(self) -> str: ...
+    def source_name(self) -> str: ...
+
+    @abstractmethod
+    def fetch_records(self) -> list[dict]: ...
+
+    def normalize(self, row: dict) -> dict:
+        return {
+            "email": row["email"].strip().lower(),
+            "active": bool(row["active"]),
+        }
+
+    def is_valid(self, row: dict) -> bool:
+        return "@" in row["email"]
+
+    @abstractmethod
+    def store(self, rows: list[dict]) -> None: ...
 
 
-class ThirdPartyWidget:
-    """External library class — cannot modify"""
-    def draw(self) -> str:
-        return "Widget rendered"
+class CsvCustomerPipeline(IngestionPipeline):
+    @property
+    def source_name(self) -> str:
+        return "csv"
+
+    def fetch_records(self) -> list[dict]:
+        return [
+            {"email": " Alice@example.com ", "active": 1},
+            {"email": "broken-email", "active": 1},
+        ]
+
+    def store(self, rows: list[dict]) -> None:
+        for row in rows:
+            print(f"store -> {row}")
 
 
-Drawable.register(ThirdPartyWidget)
+class PartnerApiPipeline(IngestionPipeline):
+    @property
+    def source_name(self) -> str:
+        return "partner-api"
 
-widget = ThirdPartyWidget()
-print(isinstance(widget, Drawable))  # True
-print(widget.draw())                 # Widget rendered
+    def fetch_records(self) -> list[dict]:
+        return [{"email": "Carol@Example.com", "active": True}]
+
+    def store(self, rows: list[dict]) -> None:
+        for row in rows:
+            print(f"store -> {row}")
 ```
 
-### Step 5: ABC vs Protocol — When to Choose Which
+Now the subclasses only explain what varies: where rows come from and where they go. The shared steps stay in one place.
+
+### Step 4: Plug in a Third-Party Implementation Without Editing It
+
+Sometimes the workflow is good, but the class comes from another library. You may not be allowed to inherit from your ABC.
+
+```python
+from abc import ABC, abstractmethod
+
+
+class FeedSource(ABC):
+    @abstractmethod
+    def fetch_records(self) -> list[dict]: ...
+
+
+class VendorSnapshot:
+    """Pretend this class lives in a third-party package."""
+
+    def fetch_records(self) -> list[dict]:
+        return [{"email": "vendor@example.com", "active": True}]
+
+
+FeedSource.register(VendorSnapshot)
+
+snapshot = VendorSnapshot()
+print(isinstance(snapshot, FeedSource))
+print(snapshot.fetch_records())
+```
+
+`register()` is useful when you trust the external shape and want your runtime checks to recognize it.
+
+### Step 5: Make the Final ABC vs Protocol Decision Explicit
+
+Not every integration should be forced into inheritance.
 
 ```python
 from abc import ABC, abstractmethod
 from typing import Protocol
 
 
-# ABC: explicit inheritance required — good for frameworks, team contracts
-class Serializer(ABC):
+class InternalFeed(ABC):
     @abstractmethod
-    def serialize(self, data: dict) -> str: ...
-
-class JsonSerializer(Serializer):
-    def serialize(self, data: dict) -> str:
-        import json
-        return json.dumps(data)
+    def fetch_records(self) -> list[dict]: ...
 
 
-# Protocol: no inheritance needed — good for cross-library compatibility
-class SerializerProto(Protocol):
-    def serialize(self, data: dict) -> str: ...
-
-class YamlSerializer:  # does not inherit Protocol
-    def serialize(self, data: dict) -> str:
-        return "\n".join(f"{k}: {v}" for k, v in data.items())
+class FeedLike(Protocol):
+    def fetch_records(self) -> list[dict]: ...
 
 
-def save(serializer: SerializerProto, data: dict) -> None:
-    print(serializer.serialize(data))
+class BackfillExport:
+    def fetch_records(self) -> list[dict]:
+        return [{"email": "backfill@example.com", "active": True}]
 
-save(JsonSerializer(), {"name": "Kim"})  # {"name": "Kim"}
-save(YamlSerializer(), {"name": "Kim"})  # name: Kim
+
+def preview(feed: FeedLike) -> int:
+    return len(feed.fetch_records())
+
+
+print(preview(BackfillExport()))
 ```
 
-## What to Notice in This Code
+- Use **ABC** when the class is part of your internal framework and you want explicit inheritance, shared defaults, or instantiation-time failures.
+- Use **Protocol** when you only need compatibility with a shape and do not control every implementation.
 
-- Failing to implement an abstract method raises `TypeError` at instantiation
-- The template method pattern places the algorithm skeleton in the parent and delegates steps to children
-- `register()` adds an existing class to an ABC without modifying it
-- ABC provides explicit contracts; Protocol provides structural compatibility — choose based on context
+## Run, Verify, and Failure Paths
+
+### Run
+
+Put the Step 3 code in `abstraction_workflow.py` and run:
+
+```bash
+python abstraction_workflow.py
+```
+
+Expected output:
+
+```text
+store -> {'email': 'alice@example.com', 'active': True}
+[csv] loaded 1 records
+store -> {'email': 'carol@example.com', 'active': True}
+[partner-api] loaded 1 records
+```
+
+### Verify
+
+Check three things after the run:
+
+1. `normalize()` cleaned casing and whitespace.
+2. The invalid row disappeared because `is_valid()` filtered it.
+3. Both pipelines produced the same output contract even though the raw input sources differed.
+
+### Failure Path 1: Missing a Required Method
+
+```python
+class BrokenPipeline(IngestionPipeline):
+    @property
+    def source_name(self) -> str:
+        return "broken"
+
+    def fetch_records(self) -> list[dict]:
+        return []
+
+
+BrokenPipeline()
+```
+
+Expected failure:
+
+```text
+TypeError: Can't instantiate abstract class BrokenPipeline with abstract method store
+```
+
+That error is useful. It prevents the team from shipping a half-implemented workflow.
+
+### Failure Path 2: Choosing the Wrong Contract Style
+
+If an external library already ships a stable object that happens to expose `fetch_records()`, forcing it to inherit your ABC usually creates unnecessary wrapping work. That is the point where a Protocol-based boundary is simpler.
+
+Use this decision check:
+
+| Question | If yes | Better choice |
+|----------|--------|---------------|
+| Do we own every implementation? | Mostly yes | ABC |
+| Do we need shared default behavior? | Yes | ABC |
+| Do we only need shape compatibility? | Yes | Protocol |
+| Is the implementation from another library? | Yes | Protocol or `register()` |
+
+## What to Notice in This Workflow
+
+- The first real abstraction problem was not "how do I write an abstract class?" but "why is the caller forced to know three vocabularies?"
+- `@abstractmethod` helps at the moment team coordination starts to matter.
+- The template method pattern keeps the workflow sequence stable while allowing source-specific variation.
+- `register()` and Protocol solve different interoperability problems; they are not interchangeable decoration.
 
 ## 5 Common Mistakes
 
-| Mistake | Why It Is a Problem | Fix |
-|---------|---------------------|-----|
-| Leaving any abstract method unimplemented | TypeError at instantiation | IDEs highlight unimplemented methods |
-| Putting too much implementation in ABC | Increases inheritance coupling | Include only shared utilities |
-| Defining every interface as ABC | Forces unnecessary inheritance | Protocol is better for external compatibility |
-| Using ABC without any `@abstractmethod` | Class can be instantiated, defeating the purpose | Define at least one abstract method |
-| Using abstract classes for data storage | Abstract classes are for interface definition | Use dataclass or regular classes for data |
+| Mistake | Why It Becomes a Problem | Better Move |
+|---------|---------------------------|-------------|
+| Turning every interface into an ABC | External integrations get forced into inheritance they do not need | Use Protocol when shape compatibility is enough |
+| Putting too much logic in the parent | The abstract class becomes a fragile god object | Keep only truly shared workflow steps |
+| Using ABC without any abstract member | The contract stops enforcing anything important | Define at least one required method or property |
+| Letting each subclass rename the same responsibility | The caller starts branching on implementation details | Freeze one shared vocabulary first |
+| Forgetting to validate the output contract | Ingestion succeeds but produces incompatible rows | Verify normalized shape after the run |
 
-## Real-World Applications
+## Real-World Uses
 
-- Python's `collections.abc` (Iterable, Sequence, Mapping) are ABCs
-- Django's `View` class uses the template method pattern
-- Plugin architectures define plugin interfaces with ABC
-- Tests create mock classes inheriting ABC to guarantee implementation
-- Data processing pipelines abstract Extract/Transform/Load steps with ABC
+- `collections.abc` defines explicit container contracts in the Python standard library.
+- Django class-based views use a template-method-style workflow.
+- Plugin systems often use ABC internally and Protocol externally.
+- ETL pipelines frequently share one ingestion skeleton while swapping source-specific adapters.
 
 ## How Senior Engineers Think About This
 
-Abstract classes become more valuable as team size grows. For small projects, duck typing is sufficient. But when multiple developers each build their own implementations, ABC provides a clear contract: "you must implement this."
+Senior engineers rarely ask for abstraction because the code "should look more object-oriented." They ask for it when multiple implementations are already drifting apart and the caller is paying the price. The best abstraction is the smallest contract that removes that drift.
 
-The Python ecosystem mixes ABC and Protocol based on context. Internal team code uses ABC; compatibility with external libraries favors Protocol.
+In practice, many Python codebases mix both styles: ABC for internal team-owned frameworks, Protocol for boundaries where compatibility matters more than inheritance purity.
 
 ## Checklist
 
-- [ ] I can define abstract classes with ABC and `@abstractmethod`
-- [ ] I can define abstract properties
-- [ ] I can implement the template method pattern
-- [ ] I can explain the difference between ABC and Protocol
-- [ ] I can register existing classes with an ABC using `register()`
-
-## Exercises
-
-1. Define a `NotificationSender` ABC and implement `EmailSender`, `SmsSender`, and `SlackSender`.
-2. Apply the template method pattern to a `ReportGenerator` ABC and create `HtmlReport` and `PdfReport`.
-3. Inherit from `collections.abc.Sequence` to implement a custom sequence class.
+- [ ] I can explain why inconsistent method names are a workflow problem, not just a style problem
+- [ ] I can design an ABC with one required property and one required method
+- [ ] I can use the template method pattern to keep shared workflow steps in the parent
+- [ ] I can tell when `register()` is enough for a third-party class
+- [ ] I can justify choosing Protocol instead of ABC for structural compatibility
 
 ## Summary and Next Steps
 
-Abstraction manages complexity and enforces consistent interfaces. Using ABC and Protocol appropriately enables extensible and safe designs. In the next article, we compare composition and inheritance and explore when each approach is appropriate.
+Abstraction becomes useful when one workflow needs multiple implementations and the caller can no longer tolerate private naming conventions. Use ABC when your team needs an explicit contract and shared workflow defaults. Use Protocol when compatibility matters more than inheritance. In the next article, we compare composition and inheritance so you can choose where behavior should live in the first place.
 
 <!-- toc:begin -->
 - [What Is Object-Oriented Programming?](./01-what-is-oop.md)
@@ -361,7 +412,7 @@ Abstraction manages complexity and enforces consistent interfaces. Using ABC and
 ## References
 
 - [Python Official Docs — abc module](https://docs.python.org/3/library/abc.html)
-- [Real Python — Abstract Base Classes](https://realpython.com/python-interface/)
+- [PEP 544 — Protocols: Structural Subtyping](https://peps.python.org/pep-0544/)
 - [Python collections.abc Docs](https://docs.python.org/3/library/collections.abc.html)
 - [Fluent Python — Chapter 13: Interfaces, Protocols, and ABCs](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 
