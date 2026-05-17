@@ -70,54 +70,85 @@ last_reviewed: '2026-05-14'
 
 **After**: 주간 루틴 안에 강의와 복습과 연습을 분산합니다.
 
-## 실습: 학습 추적 스크립트
+## 실습: 주간 복습 루프 추적기
 
-### 1단계 — 과목 등록
-
-```python
-log = {"algorithms": [], "os": [], "db": []}
-```
-
-먼저 무엇을 추적할지 정합니다. 기록은 거창할 필요가 없고, 최소한의 구조만 있어도 충분합니다.
-
-### 2단계 — 학습 기록
+전공 공부는 총 몇 시간을 했는지보다, 강의를 들은 뒤 언제 다시 꺼내 봤고 어떤 질문이 남았는지를 추적해야 오래 남습니다. 아래 예시는 한 주치 학습 기록에서 복습 일정, 완료 여부, 과목별 총량, 약한 영역을 함께 보여 주는 간단한 추적기입니다.
 
 ```python
-log["algorithms"].append({"date": "2026-05-01", "hours": 2})
+from collections import defaultdict
+from datetime import date, timedelta
+
+sessions = [
+    {
+        "course": "algorithms",
+        "lecture_date": date(2026, 5, 4),
+        "study_minutes": 100,
+        "review_completed": True,
+        "questions": ["Why does merge sort stay O(n log n)?"],
+    },
+    {
+        "course": "operating-systems",
+        "lecture_date": date(2026, 5, 5),
+        "study_minutes": 60,
+        "review_completed": False,
+        "questions": ["What exactly causes context-switch overhead?"],
+    },
+    {
+        "course": "databases",
+        "lecture_date": date(2026, 5, 6),
+        "study_minutes": 45,
+        "review_completed": False,
+        "questions": [],
+    },
+]
+
+
+def build_weekly_report(entries):
+    totals = defaultdict(int)
+    weak_areas = []
+    lines = []
+
+    for entry in entries:
+        next_review = entry["lecture_date"] + timedelta(days=2)
+        totals[entry["course"]] += entry["study_minutes"]
+        status = "done" if entry["review_completed"] else "pending"
+        lines.append(
+            f"{entry['course']}: lecture={entry['lecture_date']}, "
+            f"next_review={next_review}, review={status}, "
+            f"questions={len(entry['questions'])}"
+        )
+
+    for course, minutes in totals.items():
+        if minutes < 90 or any(
+            e["course"] == course and not e["review_completed"] for e in entries
+        ):
+            weak_areas.append(course)
+
+    summary = ", ".join(f"{course}={minutes}m" for course, minutes in totals.items())
+    weak_summary = ", ".join(weak_areas) if weak_areas else "none"
+    return "\n".join(lines + [f"weekly_totals: {summary}", f"weak_areas: {weak_summary}"])
+
+
+print(build_weekly_report(sessions))
 ```
 
-언제 얼마나 공부했는지 적는 것만으로도 감각이 달라집니다. 기억에만 의존하면 실제 시간은 자주 왜곡됩니다.
+예시 입력을 실행하면 다음처럼 관찰 가능한 출력이 나옵니다.
 
-### 3단계 — 복습 표시
-
-```python
-def reviewed(entry):
-    return entry.get("review", False)
+```text
+algorithms: lecture=2026-05-04, next_review=2026-05-06, review=done, questions=1
+operating-systems: lecture=2026-05-05, next_review=2026-05-07, review=pending, questions=1
+databases: lecture=2026-05-06, next_review=2026-05-08, review=pending, questions=0
+weekly_totals: algorithms=100m, operating-systems=60m, databases=45m
+weak_areas: operating-systems, databases
 ```
 
-복습 여부를 구분해 두면 단순한 시간 기록이 아니라 학습 주기 기록이 됩니다. 전공 공부에서는 이 차이가 큽니다.
-
-### 4단계 — 주간 합계
-
-```python
-total = sum(e["hours"] for e in log["algorithms"])
-```
-
-합계를 보면 특정 과목에 시간이 너무 적게 들어가는지 바로 드러납니다. 공부량은 느낌보다 숫자로 보는 편이 훨씬 정확합니다.
-
-### 5단계 — 약한 과목 찾기
-
-```python
-weak = [c for c, es in log.items() if sum(e["hours"] for e in es) < 5]
-```
-
-피하고 싶은 과목일수록 더 명시적으로 표시해 두는 편이 좋습니다. 약점을 빨리 드러낼수록 보강 비용이 줄어듭니다.
+이 출력에서 바로 확인할 수 있는 것은 세 가지입니다. 언제 복습해야 하는지, 아직 풀지 못한 질문이 어디 남아 있는지, 그리고 어느 과목이 이번 주에 실제로 약하게 굴러갔는지입니다. 이렇게 봐야 간격 복습, 질문 습관, 시간 배분이 하나의 루프로 연결됩니다.
 
 ## 이 코드에서 먼저 볼 점
 
-- 기록은 습관을 눈에 보이게 만듭니다.
-- 복습 표시가 있어야 간격 학습이 작동합니다.
-- 합계는 시간 배분의 편향을 드러냅니다.
+- 강의 날짜와 다음 복습 날짜가 함께 있어야 간격 학습이 실행 계획으로 바뀝니다.
+- review 완료 여부와 질문 수를 같이 봐야 이해 부족이 어디에 남았는지 드러납니다.
+- 주간 총량과 미복습 상태를 함께 봐야 진짜 약한 과목을 찾을 수 있습니다.
 
 ## 자주 하는 실수 5가지
 
@@ -186,9 +217,9 @@ weak = [c for c, es in log.items() if sum(e["hours"] for e in es) < 5]
 
 ## 참고 자료
 
-- [Make It Stick](https://www.hup.harvard.edu/catalog.php?isbn=9780674729018)
-- [A Mind for Numbers - Barbara Oakley](https://barbaraoakley.com/books/a-mind-for-numbers/)
-- [Learning How to Learn - Coursera](https://www.coursera.org/learn/learning-how-to-learn)
-- [Spaced Repetition - SuperMemo](https://www.supermemo.com/en/articles/theory)
+- [Make It Stick](https://www.hup.harvard.edu/books/9780674729018)
+- [Improving Students' Learning With Effective Learning Techniques](https://journals.sagepub.com/doi/10.1177/1529100612453266)
+- [How Learning Works](https://www.wiley.com/en-us/How+Learning+Works%3A+Eight+Research-Based+Principles+for+Smart+Teaching-p-9780470484104)
+- [ACM/IEEE-CS/AAAI Computer Science Curricula 2023](https://csed.acm.org/cs2023/)
 
 Tags: CS, Study, Habit, Learning, Beginner
