@@ -24,9 +24,9 @@ last_reviewed: '2026-05-04'
 
 Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.
 
-Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
-
 This is post 9 in the Functional Programming 101 series.
+
+Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
 
 ## What You Will Learn
 
@@ -417,11 +417,62 @@ events = [
     OrderEvent("A-4", "busan", 27000, "KRW", "paid", "direct"),
 ]
 
-print(settle_orders(events))
-# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+normalized = normalize_currency(events)
+assert [(e.order_id, e.amount, e.currency) for e in normalized] == [
+    ("A-1", 48000, "KRW"),
+    ("A-2", 57960, "KRW"),
+    ("A-3", 31000, "KRW"),
+    ("A-4", 27000, "KRW"),
+]
+
+active = drop_cancelled(normalized)
+assert [e.order_id for e in active] == ["A-1", "A-2", "A-4"]
+
+marketplace_only = keep_marketplace(active)
+assert [e.order_id for e in marketplace_only] == ["A-1", "A-2"]
+
+with_margin = enrich_margin(marketplace_only)
+assert [(e.order_id, e.margin) for e in with_margin] == [
+    ("A-1", 8640),
+    ("A-2", 10432),
+]
+
+report = to_store_report(with_margin)
+assert report == {
+    "seoul": {"revenue": 105960, "margin": 19072, "orders": 2}
+}
+
+print("Normalized IDs:", [e.order_id for e in normalized])
+print("After cancellation filter:", [e.order_id for e in active])
+print("Marketplace IDs:", [e.order_id for e in marketplace_only])
+print("Store report:", report)
+
+print("Pipeline report:", settle_orders(events))
+# Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+# After cancellation filter: ['A-1', 'A-2', 'A-4']
+# Marketplace IDs: ['A-1', 'A-2']
+# Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+# Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 ```
 
 This example is closer to a production data flow than a toy string transformation. Currency normalization, cancellation filtering, channel filtering, margin enrichment, and store-level aggregation remain independent stages, which makes failures and business-rule changes easier to isolate.
+
+#### Expected output
+
+```text
+Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+After cancellation filter: ['A-1', 'A-2', 'A-4']
+Marketplace IDs: ['A-1', 'A-2']
+Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+```
+
+#### If your result differs, inspect this first
+
+- Check that the USD exchange rate is still `1380`. That number directly changes `A-2` and every later aggregate.
+- Verify `drop_cancelled()` really removes `cancelled` events. If `A-3` survives, the `busan` store will appear in the report.
+- Verify `keep_marketplace()` keeps only `source == "marketplace"`. If `A-4` survives, direct-channel revenue leaks into the settlement.
+- Confirm the margin rule is still `int(e.amount * 0.18)`. A different rounding rule changes the final `19072` margin.
 
 ## What to Notice in This Code
 
