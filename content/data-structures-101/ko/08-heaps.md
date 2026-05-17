@@ -46,15 +46,10 @@ last_reviewed: '2026-05-12'
 
 > 힙은 완전 이진 트리이기 때문에 빈 칸 없이 배열에 담을 수 있습니다. 그래서 부모·자식 관계를 포인터가 아니라 인덱스 계산만으로 찾을 수 있고, 메모리 효율도 좋습니다.
 
-```text
-Min-heap
-        1            index: 0  1  2  3  4  5  6
-       / \           array: [1, 3, 2, 5, 4, 6, 7]
-      3   2
-     / \ / \         parent(i)      = (i - 1) // 2
-    5  4 6  7        left_child(i)  = 2*i + 1
-                     right_child(i) = 2*i + 2
-```
+### 힙 배열 매핑
+
+![힙 배열 매핑](../../../assets/data-structures-101/08/08-01-heap-array-mapping.ko.png)
+*그림. 힙은 완전 이진 트리 형태를 유지하므로 빈 칸 없이 배열에 압축해 담을 수 있습니다. 그래서 루트의 최솟값을 빠르게 꺼내면서도 부모·자식 관계를 인덱스 계산만으로 복원할 수 있습니다.*
 
 ## 핵심 용어
 
@@ -181,23 +176,49 @@ print(heapq.nlargest(3, data))    # [9, 8, 7]
 
 ```python
 import heapq
+from itertools import count
 
-# Store (priority, task) tuples
-tasks = []
-heapq.heappush(tasks, (3, "report"))
-heapq.heappush(tasks, (1, "alert"))
-heapq.heappush(tasks, (2, "email"))
+queue = []
+tie_breaker = count()
 
-while tasks:
-    priority, task = heapq.heappop(tasks)
-    print(f"[{priority}] {task}")
 
-# [1] alert
-# [2] email
-# [3] report
+def schedule(priority, task):
+    heapq.heappush(queue, (priority, next(tie_breaker), task))
+
+
+schedule(0, "critical alert")
+schedule(2, "nightly batch")
+schedule(1, "retry failed payment")
+schedule(0, "page on-call")
+schedule(1, "retry webhook")
+
+order = []
+while queue:
+    priority, _, task = heapq.heappop(queue)
+    order.append((priority, task))
+
+print(order)
+
+expected = [
+    (0, "critical alert"),
+    (0, "page on-call"),
+    (1, "retry failed payment"),
+    (1, "retry webhook"),
+    (2, "nightly batch"),
+]
+print(f"order matches expectation: {order == expected}")
+
+# [
+#   (0, 'critical alert'),
+#   (0, 'page on-call'),
+#   (1, 'retry failed payment'),
+#   (1, 'retry webhook'),
+#   (2, 'nightly batch'),
+# ]
+# order matches expectation: True
 ```
 
-동일 우선순위의 tie-break가 필요하면 `(priority, counter, task)` 형태로 넣는 것이 안전합니다.
+이제 예제가 실제 스케줄러에 더 가까워졌습니다. 출력 순서가 다르면 우선순위 방향을 거꾸로 잡았거나, tie-break 카운터를 빼먹었거나, 큐 안의 항목을 제자리에서 바꿔 힙 불변식을 깨뜨렸을 가능성이 큽니다.
 
 ### 4단계: heapify — 배열을 한 번에 힙으로 만들기
 

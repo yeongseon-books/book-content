@@ -46,19 +46,10 @@ title: 그래프
 
 > 그래프 `G = (V, E)`는 정점 집합 V와 간선 집합 E로 정의합니다. 간선에 방향이 있으면 방향 그래프, 가중치가 있으면 가중치 그래프입니다. 인접 리스트는 메모리 효율이 좋고, 인접 행렬은 두 정점 사이 간선 존재 여부를 O(1)에 확인할 수 있습니다.
 
-```text
-Undirected graph             Directed graph
-    A ─── B                   A ──→ B
-    │     │                   │     ↓
-    C ─── D                   C ←── D
+### 그래프 표현 방식
 
-Adjacency list               Adjacency matrix
-A: [B, C]                      A B C D
-B: [A, D]                    A 0 1 1 0
-C: [A, D]                    B 1 0 0 1
-D: [B, C]                    C 1 0 0 1
-                             D 0 1 1 0
-```
+![그래프 표현 방식](../../../assets/data-structures-101/09/09-01-graph-representations.ko.png)
+*그림. 방향 간선은 서비스 호출이나 패키지 의존성처럼 한쪽으로 흐르는 관계를 표현할 때 적합합니다. 희소 그래프에는 인접 리스트가 기본 선택이고, 그래프가 조밀하거나 간선 존재 여부를 즉시 확인해야 하면 인접 행렬이 더 잘 맞습니다.*
 
 ## 핵심 용어
 
@@ -117,130 +108,163 @@ class Graph:
         return iter(self._adj)
 
 
-g = Graph()
-for u, v in [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E")]:
-    g.add_edge(u, v)
+service_graph = Graph(directed=True)
+for u, v in [
+    ("api-gateway", "auth-service"),
+    ("api-gateway", "catalog-service"),
+    ("auth-service", "user-db"),
+    ("catalog-service", "inventory-service"),
+    ("inventory-service", "warehouse-db"),
+    ("inventory-service", "cache"),
+    ("cache", "warehouse-db"),
+]:
+    service_graph.add_edge(u, v)
 
-for node in g:
-    print(node, g.neighbors(node))
+for node in service_graph:
+    print(node, service_graph.neighbors(node))
 ```
 
-dict와 list를 조합한 가장 표준적인 표현입니다. 메모리 사용량은 O(V + E)라서 희소 그래프에 잘 맞습니다.
+dict와 list를 조합한 가장 표준적인 표현입니다. 메모리 사용량은 O(V + E)라서 서비스 의존성처럼 희소한 실무 그래프에 특히 잘 맞습니다.
 
 ### 2단계: 인접 행렬로 표현
 
 ```python
 class MatrixGraph:
-    def __init__(self, n):
+    def __init__(self, n, directed=False):
         self.n = n
+        self.directed = directed
         self.matrix = [[0] * n for _ in range(n)]
 
     def add_edge(self, u, v, weight=1):
         self.matrix[u][v] = weight
-        self.matrix[v][u] = weight   # undirected
+        if not self.directed:
+            self.matrix[v][u] = weight
 
     def has_edge(self, u, v):
         return self.matrix[u][v] != 0
 
 
-g = MatrixGraph(5)
-g.add_edge(0, 1); g.add_edge(0, 2); g.add_edge(1, 3); g.add_edge(2, 3); g.add_edge(3, 4)
-print(g.has_edge(0, 1))   # True
-print(g.has_edge(1, 2))   # False
+matrix_graph = MatrixGraph(4, directed=True)
+matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
+print(matrix_graph.has_edge(0, 1))   # True
+print(matrix_graph.has_edge(1, 0))   # False
 ```
 
 행렬은 O(V^2) 메모리를 쓰지만 “간선이 있는가?”를 O(1)에 답합니다. 정점 수가 작고 그래프가 조밀할 때 유리합니다.
 
-### 3단계: BFS — 최단 거리 길이
+### 3단계: BFS — 최단 경로
 
 ```python
 from collections import deque
 
 
-def bfs_shortest(g, start, target):
-    visited = {start: 0}
+def bfs_path(g, start, target):
+    visited = {start}
+    prev = {start: None}
     queue = deque([start])
     while queue:
         u = queue.popleft()
         if u == target:
-            return visited[u]
+            path = []
+            while u is not None:
+                path.append(u)
+                u = prev[u]
+            return list(reversed(path))
         for v, _ in g.neighbors(u):
             if v not in visited:
-                visited[v] = visited[u] + 1
+                visited.add(v)
+                prev[v] = u
                 queue.append(v)
-    return -1
+    return []
 
 
-print(bfs_shortest(g, "A", "E"))   # 3
+path = bfs_path(service_graph, "api-gateway", "warehouse-db")
+print(path)
+print(f"hop count: {len(path) - 1}")
+
+expected = [
+    "api-gateway",
+    "catalog-service",
+    "inventory-service",
+    "warehouse-db",
+]
+print(f"path matches expectation: {path == expected}")
+
+# ['api-gateway', 'catalog-service', 'inventory-service', 'warehouse-db']
+# hop count: 3
+# path matches expectation: True
 ```
 
-BFS는 가까운 정점을 먼저 방문하므로, 비가중치 그래프에서는 자연스럽게 최단 경로 길이를 구할 수 있습니다.
+BFS는 가까운 정점을 먼저 방문하므로 비가중치 그래프에서 자연스럽게 최단 경로를 구합니다. 여기서 경로나 hop 수가 다르게 나오면 queue 순서를 깨뜨렸거나, `visited` 표시 시점이 늦었거나, 간선 방향을 잘못 넣었을 가능성이 큽니다.
 
 ### 4단계: DFS — 재귀 기반 순회
 
 ```python
-def dfs(g, start, visited=None):
+def dfs(g, start, visited=None, order=None):
     if visited is None:
         visited = set()
+    if order is None:
+        order = []
     visited.add(start)
-    print(start, end=" ")
+    order.append(start)
     for v, _ in g.neighbors(start):
         if v not in visited:
-            dfs(g, v, visited)
+            dfs(g, v, visited, order)
+    return order
 
 
-dfs(g, "A")   # e.g. A B D C E
-print()
+print(dfs(service_graph, "api-gateway"))
+# ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
 ```
 
 DFS는 한 갈래를 끝까지 파고들었다가 되돌아옵니다. 사이클 검출, 위상 정렬, 연결 요소 탐색의 기본 도구입니다.
 
-### 5단계: 사이클 검출과 연결 요소
+### 5단계: 의존성 그래프의 사이클 검출
 
 ```python
-def has_cycle(g, start, visited=None, parent=None):
-    if visited is None:
-        visited = set()
-    visited.add(start)
-    for v, _ in g.neighbors(start):
-        if v not in visited:
-            if has_cycle(g, v, visited, start):
-                return True
-        elif v != parent:
-            return True
-    return False
-
-
-def connected_components(g):
+def has_cycle_directed(g):
     visited = set()
-    components = []
-    for node in g:
-        if node not in visited:
-            comp = set()
-            stack = [node]
-            while stack:
-                u = stack.pop()
-                if u in comp:
-                    continue
-                comp.add(u)
-                for v, _ in g.neighbors(u):
-                    stack.append(v)
-            components.append(comp)
-            visited.update(comp)
-    return components
+    active = set()
+
+    def walk(node):
+        visited.add(node)
+        active.add(node)
+        for neighbor, _ in g.neighbors(node):
+            if neighbor not in visited and walk(neighbor):
+                return True
+            if neighbor in active:
+                return True
+        active.remove(node)
+        return False
+
+    return any(node not in visited and walk(node) for node in g)
 
 
-print(has_cycle(g, "A"))           # True (A-B-D-C-A)
-print(connected_components(g))     # [{'A','B','C','D','E'}]
+dependency_graph = Graph(directed=True)
+for u, v in [
+    ("web", "auth"),
+    ("auth", "payments"),
+    ("payments", "ledger"),
+    ("ledger", "web"),
+]:
+    dependency_graph.add_edge(u, v)
+
+
+cycle_found = has_cycle_directed(dependency_graph)
+print(cycle_found)
+print(f"topological traversal possible: {not cycle_found}")
+
+# True
+# topological traversal possible: False
 ```
 
-둘 다 DFS 응용입니다. 친구 관계 검증, 의존성 검증, 클러스터링, 네트워크 분석처럼 실전 문제에 바로 연결됩니다.
+이 검증은 DFS가 실무에서 어떻게 쓰이는지 직접 보여 줍니다. 역방향 간선이 생기면 의존성 그래프를 위상 정렬할 수 없습니다. 여기서 `cycle_found`가 `False`로 나오면 방향 그래프를 무방향처럼 다뤘거나, 재귀 스택 추적을 빼먹었을 가능성이 큽니다.
 
 ## 이 코드에서 주목할 점
 
 - 희소 그래프는 인접 리스트, 조밀 그래프는 인접 행렬이 잘 맞습니다.
-- BFS와 DFS는 뼈대가 비슷하고 자료구조만 다릅니다.
-- 무방향 그래프의 사이클 검출은 부모 정점을 함께 추적해야 정확합니다.
+- BFS와 DFS는 순회 뼈대가 비슷하고 queue냐 재귀/스택이냐가 동작을 가릅니다.
+- 방향 그래프의 사이클 검출은 현재 재귀 스택을 함께 추적해야 정확합니다.
 - 그래프는 트리의 일반화이자 관계 모델링의 기본 어휘입니다.
 
 ## 자주 하는 실수 5가지

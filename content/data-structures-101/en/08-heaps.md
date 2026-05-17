@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Heaps
 
-> Data Structures 101 series (8/10)
+This is the eighth post in the Data Structures 101 series.
 
 <!-- a-grade-intro:begin -->
 
@@ -32,8 +32,6 @@ last_reviewed: '2026-05-04'
 > A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the `heapq` module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.
 
 <!-- a-grade-intro:end -->
-
-This is post 8 in the Data Structures 101 series.
 
 ## What You Will Learn
 
@@ -52,15 +50,10 @@ Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulatio
 
 > A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.
 
-```text
-Min-heap
-        1            index: 0  1  2  3  4  5  6
-       / \           array: [1, 3, 2, 5, 4, 6, 7]
-      3   2
-     / \ / \         parent(i)      = (i - 1) // 2
-    5  4 6  7        left_child(i)  = 2*i + 1
-                     right_child(i) = 2*i + 2
-```
+### Heap array mapping
+
+![Heap array mapping](../../../assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
+*Figure. A heap stays complete, so the tree can be packed into a flat array without gaps. That is what makes index arithmetic enough to recover parent and child relationships while keeping the minimum value at the root.*
 
 ## Key Terms
 
@@ -185,23 +178,49 @@ print(heapq.nlargest(3, data))    # [9, 8, 7]
 
 ```python
 import heapq
+from itertools import count
 
-# Store (priority, task) tuples
-tasks = []
-heapq.heappush(tasks, (3, "report"))
-heapq.heappush(tasks, (1, "alert"))
-heapq.heappush(tasks, (2, "email"))
+queue = []
+tie_breaker = count()
 
-while tasks:
-    priority, task = heapq.heappop(tasks)
-    print(f"[{priority}] {task}")
 
-# [1] alert
-# [2] email
-# [3] report
+def schedule(priority, task):
+    heapq.heappush(queue, (priority, next(tie_breaker), task))
+
+
+schedule(0, "critical alert")
+schedule(2, "nightly batch")
+schedule(1, "retry failed payment")
+schedule(0, "page on-call")
+schedule(1, "retry webhook")
+
+order = []
+while queue:
+    priority, _, task = heapq.heappop(queue)
+    order.append((priority, task))
+
+print(order)
+
+expected = [
+    (0, "critical alert"),
+    (0, "page on-call"),
+    (1, "retry failed payment"),
+    (1, "retry webhook"),
+    (2, "nightly batch"),
+]
+print(f"order matches expectation: {order == expected}")
+
+# [
+#   (0, 'critical alert'),
+#   (0, 'page on-call'),
+#   (1, 'retry failed payment'),
+#   (1, 'retry webhook'),
+#   (2, 'nightly batch'),
+# ]
+# order matches expectation: True
 ```
 
-If you need to break ties at the same priority, switch to `(priority, counter, task)` so the comparison stays stable.
+This is much closer to a real scheduler than a three-item toy demo. If the dequeue order differs, you probably flipped the priority direction, forgot the tie-break counter, or broke the heap invariant by mutating queue entries in place.
 
 ### Step 4: heapify — turn an array into a heap in one pass
 
