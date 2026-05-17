@@ -1,9 +1,8 @@
 ---
 episode: 10
 language: en
-last_reviewed: '2026-05-04'
-seo_description: Design testable code with dependency injection, pure functions, and
-  clear seams so pytest can verify behavior without fragile setup.
+last_reviewed: '2026-05-17'
+seo_description: Reduce mock-heavy tests by separating pure logic from side effects and injecting boundaries explicitly in Python code.
 series: pytest-101
 status: content-ready
 tags:
@@ -25,378 +24,572 @@ title: Writing Testable Code
 
 This is the final post in the pytest 101 series.
 
-> pytest 101 series (10/10)
+When testing feels painful, the problem is often not pytest. It is that one function is trying to calculate totals, call a payment API, write to storage, stamp the current time, and notify a user all at once. In this article, we'll make that pain concrete and then show how to redraw the boundary so the important rules become easy to verify.
 
-<!-- a-grade-intro:begin -->
+## What This Article Covers
 
-**Key Question**: Why is some code easy to test while other code needs 10 mocks?
-
-> Hard-to-test code is almost always a design problem. Applying dependency injection, pure functions, and separation of concerns produces code you can test without mocks. This article covers design principles that improve testability.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- Common patterns of hard-to-test code
-- Separating external dependencies with dependency injection
-- Isolating business logic with pure functions
-- Narrowing test scope with separation of concerns
+- Why some tests need a wall of patches before they can even reach the assertion
+- Where dependency injection actually pays off in real Python code
+- How pure functions, Protocols, and Fakes each reduce testing friction
+- How to refactor legacy code toward fewer mocks and clearer business rules
 
 ## Why It Matters
 
-If a test needs more than 5 mocks, the problem isn't the test — it's the code. When a single function queries a database, calls an API, and sends an email, of course it's hard to test.
+"Hard to test" usually means "the boundaries are blurry." If one function reads from storage, calls an external API, checks the current time, and sends email, then of course the test needs a miniature universe of substitutes.
 
-> "Hard to test" is feedback that says "improve the design." Tests drive design.
+> More mocks do not automatically mean a more sophisticated test. Often they mean the code is tangled too tightly with the outside world.
 
-Code with high testability is flexible to change, easy to reuse, and fast to debug.
+Testable structure is not only about making tests pleasant. It also narrows failure causes, makes business rules easier to read, and reduces the blast radius of future changes.
 
 ## Mental Model
 
-> testable code = clear inputs + predictable outputs
+> Testable code has a pure core on the inside and replaceable side-effect boundaries on the outside.
 
 ```text
-[Hard to Test]                   [Easy to Test]
-  DB call inside the function     DB passed as parameter
-  Depends on global variables     Values passed as arguments
-  Side effects hidden inside      Side effects separated out
-  datetime.now() called directly  Time passed as parameter
+[Pure core]
+  price calculation
+  validation rules
+  status transitions
+
+[Boundary adapters]
+  payment gateway
+  repository
+  notification sender
+  clock / id factory
 ```
+
+![Diagram of a pure-logic core surrounded by injected adapters such as payment gateway, repository, notifier, and clock](../../../assets/pytest-101/10/10-01-testable-code-boundary.en.png)
+*The center is where business rules should live. Payment gateways, repositories, notifiers, and time or ID providers stay outside that core and are injected at the boundary. This keeps most tests focused on input and output instead of environment setup.*
 
 ## Core Concepts
 
 | Term | Description |
-|------|-------------|
-| Dependency injection | Passing dependencies from outside so they can be swapped |
-| Pure function | Always returns the same output for the same input, no side effects |
-| Separation of concerns | Splitting business logic from infrastructure code |
-| Testability | The degree to which code can be tested in isolation |
-| Ports and adapters | Pattern separating business logic (ports) from external systems (adapters) |
+| --- | --- |
+| Pure function | Returns the same result for the same input and has no hidden side effects |
+| Dependency injection | Receives external collaborators from the outside so they can be swapped |
+| Protocol | A type-level interface that describes the methods a collaborator must provide |
+| Fake | A lightweight test implementation that stands in for a real dependency |
+| Boundary | The place where business rules meet the outside world |
 
 ## Before / After
 
-Compare code with hard-coded dependencies versus injected dependencies.
+**Before — time, payment, persistence, and notification are fused together:**
 
 ```python
-# before: dependencies hard-coded — untestable without mocks
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 
-def create_order(user_id, items):
-    user = db.query(f"SELECT * FROM users WHERE id = {user_id}")
-    order_date = datetime.now()
-    payment = requests.post("https://pay.api/charge", json={...})
-    send_email(user["email"], "Order confirmed")
-    return {"order_id": 1, "status": "completed"}
-```
-
-```python
-# after: dependencies injected — testable without mocks
-def create_order(user, items, now, charge_fn, notify_fn):
-    total = sum(item["price"] * item["qty"] for item in items)
-    payment = charge_fn(user["id"], total)
-    if payment["status"] != "success":
-        return {"status": "payment_failed"}
-    notify_fn(user["email"], "Order confirmed")
+def create_order(user: dict, items: list[dict]) -> dict:
+    subtotal = sum(item["unit_price"] * item["quantity"] for item in items)
+    payload = {
+        "customer_id": user["payment_customer_id"],
+        "amount": subtotal,
+        "currency": "KRW",
+        "requested_at": datetime.now(timezone.utc).isoformat(),
+        "line_items": [
+            {
+                "sku": item["sku"],
+                "quantity": item["quantity"],
+                "unit_price": item["unit_price"],
+            }
+            for item in items
+        ],
+    }
+    response = requests.post(
+        "https://pay.example.com/v1/charges",
+        json=payload,
+        timeout=5,
+    )
+    response.raise_for_status()
+    charge = response.json()
+    save_order_to_db(user["id"], subtotal, charge["id"])
+    send_email(user["email"], f"Order {charge['id']} completed.")
     return {
-        "order_id": payment["order_id"],
-        "total": total,
-        "date": now,
-        "status": "completed",
+        "order_id": charge["id"],
+        "status": charge["status"],
+        "charged_amount": charge["amount"],
     }
 ```
 
-## Step-by-Step Practice
-
-### Step 1: Isolate Business Logic with Pure Functions
+**After — pure calculation and external collaboration are separated:**
 
 ```python
-# pricing.py — pure functions: input → output, no side effects
-def calculate_discount(total: float, membership: str) -> float:
+def build_charge_request(user: dict, items: list[dict], requested_at: str) -> dict:
+    subtotal = sum(item["unit_price"] * item["quantity"] for item in items)
+    return {
+        "customer_id": user["payment_customer_id"],
+        "amount": subtotal,
+        "currency": "KRW",
+        "requested_at": requested_at,
+        "line_items": [
+            {
+                "sku": item["sku"],
+                "quantity": item["quantity"],
+                "unit_price": item["unit_price"],
+            }
+            for item in items
+        ],
+    }
+
+def finalize_order(charge: dict) -> dict:
+    return {
+        "order_id": charge["id"],
+        "status": charge["status"],
+        "charged_amount": charge["amount"],
+    }
+```
+
+The key change is not style. It is that the code now separates "what data should be produced" from "which external service receives it."
+
+## Step-by-Step Practice
+
+### Step 1: Pull pure logic into the center first
+
+```python
+# pricing.py
+def calculate_subtotal(items: list[dict]) -> int:
+    return sum(item["unit_price"] * item["quantity"] for item in items)
+
+def membership_discount_rate(membership: str) -> float:
     rates = {"gold": 0.15, "silver": 0.10, "bronze": 0.05}
-    rate = rates.get(membership, 0.0)
-    return round(total * rate, 2)
+    return rates.get(membership, 0.0)
 
-def calculate_shipping(total: float, country: str) -> float:
+def calculate_discount(subtotal: int, membership: str) -> int:
+    return int(subtotal * membership_discount_rate(membership))
+
+def calculate_shipping(amount_after_discount: int, country: str) -> int:
     if country == "KR":
-        return 0.0 if total >= 50000 else 3000.0
-    return 15000.0
+        return 0 if amount_after_discount >= 50000 else 3000
+    return 15000
 
-def calculate_total(
-    items: list[dict],
-    membership: str,
-    country: str,
-) -> dict:
-    subtotal = sum(item["price"] * item["qty"] for item in items)
+def calculate_order_totals(items: list[dict], membership: str, country: str) -> dict:
+    subtotal = calculate_subtotal(items)
     discount = calculate_discount(subtotal, membership)
     shipping = calculate_shipping(subtotal - discount, country)
+    total = subtotal - discount + shipping
     return {
         "subtotal": subtotal,
         "discount": discount,
         "shipping": shipping,
-        "total": subtotal - discount + shipping,
+        "total": total,
     }
 ```
 
 ```python
-# test_pricing.py — no mocks needed
-from pricing import calculate_discount, calculate_shipping, calculate_total
+# test_pricing.py
+from pricing import calculate_order_totals, calculate_shipping, calculate_discount
 
 def test_gold_discount():
-    assert calculate_discount(100000, "gold") == 15000.0
+    assert calculate_discount(100000, "gold") == 15000
 
-def test_no_discount():
-    assert calculate_discount(100000, "none") == 0.0
+def test_shipping_for_small_domestic_order():
+    assert calculate_shipping(42000, "KR") == 3000
 
-def test_free_shipping_kr():
-    assert calculate_shipping(60000, "KR") == 0.0
+def test_order_totals_for_silver_member():
+    items = [
+        {"sku": "keyboard", "unit_price": 30000, "quantity": 1},
+        {"sku": "switch-pack", "unit_price": 5000, "quantity": 2},
+    ]
+    result = calculate_order_totals(items, membership="silver", country="KR")
 
-def test_paid_shipping_kr():
-    assert calculate_shipping(30000, "KR") == 3000.0
-
-def test_total_calculation():
-    items = [{"price": 10000, "qty": 3}, {"price": 5000, "qty": 2}]
-    result = calculate_total(items, "silver", "KR")
-    assert result["subtotal"] == 40000
-    assert result["discount"] == 4000.0
-    assert result["shipping"] == 3000.0
-    assert result["total"] == 39000.0
+    assert result == {
+        "subtotal": 40000,
+        "discount": 4000,
+        "shipping": 3000,
+        "total": 39000,
+    }
 ```
 
-### Step 2: Dependency Injection Pattern
+There is no network, no database, and no current time here. That is why the tests stay short and the failures stay obvious.
+
+### Step 2: Split external collaborators behind Protocols and Fakes
 
 ```python
-# user_service.py
+# order_service.py
 from typing import Protocol
 
-class UserRepository(Protocol):
-    def find_by_id(self, user_id: int) -> dict | None: ...
-    def save(self, user: dict) -> None: ...
+class PaymentGateway(Protocol):
+    def charge(self, payload: dict) -> dict:
+        pass
 
-class UserService:
-    def __init__(self, repo: UserRepository):
-        self.repo = repo
+class OrderRepository(Protocol):
+    def save(self, order: dict) -> dict:
+        pass
 
-    def get_user(self, user_id: int) -> dict:
-        user = self.repo.find_by_id(user_id)
-        if not user:
-            raise ValueError(f"User {user_id} not found")
-        return user
+class Notifier(Protocol):
+    def send(self, email: str, message: str) -> None:
+        pass
 
-    def update_name(self, user_id: int, new_name: str) -> dict:
-        user = self.get_user(user_id)
-        user["name"] = new_name
-        self.repo.save(user)
-        return user
+class OrderService:
+    def __init__(
+        self,
+        gateway: PaymentGateway,
+        repository: OrderRepository,
+        notifier: Notifier,
+    ):
+        self.gateway = gateway
+        self.repository = repository
+        self.notifier = notifier
+
+    def create(self, user: dict, payload: dict) -> dict:
+        charge = self.gateway.charge(payload)
+        order = {
+            "user_id": user["id"],
+            "email": user["email"],
+            "charge_id": charge["id"],
+            "status": charge["status"],
+            "charged_amount": charge["amount"],
+        }
+        saved = self.repository.save(order)
+        self.notifier.send(user["email"], f"Order {saved['charge_id']} completed.")
+        return saved
 ```
 
 ```python
-# test_user_service.py
-import pytest
-from user_service import UserService
+# test_order_service.py
+from order_service import OrderService
 
-class FakeUserRepo:
+class FakeGateway:
     def __init__(self):
-        self.users = {}
-        self.saved = []
+        self.payloads = []
 
-    def find_by_id(self, user_id):
-        return self.users.get(user_id)
+    def charge(self, payload: dict) -> dict:
+        self.payloads.append(payload)
+        return {
+            "id": "ch_1001",
+            "status": "paid",
+            "amount": payload["amount"],
+        }
 
-    def save(self, user):
-        self.saved.append(user)
+class FakeRepository:
+    def __init__(self):
+        self.saved_orders = []
 
-def test_get_user():
-    repo = FakeUserRepo()
-    repo.users[1] = {"id": 1, "name": "Alice"}
-    service = UserService(repo)
+    def save(self, order: dict) -> dict:
+        persisted = {**order, "id": 101}
+        self.saved_orders.append(persisted)
+        return persisted
 
-    user = service.get_user(1)
-    assert user["name"] == "Alice"
+class FakeNotifier:
+    def __init__(self):
+        self.messages = []
 
-def test_get_missing_user():
-    repo = FakeUserRepo()
-    service = UserService(repo)
+    def send(self, email: str, message: str) -> None:
+        self.messages.append((email, message))
 
-    with pytest.raises(ValueError, match="not found"):
-        service.get_user(999)
+def test_create_order_with_fakes():
+    service = OrderService(FakeGateway(), FakeRepository(), FakeNotifier())
+    user = {"id": 7, "email": "buyer@example.com"}
+    payload = {
+        "customer_id": "cus_777",
+        "amount": 39000,
+        "currency": "KRW",
+        "requested_at": "2026-05-17T09:00:00+00:00",
+        "line_items": [
+            {"sku": "keyboard", "quantity": 1, "unit_price": 30000},
+            {"sku": "switch-pack", "quantity": 2, "unit_price": 5000},
+        ],
+    }
 
-def test_update_name():
-    repo = FakeUserRepo()
-    repo.users[1] = {"id": 1, "name": "Alice"}
-    service = UserService(repo)
+    result = service.create(user, payload)
 
-    updated = service.update_name(1, "Bob")
-    assert updated["name"] == "Bob"
-    assert len(repo.saved) == 1
+    assert result["id"] == 101
+    assert result["charge_id"] == "ch_1001"
+    assert result["charged_amount"] == 39000
 ```
 
-### Step 3: Separation of Concerns
+The Protocol shows the contract. The Fake shows how the contract behaves in tests. Together they let you verify collaboration without a mocking framework wall.
+
+### Step 3: Make request assembly explicit and testable
 
 ```python
-# report.py — separate data processing from output
-def aggregate_sales(transactions: list[dict]) -> dict:
-    """Pure function: handles data aggregation only."""
-    total = sum(t["amount"] for t in transactions)
-    count = len(transactions)
-    avg = total / count if count > 0 else 0
-    return {"total": total, "count": count, "average": round(avg, 2)}
+# checkout.py
+def build_charge_request(user: dict, items: list[dict], requested_at: str) -> dict:
+    subtotal = sum(item["unit_price"] * item["quantity"] for item in items)
+    return {
+        "customer_id": user["payment_customer_id"],
+        "amount": subtotal,
+        "currency": "KRW",
+        "requested_at": requested_at,
+        "line_items": [
+            {
+                "sku": item["sku"],
+                "quantity": item["quantity"],
+                "unit_price": item["unit_price"],
+            }
+            for item in items
+        ],
+    }
 
-def format_report(stats: dict) -> str:
-    """Pure function: handles formatting only."""
-    return (
-        f"Sales Report\n"
-        f"Total Sales: ${stats['total']:,.0f}\n"
-        f"Transactions: {stats['count']}\n"
-        f"Average: ${stats['average']:,.0f}"
+def present_checkout_result(charge: dict) -> dict:
+    return {
+        "order_id": charge["id"],
+        "status": charge["status"],
+        "charged_amount": charge["amount"],
+    }
+```
+
+```python
+# test_checkout.py
+from checkout import build_charge_request, present_checkout_result
+
+def test_build_charge_request_uses_explicit_fields():
+    payload = build_charge_request(
+        user={"payment_customer_id": "cus_777"},
+        items=[
+            {"sku": "keyboard", "unit_price": 30000, "quantity": 1},
+            {"sku": "switch-pack", "unit_price": 5000, "quantity": 2},
+        ],
+        requested_at="2026-05-17T09:00:00+00:00",
     )
 
-def save_report(content: str, filepath: str) -> None:
-    """Infrastructure function: handles file I/O only."""
-    with open(filepath, "w") as f:
-        f.write(content)
+    assert payload == {
+        "customer_id": "cus_777",
+        "amount": 40000,
+        "currency": "KRW",
+        "requested_at": "2026-05-17T09:00:00+00:00",
+        "line_items": [
+            {"sku": "keyboard", "quantity": 1, "unit_price": 30000},
+            {"sku": "switch-pack", "quantity": 2, "unit_price": 5000},
+        ],
+    }
+
+def test_present_checkout_result():
+    charge = {"id": "ch_1001", "status": "paid", "amount": 40000}
+    assert present_checkout_result(charge) == {
+        "order_id": "ch_1001",
+        "status": "paid",
+        "charged_amount": 40000,
+    }
 ```
 
-```python
-# test_report.py — test each concern independently
-from report import aggregate_sales, format_report
+Once the payload is its own function, your docs and tests stop hiding behind placeholders like `json={...}`. The exact fields become visible and verifiable.
 
-def test_aggregate_sales():
-    transactions = [
-        {"amount": 10000},
-        {"amount": 20000},
-        {"amount": 30000},
-    ]
-    result = aggregate_sales(transactions)
-    assert result == {"total": 60000, "count": 3, "average": 20000.0}
-
-def test_aggregate_empty():
-    result = aggregate_sales([])
-    assert result == {"total": 0, "count": 0, "average": 0}
-
-def test_format_report():
-    stats = {"total": 60000, "count": 3, "average": 20000.0}
-    report = format_report(stats)
-    assert "$60,000" in report
-    assert "3" in report
-```
-
-### Step 4: Separating Side Effects via Function Parameters
+### Step 4: Move time and ID generation outside the function
 
 ```python
-# notification.py
-from typing import Callable
+from collections.abc import Callable
 
-def process_order(
-    order: dict,
-    save_fn: Callable[[dict], None],
-    notify_fn: Callable[[str, str], None],
+from pricing import calculate_order_totals
+
+def create_checkout_payload(
+    user: dict,
+    items: list[dict],
+    now_iso: str,
+    order_id_factory: Callable[[], str],
 ) -> dict:
-    """Business logic only. Injected functions handle side effects."""
-    if order["total"] <= 0:
-        raise ValueError("Order total must be greater than 0")
-
-    order["status"] = "confirmed"
-    save_fn(order)
-    notify_fn(order["email"], f"Order {order['id']} confirmed")
-    return order
+    totals = calculate_order_totals(items, membership=user["membership"], country=user["country"])
+    return {
+        "order_id": order_id_factory(),
+        "customer_id": user["payment_customer_id"],
+        "requested_at": now_iso,
+        "amount": totals["total"],
+        "currency": "KRW",
+        "line_items": items,
+    }
 ```
 
 ```python
-# test_notification.py
-import pytest
-from notification import process_order
+from checkout import create_checkout_payload
 
-def test_process_order():
-    saved = []
-    notifications = []
+def test_create_checkout_payload_with_fixed_clock_and_id():
+    user = {
+        "membership": "gold",
+        "country": "KR",
+        "payment_customer_id": "cus_777",
+    }
+    items = [{"sku": "keyboard", "unit_price": 30000, "quantity": 2}]
 
-    result = process_order(
-        order={"id": 1, "total": 10000, "email": "a@test.com"},
-        save_fn=lambda o: saved.append(o),
-        notify_fn=lambda email, msg: notifications.append((email, msg)),
+    payload = create_checkout_payload(
+        user=user,
+        items=items,
+        now_iso="2026-05-17T09:00:00+00:00",
+        order_id_factory=lambda: "order_9001",
     )
 
-    assert result["status"] == "confirmed"
-    assert len(saved) == 1
-    assert len(notifications) == 1
-    assert notifications[0][0] == "a@test.com"
-
-def test_invalid_order():
-    with pytest.raises(ValueError, match="greater than 0"):
-        process_order(
-            order={"id": 1, "total": 0, "email": "a@test.com"},
-            save_fn=lambda o: None,
-            notify_fn=lambda e, m: None,
-        )
+    assert payload["order_id"] == "order_9001"
+    assert payload["requested_at"] == "2026-05-17T09:00:00+00:00"
+    assert payload["amount"] == 51000
 ```
 
-### Step 5: Before and After Refactoring
+Direct `datetime.now()` and `uuid4()` calls make tests depend on moving time and randomness. Passing time and ID generation in from the outside makes the test deterministic immediately.
+
+### Step 5: Compare the patch wall with the refactored version
+
+First, here is a realistic pre-refactor function and test.
 
 ```python
-# before refactoring: needs 5 mocks
-# def test_create_order():
-#     with patch("module.db") as mock_db, \
-#          patch("module.requests") as mock_req, \
-#          patch("module.send_email") as mock_email, \
-#          patch("module.datetime") as mock_dt, \
-#          patch("module.logger") as mock_log:
-#         ...  # 30 lines of setup
+# before_checkout.py
+import requests
+from datetime import datetime, timezone
 
-# after refactoring: zero mocks
-def test_calculate_order_total():
-    items = [{"price": 10000, "qty": 2}]
-    total = calculate_total(items, "gold", "KR")
-    assert total["total"] == 17000.0  # 20000 - 3000(15%) + 0(shipping)
+from mailer import send_email
+from repository import save_order_to_db
+
+def checkout(user: dict, items: list[dict]) -> dict:
+    subtotal = sum(item["unit_price"] * item["quantity"] for item in items)
+    response = requests.post(
+        "https://pay.example.com/v1/charges",
+        json={
+            "customer_id": user["payment_customer_id"],
+            "amount": subtotal,
+            "currency": "KRW",
+            "requested_at": datetime.now(timezone.utc).isoformat(),
+        },
+        timeout=5,
+    )
+    response.raise_for_status()
+    charge = response.json()
+    save_order_to_db(user["id"], subtotal, charge["id"])
+    send_email(user["email"], f"Order {charge['id']} completed.")
+    return {"order_id": charge["id"], "status": charge["status"]}
 ```
+
+```python
+# test_before_checkout.py
+from datetime import datetime, timezone
+from unittest.mock import patch
+
+from before_checkout import checkout
+
+@patch("before_checkout.send_email")
+@patch("before_checkout.save_order_to_db")
+@patch("before_checkout.requests.post")
+@patch("before_checkout.datetime")
+def test_checkout_before(mock_datetime, mock_post, mock_save, mock_email):
+    mock_datetime.now.return_value = datetime(2026, 5, 17, 9, 0, tzinfo=timezone.utc)
+    mock_post.return_value.raise_for_status.return_value = None
+    mock_post.return_value.json.return_value = {
+        "id": "ch_1001",
+        "status": "paid",
+        "amount": 40000,
+    }
+
+    result = checkout(
+        user={"id": 7, "email": "buyer@example.com", "payment_customer_id": "cus_777"},
+        items=[
+            {"sku": "keyboard", "unit_price": 30000, "quantity": 1},
+            {"sku": "switch-pack", "unit_price": 5000, "quantity": 2},
+        ],
+    )
+
+    assert result == {"order_id": "ch_1001", "status": "paid"}
+    mock_save.assert_called_once()
+    mock_email.assert_called_once()
+```
+
+Most of that test is setup for the environment, not verification of business rules.
+
+Now compare it to a refactored version that keeps the core logic pure.
+
+```python
+# after_checkout.py
+from collections.abc import Callable
+
+from checkout import create_checkout_payload
+
+def plan_checkout(user: dict, items: list[dict], now_iso: str, order_id_factory: Callable[[], str]) -> dict:
+    payload = create_checkout_payload(user, items, now_iso=now_iso, order_id_factory=order_id_factory)
+    return {
+        "order_id": payload["order_id"],
+        "charge_request": payload,
+        "email": user["email"],
+    }
+
+def complete_checkout(plan: dict, charge: dict) -> dict:
+    return {
+        "order_id": plan["order_id"],
+        "status": charge["status"],
+        "charged_amount": charge["amount"],
+        "email": plan["email"],
+    }
+```
+
+```python
+# test_after_checkout.py
+from after_checkout import complete_checkout, plan_checkout
+
+def test_checkout_after_refactoring():
+    user = {
+        "email": "buyer@example.com",
+        "membership": "silver",
+        "country": "KR",
+        "payment_customer_id": "cus_777",
+    }
+    items = [
+        {"sku": "keyboard", "unit_price": 30000, "quantity": 1},
+        {"sku": "switch-pack", "unit_price": 5000, "quantity": 2},
+    ]
+
+    plan = plan_checkout(
+        user=user,
+        items=items,
+        now_iso="2026-05-17T09:00:00+00:00",
+        order_id_factory=lambda: "order_9001",
+    )
+    result = complete_checkout(
+        plan,
+        charge={"id": "ch_1001", "status": "paid", "amount": 39000},
+    )
+
+    assert plan["charge_request"]["amount"] == 39000
+    assert result == {
+        "order_id": "order_9001",
+        "status": "paid",
+        "charged_amount": 39000,
+        "email": "buyer@example.com",
+    }
+```
+
+No network patching. No database patching. No time patching. The business rule is finally the main character of the test.
 
 ## What to Notice in This Code
 
-- Pure functions only need input/output verification, keeping tests concise
-- Protocol-based dependency injection makes Fake implementations easy to build
-- Separation of concerns lets you test data processing, formatting, and I/O independently
-- Injecting side effects as function parameters enables testing with simple lambdas
+- Pure calculation functions make intent visible because the tests only talk about inputs and outputs.
+- Protocols plus Fakes shift collaborator tests away from patch mechanics and toward behavior.
+- Explicit payload-building functions document external API contracts in both code and tests.
+- Injected time and ID generation make the workflow deterministic and reproducible.
 
 ## Common Mistakes
 
 | Mistake | Why It's a Problem | Fix |
-|---------|-------------------|-----|
-| Mixing business logic and I/O in one function | Can't test without mocks | Separate logic from I/O |
-| Depending directly on global objects | State leaks between tests | Inject dependencies as parameters |
-| Overusing mocks | Tests couple to implementation details | Improve design to reduce mock needs |
-| Refusing to change code for testability | Testability is a sign of good design | Let tests drive the design |
-| Making everything a class | Unnecessary state complicates tests | Prefer pure functions when possible |
+| --- | --- | --- |
+| Mixing business rules and external calls in one function | Tests become tied to network, storage, and time at once | Split calculation from I/O boundaries first |
+| Leaving Protocol examples as `...` placeholders | Readers cannot copy and run the example immediately | Use concrete method names and at least `pass` bodies |
+| Hiding payload examples behind `json={...}` | The important verification surface stays vague | Show the exact fields explicitly |
+| Only trying to reduce patch count without moving logic inward | The design problem remains | Move more rules into the pure core |
+| Turning every boundary into a class automatically | Unnecessary state can reintroduce complexity | Keep functions when state is not needed |
 
 ## Practical Applications
 
-- Write business logic as pure functions for fast domain tests
-- Use the Repository pattern to isolate DB access with Fake implementations
-- Leverage FastAPI's Depends for injection, overriding in tests
-- Separate event handlers so publishing and processing are tested independently
-- When refactoring legacy code, aim for "testable structure" as the goal
+- Keep service-layer business rules pure in FastAPI applications and inject sessions or clients at the boundary.
+- Wrap payment, email, and queue integrations in adapters so unit tests can use Fakes.
+- Treat legacy refactoring as a boundary-redrawing exercise, not just a coverage exercise.
+- Use integration tests for the outer adapters and fast unit tests for the inner rules.
 
 ## How Practitioners Think About This
 
-When facing hard-to-test code, experienced developers ask "how do I change the design?" not "how do I mock this?" Mocking is a temporary workaround; good design is the permanent fix.
+Experienced developers usually do not respond to painful tests by looking for more pytest tricks first. They ask whether the function is doing too many jobs. The test pain is often a design signal.
 
-The real value of TDD isn't "writing tests first" — it's "forcing testable design."
+Good refactoring does more than reduce mock counts. It leaves business rules at the center and makes the external edges replaceable.
 
 ## Checklist
 
-- [ ] Separated business logic into pure functions
-- [ ] Made external dependencies swappable with dependency injection
-- [ ] Defined interfaces with Protocol and created Fakes
-- [ ] Tested each layer independently through separation of concerns
-- [ ] Tested core business logic without any mocks
+- [ ] Separated pure calculation from external collaboration
+- [ ] Exposed collaborator contracts with Protocols or equivalent interfaces
+- [ ] Wrote a core service test with Fakes instead of a patch wall
+- [ ] Made time, IDs, and API payloads deterministic to verify
+- [ ] Replaced a pre-refactor mock-heavy test with a rule-focused refactored test
 
 ## Exercises
 
-1. Refactor a function that directly queries a DB into a Repository pattern and test it with a Fake Repository.
-2. Change a function that calls `datetime.now()` to accept a time parameter and test it with a fixed time.
-3. Split a read-file → process-data → write-file function into 3 pure functions and test each independently.
+1. Wrap a direct `requests.post()` call in a `PaymentGateway` adapter and test it with a `FakeGateway`.
+2. Pick an existing function that calls `datetime.now()` directly and refactor it to accept time as an argument.
+3. Find one test in your codebase that needs 3 or more patches and write down which boundary you would separate first.
 
 ## Summary and Series Wrap-Up
 
-This series covered pytest from the basics to testable design. Tests aren't just "tools for verifying code works" — they're a "feedback loop that drives good design." Think about testing first, and good code follows naturally.
+Using pytest well and writing testable code are not separate skills. Once you move pure rules inward and push external dependencies to the boundary, tests become shorter and design becomes clearer at the same time. That is the closing idea of this series: good tests do not just verify good code — they also keep pushing the code toward better structure.
 
 <!-- toc:begin -->
 - [Why Write Tests?](./01-why-write-tests.md)
@@ -413,9 +606,10 @@ This series covered pytest from the basics to testable design. Tests aren't just
 
 ## References
 
-- [Clean Architecture — Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [pytest — Documentation](https://docs.pytest.org/)
-- [Cosmic Python — Architecture Patterns with Python](https://www.cosmicpython.com/)
+- [pytest Good Integration Practices](https://docs.pytest.org/en/stable/explanation/goodpractices.html)
+- [pytest How to use fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
+- [unittest.mock — mock object library](https://docs.python.org/3/library/unittest.mock.html)
 - [Martin Fowler — Dependency Injection](https://martinfowler.com/articles/injection.html)
+- [Brian Okken — pytest for maintainable tests](https://pythontest.com/pytest-book/)
 
 Tags: Python, pytest, Testable Code, Dependency Injection, Software Design
