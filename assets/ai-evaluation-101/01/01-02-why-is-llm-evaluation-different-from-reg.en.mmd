@@ -1,0 +1,19 @@
+flowchart TD
+    subgraph T["Traditional software test"]
+        T1["Input"] --> T2["Deterministic logic"]
+        T2 --> T3["Fixed output"]
+        T3 --> T4["Compare with expected value"]
+        T4 --> T5["assert == pass or fail"]
+        T5 --> T6["Interpretation is straightforward"]
+    end
+
+    subgraph L["LLM evaluation"]
+        L1["Input"] --> L2["Probabilistic LLM"]
+        L2 --> L3["Multiple response candidates"]
+        L3 --> L4["More than one answer can be valid"]
+        L4 --> L5["Scoring is needed instead of exact match"]
+        L5 --> L6["Judge correctness relevance safety style"]
+        L6 --> L7["Interpret with thresholds and trends"]
+    end
+
+    T5 -. "determinism" .- L5

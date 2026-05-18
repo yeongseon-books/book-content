@@ -1,0 +1,10 @@
+flowchart TD
+    Q["expected 값을 어떻게 채울까"] --> D1["답이 하나로 정해지는가"]
+    D1 -->|예| E1["Exact answer\n닫힌형 QA 정답"]
+    D1 -->|아니오| D2["핵심 키워드 충족이 중요한가"]
+    D2 -->|예| E2["Required keywords\n요약 또는 추출 검증"]
+    D2 -->|아니오| E3["Rubric\n자유형 응답 품질 기준"]
+
+    E1 --> O["라벨링 스타일 선택"]
+    E2 --> O
+    E3 --> O

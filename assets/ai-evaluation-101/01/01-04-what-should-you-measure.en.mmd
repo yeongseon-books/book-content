@@ -1,0 +1,10 @@
+flowchart TD
+    R["LLM response"] --> C["Correctness\nDoes it satisfy facts and task requirements?"]
+    R --> V["Relevance\nDoes it answer the actual intent?"]
+    R --> S["Safety\nDoes it avoid harmful or risky content?"]
+    R --> T["Style\nDoes tone length and format match expectations?"]
+
+    C --> C1["Minimize factual errors"]
+    V --> V1["Avoid verbose drift"]
+    S --> S1["Catch policy violations"]
+    T --> T1["Keep brand voice consistent"]

@@ -1,0 +1,10 @@
+flowchart TD
+    Q["How should expected values be labeled?"] --> D1["Is there only one correct answer?"]
+    D1 -->|Yes| E1["Exact answer\nClosed QA target"]
+    D1 -->|No| D2["Do required keywords matter most?"]
+    D2 -->|Yes| E2["Required keywords\nSummary or extraction checks"]
+    D2 -->|No| E3["Rubric\nQuality criteria for free-form output"]
+
+    E1 --> O["Choose the labeling style"]
+    E2 --> O
+    E3 --> O
