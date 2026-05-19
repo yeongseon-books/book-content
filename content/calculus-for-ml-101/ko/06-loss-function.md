@@ -60,7 +60,7 @@ last_reviewed: '2026-05-12'
 
 손실 함수의 흐름은 다음과 같습니다.
 
-![핵심 개념](../../../assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.ko.png)
 
 *손실 함수 흐름: 정답과 예측의 차이가 손실과 그래디언트를 거쳐 업데이트 신호가 됩니다.*
 ### MSE는 회귀 문제의 기본 손실입니다

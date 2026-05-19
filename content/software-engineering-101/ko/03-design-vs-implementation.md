@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.ko.png)
 *설계 결정이 구현과 관찰을 거쳐 다시 설계로 돌아오는 흐름*
 
 설계는 구현의 방향을 정하고, 구현 이후의 관찰 결과는 다시 설계 판단으로 돌아옵니다.

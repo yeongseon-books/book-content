@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.ko.png)
 *질문을 RED, USE, 핵심 신호 패널로 나눠 첫 화면의 판단 순서를 만드는 대시보드 설계 구조*
 
 ## 핵심 용어

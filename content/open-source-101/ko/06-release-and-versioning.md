@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 릴리스를 읽는 기본 지도
 
-![릴리스를 읽는 기본 지도](../../../assets/open-source-101/06/06-01-the-basic-release-map.ko.png)
+![릴리스를 읽는 기본 지도](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.ko.png)
 
 *MAJOR, MINOR, PATCH가 사용자에게 각각 다른 위험 신호를 전달하는 기본 지도*
 시맨틱 버전을 암기 규칙처럼만 외우면 금방 잊습니다. 대신 사용자 입장에서 이해하면 쉽습니다. MAJOR는 조심하라는 신호이고, MINOR는 새로운 기능이 들어왔다는 신호이며, PATCH는 큰 사용법 변화 없이 안심하고 올릴 가능성이 높다는 신호입니다.

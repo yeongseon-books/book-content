@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/03/03-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-diagram.ko.png)
 
 *학습, 튜닝, 최종 검증을 서로 다른 데이터 조각에 나눠 맡겨야 일반화 성능을 따로 측정할 수 있습니다.*
 

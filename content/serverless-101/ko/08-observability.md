@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
 
 *로그, 지표, 추적 정보가 한 조사 흐름으로 만나야 분산된 함수를 끝까지 따라갈 수 있습니다.*
 이 그림이 말하는 핵심은 세 신호를 따로 모으는 것이 목적이 아니라, 서로 연결된 상태로 보는 것이 목적이라는 점입니다. 그래야 특정 요청의 실패를 로그로 보고, 동일 시점의 지표 변화와 함께 읽고, 전체 경로를 추적으로 확인할 수 있습니다.

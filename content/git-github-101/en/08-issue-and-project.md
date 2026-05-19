@@ -55,7 +55,7 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 > Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.
 Here is how issues, PRs, and projects interlock.
 
-![Mental model](../../../assets/git-github-101/08/08-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
 
 *Mental model*
 Read it as a flow:
@@ -225,7 +225,7 @@ The fastest way for a Project board to turn into decoration is to create columns
 
 Use an explicit transition rule like this instead.
 
-![Define status transitions before the board fills up](../../../assets/git-github-101/08/08-01-define-status-transitions-before-the-boa.en.png)
+![Define status transitions before the board fills up](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-define-status-transitions-before-the-boa.en.png)
 
 *A work-tracking flow that makes the Issue → PR → Project state transitions explicit*
 

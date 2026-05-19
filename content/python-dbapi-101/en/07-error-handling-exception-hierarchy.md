@@ -30,7 +30,7 @@ This post is not about memorizing the mapping table. It is about turning the exc
 
 This is the 7th article in the Python DB-API 101 series.
 
-![PEP 249 exception hierarchy and SQLite error handling](../../../assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.en.png)
+![PEP 249 exception hierarchy and SQLite error handling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.en.png)
 
 *PEP 249 exception hierarchy and SQLite error handling*
 ## Questions this post answers
@@ -51,7 +51,7 @@ A second reason: `sqlite3` exception messages are English sentences, so it is te
 
 ## Mental Model: An exception is a signal about how to react
 
-![Mental Model: an exception is a signal about how to react](../../../assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
+![Mental Model: an exception is a signal about how to react](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
 
 *Mental Model: an exception is a signal about how to react*
 > An exception class is a signal about how to react in production. Retry, 4xx, or fail-loud should be encoded by the class itself.
@@ -84,7 +84,7 @@ Group the leaves into three operational buckets and decisions become easy:
 
 ## Core Concept: SQLite error codes and the PEP 249 mapping
 
-![SQLite error codes and the PEP 249 mapping](../../../assets/python-dbapi-101/07/07-03-core-concept-sqlite-error-codes-and-the.en.png)
+![SQLite error codes and the PEP 249 mapping](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-03-core-concept-sqlite-error-codes-and-the.en.png)
 
 *SQLite error codes and the PEP 249 mapping*
 SQLite defines result codes in two layers. **Primary result codes** like `SQLITE_BUSY` and `SQLITE_CONSTRAINT`, and **extended result codes** like `SQLITE_BUSY_RECOVERY` and `SQLITE_CONSTRAINT_UNIQUE`. The `sqlite3` module looks at the primary code to choose a PEP 249 class.
@@ -169,7 +169,7 @@ Domain exceptions (`DuplicateEmail`, `TransientDBError`) let the caller decide p
 
 ## Step by Step: building a safe retry decorator
 
-![Step by Step: building a safe retry decorator](../../../assets/python-dbapi-101/07/07-04-step-by-step-building-a-safe-retry-decor.en.png)
+![Step by Step: building a safe retry decorator](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-04-step-by-step-building-a-safe-retry-decor.en.png)
 
 *Step by Step: building a safe retry decorator*
 ### Step 1. Classify exceptions

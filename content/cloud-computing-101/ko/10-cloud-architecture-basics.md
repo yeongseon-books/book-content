@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![CDN, 로드밸런서, 앱, 캐시, 데이터 저장소가 계층형으로 연결된 기본 웹 아키텍처](../../../assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
+![CDN, 로드밸런서, 앱, 캐시, 데이터 저장소가 계층형으로 연결된 기본 웹 아키텍처](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
 
 *CDN, 로드밸런서, 앱, 캐시, 데이터 저장소가 계층형으로 연결된 기본 웹 아키텍처*
 이 그림은 전형적인 다층 웹 구조를 보여 줍니다. CDN이 정적 콘텐츠와 글로벌 읽기 트래픽을 흡수하고, ALB가 요청을 분산하며, 앱 계층은 Stateless하게 확장되고, 데이터 계층은 캐시·DB·오브젝트 스토리지로 역할이 나뉩니다.

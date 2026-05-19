@@ -44,7 +44,7 @@ Most dashboards are *decoration*. If you do not know *where to look* during an i
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
 *The first dashboard screen should route the operator from a question to RED, USE, and the golden signals in a predictable order.*
 
 ## Key Terms

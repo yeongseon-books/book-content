@@ -49,7 +49,7 @@ The core mechanism that enables AI agents to interact with external systems is F
 
 ### Tool-calling loop
 
-![Tool-calling loop](../../../assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
+![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
 ### The Four-Step Flow
 
 **Step 1: Provide Tool Definitions to LLM**

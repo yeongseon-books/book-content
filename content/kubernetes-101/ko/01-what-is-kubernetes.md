@@ -46,7 +46,7 @@ Kubernetes를 배우는 이유도 여기 있습니다. 많은 입문자가 Kuber
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
 *`kubectl` 요청이 API 서버를 거쳐 스케줄러와 워커 노드로 이어지는 기본 제어 흐름입니다.*
 
 

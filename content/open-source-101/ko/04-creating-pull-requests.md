@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 흐름을 먼저 눈에 넣기
 
-![흐름을 먼저 눈에 넣기](../../../assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.ko.png)
+![흐름을 먼저 눈에 넣기](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.ko.png)
 
 *포크에서 리뷰까지 단계를 분리해야 작은 변경이 깔끔한 PR로 정리되는 흐름*
 이 흐름을 귀찮은 절차로 보면 매 단계가 번거롭습니다. 하지만 역할을 나눠 보면 훨씬 이해가 쉽습니다. 포크는 개인 작업 공간, 브랜치는 변경 단위, 커밋은 이력, 풀 리퀘스트는 검토 요청입니다. 섞지 않는 이유가 분명합니다.

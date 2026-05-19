@@ -45,7 +45,7 @@ Once a URL is public, it is *expensive to change*. A bad resource model warps ev
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
 *The URL shape shows the path from collection to item to sub-resource.*
 
 When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.

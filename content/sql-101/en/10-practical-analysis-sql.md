@@ -46,7 +46,7 @@ Well-structured analytics SQL also becomes reusable team knowledge. A clean coho
 
 ## Analytics query layering flow
 
-![Analytics query layering flow](../../../assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
+![Analytics query layering flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
 ## Key Terms
 
 - **DAU/WAU/MAU**: daily / weekly / monthly *active users*.

@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
 
 *주니어에서 시니어, 리드로 갈수록 문제 정의와 영향 범위가 확장되는 성장 구조*
 이 흐름은 단순 승진 사다리가 아니라 관점의 확장을 뜻합니다. 주니어가 자신의 작업을 안정적으로 끝내는 데 집중한다면, 시니어는 문제 선정과 영향 측정, 동료 성장, 시스템 전체를 함께 봅니다.

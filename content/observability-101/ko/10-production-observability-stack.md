@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.ko.png)
 *애플리케이션 신호가 OpenTelemetry 수집기를 거쳐 Prometheus, Loki, Tempo에 저장되고 Grafana에서 다시 만나는 구조*
 
 ## 핵심 용어

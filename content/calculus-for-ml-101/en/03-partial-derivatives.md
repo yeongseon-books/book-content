@@ -44,7 +44,7 @@ Every ML *weight* receives its *share of responsibility* through a *partial deri
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
 
 *Partial-derivative flow: hold one variable fixed and isolate responsibility along the other axis.*
 ## Key Terms

@@ -46,7 +46,7 @@ Compute choice drives roughly 60% of your bill and most of your operational pain
 
 ## Concept at a Glance
 
-![The compute spectrum shifts from maximum control to maximum platform automation](../../../assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
+![The compute spectrum shifts from maximum control to maximum platform automation](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
 
 *The compute spectrum shifts from maximum control to maximum platform automation*
 

@@ -46,7 +46,7 @@ That process teaches a surprising amount of practical engineering. You practice 
 
 ## The Smallest Path to Publication
 
-![The Smallest Path to Publication](../../../assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
+![The Smallest Path to Publication](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
 
 *The minimum path from idea to docs, release, and announcement for a first public tool*
 The key insight is that publication does not happen only at the last second. As soon as you write docs with another user in mind, you have already started preparing for public use.

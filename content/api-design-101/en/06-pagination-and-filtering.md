@@ -45,7 +45,7 @@ Bad pagination produces slow queries *and* duplicates *and* gaps — at the same
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
 *A cursor is an opaque token that tells the client where the next page should continue.*
 
 The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.

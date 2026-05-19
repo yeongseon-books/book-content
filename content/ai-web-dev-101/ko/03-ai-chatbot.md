@@ -49,7 +49,7 @@ Vercel AI SDK는 이 지점을 꽤 잘 줄여 줍니다.
 
 직접 Fetch와 Server-Sent Events를 조립해도 되지만, 입문 단계에서는 먼저 안정적인 추상화를 타고 전체 그림을 보는 편이 좋습니다.
 
-![브라우저와 모델 API를 잇는 챗봇 서비스 구조](../../../assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
+![브라우저와 모델 API를 잇는 챗봇 서비스 구조](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
 
 *브라우저와 모델 API를 잇는 챗봇 서비스 구조*
 
@@ -111,11 +111,11 @@ export async function POST(req: Request) {
 
 즉, 이 경로의 책임은 “대화 UI 메시지를 모델 메시지로 바꾸고, 모델 스트림을 다시 UI 스트림으로 돌려주는 것”입니다.
 
-![API Route의 요청 처리 흐름](../../../assets/ai-web-dev-101/03/api-route-handler-flow.ko.png)
+![API Route의 요청 처리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/api-route-handler-flow.ko.png)
 
 *API Route의 요청 처리 흐름*
 
-![사용자 메시지가 AI 답변으로 변환되는 과정](../../../assets/ai-web-dev-101/03/chat-message-roundtrip.ko.png)
+![사용자 메시지가 AI 답변으로 변환되는 과정](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chat-message-roundtrip.ko.png)
 
 *사용자 메시지가 AI 답변으로 변환되는 과정*
 
@@ -181,7 +181,7 @@ export default function Chat() {
 - `status`: 현재 요청 상태입니다. 전송 중에는 입력을 잠가 중복 호출을 막을 수 있습니다.
 - `message.parts`: 텍스트 외에 tool call, 파일 등 다른 타입이 추가될 수 있어 `content` 하나만 가정하지 않는 편이 안전합니다.
 
-![useChat 훅의 상태 관리 흐름](../../../assets/ai-web-dev-101/03/usechat-state-flow.ko.png)
+![useChat 훅의 상태 관리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/usechat-state-flow.ko.png)
 
 *useChat 훅의 상태 관리 흐름*
 
@@ -191,7 +191,7 @@ export default function Chat() {
 
 이 방식의 장점은 단순히 “멋있어 보인다”가 아닙니다. 사용자는 첫 글자가 바로 나타나는 순간 서비스가 살아 있다고 느낍니다. 응답 전체가 끝날 때까지 침묵하는 UI보다 훨씬 빠르게 체감됩니다.
 
-![스트리밍 방식으로 답변이 전달되는 흐름](../../../assets/ai-web-dev-101/03/streaming-response-flow.ko.png)
+![스트리밍 방식으로 답변이 전달되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/streaming-response-flow.ko.png)
 
 *스트리밍 방식으로 답변이 전달되는 흐름*
 

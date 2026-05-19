@@ -58,7 +58,7 @@ Complex domain models         Mathematical / declarative logic
 
 ## Where to draw the OOP/FP boundary
 
-![OOP and FP boundary in one service](../../../assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
+![OOP and FP boundary in one service](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
 
 *Keep handlers and repositories at the edge, and push the important business rules into a pure core. That is the simplest repeatable way to mix OOP and FP without losing consistency.*
 

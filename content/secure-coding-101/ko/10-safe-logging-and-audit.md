@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름](../../../assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
+![구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
 
 *구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름*
 애플리케이션은 구조화된 로그를 남기고, 민감 필드는 먼저 마스킹됩니다. 중요한 감사 이벤트는 중앙 저장소에 별도로 보관되며, 저장소는 위변조가 어려운 형태여야 합니다. SIEM은 그 기록을 모아 이상 징후를 탐지하고 알림을 보냅니다.

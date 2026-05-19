@@ -52,7 +52,7 @@ A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *d
 
 ## Concept at a Glance
 
-![Warehouse-to-mart split](../../../assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
+![Warehouse-to-mart split](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
 
 *The warehouse keeps conformed shared assets, while domain-specific marts reshape them for sales, finance, and operations consumers.*
 

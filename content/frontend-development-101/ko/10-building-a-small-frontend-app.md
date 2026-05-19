@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/10/10-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-diagram.ko.png)
 
 *페이지, 컴포넌트, API, 스타일, 빌드, 배포가 작은 앱으로 연결되는 전체 그림*
 

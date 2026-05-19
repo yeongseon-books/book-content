@@ -31,7 +31,7 @@ This article frames that decision around three variables so the rest of the seri
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -94,13 +94,13 @@ With this table in hand, "we just want to nudge the response tone" branches natu
 
 ## What to understand first
 
-![base weights vs trainable boundary in fine-tuning](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+![base weights vs trainable boundary in fine-tuning](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
 
 *base weights vs trainable boundary in fine-tuning*
 
 The point most easily missed in fine-tuning is **what we choose as the training target**. Full fine-tuning updates every existing weight, so memory and optimizer state both balloon. LoRA freezes the existing weights and adds two low-rank matrices instead. So when discussing cost, look at the **trainable parameter count** separately from the total model parameters.
 
-![What to understand first](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
+![What to understand first](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
 
 *What to understand first*
 
@@ -233,7 +233,7 @@ Use post 1 to make the first branching decision before you spend GPU time.
 
 ## What to notice in this code
 
-![LoRA's surface area per linear layer measured by the script](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
+![LoRA's surface area per linear layer measured by the script](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
 
 *LoRA's surface area per linear layer measured by the script*
 
@@ -243,7 +243,7 @@ Use post 1 to make the first branching decision before you spend GPU time.
 
 ## Common mistakes
 
-![picking a base model by problem type](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
+![picking a base model by problem type](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
 
 *picking a base model by problem type*
 

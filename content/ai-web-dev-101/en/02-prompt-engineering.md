@@ -52,7 +52,7 @@ In Chat Completions, the most important split is between `system` and `user`.
 
 That split keeps application prompts easier to reason about. If quality changes, you can ask whether the failure came from the role layer or the task layer.
 
-![How the system prompt and user prompt play different roles](../../../assets/ai-web-dev-101/02/prompt-role-layering.en.png)
+![How the system prompt and user prompt play different roles](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
 
 *How the system prompt and user prompt play different roles*
 
@@ -102,7 +102,7 @@ print("\n[better]\n", better)
 
 A better prompt is not “more beautiful.” It simply makes the contract tighter.
 
-![How to improve a vague prompt into a concrete one](../../../assets/ai-web-dev-101/02/prompt-improvement-example.en.png)
+![How to improve a vague prompt into a concrete one](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-improvement-example.en.png)
 
 *How to improve a vague prompt into a concrete one*
 
@@ -124,7 +124,7 @@ If code will parse the answer later, output format is not optional. JSON, bullet
 
 Rules like “answer in Korean,” “do not guess,” or “say you do not know when evidence is missing” make real systems much safer.
 
-![Four prompt design principles that stabilize results](../../../assets/ai-web-dev-101/02/four-prompt-principles.en.png)
+![Four prompt design principles that stabilize results](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/four-prompt-principles.en.png)
 
 *Four prompt design principles that stabilize results*
 
@@ -190,7 +190,7 @@ for temp in (0.1, 0.9):
     print(f"temperature={temp}: {response.choices[0].message.content}")
 ```
 
-![How temperature and token limits affect generation](../../../assets/ai-web-dev-101/02/temperature-max-tokens.en.png)
+![How temperature and token limits affect generation](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/temperature-max-tokens.en.png)
 
 *How temperature and token limits affect generation*
 
@@ -228,7 +228,7 @@ for case in test_cases:
 
 Strong prompts are rarely “written once.” They are revised as failure cases accumulate.
 
-![A practical prompt iteration loop](../../../assets/ai-web-dev-101/02/prompt-iteration-loop.en.png)
+![A practical prompt iteration loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-iteration-loop.en.png)
 
 *A practical prompt iteration loop*
 

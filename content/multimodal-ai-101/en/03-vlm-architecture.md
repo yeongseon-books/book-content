@@ -61,7 +61,7 @@ Every VLM is a combination of three parts.
 
 The Adapter is where schools differ. It is the module that converts visual features into a token sequence the LLM can understand.
 
-![Common skeleton: Vision Encoder + Adapter + LLM](../../../assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
+![Common skeleton: Vision Encoder + Adapter + LLM](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
 *Most architectural trade-offs in a VLM come from the adapter contract: how many visual tokens survive, how often they interact with text, and where the cost lands.*
 
 ## School 1: LLaVA - simple MLP projection

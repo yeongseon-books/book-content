@@ -48,7 +48,7 @@ When stages are split cleanly, the team can narrow the failure immediately and r
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/04/04-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 The most important part of this diagram is not the stage names, but the boundaries between them. Ingest, preprocess, train, evaluate, and register have to be separate if the team wants partial re-runs and faster root-cause analysis.

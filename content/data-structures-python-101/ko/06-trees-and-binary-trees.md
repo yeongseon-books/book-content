@@ -62,7 +62,7 @@ Binary Search Tree (BST):
 
 ## 트리 구조를 그림으로 보면
 
-![트리 구조를 그림으로 보면](../../../assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)
+![트리 구조를 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)
 
 *루트에서 리프까지 갈라지는 트리와 BST의 기본 형태를 보여 주는 그림*
 

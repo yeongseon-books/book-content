@@ -52,7 +52,7 @@ Warehouse facts often hold *billions of rows*. A daily partition alone lets the 
 
 ## Concept at a Glance
 
-![Partition pruning example](../../../assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
+![Partition pruning example](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
 
 *A date predicate lets the engine scan only the matching partition and skip adjacent partitions entirely.*
 

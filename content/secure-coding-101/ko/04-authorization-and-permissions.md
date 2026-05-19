@@ -46,7 +46,7 @@ OWASP Top 10에서 broken access control이 상위에 반복해서 등장하는 
 
 ## 한눈에 보는 구조
 
-![인증 뒤 자원을 불러와 인가를 판단한 후 작업을 수행하는 흐름](../../../assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
+![인증 뒤 자원을 불러와 인가를 판단한 후 작업을 수행하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
 
 *인증 뒤 자원을 불러와 인가를 판단한 후 작업을 수행하는 흐름*
 이 흐름에서 가장 중요한 단계는 자원을 먼저 읽고 그 자원 기준으로 권한을 판단하는 부분입니다. 사용자가 누구인지만 알아서는 충분하지 않습니다. 수정하려는 게시글, 다운로드하려는 파일, 조회하려는 주문처럼 실제 대상 자원을 기준으로 다시 결정해야 합니다.

@@ -55,7 +55,7 @@ The OS is invisible until something breaks. Out-of-memory kills, zombie processe
 
 ### Where the operating system sits
 
-![Where the operating system sits](../../../assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
+![Where the operating system sits](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
 *Where the operating system sits between application code and hardware*
 
 ```text

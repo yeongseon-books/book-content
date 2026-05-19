@@ -48,7 +48,7 @@ The main habit is to ask what world the denominator describes. Many practical mi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
 *Probability starts with possible outcomes, then adds conditions, updates beliefs, and separates average outcome from risk.*
 
 ## Key Terms

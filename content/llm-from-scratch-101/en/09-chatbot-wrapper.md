@@ -48,7 +48,7 @@ This is the final article in the LLM from Scratch 101 series.
 
 To build a functional chatbot, we need four components working together: the model itself, a way to track the conversation, a streaming protocol, and a browser-based frontend.
 
-![Chatbot pipeline across model, history, streaming, UI](../../../assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
+![Chatbot pipeline across model, history, streaming, UI](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
 
 *Chatbot pipeline across model, history, streaming, UI*
 ## Designing the Multi-turn Prompt Format

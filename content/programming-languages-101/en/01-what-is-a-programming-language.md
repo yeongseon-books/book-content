@@ -44,7 +44,7 @@ If you treat a language as just a tool, every new language feels like starting o
 
 ## Concept at a Glance
 
-![Abstraction layers from high-level code down to machine code](../../../assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
+![Abstraction layers from high-level code down to machine code](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
 
 *Abstraction layers from high-level code down to machine code*
 

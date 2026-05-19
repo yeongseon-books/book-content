@@ -50,7 +50,7 @@ To use a git analogy, `upgrade` is the commit and `downgrade` is its precise rev
 
 ### Diagram: the two-way contract inside a revision file
 
-![Diagram: the two-way contract inside a revision file](../../../assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.en.png)
+![Diagram: the two-way contract inside a revision file](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.en.png)
 *A good revision makes `upgrade` and `downgrade` true round-trips across the same change.*
 
 ## Core concepts

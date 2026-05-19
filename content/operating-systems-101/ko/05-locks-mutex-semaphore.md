@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 동기화 도구가 제어하는 입장 수
 
-![동기화 도구가 제어하는 입장 수](../../../assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.ko.png)
+![동기화 도구가 제어하는 입장 수](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.ko.png)
 *동기화 도구마다 임계 구역에 들어갈 수 있는 수와 기다리는 방식이 다릅니다.*
 
 ```text

@@ -50,7 +50,7 @@ Senior is a behavior, not a title.
 
 ## Concept at a Glance
 
-![Growth path from junior through lead-level scope](../../../assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
+![Growth path from junior through lead-level scope](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
 
 *Growth path from junior through lead-level scope*
 

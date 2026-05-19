@@ -55,7 +55,7 @@ Writing assumptions and metrics next to the problem also strengthens the eventua
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
 *Connecting the problem statement to users, assumptions, and metrics*
 
 ## Practical artifact: a problem card

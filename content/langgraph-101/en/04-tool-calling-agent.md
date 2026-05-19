@@ -67,7 +67,7 @@ At the simplest level, the model looks like this.
 
 That table matters because these are the questions operators actually ask. Why did the model request this tool? Did the tool really succeed? Why did the system call it again after failure? When should execution stop instead of looping? Those questions become answerable only when tool calling is treated as an execution envelope rather than as an LLM party trick.
 
-![Questions this post answers](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -77,7 +77,7 @@ That table matters because these are the questions operators actually ask. Why d
 
 Start with the smallest tool loop that still resembles a real tool-using agent. The model reads a question, requests a tool when necessary, `ToolNode` performs the execution, and the model reads the result before producing the final answer. The example is intentionally small, but it already contains the whole control loop.
 
-![Tool loop between agent and tools](../../../assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
+![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
 
 *Tool loop between agent and tools*
 
@@ -193,7 +193,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 Do not try to assign equal weight to every line on a first pass. Three details matter first.
 
-![Tool call and ToolMessage flow](../../../assets/langgraph-101/04/04-02-what-to-notice-in-this-code.en.png)
+![Tool call and ToolMessage flow](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-02-what-to-notice-in-this-code.en.png)
 
 *Tool call and ToolMessage flow*
 
@@ -213,7 +213,7 @@ The third point is termination. `tools_condition` looks small, but it matters a 
 
 The most common mistake in tool-calling agents is assuming that “more tools” automatically means “more accuracy.” In practice, loop control and side-effect safety matter at least as much as raw answer quality.
 
-![Branching from the last AI message](../../../assets/langgraph-101/04/04-03-where-engineers-get-confused.en.png)
+![Branching from the last AI message](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-03-where-engineers-get-confused.en.png)
 
 *Branching from the last AI message*
 

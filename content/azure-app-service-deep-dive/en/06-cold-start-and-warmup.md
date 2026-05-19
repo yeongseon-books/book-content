@@ -57,7 +57,7 @@ or the new process or container has not finished becoming traffic-eligible.
 
 ## The cold path and the warm path
 
-![First request waiting for a ready worker](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
+![First request waiting for a ready worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
 
 *First request waiting for a ready worker*
 That one diagram is the whole story.
@@ -81,7 +81,7 @@ The mechanisms are not.
 - the platform can repeatedly call `WEBSITE_WARMUP_PATH`
 - startup timeout is shaped by `WEBSITES_CONTAINER_START_TIME_LIMIT`
 
-![Linux warm-up path and startup limit](../../../assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
+![Linux warm-up path and startup limit](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-02-linux-apps.en.png)
 
 *Linux warm-up path and startup limit*
 You need that split in your head before you design a warm-up strategy.
@@ -100,7 +100,7 @@ that means:
 - app-pool unload or equivalent idle behavior becomes less visible
 - worst-case first-request latency often improves
 
-![Periodic pings reducing idle coldness](../../../assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
+![Periodic pings reducing idle coldness](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-03-what-always-on-really-does.en.png)
 
 *Periodic pings reducing idle coldness*
 Always On does not erase all startup cost.
@@ -123,7 +123,7 @@ Examples include:
 
 That is where IIS `applicationInitialization` matters.
 
-![Extra warm-up path beyond the root ping](../../../assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
+![Extra warm-up path beyond the root ping](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-04-when-windows-needs-applicationinitializa.en.png)
 
 *Extra warm-up path beyond the root ping*
 Endpoint design matters here.
@@ -141,7 +141,7 @@ The App Service app-settings reference gives the critical Linux startup contract
 - `WEBSITE_WARMUP_STATUSES` can narrow accepted status codes
 - `WEBSITES_CONTAINER_START_TIME_LIMIT` bounds how long the platform waits
 
-![Warm-up responses and startup timeout contract](../../../assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
+![Warm-up responses and startup timeout contract](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-05-linux-warm-up-path-and-startup-timeout.en.png)
 
 *Warm-up responses and startup timeout contract*
 That model creates two very common Linux mistakes.
@@ -162,7 +162,7 @@ The first-request cost is usually a stack of smaller costs.
 - cache, module import, or JIT work
 - health and warm-up eligibility gates
 
-![Costs stacked inside a cold start](../../../assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
+![Costs stacked inside a cold start](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-06-what-makes-cold-start-expensive.en.png)
 
 *Costs stacked inside a cold start*
 That is why cold-start reduction is rarely a single magic setting.
@@ -195,7 +195,7 @@ you usually get one of two bad outcomes.
 
 Slots let the platform pay the cold-start cost off the production URL.
 
-![Traffic switching after staging warm-up completes](../../../assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
+![Traffic switching after staging warm-up completes](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-07-why-deployment-slots-help-so-much.en.png)
 
 *Traffic switching after staging warm-up completes*
 That is the value proposition in one line.
@@ -215,7 +215,7 @@ They do not do the same work.
 - **warm-up path**: decide readiness during startup
 - **health check**: decide whether the instance should keep receiving traffic
 
-![Different roles of Always On, warm-up, and health](../../../assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
+![Different roles of Always On, warm-up, and health](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-08-always-on-warm-up-and-health-are-not-the.en.png)
 
 *Different roles of Always On, warm-up, and health*
 If you blur them together,

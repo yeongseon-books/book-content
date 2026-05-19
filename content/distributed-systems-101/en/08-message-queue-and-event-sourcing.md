@@ -45,7 +45,7 @@ Direct service-to-service calls strongly couple availability and latency. Put a 
 
 ## Concept at a Glance
 
-![Producer-consumer decoupling through a message queue](../../../assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
+![Producer-consumer decoupling through a message queue](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
 
 *Producer-consumer decoupling through a message queue*
 

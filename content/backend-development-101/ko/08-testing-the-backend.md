@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![unit, integration, E2E 테스트가 쌓이는 테스트 피라미드](../../../assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
+![unit, integration, E2E 테스트가 쌓이는 테스트 피라미드](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
 
 *unit, integration, E2E 테스트가 쌓이는 테스트 피라미드*
 테스트 피라미드의 핵심은 아래쪽에 빠르고 많은 테스트를 두고, 위쪽에 느리고 적은 테스트를 두는 것입니다. 이 비율이 깨지면 팀의 개발 속도도 함께 무너집니다.

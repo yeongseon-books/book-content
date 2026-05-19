@@ -44,7 +44,7 @@ Analysis speed can differ by *tens to hundreds of times*. *Vectorization* is the
 
 ## Concept at a Glance
 
-![Why column-wise math outruns row-wise apply calls](../../../assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
+![Why column-wise math outruns row-wise apply calls](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
 *Why column-wise math outruns row-wise apply calls*
 
 ## Key Terms

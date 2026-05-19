@@ -52,7 +52,7 @@ The `with` statement and narrow `except` clauses are the simplest tools for avoi
 > A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of `with` and `try` blocks fall out naturally.
 The diagram below shows the flow that runs whenever you open a file and do work with it.
 
-![Mental model](../../../assets/python-101/08/08-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png)
 
 *Mental model*
 Two ideas hold this together.

@@ -46,7 +46,7 @@ Software has *no memory*. A bug fixed once can be *reintroduced by the next cont
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

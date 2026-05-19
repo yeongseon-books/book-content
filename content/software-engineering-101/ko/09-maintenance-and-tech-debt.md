@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
 *기술부채를 측정하고 우선순위를 매겨 상환하는 순환 구조*
 
 기술부채는 한 번 생기고 끝나는 사건이 아니라, 계속 관리해야 하는 순환입니다.

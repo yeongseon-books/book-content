@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 통계적 사고는 질문에서 출발해 데이터, 분포, 추정, 신뢰구간, 검정, 효과 크기, 결정으로 이어집니다. 이 순서가 정리되면 시리즈 전체가 하나의 작업 흐름처럼 읽히기 시작합니다.
 
-![멘탈 모델](../../../assets/statistics-101/10/10-01-concept-at-a-glance.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.ko.png)
 
 *통계적 사고는 질문에서 시작해 분포, 추정, 검정, 효과 크기, 의사결정으로 이어지는 하나의 흐름입니다.*
 중요한 점은 마지막 결정이 통계량 하나에서 바로 나오지 않는다는 사실입니다. 추정값과 불확실성, 효과 크기, 비즈니스 비용이 함께 모여서 결정이 됩니다.

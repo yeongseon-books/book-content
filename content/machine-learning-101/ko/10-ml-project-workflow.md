@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/10/10-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-diagram.ko.png)
 
 *문제 정의에서 시작한 ML 프로젝트는 데이터, 모델, 배포, 모니터링을 거쳐 다시 문제 정의로 돌아오는 루프로 운영됩니다.*
 

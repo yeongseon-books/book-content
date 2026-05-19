@@ -55,7 +55,7 @@ Backup ownership matters just as much. Student teams are vulnerable to exams, in
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
 *A simple structure that connects the lead with domain owners*
 
 ## Practical artifact: a responsibility matrix

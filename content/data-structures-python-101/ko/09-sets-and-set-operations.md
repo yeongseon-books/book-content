@@ -56,7 +56,7 @@ sym. diff.   A ^ B  = {1, 2, 5, 6}
 
 ## set 저장 모델을 그림으로 보면
 
-![set 저장 모델을 그림으로 보면](../../../assets/data-structures-python-101/09/09-01-set.ko.png)
+![set 저장 모델을 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)
 
 *set이 고유한 키만 저장하기 때문에 중복 제거와 집합 연산이 같은 저장 모델에서 자연스럽게 나오는 구조임을 보여 주는 그림*
 

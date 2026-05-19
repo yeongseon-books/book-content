@@ -52,7 +52,7 @@ As warehouse *compute became cheap*, loading the *raw source* and *transforming 
 
 ## Concept at a Glance
 
-![ELT pipeline flow](../../../assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
+![ELT pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
 
 *In a typical ELT pipeline, raw data lands first, then warehouse SQL transforms it into marts for downstream consumption.*
 

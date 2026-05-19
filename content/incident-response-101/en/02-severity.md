@@ -48,7 +48,7 @@ A strong severity system removes those debates from the live path. When someone 
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The point of the flow is the mapping step. Severity is not the impact itself; it is the operating language that turns impact into a response pattern.

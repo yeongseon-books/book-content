@@ -54,7 +54,7 @@ An ordered path gives you something more valuable than motivation: it gives you 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
 
 *A staged learning path from fundamentals to analytics, modeling, and product context*
 ## Key Terms

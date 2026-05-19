@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.ko.png)
 *애플리케이션에서 나온 세 신호가 대시보드, 로그 검색, 요청 흐름으로 이어지는 기본 구조*
 
 ## 핵심 용어

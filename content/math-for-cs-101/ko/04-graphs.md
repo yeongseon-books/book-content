@@ -62,7 +62,7 @@ title: 그래프
 
 ## 한 장으로 보는 그래프 탐색
 
-![한 장으로 보는 그래프 탐색](../../../assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 그래프 탐색](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)
 *그래프는 대상보다 관계가 중심인 모델입니다. 탐색은 이 연결을 어떤 순서로 읽을지 정하는 절차입니다.*
 
 ---

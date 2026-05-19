@@ -47,7 +47,7 @@ UI, 비즈니스 규칙, 인프라는 바뀌는 이유도 속도도 다릅니다
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
 *표현 계층과 애플리케이션 계층, 도메인, 인프라가 서로 다른 속도로 바뀌도록 나뉜 구조*
 
 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다. 바깥 채널과 저장소는 도메인을 향해 붙지만, 도메인은 바깥 세부를 모르는 편이 좋습니다.

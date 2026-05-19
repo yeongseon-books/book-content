@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![클로저가 함수와 캡처한 바인딩을 함께 들고 가는 구조](../../../assets/programming-languages-101/05/05-01-concept-at-a-glance.ko.png)
+![클로저가 함수와 캡처한 바인딩을 함께 들고 가는 구조](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.ko.png)
 
 *클로저가 함수와 캡처한 바인딩을 함께 들고 가는 구조*
 

@@ -44,7 +44,7 @@ The *same image* must flow from *dev to staging to prod* unchanged for *reproduc
 
 ## Concept at a Glance
 
-![A single immutable image receiving environment-specific variables and secrets at runtime](../../../assets/docker-101/06/06-01-concept-at-a-glance.en.png)
+![A single immutable image receiving environment-specific variables and secrets at runtime](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)
 
 *The image stays fixed while development, staging, and production inject different runtime configuration and secrets*
 

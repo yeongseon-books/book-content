@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 > 데이터는 패킷이라는 작은 단위로 잘려 네트워크를 흐릅니다. 그리고 각 층은 서로 다른 책임을 맡습니다. 물리 신호를 보내는 층, 바로 옆 장비와 프레임을 주고받는 층, 전 세계 경로를 찾는 층, 신뢰성 있는 전송을 맡는 층, 마지막으로 HTTP 같은 의미 있는 메시지를 다루는 층이 나뉘어 있습니다. 이 책임 분리가 바로 계층 모델입니다.
 
-![네트워크 계층 모델과 패킷 이동](../../../assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
+![네트워크 계층 모델과 패킷 이동](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
 *패킷이 계층을 따라 캡슐화되고, 중간 장비를 거쳐 목적지까지 이동하는 흐름*
 
 ## 핵심 용어

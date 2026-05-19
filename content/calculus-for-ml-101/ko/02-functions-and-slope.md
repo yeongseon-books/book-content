@@ -60,7 +60,7 @@ last_reviewed: '2026-05-12'
 
 함수와 기울기의 관계를 한 화면에 놓으면 아래처럼 정리할 수 있습니다.
 
-![핵심 개념](../../../assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.ko.png)
 
 *핵심 개념 흐름: 입력-함수-출력 관계 위에 기울기와 도함수 해석이 겹쳐집니다.*
 ### 함수는 입력을 출력으로 보내는 계약입니다

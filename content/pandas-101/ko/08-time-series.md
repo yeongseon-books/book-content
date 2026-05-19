@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![시간 축을 인덱스로 올린 뒤 리샘플링과 이동 계산을 수행하는 흐름](../../../assets/pandas-101/08/08-01-concept-at-a-glance.ko.png)
+![시간 축을 인덱스로 올린 뒤 리샘플링과 이동 계산을 수행하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.ko.png)
 *시간 축을 인덱스로 올린 뒤 리샘플링과 이동 계산을 수행하는 흐름*
 
 ## 핵심 용어

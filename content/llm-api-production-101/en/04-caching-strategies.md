@@ -34,7 +34,7 @@ This is the fourth post in the LLM API Production 101 series. Here we focus on r
 
 The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a contract for when a request should not be recomputed**.
 
-![Caching strategies: reducing cost and latency](../../../assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
+![Caching strategies: reducing cost and latency](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
 
 *Caching strategies: reducing cost and latency*
 ---
@@ -62,7 +62,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why an LLM path needs caching
 
-![Cost flow of repeated uncached requests](../../../assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.en.png)
+![Cost flow of repeated uncached requests](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-why-an-llm-path-needs-caching.en.png)
 
 *Cost flow of repeated uncached requests*
 Production logs usually show more repetition than people expect. It appears in at least four places:
@@ -80,7 +80,7 @@ The important part is defining “the same task” correctly. A human may think 
 
 ## What belongs in the cache key
 
-![Structure of a normalized cache key](../../../assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.en.png)
+![Structure of a normalized cache key](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-02-what-belongs-in-the-cache-key.en.png)
 
 *Structure of a normalized cache key*
 The most common mistake is caching only by the visible user prompt.
@@ -151,7 +151,7 @@ This matters because equivalent requests should serialize to the same string bef
 
 ## Why TTL matters
 
-![Lifecycle stages of a cached entry](../../../assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png)
+![Lifecycle stages of a cached entry](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png)
 
 *Lifecycle stages of a cached entry*
 A hash key is not enough. Without TTL, stale responses can live forever. A model may change, a prompt policy may change, or the underlying business meaning may shift while the cache keeps serving old output. Memory usage also grows without any bound.
@@ -214,7 +214,7 @@ This uses lazy eviction: expired entries are removed when they are read. That ke
 
 ## Putting the cache in front of Groq calls
 
-![Execution path for cache hit and miss](../../../assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.en.png)
+![Execution path for cache hit and miss](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-04-putting-the-cache-in-front-of-groq-calls.en.png)
 
 *Execution path for cache hit and miss*
 Now we can place the cache directly in front of a completion request.
@@ -302,7 +302,7 @@ It also helps to record the response source explicitly. A field such as `source:
 
 ## When not to cache
 
-![Comparison between cacheable and unsafe paths](../../../assets/llm-api-production-101/04/04-05-when-not-to-cache.en.png)
+![Comparison between cacheable and unsafe paths](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-05-when-not-to-cache.en.png)
 
 *Comparison between cacheable and unsafe paths*
 Caches are useful, but applying them blindly creates new risks. A few cases deserve extra caution:

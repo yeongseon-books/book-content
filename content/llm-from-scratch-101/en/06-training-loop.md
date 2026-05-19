@@ -60,7 +60,7 @@ That is why the loop is both simple and operational. It is a short core surround
 
 At its smallest, the loop is `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, and `step()`. Everything else is support code for scheduling, logging, validation, and saving.
 
-![Core training loop from forward to update](../../../assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
+![Core training loop from forward to update](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
 
 *Core training loop from forward to update.*
 

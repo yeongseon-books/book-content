@@ -45,7 +45,7 @@ Confidence intervals are the *most common tool* for showing uncertainty — and 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
 
 *A confidence interval combines an estimate, its standard error, and a critical value; the confidence belongs to that procedure.*
 ## Key Terms

@@ -45,7 +45,7 @@ Tests must be *fast and deterministic*. Calling a real payment API is *slow and 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms (Meszaros' five)

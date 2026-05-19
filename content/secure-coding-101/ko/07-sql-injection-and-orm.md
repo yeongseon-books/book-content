@@ -46,7 +46,7 @@ SQL injection은 단일 필드 검증 실수가 데이터베이스 전체 사고
 
 ## 한눈에 보는 구조
 
-![문자열 결합 SQL과 파라미터 바인딩 SQL의 차이](../../../assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
+![문자열 결합 SQL과 파라미터 바인딩 SQL의 차이](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
 
 *문자열 결합 SQL과 파라미터 바인딩 SQL의 차이*
 이 그림은 SQL injection의 본질을 단순하게 보여 줍니다. 문자열 연결은 입력값을 SQL 문법 안으로 섞어 넣고, prepared statement는 SQL과 값을 분리합니다. 이 한 차이가 공격 가능성과 안전성을 가릅니다.

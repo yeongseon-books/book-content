@@ -62,7 +62,7 @@ greet = "mylib.cli:main"    →    Hello, Alice!
    runs the main() function in mylib/cli.py
 ```
 
-![멘탈 모델](../../../assets/python-package-101/07/07-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
 *설치된 패키지가 entry point를 통해 CLI 명령으로 연결되는 구조*
 
 ## 핵심 개념

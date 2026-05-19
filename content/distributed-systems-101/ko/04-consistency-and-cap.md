@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![일관성 모델의 강도 스펙트럼](../../../assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
+![일관성 모델의 강도 스펙트럼](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
 
 *일관성 모델의 강도 스펙트럼*
 

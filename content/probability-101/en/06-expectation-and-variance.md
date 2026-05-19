@@ -46,7 +46,7 @@ The key habit is to read center and spread together. A system with the same aver
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

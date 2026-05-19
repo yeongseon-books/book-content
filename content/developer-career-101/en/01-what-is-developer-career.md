@@ -50,7 +50,7 @@ Without direction, five years later you are still at square one.
 
 ## Concept at a Glance
 
-![Career stages and expanding impact radius](../../../assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
+![Career stages and expanding impact radius](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
 
 *Career stages and expanding impact radius*
 

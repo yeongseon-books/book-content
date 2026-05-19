@@ -45,7 +45,7 @@ last_reviewed: '2026-05-16'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
 
 *트리거를 이해할 때는 이벤트 소스, 함수 호출, 실패 격리 경로를 함께 봐야 디버깅이 빨라집니다.*
 

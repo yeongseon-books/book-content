@@ -48,7 +48,7 @@ A usable incident definition reduces argument during the first minutes of respon
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The diagram below shows the first decision cut. Events arrive all day, but only the subset with meaningful customer impact should cross into the incident path.

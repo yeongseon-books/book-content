@@ -45,7 +45,7 @@ When the domain creates its own dependencies, it learns *how to make* them. Fact
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
 *Factory and DI keep assembly in one place so services can focus on using collaborators instead of constructing them.*
 
 ## Key Terms

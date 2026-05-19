@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 컨테이너 격리를 이루는 층
 
-![컨테이너 격리를 이루는 층](../../../assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
+![컨테이너 격리를 이루는 층](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
 *컨테이너 격리는 한 기능이 아니라 namespace, cgroup, 권한 축소 장치가 겹쳐서 만들어집니다.*
 
 ```text

@@ -52,7 +52,7 @@ The transport-protocol choice directly affects system performance and user exper
 
 > TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.
 
-![TCP and UDP split responsibility in different ways](../../../assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
+![TCP and UDP split responsibility in different ways](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
 *TCP puts reliability in the operating system, while UDP leaves it to the application so you can pay only for what the workload needs.*
 
 ## Key Terms

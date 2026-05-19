@@ -43,7 +43,7 @@ Half of web work is *building and reading HTTP messages*. If you cannot picture 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
 
 *The smallest useful picture of an HTTP request and response contract.*
 

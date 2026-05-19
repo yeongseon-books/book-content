@@ -46,7 +46,7 @@ Teams that ignore this usually become dependent on memory, heroics, and manual r
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
 
 *The SRE feedback loop turns production signals back into engineering decisions.*
 ## Key Terms

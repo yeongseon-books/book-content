@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![timeout, breaker, bulkhead, backpressure 경계](../../../assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
+![timeout, breaker, bulkhead, backpressure 경계](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
 
 *timeout, breaker, bulkhead, backpressure 경계*
 

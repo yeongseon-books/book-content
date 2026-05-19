@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.ko.png)
 *RFC 초안에서 비동기 토론과 결정 로그로 이어지는 협업 흐름*
 
 토론은 비동기로 넓게 받고, 결정은 짧은 동기 회의에서 닫는 편이 효율적입니다.

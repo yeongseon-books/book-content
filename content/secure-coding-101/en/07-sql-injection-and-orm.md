@@ -46,7 +46,7 @@ A single SQLi exposes the *entire database*. Auth bypass, data exfiltration, and
 
 ## Concept at a Glance
 
-![The difference between string-built SQL and parameterized SQL](../../../assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
+![The difference between string-built SQL and parameterized SQL](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
 
 *The difference between string-built SQL and parameterized SQL*
 ## Key Terms

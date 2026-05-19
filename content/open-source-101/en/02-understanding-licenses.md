@@ -46,7 +46,7 @@ Open source choices are both technical choices and legal choices. A developer ma
 
 ## Draw the License Map First
 
-![Draw the license map first](../../../assets/open-source-101/02/02-01-draw-the-license-map-first.en.png)
+![Draw the license map first](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png)
 
 *A quick map for comparing permissive and copyleft license families before reading fine print*
 There is no reason to treat this split as a moral ranking. Permissive licenses make reuse easier. Copyleft licenses push sharing obligations harder. Neither side is universally better. The practical question is what kind of project behavior and distribution model you want to support.

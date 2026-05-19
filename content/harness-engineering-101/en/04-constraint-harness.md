@@ -39,7 +39,7 @@ This is post 4 in the Harness Engineering 101 series. Here we treat constraints 
 
 > Safe agents do not come from well-meaning prompt text. They come from constraints enforced at layers that are hard to bypass.
 
-![Constraint harness - defining Rules, Boundaries, and forbidden actions](../../../assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
+![Constraint harness - defining Rules, Boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
 
 *Constraint harness - defining Rules, Boundaries, and forbidden actions*
 ## Agents Try Everything They Are Allowed To
@@ -54,7 +54,7 @@ Constraint Harness defines, in code-expressed rules, what an agent may and may n
 
 ## Four Kinds of Constraints
 
-![Four kinds of constraints](../../../assets/harness-engineering-101/04/04-02-four-kinds-of-constraints.en.png)
+![Four kinds of constraints](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-02-four-kinds-of-constraints.en.png)
 
 *Four kinds of constraints*
 Constraints on an agent fall into four categories.
@@ -113,7 +113,7 @@ Without this four-way classification, vague demands like "the agent should behav
 
 ## Capability Constraints — Tool Whitelisting
 
-![Capability constraints - tool whitelisting](../../../assets/harness-engineering-101/04/04-03-capability-constraints-tool-whitelisting.en.png)
+![Capability constraints - tool whitelisting](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-03-capability-constraints-tool-whitelisting.en.png)
 
 *Capability constraints - tool whitelisting*
 The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.
@@ -264,7 +264,7 @@ When a violation is detected, request the agent to regenerate. Not a flat block 
 
 ## Scope Constraints — Permissions at the Data Layer
 
-![Scope constraints - permissions at the data layer](../../../assets/harness-engineering-101/04/04-04-scope-constraints-permissions-at-the-dat.en.png)
+![Scope constraints - permissions at the data layer](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-04-scope-constraints-permissions-at-the-dat.en.png)
 
 *Scope constraints - permissions at the data layer*
 The strongest constraints come from the data layer. No matter how badly the agent's query is formed, if the database refuses to return out-of-scope rows, you are safe.

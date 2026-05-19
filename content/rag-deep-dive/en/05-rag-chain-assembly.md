@@ -34,7 +34,7 @@ This is post 5 in the RAG Deep Dive series.
 
 > A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
 
-![Questions this post answers](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -172,7 +172,7 @@ This episode traces both paths from the source. We will first walk through `Retr
 
 The first file to read is `langchain/chains/retrieval_qa/base.py`. `BaseRetrievalQA` holds four pieces of state that define the public surface: `combine_documents_chain`, `input_key`, `output_key`, and `return_source_documents`. The defaults are `input_key="query"` and `output_key="result"`, so the classic call shape is `qa.invoke({"query": "..."})`, returning `{"result": "..."}`. If `return_source_documents=True`, the `output_keys` property appends `"source_documents"`, which changes the output contract to `{"result": "...", "source_documents": [...]}`.
 
-![RetrievalQA chain-type dispatch path](../../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
+![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
 
 *RetrievalQA chain-type dispatch path*
 
@@ -246,7 +246,7 @@ The value of `RetrievalQA` in 2026 is mostly pedagogical. It is one of the clear
 
 LCEL starts in `langchain_core.runnables.base.py`. The `Runnable` abstraction defines the common execution surface: `invoke`, `ainvoke`, `batch`, `abatch`, `stream`, `astream`, plus input and output schema reflection. Then `Runnable.__or__()` reveals the heart of the language in one short method: `self | other` returns `RunnableSequence(self, coerce_to_runnable(other))`. So the pipe operator is not special syntax for “call the next function.” It is a constructor for a runnable sequence whose output feeds the next step.
 
-![LCEL pipe operator building a sequence](../../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png)
+![LCEL pipe operator building a sequence](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.en.png)
 
 *LCEL pipe operator building a sequence*
 
@@ -303,7 +303,7 @@ chain = (
 
 The code is compact enough to hide what is really happening. Two source-level details matter. First, when a dict enters LCEL composition, `coerce_to_runnable(...)` wraps it as `RunnableParallel`. Second, `RunnablePassthrough()` is just the identity runnable. So the first line is really saying: take the same input question, send it to multiple branches at once, let one branch build `context`, let another preserve the original `question`, then merge those branch outputs back into one dictionary.
 
-![Parallel split into context and question](../../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png)
+![Parallel split into context and question](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.en.png)
 
 *Parallel split into context and question*
 
@@ -387,7 +387,7 @@ The most important shift is conceptual. In LCEL, retrieval is not a hidden phase
 
 Sooner or later, plain string output stops being enough. Production RAG systems usually need to return the answer together with sources, IDs, scores, or diagnostic fields. The base `prompt | llm | parser` pattern discards most of that state because the chain narrows toward one final string. The tool that solves this in LCEL is `RunnablePassthrough.assign()` from `langchain_core.runnables.passthrough.py`.
 
-![Assign enriching answer output with sources](../../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png)
+![Assign enriching answer output with sources](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.en.png)
 
 *Assign enriching answer output with sources*
 
@@ -485,7 +485,7 @@ if __name__ == "__main__":
 
 The execution-model difference becomes sharpest with streaming and batching. `RetrievalQA` is built around `_call()` and `_acall()`. It runs retrieval, runs the combine-documents chain, and returns only after the answer is fully assembled. It can optionally return source documents, but it does not expose a first-class surface for streaming intermediate answer chunks through the chain interface.
 
-![Streaming chunks propagating through runnable steps](../../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png)
+![Streaming chunks propagating through runnable steps](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.en.png)
 
 *Streaming chunks propagating through runnable steps*
 

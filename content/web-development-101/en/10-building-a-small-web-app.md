@@ -43,7 +43,7 @@ Knowledge sets only when you *make something small*. One small full-stack app te
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
 
 *The end-to-end shape of the Todo app built in this capstone chapter.*
 

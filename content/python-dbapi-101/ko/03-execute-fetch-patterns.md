@@ -27,7 +27,7 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 
 이 글은 Python DB-API 101 시리즈의 세 번째 글입니다.
 
-![execute, executemany, and fetch patterns](../../../assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.ko.png)
+![execute, executemany, and fetch patterns](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.ko.png)
 
 *execute, executemany, and fetch patterns*
 
@@ -42,7 +42,7 @@ DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`�
 
 ## 1. execute - 한 번의 query
 
-![execute - 한 번의 query](../../../assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.ko.png)
+![execute - 한 번의 query](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.ko.png)
 
 *execute - 한 번의 query*
 `cursor.execute(operation, parameters=None)`은 single SQL statement를 실행합니다. SELECT, INSERT, UPDATE, DELETE, DDL 모두 동일한 method를 씁니다.
@@ -62,7 +62,7 @@ print(cur.rowcount)    # 1
 
 ## 2. executemany - bulk write
 
-![executemany - bulk write](../../../assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.ko.png)
+![executemany - bulk write](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.ko.png)
 
 *executemany - bulk write*
 같은 statement를 여러 parameter set으로 반복 실행할 때 `executemany()`를 씁니다.
@@ -118,7 +118,7 @@ print(rows)   # [(1, 'hello'), (2, 'first'), (3, 'second'), (4, 'third')]
 
 ## 5. fetchmany - chunk 단위
 
-![fetchmany - chunk 단위](../../../assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.ko.png)
+![fetchmany - chunk 단위](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.ko.png)
 
 *fetchmany - chunk 단위*
 `fetchmany(size=cursor.arraysize)`은 지정한 개수만큼만 가져옵니다.

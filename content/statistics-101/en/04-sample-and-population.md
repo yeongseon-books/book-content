@@ -45,7 +45,7 @@ This is post 4 in the Statistics 101 series. Here we will clarify the relationsh
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
 
 *Statistics speaks about the population through a sample, so the sample design determines how trustworthy the estimate is.*
 ## Key Terms

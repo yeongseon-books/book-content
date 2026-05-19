@@ -30,7 +30,7 @@ This is the 3rd article in the Python DB-API 101 series.
 
 <!-- a-grade-intro:begin -->
 
-![execute, executemany, and fetch patterns](../../../assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.en.png)
+![execute, executemany, and fetch patterns](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.en.png)
 
 *execute, executemany, and fetch patterns*
 ## Key Questions
@@ -46,7 +46,7 @@ This is the 3rd article in the Python DB-API 101 series.
 
 ## 1. execute - one statement at a time
 
-![execute - one statement at a time](../../../assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
+![execute - one statement at a time](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
 
 *execute - one statement at a time*
 `cursor.execute(operation, parameters=None)` runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.
@@ -66,7 +66,7 @@ print(cur.rowcount)    # 1
 
 ## 2. executemany - bulk write
 
-![executemany - bulk write](../../../assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.en.png)
+![executemany - bulk write](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-03-2-executemany-bulk-write.en.png)
 
 *executemany - bulk write*
 When the same statement runs against many parameter sets, use `executemany()`.
@@ -122,7 +122,7 @@ For small result sets (a few hundred rows) it is the most convenient and the fas
 
 ## 5. fetchmany - in chunks
 
-![fetchmany - in chunks](../../../assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.en.png)
+![fetchmany - in chunks](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-04-5-fetchmany-in-chunks.en.png)
 
 *fetchmany - in chunks*
 `fetchmany(size=cursor.arraysize)` returns a fixed number of rows.

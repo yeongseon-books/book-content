@@ -42,7 +42,7 @@ Auth is the *one area* where a single mistake can sink a company. A line that st
 
 ## Concept at a Glance
 
-![authentication and authorization flow from login to token verification and role check](../../../assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
+![authentication and authorization flow from login to token verification and role check](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
 
 *authentication and authorization flow from login to token verification and role check*
 Authentication asks *who*; authorization asks *can you*.

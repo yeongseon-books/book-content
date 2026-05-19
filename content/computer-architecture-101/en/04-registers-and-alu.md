@@ -46,7 +46,7 @@ The number of registers is the number of variables a CPU can hold at once. Too f
 
 ### Registers ALU dataflow
 
-![Registers ALU dataflow](../../../assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
+![Registers ALU dataflow](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
 *Fast execution happens when live values stay in registers, the ALU produces the next result, and the branch reads fresh FLAGS. Once register pressure forces spill traffic to the stack, the same source loop acquires extra loads and stores.*
 
 ## Key Terms

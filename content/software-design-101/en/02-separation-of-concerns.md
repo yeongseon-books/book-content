@@ -47,7 +47,7 @@ When concerns blend together you must understand everything to change one thing.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
 *How separating UI, domain, and infrastructure concerns gives each concern its own pace of change*
 
 Three concerns separated, three independent timelines.

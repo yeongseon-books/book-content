@@ -45,7 +45,7 @@ Most papers and reports collapse a *conclusion* into one line: *p < 0.05*. Yet *
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
 
 *A p-value measures how surprising the observed data would be if the null hypothesis were true.*
 ## Key Terms

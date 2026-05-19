@@ -35,12 +35,12 @@ This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metri
 > Mental model: treat RAG as a two-stage pipeline under test. Retrieval decides what evidence is available; generation decides whether the model actually stays faithful to that evidence.
 
 ---
-![Evaluating RAG systems](../../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
+![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
 
 *Evaluating RAG systems*
 ## RAG Is a Pipeline, Not a Single Model
 
-![RAG is a Pipeline, not a single model](../../../assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
+![RAG is a Pipeline, not a single model](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
 
 *RAG is a Pipeline, not a single model*
 A RAG (Retrieval-Augmented Generation) system runs in two stages.
@@ -61,7 +61,7 @@ So RAG evaluation must measure **each stage separately**. A single number like "
 
 ## The Four Core RAG Metrics
 
-![The four core RAG metrics](../../../assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png)
+![The four core RAG metrics](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.en.png)
 
 *The four core RAG metrics*
 The industry standard, used by RAGAS and TruLens:
@@ -79,7 +79,7 @@ Let's look at each.
 
 ## Evaluating Retrieval
 
-![Evaluating retrieval](../../../assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png)
+![Evaluating retrieval](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-04-evaluating-retrieval.en.png)
 
 *Evaluating retrieval*
 ### Context Recall — Did we retrieve what we need
@@ -166,7 +166,7 @@ def context_precision(question: str, chunks: list[str]) -> float:
 
 ## Evaluating Generation
 
-![Evaluating generation](../../../assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png)
+![Evaluating generation](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-05-evaluating-generation.en.png)
 
 *Evaluating generation*
 ### Faithfulness — Hallucination Detection

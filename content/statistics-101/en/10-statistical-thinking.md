@@ -45,7 +45,7 @@ Knowing the tools is meaningless without knowing *when and how to use them*. *St
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
 
 *Statistical thinking is one connected flow: question, data, distribution, estimation, testing, effect size, then decision.*
 ## Key Terms

@@ -45,7 +45,7 @@ Both Compose and Kubernetes ride on top of these abstractions. Get the basics ri
 
 ## Concept at a Glance
 
-![Name-based connectivity on a user-defined bridge network](../../../assets/containers-101/06/06-01-concept-at-a-glance.en.png)
+![Name-based connectivity on a user-defined bridge network](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
 
 *Name-based connectivity on a user-defined bridge network*
 ## Key Terms

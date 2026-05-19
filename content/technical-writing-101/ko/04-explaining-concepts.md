@@ -51,7 +51,7 @@ title: 개념 설명하기
 
 > 멘탈 모델: 좋은 개념 설명은 정의로 중심을 잡고, 비유로 문을 열고, 반례로 경계를 긋고, 예시로 손에 잡히게 만듭니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

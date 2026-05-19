@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념 지도
 
-![한눈에 보는 개념 지도](../../../assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
 
 *사용자 경험, 서버 로직, 데이터 저장소가 어떤 경계로 연결되는지 보여 주는 그림입니다.*
 

@@ -44,7 +44,7 @@ This *capstone* synthesizes the series and lets you implement the *common skelet
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
 
 *Training-loop flow: forward, loss, backward, and update repeat as one closed cycle.*
 ## Key Terms

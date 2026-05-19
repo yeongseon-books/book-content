@@ -29,7 +29,7 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 
 2편에서 만든 `MetaData`와 `Table`이 이번 글부터 실제로 움직이기 시작합니다. 이후 ORM을 쓰더라도 복잡한 조회나 서브쿼리를 다룰 때는 결국 같은 Core 표현식으로 내려오기 때문에, 이 감각을 지금 잡아 두는 편이 좋습니다.
 
-![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](../../../assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
+![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
 
 *SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기*
 ## 이 글에서 다룰 문제
@@ -42,7 +42,7 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 
 ## 왜 중요한가
 
-![핵심 개념](../../../assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
 
 *핵심 개념*
 raw SQL 문자열로만 작업하면 다음 세 가지 비용이 누적됩니다. 첫째, 컬럼 이름 변경이 발생할 때마다 application 전체 grep이 필요합니다. 둘째, 같은 SQL을 여러 곳에서 약간씩 다르게 적게 되어 동작이 미묘하게 달라집니다. 셋째, dialect 차이를 모두 손으로 처리해야 합니다.
@@ -53,7 +53,7 @@ Core SQL expression은 schema 객체와 Python 표현식을 조합해 SQL을 구
 
 ## 멘탈 모델
 
-![Mental model](../../../assets/sqlalchemy-101/03/03-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-03-mental-model.ko.png)
 
 *멘탈 모델*
 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
@@ -81,7 +81,7 @@ select(users.c.id, users.c.name)        # statement 1
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/sqlalchemy-101/03/03-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### select 기본형
@@ -333,7 +333,7 @@ def find_users(active=None, email_like=None, limit=10):
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/sqlalchemy-101/03/03-05-step-by-step-practice.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-05-step-by-step-practice.ko.png)
 
 *단계별 실습*
 ### 1단계: 데이터 준비

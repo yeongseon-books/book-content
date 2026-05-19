@@ -47,7 +47,7 @@ Design is invisible. But it shows itself every time the next change is more expe
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
 *How requirements become design decisions and eventually turn into change cost*
 
 Design determines change cost.

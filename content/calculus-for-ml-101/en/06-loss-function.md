@@ -44,7 +44,7 @@ The *wrong loss* yields the *wrong model*. *Choosing the loss* is *defining the 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
 
 *Loss flow: the gap between truth and prediction becomes loss, gradient, and finally an update signal.*
 ## Key Terms

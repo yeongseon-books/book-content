@@ -44,7 +44,7 @@ Sales, traffic, sensors, finance — *most operational data* is time series. Tre
 
 ## Concept at a Glance
 
-![A time-first workflow with resampling, rolling windows, and time zones](../../../assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
+![A time-first workflow with resampling, rolling windows, and time zones](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
 *A time-first workflow with resampling, rolling windows, and time zones*
 
 ## Key Terms

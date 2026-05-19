@@ -44,7 +44,7 @@ Without a grasp of scope, "why isn't this variable updating?" or "why am I sudde
 
 ## Concept at a Glance
 
-![The LEGB lookup path from local names out to built-ins](../../../assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
+![The LEGB lookup path from local names out to built-ins](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
 
 *The LEGB lookup path from local names out to built-ins*
 

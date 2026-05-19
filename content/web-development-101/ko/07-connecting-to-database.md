@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념 지도
 
-![한눈에 보는 개념 지도](../../../assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
 
 *웹앱이 연결 풀을 거쳐 데이터베이스와 대화하는 기본 구조를 요약한 그림입니다.*
 

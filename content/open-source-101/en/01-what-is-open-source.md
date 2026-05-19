@@ -46,7 +46,7 @@ This matters immediately in production work. When teams evaluate a library, they
 
 ## A Concept Map You Can Keep in Your Head
 
-![A concept map you can keep in your head](../../../assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
+![A concept map you can keep in your head](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
 
 *The basic participation loop where users, contributors, and maintainers grow the project together*
 If you read that diagram as a strict hierarchy, you only understand half of it. In practice it is a loop. A user can report a bug and become a contributor through one issue or one typo fix. A contributor can start reviewing other people's work and gradually grow into a maintainer role. The point is not that everyone has the same responsibilities. The point is that the participation path is open.

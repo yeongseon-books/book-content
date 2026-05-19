@@ -34,7 +34,7 @@ This is post 2 in the RAG Deep Dive series.
 
 > Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
 
-![Questions this post answers](../../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -138,7 +138,7 @@ That is why embeddings and indexing have to be read together. A production retri
 
 In LangChain 0.2.17, the familiar `OpenAIEmbeddings` class lives in `langchain_community.embeddings.openai`. One source-level detail matters immediately: the class is already deprecated in favor of `langchain_openai.OpenAIEmbeddings`. It is still a useful baseline because a lot of existing tutorials and pipelines in this release line still follow this code path.
 
-![Document and query embedding flow](../../../assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
+![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
 
 *Document and query embedding flow*
 
@@ -184,7 +184,7 @@ The baseline for the rest of this post is simple. The embedding step is already 
 
 `IndexFlatL2` is often described as the simplest FAISS index. That is true, but incomplete. What makes it simple is not just that it is brute-force. It is that it computes the exact L2 comparison against every stored vector and then picks the smallest `k` results. No pruning, no quantization, no approximation.
 
-![Query against full vector scan](../../../assets/rag-deep-dive/02/02-02-indexflat-search-internals.en.png)
+![Query against full vector scan](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-02-indexflat-search-internals.en.png)
 
 *Query against full vector scan*
 
@@ -238,7 +238,7 @@ Use `IndexFlatL2` when you want exactness and a trustworthy baseline. Stop treat
 
 At the API level, `FAISS.from_documents()` feels like one convenience call. Under the hood, the path is important. `VectorStore.from_documents()` in `langchain_core.vectorstores.base` extracts `page_content` and `metadata` from each `Document` and delegates to `from_texts()`. In `langchain_community.vectorstores.faiss`, `FAISS.from_texts()` embeds those texts with `embedding.embed_documents(texts)` and then passes everything into the internal `__from()` constructor.
 
-![Document to FAISS mapping layers](../../../assets/rag-deep-dive/02/02-03-langchain-faiss-layers.en.png)
+![Document to FAISS mapping layers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-03-langchain-faiss-layers.en.png)
 
 *Document to FAISS mapping layers*
 
@@ -296,7 +296,7 @@ The main operational takeaway is that retrieval bugs can happen in any of these 
 
 The first FAISS choice is usually the metric. `IndexFlatL2` minimizes squared Euclidean distance. `IndexFlatIP` maximizes inner product. Both are flat indexes, which means both are exact. The difference is not speed class but similarity definition.
 
-![Index choices and search tradeoffs](../../../assets/rag-deep-dive/02/02-04-index-type-comparison.en.png)
+![Index choices and search tradeoffs](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-04-index-type-comparison.en.png)
 
 *Index choices and search tradeoffs*
 
@@ -367,7 +367,7 @@ For many teams, exact flat search remains the right choice longer than expected.
 
 LangChain's FAISS wrapper persists state through `save_local()` and restores it through `load_local()`. The implementation is important because it stores two different layers in two different formats. `save_local()` writes the FAISS index with `faiss.write_index(...)` into an `.faiss` file, then pickles `(self.docstore, self.index_to_docstore_id)` into a `.pkl` file.
 
-![Persistence split across two files](../../../assets/rag-deep-dive/02/02-05-persistence-flow.en.png)
+![Persistence split across two files](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-05-persistence-flow.en.png)
 
 *Persistence split across two files*
 

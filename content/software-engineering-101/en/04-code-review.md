@@ -45,7 +45,7 @@ Code review shapes both code quality and the distribution of knowledge in a team
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
 *How automation and human review combine inside a pull request workflow*
 
 Automation first, humans focus on judgment.

@@ -46,7 +46,7 @@ Network design is the hardest decision to undo later. The first hour shapes the 
 
 ## Concept at a Glance
 
-![A common public-private subnet pattern that limits exposure to the load balancer](../../../assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
+![A common public-private subnet pattern that limits exposure to the load balancer](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
 
 *A common public-private subnet pattern that limits exposure to the load balancer*
 

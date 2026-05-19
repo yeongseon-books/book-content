@@ -54,7 +54,7 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-![데이터 버전 관리 흐름](../../../assets/mlops-101/03/03-01-see-the-flow-first.ko.png)
+![데이터 버전 관리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.ko.png)
 
 *데이터 버전 관리 흐름*
 이 구조를 이해하면 왜 DVC 같은 도구가 필요한지 감이 옵니다. git 저장소에는 실제 대용량 파일이 아니라 포인터 파일이 들어가고, 실제 데이터는 원격 저장소에 둡니다. 파이프라인은 포인터를 읽어 정확한 데이터 상태를 다시 가져옵니다.

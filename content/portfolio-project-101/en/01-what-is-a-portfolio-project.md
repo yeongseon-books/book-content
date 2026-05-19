@@ -49,7 +49,7 @@ That is where a portfolio project becomes useful. Reviewers rarely spend a long 
 
 A strong portfolio project is easiest to understand as a flow from problem to solution, then to code, deployment, and explanation.
 
-![The basic flow that turns a project into a portfolio case study](../../../assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
+![The basic flow that turns a project into a portfolio case study](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
 
 *The basic flow that turns a project into a portfolio case study*
 

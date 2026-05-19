@@ -68,7 +68,7 @@ last_reviewed: '2026-05-16'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
 
 *플랫폼은 이벤트와 함수 사이에서 실행 환경 준비, 스케일링, 재시도 같은 책임을 맡고, 개발자는 함수 경계와 외부 상태 경계를 설계합니다.*
 

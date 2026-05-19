@@ -45,7 +45,7 @@ Without layers, you cannot really optimize a Dockerfile. The difference between 
 
 ## Concept at a Glance
 
-![Layer stack with a writable container layer on top](../../../assets/containers-101/02/02-01-concept-at-a-glance.en.png)
+![Layer stack with a writable container layer on top](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png)
 
 *Layer stack with a writable container layer on top*
 ## Key Terms

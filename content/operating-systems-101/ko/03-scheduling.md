@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 스케줄러가 고르는 다음 실행자
 
-![스케줄러가 고르는 다음 실행자](../../../assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
+![스케줄러가 고르는 다음 실행자](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
 *스케줄러는 runnable 큐와 blocked 상태를 오가며 다음 CPU 사용자를 계속 바꿉니다.*
 
 ```text

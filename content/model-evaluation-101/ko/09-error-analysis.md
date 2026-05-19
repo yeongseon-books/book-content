@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부](../../../assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
+![슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
 
 *슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부*
 평균을 쪼개면 패턴이 보입니다. 특성별 슬라이스, 오류 유형, 신뢰도 구간을 나눠 보면 같은 모델도 전혀 다른 얼굴을 드러냅니다.

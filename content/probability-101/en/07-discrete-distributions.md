@@ -46,7 +46,7 @@ Choosing a distribution gives you more than one probability. It gives you a whol
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

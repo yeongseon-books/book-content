@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![결측 원인을 먼저 묻고 제거, 대체, 보간을 고르는 판단 흐름](../../../assets/pandas-101/05/05-01-concept-at-a-glance.ko.png)
+![결측 원인을 먼저 묻고 제거, 대체, 보간을 고르는 판단 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.ko.png)
 *결측 원인을 먼저 묻고 제거, 대체, 보간을 고르는 판단 흐름*
 
 ## 핵심 용어

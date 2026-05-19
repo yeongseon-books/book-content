@@ -53,7 +53,7 @@ This is post 4 in the Data Science 101 series. In this chapter, we turn the mess
 
 ## Concept at a Glance
 
-![A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review](../../../assets/data-science-101/04/04-01-concept-at-a-glance.en.png)
+![A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png)
 
 *A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review*
 ## Key Terms

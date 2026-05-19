@@ -46,7 +46,7 @@ Kubernetes는 많은 자동화를 제공하지만, 운영 감각까지 자동으
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
 *운영 관점에서는 probe, 관측성, 런북, GitOps가 따로가 아니라 하나의 대응 체계로 연결됩니다.*
 
 

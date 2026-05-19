@@ -44,7 +44,7 @@ Smaller images shorten *pull time = deploy time*. Cleaner images also reduce the
 
 ## Concept at a Glance
 
-![Multi-stage build separating builder and runtime stages to produce a smaller final image](../../../assets/docker-101/09/09-01-concept-at-a-glance.en.png)
+![Multi-stage build separating builder and runtime stages to produce a smaller final image](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)
 
 *Builder-only tools stay out of the runtime image so build speed, image size, and attack surface all improve together*
 

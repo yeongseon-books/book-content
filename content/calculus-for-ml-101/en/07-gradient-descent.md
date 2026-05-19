@@ -44,7 +44,7 @@ Most ML training is a *variant* of gradient descent.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
 
 *Gradient-descent loop: weights produce a gradient, the step flips direction, and loss moves downward.*
 ## Key Terms

@@ -43,7 +43,7 @@ This matters quickly in practice. Similarity search, normalization, and metric c
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
 
 *This diagram frames vectors as geometry, coordinates, and one row of data at the same time.*
 

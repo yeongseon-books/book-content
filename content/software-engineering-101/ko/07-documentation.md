@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.ko.png)
 *튜토리얼·하우투·레퍼런스·설명으로 문서를 나누는 Diataxis 구조*
 
 Diataxis는 문서를 작성자 기준이 아니라 독자의 목적 기준으로 나누게 해 줍니다.

@@ -45,7 +45,7 @@ Once you split services, the next decision is "how do they talk?" That decision 
 
 ## Concept at a Glance
 
-![RPC and message-passing communication models](../../../assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
+![RPC and message-passing communication models](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
 
 *RPC and message-passing communication models*
 

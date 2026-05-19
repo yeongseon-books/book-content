@@ -54,7 +54,7 @@ The answer to "Can every problem be solved by a program?" is no. Computation the
 
 > Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.
 
-![Concept at a Glance](../../../assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
 *A ladder from the theory of computation to the paradigms we use to express code*
 
 ## Key Terms

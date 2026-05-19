@@ -67,7 +67,7 @@ pyproject.toml          tests/
                         pyproject.toml
 ```
 
-![Mental Model](../../../assets/python-package-101/02/02-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
 *How src layout separates source, metadata, and installation-time verification*
 
 ## Core Concepts

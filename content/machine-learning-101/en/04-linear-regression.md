@@ -42,7 +42,7 @@ Linear regression is interpretable, fast, and surprisingly strong. Always run it
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
 
 *Linear regression combines features into a prediction, then adjusts the weights by minimizing a loss such as mean squared error.*
 

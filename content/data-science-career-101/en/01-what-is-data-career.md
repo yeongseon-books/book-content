@@ -54,7 +54,7 @@ An analyst may be asked to define a metric and explain a drop in conversion. A s
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
 
 *A basic map of data work flowing from question to data to analysis to product change*
 ## Key Terms

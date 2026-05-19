@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![2PC의 coordinator와 참여자 흐름](../../../assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
+![2PC의 coordinator와 참여자 흐름](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
 
 *2PC의 coordinator와 참여자 흐름*
 

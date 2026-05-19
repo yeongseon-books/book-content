@@ -46,7 +46,7 @@ Transactions and RETURNING help turn risky changes into auditable ones. They let
 
 ## Safe data-change flow
 
-![Safe data-change flow](../../../assets/sql-101/08/08-01-safe-data-change-flow.en.png)
+![Safe data-change flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
 ## Key Terms
 
 - **DML**: Data Manipulation Language — INSERT, UPDATE, DELETE.

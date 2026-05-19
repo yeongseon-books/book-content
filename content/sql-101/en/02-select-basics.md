@@ -46,7 +46,7 @@ Explicit column lists help more than the current query. They show future readers
 
 ## SELECT evaluation flow
 
-![SELECT evaluation flow](../../../assets/sql-101/02/02-01-select-evaluation-flow.en.png)
+![SELECT evaluation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
 ## Key Terms
 
 - **Projection**: the *set of columns* SELECT picks.

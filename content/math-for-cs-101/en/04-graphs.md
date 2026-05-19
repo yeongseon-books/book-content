@@ -48,7 +48,7 @@ That modeling choice often determines the solution strategy. Once a problem beco
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
 *Graphs turn connected data into a structure you can traverse, measure, and reason about step by step.*
 
 ## Key Terms

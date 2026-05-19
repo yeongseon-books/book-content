@@ -50,7 +50,7 @@ Without TLS in your head, certificate-expiry incidents are paralyzing and danger
 
 ## Concept at a Glance
 
-![TLS handshake and session-key creation](../../../assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png)
+![TLS handshake and session-key creation](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png)
 *TLS proves identity with certificates, derives a shared session key, and then uses that symmetric key to protect the rest of the traffic efficiently.*
 
 A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.

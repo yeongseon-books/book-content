@@ -45,7 +45,7 @@ A default container runs as *root* with *too many privileges* and easily becomes
 
 ## Concept at a Glance
 
-![Security flow from scanning to least-privilege runtime](../../../assets/containers-101/08/08-01-concept-at-a-glance.en.png)
+![Security flow from scanning to least-privilege runtime](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.en.png)
 
 *Security flow from scanning to least-privilege runtime*
 ## Key Terms

@@ -44,7 +44,7 @@ Knowing each tool separately is not the same as *producing a result*. *Pro analy
 
 ## Concept at a Glance
 
-![A reproducible analysis pipeline from loading to KPI charts](../../../assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
+![A reproducible analysis pipeline from loading to KPI charts](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
 *A reproducible analysis pipeline from loading to KPI charts*
 
 ## Key Terms

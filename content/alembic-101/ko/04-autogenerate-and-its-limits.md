@@ -50,7 +50,7 @@ git diff 비유가 잘 맞습니다. autogenerate는 line-level diff입니다. �
 
 ### 다이어그램: autogenerate diff 파이프라인
 
-![다이어그램: autogenerate diff 파이프라인](../../../assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.ko.png)
+![다이어그램: autogenerate diff 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.ko.png)
 *autogenerate는 diff를 만들 뿐이며, rename 같은 의도 판단은 마지막에 사람이 맡습니다*
 
 ## 핵심 개념

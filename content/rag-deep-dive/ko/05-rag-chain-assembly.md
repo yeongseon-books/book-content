@@ -33,7 +33,7 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 
 > RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
 
-![이 글에서 답할 질문](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
 `langchain/chains/retrieval_qa/base.py`를 먼저 보면 `BaseRetrievalQA`가 눈에 들어옵니다. 이 클래스는 `combine_documents_chain`, `input_key`, `output_key`, `return_source_documents`를 핵심 상태로 들고 있습니다. 기본 `input_key`는 `"query"`, 기본 `output_key`는 `"result"`입니다. 그래서 `qa.invoke({"query": "..."})`의 결과는 기본적으로 `{"result": "..."}` 모양이 됩니다. 여기에 `return_source_documents=True`를 주면 `output_keys` 프로퍼티가 `source_documents`를 추가해서 `{"result": "...", "source_documents": [...]}`를 반환합니다. 이름만 보면 사소해 보이지만, 이 규약이 중요한 이유는 `RetrievalQA`가 처음부터 “질문 한 개를 받아 답 하나를 돌려주는 봉인된 체인”으로 설계됐기 때문입니다. 입력 표면과 출력 표면이 좁고 고정적입니다.
 
-![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](../../../assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
+![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
 
 *RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
 
@@ -244,7 +244,7 @@ if __name__ == "__main__":
 
 LCEL의 출발점은 `langchain_core.runnables.base.py`입니다. 여기서 `Runnable` 추상 클래스가 `invoke`, `batch`, `stream`, `input_schema`, `output_schema` 같은 공통 인터페이스를 정의합니다. 그리고 같은 파일 안에서 `Runnable.__or__()`는 단 두 줄로 핵심 아이디어를 드러냅니다. `self | other`가 호출되면 `RunnableSequence(self, coerce_to_runnable(other))`를 반환합니다. 즉 파이프 연산자는 특수한 문법이 아니라, “왼쪽 출력이 오른쪽 입력으로 흐르는 sequence 객체를 만든다”는 선언입니다.
 
-![LCEL 파이프가 runnable 순서를 고정하는 구조](../../../assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.ko.png)
+![LCEL 파이프가 runnable 순서를 고정하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-02-lcel-runnable-sequence-composition.ko.png)
 
 *LCEL 파이프가 runnable 순서를 고정하는 구조*
 
@@ -303,7 +303,7 @@ chain = (
 
 겉보기에는 간단한 dict 리터럴 하나와 파이프 몇 개뿐입니다. 하지만 소스 기준으로 보면 여기에는 두 가지 중요한 변환이 숨어 있습니다. 첫째, `|` 오른쪽이나 왼쪽에 dict가 오면 `coerce_to_runnable(...)`이 그것을 `RunnableParallel`로 감쌉니다. 둘째, `RunnablePassthrough()`는 입력을 바꾸지 않는 identity runnable입니다. 그래서 위 코드는 사실상 “질문 하나를 받아, 같은 입력을 병렬로 두 갈래에 보내고, 한 갈래에서는 retriever를 돌려 `context`를 만들고, 다른 갈래에서는 질문 원문을 그대로 `question`으로 보존한 뒤, 그 dict를 prompt에 넘긴다”는 뜻입니다.
 
-![질문이 병렬 분기로 context와 question이 되는 흐름](../../../assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.ko.png)
+![질문이 병렬 분기로 context와 question이 되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-03-lcel-rag-parallel-passthrough-flow.ko.png)
 
 *질문이 병렬 분기로 context와 question이 되는 흐름*
 
@@ -387,7 +387,7 @@ if __name__ == "__main__":
 
 LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 점입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
 
-![assign이 답변 출력에 출처를 합치는 구조](../../../assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
+![assign이 답변 출력에 출처를 합치는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
 
 *assign이 답변 출력에 출처를 합치는 구조*
 
@@ -485,7 +485,7 @@ if __name__ == "__main__":
 
 이제 실행 모델 차이를 볼 차례입니다. `RetrievalQA`는 `_call()`과 `_acall()` 중심의 고전 체인입니다. 최종적으로 `combine_documents_chain.run(...)` 또는 `arun(...)`을 호출해 문자열 답을 다 만든 뒤에야 결과를 반환합니다. source 문서를 같이 돌려주는 옵션은 있어도, 토큰이 생성되는 중간을 체인 표면에서 바로 흘려주지는 못합니다. 반면 LCEL은 runnable마다 `stream()`과 `transform()`을 공유하므로, 뒤 단계가 청크를 생산하면 그 청크를 sequence 전체가 전파할 수 있습니다.
 
-![스트리밍 청크가 runnable 단계를 통과하는 전파](../../../assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.ko.png)
+![스트리밍 청크가 runnable 단계를 통과하는 전파](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-05-lcel-streaming-chunk-propagation.ko.png)
 
 *스트리밍 청크가 runnable 단계를 통과하는 전파*
 

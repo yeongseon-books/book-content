@@ -44,7 +44,7 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png)
 *A metric condition becomes an alert rule, then routes either to a pager or to a lower-urgency coordination channel.*
 
 ## Key Terms

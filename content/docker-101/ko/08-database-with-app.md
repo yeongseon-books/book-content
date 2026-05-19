@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![데이터베이스 readiness 뒤 migration이 실행되고 그 다음 웹 앱이 시작되는 순서](../../../assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
+![데이터베이스 readiness 뒤 migration이 실행되고 그 다음 웹 앱이 시작되는 순서](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
 
 *PostgreSQL이 준비된 뒤 migration 컨테이너가 스키마를 맞추고 마지막에 앱이 올라오는 시작 순서*
 

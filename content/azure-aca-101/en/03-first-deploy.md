@@ -60,7 +60,7 @@ So a first deploy flows in this order: image build → registry push → ACA cre
 
 Seeing the route makes the deploy feel much simpler.
 
-![End-to-end path from local code to an ACA deploy](../../../assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
+![End-to-end path from local code to an ACA deploy](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
 
 *End-to-end path from local code to an ACA deploy*
 

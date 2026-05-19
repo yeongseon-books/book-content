@@ -30,7 +30,7 @@ SQL injection starts the moment query text and user input become the same string
 
 This is the 4th article in the Python DB-API 101 series.
 
-![Parameter binding and SQL injection defense (sqlite3, PEP 249)](../../../assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png)
+![Parameter binding and SQL injection defense (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png)
 
 *Parameter binding and SQL injection defense (sqlite3, PEP 249)*
 ## Questions this post answers
@@ -67,7 +67,7 @@ This post reproduces the attack with sqlite3 and contrasts it with the binding f
 
 ## Mental Model — keep query string and values separate
 
-![Mental model - keep query string and values separate](../../../assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png)
+![Mental model - keep query string and values separate](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png)
 
 *Mental model - keep query string and values separate*
 ```text
@@ -96,7 +96,7 @@ The key point: SQL tokenization happens **before** binding. `?` tells the parser
 
 ## Core concepts
 
-![Core concepts](../../../assets/python-dbapi-101/04/04-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-03-core-concepts.en.png)
 
 *Core concepts*
 ### qmark style (`?`)
@@ -147,7 +147,7 @@ For these positions, validate against a whitelist and inject as a string.
 
 ## Before / After
 
-![Before / after](../../../assets/python-dbapi-101/04/04-04-before-after.en.png)
+![Before / after](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-04-before-after.en.png)
 
 *Before / after*
 ### Before — vulnerable code

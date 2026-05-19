@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![태그, 예산, 약정 할인, 라이트사이징이 비용 관리 루프를 이루는 구조](../../../assets/cloud-computing-101/09/09-01-concept-at-a-glance.ko.png)
+![태그, 예산, 약정 할인, 라이트사이징이 비용 관리 루프를 이루는 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.ko.png)
 
 *태그, 예산, 약정 할인, 라이트사이징이 비용 관리 루프를 이루는 구조*
 비용 관리의 첫 단계는 보이게 만드는 것입니다. 그다음 알림을 걸고, 안정적인 부하에는 약정을 적용하고, 마지막으로 실제 사용량에 맞춰 자원 크기를 줄입니다.

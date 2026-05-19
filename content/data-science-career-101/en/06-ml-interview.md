@@ -54,7 +54,7 @@ Interviewers want to hear how you reason under constraints: data size, interpret
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
 
 *An ML interview answer should connect problem framing, evaluation, and deployment concerns*
 ## Key Terms

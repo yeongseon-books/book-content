@@ -52,7 +52,7 @@ Warehouses charge by *what you read*. The same answer with *fewer bytes* means *
 
 ## Concept at a Glance
 
-![Query-plan cost signals](../../../assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
+![Query-plan cost signals](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
 
 *Query cost usually traces back to three signals in the plan: bytes scanned, data shuffled between workers, and spill caused by memory pressure.*
 

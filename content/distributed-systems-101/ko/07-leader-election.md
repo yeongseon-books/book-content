@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![lease 기반 리더 선출과 heartbeat 갱신](../../../assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
+![lease 기반 리더 선출과 heartbeat 갱신](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
 
 *lease 기반 리더 선출과 heartbeat 갱신*
 

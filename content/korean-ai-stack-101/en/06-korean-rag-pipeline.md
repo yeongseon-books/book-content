@@ -68,7 +68,7 @@ The code in this post deliberately prints intermediate state and logs retrieval 
 
 ## Mental Model — the four-stage pipeline
 
-![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
 
 *Core flow*
 
@@ -158,7 +158,7 @@ index.add(vectors)
 
 ### Step 2 — retrieval
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -179,7 +179,7 @@ for h in hits:
 
 ### Step 3 — generation
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -366,7 +366,7 @@ Whenever a failure appears, promote that question into the permanent regression 
 
 ## Common mistakes
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 

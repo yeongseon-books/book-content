@@ -104,13 +104,13 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
 
 *Core flow*
 
 ## 왜 dense 기준선부터 시작할까
 
-![최소 실행 예제](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.ko.png)
+![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.ko.png)
 
 *최소 실행 예제*
 
@@ -153,7 +153,7 @@ print('dim =', embeddings.shape[1])  # 1024
 
 ### Step 3 — Search English+Korean documents with a Korean query
 
-![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.ko.png)
+![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
 
@@ -203,7 +203,7 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 
 ## 이 코드에서 먼저 봐야 할 점
 
-![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.ko.png)
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.ko.png)
 
 *엔지니어가 헷갈리는 지점*
 

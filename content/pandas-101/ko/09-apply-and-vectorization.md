@@ -44,7 +44,7 @@ Pandas를 어느 정도 쓰기 시작하면 코드가 돌아가는 것과 빠르
 
 ## 한눈에 보는 개념
 
-![행 반복에서 열 단위 계산으로 넘어갈 때 성능이 달라지는 이유](../../../assets/pandas-101/09/09-01-concept-at-a-glance.ko.png)
+![행 반복에서 열 단위 계산으로 넘어갈 때 성능이 달라지는 이유](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.ko.png)
 *행 반복에서 열 단위 계산으로 넘어갈 때 성능이 달라지는 이유*
 
 ## 핵심 용어

@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![1학년 기초 과목 연결 구조](../../../assets/computer-science-major-101/02/02-01-first-year-foundation-map.ko.png)
+![1학년 기초 과목 연결 구조](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.ko.png)
 
 *1학년 과목이 다음 학년 과목의 바탕이 되는 흐름*
 

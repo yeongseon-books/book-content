@@ -79,7 +79,7 @@ HPA가 먼저 Pod를 늘리고, scheduler가 빈자리를 못 찾아 Pending을 
 Pod 수를 다루는 루프와 node 수를 다루는 루프가 같은 화면에 놓여 있어야 race window가 왜 생기는지 자연스럽게 보입니다.
 특히 scheduler가 중간에 들어간다는 점이 중요합니다.
 
-![Pod 확장과 노드 확장이 만나는 두 루프](../../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png)
+![Pod 확장과 노드 확장이 만나는 두 루프](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png)
 
 *Pod 확장과 노드 확장이 만나는 두 루프*
 
@@ -95,7 +95,7 @@ HPA control loop의 기본 sync period는 `--horizontal-pod-autoscaler-sync-peri
 운영적으로는 HPA가 두 루프 중 더 빠른 편입니다.
 그래서 수요가 늘면 먼저 replica 증가 결정이 나오고, 클러스터에 빈 node 자원이 없으면 새 Pod는 Ready 대신 Pending으로 보일 수 있습니다.
 
-![메트릭으로 replica 수를 조정하는 HPA 루프](../../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.ko.png)
+![메트릭으로 replica 수를 조정하는 HPA 루프](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-02-the-hpa-side.ko.png)
 
 *메트릭으로 replica 수를 조정하는 HPA 루프*
 
@@ -117,7 +117,7 @@ AKS 기본값에서 `scan-interval`은 10초이고, 새 node provisioning 대기
 또한 `scale-down-unneeded-time`과 `scale-down-delay-after-add`는 둘 다 기본 10분으로 꽤 보수적입니다.
 이 설계는 scale-up과 scale-down이 같은 속도로 움직이지 않도록 의도한 것입니다.
 
-![미배치 Pod를 보고 노드를 늘리는 CA 루프](../../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.ko.png)
+![미배치 Pod를 보고 노드를 늘리는 CA 루프](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-03-the-ca-side.ko.png)
 
 *미배치 Pod를 보고 노드를 늘리는 CA 루프*
 

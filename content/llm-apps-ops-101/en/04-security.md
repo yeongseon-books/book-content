@@ -36,12 +36,12 @@ The practical goal is not perfect prevention. It is to fail earlier, before bad 
 > LLM security is about moving failure earlier. Block risky input before the model sees it, then block risky output before the user sees it.
 
 ## Big picture
-![LLM app security layer structure](../../../assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
+![LLM app security layer structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
 
 *LLM app security layer structure*
 
 ## Why this layer matters
-![Input guard and output filter flow](../../../assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)
+![Input guard and output filter flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)
 
 *Input guard and output filter flow*
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Injection detection splits from PII masking](../../../assets/llm-apps-ops-101/04/04-02-what-to-notice-in-this-code.en.png)
+![Injection detection splits from PII masking](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-02-what-to-notice-in-this-code.en.png)
 
 *Injection detection splits from PII masking*
 - Separating input validation from output filtering tells you which layer actually blocked a request.
@@ -199,7 +199,7 @@ RESULT: Dataclasses reduce boilerplate for classes that mainly store fields.
 That output is enough to prove the boundary: normal prompts pass, obvious injection attempts fail, and user PII does not travel inward unchanged.
 
 ## Where engineers get confused
-![Input and output defenses split roles](../../../assets/llm-apps-ops-101/04/04-03-where-engineers-get-confused.en.png)
+![Input and output defenses split roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-03-where-engineers-get-confused.en.png)
 
 *Input and output defenses split roles*
 - More blocking rules also create more false positives, so rejection messages should be useful without exposing internal policy details.

@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png)
 *문제를 먼저 알아보고, 패턴 이름을 붙인 뒤, 구조와 트레이드오프까지 함께 읽어야 패턴이 실전에 남습니다.*
 
 ## 핵심 용어

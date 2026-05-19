@@ -44,7 +44,7 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
 *The first metric pipeline: the app exposes metrics, Prometheus scrapes them, and Grafana turns stored time series into questions.*
 
 ## Key Terms

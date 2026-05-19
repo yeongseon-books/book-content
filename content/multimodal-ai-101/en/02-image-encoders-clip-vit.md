@@ -45,7 +45,7 @@ The quality of any multimodal system ultimately rides on the quality of the repr
 
 ## Mental model: encode first, decide later
 
-![Mental model: encode first, decide later](../../../assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
+![Mental model: encode first, decide later](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
 *Good image encoders do not answer the question by themselves. They produce a reusable representation that later retrieval, classification, and reasoning stages can trust.*
 
 ## ViT: looking at images as a token sequence

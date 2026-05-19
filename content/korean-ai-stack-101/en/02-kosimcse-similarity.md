@@ -100,7 +100,7 @@ What matters is (1) queries without the exact keyword "재설정" still match, (
 
 ## Core flow
 
-![Core flow](../../../assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
 
 *Core flow*
 
@@ -142,7 +142,7 @@ index.add(embeddings)
 
 ### Step 3 — Search a query
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -182,7 +182,7 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## What to notice in this code
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -193,7 +193,7 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## Common mistakes
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 

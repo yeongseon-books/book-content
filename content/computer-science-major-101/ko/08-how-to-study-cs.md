@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![전공 공부 루프](../../../assets/computer-science-major-101/08/08-01-study-loop.ko.png)
+![전공 공부 루프](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.ko.png)
 
 *강의, 노트, 복습, 연습, 질문으로 이어지는 학습 루프*
 

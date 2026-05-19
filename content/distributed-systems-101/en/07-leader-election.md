@@ -45,7 +45,7 @@ Many distributed-system bugs happen the moment "there are two leaders." When two
 
 ## Concept at a Glance
 
-![Lease-based leader election and heartbeat renewal](../../../assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
+![Lease-based leader election and heartbeat renewal](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
 
 *Lease-based leader election and heartbeat renewal*
 

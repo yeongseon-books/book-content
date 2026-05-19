@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![클라이언트와 서버 사이에서 오가는 raw HTTP 요청과 응답 흐름](../../../assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
+![클라이언트와 서버 사이에서 오가는 raw HTTP 요청과 응답 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
 
 *클라이언트와 서버 사이에서 오가는 raw HTTP 요청과 응답 흐름*
 요청과 응답은 결국 텍스트 블록입니다. 서버는 소켓에서 바이트를 읽고, 그것을 HTTP 요청으로 해석하고, 다시 응답 텍스트를 써 주는 프로그램입니다.

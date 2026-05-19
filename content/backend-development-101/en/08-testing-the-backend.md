@@ -42,7 +42,7 @@ Code without tests can be *read but not changed safely*. The mark of a good back
 
 ## Concept at a Glance
 
-![test pyramid from unit to integration and end-to-end coverage](../../../assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
+![test pyramid from unit to integration and end-to-end coverage](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
 
 *test pyramid from unit to integration and end-to-end coverage*
 The test pyramid — *many* at the bottom, *few* at the top.

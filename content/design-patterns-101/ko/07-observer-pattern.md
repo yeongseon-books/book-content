@@ -47,7 +47,7 @@ Observer는 이 연결을 약하게 만듭니다. 발행자는 “무슨 일이 
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
 *Observer의 핵심은 발행자가 직접 호출 대신 통지만 하고, 구독자는 필요한 반응만 선택적으로 붙이는 데 있습니다.*
 
 ## 핵심 용어

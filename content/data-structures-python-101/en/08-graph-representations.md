@@ -63,7 +63,7 @@ Graph problems appear at medium-to-hard difficulty in coding interviews. You nee
 
 ## Graph Representation at a Glance
 
-![Graph Representation at a Glance](../../../assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
+![Graph Representation at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
 
 *The same relationship data shown as an undirected graph and as an adjacency list view*
 

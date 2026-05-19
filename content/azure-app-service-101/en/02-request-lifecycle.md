@@ -49,7 +49,7 @@ Client → DNS → Azure Load Balancer → App Service Frontend → Worker Insta
 
 Issues can occur at each stage, resulting in different error messages.
 
-![Request path from client to app](../../../assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
+![Request path from client to app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/01-full-request-lifecycle.en.png)
 
 *Request path from client to app*
 
@@ -92,7 +92,7 @@ The App Service Frontend performs these roles:
 | Access Restriction Evaluation | IP restrictions, auth checks |
 | Instance Selection | Routes to healthy Worker |
 
-![Frontend routing and rejection checks](../../../assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
+![Frontend routing and rejection checks](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/02-frontend-routing-decision.en.png)
 
 *Frontend routing and rejection checks*
 
@@ -263,7 +263,7 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 | Unhealthy | Removed from the routing pool |
 | Recovering | Re-included after probes pass |
 
-![Instance state changes from health checks](../../../assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
+![Instance state changes from health checks](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/03-health-check-state-machine.en.png)
 
 *Instance state changes from health checks*
 
@@ -339,7 +339,7 @@ az webapp log tail \
 
 ## Common Failure Patterns
 
-![Status codes mapped to failure layers](../../../assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
+![Status codes mapped to failure layers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/02/04-failure-pattern-map.en.png)
 
 *Status codes mapped to failure layers*
 

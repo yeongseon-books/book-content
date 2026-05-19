@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![아이디어 선정부터 배포와 피드백까지의 사이드 프로젝트 흐름](../../../assets/developer-career-101/08/08-01-concept-at-a-glance.ko.png)
+![아이디어 선정부터 배포와 피드백까지의 사이드 프로젝트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.ko.png)
 
 *아이디어 선정부터 배포와 피드백까지의 사이드 프로젝트 흐름*
 

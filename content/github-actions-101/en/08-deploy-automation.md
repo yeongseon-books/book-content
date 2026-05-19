@@ -44,7 +44,7 @@ This is post 8 in the GitHub Actions 101 series. In this post, we will design a 
 
 ## Concept at a Glance
 
-![A deployment path from main merge to automatic staging and approval-gated production](../../../assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)
+![A deployment path from main merge to automatic staging and approval-gated production](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)
 
 *A deployment path from main merge to automatic staging and approval-gated production*
 

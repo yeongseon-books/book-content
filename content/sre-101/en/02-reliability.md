@@ -46,7 +46,7 @@ Once the dimensions are explicit, reliability becomes easier to discuss as produ
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
 
 *Reliability only becomes visible when availability, latency, correctness, and durability are read together.*
 ## Key Terms

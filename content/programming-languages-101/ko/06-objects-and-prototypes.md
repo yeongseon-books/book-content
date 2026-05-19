@@ -44,7 +44,7 @@ Java의 클래스도 객체지향이고, JavaScript의 프로토타입도 객체
 
 ## 핵심 개념 한눈에 보기
 
-![클래스 기반 탐색과 프로토타입 체인이 위임으로 만나는 구조](../../../assets/programming-languages-101/06/06-01-concept-at-a-glance.ko.png)
+![클래스 기반 탐색과 프로토타입 체인이 위임으로 만나는 구조](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.ko.png)
 
 *클래스 기반 탐색과 프로토타입 체인이 위임으로 만나는 구조*
 

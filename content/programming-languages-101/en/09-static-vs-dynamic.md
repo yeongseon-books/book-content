@@ -44,7 +44,7 @@ Every team debates "should we add more types?" Holding that conversation well re
 
 ## Concept at a Glance
 
-![The same type error surfacing at build time in static typing and at runtime in dynamic typing](../../../assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
+![The same type error surfacing at build time in static typing and at runtime in dynamic typing](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
 
 *The same type error surfacing at build time in static typing and at runtime in dynamic typing*
 

@@ -45,7 +45,7 @@ Python's basic tools — modules, functions, Protocols — already provide *runt
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
 *In Python, the same pattern intent often survives best when expressed through modules, functions, Protocols, and decorators instead of heavier class scaffolding.*
 
 ## Key Terms

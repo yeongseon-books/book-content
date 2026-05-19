@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![키 관계와 행 수 변화를 함께 점검하는 안전한 병합 흐름](../../../assets/pandas-101/07/07-01-concept-at-a-glance.ko.png)
+![키 관계와 행 수 변화를 함께 점검하는 안전한 병합 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.ko.png)
 *키 관계와 행 수 변화를 함께 점검하는 안전한 병합 흐름*
 
 ## 핵심 용어

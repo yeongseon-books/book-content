@@ -46,7 +46,7 @@ It is also one of the easiest places to create plausible but incorrect numbers. 
 
 ## Aggregation flow
 
-![Aggregation flow](../../../assets/sql-101/05/05-01-aggregation-flow.en.png)
+![Aggregation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
 ## Key Terms
 
 - **Aggregate function**: `SUM, COUNT, AVG, MIN, MAX`, etc.

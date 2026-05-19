@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름](../../../assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
+![request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
 
 *request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름*
 정상 경로든 오류 경로든 결국 모두 로그로 모입니다. 운영 가능한 시스템은 이 흐름이 일관되게 설계되어 있습니다.

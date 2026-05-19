@@ -52,7 +52,7 @@ BI is the *last centimeter* of a warehouse. You can model *billions of rows* per
 
 ## Concept at a Glance
 
-![BI decision flow](../../../assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
+![BI decision flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
 
 *Warehouse data becomes a team decision only after semantic definitions, BI tooling, and dashboard design line up.*
 

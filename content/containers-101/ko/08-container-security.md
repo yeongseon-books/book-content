@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![스캔, 서명, 최소 권한 실행으로 이어지는 보안 흐름](../../../assets/containers-101/08/08-01-concept-at-a-glance.ko.png)
+![스캔, 서명, 최소 권한 실행으로 이어지는 보안 흐름](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.ko.png)
 
 *스캔, 서명, 최소 권한 실행으로 이어지는 보안 흐름*
 이미지는 먼저 검사하고, 가능하면 서명하고, 실행 시에는 비root·최소 capability·적절한 시크릿 마운트로 공격 표면을 줄입니다.

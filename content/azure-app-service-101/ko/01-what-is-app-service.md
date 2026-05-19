@@ -65,7 +65,7 @@ App Service는 크게 다음 세 영역으로 나뉩니다.
 
 즉, 세 Plane은 서로 연결되어 있지만 **같은 것이 아니고**, 각자 **독립적인 API와 장애 모드**를 가집니다. “포털에서 설정은 정상인데 앱이 느리다”, “앱은 정상인데 배포 로그가 안 보인다” 같은 상황을 이해하려면 이 분리가 꼭 필요합니다.
 
-![세 Plane의 역할 분리 구조](../../../assets/azure-app-service-101/01/01-three-plane-architecture.ko.png)
+![세 Plane의 역할 분리 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/01-three-plane-architecture.ko.png)
 
 *세 Plane의 역할 분리 구조*
 
@@ -106,7 +106,7 @@ Management Plane을 다룰 때 기억할 문장은 이겁니다. **설정은 곧
 
 요청 흐름을 가장 단순하게 그리면 아래와 같습니다.
 
-![Frontend와 Worker를 거치는 요청 흐름](../../../assets/azure-app-service-101/01/02-request-flow.ko.png)
+![Frontend와 Worker를 거치는 요청 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/02-request-flow.ko.png)
 
 *Frontend와 Worker를 거치는 요청 흐름*
 
@@ -185,7 +185,7 @@ app.run(host="0.0.0.0", port=port)
 
 App Service에서 파일시스템은 아주 자주 오해되는 주제입니다. 특히 처음 배포한 뒤 SSH나 Kudu로 파일을 들여다보면 “아, 여기도 결국 서버 하나구나”라는 착각이 들기 쉽습니다. 하지만 운영 관점에서는 **임시 저장소와 영구 저장소를 명확히 구분해서 생각해야** 합니다.
 
-![임시 저장소와 홈 디렉터리의 차이](../../../assets/azure-app-service-101/01/03-file-system-layout.ko.png)
+![임시 저장소와 홈 디렉터리의 차이](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/01/03-file-system-layout.ko.png)
 
 *임시 저장소와 홈 디렉터리의 차이*
 

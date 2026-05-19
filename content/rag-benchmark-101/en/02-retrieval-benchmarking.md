@@ -28,7 +28,7 @@ This is post 2 in the RAG Evaluation and Benchmarking 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -99,7 +99,7 @@ QUERIES = [
 
 ### Step 2 — Build the measurement loop
 
-![Benchmark loop for queries and latency](../../../assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
+![Benchmark loop for queries and latency](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
 
 *Benchmark loop for queries and latency*
 
@@ -136,7 +136,7 @@ The warm-up call is not cosmetic. The first call often includes model load, cach
 
 ### Step 3 — Compute the metrics
 
-![Retrieval quality axes with hit rate and MRR](../../../assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
+![Retrieval quality axes with hit rate and MRR](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png)
 
 *Retrieval quality axes with hit rate and MRR*
 
@@ -207,7 +207,7 @@ This is where the benchmark becomes operationally useful. It stops being just a 
 
 ## Common mistakes
 
-![High hit rate with weak ranking](../../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
+![High hit rate with weak ranking](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png)
 
 *High hit rate with weak ranking*
 
@@ -228,7 +228,7 @@ As the harness grows, capture more context.
 
 ## Checklist
 
-![Benchmark record with gold IDs and logs](../../../assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
+![Benchmark record with gold IDs and logs](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-04-benchmark-record-with-gold-ids-and-logs.en.png)
 
 *Benchmark record with gold IDs and logs*
 

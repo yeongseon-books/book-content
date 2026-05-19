@@ -64,7 +64,7 @@ seo_description: CS에서 수학이 왜 필요한지 추상화, 증명, 모델�
 
 ## 한 장으로 보는 Math for CS의 역할
 
-![한 장으로 보는 Math for CS의 역할](../../../assets/math-for-cs-101/01/01-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 Math for CS의 역할](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.ko.png)
 *Math for CS는 추상화, 증명, 모델링, 분석을 한 언어로 묶어 코드 바깥의 구조를 보이게 합니다.*
 
 ---

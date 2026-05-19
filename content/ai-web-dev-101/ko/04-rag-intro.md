@@ -51,7 +51,7 @@ RAG는 거창해 보여도 사람이 일하는 방식과 비슷합니다. 아주
 2. 증강: 질문과 함께 문서 내용을 모델에게 제공합니다.
 3. 생성: 모델이 그 근거를 바탕으로 답을 정리합니다.
 
-![사전 지식 답변과 문서 검색 답변의 차이](../../../assets/ai-web-dev-101/04/plain-llm-vs-rag.ko.png)
+![사전 지식 답변과 문서 검색 답변의 차이](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.ko.png)
 
 *사전 지식 답변과 문서 검색 답변의 차이*
 
@@ -74,7 +74,7 @@ RAG에서 검색은 단순 문자열 검색만으로 끝나지 않는 경우가 
 
 이때 쓰는 것이 임베딩입니다. 텍스트를 숫자 벡터로 바꿔 의미적으로 비슷한 문장끼리 가까운 위치에 놓는 방식입니다. 즉, 임베딩은 문장을 숫자로 바꾸는 과정이 아니라, 의미 관계를 계산 가능한 형태로 바꾸는 과정입니다.
 
-![임베딩을 통한 의미 유사도 표현](../../../assets/ai-web-dev-101/04/embedding-similarity-concept.ko.png)
+![임베딩을 통한 의미 유사도 표현](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/embedding-similarity-concept.ko.png)
 
 *임베딩을 통한 의미 유사도 표현*
 
@@ -178,7 +178,7 @@ for score, chunk in hits:
 
 정확한 점수는 달라질 수 있지만, 첫 번째 결과가 환불 정책 문장이어야 합니다. 그렇지 않다면 청킹, 질의 문장, 임베딩 모델, 혹은 유사도 계산부터 다시 봐야 합니다.
 
-![벡터 DB의 의미 기반 검색 원리](../../../assets/ai-web-dev-101/04/vector-search-flow.ko.png)
+![벡터 DB의 의미 기반 검색 원리](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/vector-search-flow.ko.png)
 
 *벡터 DB의 의미 기반 검색 원리*
 
@@ -228,11 +228,11 @@ print(answer_with_rag("돈을 돌려받고 싶은데 어떻게 하나요?"))
 
 이 예제는 단순하지만 RAG의 핵심이 모두 들어 있습니다. 문서 목록이 있고, 질문을 임베딩으로 바꿔 가장 가까운 문장을 찾고, 그 문장을 근거로 다시 답을 생성합니다. 큰 시스템도 본질은 크게 다르지 않습니다. 다만 문서 수가 많아지고, 청킹 전략과 검색 전략이 더 정교해질 뿐입니다.
 
-![문서 검색형 답변 생성의 다섯 단계](../../../assets/ai-web-dev-101/04/rag-five-step-pipeline.ko.png)
+![문서 검색형 답변 생성의 다섯 단계](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/rag-five-step-pipeline.ko.png)
 
 *문서 검색형 답변 생성의 다섯 단계*
 
-![FAQ 챗봇의 RAG 동작 흐름](../../../assets/ai-web-dev-101/04/faq-bot-example-flow.ko.png)
+![FAQ 챗봇의 RAG 동작 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/faq-bot-example-flow.ko.png)
 
 *FAQ 챗봇의 RAG 동작 흐름*
 

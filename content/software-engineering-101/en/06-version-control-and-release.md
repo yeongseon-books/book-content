@@ -45,7 +45,7 @@ A release is the only moment your code meets the user. If something fails here, 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png)
 *The release path from feature branch to canary and production*
 
 Each stage shrinks the cost of recovery.

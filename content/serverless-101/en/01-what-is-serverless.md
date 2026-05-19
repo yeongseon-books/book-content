@@ -68,7 +68,7 @@ So the key framing for this first post is not “what became automatic?” but *
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
 
 *The platform sits between the incoming event and the function, which is why serverless is better understood as a responsibility shift than as a “no servers” slogan.*
 

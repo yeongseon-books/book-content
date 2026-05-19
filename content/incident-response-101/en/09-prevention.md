@@ -48,7 +48,7 @@ That is why prevention is best treated as an engineering output. Good intentions
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.

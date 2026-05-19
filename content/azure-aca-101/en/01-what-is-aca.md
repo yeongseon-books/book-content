@@ -65,7 +65,7 @@ This diagram is the map for the whole series. Later posts zoom into each box.
 - Dapr: episode 6
 - Observability: episode 7
 
-![Ingress and app layout in one ACA environment](../../../assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
+![Ingress and app layout in one ACA environment](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
 
 *Ingress and app layout in one ACA environment*
 
@@ -159,7 +159,7 @@ The final output prints a `https://hello-aca.<unique>.azurecontainerapps.io` URL
 
 Walking through the simplest HTTP request makes the platform's responsibilities concrete.
 
-![Client request flow to an active revision](../../../assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
+![Client request flow to an active revision](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-02-the-path-of-one-request.en.png)
 
 *Client request flow to an active revision*
 

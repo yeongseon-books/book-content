@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![레이어 스택과 쓰기 가능한 컨테이너 레이어](../../../assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
+![레이어 스택과 쓰기 가능한 컨테이너 레이어](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
 
 *레이어 스택과 쓰기 가능한 컨테이너 레이어*
 아래쪽은 운영 체제나 런타임 같은 공통 기반이고, 위쪽으로 갈수록 애플리케이션 고유 변경이 쌓입니다. 실행 시에는 여기에 쓰기 가능한 컨테이너 레이어가 하나 더 붙습니다.

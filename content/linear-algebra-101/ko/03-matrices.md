@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/03/03-01-concept-at-a-glance.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.ko.png)
 
 *행렬이 곱셈, 전치, 역행렬을 통해 변환 규칙으로 읽히는 흐름을 한 그림으로 정리한 모습입니다.*
 

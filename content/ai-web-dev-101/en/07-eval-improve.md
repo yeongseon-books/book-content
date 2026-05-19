@@ -47,7 +47,7 @@ That is why evaluation matters for three reasons:
 2. it catches regressions after model or prompt changes
 3. it helps you compare quality against cost and latency
 
-![Why evaluation matters for regression, accuracy, and cost](../../../assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
+![Why evaluation matters for regression, accuracy, and cost](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
 
 *Why evaluation matters for regression, accuracy, and cost*
 
@@ -61,7 +61,7 @@ For a first evaluation framework, three axes are enough:
 
 Different products weight these differently. A customer-support assistant may prioritize accuracy and safety. A brainstorming tool may care more about relevance and tone.
 
-![Scoring answer quality across accuracy, relevance, and safety](../../../assets/ai-web-dev-101/07/test-case-scoring-flow.en.png)
+![Scoring answer quality across accuracy, relevance, and safety](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/test-case-scoring-flow.en.png)
 
 *Scoring answer quality across accuracy, relevance, and safety*
 
@@ -192,7 +192,7 @@ def judge_answer(question: str, rubric_context: str, answer: str) -> dict:
 
 LLM-as-Judge is valuable for larger batches, but it is still a model-based judgment system. For important changes, sample human review should stay in the loop.
 
-![Using a judge model to score answer quality](../../../assets/ai-web-dev-101/07/llm-as-judge-flow.en.png)
+![Using a judge model to score answer quality](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/llm-as-judge-flow.en.png)
 
 *Using a judge model to score answer quality*
 
@@ -205,7 +205,7 @@ LLM-as-Judge is valuable for larger batches, but it is still a model-based judgm
 
 Evaluation becomes useful only when it leads to controlled iteration.
 
-![Feeding evaluation results back into the next iteration](../../../assets/ai-web-dev-101/07/improvement-cycle.en.png)
+![Feeding evaluation results back into the next iteration](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/improvement-cycle.en.png)
 
 *Feeding evaluation results back into the next iteration*
 
@@ -219,7 +219,7 @@ Imagine the RAG chatbot from the previous chapter fails on two out of five test 
 
 This separation matters because “the answer is bad” is not a diagnosis.
 
-![Regression checking after a system change](../../../assets/ai-web-dev-101/07/regression-check-flow.en.png)
+![Regression checking after a system change](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/regression-check-flow.en.png)
 
 *Regression checking after a system change*
 

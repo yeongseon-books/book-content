@@ -48,7 +48,7 @@ The git analogy: type 1 is a commit that reverts cleanly; type 2 is a merged his
 
 ### Diagram: deciding between reversible and irreversible changes
 
-![Diagram: deciding between reversible and irreversible changes](../../../assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
+![Diagram: deciding between reversible and irreversible changes](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
 *You decide whether downgrade is honest only after classifying the change by reversibility.*
 
 ## Core concepts

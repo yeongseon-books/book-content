@@ -49,7 +49,7 @@ Review is the last quality gate and the largest learning channel a team has.
 
 ## Concept at a Glance
 
-![standards for a good code review](../../../assets/clean-code-101/10/10-01-concept-at-a-glance.en.png)
+![standards for a good code review](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png)
 
 *Review flow: automation handles toil so reviewers can focus on intent, structure, and risk.*
 

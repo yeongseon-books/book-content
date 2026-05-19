@@ -44,7 +44,7 @@ When performance hurts, being able to answer "what does this line actually run a
 
 ## Concept at a Glance
 
-![Source code splitting into bytecode, JIT, and ahead-of-time compilation paths](../../../assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
+![Source code splitting into bytecode, JIT, and ahead-of-time compilation paths](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
 
 *Source code splitting into bytecode, JIT, and ahead-of-time compilation paths*
 

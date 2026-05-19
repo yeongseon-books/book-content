@@ -44,7 +44,7 @@ This is the sixth post in the Azure Functions 101 series. Here, we turn scaling 
 - **Horizontal scaling (scale out)** — how many instances the app gets
 - **In-instance concurrency** — how many invocations one instance handles at the same time
 
-![Two scaling axes: instances and concurrency](../../../assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png)
+![Two scaling axes: instances and concurrency](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png)
 
 *Two scaling axes: instances and concurrency*
 Plans differ in who controls those axes and how exposed they are.
@@ -64,7 +64,7 @@ So target-based scaling is not a Flex-only idea. It applies more broadly across 
 
 Differences are easier to see on a timeline. Assume the app is idle, then at t=0 an HTTP spike arrives.
 
-![Plan reactions to a traffic spike](../../../assets/azure-functions-101/06/06-02-how-the-plans-react-to-a-traffic-spike.en.png)
+![Plan reactions to a traffic spike](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-02-how-the-plans-react-to-a-traffic-spike.en.png)
 
 *Plan reactions to a traffic spike*
 Operationally, the differences are straightforward.
@@ -86,7 +86,7 @@ Cold start is not just “the first request felt slow.” It is the total time n
 
 That usually looks like this:
 
-![Cold start stages before first invocation](../../../assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.en.png)
+![Cold start stages before first invocation](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.en.png)
 
 *Cold start stages before first invocation*
 | Step | Typical source of latency | Typical mitigation |
@@ -162,7 +162,7 @@ Automatic scale-out does not remove the need to think about concurrency.
 
 Database pools, external API rate limits, and Redis connection limits stay fixed unless you scale them too. A function app can scale out quickly and still bottleneck immediately on the systems behind it.
 
-![Mismatch between function scale and downstream capacity](../../../assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png)
+![Mismatch between function scale and downstream capacity](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-04-1-downstream-systems-do-not-scale-with-y.en.png)
 
 *Mismatch between function scale and downstream capacity*
 That is why operations work usually includes both of these:

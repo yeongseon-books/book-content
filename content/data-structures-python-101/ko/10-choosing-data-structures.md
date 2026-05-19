@@ -63,7 +63,7 @@ Relationship network? -> graph
 
 ## 선택 흐름을 그림으로 보면
 
-![선택 흐름을 그림으로 보면](../../../assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
+![선택 흐름을 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
 
 *조회·순서·우선순위 같은 요구를 기준으로 기본 자료구조를 고르는 흐름도*
 

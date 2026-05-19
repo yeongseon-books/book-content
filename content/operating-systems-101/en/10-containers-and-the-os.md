@@ -55,7 +55,7 @@ In the container era, knowing the OS means knowing namespaces and cgroups. OOM-k
 
 ### The layers that create container isolation
 
-![The layers that create container isolation](../../../assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
+![The layers that create container isolation](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
 *Container isolation is the combined effect of visibility boundaries, resource limits, and reduced privilege on top of one shared kernel.*
 
 ```text

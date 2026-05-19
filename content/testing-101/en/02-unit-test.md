@@ -46,7 +46,7 @@ Unit tests are *the base of the pyramid*. Because they are fast, *thousands* of 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

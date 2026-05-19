@@ -46,7 +46,7 @@ This is post 9 in the AI Agent 101 series. Here we cover agent observability, co
 
 Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.
 
-![Observability](../../../assets/ai-agent-101/09/09-01-observability.en.png)
+![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
 *Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.*
 
 ### Structured Logging

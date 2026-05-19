@@ -50,7 +50,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![주니어에서 리드로 확장되는 성장 단계](../../../assets/developer-career-101/10/10-01-concept-at-a-glance.ko.png)
+![주니어에서 리드로 확장되는 성장 단계](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.ko.png)
 
 *주니어에서 리드로 확장되는 성장 단계*
 

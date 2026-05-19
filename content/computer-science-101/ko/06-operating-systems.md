@@ -58,7 +58,7 @@ OS의 추상화를 모르면 디버깅은 마법이 됩니다.
 
 > 프로세스는 격리된 실행 단위, 스레드는 같은 프로세스 안에서 메모리를 공유하는 실행 흐름입니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)
 *프로세스는 서로 격리되고, 운영체제가 하드웨어 자원을 나눠 배분합니다*
 
 ## 핵심 용어

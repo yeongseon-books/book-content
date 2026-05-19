@@ -43,7 +43,7 @@ When all three live in one file, fixing one line breaks another. *Separation* is
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png)
 
 *A responsibility map for structure, style, and behavior on one page.*
 

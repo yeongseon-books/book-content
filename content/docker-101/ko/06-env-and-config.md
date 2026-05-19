@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![하나의 불변 이미지에 환경별 설정과 secret이 런타임에 주입되는 구조](../../../assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
+![하나의 불변 이미지에 환경별 설정과 secret이 런타임에 주입되는 구조](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
 
 *같은 이미지를 유지한 채 dev·staging·prod가 서로 다른 환경변수와 secret만 주입하는 방식*
 

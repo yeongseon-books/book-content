@@ -43,7 +43,7 @@ That is why the topic keeps returning in PCA, stability analysis, and ranking al
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
 
 *This diagram shows how the eigenvalue equation leads to invariant directions and downstream applications.*
 

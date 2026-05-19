@@ -68,7 +68,7 @@ python -m build → dist/*.whl, dist/*.tar.gz
           twine upload dist/*          (production)
 ```
 
-![Mental Model](../../../assets/python-package-101/05/05-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.en.png)
 *The release path from build output to TestPyPI validation and final PyPI publishing*
 
 ## Core Concepts

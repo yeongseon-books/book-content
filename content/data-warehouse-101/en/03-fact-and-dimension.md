@@ -52,7 +52,7 @@ Analytical questions almost always read as *how much (measure)* by *which slice 
 
 ## Concept at a Glance
 
-![Fact-to-dimension relationship](../../../assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
+![Fact-to-dimension relationship](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
 
 *Facts carry the measurable events, while user, product, and date dimensions provide the context needed to group and explain them.*
 

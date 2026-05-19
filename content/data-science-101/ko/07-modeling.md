@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![정제된 데이터를 학습·평가로 나누고 베이스라인과 모델을 비교하는 흐름](../../../assets/data-science-101/07/07-01-concept-at-a-glance.ko.png)
+![정제된 데이터를 학습·평가로 나누고 베이스라인과 모델을 비교하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.ko.png)
 
 *정제된 데이터를 학습·평가로 나누고 베이스라인과 모델을 비교하는 흐름*
 ## 핵심 용어

@@ -28,7 +28,7 @@ This is the third post in the LLM Fine-tuning 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -93,13 +93,13 @@ That single line confirms attachment. It also lines up with the 1.5% you compute
 
 ## What to fix first about the config
 
-![Low-rank decomposition and scaling structure](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
+![Low-rank decomposition and scaling structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
 
 *Low-rank decomposition and scaling structure*
 
 `r` is the low-rank dimension, `lora_alpha` is the scale, and `lora_dropout` is dropout on the adapter path only. The most accident-prone field in practice is `target_modules`. Get this list wrong and either nothing attaches, or you attach to layers you did not mean to.
 
-![Fields with real operational impact](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
+![Fields with real operational impact](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
 
 *Fields with real operational impact*
 
@@ -162,7 +162,7 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 
 ## What to notice in this code
 
-![Choosing target modules for GPT-style models](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
+![Choosing target modules for GPT-style models](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
 
 *Choosing target modules for GPT-style models*
 
@@ -173,7 +173,7 @@ Only parameters ending in `lora_A` and `lora_B` should be trainable. Anything el
 
 ## Common mistakes
 
-![Full fine-tuning vs. LoRA parameter scale](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
+![Full fine-tuning vs. LoRA parameter scale](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
 
 *Full fine-tuning vs. LoRA parameter scale*
 

@@ -68,7 +68,7 @@ A dictionary opens, hands you a definition, and closes. An intern is different. 
 
 ### Agent loop at a glance
 
-![Agent loop at a glance](../../../assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
+![Agent loop at a glance](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
 ## Concept 1 - Chatbot vs Agent
 
 | | Chatbot | Agent |

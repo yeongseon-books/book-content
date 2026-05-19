@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.ko.png)
 *품질 속성이 서로 균형을 이루며 시스템 건강도를 만드는 구조*
 
 품질은 한 축이 아니라 여러 축의 균형입니다. 한 방향만 과하게 밀어도 전체 시스템 건강도는 떨어질 수 있습니다.

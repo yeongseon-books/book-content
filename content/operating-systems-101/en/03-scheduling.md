@@ -55,7 +55,7 @@ The scheduler is invisible until things slow down or jitter. Why does the system
 
 ### How tasks move through the scheduler
 
-![How tasks move through the scheduler](../../../assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)
+![How tasks move through the scheduler](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)
 *The scheduler keeps moving work between runnable and blocked states while picking the next CPU owner.*
 
 ```text

@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![오류 처리](../../../assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
+![오류 처리](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
 
 *오류 처리의 흐름: 입력 검증, 값 기반 실패, 예외 체이닝, 경계 처리로 책임을 분리합니다.*
 

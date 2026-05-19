@@ -45,7 +45,7 @@ Without docs, every question routes through a person. The moment a person become
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
 *The Diataxis structure that separates docs by reader intent*
 
 Diataxis splits docs by reader intent.

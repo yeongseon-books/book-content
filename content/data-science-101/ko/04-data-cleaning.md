@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![타입 정리에서 이상치 탐지까지 이어지는 기본 정제 순서](../../../assets/data-science-101/04/04-01-concept-at-a-glance.ko.png)
+![타입 정리에서 이상치 탐지까지 이어지는 기본 정제 순서](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.ko.png)
 
 *타입 정리에서 이상치 탐지까지 이어지는 기본 정제 순서*
 ## 핵심 용어

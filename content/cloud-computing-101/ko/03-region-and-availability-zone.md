@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![리전 내부에 여러 AZ가 배치되어 장애 경계를 나누는 구조](../../../assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)
+![리전 내부에 여러 AZ가 배치되어 장애 경계를 나누는 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)
 
 *리전 내부에 여러 AZ가 배치되어 장애 경계를 나누는 구조*
 리전은 도시 또는 대륙 규모의 위치이고, AZ는 리전 내부에서 물리적으로 분리된 장애 경계입니다. Edge는 CDN이 사용자 가까이에 콘텐츠를 두는 마지막 홉입니다. 이 셋을 구분해야 지연 시간과 가용성을 같은 표 위에서 비교할 수 있습니다.

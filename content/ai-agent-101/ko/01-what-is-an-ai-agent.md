@@ -61,7 +61,7 @@ AI Agent를 가장 안정적으로 이해하는 방법은 agent를 하나의 앱
 
 ### agent 루프 한눈에 보기
 
-![agent 루프 한눈에 보기](../../../assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
+![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
 ## 핵심 개념
 
 ### Chatbot과 Agent를 먼저 분리해야 합니다

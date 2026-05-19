@@ -30,7 +30,7 @@ This article breaks one training step into its six moving parts so you can reaso
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -96,13 +96,13 @@ The absolute loss value (8.74) is meaningless. What matters is (1) the run compl
 
 ## What you can shrink and what you cannot
 
-![Comparison of shrinkable and must-keep components](../../../assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
+![Comparison of shrinkable and must-keep components](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
 
 *Comparison of shrinkable and must-keep components*
 
 Sample count and step count can be cut down. But **tokenized inputs, labels, optimizer step, and loss computation** cannot be removed — drop any of them and you no longer have a training validation, just an inference test. That is why even the smallest example in this article keeps every training-related component intact.
 
-![What you can shrink and what you cannot](../../../assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
+![What you can shrink and what you cannot](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png)
 
 *What you can shrink and what you cannot*
 
@@ -275,7 +275,7 @@ This order matters because it preserves blame. If a run regresses, you can still
 
 ## What to notice in this code
 
-![Relationship between batch size and gradient accumulation](../../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
+![Relationship between batch size and gradient accumulation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
 
 *Relationship between batch size and gradient accumulation*
 
@@ -286,7 +286,7 @@ This order matters because it preserves blame. If a run regresses, you can still
 
 ## Common mistakes
 
-![Decision flow for training debug output priority](../../../assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
+![Decision flow for training debug output priority](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-04-where-engineers-get-confused.en.png)
 
 *Decision flow for training debug output priority*
 

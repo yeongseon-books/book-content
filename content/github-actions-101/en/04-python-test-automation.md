@@ -44,7 +44,7 @@ Manual tests get *forgotten*. Only automation guarantees *the same trust* on eve
 
 ## Concept at a Glance
 
-![A Python test workflow moving from PR open to setup, install, pytest, and coverage](../../../assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
+![A Python test workflow moving from PR open to setup, install, pytest, and coverage](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
 
 *A Python test workflow moving from PR open to setup, install, pytest, and coverage*
 

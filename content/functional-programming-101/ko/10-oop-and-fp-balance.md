@@ -58,7 +58,7 @@ Complex domain models         Mathematical / declarative logic
 
 ## OOP와 FP의 경계를 나누는 기준
 
-![OOP와 FP를 함께 쓰는 경계](../../../assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
+![OOP와 FP를 함께 쓰는 경계](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
 
 *핸들러와 저장소는 바깥 경계에 두고, 핵심 계산은 순수 함수 코어에 모으면 OOP와 FP를 함께 써도 설계 기준이 흔들리지 않습니다.*
 

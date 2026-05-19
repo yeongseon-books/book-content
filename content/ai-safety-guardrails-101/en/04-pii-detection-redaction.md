@@ -57,7 +57,7 @@ This post covers:
 
 ## Section 1 — PII Categories
 
-![section 1: PII categories](../../../assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
+![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
 *PII protection has to cover inbound detection, model-time masking, outbound re-checking, and storage separation.*
 
 | Category | Examples |

@@ -44,7 +44,7 @@ Evaluation is the language of model selection. When the language is wrong, the e
 
 ## Concept at a Glance
 
-![evaluation flow from predictions to metrics and decisions](../../../assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
+![evaluation flow from predictions to metrics and decisions](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
 
 *evaluation flow from predictions to metrics and decisions*
 ## Key Terms

@@ -56,7 +56,7 @@ Queries are short, but deep algorithms sit behind them.
 
 > An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.
 
-![Concept at a Glance](../../../assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
 *An index swaps a row-by-row scan for a structured lookup path*
 
 ## Key Terms

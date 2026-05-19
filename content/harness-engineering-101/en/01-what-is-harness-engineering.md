@@ -39,7 +39,7 @@ This is the first post in the Harness Engineering 101 series. It establishes the
 
 > A reliable agent is decided more by the system around the model than by the model alone. Harness Engineering is the work of designing that surrounding system.
 
-![What is harness Engineering](../../../assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
+![What is harness Engineering](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
 
 *What is harness Engineering*
 
@@ -77,7 +77,7 @@ The word is already familiar in software engineering. A test harness provides th
 
 ## Agents Without and With a Harness
 
-![Agents without and with a harness](../../../assets/harness-engineering-101/01/01-02-agents-without-and-with-a-harness.en.png)
+![Agents without and with a harness](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-02-agents-without-and-with-a-harness.en.png)
 
 *Agents without and with a harness*
 Without a harness, an agent often looks like this:
@@ -179,7 +179,7 @@ Harnessed run
 
 ## The Eight Harnesses
 
-![The eight harnesses](../../../assets/harness-engineering-101/01/01-03-the-eight-harnesses.en.png)
+![The eight harnesses](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-03-the-eight-harnesses.en.png)
 
 *The eight harnesses*
 This series covers eight harnesses. Each one designs a different aspect of the agent.
@@ -269,7 +269,7 @@ This is a tiny example, but it captures the real point. Once outputs are pinned 
 
 ## A Small Example: Email Classification Agent
 
-![A small Example: email classification agent](../../../assets/harness-engineering-101/01/01-04-a-small-example-email-classification-age.en.png)
+![A small Example: email classification agent](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-04-a-small-example-email-classification-age.en.png)
 
 *A small Example: email classification agent*
 Enough abstraction. Consider a small task: "classify incoming emails by priority." Without a harness:

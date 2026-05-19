@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![비밀번호 검증 뒤 세션을 발급하고 이후 요청에서 다시 확인하는 흐름](../../../assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
+![비밀번호 검증 뒤 세션을 발급하고 이후 요청에서 다시 확인하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
 
 *비밀번호 검증 뒤 세션을 발급하고 이후 요청에서 다시 확인하는 흐름*
 로그인 요청은 먼저 비밀번호 검증을 거치고, 검증이 끝나면 서버가 세션을 발급합니다. 이후 요청은 쿠키나 토큰으로 그 세션을 다시 증명합니다. 여기서 한 단계라도 약하면 나머지 단계 품질이 상쇄됩니다. 예를 들어 해시가 안전해도 쿠키가 `HttpOnly` 없이 내려가면 XSS 한 번으로 세션이 탈취될 수 있습니다.

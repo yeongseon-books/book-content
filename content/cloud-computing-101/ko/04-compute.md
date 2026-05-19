@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![베어메탈에서 서버리스로 갈수록 제어권보다 자동화 비중이 커지는 스펙트럼](../../../assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png)
+![베어메탈에서 서버리스로 갈수록 제어권보다 자동화 비중이 커지는 스펙트럼](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png)
 
 *베어메탈에서 서버리스로 갈수록 제어권보다 자동화 비중이 커지는 스펙트럼*
 왼쪽으로 갈수록 제어권이 크고, 오른쪽으로 갈수록 플랫폼 자동화가 많아집니다. 하지만 오른쪽으로 갈수록 언제나 더 좋다는 뜻은 아닙니다. 워크로드 특성과 팀 역량에 맞는 수준을 고르는 것이 중요합니다.

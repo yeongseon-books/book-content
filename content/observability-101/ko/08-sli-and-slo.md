@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.ko.png)
 *정상 요청 비율이 서비스 수준 지표가 되고 목표와 오류 예산, 소진 속도 경보로 이어지는 구조*
 
 ## 핵심 용어

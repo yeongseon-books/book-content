@@ -50,7 +50,7 @@ Dashboards, chat, games, market feeds, collaborative editing — all of them dep
 
 ## Concept at a Glance
 
-![From HTTP Upgrade to a long-lived WebSocket stream](../../../assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png)
+![From HTTP Upgrade to a long-lived WebSocket stream](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png)
 *After the HTTP upgrade succeeds, the same TCP connection becomes a long-lived bidirectional frame channel.*
 
 The pivot is **101 Switching Protocols**. The connection starts as HTTP and, after the response, behaves as a stream of WebSocket frames instead.

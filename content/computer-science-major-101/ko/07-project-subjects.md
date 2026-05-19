@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![프로젝트 진행 흐름](../../../assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
+![프로젝트 진행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
 
 *계획부터 설계, 구현, 테스트, 시연으로 이어지는 프로젝트 흐름*
 

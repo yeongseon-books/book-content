@@ -44,7 +44,7 @@ A blurry *reader* leads to blurry *sentences*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

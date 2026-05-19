@@ -44,7 +44,7 @@ CI를 돌려서 빌드까지 성공했는데 결과물이 그대로 사라진다
 
 ## 한눈에 보는 아티팩트 흐름
 
-![build 잡이 만든 산출물이 upload-artifact를 거쳐 저장되고 deploy 잡에서 다시 내려받는 흐름](../../../assets/github-actions-101/06/06-01-diagram.ko.png)
+![build 잡이 만든 산출물이 upload-artifact를 거쳐 저장되고 deploy 잡에서 다시 내려받는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-diagram.ko.png)
 
 *build 잡이 만든 산출물이 upload-artifact를 거쳐 저장되고 deploy 잡에서 다시 내려받는 흐름*
 

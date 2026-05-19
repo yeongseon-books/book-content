@@ -52,7 +52,7 @@ Knowing the parts is not enough — *putting them together* is the real skill. A
 
 ## Concept at a Glance
 
-![End-to-end warehouse design flow](../../../assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
+![End-to-end warehouse design flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
 
 *An end-to-end warehouse design flows from source systems through staging, facts and dimensions, marts, and finally into dashboard consumption.*
 

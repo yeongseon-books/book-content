@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.ko.png)
 
 *용어, KPI, 현장 관찰, 회고를 반복하며 도메인 전문성이 쌓이는 학습 루프*
 도메인 학습은 보통 이 순서로 쌓입니다. 용어를 알아야 회의가 들리고, 지표를 알아야 숫자가 읽히고, 현장을 알아야 왜 그런 숫자가 나오는지 감이 생깁니다.

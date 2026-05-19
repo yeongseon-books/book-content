@@ -50,7 +50,7 @@ A side project leaves both learning and evidence behind.
 
 ## Concept at a Glance
 
-![Side-project flow from idea selection to release and feedback](../../../assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
+![Side-project flow from idea selection to release and feedback](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
 
 *Side-project flow from idea selection to release and feedback*
 

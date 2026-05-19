@@ -49,7 +49,7 @@ This is post 6 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-![AI learning pipeline](../../../assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)
+![AI learning pipeline](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)
 
 *How data, statistics, models, and analysis connect*
 

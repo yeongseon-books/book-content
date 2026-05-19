@@ -28,7 +28,7 @@ It helps to think about SQLAlchemy extension points as three layers: types, attr
 
 This is the 8th article in the SQLAlchemy 101 series.
 
-![Events, hybrid_property, and custom types](../../../assets/sqlalchemy-101/08/08-01-events-hybrid-property-and-custom-types.en.png)
+![Events, hybrid_property, and custom types](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-01-events-hybrid-property-and-custom-types.en.png)
 
 *Events, hybrid_property, and custom types*
 ## What you will learn
@@ -41,7 +41,7 @@ This is the 8th article in the SQLAlchemy 101 series.
 
 ## Why this matters
 
-![Why this matters](../../../assets/sqlalchemy-101/08/08-02-why-this-matters.en.png)
+![Why this matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-02-why-this-matters.en.png)
 
 *Why this matters*
 When you first reach for an ORM, a model is just a table. Once the domain grows, you need email normalization, password hashing, audit columns, derived attributes, and encrypted fields. If every handler does this work itself, the same code is scattered everywhere and tests become painful.
@@ -50,7 +50,7 @@ SQLAlchemy's event system, `hybrid_property`, and `TypeDecorator` are the offici
 
 ## Mental model
 
-![Mental model](../../../assets/sqlalchemy-101/08/08-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-03-mental-model.en.png)
 
 *Mental model*
 > Think of SQLAlchemy extension points as three layers. The **type layer** transforms values as they cross the column boundary; the **attribute layer** defines a single name that works in Python and in SQL; the **event layer** hooks into the lifecycle of objects, sessions, and the engine.
@@ -65,7 +65,7 @@ The decision depends on how general the rule is and when it must take effect.
 
 ## Core concepts
 
-![Core concepts](../../../assets/sqlalchemy-101/08/08-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-04-core-concepts.en.png)
 
 *Core concepts*
 ### The event system
@@ -141,7 +141,7 @@ The "after" version applies the same rules no matter where users are created. Te
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/sqlalchemy-101/08/08-05-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-05-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ### Step 1: Set up

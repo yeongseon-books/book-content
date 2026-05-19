@@ -46,7 +46,7 @@ You can launch a global service with *zero up-front capital*. The trade-off is t
 
 ## Concept at a Glance
 
-![Basic flow where a user requests abstracted cloud resources through the provider](../../../assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
+![Basic flow where a user requests abstracted cloud resources through the provider](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
 
 *Basic flow where a user requests abstracted cloud resources through the provider*
 

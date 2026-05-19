@@ -51,7 +51,7 @@ last_reviewed: '2026-05-15'
 
 > 멘탈 모델: 흐름을 보여 주고 싶으면 그림을 고르고, 선택지를 나란히 비교하고 싶으면 표를 고릅니다. 이 구분만 지켜도 많은 시각 자료가 더 정확해집니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어
@@ -83,12 +83,12 @@ last_reviewed: '2026-05-15'
 
 ### 1단계 — 흐름도
 
-![클라이언트에서 서버와 데이터베이스로 이어지는 요청 흐름](../../../assets/technical-writing-101/06/06-02-step-1-flowchart.ko.png)
+![클라이언트에서 서버와 데이터베이스로 이어지는 요청 흐름](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-02-step-1-flowchart.ko.png)
 
 *클라이언트 요청이 서버와 데이터베이스로 흐르는 기본 경로를 보여 주는 흐름도입니다.*
 ### 2단계 — 시퀀스
 
-![클라이언트와 서버, 데이터베이스 사이의 호출 순서](../../../assets/technical-writing-101/06/06-03-step-2-sequence.ko.png)
+![클라이언트와 서버, 데이터베이스 사이의 호출 순서](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-03-step-2-sequence.ko.png)
 
 *클라이언트와 서버, 데이터베이스 사이의 호출 순서를 보여 주는 시퀀스 다이어그램입니다.*
 ### 3단계 — 비교 표

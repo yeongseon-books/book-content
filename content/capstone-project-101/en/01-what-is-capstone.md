@@ -55,7 +55,7 @@ The same pattern appears in real product work. Teams define the problem, commit 
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
 *The core capstone flow from problem definition to retrospective*
 
 ## Practical artifact: a one-page project brief

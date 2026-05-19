@@ -53,7 +53,7 @@ A *fuzzy question* gives you *no way to choose* the right data. *Framing* is *ha
 
 ## Concept at a Glance
 
-![How a vague business request becomes a metric, window, population, and falsifiable hypothesis](../../../assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
+![How a vague business request becomes a metric, window, population, and falsifiable hypothesis](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
 
 *How a vague business request becomes a metric, window, population, and falsifiable hypothesis*
 ## Key Terms

@@ -49,7 +49,7 @@ Code is written once and read a hundred times. Readability decides the cost of c
 
 ## Concept at a Glance
 
-![defining clean code](../../../assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
+![defining clean code](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
 
 *Core clean-code flow: working code becomes readable code, then code that stays easy to change.*
 

@@ -55,7 +55,7 @@ Processes and threads are the two basic building blocks of concurrency. Mixing t
 
 ### What the process shares and what each thread keeps
 
-![What the process shares and what each thread keeps](../../../assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
+![What the process shares and what each thread keeps](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
 *A process bundles resources for isolation, while threads multiply execution flows inside that boundary.*
 
 ```text

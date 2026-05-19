@@ -47,7 +47,7 @@ That makes the real chapter question this one:
 
 ## Concept at a glance
 
-![precision and recall moving as the threshold changes](../../../assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
+![precision and recall moving as the threshold changes](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
 
 *precision and recall moving as the threshold changes*
 

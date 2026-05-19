@@ -44,7 +44,7 @@ Design sense is not just for evaluating languages — **the same instinct applie
 
 ## Concept at a Glance
 
-![The five design axes pulling against one another in language design](../../../assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png)
+![The five design axes pulling against one another in language design](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png)
 
 *The five design axes pulling against one another in language design*
 

@@ -54,7 +54,7 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-![재학습 의사결정 루프](../../../assets/mlops-101/08/08-01-see-the-flow-first.ko.png)
+![재학습 의사결정 루프](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.ko.png)
 
 *재학습 의사결정 루프*
 이 구조는 재학습을 잘 설명합니다. 어떤 트리거가 발생하면 챌린저 모델을 학습하고, 평가하고, 현재 챔피언과 비교하고, 마지막에 승격하거나 반려합니다. 즉, 재학습은 학습만이 아니라 비교와 승격 정책을 함께 포함한 루프입니다.

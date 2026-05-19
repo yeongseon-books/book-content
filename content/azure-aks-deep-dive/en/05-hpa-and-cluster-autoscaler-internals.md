@@ -55,7 +55,7 @@ Cluster Autoscaler is operated by Microsoft as part of the AKS managed control p
 
 ## Put both loops in one diagram
 
-![Two loops for Pod and node scaling](../../../assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
+![Two loops for Pod and node scaling](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
 
 *Two loops for Pod and node scaling*
 ---
@@ -70,7 +70,7 @@ and stabilization windows.
 
 Operationally, HPA is the faster loop. It can decide to raise replica count well before the cluster has spare node capacity. That is why HPA-driven scale-up often appears first as new Pending Pods rather than instantly as more Ready Pods.
 
-![HPA loop adjusting replica count from metrics](../../../assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
+![HPA loop adjusting replica count from metrics](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-02-the-hpa-side.en.png)
 
 *HPA loop adjusting replica count from metrics*
 ---
@@ -84,7 +84,7 @@ It asks whether extra nodes from a specific pool would make the Pods schedulable
 
 In AKS, the default `scan-interval` is 10 seconds. The node provisioning wait budget is controlled by `max-node-provision-time`, which defaults to 15 minutes. Scale-down behavior is intentionally conservative: `scale-down-unneeded-time` defaults to 10 minutes, and `scale-down-delay-after-add` also defaults to 10 minutes. That means HPA can ask for more Pods, scheduler can mark them Pending, and CA can still be in the "adding nodes" phase for a while before the new node becomes Ready enough for binding.
 
-![CA loop adding nodes for unschedulable Pods](../../../assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
+![CA loop adding nodes for unschedulable Pods](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-03-the-ca-side.en.png)
 
 *CA loop adding nodes for unschedulable Pods*
 ---

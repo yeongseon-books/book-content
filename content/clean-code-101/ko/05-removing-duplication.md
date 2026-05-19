@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![중복 제거](../../../assets/clean-code-101/05/05-01-concept-at-a-glance.ko.png)
+![중복 제거](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.ko.png)
 
 *중복 제거의 흐름: 같은 이유로 바뀌는 지식만 하나의 출처로 모아야 합니다.*
 

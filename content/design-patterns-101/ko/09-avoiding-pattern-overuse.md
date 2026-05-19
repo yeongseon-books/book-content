@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
 *패턴은 실제 필요와 리팩터링이 불러와야 하고, 문제보다 먼저 도착한 추상화는 대개 복잡성만 남깁니다.*
 
 ## 핵심 용어

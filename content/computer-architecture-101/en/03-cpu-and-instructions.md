@@ -46,7 +46,7 @@ Performance work eventually reduces to "how many instructions does this code bec
 
 ### CPU fetch decode execute
 
-![CPU fetch decode execute](../../../assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
+![CPU fetch decode execute](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
 *The CPU does not "run code" abstractly. It keeps moving the PC, fetching bytes, decoding them, and then either computing a result, touching memory, or redirecting control flow.*
 
 ## Key Terms

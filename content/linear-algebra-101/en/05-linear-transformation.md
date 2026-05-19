@@ -43,7 +43,7 @@ Once this intuition clicks, a matrix stops being a static object. Some matrices 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
 
 *This diagram shows how one matrix can rotate, scale, reflect, or shear an entire space.*
 

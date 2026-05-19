@@ -46,7 +46,7 @@ Kubernetes를 처음 배우면 가장 먼저 헷갈리는 지점이 있습니다
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
 *Pod는 앱 컨테이너, 사이드카, 공유 볼륨, 공유 네트워크를 하나의 실행 묶음으로 다룹니다.*
 
 

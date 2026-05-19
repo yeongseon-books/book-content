@@ -38,7 +38,7 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 - 체크포인트가 붙어 있어도 route 설계가 약하면 어떤 종류의 혼선이 반복될까요?
 - “이제 production-ready한 골격이다”라고 말하기 전에 최소한 무엇을 검증해야 할까요?
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
 *이 글에서 답할 질문*
 
 ## 왜 이 글이 중요한가
@@ -60,7 +60,7 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 ## 최소 실행 예제
 이제 시리즈에서 다룬 요소를 하나로 묶어 보겠습니다. 예제는 두 경로를 모두 보여 줍니다. 첫 번째 턴에서는 LangGraph 개념 질문에 직접 답하고, 두 번째 턴에서는 계산 요청을 tool loop로 보냅니다. 그리고 두 턴 모두 같은 `thread_id` 아래에서 저장해, 마지막에 checkpoint 상태를 확인합니다.
 
-![supervisor와 tool loop가 결합된 통합 그래프](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
+![supervisor와 tool loop가 결합된 통합 그래프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
 *supervisor와 tool loop가 결합된 통합 그래프*
 
 ```python
@@ -232,7 +232,7 @@ if __name__ == "__main__":
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
 
 ## 이 코드에서 먼저 봐야 할 점
-![checkpoint와 route 상태 구조](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
+![checkpoint와 route 상태 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
 *checkpoint와 route 상태 구조*
 
 - supervisor는 최신 질문만 보고 `direct_answer`와 `tool_agent`를 분리합니다.
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 ## 어디서 자주 헷갈릴까요?
 완성형 예제에서 가장 흔한 오해는 “이제 기능이 다 들어갔으니 거의 끝났다”는 기대입니다. 실제로는 이 단계부터 안티패턴도 더 선명하게 드러납니다. direct path, tool path, checkpoint 중 하나라도 경계가 약하면 나머지 둘이 멀쩡해 보여도 전체 시스템은 금방 흔들립니다.
 
-![human review interrupt가 포함된 검증 경로](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.ko.png)
+![human review interrupt가 포함된 검증 경로](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-03-where-engineers-get-confused.ko.png)
 *human review interrupt가 포함된 검증 경로*
 
 - 모든 요청을 tool loop로 보내면 agent는 필요 이상으로 느리고 비싸집니다.
@@ -276,7 +276,7 @@ if __name__ == "__main__":
 현업에서 저는 여기서 평가 경계를 분리합니다. tool 호출 성공률, route 정확도, 최종 답변 품질은 서로 다른 지표입니다. calculator가 정상 동작해도 route가 잘못되면 쓸데없는 계산이 늘고, route가 좋아도 checkpoint가 약하면 다음 턴 품질이 흔들립니다. 완성형 그래프를 잘 운영하는 팀은 모델 하나의 품질보다 경로별 책임과 지표를 먼저 나눕니다.
 
 ## 정리: LangGraph 완성은 기능 나열이 아니라, 상태·분기·도구·체크포인트를 하나의 운영 모델로 묶는 일이다
-![턴 전반의 production 에이전트 흐름](../../../assets/langgraph-101/06/06-04-summary.ko.png)
+![턴 전반의 production 에이전트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-04-summary.ko.png)
 *턴 전반의 production 에이전트 흐름*
 
 마지막 글에서 가져가야 할 핵심은 분명합니다. 완성형 LangGraph는 거대한 만능 프롬프트가 아닙니다. supervisor 성격의 route 판단이 direct path와 tool path를 나누고, 필요한 경우에만 `ToolNode` 루프가 열리며, 그 전체 대화가 checkpoint를 통해 같은 세션 타임라인에 저장되는 구조입니다.

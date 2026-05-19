@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 이슈를 읽는 순서부터 고정하기
 
-![이슈를 읽는 순서부터 고정하기](../../../assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png)
+![이슈를 읽는 순서부터 고정하기](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png)
 
 *이슈를 제목에서 댓글까지 순서대로 읽어야 맥락을 놓치지 않는 기본 흐름*
 읽는 순서가 중요한 이유는 이슈의 정보가 이 흐름으로 쌓이기 때문입니다. 제목만 보면 증상만 보이고, 댓글만 먼저 보면 맥락이 흐려집니다. 기본 정보에서 세부 정보로 내려가는 순서를 지키면 실수를 크게 줄일 수 있습니다.

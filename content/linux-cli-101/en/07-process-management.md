@@ -45,7 +45,7 @@ When a web server is consuming 100% CPU, a Python script is stuck in an infinite
 
 > A program is a recipe (code file), and a process is a cook actually cooking with that recipe (running instance). Just as 3 cooks can cook the same recipe simultaneously, 3 processes can run from the same program at the same time.
 
-![A practical escalation path for process troubleshooting](../../../assets/linux-cli-101/07/07-01-mental-model.en.png)
+![A practical escalation path for process troubleshooting](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
 
 *A practical escalation path for checking and stopping problematic processes*
 

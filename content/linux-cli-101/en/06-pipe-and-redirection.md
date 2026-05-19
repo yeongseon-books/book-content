@@ -51,7 +51,7 @@ This single line finishes in 3 seconds what would take an analyst 30 minutes in 
 
 > Commands are faucets and pipe (`|`) is plumbing. Data flows from left to right. Redirection (`>`) diverts the flow from the pipe to a bucket (file) instead.
 
-![How stdin, stdout, and stderr move through pipes and files](../../../assets/linux-cli-101/06/06-01-mental-model.en.png)
+![How stdin, stdout, and stderr move through pipes and files](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
 
 *How stdin, stdout, and stderr move through pipes and files*
 

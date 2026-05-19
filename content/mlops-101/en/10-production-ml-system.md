@@ -48,7 +48,7 @@ An operable system needs three things at the same time. Data and model flow have
 
 ## See the Loop First
 
-![See the Loop First](../../../assets/mlops-101/10/10-01-see-the-loop-first.en.png)
+![See the Loop First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/10/10-01-see-the-loop-first.en.png)
 
 *See the Loop First*
 This diagram compresses the whole series into one loop. Data versioning and the feature store stabilize the inputs, the training pipeline produces a candidate model, the registry holds the version, deployment puts it into production, monitoring observes it, and drift plus retraining feed the next cycle.

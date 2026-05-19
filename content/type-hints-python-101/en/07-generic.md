@@ -56,7 +56,7 @@ TypeVar("T") ──> function signature uses T
                return type = int
 ```
 
-![How Generic preserves the input-output type relationship](../../../assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png)
+![How Generic preserves the input-output type relationship](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png)
 
 *How Generic preserves the input-output type relationship*
 

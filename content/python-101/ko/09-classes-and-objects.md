@@ -43,7 +43,7 @@ seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 
 > 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는 개별 객체입니다. 이 한 줄이 잡혀 있으면 `self`, 클래스 속성, dunder 메서드의 자리가 자연스럽게 정해집니다.
 다음 그림은 클래스 정의에서 인스턴스 호출까지의 흐름을 보여줍니다.
 
-![Mental Model](../../../assets/python-101/09/09-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.ko.png)
 
 *Mental Model*
 세 가지 핵심 아이디어가 있습니다.

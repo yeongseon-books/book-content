@@ -50,7 +50,7 @@ Solo learning has a ceiling. Connection is a shortcut.
 
 ## Concept at a Glance
 
-![Networking loop from learning to contribution](../../../assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
+![Networking loop from learning to contribution](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
 
 *Networking loop from learning to contribution*
 

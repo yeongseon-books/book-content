@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/01/01-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.ko.png)
 *캡스톤 프로젝트를 실무 흐름으로 보는 기본 구조*
 
 ## 실전 문서 예시: 한 장짜리 프로젝트 브리프

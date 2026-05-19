@@ -56,13 +56,13 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 
 ## 핵심 개념
 
-![역할 기반 프롬프트 구성의 전체 그림](../../../assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
+![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
 
 *역할 기반 프롬프트 구성의 전체 그림*
 
 채팅 프롬프트를 운영 가능한 형태로 만들려면 먼저 세 역할을 분리해야 합니다. `system`은 전체 정책, `user`는 현재 요청, `assistant`는 이전 답변입니다. 이 구조가 없으면 애플리케이션은 매 요청마다 같은 규칙을 중복해서 말하게 되고, 이력도 암묵적으로 기대하게 됩니다.
 
-![세 역할이 하나의 messages 배열로 합쳐지는 구조](../../../assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.ko.png)
+![세 역할이 하나의 messages 배열로 합쳐지는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.ko.png)
 
 *세 역할이 하나의 messages 배열로 합쳐지는 구조*
 
@@ -74,7 +74,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 
 system 메시지의 효과는 직접 비교해 보는 편이 빠릅니다.
 
-![system 메시지가 답변 구조를 바꾸는 방식](../../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.ko.png)
+![system 메시지가 답변 구조를 바꾸는 방식](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.ko.png)
 
 *system 메시지가 답변 구조를 바꾸는 방식*
 
@@ -139,7 +139,7 @@ print(with_system.choices[0].message.content)
 
 멀티턴 이력은 모델의 숨은 기억이 아니라 애플리케이션이 재구성한 메시지 배열입니다.
 
-![이전 assistant 답변이 다음 턴에 재주입되는 구조](../../../assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.ko.png)
+![이전 assistant 답변이 다음 턴에 재주입되는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.ko.png)
 
 *이전 assistant 답변이 다음 턴에 재주입되는 구조*
 
@@ -210,7 +210,7 @@ print(second.choices[0].message.content)
 
 샘플링 파라미터도 프롬프트 설계의 일부입니다.
 
-![낮은 temperature와 높은 temperature의 차이](../../../assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.ko.png)
+![낮은 temperature와 높은 temperature의 차이](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.ko.png)
 
 *낮은 temperature와 높은 temperature의 차이*
 
@@ -357,7 +357,7 @@ print(completion.choices[0].message.content)
 
 마지막으로, 흔한 실수는 대부분 입력 구조를 흐리게 만드는 방향에서 나옵니다.
 
-![출력을 흔들리게 만드는 프롬프트 설계 실수들](../../../assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.ko.png)
+![출력을 흔들리게 만드는 프롬프트 설계 실수들](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.ko.png)
 
 *출력을 흔들리게 만드는 프롬프트 설계 실수들*
 

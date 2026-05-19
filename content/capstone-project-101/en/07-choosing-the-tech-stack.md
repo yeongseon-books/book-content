@@ -55,7 +55,7 @@ Operational burden matters separately too. A tool that feels simple on a laptop 
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
 *A stack-selection flow that ends in a written ADR*
 
 ## Practical artifact: a lightweight ADR

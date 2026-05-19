@@ -46,7 +46,7 @@ The same pattern appears in internal platforms and shared libraries. Clear docs,
 
 ## The Smallest Structure That Still Works
 
-![The smallest structure that still works](../../../assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
+![The smallest structure that still works](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
 
 *The minimum community system from code of conduct to onboarding and recognition*
 The last step is easy to underestimate. Rules and docs alone do not create a healthy community. A first-time contributor has to feel that they were actually received well. Otherwise the project still feels closed.

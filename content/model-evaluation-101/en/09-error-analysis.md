@@ -44,7 +44,7 @@ This is post 9 in the Model Evaluation 101 series. In this post, we break the sc
 
 ## Concept at a Glance
 
-![error analysis moving from all errors to slices and confidence buckets](../../../assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
+![error analysis moving from all errors to slices and confidence buckets](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
 
 *error analysis moving from all errors to slices and confidence buckets*
 ## Key Terms

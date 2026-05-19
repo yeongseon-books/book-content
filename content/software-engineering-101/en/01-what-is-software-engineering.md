@@ -45,7 +45,7 @@ Most learning stops at "how to write code". Real work is code + collaboration + 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
 *The engineering loop from requirements to operations and maintenance*
 
 Engineering is a loop that does not break.

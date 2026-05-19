@@ -46,7 +46,7 @@ Good monitoring reduces decision time. It tells the team whether there is user i
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)
 
 *Monitoring is useful when telemetry flows into alerts, dashboards, and concrete operator action.*
 ## Key Terms

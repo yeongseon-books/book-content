@@ -53,7 +53,7 @@ A *good baseline* is the real starting line — much more than a fancy model. Wi
 
 ## Concept at a Glance
 
-![How cleaned data splits into train and test so a baseline and a model can be compared fairly](../../../assets/data-science-101/07/07-01-concept-at-a-glance.en.png)
+![How cleaned data splits into train and test so a baseline and a model can be compared fairly](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.en.png)
 
 *How cleaned data splits into train and test so a baseline and a model can be compared fairly*
 ## Key Terms

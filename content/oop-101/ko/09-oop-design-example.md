@@ -49,7 +49,7 @@ OrderService
 └── OrderRepository -> order persistence (DIP)
 ```
 
-![핵심 개념 잡기](../../../assets/oop-101/09/09-01-concept-overview.ko.png)
+![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.ko.png)
 *주문 서비스는 모든 일을 직접 하지 않고, 바뀌기 쉬운 결제·할인·저장 경계를 협력 객체로 밀어냅니다.*
 
 ## 핵심 개념

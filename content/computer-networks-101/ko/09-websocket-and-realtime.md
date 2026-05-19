@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 그림
 
-![HTTP 연결이 WebSocket 프레임 스트림으로 바뀌는 흐름](../../../assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
+![HTTP 연결이 WebSocket 프레임 스트림으로 바뀌는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
 *HTTP 핸드셰이크가 끝나면 같은 TCP 연결이 장시간 유지되는 양방향 프레임 채널로 바뀝니다.*
 
 핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다.

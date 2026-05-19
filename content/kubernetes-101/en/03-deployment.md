@@ -44,7 +44,7 @@ Here, we will treat Deployment as the default stateless workload controller that
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
 *Deployment uses ReplicaSets to keep the target Pod count stable while swapping versions in a controlled rollout sequence.*
 
 

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 분석 쿼리 적층 흐름
 
-![분석 쿼리 적층 흐름](../../../assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png)
+![분석 쿼리 적층 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png)
 대부분의 분석 SQL은 원본 이벤트를 정리하고, 집계하고, 필요하면 윈도 함수로 후처리한 뒤 최종 보고서 형태로 만듭니다. 중요한 점은 각 단계를 명확히 구분하는 것입니다.
 
 ## 핵심 개념 정리

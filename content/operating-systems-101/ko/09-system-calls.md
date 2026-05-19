@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 시스템 콜이 지나가는 권한 경계
 
-![시스템 콜이 지나가는 권한 경계](../../../assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
+![시스템 콜이 지나가는 권한 경계](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
 *시스템 콜은 사용자 코드가 커널 자원에 들어갈 수 있는 유일한 문이며, 그만큼 매 호출에 비용이 붙습니다.*
 
 ```text

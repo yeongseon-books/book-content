@@ -48,7 +48,7 @@ When every run is recorded, the process becomes an asset in its own right. Faile
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/02/02-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.

@@ -36,7 +36,7 @@ Here chunking is treated as a retrieval design choice, not a preprocessing after
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
 
-![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
 
 *Chunk size and overlap structure*
 <!-- ebook-only:start -->
@@ -64,7 +64,7 @@ After this chapter, the next one moves on to **Vector search pipeline — from d
 
 ## Chunk size and overlap
 
-![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
 
 *Chunk size and overlap structure*
 Two parameters control chunking: `chunk_size` and `chunk_overlap`.
@@ -88,7 +88,7 @@ A common rule of thumb sets overlap at 10–20% of chunk size. Too much overlap 
 
 ## Fixed-size chunking from scratch
 
-![Fixed size chunking execution flow](../../../assets/vector-search-101/05/05-02-fixed-size-chunking-from-scratch.en.png)
+![Fixed size chunking execution flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-02-fixed-size-chunking-from-scratch.en.png)
 
 *Fixed size chunking execution flow*
 This implementation makes the concept concrete.
@@ -153,7 +153,7 @@ This version is for illustration only. Splitting by raw character count often cu
 
 ## RecursiveCharacterTextSplitter
 
-![Separator priority fallback path](../../../assets/vector-search-101/05/05-03-recursivecharactertextsplitter.en.png)
+![Separator priority fallback path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-03-recursivecharactertextsplitter.en.png)
 
 *Separator priority fallback path*
 LangChain's `RecursiveCharacterTextSplitter` tries to split at natural boundaries. It works down a priority list of separators, trying `\n\n` first, then `\n`, then `. `, then space, finally individual characters. This keeps sentences intact in most cases.
@@ -223,7 +223,7 @@ The `separators` list is tried in order. If `\n\n` produces a piece within `chun
 
 ## Full pipeline: chunking to FAISS
 
-![Execution path from chunking to FAISS search](../../../assets/vector-search-101/05/05-04-full-pipeline-chunking-to-faiss.en.png)
+![Execution path from chunking to FAISS search](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-04-full-pipeline-chunking-to-faiss.en.png)
 
 *Execution path from chunking to FAISS search*
 Connecting chunking to embedding to index in one block.
@@ -419,7 +419,7 @@ Small chunks surface direct answers more aggressively. Larger chunks keep more s
 
 ## How chunk size affects retrieval
 
-![Retrieval quality across chunk sizes](../../../assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.en.png)
+![Retrieval quality across chunk sizes](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.en.png)
 
 *Retrieval quality across chunk sizes*
 Chunks that are too small lack enough context to match a query accurately. Chunks that are too large mix unrelated content and dilute the semantic signal.

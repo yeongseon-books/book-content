@@ -47,7 +47,7 @@ An interface is a promise. When the promise is small and clear, both sides stay 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
 *A good interface lets callers depend on one contract while multiple implementations sit behind it*
 
 The caller knows one shape; multiple implementations sit behind it.

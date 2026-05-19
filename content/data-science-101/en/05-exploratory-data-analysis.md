@@ -53,7 +53,7 @@ Weak EDA produces *the wrong model*. Skipping the *data's self-introduction* and
 
 ## Concept at a Glance
 
-![The EDA reading order from dataset shape through distributions, missingness, and correlation](../../../assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
+![The EDA reading order from dataset shape through distributions, missingness, and correlation](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
 
 *The EDA reading order from dataset shape through distributions, missingness, and correlation*
 ## Key Terms

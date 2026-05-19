@@ -57,7 +57,7 @@ Make change for 1,260:
 Total: 6 coins — optimal via greedy
 ```
 
-![그리디 선택 규칙과 반례 검증 흐름](../../../assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
+![그리디 선택 규칙과 반례 검증 흐름](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
 
 *그리디는 규칙 하나로 끝나는 알고리즘이 아니라, 그 규칙이 항상 맞는지 반례로 검증해야 하는 전략입니다.*
 

@@ -46,7 +46,7 @@ Good postmortems turn one painful event into shared operating knowledge. That is
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png)
 
 *A postmortem becomes valuable when the incident record turns into tracked follow-up work.*
 ## Key Terms

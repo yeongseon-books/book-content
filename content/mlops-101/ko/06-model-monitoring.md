@@ -54,7 +54,7 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-![모델 모니터링 수집 경로](../../../assets/mlops-101/06/06-01-see-the-flow-first.ko.png)
+![모델 모니터링 수집 경로](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.ko.png)
 
 *모델 모니터링 수집 경로*
 이 구성은 모델 모니터링의 가장 기본적인 형태입니다. 애플리케이션이 `/metrics` 엔드포인트로 시계열 메트릭을 노출하고, Prometheus가 주기적으로 긁어 오고, Grafana가 시각화하고, Alertmanager가 임계값을 넘는 상황을 사람에게 전달합니다.

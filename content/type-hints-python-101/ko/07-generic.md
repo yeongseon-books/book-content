@@ -54,7 +54,7 @@ TypeVar("T") ──> 함수 시그니처에 T 사용
                반환 타입 = int
 ```
 
-![Generic이 입력과 출력 타입 관계를 보존하는 흐름](../../../assets/type-hints-python-101/07/07-01-concept-at-a-glance.ko.png)
+![Generic이 입력과 출력 타입 관계를 보존하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.ko.png)
 
 *Generic이 입력과 출력 타입 관계를 보존하는 흐름*
 

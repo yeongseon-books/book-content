@@ -59,7 +59,7 @@ A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 ```
 
-![Priority queue and relaxation flow in Dijkstra's algorithm](../../../assets/algorithms-python-101/08/08-01-concept-overview.en.png)
+![Priority queue and relaxation flow in Dijkstra's algorithm](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png)
 
 *Dijkstra keeps pulling the nearest candidate first, then updates distances whenever it discovers a cheaper path.*
 

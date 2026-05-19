@@ -46,7 +46,7 @@ XSS 한 번이면 세션 탈취, 화면 변조, 피싱 삽입, 관리자 권한 
 
 ## 한눈에 보는 구조
 
-![출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름](../../../assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
+![출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
 
 *출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름*
 사용자 입력은 저장된 뒤 다시 출력될 수 있고, 그 출력이 브라우저에서 실행될 수도 있습니다. 동시에 브라우저는 다른 사이트에서 보낸 요청에도 쿠키를 자동 첨부할 수 있습니다. 그래서 출력 방어와 요청 출처 검증이 각각 필요합니다.

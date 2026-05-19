@@ -60,7 +60,7 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 학습 루프를 가장 작게 요약하면 `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, `step()`입니다. 나머지는 평가, 로그, 스케줄링, 저장 같은 운영 코드입니다. 즉, 핵심 자체는 매우 짧고 반복적입니다.
 
-![순전파에서 업데이트까지 이어지는 학습 루프](../../../assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
+![순전파에서 업데이트까지 이어지는 학습 루프](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
 
 *배치를 뽑고 loss를 계산한 뒤 gradient를 흘려 보내고 optimizer step을 밟는 핵심 루프입니다.*
 

@@ -28,7 +28,7 @@ One of the most common database tasks is "fetch the related rows together": a us
 
 This is the 6th article in the SQLAlchemy 101 series.
 
-![ORM Relationships: connecting both sides safely with relationship and back_populates](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png)
+![ORM Relationships: connecting both sides safely with relationship and back_populates](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png)
 
 *ORM Relationships: connecting both sides safely with relationship and back_populates*
 ## Questions this post answers
@@ -42,7 +42,7 @@ This is the 6th article in the SQLAlchemy 101 series.
 
 ## Why it matters
 
-![Why it matters](../../../assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
+![Why it matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
 
 *Why it matters*
 Misconfigured relationships create a familiar set of bugs:
@@ -56,7 +56,7 @@ Relationships are the skeleton of your domain model. Setting them up cleanly the
 
 ## Mental Model
 
-![Mental model](../../../assets/sqlalchemy-101/06/06-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-03-mental-model.en.png)
 
 *Mental model*
 > `ForeignKey` is the SQL-level reference; `relationship()` is the object-level navigation channel. `back_populates` ties both ends of that channel together so a change made on one side is immediately reflected on the other.
@@ -75,7 +75,7 @@ orders: list[Order]   ←──┐         ┌─→  user: User
 
 ## Core concepts
 
-![Core concepts](../../../assets/sqlalchemy-101/06/06-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-04-core-concepts.en.png)
 
 *Core concepts*
 ### 1) ForeignKey and relationship are a pair
@@ -222,7 +222,7 @@ def get_user_orders(session, user_id):
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-05-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ```python

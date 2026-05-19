@@ -44,7 +44,7 @@ Incidents *always come*. The difference is *how fast you know* and *how fast you
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

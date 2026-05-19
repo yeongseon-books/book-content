@@ -54,7 +54,7 @@ class Closeable(Protocol):     class FileHandler:
                  (상속 필요 없음)
 ```
 
-![Protocol과 ABC가 계약을 해석하는 방식](../../../assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
+![Protocol과 ABC가 계약을 해석하는 방식](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
 
 *Protocol과 ABC가 계약을 해석하는 방식*
 

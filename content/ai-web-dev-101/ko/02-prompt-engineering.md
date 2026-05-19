@@ -54,7 +54,7 @@ OpenAI Chat Completions API에서는 `role` 필드로 메시지 성격을 구분
 
 예를 들어 `system`에는 “너는 보안과 성능을 중시하는 시니어 개발자다” 같은 기본 규칙을 두고, `user`에는 “이 함수를 리뷰해 달라”는 현재 작업을 넣습니다. 이렇게 나누면 모델의 장기 규칙과 개별 요청을 분리해서 관리할 수 있습니다.
 
-![System Prompt와 User Prompt의 역할](../../../assets/ai-web-dev-101/02/prompt-role-layering.ko.png)
+![System Prompt와 User Prompt의 역할](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.ko.png)
 
 *System Prompt와 User Prompt의 역할*
 
@@ -116,7 +116,7 @@ print("\n[better]\n", better)
 
 정확히 이 문장이 나오지는 않더라도, 개선된 프롬프트가 더 짧고 구조화된 결과를 내야 합니다. 여기서 핵심은 문학적 표현이 아니라 **입력 필드와 출력 계약을 명시했다**는 점입니다.
 
-![모호한 프롬프트를 구체적으로 개선하는 과정](../../../assets/ai-web-dev-101/02/prompt-improvement-example.ko.png)
+![모호한 프롬프트를 구체적으로 개선하는 과정](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-improvement-example.ko.png)
 
 *모호한 프롬프트를 구체적으로 개선하는 과정*
 
@@ -140,7 +140,7 @@ print("\n[better]\n", better)
 
 “문서 근거가 없으면 모른다고 답하라”, “3문장을 넘기지 마라”, “개인정보를 추측하지 마라” 같은 조건은 실서비스에서 특히 중요합니다.
 
-![좋은 결과를 이끄는 프롬프트 설계 원칙](../../../assets/ai-web-dev-101/02/four-prompt-principles.ko.png)
+![좋은 결과를 이끄는 프롬프트 설계 원칙](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/four-prompt-principles.ko.png)
 
 *좋은 결과를 이끄는 프롬프트 설계 원칙*
 
@@ -221,7 +221,7 @@ for temp in (0.1, 0.9):
     print(f"temperature={temp}: {response.choices[0].message.content}")
 ```
 
-![생성 다양성과 답변 길이를 조절하는 두 설정](../../../assets/ai-web-dev-101/02/temperature-max-tokens.ko.png)
+![생성 다양성과 답변 길이를 조절하는 두 설정](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/temperature-max-tokens.ko.png)
 
 *생성 다양성과 답변 길이를 조절하는 두 설정*
 
@@ -269,7 +269,7 @@ for case in test_cases:
 
 프롬프트는 한 번 완성해서 끝나는 문서가 아니라, 실패 패턴을 반영해 계속 정리되는 실행 계약입니다.
 
-![프롬프트 개선 반복 과정](../../../assets/ai-web-dev-101/02/prompt-iteration-loop.ko.png)
+![프롬프트 개선 반복 과정](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-iteration-loop.ko.png)
 
 *프롬프트 개선 반복 과정*
 

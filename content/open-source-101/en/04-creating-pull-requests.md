@@ -46,7 +46,7 @@ The same is true inside companies. Pull requests are the default unit of code re
 
 ## Put the Flow in Your Head First
 
-![Put the flow in your head first](../../../assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
+![Put the flow in your head first](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
 
 *The contribution flow from fork to review that keeps a change small, isolated, and reviewable*
 If you treat that flow as paperwork, every step feels annoying. If you see the role split, it starts to make sense. The fork is your private workspace. The branch is the change boundary. The commit is the history unit. The pull request is the request for review. Keeping them separate lowers confusion.

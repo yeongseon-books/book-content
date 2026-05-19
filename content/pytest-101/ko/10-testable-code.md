@@ -58,7 +58,7 @@ last_reviewed: '2026-05-17'
   clock / id factory
 ```
 
-![순수 로직 코어와 결제, 저장, 알림 같은 외부 어댑터 경계를 나눈 테스트하기 쉬운 코드 구조](../../../assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
+![순수 로직 코어와 결제, 저장, 알림 같은 외부 어댑터 경계를 나눈 테스트하기 쉬운 코드 구조](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
 *가운데의 순수 로직 코어는 입력과 출력만으로 검증할 수 있어야 하고, 결제 게이트웨이·저장소·알림 발송기 같은 바깥 의존성은 경계 밖에서 주입받아야 합니다. 이렇게 나누면 비즈니스 규칙 테스트는 mock 벽 없이 빠르게 돌고, 바깥 통합부만 별도 검증 대상으로 남길 수 있습니다.*
 
 ## 핵심 개념

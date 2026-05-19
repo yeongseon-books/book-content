@@ -44,7 +44,7 @@ CI/CD determines *team speed and quality*. *GitHub Actions* runs *next to your c
 
 ## Concept at a Glance
 
-![A GitHub Actions run flowing from a push event to a workflow, job, and step](../../../assets/github-actions-101/01/01-01-concept-at-a-glance.en.png)
+![A GitHub Actions run flowing from a push event to a workflow, job, and step](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-concept-at-a-glance.en.png)
 
 *A GitHub Actions run flowing from a push event to a workflow, job, and step*
 

@@ -52,7 +52,7 @@ This chapter is also a setup for the next one on functions and argument design. 
 > When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.
 
-![Mental model](../../../assets/python-101/05/05-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
 
 *Mental model*
 Three rules carry most of the weight.

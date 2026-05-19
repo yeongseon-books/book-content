@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![이력서에서 포트폴리오로 이어지는 검토 흐름](../../../assets/developer-career-101/04/04-01-concept-at-a-glance.ko.png)
+![이력서에서 포트폴리오로 이어지는 검토 흐름](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.ko.png)
 
 *이력서에서 포트폴리오로 이어지는 검토 흐름*
 

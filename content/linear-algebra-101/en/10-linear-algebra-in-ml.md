@@ -43,7 +43,7 @@ With the right mental model, the internals get much less mysterious. A layer bec
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png)
 
 *This diagram shows the linear-algebra backbone of an ML workflow from data matrix to gradient updates.*
 

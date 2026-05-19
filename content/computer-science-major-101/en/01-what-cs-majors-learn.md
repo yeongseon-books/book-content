@@ -49,7 +49,7 @@ A clear *map* keeps your *four years* from drifting.
 
 ## Concept at a Glance
 
-![CS major learning flow](../../../assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
+![CS major learning flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
 
 *How a CS major moves from foundations to projects*
 

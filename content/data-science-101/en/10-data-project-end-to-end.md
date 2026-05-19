@@ -53,7 +53,7 @@ Looking at parts in isolation gives you *fragments*; following one project from 
 
 ## Concept at a Glance
 
-![The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery](../../../assets/data-science-101/10/10-01-concept-at-a-glance.en.png)
+![The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.en.png)
 
 *The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery*
 ## Key Terms

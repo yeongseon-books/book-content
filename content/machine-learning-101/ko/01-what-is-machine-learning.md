@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/01/01-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-diagram.ko.png)
 
 *학습 데이터에서 함수를 추정하고, 그 함수를 새 입력에 적용하는 머신러닝의 가장 기본적인 흐름입니다.*
 

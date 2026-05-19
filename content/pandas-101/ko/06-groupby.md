@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![분할, 적용, 결합으로 이어지는 groupby 계산 흐름](../../../assets/pandas-101/06/06-01-concept-at-a-glance.ko.png)
+![분할, 적용, 결합으로 이어지는 groupby 계산 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.ko.png)
 *분할, 적용, 결합으로 이어지는 groupby 계산 흐름*
 
 ## 핵심 용어

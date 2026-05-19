@@ -48,7 +48,7 @@ If you reverse that order, `acc 96%` sounds impressive. If you keep the order, y
 
 ## Concept at a glance
 
-![how balanced and imbalanced data change the meaning of accuracy](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
+![how balanced and imbalanced data change the meaning of accuracy](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
 
 *how balanced and imbalanced data change the meaning of accuracy*
 

@@ -45,7 +45,7 @@ Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. v
 
 ## 한눈에 보는 개념
 
-![호스트 디스크와 Docker volume, 브리지 네트워크가 컨테이너를 연결하는 구조](../../../assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
+![호스트 디스크와 Docker volume, 브리지 네트워크가 컨테이너를 연결하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
 
 *영속 데이터는 volume으로 분리하고 컨테이너 간 통신은 브리지 네트워크로 연결하는 기본 구조*
 

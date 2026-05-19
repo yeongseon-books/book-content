@@ -46,7 +46,7 @@ The same feature can cost ten times more or ten times less depending on the arch
 
 ## Concept at a Glance
 
-![A layered web architecture with CDN, load balancer, stateless app tier, and data services](../../../assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
+![A layered web architecture with CDN, load balancer, stateless app tier, and data services](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
 
 *A layered web architecture with CDN, load balancer, stateless app tier, and data services*
 

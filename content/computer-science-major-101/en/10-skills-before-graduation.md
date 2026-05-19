@@ -48,7 +48,7 @@ The first few months of your first job matter more than many students expect. Th
 
 ## Concept at a Glance
 
-![Graduation skill map](../../../assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
+![Graduation skill map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
 
 *How fundamentals, systems, data, collaboration, and writing form graduation readiness*
 

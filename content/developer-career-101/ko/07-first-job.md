@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프](../../../assets/developer-career-101/07/07-01-concept-at-a-glance.ko.png)
+![학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.ko.png)
 
 *학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프*
 

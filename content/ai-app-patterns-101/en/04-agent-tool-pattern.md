@@ -33,7 +33,7 @@ This is post 4 in the AI App Patterns 101 series. Here we examine when the agent
 
 > An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
 
-![Questions this post answers](../../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 > AI App Patterns 101 (4/6)
@@ -55,7 +55,7 @@ Topics:
 
 ### Fixed chain versus dynamic agent
 
-![Fixed chain versus dynamic agent](../../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
+![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
 
 *Fixed chain versus dynamic agent*
 **Chain**: input → step A → step B → output. The execution path is determined at design time.
@@ -70,7 +70,7 @@ Agents use the ReAct (Reason + Act) loop: Thought → Action → Observation, re
 
 ### Tool registry and selection surface
 
-![Tool registry and selection surface](../../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
+![Tool registry and selection surface](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
 
 *Tool registry and selection surface*
 In LangChain, a tool is a Python function decorated with `@tool`. The docstring becomes the description the LLM reads when deciding which tool to use. Write it precisely — a vague docstring leads to wrong tool selection.
@@ -169,7 +169,7 @@ def search_policy(query: str) -> str:
 
 ### Thought action observation loop
 
-![Thought action observation loop](../../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
+![Thought action observation loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
 
 *Thought action observation loop*
 ```python
@@ -243,7 +243,7 @@ for question in questions:
 
 ### Intermediate-step trace for tool selection
 
-![Execution trace and stopping conditions](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+![Execution trace and stopping conditions](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
 
 *Execution trace and stopping conditions*
 An agent demo is not trustworthy until you can inspect the chosen tool path. `verbose=True` is useful for humans, but structured traces are better when you want regression checks.
@@ -289,7 +289,7 @@ This is where agent debugging becomes practical. You stop saying “the model wa
 
 ### Execution trace and stopping conditions
 
-![Execution trace and stopping conditions](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+![Execution trace and stopping conditions](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
 
 *Execution trace and stopping conditions*
 With `verbose=True`, the console prints every Thought, Action, Action Input, and Observation. For a simple question, the agent usually completes in one round. For a two-step question — count words, then multiply — it completes in two rounds, using the output of the first tool as input to the next computation.
@@ -311,7 +311,7 @@ When tool choice looks wrong, inspect these in order:
 
 ### Returning tool errors as observations
 
-![Returning tool errors as observations](../../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
+![Returning tool errors as observations](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
 
 *Returning tool errors as observations*
 If a tool raises an unhandled exception, the agent stops. Catching exceptions inside the tool and returning a descriptive error string keeps the agent running. The error string becomes the Observation, and the LLM can decide to try a different approach or explain the failure.

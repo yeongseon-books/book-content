@@ -56,7 +56,7 @@ sym. diff.   A ^ B  = {1, 2, 5, 6}
 
 ## Set Storage and Dedup
 
-![Set Storage and Dedup](../../../assets/data-structures-python-101/09/09-01-set-storage-and-dedup.en.png)
+![Set Storage and Dedup](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set-storage-and-dedup.en.png)
 
 *How a set stores only unique keys in a hash table, making deduplication and set algebra consequences of the same storage model*
 

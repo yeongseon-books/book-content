@@ -36,7 +36,7 @@ Here we turn local embeddings into a reusable workflow: initialize once, encode 
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
-![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 
 *Single query embedding call flow*
 <!-- ebook-only:start -->
@@ -76,7 +76,7 @@ pip install langchain-huggingface sentence-transformers numpy
 
 ## First embedding
 
-![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.en.png)
+![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.en.png)
 
 *Single query embedding call flow*
 Initialize the model and encode a single sentence.
@@ -119,7 +119,7 @@ print(f"first 5 values: {vector[:5]}")
 
 ## Batch embedding
 
-![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
+![Single call and batch call contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-02-batch-embedding.en.png)
 
 *Single call and batch call contrast*
 For multiple documents, a single `embed_documents()` call outperforms a loop of `embed_query()` calls. The model processes inputs in batches internally, and the overhead of repeated setup adds up fast.
@@ -167,7 +167,7 @@ The gap between batch and loop grows with document count. For large corpora, alw
 
 ## Saving and reloading vectors
 
-![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
+![Vector and document save flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
 
 *Vector and document save flow*
 Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.
@@ -250,7 +250,7 @@ Post 4 uses exactly this pattern to build a working FAISS search system.
 
 ## Practical speed tips
 
-![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
+![Model reuse and batch size path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
 
 *Model reuse and batch size path*
 CPU encoding is slow at scale. Several adjustments help.
@@ -285,7 +285,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ## Comparing wrapper and raw API
 
-![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
+![Wrapper and raw API comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
 
 *Wrapper and raw API comparison structure*
 `HuggingFaceEmbeddings` wraps `SentenceTransformer`. Their outputs are numerically identical.

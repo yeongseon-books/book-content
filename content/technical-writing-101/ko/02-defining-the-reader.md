@@ -51,7 +51,7 @@ last_reviewed: '2026-05-15'
 
 > 멘탈 모델: 선명한 독자 한 명을 먼저 세우면, 글의 지식 수준과 목표와 범위가 그 독자 주변으로 자동 정렬됩니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

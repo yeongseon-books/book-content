@@ -60,7 +60,7 @@ mypy checks:
   x: int = greet("Alice")  # Error: str assigned to int
 ```
 
-![멘탈 모델](../../../assets/python-package-101/08/08-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.ko.png)
 *타입 힌트가 정적 검사와 패키지 소비자 경험으로 이어지는 흐름*
 
 ## 핵심 개념

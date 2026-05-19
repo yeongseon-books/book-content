@@ -56,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 > 계산은 입력을 규칙에 따라 변환하는 과정입니다. 튜링 기계는 이 과정의 가장 기본적인 모델이며, 프로그래밍 언어는 이를 인간이 읽을 수 있게 표현합니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)
 *계산 이론이 기계어와 고급 언어를 거쳐 프로그래밍 패러다임으로 이어지는 흐름*
 
 ## 핵심 용어

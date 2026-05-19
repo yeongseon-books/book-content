@@ -44,7 +44,7 @@ HTML과 CSS는 프론트엔드에서 가장 오래 살아남는 기술입니다.
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/02/02-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-diagram.ko.png)
 
 *시맨틱 구조에서 레이아웃과 접근성까지 이어지는 HTML·CSS 학습 순서*
 

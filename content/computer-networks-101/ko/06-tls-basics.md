@@ -42,7 +42,7 @@ TLS를 머릿속에 그리지 못하면 인증서 만료 사고가 생겼을 때
 
 ## 핵심 그림
 
-![TLS 핸드셰이크와 세션 키 생성](../../../assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
+![TLS 핸드셰이크와 세션 키 생성](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
 *TLS는 인증서로 신원을 확인하고, 그 결과로 만든 대칭 세션 키로 이후 데이터를 빠르게 보호합니다.*
 
 비대칭 합의로 대칭 세션 키를 만들고, 그 뒤부터는 그 키로 빠르게 데이터를 암호화합니다.

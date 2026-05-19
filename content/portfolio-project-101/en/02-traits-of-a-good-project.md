@@ -49,7 +49,7 @@ A portfolio is not product marketing. It is evidence of engineering judgment. Th
 
 A strong project usually connects five traits in one chain: focus, problem clarity, measurable results, maintainability, and reproducibility.
 
-![How focus, clarity, results, maintainability, and reproducibility connect](../../../assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
+![How focus, clarity, results, maintainability, and reproducibility connect](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
 
 *How focus, clarity, results, maintainability, and reproducibility connect*
 

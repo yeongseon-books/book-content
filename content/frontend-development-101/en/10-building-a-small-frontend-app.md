@@ -41,7 +41,7 @@ Knowledge becomes *yours* only when it is *bound into a project*. The nine posts
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
 
 *The end-to-end picture that ties pages, components, APIs, styles, build, and deployment into one app*
 

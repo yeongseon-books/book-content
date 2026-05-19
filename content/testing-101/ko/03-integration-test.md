@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/03/03-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 이 그림에서 중요한 지점은 테스트 대상이 함수 하나가 아니라 흐름이라는 점입니다. 라우트, 서비스, 저장소, 데이터베이스가 함께 맞물릴 때 어떤 응답이 나오는지 봅니다. 그래서 통합 테스트는 로직 검증과 계약 검증을 동시에 수행합니다.

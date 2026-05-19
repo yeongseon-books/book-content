@@ -34,7 +34,7 @@ This is the fifth post in the LangChain 101 series. It covers `stream()`, `astre
 
 > Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.
 
-![Questions this post answers](../../../assets/langchain-101/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 ## Minimal runnable example
@@ -58,7 +58,7 @@ for chunk in chain.stream({"topic": "astream"}):
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)
 
 *The flow at a glance*
 When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.
@@ -77,7 +77,7 @@ Topics:
 
 ## Basic streaming
 
-![Direct model and chain streaming comparison](../../../assets/langchain-101/05/05-01-basic-streaming.en.png)
+![Direct model and chain streaming comparison](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-01-basic-streaming.en.png)
 
 *Direct model and chain streaming comparison*
 `stream()` returns a generator. Iterate over it with a `for` loop.
@@ -118,7 +118,7 @@ print()
 
 ## Collecting streamed output
 
-![Reassembling chunks into final text](../../../assets/langchain-101/05/05-02-collecting-streamed-output.en.png)
+![Reassembling chunks into final text](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-collecting-streamed-output.en.png)
 
 *Reassembling chunks into final text*
 When you need the full text after streaming, accumulate chunks in a list.
@@ -190,7 +190,7 @@ print(f"\n\ntotal characters: {len(full_text)}")
 
 ## astream() — async streaming
 
-![Async for streaming execution path](../../../assets/langchain-101/05/05-03-astream-async-streaming.en.png)
+![Async for streaming execution path](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-03-astream-async-streaming.en.png)
 
 *Async for streaming execution path*
 In async frameworks like FastAPI, use `astream()` with `async for`.
@@ -281,7 +281,7 @@ curl "http://localhost:8000/stream?question=What+is+RAG"
 
 ## astream_events() for fine-grained control
 
-![Selecting specific chain events](../../../assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.en.png)
+![Selecting specific chain events](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-04-astream-events-for-fine-grained-control.en.png)
 
 *Selecting specific chain events*
 `astream_events()` exposes individual events from each component in the chain.

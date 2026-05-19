@@ -48,7 +48,7 @@ That local information becomes operational in optimization. A derivative gives t
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
 *Calculus turns tiny local change into practical direction: first a derivative, then a gradient, then a repeated optimization procedure.*
 
 ## Key Terms

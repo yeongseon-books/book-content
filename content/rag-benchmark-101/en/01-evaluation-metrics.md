@@ -33,7 +33,7 @@ This is the first post in the RAG Evaluation and Benchmarking 101 series.
 - Understand why retrieval quality must be measured independently before adding LLM evaluation on top.
 - Run a one-file Python example that calculates the metrics end-to-end.
 
-![Questions this post answers](../../../assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -86,7 +86,7 @@ Q2 has **low precision but perfect recall** — there is only one relevant doc, 
 Q3 has **perfect precision but low recall** — three of five relevant docs found.
 Looking at one without the other leads you to the wrong conclusion.
 
-![Top-k overlap and metric calculation flow](../../../assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
+![Top-k overlap and metric calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
 
 *Top-k overlap and metric calculation flow*
 
@@ -242,7 +242,7 @@ With that row-level report, you can immediately tell whether the next hypothesis
 
 That table turns scores into an operating workflow. The benchmark is not just there to grade the system. It should shorten the path to the next experiment.
 
-![Precision@k versus Recall@k decision axes](../../../assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png)
+![Precision@k versus Recall@k decision axes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png)
 
 *Precision@k versus Recall@k decision axes*
 
@@ -254,7 +254,7 @@ That table turns scores into an operating workflow. The benchmark is not just th
 - **Using a different k from production** — if RAG passes 5 chunks but you measure k=10, scores are inflated.
 - **Defining the gold set too narrowly** — labeling "only this exact doc is relevant" punishes the retriever for finding semantically equivalent ones.
 
-![Rank position changes the MRR signal](../../../assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.en.png)
+![Rank position changes the MRR signal](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-04-rank-position-changes-the-mrr-signal.en.png)
 
 *Rank position changes the MRR signal*
 
@@ -285,7 +285,7 @@ Also persist the report as JSON, not just a Markdown table or console output. Hu
 2. Two retrievers A and B share the same average Recall@5 but differ in average MRR. Which one is better for production UX, and why?
 3. RAG passes exactly 3 chunks to the LLM. Which two metrics matter most? Why?
 
-![Per-query and average report reading flow](../../../assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.en.png)
+![Per-query and average report reading flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-05-per-query-and-average-report-reading-flo.en.png)
 
 *Per-query and average report reading flow*
 

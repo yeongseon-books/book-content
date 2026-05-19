@@ -47,7 +47,7 @@ Most bugs appear when data changes in unexpected places. A single direction make
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
 *A one-way data pipeline makes each transformation step visible from input to output*
 
 Each step is small and just hands off to the next.

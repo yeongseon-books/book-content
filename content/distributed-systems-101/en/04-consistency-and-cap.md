@@ -45,7 +45,7 @@ A one-line difference like "this DB is strongly consistent" or "eventual" reshap
 
 ## Concept at a Glance
 
-![Consistency spectrum from linearizable to eventual](../../../assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
+![Consistency spectrum from linearizable to eventual](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
 
 *Consistency spectrum from linearizable to eventual*
 

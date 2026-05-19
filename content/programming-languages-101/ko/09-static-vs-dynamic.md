@@ -44,7 +44,7 @@ title: 정적 언어와 동적 언어
 
 ## 핵심 개념 한눈에 보기
 
-![같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교](../../../assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
+![같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
 
 *같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교*
 

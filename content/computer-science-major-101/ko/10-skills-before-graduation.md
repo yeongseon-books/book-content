@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![졸업 전 역량 지도](../../../assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
+![졸업 전 역량 지도](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
 
 *기초, 시스템, 데이터, 협업, 문서화가 졸업 역량으로 이어지는 구조*
 

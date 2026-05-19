@@ -36,7 +36,7 @@ This is the first post in the LLM API Production 101 series. Here we focus on bu
 
 The main idea is simple: **structured output in production is a contract design problem, not a prompt trick**.
 
-![Structured output: JSON mode and response schemas](../../../assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
+![Structured output: JSON mode and response schemas](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
 
 *Structured output: JSON mode and response schemas*
 ---
@@ -66,7 +66,7 @@ All examples in this post assume `llama-3.1-8b-instant` and the official `groq` 
 
 ## Why plain-text parsing does not age well
 
-![Failure path of plain-text parsing](../../../assets/llm-api-production-101/01/01-01-why-plain-text-parsing-does-not-age-well.en.png)
+![Failure path of plain-text parsing](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-why-plain-text-parsing-does-not-age-well.en.png)
 
 *Failure path of plain-text parsing*
 An early implementation often looks like this: ask the model to classify a support ticket, get a small text answer back, and split the string.
@@ -90,7 +90,7 @@ Imagine a ticket classifier. `category` should come from a finite set. `priority
 
 ## What JSON mode guarantees and what it does not
 
-![Responsibility split between JSON mode and validation](../../../assets/llm-api-production-101/01/01-02-what-json-mode-guarantees-and-what-it-do.en.png)
+![Responsibility split between JSON mode and validation](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-02-what-json-mode-guarantees-and-what-it-do.en.png)
 
 *Responsibility split between JSON mode and validation*
 Groq's `response_format={"type": "json_object"}` pushes the model toward returning a JSON object instead of free-form prose. That is useful because it creates a minimum syntactic contract. Your response is much more likely to be machine-readable without string surgery.
@@ -117,7 +117,7 @@ If the first step is missing, parsing becomes unreliable. If the second step is 
 
 ## Sending a JSON-mode request with the Groq SDK
 
-![JSON mode request and parse flow](../../../assets/llm-api-production-101/01/01-03-sending-a-json-mode-request-with-the-gro.en.png)
+![JSON mode request and parse flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-03-sending-a-json-mode-request-with-the-gro.en.png)
 
 *JSON mode request and parse flow*
 The example below extracts `category`, `priority`, and `summary` from a customer support message.
@@ -182,7 +182,7 @@ Third, `json.loads()` only answers one question: is this string parseable JSON? 
 
 ## Locking the response with Pydantic
 
-![Relationship between model output and schema checks](../../../assets/llm-api-production-101/01/01-04-locking-the-response-with-pydantic.en.png)
+![Relationship between model output and schema checks](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-04-locking-the-response-with-pydantic.en.png)
 
 *Relationship between model output and schema checks*
 This is where structured output becomes operationally useful. The code below parses the model output and validates it against a typed schema.
@@ -263,7 +263,7 @@ There is also a downstream benefit. Once validation succeeds, the rest of your c
 
 ## Thinking in failure layers
 
-![Failure layers in structured output handling](../../../assets/llm-api-production-101/01/01-05-thinking-in-failure-layers.en.png)
+![Failure layers in structured output handling](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-05-thinking-in-failure-layers.en.png)
 
 *Failure layers in structured output handling*
 Structured output failures are easier to operate if you separate them into layers.

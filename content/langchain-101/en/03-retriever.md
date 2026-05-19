@@ -34,7 +34,7 @@ This is the third post in the LangChain 101 series. It covers Retrievers, Vector
 
 > A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
 
-![Questions this post answers](../../../assets/langchain-101/03/03-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 ## Minimal runnable example
@@ -62,7 +62,7 @@ print(retriever.invoke("What does a Retriever do?")[0].page_content)
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
 
 *The flow at a glance*
 A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: `get_relevant_documents(query)`. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.
@@ -81,7 +81,7 @@ Topics:
 
 ## Creating a FAISS VectorStore
 
-![Documents turning into a vector index](../../../assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
+![Documents turning into a vector index](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png)
 
 *Documents turning into a vector index*
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.
@@ -129,7 +129,7 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ## Creating a Retriever
 
-![Similarity mmr threshold search paths](../../../assets/langchain-101/03/03-02-creating-a-retriever.en.png)
+![Similarity mmr threshold search paths](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-creating-a-retriever.en.png)
 
 *Similarity mmr threshold search paths*
 `as_retriever()` wraps the VectorStore in the Retriever interface.
@@ -166,7 +166,7 @@ retriever_mmr = vectorstore.as_retriever(
 
 ## Connecting a Retriever to a chain
 
-![Retrieved documents becoming prompt context](../../../assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
+![Retrieved documents becoming prompt context](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-03-connecting-a-retriever-to-a-chain.en.png)
 
 *Retrieved documents becoming prompt context*
 The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.
@@ -269,7 +269,7 @@ The key is the chain input dict:
 
 ## Saving and reloading a VectorStore
 
-![Saving and reloading index lifecycle](../../../assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
+![Saving and reloading index lifecycle](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png)
 
 *Saving and reloading index lifecycle*
 ```python

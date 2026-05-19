@@ -62,7 +62,7 @@ seo_description: 조합론으로 경우의 수를 세고 복잡도와 확률의 
 
 ## 한 장으로 보는 경우의 수 구조
 
-![한 장으로 보는 경우의 수 구조](../../../assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 경우의 수 구조](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)
 *조합론은 공식을 외우는 과목이 아니라 구조를 먼저 읽고 그 구조에 맞는 셈을 고르는 훈련입니다.*
 
 ---

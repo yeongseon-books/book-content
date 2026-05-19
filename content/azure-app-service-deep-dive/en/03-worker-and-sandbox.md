@@ -65,7 +65,7 @@ All of those symptoms start here.
 
 ## The two worker models that matter
 
-![Windows and Linux worker execution boundaries](../../../assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
+![Windows and Linux worker execution boundaries](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
 
 *Windows and Linux worker execution boundaries*
 “Worker” is one platform term.
@@ -95,7 +95,7 @@ The public sandbox material is especially explicit about two constraints.
   which means most User32/GDI32 calls,
   are heavily restricted
 
-![w3wp.exe inside the App Service sandbox](../../../assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
+![w3wp.exe inside the App Service sandbox](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-02-windows-w3wp-exe-under-the-app-service-s.en.png)
 
 *w3wp.exe inside the App Service sandbox*
 That single diagram explains the starting point for “why does this PDF or imaging library fail only on Windows App Service?”
@@ -144,7 +144,7 @@ the operational boundary to care about is this one:
 - readiness affects when traffic starts
 - persistent storage depends on `/home` mount behavior
 
-![Linux app running inside one container](../../../assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
+![Linux app running inside one container](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-linux-the-container-is-the-execution-bou.en.png)
 
 *Linux app running inside one container*
 On Linux,
@@ -167,10 +167,10 @@ one setting changes the meaning of `/home` dramatically.
 
 That gives you two very different operational pictures.
 
-![Shared home mount versus local container layer](../../../assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
+![Shared home mount versus local container layer](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-02-when-websites-enable-app-service-storage.en.png)
 
 *Shared home mount versus local container layer*
-![Shared home mount versus local container layer](../../../assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
+![Shared home mount versus local container layer](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-05-when-websites-enable-app-service-storage-2.en.png)
 
 *Shared home mount versus local container layer*
 If you miss this distinction,
@@ -215,7 +215,7 @@ the sandbox is also a quality-of-service mechanism.
 Multiple customer apps share worker infrastructure.
 The platform needs limits so that one app cannot consume or expose shared components in ways that harm others.
 
-![Sandbox limits protecting isolation and fair sharing](../../../assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
+![Sandbox limits protecting isolation and fair sharing](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-06-the-sandbox-is-a-security-feature-and-a.en.png)
 
 *Sandbox limits protecting isolation and fair sharing*
 That makes the restrictions easier to reason about.

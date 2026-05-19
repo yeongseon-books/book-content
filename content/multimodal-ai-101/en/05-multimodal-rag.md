@@ -152,7 +152,7 @@ class HybridIndex:
 
 Pick `alpha` dynamically by query intent: 0.7 for visual queries, 0.2 for fact/numeric queries.
 
-![Strategy 3: hybrid (both image and text vectors)](../../../assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
+![Strategy 3: hybrid (both image and text vectors)](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
 *The production win in multimodal RAG usually comes from separating evidence by modality first, then fusing scores and prompt context deliberately rather than treating every artifact as one giant index.*
 
 ## Generation: feeding retrieval into a VLM

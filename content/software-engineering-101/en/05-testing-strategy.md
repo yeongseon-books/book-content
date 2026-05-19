@@ -45,7 +45,7 @@ Tests determine the cost of change. Good tests let you refactor without fear; ba
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
 *The test pyramid as a balance between speed, cost, and confidence*
 
 The pyramid balances cost against speed.

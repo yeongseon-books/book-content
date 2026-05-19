@@ -48,7 +48,7 @@ That distinction matters far beyond textbook exercises. Type systems encode logi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
 *Logic organizes the claim, and proof chooses the route from assumption to conclusion: direct reasoning, contradiction, or induction.*
 
 ## Key Terms

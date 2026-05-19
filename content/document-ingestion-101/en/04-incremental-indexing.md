@@ -35,7 +35,7 @@ This is the fourth post in the Document Ingestion 101 series. Here, we use file 
 
 Example code: `en/04-incremental-indexing/main.py`
 
-![Questions this post answers](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
@@ -44,14 +44,14 @@ This example uses only file hashes and a JSON state file to classify `added`, `u
 
 ## Incremental scan and change detection
 
-![Incremental scan and change detection flow](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
 
 *Incremental scan and change detection flow*
 The first win in incremental indexing is narrowing the work set before any expensive downstream processing starts.
 
 ## State store and hash comparison
 
-![State store and hash comparison flow](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
+![State store and hash comparison flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
 
 *State store and hash comparison flow*
 A content hash next to timestamps makes the change detector much more trustworthy than mtime alone.
@@ -164,7 +164,7 @@ python main.py
 
 ### Added updated and deleted paths
 
-![Added updated and deleted decision flow](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
+![Added updated and deleted decision flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
 
 *Added updated and deleted decision flow*
 Once deletion is modeled as its own path, index cleanup becomes an extension of the same state machine.
@@ -177,7 +177,7 @@ Once deletion is modeled as its own path, index cleanup becomes an extension of 
 
 ### Index version and run history flow
 
-![Index version and run history flow](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
+![Index version and run history flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
 
 *Index version and run history flow*
 Past a certain scale, knowing which run produced which index version becomes as important as change detection itself.

@@ -59,7 +59,7 @@ More instances
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
 
-![Scaling up versus adding instances](../../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
+![Scaling up versus adding instances](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
 
 *Scaling up versus adding instances*
 
@@ -120,7 +120,7 @@ az appservice plan show \
 - Need multiple instances for **high availability**
 - App is designed to be **stateless**
 
-![Scaling choices by bottleneck type](../../../assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
+![Scaling choices by bottleneck type](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
 
 *Scaling choices by bottleneck type*
 
@@ -176,7 +176,7 @@ az appservice plan update \
 
 **Automatically** increase or decrease instances based on traffic.
 
-![Autoscale loop from metrics to actions](../../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
+![Autoscale loop from metrics to actions](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
 
 *Autoscale loop from metrics to actions*
 
@@ -293,7 +293,7 @@ az monitor autoscale rule create \
 
 When instances increase, **load on external dependencies also increases**.
 
-![Instance growth cascading into dependency load](../../../assets/azure-app-service-101/07/03-dependency-cascade.en.png)
+![Instance growth cascading into dependency load](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/07/03-dependency-cascade.en.png)
 
 *Instance growth cascading into dependency load*
 

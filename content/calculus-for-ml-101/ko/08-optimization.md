@@ -60,7 +60,7 @@ last_reviewed: '2026-05-12'
 
 최적화 흐름은 다음과 같습니다.
 
-![핵심 개념](../../../assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
 
 *최적화 흐름: gradient 신호에 momentum, 적응형 스케일, schedule이 더해집니다.*
 ### momentum은 방향의 일관성을 키웁니다

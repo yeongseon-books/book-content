@@ -47,7 +47,7 @@ URL 단축기는 예제가 작으면서도 설계 요소가 고르게 들어 있
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
 *URL 단축기 예제에서 표현 계층과 유스케이스, 도메인, 포트, 어댑터가 협력하는 전체 구조*
 
 도메인은 가운데 있고, 포트가 필요한 모양을 정의하며, 어댑터가 그 바깥 구현을 맡습니다. 표현 계층은 이 흐름을 호출만 합니다.

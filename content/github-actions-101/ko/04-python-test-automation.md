@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 테스트 흐름
 
-![PR이 열리면 Python 환경 준비, 의존성 설치, pytest, coverage 순서로 이어지는 테스트 흐름](../../../assets/github-actions-101/04/04-01-diagram.ko.png)
+![PR이 열리면 Python 환경 준비, 의존성 설치, pytest, coverage 순서로 이어지는 테스트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-diagram.ko.png)
 
 *PR이 열리면 Python 환경 준비, 의존성 설치, pytest, coverage 순서로 이어지는 테스트 흐름*
 

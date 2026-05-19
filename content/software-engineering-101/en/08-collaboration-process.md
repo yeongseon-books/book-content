@@ -45,7 +45,7 @@ Code can be written alone, but products are not. Without a process, technical de
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)
 *The collaboration flow from RFC draft to async discussion and decision log*
 
 Async-first; sync only at the moment of decision.

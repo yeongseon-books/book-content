@@ -60,7 +60,7 @@ outer_func(x)
 
 ## 클로저와 `partial` 선택 흐름
 
-![클로저와 partial 선택 흐름](../../../assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
+![클로저와 partial 선택 흐름](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
 
 *클로저는 상태를 기억할 때, `partial`은 인자만 고정하면 될 때 더 잘 맞습니다.*
 

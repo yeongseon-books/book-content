@@ -44,7 +44,7 @@ The core idea in this chapter is simple. A DataFrame is a collection of Series t
 
 ## Concept at a Glance
 
-![A DataFrame built from multiple Series sharing one index](../../../assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
+![A DataFrame built from multiple Series sharing one index](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
 *A DataFrame built from multiple Series sharing one index*
 
 ## Key Terms

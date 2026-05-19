@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![자료구조와 알고리즘 연결 구조](../../../assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.ko.png)
+![자료구조와 알고리즘 연결 구조](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.ko.png)
 
 *자료구조 선택과 알고리즘 판단이 문제 해결로 이어지는 흐름*
 

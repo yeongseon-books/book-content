@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![예측 확률 구간과 실제 빈도를 비교하는 보정 흐름](../../../assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
+![예측 확률 구간과 실제 빈도를 비교하는 보정 흐름](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
 
 *예측 확률 구간과 실제 빈도를 비교하는 보정 흐름*
 예측 확률 구간별 평균과 실제 양성 빈도를 나란히 놓고 비교해야 합니다. 두 값이 대각선 위에 가깝게 맞아야 확률이 정직하다고 말할 수 있습니다.

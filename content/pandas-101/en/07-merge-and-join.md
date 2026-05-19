@@ -44,7 +44,7 @@ Real data is *spread across many tables*. *Joining ability* equals *analysis abi
 
 ## Concept at a Glance
 
-![A safe join flow that checks key assumptions and row counts](../../../assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
+![A safe join flow that checks key assumptions and row counts](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
 *A safe join flow that checks key assumptions and row counts*
 
 ## Key Terms

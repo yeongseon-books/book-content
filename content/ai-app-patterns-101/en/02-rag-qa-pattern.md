@@ -33,7 +33,7 @@ This is post 2 in the AI App Patterns 101 series. Here we build the smallest use
 
 > RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
 
-![Questions this post answers](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 > AI App Patterns 101 (2/6)
@@ -58,7 +58,7 @@ Topics:
 
 ### Offline indexing pipeline
 
-![Offline indexing pipeline](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
+![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
 
 *Offline indexing pipeline*
 **Indexing** (offline): split documents into chunks, embed them, store in a vector index.
@@ -76,7 +76,7 @@ retrieval: query → embedding → FAISS search → prompt injection → LLM →
 
 ### Online question answering flow
 
-![Online question answering flow](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
+![Online question answering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
 
 *Online question answering flow*
 ```python
@@ -182,7 +182,7 @@ The point of this example is not just that the chain works when the answer exist
 
 ### Retrieval inspection with scores and chunk metadata
 
-![Online question answering flow](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
+![Online question answering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
 
 *Online question answering flow*
 Before tuning the prompt, inspect what the retriever is actually returning. If the wrong chunk ranks first, generation quality is already capped.
@@ -242,7 +242,7 @@ If the best match is wrong, do not start with prompt rewrites. Check chunk bound
 
 ### Answer and source return structure
 
-![Answer and source return structure](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.en.png)
+![Answer and source return structure](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.en.png)
 
 *Answer and source return structure*
 Showing which document supported the answer improves user trust.
@@ -316,7 +316,7 @@ print(f"sources: {result['sources']}")
 
 ### Fallback branch driven by minimum relevance
 
-![Fallback branch for missing evidence](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
+![Fallback branch for missing evidence](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
 
 *Fallback branch for missing evidence*
 The prompt alone is not enough. In production, add an application-side guard that checks whether retrieval produced evidence strong enough to justify generation.
@@ -374,12 +374,12 @@ This is the point where many RAG systems become safer. You stop asking the model
 
 ### Defense layers against retrieval misses
 
-![Defense layers against retrieval misses](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.en.png)
+![Defense layers against retrieval misses](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.en.png)
 
 *Defense layers against retrieval misses*
 ### Fallback branch for missing evidence
 
-![Fallback branch for missing evidence](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
+![Fallback branch for missing evidence](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
 
 *Fallback branch for missing evidence*
 **The relevant chunk was not retrieved.** If the query does not match any stored chunk, the LLM falls back on its internal knowledge and may hallucinate. The prompt instruction "say you don't know if it's not in the documents" is the first line of defense.

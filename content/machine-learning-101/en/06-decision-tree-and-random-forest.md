@@ -42,7 +42,7 @@ Random forests and gradient-boosted trees still dominate tabular data. They belo
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
 
 *A single deep tree can overfit quickly, while a random forest reduces that variance by averaging many differently sampled trees.*
 

@@ -46,7 +46,7 @@ Half of the OWASP Top 10 comes from *trusting input*. SQL injection, XSS, path t
 
 ## Concept at a Glance
 
-![Input validation split across edge checks, schema validation, and business rules](../../../assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
+![Input validation split across edge checks, schema validation, and business rules](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
 
 *Input validation split across edge checks, schema validation, and business rules*
 ## Key Terms

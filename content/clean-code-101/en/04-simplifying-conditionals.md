@@ -49,7 +49,7 @@ Nested conditionals are the most common source of complexity. Reducing depth by 
 
 ## Concept at a Glance
 
-![Simplifying Conditionals](../../../assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
+![Simplifying Conditionals](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
 
 *Conditional-simplification flow: guard clauses, polymorphism, and tables reduce branch depth and expose the main path.*
 

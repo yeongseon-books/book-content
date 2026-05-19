@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![호스트 커널을 공유하는 컨테이너 실행 구조](../../../assets/containers-101/01/01-01-concept-at-a-glance.ko.png)
+![호스트 커널을 공유하는 컨테이너 실행 구조](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.ko.png)
 
 *호스트 커널을 공유하는 컨테이너 실행 구조*
 호스트 운영 체제의 커널 하나 위에 여러 컨테이너가 올라가고, 각 컨테이너 안에서는 애플리케이션 프로세스가 격리된 것처럼 보입니다. 핵심은 “프로세스 격리”이지 “운영 체제 복제”가 아니라는 점입니다.

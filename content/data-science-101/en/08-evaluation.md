@@ -53,7 +53,7 @@ If the metric *misaligns with the problem*, the model learns the *wrong directio
 
 ## Concept at a Glance
 
-![The main evaluation branches for classification metrics and regression metrics](../../../assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
+![The main evaluation branches for classification metrics and regression metrics](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
 
 *The main evaluation branches for classification metrics and regression metrics*
 ## Key Terms

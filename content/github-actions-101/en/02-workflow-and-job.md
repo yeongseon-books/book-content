@@ -44,7 +44,7 @@ A fully *serial* CI is slow; a fully *parallel* one *breaks ordering*. Drawing t
 
 ## Concept at a Glance
 
-![A job graph where lint and test run in parallel before build and deploy](../../../assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
+![A job graph where lint and test run in parallel before build and deploy](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
 
 *A job graph where lint and test run in parallel before build and deploy*
 

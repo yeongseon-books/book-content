@@ -93,7 +93,7 @@ az functionapp config appsettings set \
 
 실시간 상황에서는 **Application Insights → Live Metrics**가 가장 빠른 출발점입니다. 요청량, 실패율, 응답 시간 변화, 현재 활성 인스턴스 수 같은 신호를 거의 실시간으로 확인할 수 있기 때문입니다.
 
-![장애 초기에 보는 Live Metrics 신호](../../../assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
+![장애 초기에 보는 Live Metrics 신호](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
 
 *장애 초기에 보는 Live Metrics 신호*
 
@@ -223,7 +223,7 @@ az monitor app-insights events show \
 
 장애 초반 5분은 대체로 같은 질문을 반복합니다.
 
-![장애 초반 점검 순서와 판단 흐름](../../../assets/azure-functions-101/07/07-02-a-useful-3am-incident-order-of-operation.ko.png)
+![장애 초반 점검 순서와 판단 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-02-a-useful-3am-incident-order-of-operation.ko.png)
 
 *장애 초반 점검 순서와 판단 흐름*
 

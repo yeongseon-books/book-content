@@ -52,7 +52,7 @@ last_reviewed: '2026-05-15'
 
 ## 개념 한눈에 보기
 
-![BI 의사결정 흐름](../../../assets/data-warehouse-101/07/07-01-concept-at-a-glance.ko.png)
+![BI 의사결정 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.ko.png)
 
 *Warehouse의 숫자가 시맨틱 레이어와 BI 도구를 거쳐 실제 의사결정 화면으로 소비되는 흐름*
 

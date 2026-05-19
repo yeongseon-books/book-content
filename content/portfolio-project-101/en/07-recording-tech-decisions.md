@@ -47,7 +47,7 @@ Decision records help because they make constraint-aware thinking visible. They 
 
 A useful decision record usually flows from context to options, then to the decision, the consequence, and the likely next step.
 
-![The ADR flow from context and options to consequence and next step](../../../assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
+![The ADR flow from context and options to consequence and next step](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
 
 *The ADR flow from context and options to consequence and next step*
 

@@ -75,7 +75,7 @@ That table matters because it answers the questions people actually ask while op
 
 In practice, I see two kinds of teams. One group compares only the final output string. The other inspects state fields and transition order together. The first group debugs symptoms. The second group debugs causes. LangGraph is valuable because it nudges you toward the second habit.
 
-![Questions this post answers](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -85,7 +85,7 @@ In practice, I see two kinds of teams. One group compares only the final output 
 
 Start with the smallest graph that still shows the core idea. A user request comes in, one node chooses a topic, another builds an outline, and a final node assembles the answer text. The example is deliberately plain, but it already contains the parts that matter later.
 
-![Basic graph flow from START to END](../../../assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
+![Basic graph flow from START to END](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
 
 *Basic graph flow from START to END*
 
@@ -230,7 +230,7 @@ This is the operational habit I want readers to leave with: inspect the state co
 
 Do not try to absorb the entire file at once. On a first pass, there are three things worth locking in.
 
-![Request to state field mapping](../../../assets/langgraph-101/01/01-02-what-to-notice-in-this-code.en.png)
+![Request to state field mapping](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-02-what-to-notice-in-this-code.en.png)
 
 *Request to state field mapping*
 
@@ -250,7 +250,7 @@ The third point is the edge structure. In ordinary chain code, execution order o
 
 The first mistakes people make here are rarely syntax mistakes. They are mental-model mistakes. Three confusions come up over and over.
 
-![Execution flow from definition to invoke](../../../assets/langgraph-101/01/01-03-where-engineers-get-confused.en.png)
+![Execution flow from definition to invoke](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-03-where-engineers-get-confused.en.png)
 
 *Execution flow from definition to invoke*
 

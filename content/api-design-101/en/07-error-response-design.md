@@ -45,7 +45,7 @@ There is one success path and *hundreds of error paths*. If the shape is inconsi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
 *Input errors, authorization failures, and internal faults all branch into the same envelope shape with different status and detail fields.*
 
 That stable shape lets clients keep one parser and branch cleanly on `status`, `code`, and `errors[]` instead of reverse-engineering a different payload for each endpoint.

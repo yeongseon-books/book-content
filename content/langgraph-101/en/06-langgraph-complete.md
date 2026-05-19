@@ -56,7 +56,7 @@ If you keep those questions visible, the combined graph becomes easier to unders
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
 
-![Questions this post answers](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -66,7 +66,7 @@ Start with the smallest graph that still feels like a real agent skeleton. This 
 
 If you read the code with one goal in mind, make it this: notice how the graph does not treat all requests the same. That is where completeness starts to become operational rather than decorative.
 
-![Combined graph with supervisor and tool loop](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
+![Combined graph with supervisor and tool loop](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
 
 *Combined graph with supervisor and tool loop*
 
@@ -248,7 +248,7 @@ That separation is what makes the example feel more mature than a basic demo. Th
 
 Do not give every line equal weight. Three design decisions matter more than the rest.
 
-![Checkpoint and route state structure](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.en.png)
+![Checkpoint and route state structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-02-what-to-notice-in-this-code.en.png)
 
 *Checkpoint and route state structure*
 
@@ -266,7 +266,7 @@ The third point is persistence. Checkpointing is not just a convenience feature.
 
 The first confusion is calling any graph with memory and tools “production-like.” I understand the temptation. The example already feels richer than a single-node demo. But completeness is not the same as readiness. If routing rules are brittle, if tool selection is too naive, or if state observability is weak, the graph may still fail in exactly the places a real workload will expose first.
 
-![Validation path with human review interrupt](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.en.png)
+![Validation path with human review interrupt](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-03-where-engineers-get-confused.en.png)
 
 *Validation path with human review interrupt*
 
@@ -304,7 +304,7 @@ That is also the right way to close the series. LangGraph never needed to be mys
 
 If you carry one idea forward, make it this: the best LangGraph systems are readable as graphs before they are impressive as demos. That is what makes them easier to extend, safer to review, and far more likely to survive contact with real users.
 
-![Production agent flow across turns](../../../assets/langgraph-101/06/06-04-summary.en.png)
+![Production agent flow across turns](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-04-summary.en.png)
 
 *Production agent flow across turns*
 

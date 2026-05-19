@@ -44,7 +44,7 @@ Writing tends to *outlive* the *code* it describes.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

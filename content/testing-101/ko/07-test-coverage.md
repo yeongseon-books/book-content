@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/07/07-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 프로덕션 코드를 실행하면 커버리지 도구가 어떤 줄과 분기가 실행됐는지 기록합니다. 보고서를 읽고 비어 있는 지점을 확인한 뒤, 필요한 테스트를 보강하는 흐름입니다. 그래서 커버리지는 테스트 작성의 출발점이 아니라 점검 단계에 가깝습니다.

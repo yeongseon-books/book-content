@@ -47,7 +47,7 @@ A deployment setup also reveals operational judgment. Even a small project looks
 
 You do not need a complicated model: code is pushed, built, deployed, checked, and then made available through a public URL.
 
-![The path from git push to a public URL that others can verify](../../../assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
+![The path from git push to a public URL that others can verify](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
 
 *The path from git push to a public URL that others can verify*
 

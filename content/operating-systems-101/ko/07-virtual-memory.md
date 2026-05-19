@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 가상 주소가 실제 RAM으로 가는 길
 
-![가상 주소가 실제 RAM으로 가는 길](../../../assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
+![가상 주소가 실제 RAM으로 가는 길](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
 *가상 메모리의 비용은 주소 변환이 캐시에 있느냐, page fault로 내려가느냐에서 갈립니다.*
 
 ```text

@@ -44,7 +44,7 @@ My goal here is to organize selection tools as a small decision framework: label
 
 ## Concept at a Glance
 
-![Choosing between labels, positions, boolean masks, and query syntax](../../../assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
+![Choosing between labels, positions, boolean masks, and query syntax](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
 *Choosing between labels, positions, boolean masks, and query syntax*
 
 ## Key Terms

@@ -45,7 +45,7 @@ A consensus algorithm sits at the heart of etcd, ZooKeeper, Consul, and Cockroac
 
 ## Concept at a Glance
 
-![Leader-centered log replication in Raft](../../../assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
+![Leader-centered log replication in Raft](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
 
 *Leader-centered log replication in Raft*
 

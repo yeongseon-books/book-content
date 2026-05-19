@@ -45,7 +45,7 @@ Replication is the lowest layer in any distributed data system. The choices here
 
 ## Concept at a Glance
 
-![Comparison of common replication topologies](../../../assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
+![Comparison of common replication topologies](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
 
 *Comparison of common replication topologies*
 

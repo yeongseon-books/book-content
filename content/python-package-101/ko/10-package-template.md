@@ -67,7 +67,7 @@ cookiecutter/copier + template
     ...
 ```
 
-![멘탈 모델](../../../assets/python-package-101/10/10-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.ko.png)
 *템플릿 입력값이 표준 프로젝트 골격과 검증 체계로 확장되는 흐름*
 
 ## 핵심 개념

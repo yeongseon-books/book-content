@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![builder 단계와 runtime 단계를 분리해 가벼운 최종 이미지를 만드는 멀티스테이지 흐름](../../../assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
+![builder 단계와 runtime 단계를 분리해 가벼운 최종 이미지를 만드는 멀티스테이지 흐름](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
 
 *빌드 도구는 builder 단계에 남기고 runtime 단계에는 실행에 필요한 산출물만 남기는 멀티스테이지 전략*
 

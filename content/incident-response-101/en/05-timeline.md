@@ -48,7 +48,7 @@ A clear timeline protects the team from that distortion. It creates a fact base 
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.

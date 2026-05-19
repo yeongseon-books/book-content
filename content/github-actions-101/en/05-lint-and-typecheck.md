@@ -44,7 +44,7 @@ This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff,
 
 ## Concept at a Glance
 
-![Code changes passing through Ruff and Mypy before they reach the CI quality gate](../../../assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
+![Code changes passing through Ruff and Mypy before they reach the CI quality gate](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
 
 *Code changes passing through Ruff and Mypy before they reach the CI quality gate*
 

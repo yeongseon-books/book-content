@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![토큰화부터 실행까지 이어지는 구문과 의미의 처리 흐름](../../../assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png)
+![토큰화부터 실행까지 이어지는 구문과 의미의 처리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png)
 
 *토큰화부터 실행까지 이어지는 구문과 의미의 처리 흐름*
 

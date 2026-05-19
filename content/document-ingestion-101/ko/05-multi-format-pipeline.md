@@ -34,7 +34,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 
 예제 코드: `en/05-multi-format-pipeline/main.py`
 
-![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.ko.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-questions-this-post-answers.ko.png)
 
 *Questions this post answers*
 
@@ -44,7 +44,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 
 ## 파일 형식별 로더 라우팅
 
-![Loader routing by file format](../../../assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
+![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
 
 *Loader routing by file format*
 
@@ -52,7 +52,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 
 ## 형식별 전처리
 
-![Format-specific preprocessing branches](../../../assets/document-ingestion-101/05/05-02-format-specific-preprocessing.ko.png)
+![Format-specific preprocessing branches](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-02-format-specific-preprocessing.ko.png)
 
 *Format-specific preprocessing branches*
 
@@ -209,7 +209,7 @@ source=diagram.docx format=docx status=unsupported reason=unsupported format: .d
 
 ### 공통 Document 계약 스키마
 
-![Shared Document contract schema](../../../assets/document-ingestion-101/05/05-01-shared-document-contract-schema.ko.png)
+![Shared Document contract schema](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-shared-document-contract-schema.ko.png)
 
 *Shared Document contract schema*
 
@@ -223,7 +223,7 @@ source=diagram.docx format=docx status=unsupported reason=unsupported format: .d
 
 ### 파일 형식별 오류 처리
 
-![Format error handling fallback flow](../../../assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.ko.png)
+![Format error handling fallback flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.ko.png)
 
 *Format error handling fallback flow*
 

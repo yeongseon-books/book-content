@@ -54,7 +54,7 @@ If your mental shortcut has been “Functions = autoscale,” this is where that
 
 ## Big picture
 
-![Plan differences in billing, warm capacity, scaling](../../../assets/azure-functions-101/05/05-01-big-picture.en.png)
+![Plan differences in billing, warm capacity, scaling](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png)
 
 *Plan differences in billing, warm capacity, scaling*
 Now put the differences on one table.
@@ -179,7 +179,7 @@ Teams often choose Dedicated on instinct and then discover that queues do not au
 
 ## Decision tree
 
-![Hosting plan choice by requirements](../../../assets/azure-functions-101/05/05-02-decision-tree.en.png)
+![Hosting plan choice by requirements](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-02-decision-tree.en.png)
 
 *Hosting plan choice by requirements*
 Dedicated sits outside the main path on purpose. It is not a bad plan. It is a plan for cases where you can **explicitly give up event-driven platform scaling**.

@@ -62,7 +62,7 @@ These two stages are separate, so you can manage "external exposure" and "versio
 
 ACA's managed Ingress layer plays the front door, then dispatches traffic to active Revisions according to weights.
 
-![Ingress routing requests to active Revisions](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
+![Ingress routing requests to active Revisions](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png)
 
 *Ingress routing requests to active Revisions*
 

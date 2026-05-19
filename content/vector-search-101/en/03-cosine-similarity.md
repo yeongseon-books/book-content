@@ -34,7 +34,7 @@ This post implements all three metrics from scratch, shows why normalization mat
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
-![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 
 *Cosine dot and euclidean comparison structure*
 <!-- ebook-only:start -->
@@ -62,7 +62,7 @@ After this chapter, the next one moves on to **FAISS fundamentals — fast appro
 
 ## Three distance metrics
 
-![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
 
 *Cosine dot and euclidean comparison structure*
 ### Cosine similarity
@@ -116,7 +116,7 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ## Comparing all three metrics
 
-![Three metrics on one pair flow](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
+![Three metrics on one pair flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
 
 *Three metrics on one pair flow*
 Apply all three to the same sentence pairs.
@@ -182,7 +182,7 @@ With normalized vectors, cosine and dot product match exactly. Euclidean distanc
 
 ## Why normalization matters
 
-![Before and after normalization difference](../../../assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
+![Before and after normalization difference](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
 
 *Before and after normalization difference*
 Without normalization, dot product and cosine similarity diverge.
@@ -234,7 +234,7 @@ Without normalization, the raw dot product (14.15) is dominated by the vector ma
 
 ## Brute-force nearest-neighbor search
 
-![Brute force nearest neighbor execution path](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
+![Brute force nearest neighbor execution path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
 
 *Brute force nearest neighbor execution path*
 For a few hundred documents, NumPy alone is sufficient for retrieval.
@@ -301,7 +301,7 @@ This approach is called exact search or brute-force search. It is accurate but s
 
 ## When to use each metric
 
-![Metric selection decision flow](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
+![Metric selection decision flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
 
 *Metric selection decision flow*
 | Metric | Best for | Watch out for |

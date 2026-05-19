@@ -42,7 +42,7 @@ Routing makes *refresh-safe screens*, *shareable links*, and *back-button behavi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
 
 *The SPA routing flow in which the router reads the URL and selects the screen component*
 

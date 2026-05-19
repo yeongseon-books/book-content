@@ -44,7 +44,7 @@ The trap is that averages hide the problem. If warm invocations are common, the 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
 
 *Cold start combines environment creation, runtime loading, and your own initialization code into one delay.*
 This diagram matters because it shows that *cold start* is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.

@@ -45,7 +45,7 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
 *입력 오류, 권한 오류, 내부 오류가 같은 envelope 안에서 다른 상태 코드와 detail로 분기됩니다.*
 
 이렇게 모양을 고정해 두면 클라이언트는 공통 파서를 유지한 채 `status`, `code`, `errors[]`만 보고도 적절한 사용자 메시지와 재시도 전략을 고를 수 있습니다.

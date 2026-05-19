@@ -46,7 +46,7 @@ This is one of the places where SQL becomes more than a retrieval language. Once
 
 ## Window calculation flow
 
-![Window calculation flow](../../../assets/sql-101/07/07-01-window-calculation-flow.en.png)
+![Window calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
 ## Key Terms
 
 - **Partition**: rows *grouped together*.

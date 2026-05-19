@@ -44,7 +44,7 @@ Without that question, ROC-AUC stays a nice-looking summary. With it, the whole 
 
 ## Concept at a glance
 
-![ranking flow from model scores to roc and pr views](../../../assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
+![ranking flow from model scores to roc and pr views](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
 
 *ranking flow from model scores to roc and pr views*
 

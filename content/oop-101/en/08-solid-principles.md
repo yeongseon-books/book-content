@@ -45,7 +45,7 @@ Rather than treating SOLID as five isolated slogans, we will use one checkout wo
 
 ## Concept Overview
 
-![Concept Overview](../../../assets/oop-101/08/08-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png)
 *Use the observable smell first, then choose the matching principle and the smallest refactor move instead of trying to apply all five rules at once.*
 
 The key is not memorizing the acronym. The key is mapping one visible failure mode to one design correction. If the service has too many reasons to change, start with SRP. If every new rule edits old branching code, reach for OCP. If the system cannot swap dependencies cleanly, DIP is the more urgent fix.

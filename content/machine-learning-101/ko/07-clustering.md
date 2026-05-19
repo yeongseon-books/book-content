@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/07/07-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-diagram.ko.png)
 
 *표준화된 입력을 KMeans나 DBSCAN에 넣으면 서로 다른 기준으로 데이터의 잠재 구조를 묶어 볼 수 있습니다.*
 

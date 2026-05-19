@@ -46,7 +46,7 @@ Pick the wrong model and you waste both *cost* and *speed*. Each stage of an org
 
 ## Concept at a Glance
 
-![As the service model rises, the portion you operate directly gets smaller](../../../assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
+![As the service model rises, the portion you operate directly gets smaller](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
 
 *As the service model rises, the portion you operate directly gets smaller*
 

@@ -44,7 +44,7 @@ A *runnable* example must reach the reader's *hands* to teach.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

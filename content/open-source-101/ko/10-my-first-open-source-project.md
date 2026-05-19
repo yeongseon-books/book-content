@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 공개까지 가는 최소 경로
 
-![공개까지 가는 최소 경로](../../../assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
+![공개까지 가는 최소 경로](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
 
 *아이디어에서 문서, 릴리스, 공지까지 작은 도구를 공개 가능한 프로젝트로 바꾸는 최소 경로*
 이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.

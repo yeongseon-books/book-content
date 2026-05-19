@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/probability-101/06/06-01-diagram.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-diagram.ko.png)
 
 *핵심 개념 한눈에 보기*
 

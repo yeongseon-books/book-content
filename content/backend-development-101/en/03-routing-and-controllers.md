@@ -42,7 +42,7 @@ In a tiny project, a single file works. As endpoints grow, that single file *bec
 
 ## Concept at a Glance
 
-![request routing flow from router to controller, service, and repository](../../../assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
+![request routing flow from router to controller, service, and repository](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
 
 *request routing flow from router to controller, service, and repository*
 Routers are the *map*, controllers are the *front desk*, services are the *experts*.

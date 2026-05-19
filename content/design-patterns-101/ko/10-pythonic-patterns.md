@@ -47,7 +47,7 @@ Python은 모듈 로딩, 함수 전달, 구조적 타이핑, 데코레이터 문
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.ko.png)
 *같은 패턴 의도라도 Python에서는 모듈, 함수, Protocol, 데코레이터로 훨씬 가볍게 표현할 수 있습니다.*
 
 ## 핵심 용어

@@ -44,7 +44,7 @@ A *first success* creates the will to keep *learning*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

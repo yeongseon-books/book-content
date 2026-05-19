@@ -55,7 +55,7 @@ Once PRs become routine, three habits follow naturally:
 > A Pull Request is not a plain merge; it is a place to "propose merging your branch into main and host the review and discussion that surrounds that proposal".
 A PR is a request: "Please accept my branch as a proposal against `main`." The request has a title, a description, a list of changed files, and a comment thread.
 
-![Mental model](../../../assets/git-github-101/07/07-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.en.png)
 
 *Mental model*
 The diagram reads like this:

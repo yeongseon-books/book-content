@@ -39,7 +39,7 @@ This is the final post in the Harness Engineering 101 series. It binds Task, Con
 
 > A production agent is not just a pile of harnesses. It is a versioned operating stack that can be deployed, observed, and rolled back safely.
 
-![Production harness - building operational environments for agents](../../../assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
+![Production harness - building operational environments for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
 
 *Production harness - building operational environments for agents*
 ## What Is the Production Harness?
@@ -65,7 +65,7 @@ The Production Harness takes this stack and packages it into "something deployab
 
 ## How the Nine Harnesses Fit Together
 
-![How the nine harnesses fit together](../../../assets/harness-engineering-101/10/10-02-how-the-nine-harnesses-fit-together.en.png)
+![How the nine harnesses fit together](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-02-how-the-nine-harnesses-fit-together.en.png)
 
 *How the nine harnesses fit together*
 When a request arrives, it flows in this order:
@@ -96,7 +96,7 @@ Each harness owns exactly one responsibility, and the interface to the next harn
 
 ## Deployment Pattern — Gradual Rollout
 
-![Deployment pattern - gradual rollout](../../../assets/harness-engineering-101/10/10-03-deployment-pattern-gradual-rollout.en.png)
+![Deployment pattern - gradual rollout](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-03-deployment-pattern-gradual-rollout.en.png)
 
 *Deployment pattern - gradual rollout*
 A new prompt or tool never goes to 100% of users in one shot.
@@ -125,7 +125,7 @@ The standard ramp is 1% → 10% → 50% → 100%, comparing candidate against ba
 
 ## Rollback — A Deploy Is Only a Deploy if You Can Undo It
 
-![Rollback - A deploy is only a deploy if you can undo it](../../../assets/harness-engineering-101/10/10-04-rollback-a-deploy-is-only-a-deploy-if-yo.en.png)
+![Rollback - A deploy is only a deploy if you can undo it](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-04-rollback-a-deploy-is-only-a-deploy-if-yo.en.png)
 
 *Rollback - A deploy is only a deploy if you can undo it*
 If you cannot return to the previous version within 30 seconds of a deploy, that is not a deploy — it is an incident.

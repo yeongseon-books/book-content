@@ -44,7 +44,7 @@ Closures are the foundation of callbacks, decorators, partial application, and m
 
 ## Concept at a Glance
 
-![A closure carrying both function logic and the binding it captured](../../../assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
+![A closure carrying both function logic and the binding it captured](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
 
 *A closure carrying both function logic and the binding it captured*
 

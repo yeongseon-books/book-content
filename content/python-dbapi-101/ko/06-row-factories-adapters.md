@@ -29,7 +29,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 이 글은 Python DB-API 101 시리즈의 여섯 번째 글입니다.
 
-![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
+![Row factory와 type adapter (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
@@ -45,7 +45,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## Mental Model — 두 단계 변환
 
-![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
+![Mental Model - 두 단계 변환](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental Model - 두 단계 변환*
 
@@ -60,7 +60,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### `sqlite3.Row`
@@ -110,7 +110,7 @@ dict는 아니지만 80% 케이스에 충분합니다.
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`

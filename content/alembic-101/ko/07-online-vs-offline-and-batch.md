@@ -50,7 +50,7 @@ production 배포 직전에는 migration이 실제로 어떤 SQL을 내보낼지
 
 ### 다이어그램: online, offline, batch mode의 역할 분담
 
-![다이어그램: online, offline, batch mode의 역할 분담](../../../assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.ko.png)
+![다이어그램: online, offline, batch mode의 역할 분담](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.ko.png)
 *같은 revision이라도 적용용 경로와 리뷰용 경로, SQLite 전용 batch 경로가 분리됩니다*
 
 ## 핵심 개념

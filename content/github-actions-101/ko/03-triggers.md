@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 트리거 구조
 
-![push, pull_request, schedule, workflow_dispatch가 하나의 워크플로우로 연결되는 트리거 구조](../../../assets/github-actions-101/03/03-01-diagram.ko.png)
+![push, pull_request, schedule, workflow_dispatch가 하나의 워크플로우로 연결되는 트리거 구조](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-diagram.ko.png)
 
 *push, pull_request, schedule, workflow_dispatch가 하나의 워크플로우로 연결되는 트리거 구조*
 

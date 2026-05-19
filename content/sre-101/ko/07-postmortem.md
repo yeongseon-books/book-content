@@ -50,7 +50,7 @@ title: Postmortem
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.ko.png)
 
 *장애 기록이 액션 아이템과 추적으로 이어질 때 포스트모템이 학습 시스템이 됩니다.*
 장애가 문서로 끝나면 의미가 약합니다. 문서가 액션으로 연결되고, 그 액션이 추적과 리뷰로 이어질 때 비로소 재발 방지 효과가 생깁니다.

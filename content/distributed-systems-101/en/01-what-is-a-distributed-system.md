@@ -45,7 +45,7 @@ Almost every service you build today is effectively a distributed system. A sing
 
 ## Concept at a Glance
 
-![Core distributed-system topology and failure points](../../../assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
+![Core distributed-system topology and failure points](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
 
 *Core distributed-system topology and failure points*
 

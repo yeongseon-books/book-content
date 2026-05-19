@@ -53,7 +53,7 @@ A missing record at the *collection step* haunts you all the way to the final re
 
 ## Concept at a Glance
 
-![Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis](../../../assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
+![Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
 
 *Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis*
 ## Key Terms

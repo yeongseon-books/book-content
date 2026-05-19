@@ -50,7 +50,7 @@ Toil이 팀 시간의 큰 비중을 차지하면 개선 작업이 멈춥니다. 
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.ko.png)
 
 *반복 수작업을 Toil로 식별하고 자동화로 넘겨 시간을 되찾는 기본 구조입니다.*
 이 흐름은 측정과 자동화의 방향을 단순하게 보여 줍니다. 수작업을 그냥 익숙한 절차로 두지 말고, Toil로 식별하고, 자동화로 넘겨 팀 시간을 되찾아야 합니다.

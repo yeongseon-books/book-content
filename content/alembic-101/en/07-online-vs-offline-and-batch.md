@@ -50,7 +50,7 @@ Turning on `render_as_batch` makes calls like `op.alter_column` expand internall
 
 ### Diagram: how online, offline, and batch mode divide responsibilities
 
-![Diagram: how online, offline, and batch mode divide responsibilities](../../../assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
+![Diagram: how online, offline, and batch mode divide responsibilities](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
 *The same revision can drive apply-time execution, review-time SQL output, and SQLite-specific batch rewriting.*
 
 ## Core concepts

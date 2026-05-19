@@ -40,7 +40,7 @@ This is the second post in the Azure Kubernetes Service 101 series. Here, we tur
 
 ## Cut the cluster in half
 
-![Responsibility boundary between control plane and node pools](../../../assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
+![Responsibility boundary between control plane and node pools](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
 
 *Responsibility boundary between control plane and node pools*
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.
@@ -88,7 +88,7 @@ Pods are the logical unit. Node pools are the capacity and cost unit.
 
 This is the first node-pool distinction to learn in AKS.
 
-![Role split between system and user pools](../../../assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
+![Role split between system and user pools](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-02-system-node-pool-vs-user-node-pool.en.png)
 
 *Role split between system and user pools*
 ### System node pool

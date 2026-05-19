@@ -85,7 +85,7 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 
 ### 아키텍처는 여섯 단계 파이프라인으로 정리할 수 있습니다
 
-![Architecture - a 6-stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
+![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
 
 각 stage는 input/output parquet와 manifest를 갖습니다. manifest에 fingerprint, 코드 버전, 파라미터를 남겨 두면 데이터셋을 파일이 아니라 재현 가능한 산출물로 다룰 수 있습니다.
 

@@ -54,7 +54,7 @@ As data roles become more embedded in product and business teams, the ability to
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
 
 *A case interview answer moves from clarification to metrics, hypotheses, data, and decision*
 ## Key Terms

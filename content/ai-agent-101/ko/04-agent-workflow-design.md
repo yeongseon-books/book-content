@@ -58,12 +58,12 @@ workflow 패턴은 모델의 성격 설명이 아니라 **제어 흐름 패턴**
 
 ### 워크플로 패턴 지도
 
-![워크플로 패턴 지도](../../../assets/ai-agent-101/04/04-01-workflow-pattern-map.ko.png)
+![워크플로 패턴 지도](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-workflow-pattern-map.ko.png)
 ## 핵심 개념
 
 ### workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다
 
-![workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다](../../../assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.ko.png)
+![workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.ko.png)
 *Agent workflow는 목표를 step으로 쪼개고, 실행 결과를 검증한 뒤 필요할 때만 재계획하는 구조로 보는 편이 안전합니다.*
 
 ### ReAct는 관찰에 따라 즉시 적응하는 패턴입니다

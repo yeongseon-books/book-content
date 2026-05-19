@@ -45,7 +45,7 @@ Since Kubernetes 1.24 removed `dockershim`, you cannot debug effectively without
 
 ## Concept at a Glance
 
-![Runtime layers from Docker down to runc](../../../assets/containers-101/03/03-01-concept-at-a-glance.en.png)
+![Runtime layers from Docker down to runc](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.en.png)
 
 *Runtime layers from Docker down to runc*
 ## Key Terms

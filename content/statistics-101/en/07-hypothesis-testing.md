@@ -45,7 +45,7 @@ This is post 7 in the Statistics 101 series. Here we will define the null and al
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
 
 *Hypothesis testing starts from a no-difference world, measures how unusual the observed data would be there, and then compares that result to a threshold.*
 ## Key Terms

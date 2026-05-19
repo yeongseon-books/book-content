@@ -56,7 +56,7 @@ This example is small but it pulls together every concept covered in episodes 1 
 
 ## End-to-end build map
 
-![diagram](../../../assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
+![diagram](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
 ---
 
 ## Prerequisites

@@ -60,7 +60,7 @@ outer_func(x)
 
 ## Closure vs partial decision flow
 
-![Closure vs partial decision flow](../../../assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
+![Closure vs partial decision flow](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
 
 *Use closures when the function must remember context. Use `partial` when an existing function only needs a few fixed arguments.*
 

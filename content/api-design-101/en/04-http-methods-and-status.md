@@ -45,7 +45,7 @@ Methods and status codes drive the *branching logic* on the client. Return the w
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
 *The HTTP method expresses intent, and the status code expresses the outcome.*
 
 Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.

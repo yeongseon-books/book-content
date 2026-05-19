@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![좋은 코드 리뷰 기준](../../../assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)
+![좋은 코드 리뷰 기준](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)
 
 *좋은 코드 리뷰의 흐름: 자동화가 잡무를 맡고, 사람은 의도와 구조를 검토합니다.*
 

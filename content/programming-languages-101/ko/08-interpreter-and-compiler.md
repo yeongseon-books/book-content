@@ -44,7 +44,7 @@ Python을 흔히 인터프리터 언어라고 부릅니다. 그런데 `.pyc` 파
 
 ## 핵심 개념 한눈에 보기
 
-![소스 코드가 바이트코드와 JIT, AOT 경로로 갈라지는 실행 전략 비교](../../../assets/programming-languages-101/08/08-01-concept-at-a-glance.ko.png)
+![소스 코드가 바이트코드와 JIT, AOT 경로로 갈라지는 실행 전략 비교](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.ko.png)
 
 *소스 코드가 바이트코드와 JIT, AOT 경로로 갈라지는 실행 전략 비교*
 

@@ -43,7 +43,7 @@ Without that distinction, metric choice becomes habit instead of judgment. You s
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
 
 *This diagram links the inner product to cosine similarity and distance metrics as separate comparison questions.*
 

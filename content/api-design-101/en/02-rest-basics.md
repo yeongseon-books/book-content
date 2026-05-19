@@ -45,7 +45,7 @@ REST is the most common API style. Follow it well and your API becomes *predicta
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
 *In REST, the URL identifies the resource and the HTTP method expresses the action on it.*
 
 A client should be able to read `GET /users/42` and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.

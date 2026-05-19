@@ -39,7 +39,7 @@ This is post 7 in the Harness Engineering 101 series. Here we treat failure as s
 
 > A good agent is not one that never fails. It is one that turns failure into a controlled improvement signal.
 
-![Feedback loops - building structures that let agents recover from failure](../../../assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
+![Feedback loops - building structures that let agents recover from failure](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
 
 *Feedback loops - building structures that let agents recover from failure*
 ## No Agent Succeeds on the First Try
@@ -54,7 +54,7 @@ Feedback Loop is the structure that converts failure into a learning signal. Thi
 
 ## Retry vs Reflect
 
-![Retry vs reflect](../../../assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png)
+![Retry vs reflect](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-02-retry-vs-reflect.en.png)
 
 *Retry vs reflect*
 Two responses to failure.
@@ -135,7 +135,7 @@ Feedback that says only "try again" makes the agent repeat the same mistake. Spe
 
 ## Preventing Infinite Loops
 
-![Preventing infinite loops](../../../assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png)
+![Preventing infinite loops](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-03-preventing-infinite-loops.en.png)
 
 *Preventing infinite loops*
 Reflect loops can run forever. The agent might repeat the same mistake or oscillate between two errors. Three safeties.
@@ -240,7 +240,7 @@ Self-critique has two risks. (1) The agent misses its own mistakes (false positi
 
 ## Failure Memory
 
-![Failure memory](../../../assets/harness-engineering-101/07/07-04-failure-memory.en.png)
+![Failure memory](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-04-failure-memory.en.png)
 
 *Failure memory*
 When the same task type runs many times, remembering past failures cuts repeated mistakes. Failure memory accumulates which approaches failed per task.

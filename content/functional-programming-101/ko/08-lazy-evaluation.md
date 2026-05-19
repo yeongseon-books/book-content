@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 > eager는 값을 즉시 만들고, lazy는 필요해질 때까지 미룹니다.
 
-![소비자가 끌어당기는 지연 파이프라인 흐름](../../../assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
+![소비자가 끌어당기는 지연 파이프라인 흐름](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
 
 *지연 파이프라인에서는 소비자가 다음 값을 요청할 때만 각 단계가 한 레코드씩 움직입니다. 그래서 입력이 커져도 중간 결과 전체를 메모리에 쌓아 둘 필요가 없습니다.*
 

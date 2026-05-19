@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/02/02-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 단위 테스트는 가장 많고 가장 빨라야 합니다. 통합 테스트는 그보다 적고, E2E 테스트는 더 적어야 합니다. 이 분포가 중요한 이유는 속도 때문입니다. 빠른 테스트가 많아야 개발자가 자주 돌릴 수 있고, 자주 돌려야 테스트가 실제 습관이 됩니다.

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## WHERE 평가 흐름
 
-![WHERE 평가 흐름](../../../assets/sql-101/03/03-01-where-evaluation-flow.ko.png)
+![WHERE 평가 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.ko.png)
 모든 행이 일단 후보로 들어오고, `WHERE` 조건식을 평가한 뒤 참인 행만 다음 단계로 넘어갑니다. 거짓뿐 아니라 `NULL` 결과도 통과하지 못한다는 점이 중요합니다. 이 세 값 논리가 `= NULL` 실수를 낳는 원인입니다.
 
 ## 핵심 개념 정리

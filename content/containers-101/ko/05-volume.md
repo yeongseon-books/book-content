@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![volume, bind mount, tmpfs의 저장 경로 차이](../../../assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
+![volume, bind mount, tmpfs의 저장 경로 차이](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
 
 *volume, bind mount, tmpfs의 저장 경로 차이*
 세 가지는 모두 마운트 방식이지만 목적이 다릅니다. named volume은 지속성, bind mount는 호스트 경로 연결, tmpfs는 메모리 기반 임시 저장이 중심입니다.

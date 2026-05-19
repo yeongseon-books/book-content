@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![분산 시스템의 기본 토폴로지와 장애 지점](../../../assets/distributed-systems-101/01/01-01-concept-at-a-glance.ko.png)
+![분산 시스템의 기본 토폴로지와 장애 지점](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.ko.png)
 
 *분산 시스템의 기본 토폴로지와 장애 지점*
 

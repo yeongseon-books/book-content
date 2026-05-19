@@ -39,7 +39,7 @@ This post covers the entire process from local development environment setup to 
 
 By the end, you will have a Flask app running locally, an App Service app in Azure, and a repeatable deployment path you can verify with logs and a health endpoint.
 
-![From local development to Azure deployment](../../../assets/azure-app-service-101/04/01-deployment-pipeline.en.png)
+![From local development to Azure deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/01-deployment-pipeline.en.png)
 
 *From local development to Azure deployment*
 
@@ -175,7 +175,7 @@ curl http://localhost:8000/health
 
 ## Step 4: Create Azure Resources
 
-![Azure resource hierarchy from subscription to web app](../../../assets/azure-app-service-101/04/02-resource-hierarchy.en.png)
+![Azure resource hierarchy from subscription to web app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/02-resource-hierarchy.en.png)
 
 *Azure resource hierarchy from subscription to web app*
 
@@ -365,7 +365,7 @@ https://<app-name>.scm.azurewebsites.net
 
 ### 502 Bad Gateway
 
-![Stepwise path to isolate 502 causes](../../../assets/azure-app-service-101/04/03-troubleshooting-502.en.png)
+![Stepwise path to isolate 502 causes](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/03-troubleshooting-502.en.png)
 
 *Stepwise path to isolate 502 causes*
 

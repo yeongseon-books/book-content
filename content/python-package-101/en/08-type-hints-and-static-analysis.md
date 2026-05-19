@@ -63,7 +63,7 @@ mypy checks:
   x: int = greet("Alice")  # Error: str assigned to int
 ```
 
-![Mental Model](../../../assets/python-package-101/08/08-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
 *How type hints feed static analysis and improve the package consumer experience*
 
 ## Core Concepts

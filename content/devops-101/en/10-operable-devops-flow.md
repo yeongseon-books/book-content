@@ -43,7 +43,7 @@ Adopting tools *one by one* creates *islands*. Only when they connect as a *flow
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

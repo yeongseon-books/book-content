@@ -47,7 +47,7 @@ Adapter는 이 움직임을 한 줄의 경계에 고정합니다. 도메인은 `
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png)
 *도메인은 자기 계약만 알고, 외부 라이브러리 호출은 Adapter가 맡을 때 테스트성과 교체 가능성이 함께 올라갑니다.*
 
 ## 핵심 용어

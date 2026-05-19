@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
 *Structural 패턴은 객체를 번역하고, 감싸고, 단순화하고, 대리하고, 트리로 묶는 다섯 가지 연결 방식을 한눈에 보여 줍니다.*
 
 ## 핵심 용어

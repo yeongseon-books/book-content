@@ -102,13 +102,13 @@ What matters: (1) a Korean query lifts an English runbook to top-1, (2) the equi
 
 ## Core flow
 
-![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
 
 *Core flow*
 
 ## Why start from a dense-only baseline
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -151,7 +151,7 @@ Confirm the dimension once. It helps later when sizing IVF training data.
 
 ### Step 3 — Search English+Korean documents with a Korean query
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -201,7 +201,7 @@ If the top-1 stays the same across the Korean and English version of the same qu
 
 ## What to notice in this code
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 

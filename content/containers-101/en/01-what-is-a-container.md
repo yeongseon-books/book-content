@@ -45,7 +45,7 @@ Since 2013, the container has been the default unit of deployment. Without it, m
 
 ## Concept at a Glance
 
-![Container processes sharing the host kernel](../../../assets/containers-101/01/01-01-concept-at-a-glance.en.png)
+![Container processes sharing the host kernel](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png)
 
 *Container processes sharing the host kernel*
 ## Key Terms

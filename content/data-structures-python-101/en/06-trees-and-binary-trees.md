@@ -70,7 +70,7 @@ Binary Search Tree (BST):
 
 ## Tree Shape at a Glance
 
-![Tree Shape at a Glance](../../../assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
+![Tree Shape at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
 
 *A simple tree shape and the BST ordering pattern from root to leaves*
 

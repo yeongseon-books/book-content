@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 그림
 
-![라우팅과 NAT가 사설 IP를 인터넷으로 내보내는 과정](../../../assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
+![라우팅과 NAT가 사설 IP를 인터넷으로 내보내는 과정](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
 *라우팅은 다음 홉을 고르고, NAT는 사설 IP와 포트를 공인 주소로 바꿔 응답이 다시 원래 호스트로 돌아오게 만듭니다.*
 
 ## 핵심 용어

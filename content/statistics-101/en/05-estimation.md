@@ -45,7 +45,7 @@ Reporting a mean is not the end. *How close it is* must be reported *together* s
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
 
 *Point estimates become interval estimates only after you add the estimator's uncertainty through standard error.*
 ## Key Terms

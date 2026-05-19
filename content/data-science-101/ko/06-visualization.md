@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![메시지 유형에 따라 분포, 비교, 추세, 관계, 구성비 차트를 고르는 지도](../../../assets/data-science-101/06/06-01-concept-at-a-glance.ko.png)
+![메시지 유형에 따라 분포, 비교, 추세, 관계, 구성비 차트를 고르는 지도](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.ko.png)
 
 *메시지 유형에 따라 분포, 비교, 추세, 관계, 구성비 차트를 고르는 지도*
 ## 핵심 용어

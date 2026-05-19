@@ -28,7 +28,7 @@ This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -113,7 +113,7 @@ dimension = doc_vectors.shape[1]
 
 ### Step 2 — Build the flat index
 
-![same vectors compared across flat and IVF indexes](../../../assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
+![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
 
 *same vectors compared across flat and IVF indexes*
 
@@ -146,7 +146,7 @@ ivf_index.nprobe = 4
 
 ### Step 4 — Measure pure search latency
 
-![Boundary between embedding and search time](../../../assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
+![Boundary between embedding and search time](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png)
 
 *Boundary between embedding and search time*
 
@@ -175,7 +175,7 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 ### Step 6 — Sweep `nprobe`
 
-![nprobe trade-off between speed and accuracy](../../../assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
+![nprobe trade-off between speed and accuracy](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-03-nprobe-trade-off-between-speed-and-accur.en.png)
 
 *nprobe trade-off between speed and accuracy*
 
@@ -191,7 +191,7 @@ Vary `nprobe` across 1, 2, 4, 8, 16 and plot recall and latency. There is almost
 
 ## In production
 
-![Index decision axes for real workloads](../../../assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
+![Index decision axes for real workloads](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-04-index-decision-axes-for-real-workloads.en.png)
 
 *Index decision axes for real workloads*
 

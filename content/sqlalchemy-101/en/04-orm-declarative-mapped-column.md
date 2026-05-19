@@ -28,7 +28,7 @@ In Core we worked directly with `Table` and `select()` to compose SQL expression
 
 This is the 4th article in the SQLAlchemy 101 series.
 
-![ORM Basics: defining models with DeclarativeBase and mapped_column](../../../assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.en.png)
+![ORM Basics: defining models with DeclarativeBase and mapped_column](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.en.png)
 
 *ORM Basics: defining models with DeclarativeBase and mapped_column*
 ## Questions this post answers
@@ -42,7 +42,7 @@ This is the 4th article in the SQLAlchemy 101 series.
 
 ## Why it matters
 
-![Why it matters](../../../assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
+![Why it matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
 
 *Why it matters*
 Core alone is enough to talk to a database. But as an application grows, several costs add up quickly.
@@ -56,7 +56,7 @@ The ORM is not magic; it is a thin layer above Core that absorbs these costs. De
 
 ## Mental Model
 
-![Mental model](../../../assets/sqlalchemy-101/04/04-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-03-mental-model.en.png)
 
 *Mental model*
 > An ORM model class is the marriage of "a Python class plus a Core `Table`." `DeclarativeBase` is the container (a `MetaData`) for those bindings, and `mapped_column` is the helper that derives a `Column` from a type hint.
@@ -76,7 +76,7 @@ The moment you define an ORM class, a Core `Table` object is created and registe
 
 ## Core concepts
 
-![Core concepts](../../../assets/sqlalchemy-101/04/04-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-04-core-concepts.en.png)
 
 *Core concepts*
 ### 1) DeclarativeBase
@@ -227,7 +227,7 @@ Two things changed. First, the elements of `users_list` are `User` instances rat
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/sqlalchemy-101/04/04-05-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-05-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 All you need is SQLite and SQLAlchemy 2.x. Save the following as a single file and run it; the flow becomes muscle memory quickly.

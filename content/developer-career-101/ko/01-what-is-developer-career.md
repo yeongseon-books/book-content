@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![커리어 단계와 영향 범위 확장 흐름](../../../assets/developer-career-101/01/01-01-concept-at-a-glance.ko.png)
+![커리어 단계와 영향 범위 확장 흐름](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.ko.png)
 
 *커리어 단계와 영향 범위 확장 흐름*
 

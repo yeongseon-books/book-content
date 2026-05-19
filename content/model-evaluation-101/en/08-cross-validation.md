@@ -44,7 +44,7 @@ A single split is noisy. Reporting the standard deviation alongside the mean mak
 
 ## Concept at a Glance
 
-![cross-validation flow from folds to score mean and variance](../../../assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
+![cross-validation flow from folds to score mean and variance](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
 
 *cross-validation flow from folds to score mean and variance*
 ## Key Terms

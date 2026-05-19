@@ -43,7 +43,7 @@ Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons t
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
 
 *How design tokens, components, pages, and themes connect into one styling system*
 

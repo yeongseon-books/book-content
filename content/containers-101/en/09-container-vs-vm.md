@@ -45,7 +45,7 @@ Choosing *isolation that fits the workload* keeps both *cost* and *security* und
 
 ## Concept at a Glance
 
-![VM isolation through a hypervisor versus shared-kernel containers](../../../assets/containers-101/09/09-01-concept-at-a-glance.en.png)
+![VM isolation through a hypervisor versus shared-kernel containers](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png)
 
 *VM isolation through a hypervisor versus shared-kernel containers*
 ## Key Terms

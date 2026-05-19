@@ -62,7 +62,7 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
                      models.py
 ```
 
-![멘탈 모델](../../../assets/python-package-101/01/01-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
 *모듈이 패키지와 배포판을 거쳐 설치되는 흐름*
 
 ## 핵심 개념

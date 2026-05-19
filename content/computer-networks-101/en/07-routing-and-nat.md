@@ -50,7 +50,7 @@ Without routing, you cannot answer "why does it only fail on our corporate netwo
 
 ## Concept at a Glance
 
-![How routing and NAT move a private-IP packet onto the Internet](../../../assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
+![How routing and NAT move a private-IP packet onto the Internet](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
 *Routing chooses the next hop, while NAT rewrites private source addresses and ports so replies can find their way back to the original host.*
 
 ## Key Terms

@@ -53,7 +53,7 @@ Used together, they let you self-review what your next commit will contain. That
 > `status`, `diff`, and `log` are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.
 Each command compares a different pair of areas.
 
-![Mental model](../../../assets/git-github-101/03/03-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png)
 
 *Mental model*
 A one-line rule of thumb:

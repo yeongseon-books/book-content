@@ -45,7 +45,7 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)
 *cursor는 다음 페이지를 어디서 이어 읽어야 하는지 알려 주는 불투명 토큰입니다.*
 
 중요한 점은 클라이언트가 cursor 내부를 이해하지 않아도 된다는 것입니다. 서버가 정렬 키와 경계 조건을 책임져야 중복과 누락 없이 큰 결과 집합을 안정적으로 넘길 수 있습니다.

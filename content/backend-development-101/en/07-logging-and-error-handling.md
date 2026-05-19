@@ -42,7 +42,7 @@ Code is written once and *operated for years*. Ninety percent of operations is *
 
 ## Concept at a Glance
 
-![request ID middleware and global exception handling flow into logs](../../../assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
+![request ID middleware and global exception handling flow into logs](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
 
 *request ID middleware and global exception handling flow into logs*
 Every path leads to the *log*.

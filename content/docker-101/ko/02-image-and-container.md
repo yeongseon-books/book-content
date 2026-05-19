@@ -45,7 +45,7 @@ Docker를 조금만 써 보면 가장 먼저 헷갈리는 지점이 image와 con
 
 ## 한눈에 보는 개념
 
-![불변 이미지가 실행 단계에서 가변 컨테이너로 이어지는 수명 주기](../../../assets/docker-101/02/02-01-concept-at-a-glance.ko.png)
+![불변 이미지가 실행 단계에서 가변 컨테이너로 이어지는 수명 주기](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.ko.png)
 
 *이미지는 불변 산출물로 남고 컨테이너만 생성·실행·중지·삭제를 반복하는 구조*
 

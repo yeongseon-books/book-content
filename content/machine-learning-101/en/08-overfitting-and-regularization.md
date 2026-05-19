@@ -42,7 +42,7 @@ Half of every model improvement is regularization. The more capacity a model has
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
 
 *Too little capacity underfits, too much capacity overfits, and regularization helps move the model back toward a generalizing middle ground.*
 

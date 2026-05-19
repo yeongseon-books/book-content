@@ -47,7 +47,7 @@ So the right question is not “what is the F1?” but “which F1, chosen how, 
 
 ## Concept at a glance
 
-![f1 summary branching into averaging modes and f-beta choices](../../../assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
+![f1 summary branching into averaging modes and f-beta choices](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
 
 *f1 summary branching into averaging modes and f-beta choices*
 

@@ -34,7 +34,7 @@ This is post 4 in the RAG Deep Dive series.
 
 > The prompt layer is where structured retrieval output becomes the exact contract the model will read.
 
-![Questions this post answers](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -117,7 +117,7 @@ That is why prompt construction is not presentation glue. In RAG, it is the last
 
 At the source level, `PromptTemplate` lives in `langchain_core.prompts.prompt.PromptTemplate`, but most of the important behavior comes from its parent classes. `PromptTemplate` inherits from `StringPromptTemplate`, which itself inherits from `BasePromptTemplate`. That class stack explains why a prompt in LangChain is more than a formatted string. It has declared `input_variables`, optional `partial_variables`, validation logic, a runnable `invoke()` entry point, and a `format_prompt()` method that wraps the final string into a `StringPromptValue` object.
 
-![String and chat prompt hierarchy](../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
+![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
 
 *String and chat prompt hierarchy*
 
@@ -161,7 +161,7 @@ The practical lesson is simple: prompt shape is enforced before any model call h
 
 Once you switch from string prompts to chat prompts, the center of gravity moves from one template string to a list of message templates. In `langchain_core.prompts.chat`, LangChain models that list explicitly. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, and `AIMessagePromptTemplate` are thin wrappers around underlying string prompt templates. Each one ultimately formats into a concrete message class such as `SystemMessage`, `HumanMessage`, or `AIMessage`.
 
-![Message templates becoming chat messages](../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
+![Message templates becoming chat messages](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
 
 *Message templates becoming chat messages*
 
@@ -214,7 +214,7 @@ The important design choice is that retrieved context and prior conversation are
 
 The retrieval path becomes concrete in `langchain/chains/retrieval_qa/base.py`. Even though `RetrievalQA` is deprecated in favor of `create_retrieval_chain`, it is still one of the cleanest source files for understanding how LangChain assembles a classic RAG answer. The important methods are `_get_docs()` and `_call()`.
 
-![RetrievalQA context assembly path](../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
+![RetrievalQA context assembly path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
 
 *RetrievalQA context assembly path*
 
@@ -253,7 +253,7 @@ This is also where one of LangChain's sharpest foot-guns sits. Neither `Retrieva
 
 Now that we have seen where `{context}` comes from, the next question is how variables travel through the prompt layer. `BasePromptTemplate` is the key source file here. It defines both partial binding and the runnable `invoke()` path.
 
-![Partial variables meeting invoke inputs](../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
+![Partial variables meeting invoke inputs](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
 
 *Partial variables meeting invoke inputs*
 
@@ -314,7 +314,7 @@ The key point is that `partial()` reduces the call-time surface area, while `inv
 
 A good RAG prompt does not merely say “use the context.” It tells the model how to treat evidence, what to do when evidence is missing, and how to cite sources.
 
-![RAG chat prompt with citation rules](../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
+![RAG chat prompt with citation rules](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
 
 *RAG chat prompt with citation rules*
 

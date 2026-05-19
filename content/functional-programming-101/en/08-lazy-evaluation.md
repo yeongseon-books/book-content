@@ -47,7 +47,7 @@ Python's `range()`, `map()`, `filter()`, and file objects all use lazy evaluatio
 
 > Eager vs Lazy Evaluation
 
-![Pull-based lazy pipeline](../../../assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
+![Pull-based lazy pipeline](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
 
 *In a lazy pipeline, the consumer pulls one record at a time through every stage. That pull model is why a large input stream does not require every intermediate result to live in memory at once.*
 

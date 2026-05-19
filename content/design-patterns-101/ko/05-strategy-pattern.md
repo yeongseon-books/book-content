@@ -47,7 +47,7 @@ Strategy는 이 분기를 교체 가능한 단위로 바꿉니다. 새 알고리
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/design-patterns-101/05/05-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.ko.png)
 *Strategy의 핵심은 컨텍스트가 계산 방법 자체를 몰라도 되고, 알고리즘 선택만 바깥에서 바뀔 수 있게 만드는 데 있습니다.*
 
 ## 핵심 용어

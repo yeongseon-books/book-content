@@ -28,7 +28,7 @@ This is the second post in the LLM Fine-tuning 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -98,13 +98,13 @@ The prompt prefix (everything up to `### Response:`) is masked to -100; only the
 
 ## What to fix first about the dataset
 
-![Three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
+![Three layers of dataset preparation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
 
 *Three layers of dataset preparation*
 
 Fine-tuning data is usually three layers: **raw samples**, **template-applied text**, and **tokenized tensors**. Separating them is what lets you isolate filtering issues from token-length issues.
 
-![Three layers of dataset preparation](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
+![Three layers of dataset preparation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
 
 *Three layers of dataset preparation*
 
@@ -180,7 +180,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## What to notice in this code
 
-![Format checking and length verification flow](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
+![Format checking and length verification flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
 
 *Format checking and length verification flow*
 
@@ -191,7 +191,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## Common mistakes
 
-![Deduplication and split decision flow](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
+![Deduplication and split decision flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
 
 *Deduplication and split decision flow*
 

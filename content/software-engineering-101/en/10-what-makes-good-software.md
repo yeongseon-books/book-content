@@ -45,7 +45,7 @@ A working feature is the start, not the end. Good software endures over time and
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
 *How quality attributes balance each other to define software health*
 
 Quality is not one axis but a balance across many.

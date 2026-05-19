@@ -50,7 +50,7 @@ Warehouse는 조직 전체가 공유하는 공통 데이터를 담습니다. 하
 
 ## 개념 한눈에 보기
 
-![Warehouse와 Mart 분리 구조](../../../assets/data-warehouse-101/08/08-01-concept-at-a-glance.ko.png)
+![Warehouse와 Mart 분리 구조](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.ko.png)
 
 *공통 Warehouse 위에 영업·재무·운영 mart를 분리하고 각 팀 대시보드로 연결하는 구조*
 

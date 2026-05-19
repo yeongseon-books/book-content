@@ -40,7 +40,7 @@ seo_description: Flask 앱을 로컬에서 검증하고 Azure App Service에 첫
 
 이 글을 마치면 Flask 앱을 로컬에서 실행하고, Azure App Service에 배포하고, 로그와 health endpoint로 배포가 정상인지 반복 가능하게 검증할 수 있습니다.
 
-![From local development to Azure deployment](../../../assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
+![From local development to Azure deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/01-deployment-pipeline.ko.png)
 
 *로컬 개발에서 Azure 배포까지 이어지는 흐름*
 
@@ -178,7 +178,7 @@ curl http://localhost:8000/health
 
 ## Step 4: Create Azure Resources
 
-![Azure resource hierarchy from subscription to web app](../../../assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
+![Azure resource hierarchy from subscription to web app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/02-resource-hierarchy.ko.png)
 
 *구독에서 web app까지 이어지는 Azure 리소스 계층*
 
@@ -369,7 +369,7 @@ https://<app-name>.scm.azurewebsites.net
 
 ### 502 Bad Gateway
 
-![Stepwise path to isolate 502 causes](../../../assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
+![Stepwise path to isolate 502 causes](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/04/03-troubleshooting-502.ko.png)
 
 *502 원인을 단계별로 좁혀 가는 흐름*
 

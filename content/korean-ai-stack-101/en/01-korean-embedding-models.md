@@ -46,7 +46,7 @@ In practice, the real question is not “which model wins the benchmark?” It i
 
 ## Core flow
 
-![Core flow](../../../assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
 
 *Core flow*
 
@@ -54,7 +54,7 @@ In practice, the real question is not “which model wins the benchmark?” It i
 
 ## Why start with a reproducible comparison
 
-![Why start with a reproducible comparison](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.en.png)
+![Why start with a reproducible comparison](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.en.png)
 
 *Why start with a reproducible comparison*
 
@@ -104,7 +104,7 @@ GPU is optional here. The point is not throughput benchmarking. The point is to 
 
 ## Minimal runnable example
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -197,7 +197,7 @@ If your workload is mostly Korean FAQ search, the output above makes `ko-sbert-n
 
 ## What to notice in this code
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -256,7 +256,7 @@ This first post should surface the possibility that a Korean-oriented model may 
 
 ## Where engineers get confused
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/01/01-04-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-04-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 

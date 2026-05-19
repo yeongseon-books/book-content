@@ -56,7 +56,7 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 
 ## 핵심 개념
 
-![스트리밍 응답의 전체 이벤트 흐름](../../../assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
+![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
 
 *스트리밍 응답의 전체 이벤트 흐름*
 
@@ -64,7 +64,7 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 
 가장 작은 Groq 스트리밍 호출은 아래와 같습니다.
 
-![완성 전 청크가 먼저 도착하는 최소 예제](../../../assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.ko.png)
+![완성 전 청크가 먼저 도착하는 최소 예제](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.ko.png)
 
 *완성 전 청크가 먼저 도착하는 최소 예제*
 
@@ -99,7 +99,7 @@ for chunk in stream:
 
 이제 응답은 하나의 문자열이 아니라 청크들의 시퀀스입니다. 애플리케이션은 이 시퀀스에서 사용자에게 보여 줄 텍스트만 골라내야 합니다.
 
-![청크 안에서 텍스트와 종료 정보를 읽는 구조](../../../assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.ko.png)
+![청크 안에서 텍스트와 종료 정보를 읽는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.ko.png)
 
 *청크 안에서 텍스트와 종료 정보를 읽는 구조*
 
@@ -148,7 +148,7 @@ print(final_text)
 
 스트리밍과 async는 같은 개념이 아닙니다.
 
-![동기 스트리밍과 비동기 스트리밍의 구조 차이](../../../assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.ko.png)
+![동기 스트리밍과 비동기 스트리밍의 구조 차이](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.ko.png)
 
 *동기 스트리밍과 비동기 스트리밍의 구조 차이*
 
@@ -203,7 +203,7 @@ asyncio.run(main())
 
 스트리밍에서는 사용량 메타데이터를 언제 읽을지도 달라집니다.
 
-![마지막 청크와 별도 집계로 사용량을 읽는 구조](../../../assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.ko.png)
+![마지막 청크와 별도 집계로 사용량을 읽는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.ko.png)
 
 *마지막 청크와 별도 집계로 사용량을 읽는 구조*
 
@@ -277,7 +277,7 @@ def consume_stream(stream) -> tuple[str, float | None]:
 
 스트리밍은 UI뿐 아니라 파일 저장과 파이프라인 연결에도 유용합니다. 긴 초안 생성 중간 결과를 바로 파일에 flush할 수도 있고, 문장 단위로 버퍼링해 다른 소비자에게 넘길 수도 있습니다. 핵심은 스트림을 “터미널 출력”이 아니라 “중간에 끼워 넣을 수 있는 데이터 흐름”으로 보는 것입니다. 이제 서버에서 브라우저로 릴레이하는 패턴까지 보면 스트리밍의 제품적 위치가 더 선명해집니다.
 
-![FastAPI가 모델 스트림을 브라우저로 전달하는 구조](../../../assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.ko.png)
+![FastAPI가 모델 스트림을 브라우저로 전달하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.ko.png)
 
 *FastAPI가 모델 스트림을 브라우저로 전달하는 구조*
 

@@ -48,7 +48,7 @@ Agents tangle together LLMs, tools, external APIs, and user input, so error sour
 
 ### Reliability control loop
 
-![Reliability control loop](../../../assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
+![Reliability control loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
 ### LLM Response Errors
 
 The LLM's own non-determinism, format errors, and hallucinations are the most common error source.

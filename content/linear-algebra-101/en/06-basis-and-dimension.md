@@ -43,7 +43,7 @@ In practice, some features add almost no new information because they are nearly
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
 
 *This diagram condenses the flow from linear independence to basis, dimension, and matrix rank.*
 

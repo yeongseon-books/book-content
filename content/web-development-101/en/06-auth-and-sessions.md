@@ -43,7 +43,7 @@ Almost every app has login. A weak design lets *account takeover* happen in one 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
 
 *The default login flow where a session id survives across requests through a cookie.*
 

@@ -44,7 +44,7 @@ A normal chatbot generates text from the information already available in the pr
 - chatbot: answer from existing context
 - agent: ask for tools such as APIs, databases, calculators, or search systems
 
-![Difference between a chatbot and an AI agent](../../../assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
+![Difference between a chatbot and an AI agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
 
 *Difference between a chatbot and an AI agent*
 
@@ -58,7 +58,7 @@ A normal chatbot generates text from the information already available in the pr
 
 The key point is execution ownership. The model proposes. The application decides whether and how to execute.
 
-![How model judgment and function execution interact](../../../assets/ai-web-dev-101/05/function-calling-cycle.en.png)
+![How model judgment and function execution interact](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/function-calling-cycle.en.png)
 
 *How model judgment and function execution interact*
 
@@ -252,7 +252,7 @@ def run_agent(user_prompt):
     return messages[-1].content
 ```
 
-![An agent using multiple tools in sequence](../../../assets/ai-web-dev-101/05/multi-tool-example-flow.en.png)
+![An agent using multiple tools in sequence](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/multi-tool-example-flow.en.png)
 
 *An agent using multiple tools in sequence*
 
@@ -267,7 +267,7 @@ def run_agent(user_prompt):
 
 That order matters because it keeps debugging grounded. When the behavior looks strange, you can ask whether the issue came from tool selection, argument generation, execution, or result interpretation.
 
-![The repeating agent loop of judgment and action](../../../assets/ai-web-dev-101/05/agent-loop-overview.en.png)
+![The repeating agent loop of judgment and action](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/agent-loop-overview.en.png)
 
 *The repeating agent loop of judgment and action*
 
@@ -281,7 +281,7 @@ That order matters because it keeps debugging grounded. When the behavior looks 
 
 The core rule is simple: never execute model-generated arguments blindly.
 
-![Tool permission boundaries and safety checks](../../../assets/ai-web-dev-101/05/tool-permission-boundary.en.png)
+![Tool permission boundaries and safety checks](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/tool-permission-boundary.en.png)
 
 *Tool permission boundaries and safety checks*
 

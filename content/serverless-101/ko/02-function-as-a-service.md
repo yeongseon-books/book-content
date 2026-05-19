@@ -45,7 +45,7 @@ last_reviewed: '2026-05-16'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.ko.png)
 
 *FaaS에서는 핸들러 자체보다 패키지 구조와 런타임 초기화가 실제 실행 결과를 크게 좌우합니다.*
 

@@ -48,7 +48,7 @@ communication이 흔들리면 복구 작업도 함께 흔들립니다. 대응자
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/04/04-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 한 incident에서도 청중은 적어도 셋으로 나뉩니다. 내부 대응팀은 기술 세부사항이 필요하고, 고객은 영향과 행동 안내가 필요하며, 경영진은 요약과 사업 영향을 빠르게 알아야 합니다. 채널이 다르면 메시지의 길이와 어휘도 함께 달라져야 합니다.

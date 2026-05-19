@@ -44,7 +44,7 @@ In this post, we'll use computation graphs, forward and backward passes, local d
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
 
 *Backpropagation flow: loss sends gradient signals backward through the computation graph.*
 ## Key Terms

@@ -44,7 +44,7 @@ In this chapter, we will treat `read_csv` and `read_excel` as data-loading contr
 
 ## Concept at a Glance
 
-![A loading flow that checks encoding, dtypes, and headers early](../../../assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
+![A loading flow that checks encoding, dtypes, and headers early](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
 *A loading flow that checks encoding, dtypes, and headers early*
 
 ## Key Terms

@@ -44,7 +44,7 @@ A workflow that *throws build outputs away* offers *no reuse, no trace*. Artifac
 
 ## Concept at a Glance
 
-![A build job uploading artifacts to GitHub storage before a deploy job downloads them](../../../assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
+![A build job uploading artifacts to GitHub storage before a deploy job downloads them](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
 
 *A build job uploading artifacts to GitHub storage before a deploy job downloads them*
 

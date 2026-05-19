@@ -44,7 +44,7 @@ In this chapter, we will frame `groupby` as the split-apply-combine workflow. Th
 
 ## Concept at a Glance
 
-![The split, apply, and combine flow behind groupby work](../../../assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
+![The split, apply, and combine flow behind groupby work](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
 *The split, apply, and combine flow behind groupby work*
 
 ## Key Terms

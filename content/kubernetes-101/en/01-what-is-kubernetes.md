@@ -44,7 +44,7 @@ A handful of containers fits on *Compose*. From *dozens* upward, an *orchestrato
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
 *This control-flow view shows how `kubectl` talks to the API server and lets the control plane drive scheduling toward the desired state.*
 
 

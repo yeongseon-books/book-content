@@ -43,7 +43,7 @@ It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and recon
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
 
 *This diagram captures the PCA flow from centering to principal components and projection onto the top axes.*
 

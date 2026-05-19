@@ -58,7 +58,7 @@ function calling은 모델이 직접 API를 호출하는 기능이 아닙니다.
 
 ### 도구 호출 루프
 
-![도구 호출 루프](../../../assets/ai-agent-101/03/03-01-tool-calling-loop.ko.png)
+![도구 호출 루프](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.ko.png)
 ## 핵심 개념
 
 ### function calling의 기본 흐름은 네 단계입니다

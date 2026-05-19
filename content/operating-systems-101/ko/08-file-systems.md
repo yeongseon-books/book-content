@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 쓰기가 안전해지기까지 거치는 경로
 
-![쓰기가 안전해지기까지 거치는 경로](../../../assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png)
+![쓰기가 안전해지기까지 거치는 경로](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png)
 *write가 끝났다는 사실과 디스크에 안전하게 남았다는 사실은 서로 다른 단계입니다.*
 
 ```text

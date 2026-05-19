@@ -56,7 +56,7 @@ class Closeable(Protocol):     class FileHandler:
               (no inheritance needed)
 ```
 
-![How Protocol and ABC evaluate compatibility](../../../assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
+![How Protocol and ABC evaluate compatibility](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
 
 *How Protocol and ABC evaluate compatibility*
 

@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/10/10-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 테스트 피라미드는 단순한 그림이 아니라 비용 구조를 보여 줍니다. 아래층일수록 빠르고 많아야 하고, 위층일수록 비싸고 적어야 합니다. 이 분포가 무너지면 피드백 속도와 신뢰가 함께 흔들립니다.

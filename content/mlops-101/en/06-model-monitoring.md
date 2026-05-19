@@ -48,7 +48,7 @@ Without monitoring, deployment is close to driving with your eyes closed. The te
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/06/06-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This is the smallest useful monitoring shape. The application exposes time-series metrics on `/metrics`, Prometheus scrapes them, Grafana visualizes them, and Alertmanager routes meaningful threshold crossings to humans.

@@ -47,7 +47,7 @@ Principles are diagnostic tools, not commandments. When the code smells, they po
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
 *Design principles are most useful when they translate a code smell into a refactoring direction*
 
 Smell → principle → refactor.

@@ -47,7 +47,7 @@ Documentation does the same thing for humans. It lowers the cost of understandin
 
 Verification usually grows from small logic checks to full user flow checks, then out to docs and CI.
 
-![How tests, documentation, and CI stack into one verification flow](../../../assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
+![How tests, documentation, and CI stack into one verification flow](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
 
 *How tests, documentation, and CI stack into one verification flow*
 

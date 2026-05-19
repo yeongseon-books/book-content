@@ -56,7 +56,7 @@ Example graph:     BFS order:           DFS order:
   E   F
 ```
 
-![BFS 층별 방문과 DFS 경로 우선 방문 비교](../../../assets/algorithms-python-101/07/07-01-concept-overview.ko.png)
+![BFS 층별 방문과 DFS 경로 우선 방문 비교](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.ko.png)
 
 *BFS는 층별로 넓게 퍼지고, DFS는 한 경로를 끝까지 따라간 뒤 되돌아옵니다.*
 

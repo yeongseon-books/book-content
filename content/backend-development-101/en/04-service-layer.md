@@ -42,7 +42,7 @@ Putting business logic in controllers spreads the same rule across *three places
 
 ## Concept at a Glance
 
-![service layer coordinating repositories, external APIs, and events](../../../assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
+![service layer coordinating repositories, external APIs, and events](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
 
 *service layer coordinating repositories, external APIs, and events*
 A service is the *orchestrator* — it coordinates the repo, external APIs, and the event bus.
