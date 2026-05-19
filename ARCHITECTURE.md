@@ -23,7 +23,7 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 | `yeongseon-books/book-content` | private | Canonical source, scripts, exports |
 | `yeongseon-books/book-public-assets` | **public** | GitHub Pages로 호스팅하는 이미지 CDN |
 
-Canonical source에는 public asset URL을 hardcode하지 않는다. Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
+Canonical source는 `book-public-assets`의 public URL(`{asset_base_url}/assets/...`)을 직접 참조한다. Tistory/Hashnode/Medium/MkDocs는 동일한 URL을 그대로 통과시키며, eBook exporter만 bundle을 self-contained로 만들기 위해 로컬 `assets/...` 경로로 역재작성한다. 상세는 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 
 ## Publication Pipelines
 

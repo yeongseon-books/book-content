@@ -290,13 +290,12 @@ python3 scripts/export_ebook_source.py azure-functions-101 --lang ko
 
 외부 발행(Medium, Tistory, Hashnode)에서 이미지를 참조할 때의 규칙이다.
 
-- Canonical source(`ko/*.md`, `en/*.md`)에는 public asset URL을 hardcode하지 않는다.
-- Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
-- `asset_base_url`에는 trailing slash를 넣지 않는다.
-- Base URL 형식: `https://yeongseon-books.github.io/book-public-assets`
+- Canonical source(`ko/*.md`, `en/*.md`)는 `book-public-assets`의 public URL을 직접 참조한다. Tistory/Hashnode/Medium/MkDocs는 동일한 URL을 그대로 통과시키므로 발행 시점의 경로 재작성이 필요 없다.
+- `series.yaml`의 `meta.asset_base_url`은 정책 참조용 단일 출처(`https://yeongseon-books.github.io/book-public-assets`)이며 trailing slash를 넣지 않는다.
 - 최종 이미지 URL 예시: `{asset_base_url}/assets/{series}/{NN}/{file}.png`
-- Medium은 `--asset-mode` 플래그로 `public` (기본) / `inline` (base64) / `local` (상대 경로)을 선택한다.
-- Tistory는 `--local-assets` 플래그로 상대 경로 유지를 선택할 수 있다. 기본은 public URL 재작성.
+- Medium은 `--asset-mode` 플래그로 `public` (기본: 그대로 통과) / `inline` (base64) / `local` (상대 경로)을 선택한다.
+- Tistory는 `--local-assets` 플래그로 상대 경로로 강제 변환할 수 있다. 기본은 public URL 통과.
+- eBook exporter는 자동으로 public URL을 로컬 `assets/...` 경로로 역재작성한다 (bundle self-contained, ASSET_POLICY.md §eBook 예외).
 - `check_links.py`는 외부 public asset URL을 검증하지 않는다 (로컬 파일 존재 여부만 확인).
 
 ---

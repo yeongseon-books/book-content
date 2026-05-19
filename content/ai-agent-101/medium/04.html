@@ -74,16 +74,10 @@
 
 <h2>Key Workflow Patterns</h2>
 <p>Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.</p>
-<<<<<<< HEAD
 <p><strong>Draw the control flow before you tune the prompt</strong></p>
 <p><img alt="Draw the control flow before you tune the prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png"><br>
 <em>A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.</em></p>
 <p><strong>ReAct (Reasoning + Acting)</strong></p>
-=======
-<p><strong>Workflow pattern map</strong></p>
-<p><img alt="Workflow pattern map" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-workflow-pattern-map.en.png"><br>
-<strong>ReAct (Reasoning + Acting)</strong></p>
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 <p><strong>ReAct</strong> alternates between Reasoning and Acting. The agent thinks, uses tools, and observes results iteratively.</p>
 <pre><code class="language-python">from typing import Dict, Any, List
 import openai
@@ -106,7 +100,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
-            model=&quot;gpt-4o&quot;,
+            model=&quot;gpt-4.1&quot;,
             messages=messages,
             tools=tools,
             tool_choice=&quot;auto&quot;
@@ -168,7 +162,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
     &quot;&quot;&quot;
 
     response = openai.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
+        model=&quot;gpt-4.1&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: plan_prompt}]
     )
 
@@ -203,7 +197,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
     &quot;&quot;&quot;
 
     final_response = openai.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
+        model=&quot;gpt-4.1&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary_prompt}]
     )
 
@@ -262,7 +256,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
         &quot;&quot;&quot;
 
         reflection_response = openai.chat.completions.create(
-            model=&quot;gpt-4o&quot;,
+            model=&quot;gpt-4.1&quot;,
             messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: reflection_prompt}]
         )
 
@@ -345,7 +339,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
     &quot;&quot;&quot;
 
     response = openai.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
+        model=&quot;gpt-4.1&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}]
     )
 
@@ -386,7 +380,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -&gt; s
     &quot;&quot;&quot;
 
     response = openai.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
+        model=&quot;gpt-4.1&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}]
     )
 
@@ -460,7 +454,7 @@ order = decompose_with_dependencies(tasks, dependencies)
         &quot;&quot;&quot;
 
         response = openai.chat.completions.create(
-            model=&quot;gpt-4o&quot;,
+            model=&quot;gpt-4.1&quot;,
             messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: next_step_prompt}]
         )
 

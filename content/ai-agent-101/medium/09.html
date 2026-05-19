@@ -74,15 +74,9 @@
 
 <h2>Observability</h2>
 <p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
-<<<<<<< HEAD
 <p><img alt="Observability" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png"><br>
 <em>Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.</em></p>
 <p><strong>Structured Logging</strong></p>
-=======
-<p><strong>Operations feedback loop</strong></p>
-<p><img alt="Operations feedback loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-operations-feedback-loop.en.png"><br>
-<strong>Structured Logging</strong></p>
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 <p>Plaintext logs are hard to parse and query. JSON-structured logs are the standard.</p>
 <pre><code class="language-python">import logging
 import json
@@ -244,8 +238,8 @@ class BudgetEnforcer:
     &quot;&quot;&quot;Budget enforcement.&quot;&quot;&quot;
 
     PRICING = {
-        &quot;gpt-4o&quot;: {&quot;prompt&quot;: 0.0025 / 1000, &quot;completion&quot;: 0.01 / 1000},
-        &quot;gpt-4o-mini&quot;: {&quot;prompt&quot;: 0.00015 / 1000, &quot;completion&quot;: 0.0006 / 1000}
+        &quot;gpt-4&quot;: {&quot;prompt&quot;: 0.03 / 1000, &quot;completion&quot;: 0.06 / 1000},
+        &quot;gpt-4o-mini&quot;: {&quot;prompt&quot;: 0.15 / 1_000_000, &quot;completion&quot;: 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -292,6 +286,7 @@ budget.set_limit(&quot;user_123&quot;, daily_limit_usd=5.0)
 if not budget.check_and_record(&quot;user_123&quot;, &quot;gpt-4o&quot;, 1500, 500):
     raise RuntimeError(&quot;daily budget exceeded&quot;)
 </code></pre>
+<p>If you still run a legacy <code>gpt-3.5-turbo</code> workload, budget it with the current legacy rates of $0.50 per 1M input tokens and $1.50 per 1M output tokens. For new cost-sensitive production defaults, <code>gpt-4o-mini</code> is the better example.</p>
 <p>Without cost limits, one user can drain the entire budget.</p>
 <h2>Scaling Strategies</h2>
 <p>Most agent load comes from LLM API calls. Optimizing those calls is the core of scaling.</p>

@@ -102,12 +102,13 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM decides whether to use tools
 )
 </code></pre>
+<p>Use a model that currently supports tool calling, such as <code>gpt-4.1</code>, for examples like this. Keep <code>gpt-4</code> only when you are explicitly discussing a legacy setup.</p>
 <p><strong>Step 2: LLM Decides to Call a Tool</strong></p>
 <p>The LLM analyzes the user query and determines which tool to use.</p>
 <pre><code class="language-python"># Example response from LLM
@@ -160,7 +161,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=messages
 )
 
@@ -185,7 +186,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-            model=&quot;gpt-4o&quot;,
+            model=&quot;gpt-4.1&quot;,
             messages=messages,
             tools=tools,
             tool_choice=&quot;auto&quot;
@@ -406,7 +407,7 @@ tools = [
 
 # Pass tool information to LLM
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM automatically selects tool
@@ -589,7 +590,7 @@ tools = [
 
 # Strategy 1: Automatic selection (LLM decides)
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM uses tools when needed
@@ -597,7 +598,7 @@ response = openai.chat.completions.create(
 
 # Strategy 2: Force tool use
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;required&quot;  # Must call one tool
@@ -605,7 +606,7 @@ response = openai.chat.completions.create(
 
 # Strategy 3: Specify tool
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice={&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;get_weather&quot;}}
@@ -613,7 +614,7 @@ response = openai.chat.completions.create(
 
 # Strategy 4: Disable tools
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;none&quot;  # No tool use
@@ -694,7 +695,7 @@ def select_relevant_tools(
     &quot;&quot;&quot;
 
     response = openai.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
+        model=&quot;gpt-4.1&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary_prompt}]
     )
 
@@ -891,7 +892,7 @@ tools = registry.get_tools(context=&quot;database&quot;)
 <p><strong>Lesson</strong>: Always check the <code>success</code> field in tool results and prepare fallback strategies for failures.</p>
 <p><strong>Mistake 4: Registering Too Many Tools</strong></p>
 <p><strong>Bad</strong>: Register all possible tools at once.</p>
-<pre><code class="language-python"># Pass 50 tools to LLM at once
+<pre><code class="language-text"># Pass 50 tools to LLM at once
 tools = [
     {&quot;name&quot;: &quot;get_weather&quot;, ...},
     {&quot;name&quot;: &quot;search_docs&quot;, ...},
@@ -901,7 +902,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools  # Token waste, reduced selection accuracy
 )
@@ -924,7 +925,7 @@ response = openai.chat.completions.create(
 relevant_tools = get_relevant_tools(user_query, all_tools)
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4o&quot;,
+    model=&quot;gpt-4.1&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}],
     tools=relevant_tools  # 3-5 tools only
 )
