@@ -1,0 +1,23 @@
+flowchart LR
+    Config["Core LoraConfig fields"] --> Rank["r\nexpressiveness ↔ trainable parameter count"]
+    Config --> Alpha["lora_alpha\nscale of adapter influence"]
+    Config --> Dropout["lora_dropout\nregularization on adapter path"]
+    Config --> Targets["target_modules\nwhere LoRA actually attaches"]
+    Config --> Bias["bias\nextra items to train"]
+    Config --> TaskType["task_type\nhow the head is interpreted"]
+
+    Rank --> Params["changes trainable params"]
+    Alpha --> Scaling["effective influence is alpha / r"]
+    Dropout --> Stability["reduces overfit risk\non tiny datasets"]
+    Targets --> Attachment["module names must match\nor nothing useful attaches"]
+    Bias --> Memory["changes memory use\nand adaptation scope"]
+    TaskType --> Compatibility["must align with task\nsuch as CAUSAL_LM"]
+
+    Attachment --> Conclusion["Check target_modules and\ntrainable params before anything else"]
+    Params --> Conclusion
+    Stability --> Conclusion
+    Compatibility --> Conclusion
+
+    style Config fill:#e3f2fd,stroke:#1976d2
+    style Targets fill:#ffebee,stroke:#c62828
+    style Conclusion fill:#fff8e1,stroke:#f9a825

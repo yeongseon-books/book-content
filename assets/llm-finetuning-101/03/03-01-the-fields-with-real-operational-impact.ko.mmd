@@ -1,0 +1,23 @@
+flowchart LR
+    설정["LoraConfig 핵심 필드"] --> 랭크["r\n표현력 ↔ 학습 가능 파라미터 수"]
+    설정 --> 알파["lora_alpha\n어댑터 영향력 스케일"]
+    설정 --> 드롭아웃["lora_dropout\n어댑터 경로 정규화"]
+    설정 --> 대상모듈["target_modules\n어디에 실제로 붙는가"]
+    설정 --> 바이어스["bias\n추가로 학습할 항목"]
+    설정 --> 태스크["task_type\n헤드 해석 방식"]
+
+    랭크 --> 파라미터["trainable params 변화"]
+    알파 --> 스케일["alpha / r 로 체감 영향"]
+    드롭아웃 --> 안정성["작은 데이터에서 과적합 억제"]
+    대상모듈 --> 부착성공["모듈 이름이 맞아야\n어댑터가 실제로 주입"]
+    바이어스 --> 메모리["추가 메모리와 미세 조정 범위"]
+    태스크 --> 호환성["CAUSAL_LM 등 태스크와\n구성 일치 여부"]
+
+    부착성공 --> 운영결론["가장 먼저 확인할 값은\ntarget_modules와 trainable params"]
+    파라미터 --> 운영결론
+    안정성 --> 운영결론
+    호환성 --> 운영결론
+
+    style 설정 fill:#e3f2fd,stroke:#1976d2
+    style 대상모듈 fill:#ffebee,stroke:#c62828
+    style 운영결론 fill:#fff8e1,stroke:#f9a825

@@ -1,0 +1,22 @@
+flowchart TB
+    시작["평가 함수 호출"] --> 평가모드["model.eval()"]
+    평가모드 --> 반복["평가 데이터 각 행 순회"]
+    반복 --> 배치["row → torch.tensor 배치"]
+    배치 --> 노그래드["torch.no_grad()"]
+    노그래드 --> 손실["model(**batch).loss"]
+
+    손실 --> 수집["loss.item() 누적"]
+    수집 --> 평균["평균 손실 계산"]
+    평균 --> 지수["math.exp(mean_loss)"]
+    지수 --> 퍼플렉서티["perplexity 출력"]
+
+    퍼플렉서티 --> 비교["학습 전후 값 비교"]
+    퍼플렉서티 --> 골든["별도 골든 세트 점수와 함께 읽기"]
+    비교 --> 회귀["회귀 감지 기준선 확인"]
+    골든 --> 회귀
+    회귀 --> 결론["숫자 추세와 사용자 체감 품질을\n동시에 점검"]
+
+    style 시작 fill:#e3f2fd,stroke:#1976d2
+    style 노그래드 fill:#e8f5e9,stroke:#388e3c
+    style 퍼플렉서티 fill:#f3e5f5,stroke:#7b1fa2
+    style 결론 fill:#fff8e1,stroke:#f9a825

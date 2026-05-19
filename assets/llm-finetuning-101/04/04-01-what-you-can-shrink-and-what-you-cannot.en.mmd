@@ -1,0 +1,27 @@
+flowchart LR
+    TinyRun["Smallest useful training validation"] --> Shrinkable["What you can shrink"]
+    TinyRun --> MustKeep["What you must keep"]
+
+    Shrinkable --> SampleCount["sample count"]
+    Shrinkable --> StepCount["training step count"]
+    Shrinkable --> Logging["reporting and checkpoint frequency"]
+
+    MustKeep --> TokenInputs["tokenized inputs"]
+    MustKeep --> Labels["labels or the equivalent loss target"]
+    MustKeep --> Optimizer["optimizer.step()"]
+    MustKeep --> LossCheck["loss.backward() and a finite loss"]
+
+    SampleCount --> ValidTest["still remains a training validation"]
+    StepCount --> ValidTest
+    Logging --> ValidTest
+    TokenInputs --> NotInference["remove any of these and it becomes\nan inference demo, not training"]
+    Labels --> NotInference
+    Optimizer --> NotInference
+    LossCheck --> NotInference
+
+    ValidTest --> Conclusion["Make it smaller, but keep\nthe essence of learning intact"]
+    NotInference --> Conclusion
+
+    style TinyRun fill:#e3f2fd,stroke:#1976d2
+    style MustKeep fill:#ffebee,stroke:#c62828
+    style Conclusion fill:#fff8e1,stroke:#f9a825
