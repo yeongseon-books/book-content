@@ -37,8 +37,6 @@ This is the second post in the Korean AI Stack 101 series. Here, we build a mini
 
 > Korean AI Stack 101 (2/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/02-kosimcse-similarity)
-
 ## Why this matters
 
 This post moves from model comparison into an actual Korean retrieval loop. The task is intentionally narrow: encode FAQ questions, index them with FAISS, and retrieve the closest match for a new Korean query.

@@ -154,8 +154,6 @@ if __name__ == "__main__":
 
 실행 파일 경로보다 더 중요한 점도 있습니다. 이 코드는 “대화형처럼 보이는 함수 호출”과 “실제로 재개 가능한 시스템”의 차이를 눈앞에 드러냅니다. 그 차이를 이해해야 이후 분기와 tool loop를 붙일 때도 안정적인 복구 전략을 설계할 수 있습니다.
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints)
-
 ---
 
 ## 저장이 실제로 됐는지 로컬에서 검증하기

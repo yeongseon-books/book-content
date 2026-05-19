@@ -22,8 +22,6 @@ seo_description: Define a reliable application contract using JSON mode and Pyda
 
 > LLM API Production 101 (1/6)
 
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/01-structured-output)
-
 The first production problem in an LLM application is often not answer quality. It is output shape. A demo can render one paragraph of model text and stop there. A real service usually cannot. It needs fields that can be inserted into a database, validated against business rules, passed to another service, or used to drive control flow. At that point, pretty prose is secondary. The important question is whether the application can trust the response format.
 
 Teams often lose time here because the early version looks deceptively easy. The prompt says, "Return JSON," the code calls `json.loads()`, and the first few tests pass. Then the prompt grows, an edge case appears, the model adds a sentence before the payload, wraps the object in a code fence, or renames a key. The failure is not really about model intelligence. It is about the absence of a contract between text generation and application logic.

@@ -34,8 +34,6 @@ This post covers the baseline FAISS workflow you need before tuning larger ANN d
 - running real queries against a small corpus
 - how to choose between index types
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/04-faiss-fundamentals)
-
 ![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
 
 *FAISS index type comparison structure*

@@ -69,7 +69,6 @@
 <blockquote>
 <p>If full fine-tuning is rebuilding an entire building, LoRA is bolting reinforcement onto a few load-bearing columns.</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/01-intro">github.com/yeongseon-books/llm-finetuning-101</a></p>
 <h2>Why this matters</h2>
 <p>LLM fine-tuning does not have to start with a GPU lab. If we throw a large model at the problem first, learning rate, dataset format, and adapter rank all wobble at once, and we lose the ability to tell which knob actually moved the result. The point of post 1 is to defer the model run and align our <strong>arithmetic intuition</strong> first.</p>
 <p>Understanding numerically why LoRA is cheap and fast, how few parameters it really trains, and when this trade-off is rational keeps the dataset, training, evaluation, and serving posts that follow from getting tangled. The ratio we compute here once (≈ 1.5% of total linear parameters for a LoRA adapter) reappears in post 3 when we choose <code>LoraConfig(r=8)</code>, in post 4 when we estimate training time, and in post 6 when we ship adapter weights independently of the base model.</p>
@@ -273,7 +272,6 @@ rank=32 trainable=7,077,888 ratio=6.2500%
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://arxiv.org/abs/2106.09685">LoRA paper</a></li>
 <li><a href="https://huggingface.co/docs/peft">Hugging Face PEFT documentation</a></li>
 <li><a href="https://arxiv.org/abs/2305.14314">QLoRA paper</a></li>

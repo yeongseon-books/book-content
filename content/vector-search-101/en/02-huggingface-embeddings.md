@@ -34,8 +34,6 @@ Here we turn local embeddings into a reusable workflow: initialize once, encode 
 - practical tips for speeding up encoding on CPU
 - comparing the wrapper to the raw `SentenceTransformer` API
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
-
 ![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 
 *Single query embedding call flow*

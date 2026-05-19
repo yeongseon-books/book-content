@@ -176,8 +176,6 @@ def build_graph():
 
 실행 파일 경로보다 더 중요한 점도 있습니다. 이 코드는 “한 에이전트가 모든 걸 하는 구조”와 “위임 구조가 설명 가능한 그래프”의 차이를 드러냅니다. 그 차이를 이해해야 worker가 늘어나도 shared state 폭발과 책임 혼선을 예방할 수 있습니다.
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
-
 ---
 
 ## 이 코드에서 먼저 봐야 할 점

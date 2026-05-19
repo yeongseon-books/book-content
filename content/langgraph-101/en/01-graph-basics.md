@@ -160,8 +160,6 @@ That is why I prefer starting with examples this small. If you introduce an LLM 
 
 You can keep the runnable-file path around if you want, but the more important point is this: the code is your first exercise in reading a graph as a state machine rather than as function composition. Small examples are where that reading habit becomes easy enough to practice.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
-
 ---
 
 ## Validate the full state, not just the final prose

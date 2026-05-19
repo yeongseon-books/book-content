@@ -188,7 +188,6 @@ def build_graph():
 <p>This example is small, but it proves three operationally important things. First, the supervisor owns route selection while workers own actual execution, so delegation logic and work output can be inspected separately. Second, workers update a dedicated field like <code>worker_result</code>, which keeps the shared-state contract narrow. Third, the finalizer holds output assembly in one place, so adding workers later does not scatter answer-shaping logic across the graph.</p>
 <p>That is why I like examples in this shape. They make multi-agent design read like a handoff graph instead of a pile of model calls. If you start with too many workers and too many loops, the phenomenon looks richer but the structure gets harder to see. Here the supervisor, worker, and finalizer layers are visible enough to make delegation boundaries intuitive first.</p>
 <p>There is another useful contrast here. This code shows the difference between “one agent trying to do everything” and “a graph whose delegation can be explained.” Once that difference is clear, shared-state discipline and handoff safety stop looking optional.</p>
-<p>Example code: <a href="https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent">github.com/yeongseon-books/langgraph-101</a></p>
 <hr>
 <h2>What to notice in this code</h2>
 <p>Do not try to absorb the whole file with equal attention. Three things matter first.</p>

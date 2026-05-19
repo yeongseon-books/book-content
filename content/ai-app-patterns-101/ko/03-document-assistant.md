@@ -39,8 +39,6 @@ seo_description: 문서 어시스턴트는 대화형 시스템이 아니라 긴 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (3/6)
 
-예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/03-document-assistant)
-
 문서 어시스턴트 패턴은 문서를 입력으로 받아 특정 처리 작업을 수행합니다. 챗봇이나 RAG 파이프라인과 달리, 여기에는 이어지는 대화가 없습니다. 문서가 입력이고, 구조화되거나 압축된 결과가 출력입니다. LLM이 요약, 정보 추출, 분류를 잘 처리하는 이유도 세 작업이 결국 같은 연산으로 환원되기 때문입니다. 문서를 읽고, 규칙을 적용하고, 구조화된 텍스트를 반환하는 일입니다.
 
 다룰 주제는 다음과 같습니다.

@@ -69,7 +69,6 @@
 <blockquote>
 <p>The training loop is not a giant black box. It is a repetition: feed a tokenized batch into the model and reduce the loss once.</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/04-training">github.com/yeongseon-books/llm-finetuning-101</a></p>
 <h2>Why this matters</h2>
 <p>Episode 4 is the first article in this series where actual weight updates happen. But the goal is still not high accuracy — it is to <strong>prove that the training loop is alive</strong>. Once you verify a single end-to-end step, future failures become easy to triage: is it the environment, the data, or the hyperparameters?</p>
 <p>Episode 4 also breaks the habit of tuning many hyperparameters at once. If you change the learning rate by 10x and the batch size by 4x in the same run, you cannot tell which change moved the loss. Practicing one-change-at-a-time here pays off in episode 5 (evaluation), where "why is the score low?" gets answered much faster.</p>
@@ -318,7 +317,6 @@ print(metrics)
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/trainer">Transformers Trainer documentation</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">TrainingArguments reference</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/data_collator">DataCollatorForLanguageModeling</a></li>

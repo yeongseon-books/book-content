@@ -39,8 +39,6 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 
 > 좋은 파인튜닝 데이터셋은 문장 더미가 아니라, 모델이 반복해서 흉내 내야 하는 **요청-응답 계약**입니다.
 
-예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset)
-
 ## 왜 이 글이 중요한가
 
 데이터셋 단계에서 가장 중요한 것은 양이 아니라 **형식 일관성**입니다. 무엇이 입력인지, 어디부터가 모델이 학습해야 할 응답인지 애매하면 손실은 내려가도 실제 답변은 흐릿하게 남습니다. 작은 LoRA 실험일수록 이 경계가 더 중요합니다.
@@ -250,7 +248,6 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## 참고 자료
 
-- [예제 저장소 — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Hugging Face Datasets documentation](https://huggingface.co/docs/datasets)
 - [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)

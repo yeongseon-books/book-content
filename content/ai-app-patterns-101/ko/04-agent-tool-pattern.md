@@ -39,8 +39,6 @@ seo_description: 에이전트는 단계를 미리 고정하지 않고 모델이 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (4/6)
 
-예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/04-agent-tool-pattern)
-
 지금까지 만든 체인은 모두 실행 경로가 고정되어 있었습니다. 입력이 들어오고, 단계가 순서대로 실행되고, 출력이 나갑니다. 에이전트 패턴은 여기서 달라집니다. LLM이 어떤 도구를 호출할지 결정하고, 그 결과를 읽고, 다음에 무엇을 할지 다시 결정합니다. 필요하다면 또 다른 도구를 호출할 수도 있고, 그 시점에서 최종 답을 낼 수도 있습니다.
 
 다룰 주제는 다음과 같습니다.

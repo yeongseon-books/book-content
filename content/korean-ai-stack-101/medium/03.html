@@ -67,7 +67,6 @@
 <p>The first thing to do when starting multilingual retrieval is not to combine fancy multi-vector signals, but to measure the dense baseline cleanly.</p>
 <p>Korean AI Stack 101 (3/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/03-bge-m3-multilingual">github.com/yeongseon-books/korean-ai-stack-101</a></p>
 <h2>Why this matters</h2>
 <p>This post moves into a Korean retrieval scenario that is the daily reality at Korean companies: queries arrive in Korean, but a large fraction of the document corpus is written in English. The previous post used KoSimCSE on Korean-only short sentences. Here we use BGE-M3 on a mixed Korean-English corpus.</p>
 <p>BGE-M3 deserves its own stage for two reasons. First, internal documentation search at Korean companies is almost impossible without a multilingual encoder — manuals and incident postmortems are in English while user queries are in Korean. Second, BGE-M3 is the first widely available open model that emits dense, sparse, and multi-vector representations at once, which means later hybrid retrieval can fuse scores from the same backbone. This post focuses on the dense baseline; sparse and multi-vector are deferred to the next stage.</p>

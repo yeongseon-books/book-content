@@ -160,8 +160,6 @@ if __name__ == "__main__":
 
 실행 파일 경로보다 더 중요한 점도 있습니다. 이 코드는 “분기가 있는 함수”와 “분기가 설명 가능한 그래프”의 차이를 드러냅니다. 이 차이를 이해해야 default 경로, fallback 설계, recursion limit 같은 운영 안전장치도 같은 구조 안에서 읽힙니다.
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
-
 ---
 
 ## default route를 코드로 고정해 두기

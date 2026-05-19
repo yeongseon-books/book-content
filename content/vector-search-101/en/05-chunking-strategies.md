@@ -34,8 +34,6 @@ Here chunking is treated as a retrieval design choice, not a preprocessing after
 - how chunk boundaries affect retrieval quality
 - choosing a chunking strategy for different document types
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
-
 ![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
 
 *Chunk size and overlap structure*

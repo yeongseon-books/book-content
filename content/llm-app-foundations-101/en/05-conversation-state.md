@@ -22,8 +22,6 @@ seo_description: Build stateful LLM chatbots by managing conversation history th
 
 > LLM App Foundations 101 (5/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/05-conversation-state)
-
 The diagram below summarizes how message history accumulates across turns.
 
 ![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)

@@ -37,8 +37,6 @@ This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe 
 
 > Korean AI Stack 101 (5/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/05-hyperclova-solar-api)
-
 The title points to HyperCLOVA X and Solar because they matter in the Korean model landscape, but the runnable example uses Groq's `llama-3.1-8b-instant`. The reason is practical: the repository example must run immediately in a reader's environment.
 
 ## Why this matters

@@ -68,7 +68,6 @@
 <blockquote>
 <p>Serving is not the step that makes the model smarter. It is the step that places an already-prepared model behind a predictable HTTP contract.</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/06-serving">github.com/yeongseon-books/llm-finetuning-101</a></p>
 <h2>Why this matters</h2>
 <p>The final article in the series puts the trained adapter behind an API. In production, training and serving are kept separate as a rule. For a demo, however, doing one small fine-tuning step and immediately wrapping the result in an endpoint helps you see the whole flow at once.</p>
 <p>There is a clear reason to make serving its own stage. Training thinks in batches and epochs, but serving must think in <strong>per-request latency and concurrency</strong>. The same model under these two viewpoints needs different code structure, memory policy, and error handling. Episode 6 practices that switch in the smallest possible unit.</p>
@@ -225,7 +224,6 @@ print(client.post(&quot;/generate&quot;, json={&quot;prompt&quot;: &quot;Python 
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://fastapi.tiangolo.com/">FastAPI documentation</a></li>
 <li><a href="https://www.starlette.io/testclient/">Starlette TestClient reference</a></li>
 <li><a href="https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters">PEFT — Multiple adapters</a></li>

@@ -177,8 +177,6 @@ That is why I like examples in this shape. They make multi-agent design read lik
 
 There is another useful contrast here. This code shows the difference between “one agent trying to do everything” and “a graph whose delegation can be explained.” Once that difference is clear, shared-state discipline and handoff safety stop looking optional.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
-
 ---
 
 ## What to notice in this code

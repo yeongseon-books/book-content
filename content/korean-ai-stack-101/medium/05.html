@@ -67,7 +67,6 @@
 <p>Switching generation providers is not just a model-name change. It also changes authentication, request shape, prompt contracts, and response validation.</p>
 <p>Korean AI Stack 101 (5/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/05-hyperclova-solar-api">github.com/yeongseon-books/korean-ai-stack-101</a></p>
 <p>The title points to HyperCLOVA X and Solar because they matter in the Korean model landscape, but the runnable example uses Groq's <code>llama-3.1-8b-instant</code>. The reason is practical: the repository example must run immediately in a reader's environment.</p>
 <h2>Why this matters</h2>
 <p>This post covers the patterns for safely calling Korean generation LLM APIs. Earlier posts cleaned the input data with embeddings (KoSimCSE, BGE-M3) and OCR (CLOVA). This post builds the answer on top. HyperCLOVA X (NAVER) and Solar (Upstage) are tuned for Korean fluency, but the real production problems live on the call-contract side: authentication, latency, error codes, token limits, prompt caching.</p>

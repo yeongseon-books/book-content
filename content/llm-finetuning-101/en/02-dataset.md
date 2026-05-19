@@ -39,8 +39,6 @@ This is the second post in the LLM Fine-tuning 101 series.
 
 > A good fine-tuning dataset is not a pile of sentences but a **request-response contract** the model is asked to imitate, repeatedly.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset)
-
 ## Why this matters
 
 At the dataset stage, what matters most is not volume but **format consistency**. If it is unclear what counts as input and which span the model should learn as a response, the loss may drop while the answers stay blurry. With the same 1,000 samples a consistent prompt format lets LoRA r=8 succeed; a mixed format may not converge even at r=64 with 5× more data.
@@ -246,7 +244,6 @@ Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `a
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Hugging Face Datasets documentation](https://huggingface.co/docs/datasets)
 - [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)

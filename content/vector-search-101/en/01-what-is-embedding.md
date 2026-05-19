@@ -34,8 +34,6 @@ This post focuses on the concept and intuition behind embeddings. Code stays min
 - a first hands-on example that produces real vectors
 - where embeddings fall short and what to watch for
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
-
 ![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 
 *Keyword search and embedding search contrast*

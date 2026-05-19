@@ -39,8 +39,6 @@ This is the third post in the LLM Fine-tuning 101 series.
 
 > A LoRA adapter is not a device for rewriting an entire model — it is a small correction patch attached beside specific linear transformations.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/03-lora)
-
 ## Why this matters
 
 From post 3 we touch real model objects. We assume no GPU and use a tiny model like `sshleifer/tiny-gpt2`, but the goal at this stage is not performance — it is **verifying that wiring is correct**. A single typo in `target_modules` makes `print_trainable_parameters()` print 0 with no traceback. Training runs, loss does not move — the most diagnostically painful failure mode in fine-tuning starts here.
@@ -227,7 +225,6 @@ Post 4 covers the training loop. We push real gradients through this adapter and
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [PEFT quicktour](https://huggingface.co/docs/peft/quicktour)
 - [Transformers model classes](https://huggingface.co/docs/transformers/index)
 - [LoRA paper](https://arxiv.org/abs/2106.09685)

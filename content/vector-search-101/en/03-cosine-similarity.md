@@ -32,8 +32,6 @@ This post implements all three metrics from scratch, shows why normalization mat
 - running a real query and examining the results
 - when to use each metric
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
-
 ![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 
 *Cosine dot and euclidean comparison structure*

@@ -22,8 +22,6 @@ seo_description: Master the economics and limits of LLM applications by understa
 
 > LLM App Foundations 101 (2/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/02-understanding-tokens)
-
 The diagram below summarizes how raw text becomes tokens and then turns into model budget.
 
 ![Understanding tokens: cost, limits, and context windows](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png)

@@ -39,8 +39,6 @@ This is the final post in the LLM Fine-tuning 101 series.
 
 > Serving is not the step that makes the model smarter. It is the step that places an already-prepared model behind a predictable HTTP contract.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/06-serving)
-
 ## Why this matters
 
 The final article in the series puts the trained adapter behind an API. In production, training and serving are kept separate as a rule. For a demo, however, doing one small fine-tuning step and immediately wrapping the result in an endpoint helps you see the whole flow at once.
@@ -243,7 +241,6 @@ The next step is leaving the series and repeating this same flow on your own dom
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
 - [Starlette TestClient reference](https://www.starlette.io/testclient/)
 - [PEFT — Multiple adapters](https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters)

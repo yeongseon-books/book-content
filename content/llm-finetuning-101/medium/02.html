@@ -68,7 +68,6 @@
 <blockquote>
 <p>A good fine-tuning dataset is not a pile of sentences but a <strong>request-response contract</strong> the model is asked to imitate, repeatedly.</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/02-dataset">github.com/yeongseon-books/llm-finetuning-101</a></p>
 <h2>Why this matters</h2>
 <p>At the dataset stage, what matters most is not volume but <strong>format consistency</strong>. If it is unclear what counts as input and which span the model should learn as a response, the loss may drop while the answers stay blurry. With the same 1,000 samples a consistent prompt format lets LoRA r=8 succeed; a mixed format may not converge even at r=64 with 5× more data.</p>
 <p>Nailing the format in post 2 means the same template flows untouched into the training loop (post 4), evaluation (post 5), and serving (post 6). Skim past it and you get the contradictory situation where loss drops in post 4 but answer quality looks broken in post 5.</p>
@@ -230,7 +229,6 @@ print(len(tokenized[0][&quot;input_ids&quot;]))   # 64
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/datasets">Hugging Face Datasets documentation</a></li>
 <li><a href="https://arxiv.org/abs/2203.02155">Instruction tuning overview</a></li>
 <li><a href="https://github.com/tatsu-lab/stanford_alpaca#data-release">Alpaca dataset format</a></li>

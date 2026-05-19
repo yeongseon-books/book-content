@@ -15,7 +15,6 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-15'
-seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # 토큰 이해하기 — 비용, 한계, 컨텍스트 창

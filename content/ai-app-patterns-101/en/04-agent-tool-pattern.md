@@ -38,8 +38,6 @@ This is post 4 in the AI App Patterns 101 series. Here we examine when the agent
 *Questions this post answers*
 > AI App Patterns 101 (4/6)
 
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/04-agent-tool-pattern)
-
 Every chain built so far has a fixed execution path: input enters, steps run in order, output exits. The agent pattern changes this. The LLM decides which tool to call, inspects the result, and then decides what to do next — including whether to call another tool or produce a final answer.
 
 Topics:

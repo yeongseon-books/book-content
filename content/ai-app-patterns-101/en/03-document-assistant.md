@@ -38,8 +38,6 @@ This is post 3 in the AI App Patterns 101 series. Here we cover the document ass
 *Questions this post answers*
 > AI App Patterns 101 (3/6)
 
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/03-document-assistant)
-
 The document assistant pattern takes a document as input and performs a specific processing task on it. Unlike a chatbot or RAG pipeline, there is no ongoing conversation: the document is the input, and a structured or condensed result is the output. LLMs handle summarization, information extraction, and classification well because all three reduce to the same operation — read the document, apply a rule, return structured text.
 
 Topics:
