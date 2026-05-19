@@ -1,4 +1,4 @@
-.PHONY: check check-quality check-quality-audit check-content check-generated check-links finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune assets-check tistory tistory-one hashnode hashnode-one publish-check
+.PHONY: check check-quality check-quality-audit refresh-quality-audit check-content check-generated check-links finalize medium docs docs-build docs-serve series sync ebook ebook-build ebook-doctor ebook-upgrade assets-sync assets-sync-dry assets-sync-prune assets-check tistory tistory-one hashnode hashnode-one publish-check
 
 check: check-content check-generated check-links
 
@@ -6,6 +6,9 @@ check-quality: check-quality-audit
 	python3 scripts/check_content_quality.py
 
 check-quality-audit:
+	python3 scripts/quality_audit.py --check
+
+refresh-quality-audit:
 	python3 scripts/quality_audit.py
 
 # Validate source content (style, structure, metadata)
