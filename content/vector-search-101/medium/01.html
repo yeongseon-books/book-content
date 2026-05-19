@@ -65,7 +65,6 @@
 <li>a first hands-on example that produces real vectors</li>
 <li>where embeddings fall short and what to watch for</li>
 </ul>
-<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding">github.com/yeongseon-books/vector-search-101</a></p>
 <p><img alt="Keyword search and embedding search contrast" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png"></p>
 <p><em>Keyword search and embedding search contrast</em></p>
 <!-- ebook-only:start -->
@@ -77,6 +76,9 @@ After this chapter, the next one moves on to <strong>HuggingFace embeddings in p
 <!-- ebook-only:end -->
 
 <hr>
+<blockquote>
+<p>An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.</p>
+</blockquote>
 <h2>Questions this chapter answers</h2>
 <ul>
 <li>What is an embedding mathematically, and why convert text into a numeric vector at all?</li>
@@ -108,7 +110,7 @@ An embedding model converts text into a fixed-length array of floating-point num
 </code></pre>
 <p>Think of these numbers as coordinates in a high-dimensional space. Sentences with similar meaning land near each other; unrelated sentences land far apart. Retrieval becomes a nearest-neighbor search in that space.</p>
 <p>The most common distance measure is cosine similarity. It ignores vector magnitude and compares direction only, which makes it relatively stable across inputs of different lengths.</p>
-<pre><code>cosine similarity = (A · B) / (|A| × |B|)
+<pre><code class="language-text">cosine similarity = (A · B) / (|A| × |B|)
 </code></pre>
 <p>The value ranges from -1 to 1. Closer to 1 means more similar; 0 means unrelated; -1 means opposite in meaning. In practice, real sentence pairs tend to land between 0.2 and 0.95.</p>
 <hr>

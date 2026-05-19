@@ -41,8 +41,6 @@ This article breaks one training step into its six moving parts so you can reaso
 
 > The training loop is not a giant black box. It is a repetition: feed a tokenized batch into the model and reduce the loss once.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/04-training)
-
 ## Why this matters
 
 Episode 4 is the first article in this series where actual weight updates happen. But the goal is still not high accuracy — it is to **prove that the training loop is alive**. Once you verify a single end-to-end step, future failures become easy to triage: is it the environment, the data, or the hyperparameters?
@@ -343,7 +341,6 @@ The next article (episode 5) covers evaluation. We will use perplexity as a quic
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Transformers Trainer documentation](https://huggingface.co/docs/transformers/main_classes/trainer)
 - [TrainingArguments reference](https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments)
 - [DataCollatorForLanguageModeling](https://huggingface.co/docs/transformers/main_classes/data_collator)

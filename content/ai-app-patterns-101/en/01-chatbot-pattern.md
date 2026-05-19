@@ -38,8 +38,6 @@ This is the first post in the AI App Patterns 101 series. Here we cover the smal
 *Questions this post answers*
 > AI App Patterns 101 (1/6)
 
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/01-chatbot-pattern)
-
 The LLM API is stateless. Each request is independent, so if you want the model to remember earlier turns, the application must manage history itself. The core questions of the chatbot pattern are: how to store the history, how much to keep, and when to compress it.
 
 This post builds from the simplest possible chatbot to a windowed memory, a summary-based approach, and a session-keyed structure for multi-user apps.

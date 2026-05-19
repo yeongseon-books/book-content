@@ -153,8 +153,6 @@ That is why I like examples shaped like this. They force checkpointing to read l
 
 There is another useful contrast here. This code makes the difference visible between “a function that looks conversational” and “a system that can genuinely resume.” That distinction matters a lot once branching and tool loops arrive, because reliable recovery depends on it.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints)
-
 ---
 
 ## Verify what was actually persisted

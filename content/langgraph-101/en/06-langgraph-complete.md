@@ -54,8 +54,6 @@ That framing matters because it stops you from treating completeness as feature 
 
 If you keep those questions visible, the combined graph becomes easier to understand than it first appears. It is just a direct-answer lane, a tool lane, and a persisted conversation history held together by explicit transitions.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
-
 ![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*

@@ -67,7 +67,6 @@
 <p>The first useful sentence-similarity system comes from clean embeddings plus a transparent index, not from a complicated orchestration layer.</p>
 <p>Korean AI Stack 101 (2/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/02-kosimcse-similarity">github.com/yeongseon-books/korean-ai-stack-101</a></p>
 <h2>Why this matters</h2>
 <p>This post moves from model comparison into an actual Korean retrieval loop. The task is intentionally narrow: encode FAQ questions, index them with FAISS, and retrieve the closest match for a new Korean query.</p>
 <p>Sentence similarity deserves its own stage because many Korean RAG systems collapse at this very step. If embedding quality, normalization, or index choice is wrong, no amount of LLM polish will recover the wrong document. Practicing the smallest retrieval loop with a proven model like KoSimCSE gives you a reference point for everything that follows — BGE-M3, multi-vector search, hybrid retrieval.</p>

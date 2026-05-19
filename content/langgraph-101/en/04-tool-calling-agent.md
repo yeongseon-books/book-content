@@ -185,8 +185,6 @@ def build_graph():
 
 This example is small, but it already proves three operationally important things. First, the model decides whether a tool is needed while `ToolNode` owns real execution, so model-judgment failures and tool-execution failures can be inspected at different layers. Second, `tools_condition` makes loop continuation and loop termination visible in structure, so “why did this stop here?” and “why did it return to tools again?” become code-level questions instead of mysteries. Third, a deliberately safe tool implementation such as `calculator` keeps side effects and permission scope outside the prompt.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/04-tool-calling-agent)
-
 ---
 
 ## What to notice in this code

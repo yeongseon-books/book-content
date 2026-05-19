@@ -34,8 +34,6 @@ seo_description: 임베딩이 의미 기반 검색을 가능하게 하는 원리
 - 실제 벡터를 만드는 첫 번째 실습
 - 임베딩이 잘 작동하지 않는 상황과 주의점
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
-
 ![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
 
 *키워드 검색과 임베딩 검색의 대비*

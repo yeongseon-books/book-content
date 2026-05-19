@@ -229,8 +229,6 @@ if __name__ == "__main__":
 
 이 예제는 시리즈 마지막 예제로서 의도적으로 과하지 않게 구성돼 있습니다. direct path, tool path, checkpoint만 넣고도 이미 운영에 필요한 핵심 골격이 모두 보입니다. 첫 번째 턴은 supervisor가 `direct_answer`로 보내고, 두 번째 턴은 `tool_agent`와 `ToolNode` 루프를 열며, 마지막에는 `app.get_state(config)`로 실제 저장 상태를 확인합니다. route를 잘못 잡으면 첫 턴부터 비용이 새고, tool loop 종료가 약하면 두 번째 턴에서 불필요한 왕복이 생기고, checkpoint가 없으면 “같은 대화 안에서 두 종류의 요청을 처리했다”는 사실 자체가 사라집니다.
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
-
 ## 이 코드에서 먼저 봐야 할 점
 ![checkpoint와 route 상태 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
 *checkpoint와 route 상태 구조*

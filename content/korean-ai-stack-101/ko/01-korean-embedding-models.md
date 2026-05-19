@@ -35,8 +35,6 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 > Korean AI Stack 101 (1/6)
 
-예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/01-korean-embedding-models)
-
 이 글은 로컬에서 다시 돌려 볼 수 있는 비교 프레임부터 시작합니다. 제목에는 KoSimCSE, BGE-M3, Solar가 들어가지만, 실행 예제는 `all-MiniLM-L6-v2`와 `jhgan/ko-sbert-nli`를 비교합니다. 독자가 바로 `python main.py`를 실행하지 못하면 비교는 끝까지 추상적으로 남기 쉽기 때문입니다.
 
 실무에서 진짜 질문은 “어떤 모델이 벤치마크에서 이겼는가?”가 아닙니다. “우리 데이터에서 어떤 모델이 덜 자주 실패하는가?”가 더 중요합니다. 한국어만 있는 FAQ, 영어 제품명이 섞인 한국어 문장, 임계값 기반 검색은 모델마다 전혀 다른 압박을 줍니다. 그래서 첫 글은 한국어 중심 검색으로 더 깊게 들어가기 전에, 반복 가능한 비교 방법부터 다룹니다.

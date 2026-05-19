@@ -37,8 +37,6 @@ seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄
 
 > Korean AI Stack 101 (4/6)
 
-예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr)
-
 ## 왜 이 단계가 중요한가
 
 이 글은 한국어 문서 이미지, 영수증, 세금계산서, 스캔 양식을 CLOVA OCR API로 처리하고, 그 결과를 앞 글의 BGE-M3 코퍼스에 바로 넣을 수 있는 모양으로 정리합니다. 앞 글이 텍스트 코퍼스 검색을 다뤘다면, 이번 글은 그 텍스트를 처음 만들어 내는 단계입니다.

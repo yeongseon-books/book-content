@@ -34,8 +34,6 @@ The emphasis here is not on one component in isolation, but on how the whole ret
 - querying and displaying results
 - hybrid search concept and a minimal implementation
 
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
-
 ![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 
 *End to end indexing and retrieval flow*

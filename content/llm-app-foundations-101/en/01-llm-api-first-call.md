@@ -23,8 +23,6 @@ seo_description: '!Authentication rate limit and retry branches The SDK handles 
 
 > LLM App Foundations 101 (1/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/01-llm-api-first-call)
-
 The diagram below shows the smallest round trip behind a first LLM API call.
 
 ![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)

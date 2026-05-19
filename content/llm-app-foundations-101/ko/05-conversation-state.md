@@ -15,7 +15,6 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-12'
-seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # 대화 상태 관리 — 멀티턴 챗봇 만들기

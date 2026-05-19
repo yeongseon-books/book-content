@@ -15,7 +15,6 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-15'
-seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # 스트리밍 응답 처리 — 실시간으로 출력 받기

@@ -37,8 +37,6 @@ This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA O
 
 > Korean AI Stack 101 (4/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr)
-
 ## Why this matters
 
 This post processes Korean document images — receipts, tax invoices, scanned forms — with the CLOVA OCR API and shapes the result so it can drop into the BGE-M3 corpus from the previous post. The previous post handled multilingual retrieval over text. Here we make the source text in the first place.

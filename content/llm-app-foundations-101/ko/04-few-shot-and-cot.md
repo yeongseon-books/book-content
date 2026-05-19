@@ -15,7 +15,6 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-15'
-seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기

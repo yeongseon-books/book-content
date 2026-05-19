@@ -32,8 +32,6 @@ seo_description: 코사인 유사도와 내적, L2 거리를 비교하며 벡터
 - 실제 쿼리를 실행하고 결과 읽기
 - 각 척도를 언제 써야 하는지 판단하기
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
-
 ![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
 
 *코사인, 내적, 유클리드 비교 구조*

@@ -22,8 +22,6 @@ seo_description: Enhance user experience by implementing real-time LLM output wi
 
 > LLM App Foundations 101 (6/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/06-streaming-responses)
-
 The diagram below shows the basic event flow of a streamed response.
 
 ![Handling streaming responses: real-time output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)

@@ -159,8 +159,6 @@ That is why I like examples shaped like this. They present branching not as “c
 
 There is another useful contrast here. This code shows the difference between “a function that contains branching” and “a graph whose branching can be explained.” Once that difference lands, fallback routes, defaults, and recursion limits start to feel like natural safety controls instead of awkward extras.
 
-Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
-
 ---
 
 ## Make the default route explicit in code

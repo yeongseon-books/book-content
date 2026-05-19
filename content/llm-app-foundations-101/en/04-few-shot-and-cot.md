@@ -22,8 +22,6 @@ seo_description: Improve LLM performance on complex tasks using few-shot prompti
 
 > LLM App Foundations 101 (4/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/04-few-shot-and-cot)
-
 The diagram below shows how examples and stepwise reasoning steer one request.
 
 ![Few-shot and chain-of-thought: steering better answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)

@@ -202,7 +202,6 @@ def build_graph():
     return graph.compile()
 </code></pre>
 <p>This example is small, but it already proves three operationally important things. First, the model decides whether a tool is needed while <code>ToolNode</code> owns real execution, so model-judgment failures and tool-execution failures can be inspected at different layers. Second, <code>tools_condition</code> makes loop continuation and loop termination visible in structure, so “why did this stop here?” and “why did it return to tools again?” become code-level questions instead of mysteries. Third, a deliberately safe tool implementation such as <code>calculator</code> keeps side effects and permission scope outside the prompt.</p>
-<p>Example code: <a href="https://github.com/yeongseon-books/langgraph-101/tree/main/en/04-tool-calling-agent">github.com/yeongseon-books/langgraph-101</a></p>
 <hr>
 <h2>What to notice in this code</h2>
 <p>Do not try to assign equal weight to every line on a first pass. Three details matter first.</p>

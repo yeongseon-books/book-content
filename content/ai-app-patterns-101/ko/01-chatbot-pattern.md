@@ -39,8 +39,6 @@ seo_description: 챗봇은 모델이 기억하는 시스템이 아니라 누적 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (1/6)
 
-예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/01-chatbot-pattern)
-
 LLM API는 무상태(stateless)입니다. 각 요청은 서로 독립적이므로, 모델이 이전 턴을 기억하게 만들고 싶다면 애플리케이션이 이력을 직접 관리해야 합니다. 챗봇 패턴의 핵심 질문도 결국 세 가지로 모입니다. 이력을 어디에 저장할지, 얼마나 유지할지, 너무 길어졌을 때 언제 압축할지입니다.
 
 이 글에서는 가능한 한 단순한 챗봇에서 출발해, 메모리 윈도우, 요약 기반 메모리, 다중 사용자 앱을 위한 세션 키 구조까지 차례로 확장합니다.

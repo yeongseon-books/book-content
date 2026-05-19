@@ -42,8 +42,6 @@ This article frames that decision around three variables so the rest of the seri
 
 > If full fine-tuning is rebuilding an entire building, LoRA is bolting reinforcement onto a few load-bearing columns.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/01-intro)
-
 ## Why this matters
 
 LLM fine-tuning does not have to start with a GPU lab. If we throw a large model at the problem first, learning rate, dataset format, and adapter rank all wobble at once, and we lose the ability to tell which knob actually moved the result. The point of post 1 is to defer the model run and align our **arithmetic intuition** first.
@@ -296,7 +294,6 @@ Post 2 covers dataset preparation. We compare three formats — instruction, cha
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [LoRA paper](https://arxiv.org/abs/2106.09685)
 - [Hugging Face PEFT documentation](https://huggingface.co/docs/peft)
 - [QLoRA paper](https://arxiv.org/abs/2305.14314)

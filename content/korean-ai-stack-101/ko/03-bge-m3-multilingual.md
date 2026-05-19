@@ -37,8 +37,6 @@ seo_description: 다국어 dense 검색은 화려한 신호 결합보다 먼저,
 
 > Korean AI Stack 101 (3/6)
 
-예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/03-bge-m3-multilingual)
-
 ## 왜 이 단계가 중요한가
 
 이 글은 한국 회사에서 매일 마주치는 검색 상황으로 들어갑니다. 질의는 한국어인데, 문서 코퍼스 상당수가 영어로 쓰여 있는 경우입니다. 앞 글은 KoSimCSE로 한국어 짧은 문장을 다뤘습니다. 이번에는 한국어·영어 혼합 코퍼스에 BGE-M3를 적용합니다.

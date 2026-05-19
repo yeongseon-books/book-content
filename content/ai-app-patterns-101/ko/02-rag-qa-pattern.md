@@ -39,8 +39,6 @@ LLM이 모르는 최신 정보, 사내 문서, 비공개 지식이 필요한 순
 *이 글에서 답할 질문*
 > AI App Patterns 101 (2/6)
 
-예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/02-rag-qa-pattern)
-
 RAG(Retrieval-Augmented Generation)는 LLM의 두 가지 고질적 한계를 보완합니다. 첫째, 모델은 학습 시점 이후의 사건을 알지 못합니다. 둘째, 비공개 데이터나 사내 데이터에는 기본적으로 접근할 수 없습니다. RAG는 질의 시점에 관련 문서를 검색해 프롬프트에 주입함으로써 이 두 공백을 메웁니다.
 
 이 글에서는 완전한 RAG Q&A 파이프라인을 단계별로 구성합니다.

@@ -57,7 +57,6 @@
 <blockquote>
 <p>LLM API Production 101 (5/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/05-retry-and-error-handling">github.com/yeongseon-books/llm-api-production-101</a></p>
 <p>Once an LLM API call sits on a production path, failure stops being an exception in the human sense. It becomes part of the runtime. Networks stall. Providers slow down. Requests hit time limits. A client process can lose connectivity at the wrong moment. The real question is not whether failures happen. It is whether the application reacts to them predictably.</p>
 <p>One of the most common mistakes is retrying everything. Teams catch a broad exception, sleep, try again, and call that resilience. The problem is that not all failures are temporary. Authentication problems are not fixed by waiting two seconds. Invalid request payloads are not fixed by a second attempt. Schema-validation failures are not fixed just because the same call was repeated three times.</p>
 <p>That is why retries work only when they begin with error classification. A retry policy is not “try again when something goes wrong.” It is “retry only the failures that are likely to be transient, with bounded backoff and explicit stop conditions.” In this post, we will use <code>tenacity</code> to build that policy around a Groq API call.</p>

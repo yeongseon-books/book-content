@@ -39,8 +39,6 @@ seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정
 *이 글에서 답할 질문*
 > AI App Patterns 101 (5/6)
 
-예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/05-workflow-automation)
-
 어떤 작업은 단일 LLM 호출로는 버티기 어렵습니다. 고객 문의를 받고, 분류하고, 카테고리별 로직을 적용하고, 마지막 답변을 만드는 흐름이 그렇습니다. 워크플로 자동화는 이런 단계를 LangChain LCEL로 연결해 하나의 일관된 파이프라인으로 만듭니다.
 
 다룰 주제는 다음과 같습니다.

@@ -68,7 +68,6 @@
 <blockquote>
 <p>Perplexity measures how unsurprised the model is by the next token. It does not directly guarantee that humans will find the output good.</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/05-evaluation">github.com/yeongseon-books/llm-finetuning-101</a></p>
 <h2>Why this matters</h2>
 <p>Right after training, the temptation is to look only at generated samples. In production you must look at quantitative signals first. The most basic one is perplexity, which shows how naturally the model predicts tokens in your evaluation data.</p>
 <p>The real goal of episode 5 is to make evaluation an <strong>automatable pipeline</strong>. Eyeballing every output does not scale. Use perplexity as a regression baseline and stack a golden-set qualitative evaluation on top — building this two-tier structure with the same discipline as the 1-step training run from episode 4.</p>
@@ -223,7 +222,6 @@ print({&quot;before_ppl&quot;: before, &quot;after_ppl&quot;: after, &quot;delta
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/transformers/perplexity">Perplexity of fixed-length models</a></li>
 <li><a href="https://huggingface.co/docs/evaluate/index">Evaluation best practices for language models</a></li>
 <li><a href="https://arxiv.org/abs/2306.05685">LLM-as-a-judge survey</a></li>

@@ -22,8 +22,6 @@ seo_description: Reduce LLM API costs and latency by implementing a robust reque
 
 > LLM API Production 101 (4/6)
 
-Example code: [github.com/yeongseon-books/llm-api-production-101](https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/04-caching-strategies)
-
 Once an LLM feature reaches production traffic, the first thing that often looks expensive is not the model choice by itself. It is repetition. The same question comes in again, the same system prompt is sent again, the same context is serialized again, and the same answer is generated again. At that point, teams often jump straight to prompt trimming or model switching. Sometimes that is necessary. Often, the cheaper fix is much simpler: stop recomputing work you already paid for.
 
 That is what caching means in this context. The idea is familiar from web servers, databases, CDNs, and search systems, but LLM traffic adds a few complications. The cache key cannot be just the visible user question. Temperature matters. The system prompt matters. The model name matters. Structured-output settings matter. If any of those inputs change, a cached answer may no longer represent the same task.

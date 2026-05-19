@@ -34,8 +34,6 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 - 청크 경계가 검색 품질에 미치는 영향
 - 문서 유형별 청킹 전략 선택 기준
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
-
 ![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
 
 *청크 크기와 오버랩 구조*

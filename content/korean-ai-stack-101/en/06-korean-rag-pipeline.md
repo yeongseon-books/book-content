@@ -37,8 +37,6 @@ This is the final post in the Korean AI Stack 101 series. Here, we connect the e
 
 > Korean AI Stack 101 (6/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/06-korean-rag-pipeline)
-
 ---
 
 ## What you will learn

@@ -37,8 +37,6 @@ This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to
 
 > Korean AI Stack 101 (3/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/03-bge-m3-multilingual)
-
 ## Why this matters
 
 This post moves into a Korean retrieval scenario that is the daily reality at Korean companies: queries arrive in Korean, but a large fraction of the document corpus is written in English. The previous post used KoSimCSE on Korean-only short sentences. Here we use BGE-M3 on a mixed Korean-English corpus.

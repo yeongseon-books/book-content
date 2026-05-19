@@ -161,8 +161,6 @@ if __name__ == "__main__":
 
 실행 파일 경로를 남겨 두는 것도 좋지만, 그보다 먼저 기억할 점은 이 코드가 **그래프를 함수 합성 대신 상태 기계로 읽는 첫 연습**이라는 사실입니다. 예제가 작을수록 구조를 눈에 익히기 쉽고, 그 구조를 눈에 익혀야 다음 단계의 복잡성이 견딜 만해집니다.
 
-예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
-
 ---
 
 ## 실행 결과를 먼저 검증해 보기

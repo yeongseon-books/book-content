@@ -67,7 +67,6 @@
 <p>The first useful OCR output is not plain text. It is a structured extraction payload that still has to be reassembled into meaningful lines.</p>
 <p>Korean AI Stack 101 (4/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr">github.com/yeongseon-books/korean-ai-stack-101</a></p>
 <h2>Why this matters</h2>
 <p>This post processes Korean document images — receipts, tax invoices, scanned forms — with the CLOVA OCR API and shapes the result so it can drop into the BGE-M3 corpus from the previous post. The previous post handled multilingual retrieval over text. Here we make the source text in the first place.</p>
 <p>OCR deserves its own stage because half of Korean enterprise search begins with PDFs, scanned images, or phone photos. A single misaligned line break in OCR turns "공급가액 45,000원" ("amount 45,000 KRW") into two separate documents — "공급가액" and "45,000원" — and semantic retrieval fails. CLOVA OCR is well tuned for Korean, so token accuracy is high. The hard work lives in post-processing the JSON payload back into lines, paragraphs, and table cells. This post defaults to a bundled mock response so the post-processing logic can be exercised without a key.</p>

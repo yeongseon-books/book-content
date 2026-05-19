@@ -57,7 +57,6 @@
 <blockquote>
 <p>LLM API Production 101 (6/6)</p>
 </blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/llm-api-production-101/tree/main/en/06-rate-limit-management">github.com/yeongseon-books/llm-api-production-101</a></p>
 <p>Any team that runs APIs long enough eventually sees the same scene. A path that usually works fine starts failing at a busy moment, and the logs begin to fill with 429s or rate-limit warnings. LLM APIs are not different. In some ways they are harsher, because each request can be large in token volume and expensive in downstream compute. When traffic spikes, the pain shows up quickly.</p>
 <p>Systems usually fail here in one of two directions. The first is doing nothing and letting every request hit the provider as fast as it arrives. The second is overcorrecting and serializing far more traffic than necessary, which wastes available throughput. Good production behavior sits between those extremes. Send requests aggressively enough to use the allowed budget, but conservatively enough that your own application becomes the first line of control.</p>
 <p>This post implements two simple local limiters for that job: a token bucket and a sliding-window limiter. The goal is not to model every provider policy in abstract detail. It is to build the smallest application-side control layer that can shape request flow before the provider has to reject it.</p>

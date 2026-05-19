@@ -38,8 +38,6 @@ This is post 5 in the AI App Patterns 101 series. Here we cover how to design mu
 *Questions this post answers*
 > AI App Patterns 101 (5/6)
 
-Example code: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/en/05-workflow-automation)
-
 Some tasks resist a single LLM call. Receiving a customer inquiry, classifying it, applying category-specific logic, then generating a response is one example. Workflow automation connects these stages into a coherent pipeline using LangChain LCEL.
 
 Topics:

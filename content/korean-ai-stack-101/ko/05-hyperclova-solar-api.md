@@ -37,8 +37,6 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 > Korean AI Stack 101 (5/6)
 
-예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/05-hyperclova-solar-api)
-
 제목에는 HyperCLOVA X와 Solar가 들어가지만, 실행 예제는 Groq의 `llama-3.1-8b-instant`를 사용합니다. 이유는 실용적입니다. 저장소 예제가 독자의 환경에서 바로 실행되어야, 프롬프트와 검증 패턴을 몸으로 익힐 수 있기 때문입니다.
 
 ## 왜 이 단계가 중요한가

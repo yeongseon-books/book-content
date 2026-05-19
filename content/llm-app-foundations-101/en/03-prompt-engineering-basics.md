@@ -22,8 +22,6 @@ seo_description: Learn how to structure LLM prompts effectively by separating sy
 
 > LLM App Foundations 101 (3/6)
 
-Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/en/03-prompt-engineering-basics)
-
 The diagram below shows the basic flow of role-based prompt construction.
 
 ![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)

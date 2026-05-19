@@ -36,8 +36,6 @@ This is the first post in the Korean AI Stack 101 series. Here, we build a repro
 
 > Korean AI Stack 101 (1/6)
 
-Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/01-korean-embedding-models)
-
 This post starts with a comparison frame you can rerun locally. The title mentions KoSimCSE, BGE-M3, and Solar because they define the landscape of Korean embedding choices, but the runnable example compares `all-MiniLM-L6-v2` with `jhgan/ko-sbert-nli`. That decision is deliberate: if readers cannot run `python main.py` immediately, the comparison stays abstract.
 
 In practice, the real question is not “which model wins the benchmark?” It is “which model fails less often on our data?” Korean-only FAQ traffic, Korean sentences with English product names, and threshold-based retrieval all stress models differently. So the first post focuses on a repeatable comparison setup before moving deeper into Korean-first retrieval.

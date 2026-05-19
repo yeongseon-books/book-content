@@ -40,8 +40,6 @@ This is the fifth post in the LLM Fine-tuning 101 series.
 
 > Perplexity measures how unsurprised the model is by the next token. It does not directly guarantee that humans will find the output good.
 
-Example code: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/05-evaluation)
-
 ## Why this matters
 
 Right after training, the temptation is to look only at generated samples. In production you must look at quantitative signals first. The most basic one is perplexity, which shows how naturally the model predicts tokens in your evaluation data.
@@ -242,7 +240,6 @@ The next article (episode 6) covers serving. We will deploy the LoRA adapter sep
 
 ## References
 
-- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Perplexity of fixed-length models](https://huggingface.co/docs/transformers/perplexity)
 - [Evaluation best practices for language models](https://huggingface.co/docs/evaluate/index)
 - [LLM-as-a-judge survey](https://arxiv.org/abs/2306.05685)
