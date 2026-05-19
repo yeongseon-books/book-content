@@ -74,7 +74,7 @@
 <blockquote>
 <p>Structure of a Closure</p>
 </blockquote>
-<pre><code>outer_func(x)
+<pre><code class="language-text">outer_func(x)
   |
   +-- local variable x (becomes a free variable)
   |
@@ -217,7 +217,7 @@ print(tax_10_p(50000))  # 5000.0
 </code></pre>
 <p><strong>Step 5: Real-World Usage — Event Handlers</strong></p>
 <pre><code class="language-python">from functools import partial
-from typing import Callable
+from collections.abc import Callable
 
 # event system
 class EventBus:

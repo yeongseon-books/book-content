@@ -104,7 +104,8 @@ result = pipe(
 ### Step 1: Basic compose and pipe
 
 ```python
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 from functools import reduce
 
 
@@ -187,7 +188,7 @@ print(slugify("  Functional Programming — A Composition Guide  "))
 ### Step 3: Data Processing Pipeline
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def pipe_data(*funcs: Callable) -> Callable:
@@ -260,7 +261,8 @@ print(process_students(raw_data))
 ### Step 4: Generator Pipeline
 
 ```python
-from typing import Iterator, Callable
+from collections.abc import Callable
+from typing import Iterator
 
 
 def gen_pipe(*funcs: Callable) -> Callable:
@@ -324,7 +326,8 @@ for line in clean_text(lines(text)):
 ### Step 5: Conditional Pipeline
 
 ```python
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 
 
 def conditional(

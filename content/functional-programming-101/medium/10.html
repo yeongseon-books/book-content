@@ -55,8 +55,8 @@
 <body>
 <h1>Balancing OOP and Functional Programming</h1>
 <p>Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.</p>
-<p>Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.</p>
 <p>This is the final post in the Functional Programming 101 series.</p>
+<p>Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Comparing the strengths and weaknesses of OOP and FP</li>
@@ -215,7 +215,8 @@ handle_registration(&quot;&quot;, &quot;invalid-email&quot;)
 </code></pre>
 <p><strong>Step 3: Classes + Functional Methods</strong></p>
 <pre><code class="language-python">from dataclasses import dataclass
-from typing import Callable, Iterator
+from collections.abc import Callable
+from typing import Iterator
 
 @dataclass
 class DataPipeline:
@@ -308,41 +309,29 @@ print(f&quot;After discount: {sum(i['price'] for i in discounted):,}&quot;)
 # Before discount: 1,050
 # After discount: 945
 </code></pre>
-<p><strong>Step 5: Design Decision Checklist</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-Paradigm selection checklist:
-
-1. Does state change together with behavior?
-   -&gt; Yes: class (OOP)
-   -&gt; No: function (FP)
-
-2. Do you need multiple instances?
-   -&gt; Yes: class (OOP)
-   -&gt; No: module-level function (FP)
-
-3. Is data transformation the main goal?
-   -&gt; Yes: pure function pipeline (FP)
-   -&gt; No: judge by context
-
-4. Does the framework require classes?
-   -&gt; Yes: class (OOP) + internal logic as FP
-   -&gt; No: choose freely
-
-5. Is testability a priority?
-   -&gt; Yes: pure functions first (FP)
-   -&gt; State testing needed: class (OOP)
-&quot;&quot;&quot;
-
-# practical hybrid pattern: immutable value objects + pure functions + thin class shell
-from dataclasses import dataclass
+<p><strong>Step 5: Executable Hybrid Workflow</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class Config:
+class RawConfig:
+    host: str
+    port: str
+    debug: str
+
+@dataclass(frozen=True)
+class AppConfig:
     host: str
     port: int
     debug: bool
 
-def validate_config(config: Config) -&gt; list[str]:
+def normalize_config(raw: RawConfig) -&gt; AppConfig:
+    return AppConfig(
+        host=raw.host.strip(),
+        port=int(raw.port),
+        debug=raw.debug.strip().lower() in {&quot;1&quot;, &quot;true&quot;, &quot;yes&quot;},
+    )
+
+def validate_config(config: AppConfig) -&gt; list[str]:
     errors = []
     if not config.host:
         errors.append(&quot;host is required&quot;)
@@ -350,12 +339,53 @@ def validate_config(config: Config) -&gt; list[str]:
         errors.append(&quot;port must be 1-65535&quot;)
     return errors
 
-config = Config(host=&quot;localhost&quot;, port=8080, debug=True)
-errors = validate_config(config)
-if not errors:
-    print(f&quot;Config valid: {config}&quot;)
-# Config valid: Config(host='localhost', port=8080, debug=True)
+class AppServer:
+    def __init__(self, config: AppConfig) -&gt; None:
+        self.config = config
+
+    def start(self) -&gt; str:
+        mode = &quot;debug&quot; if self.config.debug else &quot;prod&quot;
+        return f&quot;starting server on {self.config.host}:{self.config.port} ({mode})&quot;
+
+def boot(raw: RawConfig) -&gt; str:
+    normalized = normalize_config(raw)
+    errors = validate_config(normalized)
+    if errors:
+        return f&quot;validation failed: {errors}&quot;
+    server = AppServer(normalized)
+    return server.start()
+
+good = RawConfig(host=&quot; localhost &quot;, port=&quot;8080&quot;, debug=&quot;yes&quot;)
+bad_host = RawConfig(host=&quot;   &quot;, port=&quot;8080&quot;, debug=&quot;yes&quot;)
+bad_port = RawConfig(host=&quot;api.internal&quot;, port=&quot;70000&quot;, debug=&quot;no&quot;)
+
+assert normalize_config(good) == AppConfig(host=&quot;localhost&quot;, port=8080, debug=True)
+assert boot(good) == &quot;starting server on localhost:8080 (debug)&quot;
+assert boot(bad_host) == &quot;validation failed: ['host is required']&quot;
+assert boot(bad_port) == &quot;validation failed: ['port must be 1-65535']&quot;
+
+print(&quot;Normalized config:&quot;, normalize_config(good))
+print(&quot;Success run:&quot;, boot(good))
+print(&quot;Missing host:&quot;, boot(bad_host))
+print(&quot;Bad port:&quot;, boot(bad_port))
+# Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+# Success run: starting server on localhost:8080 (debug)
+# Missing host: validation failed: ['host is required']
+# Bad port: validation failed: ['port must be 1-65535']
 </code></pre>
+<p><strong>Expected output</strong></p>
+<pre><code class="language-text">Normalized config: AppConfig(host='localhost', port=8080, debug=True)
+Success run: starting server on localhost:8080 (debug)
+Missing host: validation failed: ['host is required']
+Bad port: validation failed: ['port must be 1-65535']
+</code></pre>
+<p><strong>If your result differs, inspect this first</strong></p>
+<ul>
+<li>Make sure <code>normalize_config()</code> still calls <code>host.strip()</code>. A host made of whitespace should become an empty string before validation.</li>
+<li>Check that <code>port</code> is converted to <code>int</code> before range validation. Comparing the raw string can let invalid ports slip through.</li>
+<li>Make sure validation failure stops before <code>AppServer</code> is constructed. That edge is the whole point of keeping shell code outside the functional core.</li>
+<li>Confirm the success path lives in the thin class shell while normalization and validation stay pure. That separation is the design rule the example is trying to prove.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Value objects (frozen dataclasses) combine OOP structure with FP immutability</li>

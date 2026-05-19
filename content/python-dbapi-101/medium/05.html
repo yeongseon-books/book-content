@@ -264,7 +264,7 @@ except Exception:
 assert sqlite3.sqlite_version_info &gt;= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
-con.execute('BEGIN IMMEDIATE')
+print(con.in_transaction)   # → True
 try:
     con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
     con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
@@ -273,7 +273,7 @@ except Exception:
     con.rollback()
     raise
 </code></pre>
-<p>With <code>autocommit=False</code>, you write BEGIN explicitly and the driver does not interfere.</p>
+<p>With <code>autocommit=False</code>, sqlite3 keeps a transaction open for you and uses <code>BEGIN DEFERRED</code> implicitly after <code>connect()</code>, <code>commit()</code>, and <code>rollback()</code>. In the normal 3.12+ PEP 249 flow, do not pair <code>autocommit=False</code> with a redundant manual <code>BEGIN</code>.</p>
 <hr>
 <h2>Common mistakes</h2>
 <ol>
@@ -340,9 +340,9 @@ with dst:
 <li>[ ] Functions that write start with <code>isolation_level='IMMEDIATE'</code>.</li>
 <li>[ ] Production databases default to WAL + <code>synchronous=NORMAL</code> + <code>busy_timeout=5000</code>.</li>
 <li>[ ] Read-only queries use a separate connection or do not begin a transaction explicitly.</li>
-<li>[ ] <code>autocommit=None</code> (legacy) is never used for batch inserts.</li>
+<li>[ ] <code>sqlite3.LEGACY_TRANSACTION_CONTROL</code> legacy mode is never used for batch inserts.</li>
 <li>[ ] Nested behaviour uses explicit <code>SAVEPOINT</code>.</li>
-<li>[ ] New code on Python 3.12+ uses <code>autocommit=False</code> plus explicit BEGIN.</li>
+<li>[ ] New code on Python 3.12+ uses <code>autocommit=False</code> for PEP 249 semantics and does not add a redundant manual <code>BEGIN</code>.</li>
 </ul>
 <hr>
 <h2>Exercises</h2>

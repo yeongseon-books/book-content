@@ -174,7 +174,7 @@ passing = sorted(
 print(passing)  # ['Diana', 'Bob', 'Alice']
 </code></pre>
 <p><strong>Step 4: Building a Pipeline with Function Composition</strong></p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 def pipeline(*funcs: Callable) -&gt; Callable:
     &quot;&quot;&quot;Compose multiple functions into a sequential pipeline.&quot;&quot;&quot;

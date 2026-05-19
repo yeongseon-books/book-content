@@ -166,7 +166,7 @@ print(passing)  # ['Diana', 'Bob', 'Alice']
 ### Step 4: Building a Pipeline with Function Composition
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def pipeline(*funcs: Callable) -> Callable:

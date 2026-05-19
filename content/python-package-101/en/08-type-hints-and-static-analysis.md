@@ -169,7 +169,8 @@ mylib = ["py.typed"]
 
 ```python
 # src/mylib/utils.py
-from typing import TypeVar, Callable
+from collections.abc import Callable
+from typing import TypeVar
 
 T = TypeVar("T")
 

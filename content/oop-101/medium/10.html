@@ -55,299 +55,290 @@
 <body>
 <h1>When to Avoid OOP</h1>
 <p>This is the final post in the Object-Oriented Programming 101 series.</p>
-<blockquote>
-<p>Object-Oriented Programming 101 Series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Should every problem be solved with classes? When does object-oriented programming get in the way?</p>
-<blockquote>
-<p>OOP is a powerful tool, but it is not a universal solution. For simple scripts, data transformation pipelines, and stateless utilities, plain functions and modules produce cleaner code. This article explores situations where OOP is a poor fit and what alternatives to use instead.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The hardest OOP decision is often not "which class should I add?" but "should this become a class at all?"</p>
+<p>Python gives you functions, modules, <code>dataclass</code>, <code>NamedTuple</code>, <code>TypedDict</code>, and callables for a reason. In this chapter, we will start with a class-heavy reporting mini-app, simplify it in stages, and then mark the exact point where a class becomes useful again.</p>
+<h2>Questions This Article Answers</h2>
 <ul>
-<li>Warning signs that OOP is overkill for the task at hand</li>
-<li>Patterns where a function-based approach works better</li>
-<li>How to leverage dataclass and NamedTuple effectively</li>
-<li>Mixing OOP and functional programming in the right proportions</li>
+<li>Which classes are protecting real state, and which ones are only wrapping a simple transformation?</li>
+<li>When is a function pipeline clearer than a class hierarchy?</li>
+<li>What concrete signal tells me the function-first design has gone far enough and should become a class again?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>"When all you have is a hammer, everything looks like a nail." Once you learn OOP, you tend to wrap everything in classes. But Python is a multi-paradigm language, and choosing the right tool for each problem is what makes code truly good.</p>
+<h2>What This Article Tries to Solve</h2>
 <blockquote>
-<p>Good design = choosing the right tool for the problem</p>
+<p>Good design is not measured by how many classes you can introduce. It is measured by whether you can stop at functions and lightweight data structures when state and lifecycle do not justify heavier objects.</p>
 </blockquote>
-<p>Unnecessary classes make code harder to read and more expensive to maintain. Always ask yourself: "Does this really need to be a class?"</p>
+<ul>
+<li>What are the warning signs that a class-based design is mostly ceremony?</li>
+<li>Which kinds of classes are better replaced by functions, <code>dataclass</code>, <code>NamedTuple</code>, or <code>TypedDict</code>?</li>
+<li>When is a callback enough instead of a full strategy class?</li>
+<li>How do you know when a function-first design has gone too far and should become a class again?</li>
+</ul>
 <h2>Concept Overview</h2>
-<blockquote>
-<p>OOP vs Alternatives — Decision Criteria</p>
-</blockquote>
-<pre><code class="language-text">When classes make sense            When classes are overkill
-─────────────────────              ─────────────────────
-State + behavior together          Stateless transformation functions
-Multiple instances needed          Single-run scripts
-Swappable strategies required      Data-only containers
-Framework demands classes          Pipeline data processing
-</code></pre>
 <p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png"><br>
-<em>Once you decide when not to create a class, a surprising amount of Python code becomes simpler with plain functions and data structures.</em></p>
+<em>The goal is not to avoid classes forever. The goal is to reserve classes for places where state, invariants, and coordinated behavior truly move together.</em></p>
+<p>The practical question is simple: does this behavior need persistent state and lifecycle coordination, or is it mostly a data transformation pipeline? If the answer is "pipeline," classes are often extra weight.</p>
 <h2>Key Concepts</h2>
 <p><strong>Multi-paradigm</strong><br>
-- Description: A language that supports procedural, OOP, and functional styles together</p>
-<p><strong>Anemic domain model</strong><br>
-- Description: A class that holds data but contains no behavior</p>
-<p><strong>dataclass</strong><br>
-- Description: A Python feature for defining data-centric classes with minimal boilerplate</p>
+- Description: Python supports procedural, object-oriented, and functional styles together</p>
+<p><strong>Anemic class</strong><br>
+- Description: A class that mostly stores data or wraps a single trivial method</p>
+<p><strong><code>dataclass</code></strong><br>
+- Description: A compact way to model data-centric structures with generated boilerplate</p>
 <p><strong>Higher-order function</strong><br>
 - Description: A function that accepts or returns another function</p>
-<p><strong>Closure</strong><br>
-- Description: An inner function that remembers variables from its enclosing scope</p>
+<p><strong>Reintroduction threshold</strong><br>
+- Description: The point where state, validation, or lifecycle coordination becomes strong enough to justify a class again</p>
 <h2>Before / After</h2>
-<p>Remove an unnecessary class.</p>
-<pre><code class="language-python"># before: unnecessary class with a single method
-class Validator:
-    def validate_email(self, email: str) -&gt; bool:
-        return &quot;@&quot; in email and &quot;.&quot; in email
+<p>The change in this chapter is not "classes are bad." It is "use the lightest tool that still preserves the design intent."</p>
+<pre><code class="language-python"># before: classes everywhere, even for stateless helpers and plain data
+class TitleCleaner:
+    def clean(self, title: str) -&gt; str:
+        return title.strip().title()
 
-validator = Validator()
-print(validator.validate_email(&quot;test@example.com&quot;))
+class ScoreFilter:
+    def keep(self, score: int, minimum: int) -&gt; bool:
+        return score &gt;= minimum
 </code></pre>
-<pre><code class="language-python"># after: a plain function is enough
-def validate_email(email: str) -&gt; bool:
-    return &quot;@&quot; in email and &quot;.&quot; in email
+<pre><code class="language-python"># after: functions and data structures carry the same workflow more directly
+def clean_title(title: str) -&gt; str:
+    return title.strip().title()
 
-print(validate_email(&quot;test@example.com&quot;))
+def keep_score(score: int, minimum: int) -&gt; bool:
+    return score &gt;= minimum
 </code></pre>
-<h2>Hands-On Steps</h2>
-<p><strong>Step 1: Functions Instead of a Class</strong></p>
-<pre><code class="language-python"># Unnecessary class — stateless, methods only
-class StringUtils:
-    @staticmethod
-    def capitalize_words(text: str) -&gt; str:
-        return &quot; &quot;.join(w.capitalize() for w in text.split())
+<h2>One Workflow: Simplifying a Class-Heavy Reporting Mini-App</h2>
+<p><strong>Starting Point: Too Many Tiny Classes</strong></p>
+<p>Assume a team built a weekly campaign report and wrapped every step in a separate class.</p>
+<pre><code class="language-python">class TitleCleaner:
+    def clean(self, title: str) -&gt; str:
+        return title.strip().title()
 
-    @staticmethod
-    def count_words(text: str) -&gt; int:
-        return len(text.split())
-
-    @staticmethod
-    def truncate(text: str, max_len: int) -&gt; str:
-        if len(text) &lt;= max_len:
-            return text
-        return text[:max_len - 3] + &quot;...&quot;
-
-# Better: module-level functions
-def capitalize_words(text: str) -&gt; str:
-    return &quot; &quot;.join(w.capitalize() for w in text.split())
-
-def count_words(text: str) -&gt; int:
-    return len(text.split())
-
-def truncate(text: str, max_len: int) -&gt; str:
-    if len(text) &lt;= max_len:
-        return text
-    return text[:max_len - 3] + &quot;...&quot;
-
-print(capitalize_words(&quot;hello world&quot;))  # Hello World
-print(count_words(&quot;one two three&quot;))     # 3
-print(truncate(&quot;abcdefghij&quot;, 8))        # abcde...
-</code></pre>
-<p><strong>Step 2: dataclass and NamedTuple Instead of Manual Classes</strong></p>
-<pre><code class="language-python">from dataclasses import dataclass
-from typing import NamedTuple
-
-# Unnecessary boilerplate — manual __init__, __repr__, __eq__
-class ManualPoint:
-    def __init__(self, x: float, y: float) -&gt; None:
-        self.x = x
-        self.y = y
-    def __repr__(self) -&gt; str:
-        return f&quot;Point({self.x}, {self.y})&quot;
-    def __eq__(self, other: object) -&gt; bool:
-        if not isinstance(other, ManualPoint):
-            return NotImplemented
-        return self.x == other.x and self.y == other.y
-
-# Better 1: dataclass
-@dataclass
-class Point:
-    x: float
-    y: float
-
-# Better 2: NamedTuple (immutable)
-class ImmutablePoint(NamedTuple):
-    x: float
-    y: float
-
-p1 = Point(1, 2)
-p2 = Point(1, 2)
-print(p1)        # Point(x=1, y=2)
-print(p1 == p2)  # True
-
-ip = ImmutablePoint(3, 4)
-print(ip.x)  # 3
-# ip.x = 10  # AttributeError — immutable
-</code></pre>
-<p><strong>Step 3: Higher-Order Functions Instead of Strategy Classes</strong></p>
-<pre><code class="language-python"># Strategy pattern — class version
-from typing import Protocol
-
-class Formatter(Protocol):
-    def format(self, value: float) -&gt; str: ...
+class ScoreFilter:
+    def keep(self, score: int, minimum: int) -&gt; bool:
+        return score &gt;= minimum
 
 class CurrencyFormatter:
-    def format(self, value: float) -&gt; str:
-        return f&quot;${value:,.2f}&quot;
+    def format(self, value: int) -&gt; str:
+        return f&quot;${value:,.0f}&quot;
 
-class PercentFormatter:
-    def format(self, value: float) -&gt; str:
-        return f&quot;{value:.1f}%&quot;
+class ReportRow:
+    def __init__(self, title: str, score: int, spend: int) -&gt; None:
+        self.title = title
+        self.score = score
+        self.spend = spend
 
-# Better: functions are enough — no classes needed
-from typing import Callable
-
-def currency_format(value: float) -&gt; str:
-    return f&quot;${value:,.2f}&quot;
-
-def percent_format(value: float) -&gt; str:
-    return f&quot;{value:.1f}%&quot;
-
-def display_values(
-    values: list[float],
-    formatter: Callable[[float], str],
-) -&gt; None:
-    for v in values:
-        print(formatter(v))
-
-display_values([1000, 2500, 50000], currency_format)
-# $1,000.00
-# $2,500.00
-# $50,000.00
-
-display_values([0.95, 0.87, 0.12], percent_format)
-# 0.9%
-# 0.9%
-# 0.1%
+class ReportConfig:
+    def __init__(self, minimum_score: int, currency: str) -&gt; None:
+        self.minimum_score = minimum_score
+        self.currency = currency
 </code></pre>
-<p><strong>Step 4: Dictionaries and TypedDict Instead of Config Classes</strong></p>
-<pre><code class="language-python"># Unnecessary class — just holding data
-class Config:
-    def __init__(self, host: str, port: int, debug: bool) -&gt; None:
-        self.host = host
-        self.port = port
-        self.debug = debug
+<p>Each class is understandable, but the overall design is heavier than the problem.</p>
+<p><strong>Step 1: Replace Stateless Helper Classes with Functions</strong></p>
+<p>If the code has no instance state and no lifecycle, module-level functions are usually clearer.</p>
+<pre><code class="language-python">def clean_title(title: str) -&gt; str:
+    return title.strip().title()
 
-# Better 1: TypedDict (structured dictionary)
+def keep_score(score: int, minimum: int) -&gt; bool:
+    return score &gt;= minimum
+
+def format_currency(value: int) -&gt; str:
+    return f&quot;${value:,.0f}&quot;
+</code></pre>
+<p><strong>Run</strong></p>
+<pre><code class="language-python">print(clean_title(&quot;  spring launch &quot;))
+print(keep_score(82, 80))
+print(format_currency(12500))
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">Spring Launch
+True
+$12,500
+</code></pre>
+<p><strong>Check</strong></p>
+<p>What changed: instance creation disappeared because it carried no value. What stayed stable: each transformation still has one clear name and one clear job.</p>
+<p><strong>Step 2: Replace Data-Carrying Boilerplate with <code>dataclass</code> and <code>TypedDict</code></strong></p>
+<p>The original <code>ReportRow</code> and <code>ReportConfig</code> classes mainly stored fields. That is what lightweight data structures are for.</p>
+<pre><code class="language-python">from dataclasses import dataclass
 from typing import TypedDict
 
-class Config(TypedDict):
-    host: str
-    port: int
-    debug: bool
+@dataclass(frozen=True)
+class ReportRow:
+    title: str
+    score: int
+    spend: int
 
-config: Config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080, &quot;debug&quot;: True}
-print(config[&quot;host&quot;])  # localhost
+class ReportConfig(TypedDict):
+    minimum_score: int
+    channel: str
 
-# Better 2: a plain dict is enough for simple config
-config = {&quot;host&quot;: &quot;localhost&quot;, &quot;port&quot;: 8080, &quot;debug&quot;: True}
+config: ReportConfig = {&quot;minimum_score&quot;: 80, &quot;channel&quot;: &quot;email&quot;}
+row = ReportRow(title=&quot;Spring Launch&quot;, score=82, spend=12500)
+
+print(row)
+print(config[&quot;channel&quot;])
 </code></pre>
-<p><strong>Step 5: Functional Pipelines</strong></p>
-<pre><code class="language-python">from functools import reduce
+<p>Expected output:</p>
+<pre><code class="language-text">ReportRow(title='Spring Launch', score=82, spend=12500)
+email
+</code></pre>
+<p><strong>Check</strong></p>
+<p>What changed: manual constructor and representation boilerplate disappeared. What stayed stable: the workflow still has a named row type and explicit configuration keys.</p>
+<p><strong>Failure Path</strong></p>
+<p>If you typo a dict key such as <code>config["chnanel"]</code>, plain runtime dict access still fails late. That is acceptable for small, shallow configuration, but it is also the first warning sign that a richer object may become worthwhile later.</p>
+<p><strong>Step 3: Replace Trivial Strategy Classes with Callables</strong></p>
+<p>Many strategy classes are really just named formatting functions.</p>
+<pre><code class="language-python">from collections.abc import Callable
 
-# Data transformation — function chaining without classes
-def load_data() -&gt; list[dict]:
+def format_currency(value: int) -&gt; str:
+    return f&quot;${value:,.0f}&quot;
+
+def format_points(value: int) -&gt; str:
+    return f&quot;{value} pts&quot;
+
+def render_value(value: int, formatter: Callable[[int], str]) -&gt; str:
+    return formatter(value)
+
+print(render_value(12500, format_currency))
+print(render_value(82, format_points))
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">$12,500
+82 pts
+</code></pre>
+<p><strong>Check</strong></p>
+<p>What changed: the strategy abstraction shrank to the one thing the caller actually needs — a callable. What stayed stable: formatting still swaps cleanly.</p>
+<p><strong>Failure Path</strong></p>
+<p>If each formatter later needs shared configuration, caching, or helper methods, the callback-only design will start scattering related behavior. That is one threshold for reintroducing a class.</p>
+<p><strong>Step 4: Build the Report as a Function Pipeline</strong></p>
+<p>Now the mini-app can become one readable pipeline instead of a collection of tiny shells.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+from collections.abc import Callable
+from typing import TypedDict
+
+@dataclass(frozen=True)
+class ReportRow:
+    title: str
+    score: int
+    spend: int
+
+class ReportConfig(TypedDict):
+    minimum_score: int
+    channel: str
+
+def clean_title(title: str) -&gt; str:
+    return title.strip().title()
+
+def format_currency(value: int) -&gt; str:
+    return f&quot;${value:,.0f}&quot;
+
+def normalize_rows(rows: list[dict]) -&gt; list[ReportRow]:
     return [
-        {&quot;name&quot;: &quot;  Alice  &quot;, &quot;score&quot;: 85},
-        {&quot;name&quot;: &quot;  Bob  &quot;, &quot;score&quot;: 92},
-        {&quot;name&quot;: &quot;  Charlie  &quot;, &quot;score&quot;: 78},
-        {&quot;name&quot;: &quot;  Diana  &quot;, &quot;score&quot;: 95},
+        ReportRow(
+            title=clean_title(row[&quot;title&quot;]),
+            score=row[&quot;score&quot;],
+            spend=row[&quot;spend&quot;],
+        )
+        for row in rows
     ]
 
-def clean_names(data: list[dict]) -&gt; list[dict]:
-    return [{**d, &quot;name&quot;: d[&quot;name&quot;].strip()} for d in data]
+def filter_rows(rows: list[ReportRow], minimum_score: int) -&gt; list[ReportRow]:
+    return [row for row in rows if row.score &gt;= minimum_score]
 
-def filter_passing(data: list[dict], threshold: int = 80) -&gt; list[dict]:
-    return [d for d in data if d[&quot;score&quot;] &gt;= threshold]
+def sort_rows(rows: list[ReportRow]) -&gt; list[ReportRow]:
+    return sorted(rows, key=lambda row: row.score, reverse=True)
 
-def sort_by_score(data: list[dict]) -&gt; list[dict]:
-    return sorted(data, key=lambda d: d[&quot;score&quot;], reverse=True)
+def render_report(rows: list[ReportRow], money: Callable[[int], str]) -&gt; list[str]:
+    return [f&quot;{row.title} | score={row.score} | spend={money(row.spend)}&quot; for row in rows]
 
-def format_results(data: list[dict]) -&gt; list[str]:
-    return [f&quot;{d['name']}: {d['score']} points&quot; for d in data]
+def build_report(raw_rows: list[dict], config: ReportConfig, money: Callable[[int], str]) -&gt; list[str]:
+    rows = normalize_rows(raw_rows)
+    rows = filter_rows(rows, config[&quot;minimum_score&quot;])
+    rows = sort_rows(rows)
+    return render_report(rows, money)
 
-# Run the pipeline
-result = format_results(sort_by_score(filter_passing(clean_names(load_data()))))
-for line in result:
+raw_rows = [
+    {&quot;title&quot;: &quot;  spring launch &quot;, &quot;score&quot;: 82, &quot;spend&quot;: 12500},
+    {&quot;title&quot;: &quot;retargeting&quot;, &quot;score&quot;: 76, &quot;spend&quot;: 4000},
+    {&quot;title&quot;: &quot;summer promo&quot;, &quot;score&quot;: 91, &quot;spend&quot;: 18000},
+]
+config: ReportConfig = {&quot;minimum_score&quot;: 80, &quot;channel&quot;: &quot;email&quot;}
+
+for line in build_report(raw_rows, config, format_currency):
     print(line)
-# Diana: 95 points
-# Bob: 92 points
-# Alice: 85 points
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p><strong>Run</strong></p>
+<pre><code class="language-bash">python report_pipeline.py
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">Summer Promo | score=91 | spend=$18,000
+Spring Launch | score=82 | spend=$12,500
+</code></pre>
+<p><strong>Check</strong></p>
+<p>Verify three things:</p>
+<ol>
+<li>Normalization, filtering, sorting, and rendering each stay easy to test as separate functions.</li>
+<li>The data carrier is lightweight and explicit.</li>
+<li>The report pipeline reads top to bottom without instance orchestration noise.</li>
+</ol>
+<p><strong>Failure Path: When Function-Only Design Becomes Too Loose</strong></p>
+<p>The function pipeline starts to struggle when rules and shared state begin moving together. For example:</p>
+<pre><code class="language-python">config = {&quot;minimum_score&quot;: 80, &quot;chnanel&quot;: &quot;email&quot;}  # typo hidden in a plain dict
+</code></pre>
+<p>Or imagine each formatter now needs currency symbol configuration, locale-aware rounding, and memoized exchange-rate lookup. At that point, a naked callable may stop being the clearest abstraction.</p>
+<h2>Reintroduce a Class? Use This Threshold</h2>
+<p>Move back toward a class-based design when two or more of these become true:</p>
+<p><strong>The same bundle of fields travels through many functions together</strong><br>
+- Why a class starts helping: A richer domain object can hold invariants and behavior in one place</p>
+<p><strong>Validation rules and state transitions repeat together</strong><br>
+- Why a class starts helping: Methods plus encapsulated state become easier to reason about</p>
+<p><strong>A formatter or strategy now needs persistent configuration or caches</strong><br>
+- Why a class starts helping: A stateful object becomes clearer than passing extra parameters everywhere</p>
+<p><strong>The pipeline needs retries, lifecycle hooks, or shared collaborators</strong><br>
+- Why a class starts helping: A coordinator object can own those cross-cutting concerns</p>
+<p>The goal is not to stay "purely functional." The goal is to postpone heavier structure until it earns its keep.</p>
+<h2>What to Notice in This Workflow</h2>
 <ul>
-<li>Stateless utility functions are cleaner as module-level functions than as static methods in a class</li>
-<li><code>dataclass</code> and <code>NamedTuple</code> eliminate boilerplate for data-centric types</li>
-<li>Simple strategy patterns can be replaced with <code>Callable</code> — no class hierarchy needed</li>
-<li>Data transformation pipelines are a natural fit for function chaining</li>
+<li>Stateless transformation logic usually reads better as functions than as classes with one method.</li>
+<li><code>dataclass</code> and <code>TypedDict</code> preserve named structure without full object ceremony.</li>
+<li>Callables are often enough for simple interchangeable behavior.</li>
+<li>Function pipelines stay strong until state, invariants, or lifecycle coordination start repeating together.</li>
 </ul>
 <h2>5 Common Mistakes</h2>
-<p><strong>Wrapping everything in classes</strong><br>
-- Why It Is a Problem: Adds unnecessary complexity<br>
-- Fix: Check whether a plain function is sufficient first</p>
-<p><strong>Class with only one method</strong><br>
-- Why It Is a Problem: A function is clearer<br>
-- Fix: Convert to a function</p>
-<p><strong>Class with only static methods</strong><br>
-- Why It Is a Problem: Namespace abuse<br>
-- Fix: Use module-level functions instead</p>
-<p><strong>Using a plain class when dataclass fits</strong><br>
-- Why It Is a Problem: Too much boilerplate<br>
-- Fix: Use the <code>@dataclass</code> decorator</p>
-<p><strong>Forcing OOP when functional fits better</strong><br>
-- Why It Is a Problem: Verbose, hard to follow<br>
-- Fix: Embrace Python's multi-paradigm nature</p>
-<h2>Real-World Applications</h2>
+<p><strong>Turning every helper into a class</strong><br>
+- Why It Hurts: Extra objects hide a simple pipeline<br>
+- Better Move: Start with module-level functions</p>
+<p><strong>Using a manual class for plain data</strong><br>
+- Why It Hurts: Boilerplate grows faster than value<br>
+- Better Move: Prefer <code>dataclass</code>, <code>NamedTuple</code>, or <code>TypedDict</code></p>
+<p><strong>Keeping strategy classes that only wrap one function</strong><br>
+- Why It Hurts: Indirection without state<br>
+- Better Move: Pass a callable</p>
+<p><strong>Taking function-only design as an ideology</strong><br>
+- Why It Hurts: State and validation eventually scatter<br>
+- Better Move: Reintroduce classes when invariants repeat</p>
+<p><strong>Leaving dict-based configuration unbounded for too long</strong><br>
+- Why It Hurts: Typos and missing defaults surface late<br>
+- Better Move: Upgrade to richer objects when config complexity grows</p>
+<h2>Real-World Uses</h2>
 <ul>
-<li>CLI scripts are typically written with functions only</li>
-<li>Data analysis pipelines (pandas) use function chaining</li>
-<li>API response models use <code>dataclass</code> or Pydantic <code>BaseModel</code></li>
-<li>Configuration management uses <code>TypedDict</code> or environment-variable dicts</li>
-<li>Test utilities are written as module-level functions</li>
+<li>CLI utilities often work best as function-first modules.</li>
+<li>Data cleanup and transformation code usually reads naturally as pipelines.</li>
+<li><code>dataclass</code> is ideal for immutable payloads and internal DTO-like structures.</li>
+<li>Stateful integrations such as API clients or caching services often justify classes again.</li>
 </ul>
 <h2>How Senior Engineers Think About This</h2>
-<p>Python's greatest strength is its multi-paradigm nature. Combining functions, classes, and modules to fit the situation is what makes code Pythonic. The answer to "should I make this a class?" is "do state and behavior change together?"</p>
-<p>In practice, the most pragmatic approach is to start with functions and upgrade to classes only when state management becomes necessary. Knowing when not to create a class is itself a design skill.</p>
-<h2>Failure Modes of Oversimplifying Too Far</h2>
-<p><strong>Everything stays as free functions</strong><br>
-- Problem that shows up later: The same bundle of data repeats across function parameters<br>
-- Signal to introduce a class again: State and validation rules keep changing together</p>
-<p><strong>All configuration stays in dicts</strong><br>
-- Problem that shows up later: Key typos survive until runtime<br>
-- Signal to introduce a class again: Field count grows and defaults or validation start to matter</p>
-<p><strong>Strategy choices are only callbacks</strong><br>
-- Problem that shows up later: Related setup and post-processing logic scatter around the codebase<br>
-- Signal to introduce a class again: Each strategy starts carrying state or helper behavior</p>
-<p><strong>Pipeline stages are only global functions</strong><br>
-- Problem that shows up later: Shared cache, retry rules, and dependency wiring become tangled<br>
-- Signal to introduce a class again: You need lifecycle control and explicit collaborators per stage</p>
-<p>Avoiding classes is not about making the code look shorter. It is about using only the complexity you need today. That is why a function-first design can still evolve into classes later when state transitions and invariants begin to repeat.</p>
+<p>Senior engineers do not avoid classes because classes are bad. They avoid classes when classes are adding lifecycle and hierarchy weight to code that is really just transformation plus data. The best design question is often, "what is the cheapest abstraction that still protects the workflow?"</p>
+<p>That is why many Python codebases start with functions, then upgrade only the hot spots that accumulate state, invariants, and coordination. Restraint is part of design skill.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I can identify situations where a class is unnecessary</li>
-<li>[ ] I know which patterns are better served by functions</li>
-<li>[ ] I can use <code>dataclass</code> and <code>NamedTuple</code> appropriately</li>
-<li>[ ] I can replace simple strategy patterns with higher-order functions</li>
-<li>[ ] I can mix OOP and functional styles in a single codebase</li>
+<li>[ ] I can identify classes that are mostly wrapping stateless helper functions</li>
+<li>[ ] I can replace boilerplate data carriers with <code>dataclass</code> or <code>TypedDict</code></li>
+<li>[ ] I can use a callable where a trivial strategy class would be overkill</li>
+<li>[ ] I can build a readable function pipeline for transformation-heavy code</li>
+<li>[ ] I can explain when growing state and invariants justify reintroducing a class</li>
 </ul>
-<h2>Exercises</h2>
-<ol>
-<li>Refactor a <code>MathHelper</code> class with three methods into module-level functions.</li>
-<li>Convert a <code>Student</code> class to a <code>dataclass</code> and write sorting and filtering functions.</li>
-<li>Build a pipeline that reads a CSV, transforms the data, and outputs JSON using function chaining.</li>
-</ol>
 <h2>Summary and Next Steps</h2>
-<p>Object-oriented programming is a powerful tool, but it is not the right fit for every problem. Leveraging Python's multi-paradigm nature to choose the right tool for each situation is what makes code truly good. Encapsulation, inheritance, polymorphism, abstraction, composition, and SOLID — the concepts covered throughout this series — are now part of your design toolkit.</p>
+<p>You should avoid OOP when classes add more ceremony than protection. In this reporting workflow, stateless helpers became functions, data holders became lightweight structures, trivial strategies became callables, and the whole process became a direct pipeline. Just as important, you now have a concrete threshold for moving back to classes when state and invariants start traveling together.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>

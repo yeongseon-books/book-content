@@ -94,7 +94,7 @@ def get_seniors(people: list[dict]) -> list[dict]:
 
 ```python
 # after: higher-order function with condition as argument
-from typing import Callable
+from collections.abc import Callable
 
 def filter_people(
     people: list[dict],
@@ -111,7 +111,7 @@ seniors = filter_people(people, lambda p: p["age"] >= 65)
 ### Step 1: Passing Functions as Arguments
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def apply_operation(
@@ -178,7 +178,7 @@ for s in by_grade_score:
 ### Step 3: Factory Functions that Return Functions
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def make_multiplier(factor: int) -> Callable[[int], int]:
@@ -210,7 +210,8 @@ print(is_valid_rate(0.75))  # True
 
 ```python
 import time
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 from functools import wraps
 
 
@@ -263,7 +264,8 @@ print(f"Result: {result}")
 ### Step 5: Building a Pipeline with Higher-Order Functions
 
 ```python
-from typing import Callable, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
 
 T = TypeVar("T")
 

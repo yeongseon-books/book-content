@@ -88,17 +88,24 @@
 <p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-03-core-concepts.en.png"></p>
 <p><em>Core concepts</em><br>
 <strong>SQLite's three thread-safety modes</strong></p>
-<p>The SQLite C library is compiled in one of three modes:</p>
+<p>The SQLite C library is compiled in one of three native modes:</p>
 <ul>
-<li><strong>Single-thread (0)</strong>: no thread concurrency at all. Embedded only.</li>
-<li><strong>Multi-thread (1)</strong>: separate connections in separate threads is fine. Sharing one connection between threads is not.</li>
-<li><strong>Serialized (2)</strong>: even one connection can be shared across threads safely; an internal mutex serializes calls.</li>
+<li><strong>Single-thread</strong>: no thread concurrency at all. Embedded only.</li>
+<li><strong>Multi-thread</strong>: separate connections in separate threads is fine. Sharing one connection between threads is not.</li>
+<li><strong>Serialized</strong>: even one connection can be shared across threads safely; an internal mutex serializes calls.</li>
 </ul>
-<p>Python's <code>sqlite3</code> exposes the active mode:</p>
+<p>Those native mode names are not the same numbering as Python's DB-API <code>sqlite3.threadsafety</code> value. Python exposes this DB-API mapping instead:</p>
+<ul>
+<li><strong>0</strong> -&gt; SQLite single-thread</li>
+<li><strong>1</strong> -&gt; SQLite multi-thread</li>
+<li><strong>3</strong> -&gt; SQLite serialized</li>
+</ul>
+<p>The SQLite compile-time <code>SQLITE_THREADSAFE</code> numbers are different again (<code>0</code>, <code>2</code>, <code>1</code> in that same order).</p>
+<p>Python's <code>sqlite3</code> exposes the DB-API value like this:</p>
 <pre><code class="language-python">import sqlite3
-print(sqlite3.threadsafety)  # 0, 1, 2, or 3
+print(sqlite3.threadsafety)  # 0, 1, or 3
 </code></pre>
-<p>Most distros report <code>1</code> or <code>3</code>. In Python 3.11+, <code>3</code> means <code>serialized</code> and you can share a connection across threads safely.</p>
+<p>Most distros report <code>1</code> or <code>3</code>. In Python 3.11+, <code>3</code> maps to SQLite's <code>serialized</code> mode; <code>1</code> maps to <code>multi-thread</code>, which still does not mean one connection should be shared across threads.</p>
 <p><strong>What <code>check_same_thread</code> actually does</strong></p>
 <p><code>sqlite3.connect()</code> defaults to <code>check_same_thread=True</code>. This is a <strong>Python-level guard</strong>, separate from the SQLite C library's thread-safety mode. If you try to use the connection from a thread other than the one that created it, the <code>sqlite3</code> module raises <code>ProgrammingError</code>.</p>
 <pre><code class="language-python">import sqlite3, threading
@@ -110,7 +117,7 @@ def worker():
 
 threading.Thread(target=worker).start()
 </code></pre>
-<p>Setting <code>check_same_thread=False</code> removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So <code>check_same_thread=False</code> alone is <strong>not</strong> enough. You need <code>sqlite3.threadsafety &gt;= 1</code> and you must guarantee at the code level that only one thread uses a given connection at a time.</p>
+<p>Setting <code>check_same_thread=False</code> removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So <code>check_same_thread=False</code> alone is <strong>not</strong> enough. If you intend to share one connection across threads, first verify that <code>sqlite3.threadsafety == 3</code>. Otherwise keep the safer rule: do not share one connection across threads.</p>
 <p><strong>Per-thread vs shared</strong></p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
 <table>
@@ -138,7 +145,7 @@ threading.Thread(target=worker).start()
 <tr>
 <td>Single shared connection</td>
 <td>Smallest footprint</td>
-<td>Requires <code>serialized</code> mode + <code>check_same_thread=False</code>; writes serialize anyway</td>
+<td>Requires <code>sqlite3.threadsafety == 3</code> + <code>check_same_thread=False</code>; writes serialize anyway</td>
 <td>Embedded, single worker</td>
 </tr>
 <tr>
@@ -247,19 +254,32 @@ def read_user(user_id: int, db: sqlite3.Connection = Depends(get_db)):
 <p><strong>Step 4. Separate the write path</strong></p>
 <pre><code class="language-python">@app.post(&quot;/users&quot;, status_code=201)
 def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
-    with db:  # context manager handles BEGIN/COMMIT
+    db.execute(&quot;BEGIN IMMEDIATE&quot;)
+    try:
         cur = db.execute(
             &quot;INSERT INTO users(email) VALUES (?)&quot;, (payload.email,)
         )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {&quot;id&quot;: cur.lastrowid}
 </code></pre>
-<p><code>with db:</code> defines the transaction boundary. Exceptions roll it back; success commits. With <code>isolation_level=None</code> you keep the freedom to issue <code>BEGIN IMMEDIATE</code> explicitly when you want a writer lock up front.</p>
+<p>Because <code>open_conn()</code> sets <code>isolation_level=None</code>, SQLite stays in autocommit mode until you issue <code>BEGIN ...</code> yourself. Here <code>BEGIN IMMEDIATE</code> defines the write transaction boundary, <code>commit()</code> closes it on success, and <code>rollback()</code> handles exceptions.</p>
 <p><strong>Step 5. Simulate concurrent writes</strong></p>
 <pre><code class="language-python">import concurrent.futures, sqlite3
 
 def writer(i):
-    with open_conn() as conn:
+    conn = open_conn()
+    try:
+        conn.execute(&quot;BEGIN IMMEDIATE&quot;)
         conn.execute(&quot;INSERT INTO log(msg) VALUES (?)&quot;, (f&quot;msg-{i}&quot;,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
     list(ex.map(writer, range(200)))

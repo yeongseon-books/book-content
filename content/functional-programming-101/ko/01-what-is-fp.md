@@ -166,7 +166,7 @@ print(passing)  # ['Diana', 'Bob', 'Alice']
 ### Step 4: 함수 합성으로 파이프라인 만들기
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def pipeline(*funcs: Callable) -> Callable:

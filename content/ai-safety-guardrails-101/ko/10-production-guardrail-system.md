@@ -74,7 +74,7 @@ guardrail 시스템을 계층 구조로 정리하면 팀은 개별 정책보다 
 
 ```python
 from dataclasses import dataclass
-from typing import Callable
+from collections.abc import Callable
 
 @dataclass
 class GuardrailResult:

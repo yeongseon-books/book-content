@@ -55,7 +55,8 @@ The percentage of user requests the agent completes successfully.
 
 ```python
 from dataclasses import dataclass
-from typing import List, Callable
+from collections.abc import Callable
+from typing import List
 
 @dataclass
 class TestCase:

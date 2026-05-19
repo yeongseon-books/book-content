@@ -454,7 +454,8 @@ A central broker handles message routing. Senders only send messages to the brok
 
 ```python
 from collections import defaultdict, deque
-from typing import Callable, Dict, List
+from collections.abc import Callable
+from typing import Dict, List
 import threading
 
 class MessageBroker:

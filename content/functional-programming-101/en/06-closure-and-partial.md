@@ -223,7 +223,7 @@ print(tax_10_p(50000))  # 5000.0
 
 ```python
 from functools import partial
-from typing import Callable
+from collections.abc import Callable
 
 
 # event system

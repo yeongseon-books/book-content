@@ -144,7 +144,7 @@ def build_eval_dataset() -&gt; list[EvalExample]:
 <p><strong>1. Exact match</strong>: use where possible. JSON fields, numbers, IDs.</p>
 <p><strong>2. Heuristic checks</strong>: regex, length, required-word presence. Fast and deterministic.</p>
 <p><strong>3. LLM-as-judge</strong>: hand scoring to another LLM. Costly but enables semantic evaluation.</p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 @dataclass
 class Rubric:

@@ -128,7 +128,7 @@ policy = ConstraintPolicy(
 <p><em>Capability constraints - tool whitelisting</em><br>
 The simplest and most effective constraint is restricting tool exposure. An agent cannot call a tool it never received.</p>
 <p>The core principle is whitelisting. Not "this tool is forbidden" but "only this tool is allowed." A blacklist must be updated each time a new tool is added; a whitelist blocks anything not explicitly added.</p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 from dataclasses import dataclass
 
 @dataclass
