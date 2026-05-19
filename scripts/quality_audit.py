@@ -33,6 +33,7 @@ import subprocess
 import sys
 import textwrap
 from dataclasses import asdict, dataclass
+from difflib import unified_diff
 from pathlib import Path
 from typing import Any
 
@@ -137,6 +138,136 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def write_markdown(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def normalize_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    normalized = json.loads(json.dumps(payload, ensure_ascii=False))
+    normalized.pop("generated_at", None)
+    return normalized
+
+
+def normalize_markdown(content: str) -> str:
+    lines = content.splitlines()
+    normalized_lines: list[str] = []
+    for line in lines:
+        if line.startswith("Generated: "):
+            continue
+        normalized_lines.append(line)
+    return "\n".join(normalized_lines).strip() + "\n"
+
+
+def count_drift(
+    baseline_results: list[dict[str, Any]], current_results: list[dict[str, Any]]
+) -> tuple[int, int, int]:
+    baseline_map = {result["series"]: result for result in baseline_results}
+    current_map = {result["series"]: result for result in current_results}
+
+    added = sum(1 for series in current_map if series not in baseline_map)
+    removed = sum(1 for series in baseline_map if series not in current_map)
+    changed = sum(
+        1
+        for series in baseline_map.keys() & current_map.keys()
+        if baseline_map[series] != current_map[series]
+    )
+    return added, removed, changed
+
+
+def diff_lines(
+    baseline_text: str,
+    current_text: str,
+    *,
+    fromfile: str,
+    tofile: str,
+    limit: int = 20,
+) -> list[str]:
+    diff = list(
+        unified_diff(
+            baseline_text.splitlines(),
+            current_text.splitlines(),
+            fromfile=fromfile,
+            tofile=tofile,
+            lineterm="",
+        )
+    )
+    return diff[:limit]
+
+
+def check_baseline(
+    payload: dict[str, Any], markdown: str, json_output: Path, md_output: Path
+) -> int:
+    if not json_output.is_file():
+        print(
+            f"missing baseline JSON: {display_path(json_output)}. "
+            + "Run `make refresh-quality-audit` to generate baseline.",
+            file=sys.stderr,
+        )
+        return 1
+    if not md_output.is_file():
+        print(
+            f"missing baseline markdown: {display_path(md_output)}. "
+            + "Run `make refresh-quality-audit` to generate baseline.",
+            file=sys.stderr,
+        )
+        return 1
+
+    baseline_payload = load_json(json_output)
+    normalized_baseline = normalize_payload(baseline_payload)
+    normalized_current = normalize_payload(payload)
+    baseline_markdown = normalize_markdown(md_output.read_text(encoding="utf-8"))
+    current_markdown = normalize_markdown(markdown)
+
+    payload_matches = normalized_baseline == normalized_current
+    markdown_matches = baseline_markdown == current_markdown
+    if payload_matches and markdown_matches:
+        print("Audit baseline is up to date.")
+        return 0
+
+    added, removed, changed = count_drift(
+        baseline_payload.get("results", []), payload.get("results", [])
+    )
+    print(
+        "Baseline drifted: "
+        + f"{added} series added, {removed} removed, {changed} changed. "
+        + "Run `make refresh-quality-audit` and commit.",
+        file=sys.stderr,
+    )
+
+    diff_output: list[str] = []
+    if not payload_matches:
+        baseline_json_text = (
+            json.dumps(normalized_baseline, ensure_ascii=False, indent=2) + "\n"
+        )
+        current_json_text = (
+            json.dumps(normalized_current, ensure_ascii=False, indent=2) + "\n"
+        )
+        diff_output.extend(
+            diff_lines(
+                baseline_json_text,
+                current_json_text,
+                fromfile=display_path(json_output),
+                tofile="current:audit.json",
+            )
+        )
+
+    if not markdown_matches and len(diff_output) < 20:
+        remaining = 20 - len(diff_output)
+        diff_output.extend(
+            diff_lines(
+                baseline_markdown,
+                current_markdown,
+                fromfile=display_path(md_output),
+                tofile="current:audit.md",
+                limit=remaining,
+            )
+        )
+
+    for line in diff_output[:20]:
+        print(line, file=sys.stderr)
+    return 1
 
 
 def split_frontmatter(text: str) -> tuple[str, int]:
@@ -664,22 +795,21 @@ def main() -> int:
     payload = build_payload(results, repo_cache.method, args.gate, repo_cache.warnings)
     markdown = make_markdown(payload)
 
-    if not args.check:
-        write_json(args.json_output, payload)
-        write_markdown(args.md_output, markdown)
-        if args.dated_md_output:
-            write_markdown(args.dated_md_output, markdown)
+    if args.check:
+        return check_baseline(payload, markdown, args.json_output, args.md_output)
+
+    write_json(args.json_output, payload)
+    write_markdown(args.md_output, markdown)
+    if args.dated_md_output:
+        write_markdown(args.dated_md_output, markdown)
 
     print(f"series_audited={payload['series_count']}")
     print(f"problem_series={payload['problem_series_count']}")
     print(f"total_issues={payload['totals']['all']}")
-    if args.check:
-        print("mode=check (non-mutating)")
-    else:
-        print(f"json_output={display_path(args.json_output)}")
-        print(f"md_output={display_path(args.md_output)}")
-        if args.dated_md_output:
-            print(f"dated_md_output={display_path(args.dated_md_output)}")
+    print(f"json_output={display_path(args.json_output)}")
+    print(f"md_output={display_path(args.md_output)}")
+    if args.dated_md_output:
+        print(f"dated_md_output={display_path(args.dated_md_output)}")
     if payload["warnings"]:
         print(f"warnings={len(payload['warnings'])}")
         for warning in payload["warnings"]:
