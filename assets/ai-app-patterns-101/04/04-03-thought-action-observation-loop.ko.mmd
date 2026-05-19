@@ -1,0 +1,14 @@
+flowchart TD
+  Q["질문 도착\n사용자가 도움 요청"] --> T["Thought\n무슨 정보가 더 필요한가?"]
+  T --> A["Action\n도구 하나와 입력 선택"]
+  A --> O["Observation\n도구 결과 읽기"]
+  O --> D{"답하기에 충분한\n근거가 있는가?"}
+  D -->|"아니오"| T
+  D -->|"예"| F["Final Answer\n루프 종료"]
+
+  style Q fill:#e3f2fd,stroke:#1976d2
+  style T fill:#fff3e0,stroke:#f57c00
+  style A fill:#fce4ec,stroke:#c2185b
+  style O fill:#e8f5e9,stroke:#388e3c
+  style D fill:#fffde7,stroke:#f9a825
+  style F fill:#f3e5f5,stroke:#7b1fa2

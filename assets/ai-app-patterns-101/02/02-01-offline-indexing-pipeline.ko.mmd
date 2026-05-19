@@ -1,0 +1,13 @@
+flowchart TD
+  D["원본 문서\n사내 문서, 매뉴얼, 노트"] --> C["청킹\n검색 가능한 텍스트 조각으로 분할"]
+  C --> E["임베딩 모델\n청크를 벡터로 변환"]
+  E --> M["메타데이터 부착\nsource, page, section"]
+  M --> F["FAISS 인덱스\n나중 검색용 벡터 저장"]
+  F --> O["오프라인 산출물\n사용자 질의 전에 retriever 준비 완료"]
+
+  style D fill:#e3f2fd,stroke:#1976d2
+  style C fill:#fff3e0,stroke:#f57c00
+  style E fill:#f3e5f5,stroke:#7b1fa2
+  style M fill:#fffde7,stroke:#f9a825
+  style F fill:#e8f5e9,stroke:#388e3c
+  style O fill:#ede7f6,stroke:#5e35b1

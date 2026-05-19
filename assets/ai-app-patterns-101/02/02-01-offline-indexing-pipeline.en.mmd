@@ -1,0 +1,13 @@
+flowchart TD
+  D["Source documents\nprivate docs, manuals, notes"] --> C["Chunking\nsplit into retrievable text segments"]
+  C --> E["Embedding model\nconvert chunks to vectors"]
+  E --> M["Attach metadata\nsource, page, section"]
+  M --> F["FAISS index\nstore vectors for later search"]
+  F --> O["Offline output\nretriever ready before user queries"]
+
+  style D fill:#e3f2fd,stroke:#1976d2
+  style C fill:#fff3e0,stroke:#f57c00
+  style E fill:#f3e5f5,stroke:#7b1fa2
+  style M fill:#fffde7,stroke:#f9a825
+  style F fill:#e8f5e9,stroke:#388e3c
+  style O fill:#ede7f6,stroke:#5e35b1

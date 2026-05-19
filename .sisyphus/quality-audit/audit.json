@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-19T23:24:58+00:00",
+  "generated_at": "2026-05-19T23:40:44+00:00",
   "series_count": 92,
-  "problem_series_count": 62,
-  "series_with_5_plus": 47,
+  "problem_series_count": 61,
+  "series_with_5_plus": 46,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 570,
+    "BadImg": 552,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 38,
     "NoEn": 0,
-    "all": 608
+    "all": 590
   },
   "results": [
     {
@@ -2053,390 +2053,6 @@
             "code": null,
             "image": "05-03-where-engineers-get-confused.ko.png",
             "width": 1090,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
-      "series": "ai-app-patterns-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 18
-      },
-      "total": 18,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-stateless-call-with-replayed-history.en.png",
-            "width": 1341,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-stateless-call-with-replayed-history.ko.png",
-            "width": 1310,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-offline-indexing-pipeline.en.png",
-            "width": 1039,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-offline-indexing-pipeline.ko.png",
-            "width": 970,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png",
-            "line": 1,
-            "message": "PNG height 76px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-online-question-answering-flow.en.png",
-            "width": 1384,
-            "height": 76,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 66px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-online-question-answering-flow.ko.png",
-            "width": 1384,
-            "height": 66,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-questions-this-post-answers.en.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-questions-this-post-answers.ko.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-short-document-summarization-flow.en.png",
-            "width": 1355,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-short-document-summarization-flow.ko.png",
-            "width": 1109,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-stateless-call-with-replayed-history.en.png",
-            "width": 1341,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-stateless-call-with-replayed-history.ko.png",
-            "width": 1310,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-offline-indexing-pipeline.en.png",
-            "width": 1039,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-offline-indexing-pipeline.ko.png",
-            "width": 970,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png",
-            "line": 1,
-            "message": "PNG height 76px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-online-question-answering-flow.en.png",
-            "width": 1384,
-            "height": 76,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 66px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-online-question-answering-flow.ko.png",
-            "width": 1384,
-            "height": 66,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-questions-this-post-answers.en.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-questions-this-post-answers.ko.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-short-document-summarization-flow.en.png",
-            "width": 1355,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-short-document-summarization-flow.ko.png",
-            "width": 1109,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-03-json-extraction-from-unstructured-text.en.png",
-            "width": 1384,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-03-json-extraction-from-unstructured-text.ko.png",
-            "width": 1253,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png",
-            "line": 1,
-            "message": "PNG height 100px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-thought-action-observation-loop.en.png",
-            "width": 1384,
-            "height": 100,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.ko.png",
-            "line": 1,
-            "message": "PNG height 98px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-thought-action-observation-loop.ko.png",
-            "width": 1384,
-            "height": 98,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-questions-this-post-answers.en.png",
-            "width": 1003,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-questions-this-post-answers.ko.png",
-            "width": 860,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-sequential-handoff-across-stages.en.png",
-            "width": 1058,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-sequential-handoff-across-stages.ko.png",
-            "width": 860,
             "height": 67,
             "repo": null
           }
@@ -15348,6 +14964,20 @@
           }
         ]
       }
+    },
+    {
+      "series": "ai-app-patterns-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
     },
     {
       "series": "ai-data-preparation-101",
