@@ -172,7 +172,7 @@ assert task.is_executable()
 <p><strong>1. Single deliverable.</strong> A task should produce one deliverable. "Reply to tickets and update the CRM" is two tasks. Split them. Single deliverable means single completion criteria, single retry unit, single rollback unit.</p>
 <p><strong>2. Bounded tool calls.</strong> A good task finishes in fewer than five tool calls. Beyond that, decompose. This is not a hard rule but a heuristic — long tool sequences amplify error compounding.</p>
 <p><strong>3. Auto-verifiable completion criteria.</strong> Criteria a human must read and judge cannot be tested, cannot be evaluated automatically, and cannot trigger retry decisions. Criteria must be expressible as code.</p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 class VerifiableTask(TaskSpec):
     &quot;&quot;&quot;Task with executable completion criteria.&quot;&quot;&quot;

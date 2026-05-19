@@ -97,7 +97,7 @@
 <h2>Pipeline Implementation</h2>
 <p>A simplified version of the four-layer pipeline. In production each function is replaced by the modules from Episodes 1 through 9.</p>
 <pre><code class="language-python">from dataclasses import dataclass
-from typing import Callable
+from collections.abc import Callable
 
 @dataclass
 class GuardrailResult:

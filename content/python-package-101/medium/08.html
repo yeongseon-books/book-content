@@ -170,7 +170,8 @@ mylib = [&quot;py.typed&quot;]
 </code></pre>
 <p><strong>Step 5. Advanced type usage</strong></p>
 <pre><code class="language-python"># src/mylib/utils.py
-from typing import TypeVar, Callable
+from collections.abc import Callable
+from typing import TypeVar
 
 T = TypeVar(&quot;T&quot;)
 
@@ -251,7 +252,7 @@ mypy src/  # resolves import type errors for requests
 <li>Overusing <code>Any</code> defeats the purpose of type hints.</li>
 </ul>
 <p>The next post covers <strong>documentation</strong> — README, MkDocs, and API Reference.</p>
-<h2>Series Table of Contents</h2>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
@@ -271,6 +272,6 @@ mypy src/  # resolves import type errors for requests
 <li><a href="https://peps.python.org/pep-0561/">PEP 561 - Distributing and Packaging Type Information</a></li>
 <li><a href="https://docs.python.org/3/library/typing.html">Python typing documentation</a></li>
 </ul>
-<p class="tags-line">Tags: Python, Type Hints, mypy, py.typed, Static Analysis, Typing</p>
+<p class="tags-line">Tags: Python, Packaging, PyPI, pyproject.toml</p>
 </body>
 </html>

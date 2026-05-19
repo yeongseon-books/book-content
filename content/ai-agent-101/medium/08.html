@@ -155,7 +155,8 @@ def validate_user_input(text: str, max_chars: int = 10000) -&gt; str:
 <p>The most basic reliability mechanism. Exponential backoff is the standard.</p>
 <pre><code class="language-python">import time
 import random
-from typing import Callable, Type, Tuple
+from collections.abc import Callable
+from typing import Type, Tuple
 
 def retry_with_backoff(
     fn: Callable,

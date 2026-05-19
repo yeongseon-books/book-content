@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Lazy Evaluation and Generators</h1>
+<p>The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.</p>
 <p>This is post 8 in the Functional Programming 101 series.</p>
-<blockquote>
-<p>Functional Programming 101 Series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Can you process data without loading everything into memory at once?</p>
-<blockquote>
-<p>Lazy evaluation is a strategy that defers computation until the moment a value is actually needed. Python's generators are the primary tool for lazy evaluation, enabling memory-efficient data processing. This article covers how generators work and how to build lazy pipelines with itertools.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between eager evaluation and lazy evaluation</li>
@@ -83,12 +74,8 @@
 <blockquote>
 <p>Eager vs Lazy Evaluation</p>
 </blockquote>
-<pre><code class="language-text">Eager Evaluation               Lazy Evaluation
-─────────────────             ─────────────────
-[1, 4, 9, 16, 25]            (waiting to compute...)
-Everything in memory          Produces one value at a time
-list()                        generator / iterator
-</code></pre>
+<p><img alt="Pull-based lazy pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png"></p>
+<p><em>In a lazy pipeline, the consumer pulls one record at a time through every stage. That pull model is why a large input stream does not require every intermediate result to live in memory at once.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Lazy evaluation</strong><br>
 - Description: A strategy that computes values only when they are needed</p>
@@ -216,18 +203,21 @@ for key, group in groupby(data):
 # c: ['c']
 </code></pre>
 <p><strong>Step 5: Building a Lazy Pipeline</strong></p>
-<pre><code class="language-python">from typing import Iterator
+<pre><code class="language-python">from itertools import chain
+from pathlib import Path
+from typing import Iterator
 
-def read_lines(text: str) -&gt; Iterator[str]:
-    &quot;&quot;&quot;Yields lines from a text block.&quot;&quot;&quot;
-    for line in text.strip().split(&quot;\n&quot;):
-        yield line.strip()
+def read_lines(path: Path) -&gt; Iterator[str]:
+    &quot;&quot;&quot;Yields lines from a CSV file one at a time.&quot;&quot;&quot;
+    with path.open(&quot;r&quot;, encoding=&quot;utf-8&quot;) as handle:
+        for line in handle:
+            yield line.rstrip(&quot;\n&quot;)
 
 def parse_csv(lines: Iterator[str]) -&gt; Iterator[dict]:
     &quot;&quot;&quot;Converts CSV lines into dictionaries.&quot;&quot;&quot;
-    headers = next(lines).split(&quot;,&quot;)
+    headers = [header.strip() for header in next(lines).split(&quot;,&quot;)]
     for line in lines:
-        values = line.split(&quot;,&quot;)
+        values = [value.strip() for value in line.split(&quot;,&quot;)]
         yield dict(zip(headers, values))
 
 def filter_by_score(records: Iterator[dict], min_score: int) -&gt; Iterator[dict]:
@@ -241,28 +231,61 @@ def format_output(records: Iterator[dict]) -&gt; Iterator[str]:
     for r in records:
         yield f&quot;{r['name']}: {r['score']} points&quot;
 
-# run the pipeline — every stage is lazy
-csv_text = &quot;&quot;&quot;name,score
-Alice,85
-Bob,92
-Charlie,78
-Diana,95
-Eve,60&quot;&quot;&quot;
-
-pipeline = format_output(
-    filter_by_score(
-        parse_csv(read_lines(csv_text)),
-        min_score=80,
-    )
+# create a tiny sample file so the pipeline behaves like a real stream
+sample_path = Path(&quot;scores.csv&quot;)
+sample_path.write_text(
+    &quot;\n&quot;.join(
+        [
+            &quot;name,score&quot;,
+            &quot;Alice,85&quot;,
+            &quot;Bob,92&quot;,
+            &quot;Charlie,78&quot;,
+            &quot;Diana,95&quot;,
+            &quot;Eve,60&quot;,
+        ]
+    ),
+    encoding=&quot;utf-8&quot;,
 )
 
-# consume results one at a time
-for line in pipeline:
-    print(line)
-# Alice: 85 points
-# Bob: 92 points
-# Diana: 95 points
+try:
+    # keep stage handles separate so you can inspect them in isolation
+    lines_stage = read_lines(sample_path)
+    header = next(lines_stage)
+    print(f&quot;Header preview: {header}&quot;)
+
+    pipeline = format_output(
+        filter_by_score(
+            parse_csv(chain([header], lines_stage)),
+            min_score=80,
+        )
+    )
+
+    # consume results one at a time
+    for line in pipeline:
+        print(line)
+    # Alice: 85 points
+    # Bob: 92 points
+    # Diana: 95 points
+
+    print(list(pipeline))
+    # []
+finally:
+    sample_path.unlink(missing_ok=True)
 </code></pre>
+<p><strong>Expected output</strong></p>
+<pre><code class="language-text">Header preview: name,score
+Alice: 85 points
+Bob: 92 points
+Diana: 95 points
+[]
+</code></pre>
+<p><strong>If your result differs, inspect this first</strong></p>
+<ul>
+<li>Make sure the header really comes through as <code>name,score</code>. If you skip or corrupt the first line, the parser will not find the <code>score</code> column.</li>
+<li>Confirm the threshold check uses <code>&gt;= 80</code>. If it becomes <code>&gt; 80</code>, <code>Alice</code> disappears.</li>
+<li>Verify newline stripping still happens with <code>rstrip("\n")</code> or equivalent. Otherwise names or scores can keep trailing whitespace.</li>
+<li>The final <code>print(list(pipeline))</code> should be <code>[]</code>. That empty list confirms the generator was exhausted after the first full pass.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Generators produce values one at a time, saving memory</li>

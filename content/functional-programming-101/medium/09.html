@@ -55,8 +55,8 @@
 <body>
 <h1>Function Composition and Pipelines</h1>
 <p>Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.</p>
-<p>Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.</p>
 <p>This is post 9 in the Functional Programming 101 series.</p>
+<p>Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The mathematical principle behind function composition and its Python implementation</li>
@@ -74,7 +74,7 @@
 <blockquote>
 <p>compose vs pipe — a matter of direction</p>
 </blockquote>
-<pre><code>compose(f, g, h)(x)  =  f(g(h(x)))     &lt;- right to left
+<pre><code class="language-text">compose(f, g, h)(x)  =  f(g(h(x)))     &lt;- right to left
 pipe(h, g, f)(x)     =  f(g(h(x)))     &lt;- left to right
 
 Pipeline visualization:
@@ -118,7 +118,8 @@ result = pipe(
 </code></pre>
 <h2>Hands-On Steps</h2>
 <p><strong>Step 1: Basic compose and pipe</strong></p>
-<pre><code class="language-python">from typing import Callable, Any
+<pre><code class="language-python">from collections.abc import Callable
+from typing import Any
 from functools import reduce
 
 def compose(*funcs: Callable) -&gt; Callable:
@@ -191,7 +192,7 @@ print(slugify(&quot;  Functional Programming — A Composition Guide  &quot;))
 # functional-programming--a-composition-guide
 </code></pre>
 <p><strong>Step 3: Data Processing Pipeline</strong></p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 def pipe_data(*funcs: Callable) -&gt; Callable:
     &quot;&quot;&quot;Data processing pipeline.&quot;&quot;&quot;
@@ -258,7 +259,8 @@ print(process_students(raw_data))
 # Charlie        78     C
 </code></pre>
 <p><strong>Step 4: Generator Pipeline</strong></p>
-<pre><code class="language-python">from typing import Iterator, Callable
+<pre><code class="language-python">from collections.abc import Callable
+from typing import Iterator
 
 def gen_pipe(*funcs: Callable) -&gt; Callable:
     &quot;&quot;&quot;Generator-based lazy pipeline.&quot;&quot;&quot;
@@ -316,7 +318,8 @@ for line in clean_text(lines(text)):
 # DEBUG = TRUE
 </code></pre>
 <p><strong>Step 5: Conditional Pipeline</strong></p>
-<pre><code class="language-python">from typing import Callable, Any
+<pre><code class="language-python">from collections.abc import Callable
+from typing import Any
 
 def conditional(
     predicate: Callable[[Any], bool],
@@ -397,10 +400,58 @@ events = [
     OrderEvent(&quot;A-4&quot;, &quot;busan&quot;, 27000, &quot;KRW&quot;, &quot;paid&quot;, &quot;direct&quot;),
 ]
 
-print(settle_orders(events))
-# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+normalized = normalize_currency(events)
+assert [(e.order_id, e.amount, e.currency) for e in normalized] == [
+    (&quot;A-1&quot;, 48000, &quot;KRW&quot;),
+    (&quot;A-2&quot;, 57960, &quot;KRW&quot;),
+    (&quot;A-3&quot;, 31000, &quot;KRW&quot;),
+    (&quot;A-4&quot;, 27000, &quot;KRW&quot;),
+]
+
+active = drop_cancelled(normalized)
+assert [e.order_id for e in active] == [&quot;A-1&quot;, &quot;A-2&quot;, &quot;A-4&quot;]
+
+marketplace_only = keep_marketplace(active)
+assert [e.order_id for e in marketplace_only] == [&quot;A-1&quot;, &quot;A-2&quot;]
+
+with_margin = enrich_margin(marketplace_only)
+assert [(e.order_id, e.margin) for e in with_margin] == [
+    (&quot;A-1&quot;, 8640),
+    (&quot;A-2&quot;, 10432),
+]
+
+report = to_store_report(with_margin)
+assert report == {
+    &quot;seoul&quot;: {&quot;revenue&quot;: 105960, &quot;margin&quot;: 19072, &quot;orders&quot;: 2}
+}
+
+print(&quot;Normalized IDs:&quot;, [e.order_id for e in normalized])
+print(&quot;After cancellation filter:&quot;, [e.order_id for e in active])
+print(&quot;Marketplace IDs:&quot;, [e.order_id for e in marketplace_only])
+print(&quot;Store report:&quot;, report)
+
+print(&quot;Pipeline report:&quot;, settle_orders(events))
+# Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+# After cancellation filter: ['A-1', 'A-2', 'A-4']
+# Marketplace IDs: ['A-1', 'A-2']
+# Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+# Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 </code></pre>
 <p>This example is closer to a production data flow than a toy string transformation. Currency normalization, cancellation filtering, channel filtering, margin enrichment, and store-level aggregation remain independent stages, which makes failures and business-rule changes easier to isolate.</p>
+<p><strong>Expected output</strong></p>
+<pre><code class="language-text">Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
+After cancellation filter: ['A-1', 'A-2', 'A-4']
+Marketplace IDs: ['A-1', 'A-2']
+Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+</code></pre>
+<p><strong>If your result differs, inspect this first</strong></p>
+<ul>
+<li>Check that the USD exchange rate is still <code>1380</code>. That number directly changes <code>A-2</code> and every later aggregate.</li>
+<li>Verify <code>drop_cancelled()</code> really removes <code>cancelled</code> events. If <code>A-3</code> survives, the <code>busan</code> store will appear in the report.</li>
+<li>Verify <code>keep_marketplace()</code> keeps only <code>source == "marketplace"</code>. If <code>A-4</code> survives, direct-channel revenue leaks into the settlement.</li>
+<li>Confirm the margin rule is still <code>int(e.amount * 0.18)</code>. A different rounding rule changes the final <code>19072</code> margin.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>pipe</code> matches code order to execution order, improving readability</li>

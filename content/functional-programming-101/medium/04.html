@@ -118,7 +118,7 @@ def get_seniors(people: list[dict]) -&gt; list[dict]:
     return result
 </code></pre>
 <pre><code class="language-python"># after: higher-order function with condition as argument
-from typing import Callable
+from collections.abc import Callable
 
 def filter_people(
     people: list[dict],
@@ -131,7 +131,7 @@ seniors = filter_people(people, lambda p: p[&quot;age&quot;] &gt;= 65)
 </code></pre>
 <h2>Hands-On Steps</h2>
 <p><strong>Step 1: Passing Functions as Arguments</strong></p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 def apply_operation(
     values: list[int],
@@ -188,7 +188,7 @@ for s in by_grade_score:
 #   Grade 3 Charlie: 78
 </code></pre>
 <p><strong>Step 3: Factory Functions that Return Functions</strong></p>
-<pre><code class="language-python">from typing import Callable
+<pre><code class="language-python">from collections.abc import Callable
 
 def make_multiplier(factor: int) -&gt; Callable[[int], int]:
     &quot;&quot;&quot;Creates a multiplier function.&quot;&quot;&quot;
@@ -215,7 +215,8 @@ print(is_valid_rate(0.75))  # True
 </code></pre>
 <p><strong>Step 4: Decorators — Syntactic Sugar for Higher-Order Functions</strong></p>
 <pre><code class="language-python">import time
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 from functools import wraps
 
 def timer(func: Callable) -&gt; Callable:
@@ -262,7 +263,8 @@ print(f&quot;Result: {result}&quot;)
 # Result: 499999500000
 </code></pre>
 <p><strong>Step 5: Building a Pipeline with Higher-Order Functions</strong></p>
-<pre><code class="language-python">from typing import Callable, TypeVar
+<pre><code class="language-python">from collections.abc import Callable
+from typing import TypeVar
 
 T = TypeVar(&quot;T&quot;)
 

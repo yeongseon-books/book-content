@@ -55,303 +55,393 @@
 <body>
 <h1>SOLID Principles Basics</h1>
 <p>This is post 8 in the Object-Oriented Programming 101 series.</p>
-<blockquote>
-<p>Object-Oriented Programming 101 Series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: What principles should you follow to design classes that are resilient to change and flexible for extension?</p>
-<blockquote>
-<p>SOLID is a set of five core principles for object-oriented design. This article walks through Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion — each with Python code examples.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>SOLID starts making sense when one service keeps growing until every new requirement shakes unrelated code.</p>
+<p>Rather than treating SOLID as five isolated slogans, we will use one checkout workflow and refactor it step by step. Each principle will answer a concrete design smell, not just define a rule.</p>
+<h2>Questions This Article Answers</h2>
 <ul>
-<li>The definition and purpose of all five SOLID principles</li>
-<li>Violation examples and improved code for each principle</li>
-<li>Practical approaches to applying SOLID in Python</li>
-<li>Relationships and trade-offs between the principles</li>
+<li>Which SOLID principle matches the failure shape I am seeing right now?</li>
+<li>How do I refactor one workflow without turning the lesson into five disconnected toy snippets?</li>
+<li>What should keep working after each refactor step so I know the design is improving rather than drifting?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>You spend far more time maintaining code than writing it. SOLID principles guide you toward "code that is easy to change." The goal: modifying one place does not break another, and adding features requires minimal changes to existing code.</p>
+<h2>What This Article Tries to Solve</h2>
 <blockquote>
-<p>SOLID = five principles for designs that are resilient to change and flexible for extension</p>
+<p>SOLID is most useful when you can point to one brittle workflow and ask, "what is the smallest design move that stops this code from breaking the same way again?"</p>
 </blockquote>
-<p>You do not need to apply every principle perfectly from the start. Apply them when problems emerge as the code grows.</p>
+<ul>
+<li>How do you recognize which principle matches the failure you are seeing?</li>
+<li>What changes after SRP, and what should stay stable?</li>
+<li>How do OCP, LSP, ISP, and DIP build on top of one another instead of competing?</li>
+<li>When does applying SOLID too early become over-design?</li>
+</ul>
 <h2>Concept Overview</h2>
-<blockquote>
-<p>SOLID five principles summary</p>
-</blockquote>
-<pre><code>S — Single Responsibility    One class changes for only one reason
-O — Open/Closed             Open for extension, closed for modification
-L — Liskov Substitution     Children must be substitutable for parents
-I — Interface Segregation   Many small interfaces over one large interface
-D — Dependency Inversion    Depend on abstractions, not concretions
-</code></pre>
+<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png"><br>
+<em>Use the observable smell first, then choose the matching principle and the smallest refactor move instead of trying to apply all five rules at once.</em></p>
+<p>The key is not memorizing the acronym. The key is mapping one visible failure mode to one design correction. If the service has too many reasons to change, start with SRP. If every new rule edits old branching code, reach for OCP. If the system cannot swap dependencies cleanly, DIP is the more urgent fix.</p>
 <h2>Key Concepts</h2>
-<p><strong>Single Responsibility (SRP)</strong><br>
-- Description: A class should have only one responsibility</p>
-<p><strong>Open/Closed (OCP)</strong><br>
-- Description: Extend functionality without modifying existing code</p>
-<p><strong>Liskov Substitution (LSP)</strong><br>
-- Description: Child classes must be substitutable for parent classes</p>
-<p><strong>Interface Segregation (ISP)</strong><br>
-- Description: Do not depend on methods you do not use</p>
-<p><strong>Dependency Inversion (DIP)</strong><br>
-- Description: High-level modules should depend on abstractions, not low-level modules</p>
+<p><strong>SRP</strong><br>
+- Description: A class should change for one reason at a time</p>
+<p><strong>OCP</strong><br>
+- Description: New behavior should arrive mainly by extension, not by editing stable flow</p>
+<p><strong>LSP</strong><br>
+- Description: A subtype must honor the behavioral expectations of its parent contract</p>
+<p><strong>ISP</strong><br>
+- Description: Clients should depend only on the methods they actually need</p>
+<p><strong>DIP</strong><br>
+- Description: High-level policies should depend on abstractions instead of concrete tools</p>
 <h2>Before / After</h2>
-<p>Comparing SRP violation and improvement.</p>
-<pre><code class="language-python"># before: SRP violation — one class with multiple responsibilities
-class UserManager:
-    def create_user(self, name: str) -&gt; dict:
-        user = {&quot;name&quot;: name}
-        # DB save logic
-        # email send logic
-        # log recording logic
-        return user
+<p>The chapter starts with one overloaded checkout service and ends with a thinner workflow coordinator.</p>
+<pre><code class="language-python"># before: one class owns validation, pricing, persistence, and notification
+class OrderService:
+    def checkout(self, order: dict) -&gt; int:
+        if not order[&quot;items&quot;]:
+            raise ValueError(&quot;order must contain items&quot;)
+        total = sum(item[&quot;price&quot;] for item in order[&quot;items&quot;])
+        if order[&quot;customer_tier&quot;] == &quot;vip&quot;:
+            total = int(total * 0.8)
+        print(f&quot;saving order for {order['customer_email']}&quot;)
+        print(f&quot;emailing receipt for {total}&quot;)
+        return total
 </code></pre>
-<pre><code class="language-python"># after: SRP applied — each class has one responsibility
-class UserRepository:
-    def save(self, user: dict) -&gt; None:
-        print(f&quot;DB save: {user}&quot;)
-
-class EmailService:
-    def send_welcome(self, name: str) -&gt; None:
-        print(f&quot;Welcome email sent: {name}&quot;)
-
-class UserService:
-    def __init__(self, repo: UserRepository, email: EmailService) -&gt; None:
-        self._repo = repo
-        self._email = email
-
-    def create_user(self, name: str) -&gt; dict:
-        user = {&quot;name&quot;: name}
-        self._repo.save(user)
-        self._email.send_welcome(name)
-        return user
+<pre><code class="language-python"># after: the checkout flow depends on smaller collaborators and abstractions
+class CheckoutService:
+    def __init__(self, validator, pricer, repository, notifier) -&gt; None:
+        self.validator = validator
+        self.pricer = pricer
+        self.repository = repository
+        self.notifier = notifier
 </code></pre>
-<h2>Hands-On Steps</h2>
-<p><strong>Step 1: S — Single Responsibility Principle (SRP)</strong></p>
-<pre><code class="language-python"># Violation: Report class handles both data processing and output
-class Report:
-    def __init__(self, data: list[dict]) -&gt; None:
-        self.data = data
+<h2>One Workflow: Refactoring a Checkout Service with SOLID</h2>
+<p><strong>Step 1: SRP — Split Distinct Reasons to Change</strong></p>
+<p>Here is the brittle starting point.</p>
+<pre><code class="language-python">class OrderService:
+    def checkout(self, order: dict) -&gt; int:
+        if not order[&quot;items&quot;]:
+            raise ValueError(&quot;order must contain items&quot;)
 
-    def calculate_total(self) -&gt; int:
-        return sum(item[&quot;amount&quot;] for item in self.data)
+        total = sum(item[&quot;price&quot;] for item in order[&quot;items&quot;])
 
-    def to_html(self) -&gt; str:  # output format change -&gt; Report must change
-        total = self.calculate_total()
-        return f&quot;&lt;h1&gt;Total: {total}&lt;/h1&gt;&quot;
+        if order[&quot;customer_tier&quot;] == &quot;vip&quot;:
+            total = int(total * 0.8)
 
-# Improved: separate data processing from output
-class SalesReport:
-    def __init__(self, data: list[dict]) -&gt; None:
-        self.data = data
-
-    def calculate_total(self) -&gt; int:
-        return sum(item[&quot;amount&quot;] for item in self.data)
-
-class ReportFormatter:
-    def to_html(self, report: SalesReport) -&gt; str:
-        return f&quot;&lt;h1&gt;Total: {report.calculate_total()}&lt;/h1&gt;&quot;
-
-    def to_text(self, report: SalesReport) -&gt; str:
-        return f&quot;Total: {report.calculate_total()}&quot;
-
-data = [{&quot;amount&quot;: 100}, {&quot;amount&quot;: 200}]
-report = SalesReport(data)
-formatter = ReportFormatter()
-print(formatter.to_html(report))  # &lt;h1&gt;Total: 300&lt;/h1&gt;
-print(formatter.to_text(report))  # Total: 300
+        print(f&quot;saving order for {order['customer_email']}&quot;)
+        print(f&quot;emailing receipt for {total}&quot;)
+        return total
 </code></pre>
-<p><strong>Step 2: O — Open/Closed Principle (OCP)</strong></p>
+<p>This service changes when validation rules change, discount policy changes, persistence changes, or message delivery changes. That is four reasons to change packed into one class.</p>
+<p>Refactor first by separating responsibilities.</p>
+<pre><code class="language-python">class OrderValidator:
+    def validate(self, order: dict) -&gt; None:
+        if not order[&quot;items&quot;]:
+            raise ValueError(&quot;order must contain items&quot;)
+
+class OrderPricer:
+    def calculate_total(self, order: dict) -&gt; int:
+        return sum(item[&quot;price&quot;] for item in order[&quot;items&quot;])
+
+class OrderRepository:
+    def save(self, order: dict, total: int) -&gt; None:
+        print(f&quot;saving order for {order['customer_email']} -&gt; {total}&quot;)
+
+class ReceiptNotifier:
+    def send(self, email: str, total: int) -&gt; None:
+        print(f&quot;emailing receipt to {email} for {total}&quot;)
+
+class CheckoutService:
+    def __init__(self) -&gt; None:
+        self.validator = OrderValidator()
+        self.pricer = OrderPricer()
+        self.repository = OrderRepository()
+        self.notifier = ReceiptNotifier()
+
+    def checkout(self, order: dict) -&gt; int:
+        self.validator.validate(order)
+        total = self.pricer.calculate_total(order)
+        self.repository.save(order, total)
+        self.notifier.send(order[&quot;customer_email&quot;], total)
+        return total
+</code></pre>
+<p><strong>Verify</strong></p>
+<pre><code class="language-python">order = {
+    &quot;customer_email&quot;: &quot;kim@example.com&quot;,
+    &quot;customer_tier&quot;: &quot;regular&quot;,
+    &quot;items&quot;: [{&quot;price&quot;: 12000}, {&quot;price&quot;: 8000}],
+}
+
+print(CheckoutService().checkout(order))
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">saving order for kim@example.com -&gt; 20000
+emailing receipt to kim@example.com for 20000
+20000
+</code></pre>
+<p>What changed: responsibilities are now split. What stayed stable: <code>checkout()</code> still returns the total.</p>
+<p><strong>Failure Signal Before the Refactor</strong></p>
+<p>If the team asks for Slack notifications as well as email, the original class must be edited even though pricing rules did not change. That is the signal that SRP was already under strain.</p>
+<p><strong>Step 2: OCP — Move Discount Rules Behind an Extension Point</strong></p>
+<p>The checkout flow is still brittle because every new discount edits the pricing logic.</p>
 <pre><code class="language-python">from typing import Protocol
 
-class Discount(Protocol):
-    def apply(self, price: int) -&gt; int: ...
+class DiscountPolicy(Protocol):
+    def apply(self, subtotal: int, order: dict) -&gt; int: ...
 
 class NoDiscount:
-    def apply(self, price: int) -&gt; int:
-        return price
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        return subtotal
 
-class PercentDiscount:
-    def __init__(self, percent: int) -&gt; None:
-        self.percent = percent
+class VipDiscount:
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        return int(subtotal * 0.8) if order[&quot;customer_tier&quot;] == &quot;vip&quot; else subtotal
 
-    def apply(self, price: int) -&gt; int:
-        return price - (price * self.percent // 100)
+class ThresholdDiscount:
+    def __init__(self, minimum: int, amount: int) -&gt; None:
+        self.minimum = minimum
+        self.amount = amount
 
-class FixedDiscount:
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        return subtotal - self.amount if subtotal &gt;= self.minimum else subtotal
+
+class OrderPricer:
+    def __init__(self, discount: DiscountPolicy) -&gt; None:
+        self.discount = discount
+
+    def calculate_total(self, order: dict) -&gt; int:
+        subtotal = sum(item[&quot;price&quot;] for item in order[&quot;items&quot;])
+        return self.discount.apply(subtotal, order)
+</code></pre>
+<p><strong>Verify</strong></p>
+<pre><code class="language-python">order = {
+    &quot;customer_email&quot;: &quot;kim@example.com&quot;,
+    &quot;customer_tier&quot;: &quot;vip&quot;,
+    &quot;items&quot;: [{&quot;price&quot;: 12000}, {&quot;price&quot;: 8000}],
+}
+
+print(OrderPricer(NoDiscount()).calculate_total(order))
+print(OrderPricer(VipDiscount()).calculate_total(order))
+print(OrderPricer(ThresholdDiscount(minimum=15000, amount=3000)).calculate_total(order))
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-text">20000
+16000
+17000
+</code></pre>
+<p>What changed: the pricing rule became pluggable. What stayed stable: callers still ask the pricer for one total.</p>
+<p><strong>Failure Signal Before the Refactor</strong></p>
+<p>If every promotional rule adds another <code>if</code> branch to one method, OCP is the next principle to apply.</p>
+<p><strong>Step 3: LSP — Keep the Contract Honest</strong></p>
+<p>An extension point is only useful if each subtype honors the same promise. Here is a broken subtype.</p>
+<pre><code class="language-python">class PickupOnlyDiscount:
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        if order[&quot;delivery&quot;] != &quot;pickup&quot;:
+            raise ValueError(&quot;pickup-only discount cannot handle delivery orders&quot;)
+        return subtotal - 2000
+</code></pre>
+<p>This technically matches the method signature, but it does not behave like a safe <code>DiscountPolicy</code> for the checkout flow. The caller expects any discount policy to produce a total for any valid order.</p>
+<p>Refactor by moving the special condition into composition instead of hiding it inside a subtype that surprises the caller.</p>
+<pre><code class="language-python">class EligibilityRule(Protocol):
+    def allows(self, order: dict) -&gt; bool: ...
+
+class PickupEligibility:
+    def allows(self, order: dict) -&gt; bool:
+        return order[&quot;delivery&quot;] == &quot;pickup&quot;
+
+class FixedAmountDiscount:
     def __init__(self, amount: int) -&gt; None:
         self.amount = amount
 
-    def apply(self, price: int) -&gt; int:
-        return max(0, price - self.amount)
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        return max(0, subtotal - self.amount)
 
-def calculate_price(price: int, discount: Discount) -&gt; int:
-    &quot;&quot;&quot;Adding new discount types requires no changes to this function&quot;&quot;&quot;
-    return discount.apply(price)
+class ConditionalDiscount:
+    def __init__(self, rule: EligibilityRule, inner: DiscountPolicy) -&gt; None:
+        self.rule = rule
+        self.inner = inner
 
-print(calculate_price(10000, NoDiscount()))           # 10000
-print(calculate_price(10000, PercentDiscount(20)))     # 8000
-print(calculate_price(10000, FixedDiscount(3000)))     # 7000
+    def apply(self, subtotal: int, order: dict) -&gt; int:
+        if not self.rule.allows(order):
+            return subtotal
+        return self.inner.apply(subtotal, order)
 </code></pre>
-<p><strong>Step 3: L — Liskov Substitution Principle (LSP)</strong></p>
-<pre><code class="language-python">class Bird:
-    def move(self) -&gt; str:
-        return &quot;moving&quot;
+<p><strong>Verify</strong></p>
+<pre><code class="language-python">pickup_order = {&quot;delivery&quot;: &quot;pickup&quot;, &quot;items&quot;: [{&quot;price&quot;: 10000}], &quot;customer_tier&quot;: &quot;regular&quot;}
+delivery_order = {&quot;delivery&quot;: &quot;courier&quot;, &quot;items&quot;: [{&quot;price&quot;: 10000}], &quot;customer_tier&quot;: &quot;regular&quot;}
 
-class FlyingBird(Bird):
-    def move(self) -&gt; str:
-        return &quot;flying&quot;
-
-class Penguin(Bird):
-    def move(self) -&gt; str:
-        return &quot;walking&quot;
-
-def make_bird_move(bird: Bird) -&gt; None:
-    print(bird.move())
-
-# All subclasses can substitute for the parent
-make_bird_move(FlyingBird())  # flying
-make_bird_move(Penguin())     # walking
+policy = ConditionalDiscount(PickupEligibility(), FixedAmountDiscount(2000))
+print(policy.apply(10000, pickup_order))
+print(policy.apply(10000, delivery_order))
 </code></pre>
-<p><strong>Step 4: I — Interface Segregation Principle (ISP)</strong></p>
+<p>Expected output:</p>
+<pre><code class="language-text">8000
+10000
+</code></pre>
+<p>What changed: non-eligible orders now remain valid instead of exploding. What stayed stable: the pricing contract always returns a total.</p>
+<p><strong>Failure Signal Before the Refactor</strong></p>
+<p>If one child implementation needs special-case exceptions for ordinary parent use, the hierarchy is lying. That is an LSP problem.</p>
+<p><strong>Step 4: ISP — Narrow the Interfaces Each Client Depends On</strong></p>
+<p>The checkout workflow still does not need every operation some backend tool might expose.</p>
 <pre><code class="language-python">from typing import Protocol
 
-# Violation: all capabilities in one interface
-# class Worker(Protocol):
-#     def code(self) -&gt; str: ...
-#     def test(self) -&gt; str: ...
-#     def design(self) -&gt; str: ...  # unnecessary for developers
-
-# Improved: separated by role
-class Coder(Protocol):
-    def code(self) -&gt; str: ...
-
-class Tester(Protocol):
-    def test(self) -&gt; str: ...
-
-class Designer(Protocol):
-    def design(self) -&gt; str: ...
-
-class Developer:
-    def code(self) -&gt; str:
-        return &quot;Writing code&quot;
-
-    def test(self) -&gt; str:
-        return &quot;Writing tests&quot;
-
-class UxDesigner:
-    def design(self) -&gt; str:
-        return &quot;Designing UI&quot;
-
-def assign_coding(worker: Coder) -&gt; None:
-    print(worker.code())
-
-def assign_design(worker: Designer) -&gt; None:
-    print(worker.design())
-
-assign_coding(Developer())    # Writing code
-assign_design(UxDesigner())   # Designing UI
+class OrderGateway(Protocol):
+    def save(self, order: dict, total: int) -&gt; None: ...
+    def send_receipt(self, email: str, total: int) -&gt; None: ...
+    def export_daily_report(self) -&gt; str: ...
 </code></pre>
-<p><strong>Step 5: D — Dependency Inversion Principle (DIP)</strong></p>
+<p>This interface is too broad for <code>CheckoutService</code>. The checkout flow does not need reporting.</p>
+<pre><code class="language-python">class OrderWriter(Protocol):
+    def save(self, order: dict, total: int) -&gt; None: ...
+
+class ReceiptSender(Protocol):
+    def send_receipt(self, email: str, total: int) -&gt; None: ...
+
+class OrderRepository:
+    def save(self, order: dict, total: int) -&gt; None:
+        print(f&quot;saving order for {order['customer_email']} -&gt; {total}&quot;)
+
+class EmailNotifier:
+    def send_receipt(self, email: str, total: int) -&gt; None:
+        print(f&quot;emailing receipt to {email} for {total}&quot;)
+
+class CheckoutService:
+    def __init__(self, writer: OrderWriter, sender: ReceiptSender, pricer: OrderPricer, validator: OrderValidator) -&gt; None:
+        self.writer = writer
+        self.sender = sender
+        self.pricer = pricer
+        self.validator = validator
+</code></pre>
+<p><strong>Verify</strong></p>
+<p>What changed: checkout no longer depends on export/reporting methods it never calls. What stayed stable: the service still needs only persistence plus receipt sending.</p>
+<p><strong>Failure Signal Before the Refactor</strong></p>
+<p>If a fake dependency in tests must implement unrelated methods just to satisfy the type, the interface is already too wide.</p>
+<p><strong>Step 5: DIP — Inject Abstractions, Not Concrete Tools</strong></p>
+<p>The last step is to remove direct dependency on concrete infrastructure so the high-level checkout policy stays easy to test.</p>
 <pre><code class="language-python">from typing import Protocol
 
-class MessageSender(Protocol):
-    def send(self, to: str, body: str) -&gt; None: ...
+class OrderWriter(Protocol):
+    def save(self, order: dict, total: int) -&gt; None: ...
 
-class EmailSender:
-    def send(self, to: str, body: str) -&gt; None:
-        print(f&quot;Email -&gt; {to}: {body}&quot;)
+class ReceiptSender(Protocol):
+    def send_receipt(self, email: str, total: int) -&gt; None: ...
 
-class SlackSender:
-    def send(self, to: str, body: str) -&gt; None:
-        print(f&quot;Slack -&gt; {to}: {body}&quot;)
+class CheckoutService:
+    def __init__(self, validator: OrderValidator, pricer: OrderPricer, writer: OrderWriter, sender: ReceiptSender) -&gt; None:
+        self.validator = validator
+        self.pricer = pricer
+        self.writer = writer
+        self.sender = sender
 
-class NotificationService:
-    &quot;&quot;&quot;High-level module: depends on abstraction (Protocol), not concretions&quot;&quot;&quot;
+    def checkout(self, order: dict) -&gt; int:
+        self.validator.validate(order)
+        total = self.pricer.calculate_total(order)
+        self.writer.save(order, total)
+        self.sender.send_receipt(order[&quot;customer_email&quot;], total)
+        return total
 
-    def __init__(self, sender: MessageSender) -&gt; None:
-        self._sender = sender
+class FakeWriter:
+    def __init__(self) -&gt; None:
+        self.saved: list[tuple[str, int]] = []
 
-    def notify(self, user: str, message: str) -&gt; None:
-        self._sender.send(user, message)
+    def save(self, order: dict, total: int) -&gt; None:
+        self.saved.append((order[&quot;customer_email&quot;], total))
 
-# Notify via email
-service = NotificationService(EmailSender())
-service.notify(&quot;kim@example.com&quot;, &quot;Deploy complete&quot;)
+class FakeSender:
+    def __init__(self) -&gt; None:
+        self.messages: list[str] = []
 
-# Switch to Slack — no changes to NotificationService
-service = NotificationService(SlackSender())
-service.notify(&quot;#deploy&quot;, &quot;Deploy complete&quot;)
+    def send_receipt(self, email: str, total: int) -&gt; None:
+        self.messages.append(f&quot;{email}:{total}&quot;)
+
+writer = FakeWriter()
+sender = FakeSender()
+service = CheckoutService(
+    validator=OrderValidator(),
+    pricer=OrderPricer(VipDiscount()),
+    writer=writer,
+    sender=sender,
+)
+
+order = {
+    &quot;customer_email&quot;: &quot;kim@example.com&quot;,
+    &quot;customer_tier&quot;: &quot;vip&quot;,
+    &quot;delivery&quot;: &quot;courier&quot;,
+    &quot;items&quot;: [{&quot;price&quot;: 12000}, {&quot;price&quot;: 8000}],
+}
+
+total = service.checkout(order)
+print(total)
+print(writer.saved)
+print(sender.messages)
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>SRP keeps classes small by limiting each to a single reason for change</li>
-<li>OCP lets you add new features without modifying existing code</li>
-<li>LSP ensures children safely substitute for parents in inheritance hierarchies</li>
-<li>DIP is naturally implemented through Protocol and dependency injection</li>
-</ul>
+<p><strong>Verify</strong></p>
+<p>Expected output:</p>
+<pre><code class="language-text">16000
+[('kim@example.com', 16000)]
+['kim@example.com:16000']
+</code></pre>
+<p>What changed: the high-level workflow can be tested without a database or email system. What stayed stable: the service still coordinates the same checkout policy.</p>
+<p><strong>Failure Signal Before the Refactor</strong></p>
+<p>If you cannot test the policy without booting real infrastructure, DIP is the missing piece.</p>
+<h2>Run and Verify the Final Workflow</h2>
+<p>Save the final Step 5 code as <code>solid_checkout.py</code> and run:</p>
+<pre><code class="language-bash">python solid_checkout.py
+</code></pre>
+<p>Final verification checklist:</p>
+<ol>
+<li>Validation still blocks an empty order.</li>
+<li>The discount policy can change without editing <code>CheckoutService</code>.</li>
+<li>A non-eligible order no longer crashes a subtype unexpectedly.</li>
+<li>Test doubles can replace persistence and notification infrastructure.</li>
+</ol>
+<h2>How the Principles Connect</h2>
+<p><strong>SRP</strong><br>
+- Smell we saw: One class changed for validation, pricing, persistence, and notification<br>
+- Refactor move: Split collaborators by reason to change</p>
+<p><strong>OCP</strong><br>
+- Smell we saw: Every new discount edited pricing code<br>
+- Refactor move: Introduce <code>DiscountPolicy</code></p>
+<p><strong>LSP</strong><br>
+- Smell we saw: One subtype crashed on otherwise valid orders<br>
+- Refactor move: Replace brittle inheritance assumptions with composition</p>
+<p><strong>ISP</strong><br>
+- Smell we saw: Checkout depended on methods it never used<br>
+- Refactor move: Split large gateway interfaces</p>
+<p><strong>DIP</strong><br>
+- Smell we saw: Policy code depended on concrete tools<br>
+- Refactor move: Inject abstractions and fakes</p>
 <h2>5 Common Mistakes</h2>
-<p><strong>Applying all principles from the start</strong><br>
-- Why It Is a Problem: Over-abstraction adds complexity<br>
-- Fix: Apply incrementally as needed</p>
-<p><strong>Extreme SRP — too many tiny classes</strong><br>
-- Why It Is a Problem: Classes become too granular<br>
-- Fix: Judge by "reason for change"</p>
-<p><strong>LSP violation — child throws exceptions</strong><br>
-- Why It Is a Problem: Cannot use as parent type<br>
-- Fix: Consider composition instead</p>
-<p><strong>Ignoring ISP — monolithic interfaces</strong><br>
-- Why It Is a Problem: Forces unnecessary method implementations<br>
-- Fix: Split Protocols by role</p>
-<p><strong>Ignoring DIP — depending on concrete classes</strong><br>
-- Why It Is a Problem: Hard to replace and test<br>
-- Fix: Depend on abstractions and inject</p>
-<h2>Real-World Applications</h2>
+<p><strong>Applying all five principles before any pain appears</strong><br>
+- Why It Hurts: The design becomes abstract without a clear payoff<br>
+- Better Move: Start from the visible failure shape</p>
+<p><strong>Treating OCP as "never edit code again"</strong><br>
+- Why It Hurts: Indirection grows faster than value<br>
+- Better Move: Extract only the rules that actually vary</p>
+<p><strong>Mistaking signature compatibility for LSP</strong><br>
+- Why It Hurts: Subtypes still break callers at runtime<br>
+- Better Move: Verify behavioral expectations, not just method names</p>
+<p><strong>Using one giant interface for convenience</strong><br>
+- Why It Hurts: Clients must fake unrelated methods<br>
+- Better Move: Split interfaces by caller need</p>
+<p><strong>Calling something DIP while constructing concretes internally</strong><br>
+- Why It Hurts: Tests and replacements remain expensive<br>
+- Better Move: Inject abstractions from the outside</p>
+<h2>Real-World Uses</h2>
 <ul>
-<li>FastAPI's <code>Depends()</code> supports DIP at the framework level</li>
-<li>Django's settings module separates configuration following SRP</li>
-<li>Plugin systems extend functionality based on OCP</li>
-<li>REST API serialization/deserialization separates interfaces via ISP</li>
-<li>Test mocks replace concrete dependencies thanks to DIP</li>
+<li>Payment, shipping, and notification rules often become OCP extension points.</li>
+<li>Service-layer tests become dramatically easier once DIP allows fakes.</li>
+<li>Framework integration points are healthier when wide infrastructure interfaces are split by ISP.</li>
+<li>SRP usually arrives first because change pressure shows up there earliest.</li>
 </ul>
 <h2>How Senior Engineers Think About This</h2>
-<p>SOLID is a "guideline," not a "rule." You do not need to apply it to every piece of code. Apply it at the points where change becomes difficult as the code grows. The most practical principles are SRP and DIP.</p>
-<p>For small projects, you do not need to think about SOLID. But when team projects exceed tens of thousands of lines, the quality gap between developers who understand SOLID and those who do not becomes strikingly clear.</p>
-<h2>Failure Signals That Tell You Which SOLID Principle to Reach For</h2>
-<p><strong>Adding one feature forces edits in multiple files for the same reason</strong><br>
-- Principle usually involved: OCP, DIP<br>
-- First move to try: Extract the changing rule into a Protocol or strategy object</p>
-<p><strong>One class handles persistence, validation, notifications, and formatting</strong><br>
-- Principle usually involved: SRP<br>
-- First move to try: Split methods by distinct reasons for change</p>
-<p><strong>A parent type is accepted, but one child keeps throwing special-case exceptions</strong><br>
-- Principle usually involved: LSP<br>
-- First move to try: Break the inheritance chain and redefine the shared contract</p>
-<p><strong>Half the interface methods are <code>pass</code>, <code>raise</code>, or no-op</strong><br>
-- Principle usually involved: ISP<br>
-- First move to try: Slice the contract into smaller caller-specific interfaces</p>
-<p>The point is not to memorize SOLID and apply all five at once. The point is to match the failure shape to the smallest useful correction. If test doubles are hard to inject and swapping an external API is expensive, applying DIP alone often gives you more value than a full-scale redesign.</p>
+<p>Senior engineers rarely ask, "did we apply all five SOLID principles?" They ask, "what failure keeps repeating, and which principle gives the smallest fix?" The value of SOLID is not ceremony. The value is sharper reasoning about change.</p>
+<p>That is why a practical refactor often starts with SRP or DIP, then adds OCP only where variation is real. LSP and ISP act as guardrails that keep those abstractions honest and narrow.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I can explain each of the five SOLID principles</li>
-<li>[ ] I can identify and improve SRP violations</li>
-<li>[ ] I can implement OCP using Protocol or ABC</li>
-<li>[ ] I can identify LSP violation cases</li>
-<li>[ ] I can apply DIP through dependency injection</li>
+<li>[ ] I can connect each SOLID principle to a visible design smell</li>
+<li>[ ] I can split a large service by reason to change</li>
+<li>[ ] I can introduce an extension point without rewriting the stable workflow</li>
+<li>[ ] I can recognize when a subtype violates behavioral expectations</li>
+<li>[ ] I can test a high-level workflow by injecting fakes through abstractions</li>
 </ul>
-<h2>Exercises</h2>
-<ol>
-<li>Split an SRP-violating <code>OrderProcessor</code> class (order processing + payment + email) into three classes.</li>
-<li>Apply OCP to design a <code>FileExporter</code> that supports new file formats (CSV, JSON, XML) without modifying existing code.</li>
-<li>Apply DIP so that a <code>WeatherApp</code> can swap between different weather APIs (OpenWeather, WeatherAPI).</li>
-</ol>
 <h2>Summary and Next Steps</h2>
-<p>SOLID principles are guidelines for designs that are resilient to change and flexible for extension. Rather than applying them perfectly from the start, it is more practical to apply them when needed as the code grows. In the next article, we apply SOLID and other OOP principles to a real-world design example.</p>
+<p>SOLID becomes practical when you apply it to one brittle workflow instead of memorizing five slogans in isolation. In this checkout example, SRP split responsibilities, OCP made discount rules extensible, LSP kept the contract honest, ISP narrowed dependencies, and DIP made the policy testable. In the next article, we apply these ideas together in a fuller OOP design example.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
