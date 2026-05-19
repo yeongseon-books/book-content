@@ -1,0 +1,19 @@
+flowchart LR
+    입력["사용자 텍스트\n'Explain list comprehensions'"] --> 메시지["messages[]\nrole + content"]
+    모델선택["model\nllama-3.1-8b-instant"] --> 요청본문["JSON 요청 본문"]
+    메시지 --> 요청본문
+    옵션["생성 옵션\ntemperature, max_tokens"] --> 요청본문
+    요청본문 --> 원격API["원격 LLM API"]
+    원격API --> 응답JSON["JSON 응답"]
+    응답JSON --> 본문["choices[0].message.content"]
+    응답JSON --> 메타데이터["model + usage + finish_reason"]
+
+    style 입력 fill:#e3f2fd,stroke:#1976d2
+    style 메시지 fill:#f3e5f5,stroke:#7b1fa2
+    style 모델선택 fill:#f3e5f5,stroke:#7b1fa2
+    style 옵션 fill:#f3e5f5,stroke:#7b1fa2
+    style 요청본문 fill:#fff3e0,stroke:#f57c00
+    style 원격API fill:#e8f5e9,stroke:#388e3c
+    style 응답JSON fill:#ede7f6,stroke:#5e35b1
+    style 본문 fill:#fff8e1,stroke:#f9a825
+    style 메타데이터 fill:#e0f7fa,stroke:#00838f

@@ -1,0 +1,19 @@
+flowchart LR
+    환경변수["os.environ['GROQ_API_KEY']"] --> 클라이언트["Groq(api_key=...)\nclient"]
+    프롬프트["user 메시지\nExplain Python list comprehensions"] --> 호출["client.chat.completions.create()"]
+    모델["model='llama-3.1-8b-instant'"] --> 호출
+    클라이언트 --> 호출
+    호출 --> 완료객체["completion 객체"]
+    완료객체 --> 본문["choices[0].message.content"]
+    완료객체 --> 기록값["model + usage"]
+    본문 --> 출력["print(answer)"]
+
+    style 환경변수 fill:#fce4ec,stroke:#c2185b
+    style 클라이언트 fill:#f3e5f5,stroke:#7b1fa2
+    style 프롬프트 fill:#e3f2fd,stroke:#1976d2
+    style 모델 fill:#e3f2fd,stroke:#1976d2
+    style 호출 fill:#fff3e0,stroke:#f57c00
+    style 완료객체 fill:#ede7f6,stroke:#5e35b1
+    style 본문 fill:#fff8e1,stroke:#f9a825
+    style 기록값 fill:#e0f7fa,stroke:#00838f
+    style 출력 fill:#e8f5e9,stroke:#388e3c

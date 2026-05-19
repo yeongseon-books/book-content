@@ -1,0 +1,18 @@
+flowchart LR
+    원문["원문 텍스트\n질문 + 이력 + 문서"] --> 토크나이저["Tokenizer"]
+    토크나이저 --> 입력토큰["prompt_tokens"]
+    입력토큰 --> 예산["공유 컨텍스트 창"]
+    출력계획["예상 답변"] --> 출력토큰["completion_tokens"]
+    출력토큰 --> 예산
+    예산 --> 비용["총 토큰 증가\n비용 증가"]
+    예산 --> 지연["읽고 생성할 토큰 증가\n지연 증가"]
+    예산 --> 한계["예산이 빡빡하면\n잘림 또는 overflow"]
+
+    style 원문 fill:#e3f2fd,stroke:#1976d2
+    style 토크나이저 fill:#f3e5f5,stroke:#7b1fa2
+    style 입력토큰 fill:#fff3e0,stroke:#f57c00
+    style 출력토큰 fill:#fff3e0,stroke:#f57c00
+    style 예산 fill:#e8f5e9,stroke:#388e3c
+    style 비용 fill:#fff8e1,stroke:#f9a825
+    style 지연 fill:#ede7f6,stroke:#5e35b1
+    style 한계 fill:#ffebee,stroke:#c62828
