@@ -201,16 +201,16 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 
 ## 이 코드에서 먼저 봐야 할 점
 
-![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.ko.png)
-
-*엔지니어가 헷갈리는 지점*
-
 - 한국어 문서와 영어 문서는 **하나의 모델**로 인코딩해 하나의 인덱스에 넣습니다. BGE-M3에서는 언어별 인덱스를 따로 둘 필요가 거의 없습니다.
 - 테스트 케이스에 정답 문서 언어를 섞어 넣어야 진짜 다국어 성능이 드러납니다.
 - 1024차원은 KoSimCSE보다 메모리와 시간이 더 듭니다. 캐싱과 배치 인코딩의 중요성이 커집니다.
 - dense Recall이 충분하다면 sparse나 multi-vector를 아직 추가하지 마세요.
 
 ## 자주 하는 실수
+
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.ko.png)
+
+*엔지니어가 헷갈리는 지점*
 
 - **정규화를 빼먹는 것** — `normalize_embeddings=True` 없이 `IndexFlatIP`를 쓰면 dense 벡터 길이가 점수를 지배합니다.
 - **언어별 인덱스를 따로 두는 것** — 그렇게 하면 BGE-M3의 교차 언어 정렬 효과를 스스로 깨뜨리게 됩니다. 같은 인덱스에 넣어야 합니다.

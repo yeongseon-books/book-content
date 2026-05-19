@@ -199,16 +199,16 @@ If the top-1 stays the same across the Korean and English version of the same qu
 
 ## What to notice in this code
 
-![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
-
-*Where engineers get confused*
-
 - Korean and English documents are encoded with **one model** into one index. The old per-language index pattern is unnecessary with BGE-M3.
 - Mixing the gold language inside the test cases reveals the real multilingual performance.
 - 1024 dimensions cost more memory and time than KoSimCSE. Caching and batched encoding matter more.
 - If dense Recall is good enough, do not add sparse or multi-vector yet.
 
 ## Common mistakes
+
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 - **Skipping normalization** — without `normalize_embeddings=True`, dense vector length dominates the score under `IndexFlatIP`.
 - **Per-language indexes** — splitting by language defeats BGE-M3's cross-lingual alignment. Put both languages into the same index.

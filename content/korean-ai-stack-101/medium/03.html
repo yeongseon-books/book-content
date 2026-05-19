@@ -189,8 +189,6 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 </code></pre>
 <p>If the top-1 stays the same across the Korean and English version of the same query, the model has absorbed the language asymmetry well — at least qualitatively.</p>
 <h2>What to notice in this code</h2>
-<p><img alt="Where engineers get confused" src="https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png"></p>
-<p><em>Where engineers get confused</em></p>
 <ul>
 <li>Korean and English documents are encoded with <strong>one model</strong> into one index. The old per-language index pattern is unnecessary with BGE-M3.</li>
 <li>Mixing the gold language inside the test cases reveals the real multilingual performance.</li>
@@ -198,6 +196,8 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 <li>If dense Recall is good enough, do not add sparse or multi-vector yet.</li>
 </ul>
 <h2>Common mistakes</h2>
+<p><img alt="Where engineers get confused" src="https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png"></p>
+<p><em>Where engineers get confused</em></p>
 <ul>
 <li><strong>Skipping normalization</strong> — without <code>normalize_embeddings=True</code>, dense vector length dominates the score under <code>IndexFlatIP</code>.</li>
 <li><strong>Per-language indexes</strong> — splitting by language defeats BGE-M3's cross-lingual alignment. Put both languages into the same index.</li>
