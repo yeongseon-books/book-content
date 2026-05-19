@@ -1,8 +1,8 @@
 flowchart TD
-    A["mock fields"] --> B["공급가액"]
-    A --> C["45,000원 + lineBreak=True"]
-    A --> D["부가세"]
-    A --> E["4,500원 + lineBreak=True"]
+    A["mock fields"] --> B["Supply amount"]
+    A --> C["45,000 KRW + lineBreak=True"]
+    A --> D["VAT"]
+    A --> E["4,500 KRW + lineBreak=True"]
     B --> F["reconstruct_lines()"]
     C --> F
     D --> F
