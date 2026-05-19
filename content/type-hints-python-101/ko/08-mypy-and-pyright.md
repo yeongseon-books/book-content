@@ -144,10 +144,10 @@ pyright src
 ```
 
 ```text
-/Users/example/typecheck-demo/src/accounts.py
-  /Users/example/typecheck-demo/src/accounts.py:10:12 - error: Type "str" is not assignable to return type "int"
+/Users/username/typecheck-demo/src/accounts.py
+  /Users/username/typecheck-demo/src/accounts.py:10:12 - error: Type "str" is not assignable to return type "int"
     "str" is not assignable to "int" (reportReturnType)
-  /Users/example/typecheck-demo/src/accounts.py:14:38 - error: "upper" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /Users/username/typecheck-demo/src/accounts.py:14:38 - error: "upper" is not a known attribute of "None" (reportOptionalMemberAccess)
 2 errors, 0 warnings, 0 informations
 ```
 
