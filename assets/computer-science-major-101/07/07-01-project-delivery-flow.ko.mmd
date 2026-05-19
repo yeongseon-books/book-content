@@ -1,0 +1,11 @@
+flowchart TD
+    A["요구사항 분석 및 기획 (Requirements & Planning)"]
+    B["시스템 아키텍처 설계 (System Design)"]
+    C["핵심 기능 구현 및 코딩 (Implementation)"]
+    D["단위 테스트 및 디버깅 (Testing & Debugging)"]
+    E["서비스 배포 및 지속적 유지보수 (Deployment & Maintenance)"]
+    A -->|"기능 정의 및 문서화"| B
+    B -->|"데이터베이스 및 서버 아키텍처"| C
+    C -->|"버그 수정 및 단위 테스트"| D
+    D -->|"CI/CD 기반 자동화 파이프라인"| E
+    classDef default fill:#ffffe0,stroke:#d2691e,stroke-width:2px;

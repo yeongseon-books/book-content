@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["No Demo Available"]
+        A1["Only Source Code"] --> A2["Setup Required"]
+        A1 --> A5["Text Only"]
+        A2 --> A3["Errors During Run"]
+        A5 --> A3
+        A3 --> A4["Gives Up Checking Output"]
+        A3 --> A6["Lose Interest"]
+    end
+
+    subgraph B["Providing a Demo"]
+        B1["User Story"] --> B2["Core Feature Summary"]
+        B1 --> B5["Attach Screenshots"]
+        B2 --> B3["Live Link"]
+        B5 --> B3
+        B3 --> B4["Immediate Value Delivery"]
+        B3 --> B6["Provide UX"]
+    end
+
+    A2 -. "Difference in Accessibility" .- B3

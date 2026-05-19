@@ -1,0 +1,13 @@
+flowchart TD
+    A["중심경향성(Central Tendency)"] --> B["평균(Mean)"]
+    A --> C["중앙값(Median)"]
+    A --> D["최빈값(Mode)"]
+    B --> B1["모든 값의 합 / 개수"]
+    C --> C1["크기순 정렬 시 중앙 위치"]
+    D --> D1["가장 자주 등장하는 값"]
+    B1 --> B2["이상치(Outlier)에 민감함"]
+    C1 --> C2["이상치에 강건함(Robust)"]
+    E["산포도(Dispersion)"] --> F["분산(Variance)"]
+    E --> G["표준편차(Standard Deviation)"]
+    F --> F1["데이터가 퍼져있는 정도"]
+    G --> G1["분산의 양의 제곱근"]

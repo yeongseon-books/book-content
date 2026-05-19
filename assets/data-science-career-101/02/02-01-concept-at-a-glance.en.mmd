@@ -1,0 +1,8 @@
+flowchart TD
+    subgraph A["Roles & Collaboration"]
+        A1["Data Engineer"] -->|"Data Cleaning"| A2["Data Warehouse"]
+        A2 -->|"Data Extraction"| A3["Data Analyst"]
+        A2 -->|"Feature Engineering"| A4["Data Scientist"]
+    end
+    A3 --> A5["Dashboards"]
+    A4 --> A6["ML Models"]

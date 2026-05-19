@@ -1,0 +1,7 @@
+flowchart TD
+    A["Check Prerequisites"] --> B["Set Step-by-Step Goals"]
+    B --> C["Perform Action & Verify"]
+    C --> D{"Error Occurred?"}
+    D -->|Yes| E["Troubleshooting Guide"]
+    D -->|No| F["First Success Completed"]
+    E --> C

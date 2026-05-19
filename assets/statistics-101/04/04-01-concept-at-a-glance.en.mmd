@@ -1,0 +1,8 @@
+flowchart TD
+    A["Population"] -->|Sampling| B["Sample"]
+    A --> C["Parameter (μ, σ²)"]
+    B --> D["Statistic (x̄, s²)"]
+    D -->|Estimation| C
+    B --> E["Random Sampling"]
+    E --> F["Representativeness"]
+    F -->|Minimize Bias| D

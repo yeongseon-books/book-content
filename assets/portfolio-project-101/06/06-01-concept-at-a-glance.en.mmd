@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Code without Tests"]
+        A1["Manual Verification"] --> A2["Hidden Bugs"]
+        A1 --> A5["High Coupling"]
+        A2 --> A3["Fear of Refactoring"]
+        A5 --> A3
+        A3 --> A4["Unmaintainable"]
+        A3 --> A6["Tech Debt Accumulates"]
+    end
+
+    subgraph B["Tests and Docs"]
+        B1["Unit/Integration Tests"] --> B2["Automated Verification"]
+        B1 --> B5["API Documentation"]
+        B2 --> B3["Safe Refactoring"]
+        B5 --> B3
+        B3 --> B4["Ready for Collaboration"]
+        B3 --> B6["Ensure Code Quality"]
+    end
+
+    A3 -. "Code Reliability" .- B2

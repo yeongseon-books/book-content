@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant User as 사용자
+    participant System as 시스템
+    participant DB as 데이터베이스
+    User->>System: 데이터 요청 (API)
+    activate System
+    System->>DB: 쿼리 실행
+    activate DB
+    DB-->>System: 결과 반환
+    deactivate DB
+    System-->>User: 데이터 응답 (JSON)
+    deactivate System

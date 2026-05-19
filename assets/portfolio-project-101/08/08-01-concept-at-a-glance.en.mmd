@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Fragmented Memory"]
+        A1["Project Completes"] --> A2["Time Passes"]
+        A1 --> A5["No Logging"]
+        A2 --> A3["Forget Details"]
+        A5 --> A3
+        A3 --> A4["Fail to Capitalize"]
+        A3 --> A6["No Proof Materials"]
+    end
+
+    subgraph B["Blog Posting"]
+        B1["Project Completes"] --> B2["Retrospective"]
+        B1 --> B5["Process Summary"]
+        B2 --> B3["Extract Core Experience"]
+        B5 --> B3
+        B3 --> B4["Sustainable Asset"]
+        B3 --> B6["Appeal Expertise"]
+    end
+
+    A3 -. "Preservation of Experience" .- B3
