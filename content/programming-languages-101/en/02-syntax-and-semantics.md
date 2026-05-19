@@ -62,7 +62,7 @@ The lexer cuts characters into tokens; the parser checks token order against a g
 
 **Before — confusing syntax errors with intent errors**
 
-```python
+```text
 # Both are "errors," but they live in different layers.
 print("hello"   # SyntaxError
 divide(10, 0)   # legal syntax, throws ZeroDivisionError at runtime

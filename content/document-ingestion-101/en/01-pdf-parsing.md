@@ -119,8 +119,7 @@ def extract_pages(pdf_path: Path) -> list[PageSummary]:
             {
                 'page': index,
                 'chars': len(text),
-                'preview': text.replace('
-', ' ')[:100],
+                'preview': text.replace('\n', ' ')[:100],
             }
         )
     return pages

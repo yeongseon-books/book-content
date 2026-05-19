@@ -87,7 +87,8 @@ Each claim must be a single declarative sentence that can be verified independen
 Return JSON: {"claims": [{"id": 1, "text": "..."}, ...]}.
 
 ANSWER:
-"""{answer}""""""
+\"\"\"{answer}\"\"\"
+"""
 
 def extract_claims(answer: str) -> list[dict]:
     resp = client.chat.completions.create(
@@ -140,7 +141,8 @@ Reply with JSON: {"supported": true|false, "reason": "..."}.
 CLAIM: {claim}
 
 EVIDENCE:
-"""{evidence}""""""
+\"\"\"{evidence}\"\"\"
+"""
 
 def judge_grounding(claim: str, evidence: str) -> dict:
     resp = client.chat.completions.create(

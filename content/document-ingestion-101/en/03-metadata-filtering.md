@@ -137,8 +137,7 @@ def main() -> None:
     for doc in vectorstore.similarity_search(query, k=3, filter={'category': 'marketing'}):
         print(doc.metadata['title'], doc.metadata['quarter'], '-', doc.page_content)
 
-    print('
-[filter=quarter:2024Q4]')
+    print('\n[filter=quarter:2024Q4]')
     for doc in vectorstore.similarity_search(query, k=3, filter={'quarter': '2024Q4'}):
         print(doc.metadata['title'], doc.metadata['category'], '-', doc.page_content)
 

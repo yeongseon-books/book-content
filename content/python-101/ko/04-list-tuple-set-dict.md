@@ -61,7 +61,7 @@ list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 
 
 ### 1) list — 순서가 있고 가변
 
-```python
+```text
 >>> nums = [3, 1, 4, 1, 5]
 >>> nums.append(9)
 >>> nums
@@ -83,7 +83,7 @@ list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 
 
 `append`와 `extend`도 헷갈리기 쉽습니다.
 
-```python
+```text
 >>> a = [1, 2]
 >>> a.append([3, 4])
 >>> a
@@ -96,7 +96,7 @@ list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 
 
 ### 2) tuple — 순서가 있고 불변
 
-```python
+```text
 >>> point = (3, 4)
 >>> x, y = point          # unpacking
 >>> x, y
@@ -111,7 +111,7 @@ tuple은 "묶음의 정체성"을 표현할 때 좋습니다. 좌표 `(x, y)`, R
 
 요소가 하나인 튜플은 콤마가 필수입니다. `(1)`은 그냥 정수입니다.
 
-```python
+```text
 >>> type((1))
 <class 'int'>
 >>> type((1,))
@@ -122,7 +122,7 @@ tuple은 "묶음의 정체성"을 표현할 때 좋습니다. 좌표 `(x, y)`, R
 
 set은 멤버십 검사와 중복 제거에 강합니다.
 
-```python
+```text
 >>> seen = {1, 2, 3}
 >>> seen.add(2)             # already present; ignored
 >>> seen
@@ -139,7 +139,7 @@ True
 
 빈 set은 `set()`이지 `{}`이 아닙니다. `{}`은 빈 dict입니다.
 
-```python
+```text
 >>> type({})
 <class 'dict'>
 >>> type(set())
@@ -152,7 +152,7 @@ set의 반복 순서는 보장되지 않습니다. 출력을 비교하는 테스
 
 dict는 가장 자주 쓰는 자료구조입니다. Python 3.7부터 삽입 순서를 보존합니다.
 
-```python
+```text
 >>> user = {"name": "ada", "age": 30}
 >>> user["name"]
 'ada'
@@ -179,7 +179,7 @@ dict의 키와 set의 원소는 **hashable**해야 합니다. 즉 한 번 만들
 - hashable: `int`, `float`, `str`, `bool`, `bytes`, 모든 원소가 hashable인 `tuple`
 - not hashable: `list`, `set`, `dict` (가변이라 hash 결과가 도중에 바뀔 수 있어서)
 
-```python
+```text
 >>> {(1, 2), (3, 4)}                    # tuples are hashable
 {(1, 2), (3, 4)}
 >>> {[1, 2], [3, 4]}
@@ -194,7 +194,7 @@ set 안에 set을 넣고 싶다면 `frozenset`을 씁니다.
 
 list, set, dict 모두 comprehension 문법을 갖고 있습니다.
 
-```python
+```text
 >>> [n * n for n in range(5)]
 [0, 1, 4, 9, 16]
 >>> [n for n in range(10) if n % 2 == 0]

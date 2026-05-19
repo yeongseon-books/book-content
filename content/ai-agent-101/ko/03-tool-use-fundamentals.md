@@ -87,11 +87,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM decides whether to use tools
@@ -157,11 +153,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=messages
 )
 
@@ -190,11 +182,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"

@@ -84,7 +84,7 @@ def find(uid):
 
 **After — searching keys with a dict:**
 
-```python
+```text
 users = {1: "Alice", 2: "Bob", 3: "Carol", ...}
 
 def find(uid):

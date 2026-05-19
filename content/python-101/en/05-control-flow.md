@@ -228,7 +228,7 @@ Run the snippets in order, in a REPL or a small script. Lines starting with `>>>
 
 1. **Confirm truthy and falsy yourself.**
 
-```python
+```text
 >>> for v in [0, 1, "", "x", [], [0], None, {"a": 1}]:
 ...     print(repr(v), bool(v))
 0 False
@@ -245,7 +245,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 2. **Combine `enumerate` with `zip`.**
 
-```python
+```text
 >>> names = ["ada", "bob", "carol"]
 >>> roles = ["engineer", "designer", "engineer"]
 >>> for idx, (name, role) in enumerate(zip(names, roles), start=1):
@@ -259,7 +259,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 3. **Branch on a search result with `for`-`else`.**
 
-```python
+```text
 >>> def find_first_negative(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -272,7 +272,7 @@ Note that `[0]` is truthy because the container has length 1. The rule is "the c
 
 The same idea written with `for`-`else`:
 
-```python
+```text
 >>> def find_first_negative_v2(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -285,7 +285,7 @@ Here the `for`-`else` adds little because the trailing `return None` is already 
 
 4. **Move between comprehensions and a regular loop.**
 
-```python
+```text
 >>> nums = list(range(10))
 >>> [x * x for x in nums if x % 2 == 0]
 [0, 4, 16, 36, 64]

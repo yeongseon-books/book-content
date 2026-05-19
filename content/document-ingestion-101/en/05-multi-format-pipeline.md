@@ -85,18 +85,13 @@ def seed_files() -> list[Path]:
     txt_path = DATA_DIR / 'notes.txt'
     md_path = DATA_DIR / 'runbook.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.
-', encoding='utf-8')
-    md_path.write_text('# Runbook
-
-MD source: restart the worker only after checking the dead-letter queue.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.\n', encoding='utf-8')
+    md_path.write_text('# Runbook\n\nMD source: restart the worker only after checking the dead-letter queue.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_pdf(path: Path) -> list[Document]:
     reader = PdfReader(str(path))
-    text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+    text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
     return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
 
 def load_text_like(path: Path, fmt: str) -> list[Document]:
@@ -116,8 +111,7 @@ def main() -> None:
     for path in seed_files():
         docs = load_document(path)
         for doc in docs:
-            preview = doc.page_content.replace('
-', ' ')[:90]
+            preview = doc.page_content.replace('\n', ' ')[:90]
             print(f"source={doc.metadata['source']} format={doc.metadata['format']} preview={preview}")
 
 if __name__ == '__main__':

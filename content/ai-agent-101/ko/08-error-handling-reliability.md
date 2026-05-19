@@ -77,17 +77,14 @@ def parse_llm_json(response_text: str) -> dict:
     cleaned = response_text.strip()
     if cleaned.startswith("```"):
         # Remove ```json ... ``` or ``` ... ```
-        lines = cleaned.split("
-")
-        cleaned = "
-".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+        lines = cleaned.split("\n")
+        cleaned = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
     # 2. Try to parse
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError as e:
-        raise LLMResponseError(f"JSON parse failed: {e}
-raw: {response_text[:200]}")
+        raise LLMResponseError(f"JSON parse failed: {e}\nraw: {response_text[:200]}")
 ```
 
 structured output를 요구하는 agent에서는 파싱 실패가 곧 workflow 실패로 이어질 수 있습니다. 따라서 이 구간은 단순 try/except가 아니라 retry 분기와 telemetry가 함께 있어야 합니다.

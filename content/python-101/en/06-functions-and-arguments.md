@@ -203,7 +203,7 @@ Run these in the REPL. Lines starting with `>>>` are inputs; the lines below are
 
 1. **Reproduce the mutable default trap.**
 
-```python
+```text
 >>> def buggy(item, items=[]):
 ...     items.append(item)
 ...     return items
@@ -217,7 +217,7 @@ Run these in the REPL. Lines starting with `>>>` are inputs; the lines below are
 
 The same list object is shared across calls. The safe pattern is:
 
-```python
+```text
 >>> def safe(item, items=None):
 ...     items = items if items is not None else []
 ...     items.append(item)
@@ -232,7 +232,7 @@ The same list object is shared across calls. The safe pattern is:
 
 2. **Collect arguments with `*args` and `**kwargs`.**
 
-```python
+```text
 >>> def show(*args, **kwargs):
 ...     print("args =", args)
 ...     print("kwargs =", kwargs)
@@ -243,7 +243,7 @@ kwargs = {'x': 10}
 
 Unpacking on the call side uses the same notation:
 
-```python
+```text
 >>> def add3(a, b, c):
 ...     return a + b + c
 >>> nums = [1, 2, 3]
@@ -256,7 +256,7 @@ Unpacking on the call side uses the same notation:
 
 3. **Lock the signature with positional-only and keyword-only.**
 
-```python
+```text
 >>> def make_url(host, /, *, scheme="https", path="/"):
 ...     return f"{scheme}://{host}{path}"
 >>> make_url("example.com")
@@ -273,7 +273,7 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
 
 4. **Use `lambda` as a sort key.**
 
-```python
+```text
 >>> users = [{"name": "ada", "score": 71}, {"name": "bob", "score": 92}]
 >>> sorted(users, key=lambda u: u["score"], reverse=True)
 [{'name': 'bob', 'score': 92}, {'name': 'ada', 'score': 71}]

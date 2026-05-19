@@ -180,10 +180,8 @@ def judge_answer(question: str, rubric_context: str, answer: str) -> dict:
             {
                 "role": "user",
                 "content": (
-                    f"Question: {question}
-"
-                    f"Reference context: {rubric_context}
-"
+                    f"Question: {question}\n"
+                    f"Reference context: {rubric_context}\n"
                     f"Answer: {answer}"
                 ),
             },

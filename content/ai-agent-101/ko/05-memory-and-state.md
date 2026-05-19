@@ -182,15 +182,11 @@ class HybridMemory:
 
         if memories:
             # Add long-term memory content to system prompt
-            context = "Previous user preferences:
-"
+            context = "Previous user preferences:\n"
             for mem in memories:
-                context += f"- {mem['key']}: {mem['value']}
-"
+                context += f"- {mem['key']}: {mem['value']}\n"
 
-            self.short_term.messages[0]["content"] += f"
-
-{context}"
+            self.short_term.messages[0]["content"] += f"\n\n{context}"
 
     def add_user_message(self, content: str):
         """Add user message"""

@@ -80,11 +80,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM decides whether to use tools
@@ -156,11 +152,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=messages
 )
 
@@ -189,11 +181,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -437,11 +425,7 @@ tools = [
 
 # Pass tool information to LLM
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM automatically selects tool
@@ -658,11 +642,7 @@ tools = [
 
 # Strategy 1: Automatic selection (LLM decides)
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM uses tools when needed
@@ -670,11 +650,7 @@ response = openai.chat.completions.create(
 
 # Strategy 2: Force tool use
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="required"  # Must call one tool
@@ -682,11 +658,7 @@ response = openai.chat.completions.create(
 
 # Strategy 3: Specify tool
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice={"type": "function", "function": {"name": "get_weather"}}
@@ -694,11 +666,7 @@ response = openai.chat.completions.create(
 
 # Strategy 4: Disable tools
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="none"  # No tool use
@@ -791,11 +759,7 @@ def multi_tool_workflow(user_query: str) -> str:
     """
     
     response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": summary_prompt}]
     )
     
@@ -1030,7 +994,7 @@ def agent_loop(user_query: str) -> str:
 
 **Bad**: Register all possible tools at once.
 
-```python
+```text
 # Pass 50 tools to LLM at once
 tools = [
     {"name": "get_weather", ...},
@@ -1041,11 +1005,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools  # Token waste, reduced selection accuracy
 )
@@ -1071,11 +1031,7 @@ def get_relevant_tools(user_query: str, all_tools: list) -> list:
 relevant_tools = get_relevant_tools(user_query, all_tools)
 
 response = openai.chat.completions.create(
-<<<<<<< HEAD
     model="gpt-4.1",
-=======
-    model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": user_query}],
     tools=relevant_tools  # 3-5 tools only
 )

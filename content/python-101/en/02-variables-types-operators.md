@@ -155,7 +155,7 @@ Open a REPL and type these lines yourself. If a result differs from what's print
 
 ### 1) Same object versus different object
 
-```python
+```text
 >>> a = [1, 2]
 >>> b = [1, 2]
 >>> a == b      # value comparison: True
@@ -171,7 +171,7 @@ In the example above, `a` and `b` hold lists with the same contents but distinct
 
 ### 2) The floating-point trap
 
-```python
+```text
 >>> 0.1 + 0.2
 0.30000000000000004
 >>> 0.1 + 0.2 == 0.3
@@ -185,7 +185,7 @@ For computed float results, use `math.isclose` when tolerance matters, or switch
 
 ### 3) Type conversion
 
-```python
+```text
 >>> int("42")           # 42
 >>> float("3.14")       # 3.14
 >>> str(42)             # '42'

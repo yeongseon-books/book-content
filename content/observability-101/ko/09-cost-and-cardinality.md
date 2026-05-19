@@ -76,7 +76,7 @@ topk(20, count by (__name__) (...))  # top metrics
 
 ### 2단계 — 위험한 라벨 빼기
 
-```python
+```text
 # Bad: per-user series
 http_requests_total{user_id="42", path="/buy"}
 # Good: dimension reduction

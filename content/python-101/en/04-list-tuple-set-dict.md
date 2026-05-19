@@ -74,7 +74,7 @@ Three rules carry most of the weight.
 
 ### 1) list — ordered and mutable
 
-```python
+```text
 >>> nums = [3, 1, 4, 1, 5]
 >>> nums.append(9)
 >>> nums
@@ -96,7 +96,7 @@ Three rules carry most of the weight.
 
 `append` versus `extend` is another classic confusion.
 
-```python
+```text
 >>> a = [1, 2]
 >>> a.append([3, 4])
 >>> a
@@ -109,7 +109,7 @@ Three rules carry most of the weight.
 
 ### 2) tuple — ordered and immutable
 
-```python
+```text
 >>> point = (3, 4)
 >>> x, y = point          # unpacking
 >>> x, y
@@ -124,7 +124,7 @@ Tuples express identity for a small bundle of values: a coordinate `(x, y)`, an 
 
 A single-element tuple needs the trailing comma. `(1)` is just an integer.
 
-```python
+```text
 >>> type((1))
 <class 'int'>
 >>> type((1,))
@@ -135,7 +135,7 @@ A single-element tuple needs the trailing comma. `(1)` is just an integer.
 
 Sets shine at membership checks and deduplication.
 
-```python
+```text
 >>> seen = {1, 2, 3}
 >>> seen.add(2)             # already present; ignored
 >>> seen
@@ -152,7 +152,7 @@ True
 
 The empty set is `set()`, not `{}`. `{}` is an empty dict.
 
-```python
+```text
 >>> type({})
 <class 'dict'>
 >>> type(set())
@@ -165,7 +165,7 @@ A set's iteration order is not guaranteed. When tests compare output, sort first
 
 `dict` is the workhorse. From Python 3.7 onward it preserves insertion order.
 
-```python
+```text
 >>> user = {"name": "ada", "age": 30}
 >>> user["name"]
 'ada'
@@ -192,7 +192,7 @@ Dict keys and set members must be **hashable** — once created their value cann
 - Hashable: `int`, `float`, `str`, `bool`, `bytes`, and a `tuple` whose elements are all hashable.
 - Not hashable: `list`, `set`, `dict` — being mutable, their hash could change underneath the container.
 
-```python
+```text
 >>> {(1, 2), (3, 4)}                    # tuples are hashable
 {(1, 2), (3, 4)}
 >>> {[1, 2], [3, 4]}
@@ -207,7 +207,7 @@ To put a set inside a set, use `frozenset`.
 
 list, set, and dict each support comprehension syntax.
 
-```python
+```text
 >>> [n * n for n in range(5)]
 [0, 1, 4, 9, 16]
 >>> [n for n in range(10) if n % 2 == 0]

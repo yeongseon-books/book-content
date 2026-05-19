@@ -76,7 +76,7 @@ Three rules make most of the confusion disappear.
 
 Python accepts several quote styles. They mean the same thing; you pick whichever lets you avoid escaping the quotes inside.
 
-```python
+```text
 >>> 'hello'
 'hello'
 >>> "she said \"hi\""
@@ -91,7 +91,7 @@ Python accepts several quote styles. They mean the same thing; you pick whicheve
 
 Raw strings keep backslashes as-is. Use them for Windows paths and regex.
 
-```python
+```text
 >>> path = r"C:\Users\name\file.txt"
 >>> print(path)
 C:\Users\name\file.txt
@@ -99,7 +99,7 @@ C:\Users\name\file.txt
 
 `b"..."` is a byte literal. ASCII characters can appear directly; other byte values must be written with escape sequences such as `\xFF`.
 
-```python
+```text
 >>> b"hello"
 b'hello'
 >>> b"안녕"
@@ -111,7 +111,7 @@ SyntaxError: bytes can only contain ASCII literal characters
 
 At the OS and protocol boundary the data is bytes. Many Python text APIs (such as `open(..., "r")` or `requests.Response.text`) already decode it to `str` for you. When you do work with raw bytes, assume UTF-8 and call `decode` to get a `str`.
 
-```python
+```text
 >>> data = "hi".encode("utf-8")
 >>> data
 b'hi'
@@ -129,7 +129,7 @@ Guess the encoding wrong and you hit `UnicodeDecodeError`. When unsure, try UTF-
 
 Every `str` method returns a new `str`. The original is left untouched.
 
-```python
+```text
 >>> "  hello, world  ".strip()
 'hello, world'
 >>> "user@example.com".split("@")
@@ -156,7 +156,7 @@ True
 
 `str` is a sequence, so indexing and slicing work as expected.
 
-```python
+```text
 >>> s = "Python"
 >>> s[0], s[-1]
 ('P', 'n')
@@ -168,7 +168,7 @@ True
 
 To "change" part of a string, build a new one.
 
-```python
+```text
 >>> s = "hello"
 >>> s = "H" + s[1:]
 >>> s
@@ -179,7 +179,7 @@ To "change" part of a string, build a new one.
 
 f-strings (PEP 498) are the clearest default for inline formatting. Variables and expressions go directly into braces.
 
-```python
+```text
 >>> name = "yeongseon"
 >>> count = 3
 >>> f"{name} has {count} books"
@@ -190,7 +190,7 @@ f-strings (PEP 498) are the clearest default for inline formatting. Variables an
 
 After a colon comes the format spec — alignment, width, precision, base, dates — all in one line.
 
-```python
+```text
 >>> import math
 >>> f"{math.pi:.2f}"           # two decimal places
 '3.14'
@@ -208,7 +208,7 @@ After a colon comes the format spec — alignment, width, precision, base, dates
 
 `!r` is great for debugging — it applies `repr()` so quotes show up.
 
-```python
+```text
 >>> name = "ada"
 >>> f"name={name!r}"
 "name='ada'"
@@ -216,7 +216,7 @@ After a colon comes the format spec — alignment, width, precision, base, dates
 
 Since Python 3.8, adding `=` prints both the variable name and its value. Debugging gets noticeably easier.
 
-```python
+```text
 >>> count = 3
 >>> f"{count=}"
 'count=3'
@@ -226,7 +226,7 @@ Since Python 3.8, adding `=` prints both the variable name and its value. Debugg
 
 Two older styles you will still meet in legacy code. New code prefers f-strings, but you should be able to read these.
 
-```python
+```text
 >>> "{} has {} books".format("yeongseon", 3)
 'yeongseon has 3 books'
 >>> "%s has %d books" % ("yeongseon", 3)
@@ -235,7 +235,7 @@ Two older styles you will still meet in legacy code. New code prefers f-strings,
 
 `format` accepts keyword arguments. That is useful when a template comes from outside. f-strings capture variables at the spot where they are written, so they are awkward as templates.
 
-```python
+```text
 >>> template = "{name} owes {amount}"
 >>> template.format(name="ada", amount=12000)
 'ada owes 12000'
@@ -245,7 +245,7 @@ Two older styles you will still meet in legacy code. New code prefers f-strings,
 
 The `re` module manipulates strings via patterns. A full tour deserves its own chapter, but pulling email addresses out of a sentence fits in one line.
 
-```python
+```text
 >>> import re
 >>> text = "Contact ada@example.com or bob@example.org"
 >>> re.findall(r"[\w.+-]+@[\w-]+\.[\w.-]+", text)

@@ -72,7 +72,7 @@ topk(20, count by (__name__) (...))  # top metrics
 
 ### Step 2 — Remove dangerous labels
 
-```python
+```text
 # Bad: per-user series
 http_requests_total{user_id="42", path="/buy"}
 # Good: dimension reduction

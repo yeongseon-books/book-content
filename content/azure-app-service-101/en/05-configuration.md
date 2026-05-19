@@ -378,16 +378,16 @@ az webapp config appsettings list \
 ```python
 @app.route('/debug/config')
 def debug_config():
- # Disable in production!
- if os.environ.get("APP_ENV") != "development":
- return {"error": "Not allowed"}, 403
- 
- return {
- "APP_ENV": os.environ.get("APP_ENV"),
- "LOG_LEVEL": os.environ.get("LOG_LEVEL"),
- # Mask sensitive values
- "DB_PASSWORD": "***" if os.environ.get("DB_PASSWORD") else None
- }
+    # Disable in production!
+    if os.environ.get("APP_ENV") != "development":
+        return {"error": "Not allowed"}, 403
+
+    return {
+        "APP_ENV": os.environ.get("APP_ENV"),
+        "LOG_LEVEL": os.environ.get("LOG_LEVEL"),
+        # Mask sensitive values
+        "DB_PASSWORD": "***" if os.environ.get("DB_PASSWORD") else None
+    }
 ```
 
 ---

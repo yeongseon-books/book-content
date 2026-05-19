@@ -107,10 +107,8 @@ def reset_demo_state() -> None:
 
 def seed_files() -> list[Path]:
     files = {
-        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.
-',
-        'beta.txt': 'This is the second document. We will revise it later.
-',
+        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.\n',
+        'beta.txt': 'This is the second document. We will revise it later.\n',
     }
     paths = []
     for name, content in files.items():
@@ -135,8 +133,7 @@ def main() -> None:
     store = IndexStateStore(STATE_FILE)
     scan(store, files, 'first run')
     scan(store, files, 'second run without changes')
-    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.
-', encoding='utf-8')
+    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.\n', encoding='utf-8')
     scan(store, files, 'third run after beta update')
 
 if __name__ == '__main__':
