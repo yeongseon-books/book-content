@@ -202,10 +202,23 @@ def cosine_from_embeddings(emb_a, emb_b):
     b = b / np.linalg.norm(b)
     return float(np.dot(a, b))
 
-def score_with_local_model(model_name, sent_a, sent_b):
-    model = SentenceTransformer(model_name)
-    emb = model.encode([sent_a, sent_b], normalize_embeddings=True)
-    return float(np.dot(emb[0], emb[1]))
+def score_with_local_model(model, pairs):
+    flat_sentences = []
+    for sent_a, sent_b, _ in pairs:
+        flat_sentences.extend([sent_a, sent_b])
+
+    embeddings = model.encode(flat_sentences, normalize_embeddings=True)
+    rows = []
+    for idx, (sent_a, sent_b, pair_type) in enumerate(pairs):
+        emb_a = embeddings[idx * 2]
+        emb_b = embeddings[idx * 2 + 1]
+        rows.append({
+            'pair_type': pair_type,
+            'score': float(np.dot(emb_a, emb_b)),
+            'a': sent_a,
+            'b': sent_b,
+        })
+    return rows
 
 def score_with_solar(sent_a, sent_b):
     api_key = os.getenv('UPSTAGE_API_KEY')
@@ -228,10 +241,8 @@ def summarize(rows):
     print(f&quot;gap(sim-unrel)= {np.mean(similar) - np.mean(unrelated):.3f}&quot;)
 
 for label, model_name in LOCAL_MODELS.items():
-    rows = []
-    for sent_a, sent_b, pair_type in SENTENCE_PAIRS:
-        score = score_with_local_model(model_name, sent_a, sent_b)
-        rows.append({'pair_type': pair_type, 'score': score, 'a': sent_a, 'b': sent_b})
+    model = SentenceTransformer(model_name)
+    rows = score_with_local_model(model, SENTENCE_PAIRS)
 
     print(f&quot;\n== {label} ==&quot;)
     for row in rows:
