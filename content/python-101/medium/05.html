@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Control flow: if, for, while, comprehension</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Control flow: if, for, while, comprehension</h1>
+<p>Control flow gets easier when you break every branch and loop into two questions: what decision is being made, and what ends the loop. That framing keeps <code>if</code>, <code>for</code>, <code>while</code>, and comprehensions from turning into guesswork.</p>
+<p>This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you will be able to explain and code the following:</p>
+<ul>
+<li>How to handle truthy and falsy values deliberately when writing <code>if</code>/<code>elif</code>/<code>else</code></li>
+<li>A first-cut decision rule for choosing between <code>for</code> and <code>while</code></li>
+<li>How to combine <code>range</code>, <code>enumerate</code>, and <code>zip</code> for loops that read well</li>
+<li>When to reach for list/dict/set comprehensions, and when to fall back to a regular loop</li>
+<li>The subtle behavior of <code>break</code>, <code>continue</code>, and the <code>for ... else</code> clause</li>
+<li>How to avoid common traps — mutating a sequence while iterating, deeply nested comprehensions, off-by-one errors</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Branching and looping make up a large share of application code, so when this part is messy the rest is harder to read. Python's branching and loop syntax is leaner than most languages, but it adds a few unfamiliar tools — <code>for</code>-<code>else</code> and comprehensions — that pay off once you know them. With them in your toolbox you stop writing tall <code>if</code> ladders, and you can switch between regular loops and comprehensions on purpose.</p>
+<p>There is a second reason: in Python an <code>if</code> does not test "is the value true" but "is the value truthy". <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, and <code>None</code> are all falsy. The rule lets you write short, clear conditions, but if you forget it you end up with code that "checks whether a list is empty" yet behaves unexpectedly when the list contains a single zero. This chapter pins down truthy and falsy once.</p>
+<p>This chapter is also a setup for the next one on functions and argument design. Function bodies are mostly branching and looping, and the shape of the argument decides which loop reads naturally.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.<br>
+Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three rules carry most of the weight.</p>
+<ol>
+<li><strong>A single decision is <code>if</code>; the same work repeated is a loop.</strong> <code>for</code> and <code>while</code> are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.</li>
+<li><strong>If you have an iterable to walk, <code>for</code> reads naturally.</strong> Use <code>while</code> when there is no length and you must keep going until a condition holds. Blur this line and infinite loops and off-by-one errors creep in.</li>
+<li><strong>A comprehension is a focused expression for "turn an input iterable into a new collection".</strong> As soon as side effects (file writes, prints, mutating outside state) appear, a regular <code>for</code> body reads better.</li>
+</ol>
+<p>These rules anchor every section that follows.</p>
+<h2>Core concepts</h2>
+<p><strong>1. Truthy and falsy</strong></p>
+<p>Think of Python's <code>if</code> as wrapping the condition in <code>bool()</code> once. The following values are all falsy:</p>
+<ul>
+<li><code>False</code>, <code>None</code></li>
+<li>Numeric zeros: <code>0</code>, <code>0.0</code>, <code>0j</code>, <code>Decimal(0)</code>, <code>Fraction(0)</code></li>
+<li>Empty sequences and collections: <code>""</code>, <code>b""</code>, <code>()</code>, <code>[]</code>, <code>{}</code>, <code>set()</code>, <code>range(0)</code></li>
+</ul>
+<p>Everything else is truthy. The rule lets you write <code>if not items:</code> to check for an empty list. But "is the value zero" is a different question from "is the container empty". If a user explicitly entered <code>0</code>, write <code>if value is None:</code> or <code>if value == 0:</code> so the intent is clear.</p>
+<p><strong>2. <code>if</code> / <code>elif</code> / <code>else</code></strong></p>
+<p>A short branch ladder reads more easily than a tall one. If you keep adding branches against the same variable, consider flattening with a dict mapping or function dispatch.</p>
+<pre><code class="language-python">def label(score: int) -&gt; str:
+    if score &gt;= 90:
+        return &quot;A&quot;
+    elif score &gt;= 80:
+        return &quot;B&quot;
+    elif score &gt;= 70:
+        return &quot;C&quot;
+    else:
+        return &quot;F&quot;
+</code></pre>
+<p><code>elif</code> runs only when every condition above it was false. Keep the conditions getting tighter from top to bottom — it is the safest way to read them.</p>
+<p><strong>3. <code>for</code> and iterables</strong></p>
+<p><code>for</code> "pulls one element at a time from an iterable, binds it to a variable, and runs the body". So <code>range</code>, <code>list</code>, <code>tuple</code>, <code>set</code>, <code>dict</code>, file objects, and generators — anything that yields one item at a time — all work.</p>
+<pre><code class="language-python">for item in [&quot;ada&quot;, &quot;bob&quot;, &quot;carol&quot;]:
+    print(item)
+
+for i in range(3):
+    print(i)
+
+for ch in &quot;hi&quot;:
+    print(ch)
+</code></pre>
+<p><code>enumerate</code>, <code>zip</code>, and <code>range</code> raise <code>for</code>'s expressiveness sharply.</p>
+<pre><code class="language-python">names = [&quot;ada&quot;, &quot;bob&quot;, &quot;carol&quot;]
+roles = [&quot;engineer&quot;, &quot;designer&quot;, &quot;engineer&quot;]
+
+for idx, name in enumerate(names, start=1):
+    print(idx, name)
+
+for name, role in zip(names, roles):
+    print(name, &quot;-&gt;&quot;, role)
+</code></pre>
+<p>Use <code>enumerate</code> when you need the index, <code>zip</code> when you want to walk two or more sequences in lockstep. <code>zip</code> stops at the shortest input. If you want to catch mismatched lengths, use <code>zip(..., strict=True)</code> to make the intent explicit.</p>
+<p><strong>4. <code>while</code> and the exit condition</strong></p>
+<p><code>while</code> "runs the body while the condition is truthy". If the body never changes anything that affects the condition, you have an infinite loop.</p>
+<pre><code class="language-python">remaining = 5
+while remaining &gt; 0:
+    print(&quot;tick&quot;, remaining)
+    remaining -= 1
+</code></pre>
+<p>Tasks without an obvious end — reading user input, pulling messages off a queue — read better as <code>while True</code> plus an explicit <code>break</code>.</p>
+<pre><code class="language-python">while True:
+    line = input(&quot;&gt; &quot;).strip()
+    if line in {&quot;quit&quot;, &quot;exit&quot;}:
+        break
+    print(&quot;echo:&quot;, line)
+</code></pre>
+<p><strong>5. <code>break</code>, <code>continue</code>, and <code>for</code>-<code>else</code></strong></p>
+<ul>
+<li><code>break</code> ends the innermost loop immediately.</li>
+<li><code>continue</code> skips the rest of the body and moves to the next iteration.</li>
+<li>A loop's <code>else</code> clause runs <strong>only when the loop finished without <code>break</code></strong>. It can be useful in search patterns but a <code>found = False</code> flag is often clearer.</li>
+</ul>
+<pre><code class="language-python">for n in [4, 6, 8, 9]:
+    if n % 2 == 1:
+        print(&quot;found odd:&quot;, n)
+        break
+else:
+    print(&quot;no odd found&quot;)
+</code></pre>
+<p><strong>6. Comprehensions</strong></p>
+<p>List, dict, and set comprehensions are expressions that "turn an input iterable into a new collection in one go".</p>
+<pre><code class="language-python">squares = [x * x for x in range(5)]
+positives = [x for x in [-1, 2, -3, 4] if x &gt; 0]
+by_role = {name: role for name, role in zip(names, roles)}
+unique_words = {w.lower() for w in &quot;Hello hello world&quot;.split()}
+</code></pre>
+<p>You can attach a filter, and you can nest two levels. Two is about the upper limit. Beyond that, a regular <code>for</code> loop is friendlier to humans and tools alike.</p>
+<p>A generator expression (<code>(x * x for x in range(5))</code>) uses the same syntax but evaluates lazily without materializing the collection. It fits when you need to fold a large input (<code>sum(x * x for x in range(10**6))</code>) or you only need the next item.</p>
+<h2>Before-after</h2>
+<p>Rewrite the same task from "verbose loop" to "Pythonic loop". The input is a list of student names and a parallel list of scores.</p>
+<p><strong>Before — C-style loop</strong></p>
+<pre><code class="language-python">names = [&quot;ada&quot;, &quot;bob&quot;, &quot;carol&quot;, &quot;dan&quot;]
+scores = [92, 71, 85, 58]
+
+i = 0
+result = []
+while i &lt; len(names):
+    name = names[i]
+    score = scores[i]
+    if score &gt;= 60:
+        result.append(name + &quot;:&quot; + str(score))
+    i += 1
+print(result)
+</code></pre>
+<p>When you read it, you have to track four moving parts: (a) the index counter you advance by hand, (b) using the same index against both lists, (c) the inline filter condition, and (d) the accumulator variable.</p>
+<p><strong>After — <code>zip</code> plus comprehension</strong></p>
+<pre><code class="language-python">names = [&quot;ada&quot;, &quot;bob&quot;, &quot;carol&quot;, &quot;dan&quot;]
+scores = [92, 71, 85, 58]
+
+result = [f&quot;{name}:{score}&quot; for name, score in zip(names, scores) if score &gt;= 60]
+print(result)
+</code></pre>
+<p>The behavior is identical, but the intent — "walk both sequences and collect names and scores at or above 60" — is visible in one line. The index disappears, and so does the explicit accumulator.</p>
+<p>If side effects creep in — "log low scores, collect the rest" — fall back to a regular <code>for</code>.</p>
+<pre><code class="language-python">result = []
+for name, score in zip(names, scores):
+    if score &lt; 60:
+        log_low(name, score)
+        continue
+    result.append(f&quot;{name}:{score}&quot;)
+</code></pre>
+<p>Once you can move freely between these two shapes, branching-and-looping code becomes much easier to read and maintain.</p>
+<h2>Step-by-step practice</h2>
+<p>Run the snippets in order, in a REPL or a small script. Lines starting with <code>&gt;&gt;&gt;</code> are REPL inputs; the lines below are the output.</p>
+<ol>
+<li><strong>Confirm truthy and falsy yourself.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; for v in [0, 1, &quot;&quot;, &quot;x&quot;, [], [0], None, {&quot;a&quot;: 1}]:
+...     print(repr(v), bool(v))
+0 False
+1 True
+'' False
+'x' True
+[] False
+[0] True
+None False
+{'a': 1} True
+</code></pre>
+<p>Note that <code>[0]</code> is truthy because the container has length 1. The rule is "the container is empty", not "the elements are zero".</p>
+<ol start="2">
+<li><strong>Combine <code>enumerate</code> with <code>zip</code>.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; names = [&quot;ada&quot;, &quot;bob&quot;, &quot;carol&quot;]
+&gt;&gt;&gt; roles = [&quot;engineer&quot;, &quot;designer&quot;, &quot;engineer&quot;]
+&gt;&gt;&gt; for idx, (name, role) in enumerate(zip(names, roles), start=1):
+...     print(idx, name, &quot;-&gt;&quot;, role)
+1 ada -&gt; engineer
+2 bob -&gt; designer
+3 carol -&gt; engineer
+</code></pre>
+<p><code>enumerate(zip(...))</code> shows up whenever you want to walk two sequences in lockstep and number the rows from 1.</p>
+<ol start="3">
+<li><strong>Branch on a search result with <code>for</code>-<code>else</code>.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; def find_first_negative(nums):
+...     for n in nums:
+...         if n &lt; 0:
+...             return n
+...     return None
+&gt;&gt;&gt; find_first_negative([1, 2, 3])
+&gt;&gt;&gt; find_first_negative([1, -2, 3])
+-2
+</code></pre>
+<p>The same idea written with <code>for</code>-<code>else</code>:</p>
+<pre><code class="language-text">&gt;&gt;&gt; def find_first_negative_v2(nums):
+...     for n in nums:
+...         if n &lt; 0:
+...             return n
+...     else:
+...         return None
+</code></pre>
+<p>Here the <code>for</code>-<code>else</code> adds little because the trailing <code>return None</code> is already natural. Reach for it when you genuinely need to handle "we finished without finding" in one place.</p>
+<ol start="4">
+<li><strong>Move between comprehensions and a regular loop.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; nums = list(range(10))
+&gt;&gt;&gt; [x * x for x in nums if x % 2 == 0]
+[0, 4, 16, 36, 64]
+&gt;&gt;&gt; {x: x * x for x in nums if x % 2 == 0}
+{0: 0, 2: 4, 4: 16, 6: 36, 8: 64}
+&gt;&gt;&gt; sum(x * x for x in nums if x % 2 == 0)  # generator expression
+120
+</code></pre>
+<p>All three produce the same "even squares", but the resulting container differs — list, dict, and a single sum.</p>
+<h2>Common mistakes</h2>
+<ol>
+<li>
+<p><strong>Mutating the list you are iterating.</strong><br>
+   Calling <code>items.remove(...)</code> or <code>items.append(...)</code> inside <code>for item in items:</code> shifts indices and either skips elements or runs forever. Build a new list (<code>items = [x for x in items if cond(x)]</code>) or iterate over a copy (<code>for item in items[:]</code>).</p>
+</li>
+<li>
+<p><strong>Forgetting the exit condition inside <code>while True</code>.</strong><br>
+   The exit condition must become truthy somewhere in the body. If you rely on an external signal (<code>KeyboardInterrupt</code>, a queue message), make the <code>try/except</code> or <code>break</code> explicit.</p>
+</li>
+<li>
+<p><strong>Using a falsy check as "is the value zero".</strong><br>
+<code>if value:</code> is false when <code>value</code> is <code>0</code>, <code>""</code>, or <code>[]</code>. If you really mean "the value was not provided", write <code>if value is None:</code>. The two checks have different meanings.</p>
+</li>
+<li>
+<p><strong>Side effects inside a comprehension.</strong><br>
+<code>[print(x) for x in nums]</code> builds a list of <code>None</code>s as a side effect — awkward code. Call <code>print</code> from a <code>for</code> body so the intent reads.</p>
+</li>
+<li>
+<p><strong>Forgetting that <code>zip</code> stops at the shortest input.</strong><br>
+   Zipping two sequences of different length yields only as many tuples as the shorter one. If that is not the intent, use <code>zip(a, b, strict=True)</code> to raise <code>ValueError</code> immediately.</p>
+</li>
+<li>
+<p><strong>Confusing <code>==</code> and <code>is</code>.</strong><br>
+<code>is</code> checks whether two names refer to the same object. To compare values, use <code>==</code>. <code>is</code> is natural only for singletons such as <code>None</code>, <code>True</code>, and <code>False</code>.</p>
+</li>
+</ol>
+<h2>In practice</h2>
+<p>In real code you often see loops that iterate over many stages, or whose end is not known up front. Two patterns are worth keeping in mind.</p>
+<p><strong>(1) Stream a large file line by line.</strong></p>
+<pre><code class="language-python">total = 0
+with open(&quot;access.log&quot;, encoding=&quot;utf-8&quot;) as f:
+    for line in f:
+        if line.startswith(&quot;GET &quot;):
+            total += 1
+print(total)
+</code></pre>
+<p>A file object is itself an iterable that yields one line at a time, so <code>for line in f:</code> is enough. Reading everything at once with <code>f.readlines()</code> wastes memory for large files.</p>
+<p><strong>(2) Aggregate results from external calls.</strong></p>
+<pre><code class="language-python">def fetch_users(ids):
+    results = {}
+    for user_id in ids:
+        try:
+            user = api.get_user(user_id)
+        except NotFound:
+            continue
+        results[user_id] = user
+    return results
+</code></pre>
+<p>Wrapping a single call in <code>try/except</code> inside the loop lets you skip one failed user and keep going. A <code>for</code> body is more appropriate than a comprehension here because failures interrupt the flow.</p>
+<p>These two patterns reappear in the next chapter on function arguments and the chapter after on file I/O and exceptions.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can state, in one sentence, the difference between <code>if value:</code> and <code>if value is None:</code>.</li>
+<li>[ ] I can decide between <code>for</code> and <code>while</code> based on "do I have an iterable already".</li>
+<li>[ ] I have called <code>enumerate</code>, <code>zip</code>, and <code>range</code> from a real loop body.</li>
+<li>[ ] I have written one list, dict, and set comprehension each — without side effects.</li>
+<li>[ ] I know that <code>zip</code> stops at the shortest input and that <code>strict=True</code> exists.</li>
+<li>[ ] I know patterns for not mutating a sequence while iterating it (<code>items[:]</code>, comprehensions).</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Score classifier.</strong><br>
+   Given <code>scores = {"ada": 92, "bob": 58, "carol": 71}</code>, collect the names with a score of 60 or higher into a list. Write it once with a regular <code>for</code> and once with a list comprehension.<br>
+   - Success criterion: both versions produce <code>["ada", "carol"]</code>.</p>
+</li>
+<li>
+<p><strong>First negative.</strong><br>
+   Write a function <code>first_negative(nums)</code> that returns the index of the first negative number in <code>nums</code>, or <code>-1</code> if there is none.<br>
+   - Success criterion: <code>first_negative([3, 1, -7, 4]) == 2</code> and <code>first_negative([1, 2, 3]) == -1</code>.</p>
+</li>
+<li>
+<p><strong>Pair two sequences.</strong><br>
+   Take two lists — names and roles — and produce a <code>{name: role}</code> dict. If the lengths differ, raise <code>ValueError</code>.<br>
+   - Hint: <code>zip(..., strict=True)</code>.<br>
+   - Success criterion: equal lengths produce a dict; unequal lengths raise <code>ValueError</code>.</p>
+</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>Branching versus looping splits naturally on "single decision or repetition?", then on "do I have an iterable already?".</li>
+<li><code>if</code> evaluates truthy and falsy. Keep in mind that empty containers and <code>0</code> are both falsy.</li>
+<li><code>for</code> walks an iterable; <code>while</code> runs while the condition is truthy. Reach for <code>enumerate</code>/<code>zip</code>/<code>range</code> to lift expressiveness.</li>
+<li>Comprehensions are a focused tool for "transform only". The moment side effects appear, fall back to a regular <code>for</code>.</li>
+<li>Small tools like <code>for</code>-<code>else</code>, <code>zip(..., strict=True)</code>, and <code>items[:]</code> clear up the common traps.</li>
+</ul>
+<p>The next chapter covers functions and arguments. We will pin down <code>def</code>, <code>*args</code>/<code>**kwargs</code>, defaults, and <code>lambda</code>, and look at how to package branching and looping bodies into named functions.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/controlflow.html">Python tutorial — More Control Flow Tools</a> — Covers <code>if</code>, <code>for</code>, <code>while</code>, <code>break</code>, <code>continue</code>, loop <code>else</code>, and function-level examples in one place.</li>
+<li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Canonical source for truth-value testing, chained comparisons, and boolean operator behavior.</li>
+<li><a href="https://docs.python.org/3/library/functions.html">Python docs — Built-in Functions</a> — Documents <code>range</code>, <code>enumerate</code>, and <code>zip</code>, including the <code>strict</code> behavior referenced in the chapter.</li>
+<li><a href="https://peps.python.org/pep-0202/">PEP 202 — List Comprehensions</a> — Historical and syntactic source for comprehension syntax as a control-flow shortcut.</li>
+<li><a href="https://docs.python.org/3/reference/compound_stmts.html">Python docs — Compound Statements</a> — Language-reference view of <code>if</code>, <code>for</code>, <code>while</code>, and loop <code>else</code> semantics.</li>
+</ul>
+<p class="tags-line">Tags: control-flow, if-statement, for-loop, while-loop, comprehensions, enumerate-zip</p>
+</body>
+</html>

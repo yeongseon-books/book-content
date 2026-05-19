@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Standard library tour: datetime, pathlib, json, collections, itertools</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Standard library tour: datetime, pathlib, json, collections, itertools</h1>
+<p>The standard library is the toolbox that keeps you from rewriting common routines. Each module stays focused on one domain, which is why <code>datetime</code>, <code>pathlib</code>, <code>json</code>, <code>collections</code>, and <code>itertools</code> fit so naturally into day-to-day code.</p>
+<p>This post is the final article in the Python 101 series. This is the final stop in the series, where you tie the core language to the tools Python already ships with.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>How to handle dates and times with <code>datetime</code></li>
+<li>How to treat file paths as objects with <code>pathlib.Path</code></li>
+<li>How to convert between dicts and JSON strings using <code>json</code></li>
+<li>What <code>collections.Counter</code>, <code>defaultdict</code>, and <code>deque</code> are for</li>
+<li>How <code>itertools.chain</code>, <code>groupby</code>, and <code>combinations</code> compress repetitive iteration</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Python is often described as "batteries included" — many of the tools you reach for daily are part of the standard library. Getting comfortable with it changes a few things.</p>
+<ul>
+<li><strong>You add fewer external dependencies.</strong> For small scripts, checking the standard library first keeps <code>requirements.txt</code> lean.</li>
+<li><strong>The code becomes shorter and more familiar.</strong> Other Python developers know the same tools, so reviews go faster.</li>
+<li><strong>Versioning stays simple.</strong> Match the interpreter version and you can expect the same behavior.</li>
+</ul>
+<p>This article does not cover the entire standard library. It picks five modules that show up often in scripts and small data-processing jobs and walks through them at an introductory level.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>The standard library is a toolbox of routines so you do not write the same thing twice. Each module sticks to one domain — time, paths, serialization, aggregation, iteration — and exposes a small focused vocabulary.<br>
+The standard library is organized by purpose. <code>datetime</code> covers time, <code>pathlib</code> covers file paths, <code>json</code> covers serialization, <code>collections</code> adds richer data structures, and <code>itertools</code> covers iteration patterns.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Each module is designed to solve "one kind of problem" well. The naming is consistent enough that you can usually guess what a module covers from its name alone.</p>
+<h2>Core concepts</h2>
+<ul>
+<li><strong><code>datetime</code> types</strong>: <code>date</code>, <code>time</code>, the combined <code>datetime</code>, and <code>timedelta</code> for spans. A <code>datetime</code> instance can carry a <code>tzinfo</code> for time zones.</li>
+<li><strong><code>pathlib.Path</code></strong>: A path object instead of a string. You join with <code>/</code>, and call methods like <code>.exists()</code>, <code>.read_text()</code>, and <code>.glob()</code> directly on the path.</li>
+<li><strong><code>json.dumps</code>/<code>json.loads</code></strong>: Convert between Python objects and JSON strings. dict, list, str, int, float, bool, and None map directly; other types need a custom rule.</li>
+<li><strong><code>Counter</code></strong>: A dict subclass that counts occurrences of items.</li>
+<li><strong><code>defaultdict</code></strong>: A dict that calls a factory function when a missing key is accessed.</li>
+<li><strong><code>deque</code></strong>: A double-ended queue with <code>O(1)</code> append and pop on both ends.</li>
+<li><strong><code>itertools</code></strong>: A collection of functions that transform, combine, and slice iterables. Results come back as lazy iterators.</li>
+</ul>
+<h2>Before-after</h2>
+<p>The snippet below counts word occurrences.</p>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def word_counts(words):
+    counts = {}
+    for w in words:
+        if w in counts:
+            counts[w] += 1
+        else:
+            counts[w] = 1
+    return counts
+</code></pre>
+<p>Working with a plain dict means checking key membership on each step.</p>
+<p><strong>After</strong></p>
+<pre><code class="language-python">from collections import Counter
+
+def word_counts(words):
+    return Counter(words)
+</code></pre>
+<p>Three changes happened.</p>
+<ul>
+<li>The membership branch disappeared.</li>
+<li><code>Counter</code> provides helpers like <code>most_common(n)</code> for free.</li>
+<li>The result is a dict subclass, so it stays compatible with code that expects a dict.</li>
+</ul>
+<h2>Step-by-step practice</h2>
+<p>Open a REPL and follow along. Blocks marked with <code>&gt;&gt;&gt;</code> are REPL transcripts; the other code blocks are illustrative snippets.</p>
+<p><strong>1. Use <code>datetime</code> for today and now</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from datetime import date, datetime, timedelta
+&gt;&gt;&gt; date.today()
+datetime.date(2026, 5, 3)
+&gt;&gt;&gt; datetime.now()
+datetime.datetime(2026, 5, 3, 14, 30, 0, 123456)
+&gt;&gt;&gt; date(2026, 12, 25) - date.today()
+datetime.timedelta(days=236)
+&gt;&gt;&gt; (datetime(2026, 5, 3, 14, 30) + timedelta(hours=2)).strftime(&quot;%Y-%m-%d %H:%M&quot;)
+'2026-05-03 16:30'
+</code></pre>
+<p><code>strftime</code> controls the output format; <code>strptime</code> parses a string back into an object. User-provided strings vary in shape, so parsing them once at the boundary and working with objects afterward is safer.</p>
+<p><strong>2. Use <code>pathlib</code> for paths</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; p = Path(&quot;docs&quot;) / &quot;intro.md&quot;
+&gt;&gt;&gt; p
+PosixPath('docs/intro.md')
+&gt;&gt;&gt; p.suffix
+'.md'
+&gt;&gt;&gt; p.stem
+'intro'
+&gt;&gt;&gt; p.parent
+PosixPath('docs')
+</code></pre>
+<p><code>Path</code> objects abstract away OS differences. <code>Path("a") / "b"</code> becomes <code>a/b</code> on Linux and <code>a\b</code> on Windows, so you write less slash-handling code yourself.</p>
+<p><strong>3. Serialize and deserialize with <code>json</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; import json
+&gt;&gt;&gt; data = {&quot;name&quot;: &quot;Ada&quot;, &quot;tags&quot;: [&quot;math&quot;, &quot;logic&quot;]}
+&gt;&gt;&gt; s = json.dumps(data, ensure_ascii=False)
+&gt;&gt;&gt; s
+'{&quot;name&quot;: &quot;Ada&quot;, &quot;tags&quot;: [&quot;math&quot;, &quot;logic&quot;]}'
+&gt;&gt;&gt; json.loads(s) == data
+True
+</code></pre>
+<p><code>ensure_ascii=False</code> keeps non-ASCII characters readable. To work with files, use <code>json.dump(data, f)</code> for writing and <code>json.load(f)</code> for reading.</p>
+<p><strong>4. Count with <code>Counter</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from collections import Counter
+&gt;&gt;&gt; Counter(&quot;banana&quot;)
+Counter({'a': 3, 'n': 2, 'b': 1})
+&gt;&gt;&gt; Counter([&quot;red&quot;, &quot;blue&quot;, &quot;red&quot;, &quot;green&quot;, &quot;blue&quot;, &quot;red&quot;]).most_common(2)
+[('red', 3), ('blue', 2)]
+</code></pre>
+<p>A string is counted by character, a list by element. <code>most_common(n)</code> returns the <code>n</code> highest-frequency entries.</p>
+<p><strong>5. Group with <code>defaultdict</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from collections import defaultdict
+&gt;&gt;&gt; groups = defaultdict(list)
+&gt;&gt;&gt; for word in [&quot;ant&quot;, &quot;ape&quot;, &quot;bee&quot;, &quot;bat&quot;]:
+...     groups[word[0]].append(word)
+...
+&gt;&gt;&gt; dict(groups)
+{'a': ['ant', 'ape'], 'b': ['bee', 'bat']}
+</code></pre>
+<p>Missing keys produce a fresh empty list automatically, so the <code>if key not in d</code> branch goes away.</p>
+<p><strong>6. Compress iteration with <code>itertools</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from itertools import chain, groupby, combinations
+&gt;&gt;&gt; list(chain([1, 2], [3, 4]))
+[1, 2, 3, 4]
+&gt;&gt;&gt; [(k, list(g)) for k, g in groupby(&quot;aaabbc&quot;)]
+[('a', ['a', 'a', 'a']), ('b', ['b', 'b']), ('c', ['c'])]
+&gt;&gt;&gt; list(combinations([&quot;A&quot;, &quot;B&quot;, &quot;C&quot;], 2))
+[('A', 'B'), ('A', 'C'), ('B', 'C')]
+</code></pre>
+<p>Note that <code>groupby</code> only groups adjacent equal values. Unsorted input usually needs <code>sorted()</code> first to produce the groups you expect.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Mixing <code>datetime.now()</code> and <code>utcnow()</code></strong> — Both return naive objects without time-zone info. When time zones matter, use <code>datetime.now(timezone.utc)</code> and pass an explicit <code>tzinfo</code>.</li>
+<li><strong>Passing a <code>pathlib.Path</code> to APIs that demand strings</strong> — Some external libraries accept strings only. Converting with <code>str(path)</code> at the boundary makes debugging easier.</li>
+<li><strong>Seeing <code>\uXXXX</code> in <code>json.dumps</code> output</strong> — That happens when <code>ensure_ascii=False</code> is omitted. Turn it on for human-readable logs and files.</li>
+<li><strong>Relying on <code>Counter</code> key order</strong> — Without going through <code>most_common()</code>, frequency-sorted order is not guaranteed. Use <code>most_common()</code> when you need the ranking.</li>
+<li><strong>Calling the factory in <code>defaultdict</code></strong> — <code>defaultdict(list)</code> is the correct shape. <code>defaultdict(list())</code> passes a single empty list as the factory and raises <code>TypeError</code> on access.</li>
+<li><strong>Feeding unsorted input to <code>groupby</code></strong> — Adjacent-only grouping splits the same key into multiple groups.</li>
+<li><strong>Iterating an <code>itertools</code> result twice</strong> — Iterators are consumed once and become empty. To reuse, capture the result with <code>list(...)</code> first.</li>
+</ul>
+<h2>In practice</h2>
+<p>Standard-library helpers show up in many small but recurring places.</p>
+<ul>
+<li><strong>Cleaning log files</strong>: walk a directory with <code>pathlib</code>, parse the date encoded in each filename with <code>datetime</code>, and separate older files.</li>
+<li><strong>Lightweight config files</strong>: a <code>json</code> file is enough when there is no external dependency to configure. If humans edit it often, a format with comments (such as YAML) may be a better fit.</li>
+<li><strong>Log analysis</strong>: <code>Counter</code> for top error messages, <code>defaultdict(list)</code> for grouping requests by user — both produce quick stats with little code.</li>
+<li><strong>Work queues</strong>: <code>deque</code> lets you push and pop on both ends. <code>popleft()</code> outperforms <code>list.pop(0)</code> on larger inputs.</li>
+<li><strong>Pairing data</strong>: <code>itertools.combinations</code> and <code>product</code> expand candidate pairs for test cases or matrix-style inputs.</li>
+</ul>
+<p>The more familiar you are with the standard library, the shorter your scripts get. Reviewers also share the same vocabulary, so the review goes faster.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can express date arithmetic in one line using <code>datetime</code>, <code>date</code>, and <code>timedelta</code>.</li>
+<li>[ ] You can use <code>pathlib.Path</code> with <code>/</code>, <code>.suffix</code>, <code>.stem</code>, and <code>.parent</code>.</li>
+<li>[ ] You can describe the difference between <code>json.dumps</code>/<code>loads</code> and <code>json.dump</code>/<code>load</code>.</li>
+<li>[ ] You can pick between <code>Counter</code>, <code>defaultdict(list)</code>, and <code>deque</code> for the right situation.</li>
+<li>[ ] You can describe <code>itertools.chain</code>, <code>groupby</code>, and <code>combinations</code> in one sentence each.</li>
+<li>[ ] You stay aware that an iterator is consumed only once.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write a function that prints the date 100 days from today in <code>YYYY-MM-DD</code> format. (Hint: <code>date.today() + timedelta(days=100)</code>.)</li>
+<li>Use <code>pathlib.Path.glob</code> to count <code>.md</code> files in the current directory.</li>
+<li>Serialize the dict <code>{"items": [1, 2, 3], "name": "report"}</code> to a JSON string, deserialize it, and confirm the result equals the original. Try non-ASCII names too, with and without <code>ensure_ascii=False</code>.</li>
+<li>Use <code>Counter</code> to find the five most frequent characters in <code>"the quick brown fox jumps over the lazy dog"</code>.</li>
+<li>Group the tuple list <code>[("a", 80), ("b", 90), ("a", 70), ("b", 85)]</code> into a <code>defaultdict(list)</code> keyed by student.</li>
+<li>Use <code>itertools.combinations</code> to print each length-3 combination of <code>["A", "B", "C", "D"]</code>.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<ul>
+<li><code>datetime</code> lets you express date and time arithmetic with objects. Time-zone handling adds extra concerns.</li>
+<li><code>pathlib</code> treats paths as objects, removing OS-specific slash handling.</li>
+<li><code>json</code> is the lightest serialization choice for dict-shaped data going to an external destination.</li>
+<li><code>Counter</code>, <code>defaultdict</code>, and <code>deque</code> from <code>collections</code> fill in gaps that plain dict and list leave open.</li>
+<li><code>itertools</code> shortens iteration patterns; remember that the result is a lazy iterator.</li>
+</ul>
+<p>This wraps up the Python 101 series. The functions, modules, classes, and standard-library tools introduced here come up again in later series such as <code>python-dbapi-101</code> and <code>sqlalchemy-101</code>. The next series picks up from the standard library and gradually moves into external packages.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/stdlib.html">Python tutorial — Brief Tour of the Standard Library</a> — Frames the standard library as Python’s default toolbox and motivates when to reach for it first.</li>
+<li><a href="https://docs.python.org/3/library/datetime.html">Python docs — <code>datetime</code></a> — Canonical reference for date/time objects, <code>timedelta</code>, and formatting/parsing helpers.</li>
+<li><a href="https://docs.python.org/3/library/pathlib.html">Python docs — <code>pathlib</code></a> — Documents object-oriented path handling and convenience file APIs.</li>
+<li><a href="https://docs.python.org/3/library/json.html">Python docs — <code>json</code></a> — Covers <code>dump</code>/<code>load</code>/<code>dumps</code>/<code>loads</code> and the standard encoder/decoder behavior.</li>
+<li><a href="https://docs.python.org/3/library/collections.html">Python docs — <code>collections</code></a> — Primary reference for <code>Counter</code>, <code>defaultdict</code>, and <code>deque</code>.</li>
+<li><a href="https://docs.python.org/3/library/itertools.html">Python docs — <code>itertools</code></a> — Explains the lazy iterator tools highlighted in the chapter.</li>
+</ul>
+<p class="tags-line">Tags: standard-library, datetime-module, pathlib-module, json-module, collections-module, itertools-module</p>
+</body>
+</html>

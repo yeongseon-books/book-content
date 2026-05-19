@@ -1,0 +1,28 @@
+flowchart LR
+    클래스문["class User:"] --> 클래스객체["클래스 객체 User"]
+    클래스객체 --> 메서드정의["label(self) 메서드 정의"]
+    클래스객체 --> 생성호출["User('Ada', 'a@x') 호출"]
+    생성호출 --> 인스턴스["인스턴스 u 생성"]
+    인스턴스 --> 초기화["__init__(self, name, email)"]
+    초기화 --> 속성["인스턴스 속성<br/>self.name, self.email"]
+
+    인스턴스호출["u.label() 호출"] --> 조회["인스턴스에서 label 조회"]
+    조회 --> 클래스객체
+    메서드정의 --> 바운드메서드["u에 묶인 메서드 객체 생성"]
+    인스턴스 --> 바운드메서드
+    바운드메서드 --> 디스패치["실제 호출: User.label(u)"]
+    속성 --> 디스패치
+    디스패치 --> 결과["self를 통해 데이터 읽고<br/>문자열 반환"]
+
+    style 클래스문 fill:#e3f2fd,stroke:#1976d2
+    style 클래스객체 fill:#ede7f6,stroke:#5e35b1
+    style 메서드정의 fill:#ede7f6,stroke:#5e35b1
+    style 생성호출 fill:#fff3e0,stroke:#f57c00
+    style 인스턴스 fill:#e8f5e9,stroke:#388e3c
+    style 초기화 fill:#fff8e1,stroke:#f9a825
+    style 속성 fill:#e8f5e9,stroke:#388e3c
+    style 인스턴스호출 fill:#f3e5f5,stroke:#7b1fa2
+    style 조회 fill:#f3e5f5,stroke:#7b1fa2
+    style 바운드메서드 fill:#fce4ec,stroke:#c2185b
+    style 디스패치 fill:#e0f7fa,stroke:#00838f
+    style 결과 fill:#e0f7fa,stroke:#00838f

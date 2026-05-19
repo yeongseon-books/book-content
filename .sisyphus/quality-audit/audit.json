@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-19T15:21:17+00:00",
+  "generated_at": "2026-05-19T21:57:25+00:00",
   "series_count": 92,
-  "problem_series_count": 66,
+  "problem_series_count": 65,
   "series_with_5_plus": 50,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 668,
+    "BadImg": 664,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 38,
     "NoEn": 0,
-    "all": 706
+    "all": 702
   },
   "results": [
     {
@@ -16446,130 +16446,6 @@
       }
     },
     {
-      "series": "python-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 4
-      },
-      "total": 4,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/07/07-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 72px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-mental-model.en.png",
-            "width": 1384,
-            "height": 72,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/07/07-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 72px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 72,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/09/09-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 58px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-mental-model.en.png",
-            "width": 1384,
-            "height": 58,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/09/09-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 58px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 58,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/07/07-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 72px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-mental-model.en.png",
-            "width": 1384,
-            "height": 72,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/07/07-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 72px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 72,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/09/09-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 58px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-mental-model.en.png",
-            "width": 1384,
-            "height": 58,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/python-101/09/09-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 58px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 58,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "multimodal-ai-101",
       "counts": {
         "Synt": 0,
@@ -17469,6 +17345,20 @@
     },
     {
       "series": "pytest-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "python-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

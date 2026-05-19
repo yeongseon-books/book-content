@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Modules and packages: import, __init__, __name__</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Modules and packages: import, <strong>init</strong>, <strong>name</strong></h1>
+<p>In Python, a module is a namespace that is loaded once and cached, and a package is the directory-level unit that groups related modules. Once you see what <code>import</code> really loads and names, project structure becomes less mysterious.</p>
+<p>This post is the 7th article in the Python 101 series. This is the part of the series where single files turn into a real project layout.</p>
+<h2>What you will learn</h2>
+<p>After reading this chapter you will be able to:</p>
+<ul>
+<li>Treat any <code>.py</code> file as a module and pull it into another file with <code>import</code>.</li>
+<li>Turn a directory into a package by adding <code>__init__.py</code>, and group modules inside it.</li>
+<li>Explain the difference between <code>import x</code>, <code>from x import y</code>, and <code>import x as alias</code>.</li>
+<li>Trace what <code>if __name__ == "__main__":</code> does at the moment a file runs.</li>
+<li>Use <code>from .sibling import ...</code> to call sibling modules inside the same package.</li>
+<li>Describe in one sentence how <code>sys.path</code> and <code>PYTHONPATH</code> participate in import lookup.</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Once you are comfortable writing functions, code starts piling up. A single file with hundreds of lines usually runs into familiar problems:</p>
+<ul>
+<li>Function and variable names start to clash.</li>
+<li>It is hard to find where any given function was defined.</li>
+<li>Reusing the same code in another project becomes a copy-paste exercise.</li>
+</ul>
+<p>Modules and packages are among Python's main tools for solving this. You break code into files, group files into directories, and import only the parts you need. CLI scripts, web servers, and data pipelines often rely on this structure. Learning it on a tiny project makes the jump to larger projects much smoother.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by <code>__init__.py</code> that holds modules". Hold those two definitions and most import behavior collapses into one diagram.<br>
+A module is "a <code>.py</code> file that runs once and produces a namespace." A package is "a directory that holds such modules." <code>import</code> is the act of attaching that namespace to your current code.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Two ideas matter most. First, <strong>module top-level code runs once, top to bottom, the first time it is imported</strong>. Second, <strong>the resulting namespace object is cached and reused</strong>. A second import does not re-read the file; it pulls the same object from cache.</p>
+<h2>Core concepts</h2>
+<p><strong>1. Module</strong></p>
+<p>One <code>.py</code> file is a module. The module name is the file name with <code>.py</code> removed. A file called <code>math.py</code> is imported as <code>import math</code>.</p>
+<p><strong>2. Package</strong></p>
+<p>A directory containing <code>__init__.py</code> is a package. A package can hold other modules and subpackages. <code>__init__.py</code> may be empty, or it may hold code that runs the first time the package is loaded.</p>
+<pre><code class="language-text">myapp/
+    __init__.py
+    cli.py
+    db/
+        __init__.py
+        sqlite_store.py
+        migrations.py
+</code></pre>
+<p>In this layout, <code>myapp.db.sqlite_store</code> refers to the <code>sqlite_store</code> module inside the <code>db</code> subpackage inside the <code>myapp</code> package.</p>
+<p><strong>3. Forms of import</strong></p>
+<pre><code class="language-python">import math                # bring in the whole math namespace as 'math'
+from math import sqrt      # bring just sqrt into the current namespace
+import numpy as np         # use a short alias 'np' for numpy
+from .sibling import foo   # import foo from a sibling module in the same package
+</code></pre>
+<p><code>import x</code> brings in <code>x</code> itself, and you call into it as <code>x.func()</code>. <code>from x import y</code> only brings in <code>y</code>, which makes the call site shorter but hides where <code>y</code> came from. For small projects either style is fine; as code grows, <code>import x</code> tends to make sources easier to follow.</p>
+<p><strong>4. <code>__name__</code> and the <code>__main__</code> guard</strong></p>
+<p>In normal Python code, a module exposes a string attribute called <code>__name__</code>. When a module is imported by another file, <code>__name__</code> is the module name. When the file is run directly with <code>python file.py</code>, <code>__name__</code> becomes <code>"__main__"</code>.</p>
+<pre><code class="language-python">def main():
+    print(&quot;hello&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>This pattern separates "the part that should run when the file is launched as a script" from "the part that should be exposed when the file is imported as a library."</p>
+<p><strong>5. Relative imports</strong></p>
+<p>Inside a package, you can refer to sibling modules with leading dots. One dot means the same package, two dots mean the parent package.</p>
+<pre><code class="language-python"># myapp/db/sqlite_store.py
+from .migrations import latest_version       # migrations in the same db package
+from ..cli import parse_args                 # cli one level up, in myapp
+</code></pre>
+<p>Relative imports only make sense inside a package. They cannot be used in a file that is run directly as a script.</p>
+<p><strong>6. <code>sys.path</code> and the import path</strong></p>
+<p>When <code>import x</code> runs, Python walks a list of directories called <code>sys.path</code> looking for <code>x.py</code> or a package directory named <code>x/</code>. <code>sys.path</code> typically includes:</p>
+<ul>
+<li>The directory of the script that started the program</li>
+<li>Paths from the <code>PYTHONPATH</code> environment variable</li>
+<li>The standard library location</li>
+<li>Installed <code>site-packages</code></li>
+</ul>
+<p>When the same module name exists in more than one location, the first hit along <code>sys.path</code> wins.</p>
+<h2>Before / after</h2>
+<p>The same payment-processing logic, first crammed into a single file and then split across modules in a package.</p>
+<p><strong>Before — everything in one file</strong></p>
+<pre><code class="language-python"># pay.py
+import sqlite3
+
+def connect():
+    return sqlite3.connect(&quot;pay.db&quot;)
+
+def insert_order(order):
+    conn = connect()
+    conn.execute(&quot;insert into orders(amount) values (?)&quot;, [order[&quot;amount&quot;]])
+    conn.commit()
+    conn.close()
+
+def calc_tax(amount):
+    return round(amount * 0.1, 2)
+
+def send_receipt(email, amount):
+    print(f&quot;sending receipt to {email}: {amount}&quot;)
+
+def main():
+    order = {&quot;amount&quot;: 100, &quot;email&quot;: &quot;a@b.c&quot;}
+    insert_order(order)
+    send_receipt(order[&quot;email&quot;], order[&quot;amount&quot;] + calc_tax(order[&quot;amount&quot;]))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>DB access, tax math, and email handling all live in the same file, which makes it hard to test or reuse any one piece.</p>
+<p><strong>After — one responsibility per module, grouped in a package</strong></p>
+<pre><code class="language-text">pay/
+    __init__.py
+    cli.py
+    db.py
+    tax.py
+    notify.py
+</code></pre>
+<pre><code class="language-python"># pay/db.py
+import sqlite3
+
+def connect():
+    return sqlite3.connect(&quot;pay.db&quot;)
+
+def insert_order(order):
+    conn = connect()
+    conn.execute(&quot;insert into orders(amount) values (?)&quot;, [order[&quot;amount&quot;]])
+    conn.commit()
+    conn.close()
+</code></pre>
+<pre><code class="language-python"># pay/tax.py
+def calc_tax(amount):
+    return round(amount * 0.1, 2)
+</code></pre>
+<pre><code class="language-python"># pay/notify.py
+def send_receipt(email, amount):
+    print(f&quot;sending receipt to {email}: {amount}&quot;)
+</code></pre>
+<pre><code class="language-python"># pay/cli.py
+from .db import insert_order
+from .tax import calc_tax
+from .notify import send_receipt
+
+def main():
+    order = {&quot;amount&quot;: 100, &quot;email&quot;: &quot;a@b.c&quot;}
+    insert_order(order)
+    send_receipt(order[&quot;email&quot;], order[&quot;amount&quot;] + calc_tax(order[&quot;amount&quot;]))
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Each module owns one responsibility, and <code>cli.py</code> composes them. <code>tax.py</code> is testable on its own with no DB involved, and another project can pull in just <code>pay.tax</code> if that is all it needs.</p>
+<h2>Step-by-step practice</h2>
+<p>Build it yourself in a REPL. Lines beginning with <code>&gt;&gt;&gt;</code> are what you type, and the lines below show the output.</p>
+<p><strong>1. Write a module</strong></p>
+<p>In a working directory, create <code>greet.py</code>:</p>
+<pre><code class="language-python"># greet.py
+def hello(name):
+    return f&quot;hello, {name}&quot;
+
+print(&quot;greet module loaded&quot;)
+</code></pre>
+<p>Start a REPL in the same directory and import it:</p>
+<pre><code class="language-pycon">&gt;&gt;&gt; import greet
+greet module loaded
+&gt;&gt;&gt; greet.hello(&quot;ada&quot;)
+'hello, ada'
+&gt;&gt;&gt; import greet
+&gt;&gt;&gt;
+</code></pre>
+<p>The <code>print</code> line shows up on the first import only. The second <code>import greet</code> reuses the cache, so the module body does not run again.</p>
+<p><strong>2. See the <code>__name__</code> guard in action</strong></p>
+<p>Add one more line at the bottom of <code>greet.py</code>:</p>
+<pre><code class="language-python">if __name__ == &quot;__main__&quot;:
+    print(&quot;running as a script&quot;)
+</code></pre>
+<p>Now <code>python greet.py</code> shows two lines:</p>
+<pre><code class="language-text">greet module loaded
+running as a script
+</code></pre>
+<p>When another file does <code>import greet</code>, the <code>running as a script</code> line does not appear. That difference is what lets you keep a library and a CLI in the same file.</p>
+<p><strong>3. Build a small package</strong></p>
+<p>Create this layout:</p>
+<pre><code class="language-text">shop/
+    __init__.py
+    catalog.py
+    cart.py
+</code></pre>
+<pre><code class="language-python"># shop/catalog.py
+PRICES = {&quot;apple&quot;: 1000, &quot;banana&quot;: 500}
+
+def price_of(item):
+    return PRICES.get(item, 0)
+</code></pre>
+<pre><code class="language-python"># shop/cart.py
+from .catalog import price_of
+
+def total(items):
+    return sum(price_of(i) for i in items)
+</code></pre>
+<p>Open a REPL in the directory that contains <code>shop/</code>:</p>
+<pre><code class="language-pycon">&gt;&gt;&gt; from shop.cart import total
+&gt;&gt;&gt; total([&quot;apple&quot;, &quot;banana&quot;, &quot;apple&quot;])
+2500
+</code></pre>
+<p>In <code>shop/cart.py</code>, the line <code>from .catalog import price_of</code> points at <code>catalog</code> inside the same package.</p>
+<p><strong>4. Look at <code>sys.path</code></strong></p>
+<pre><code class="language-pycon">&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.path[:3]
+['', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload']
+</code></pre>
+<p>The leading empty string means "the current working directory," which is why <code>import greet</code> in step 1 found a sibling file.</p>
+<h2>Common mistakes</h2>
+<ol>
+<li>
+<p><strong>Treating a directory without <code>__init__.py</code> as a regular package.</strong><br>
+   It can sometimes work as a namespace package, but for ordinary packages an empty <code>__init__.py</code> makes intent obvious and makes import paths easier to follow.</p>
+</li>
+<li>
+<p><strong>Using <code>from x import *</code> in production code.</strong><br>
+   Names appear in your namespace without any visible source. When something clashes, you have nowhere to look. Save it for the REPL or a quick notebook.</p>
+</li>
+<li>
+<p><strong>Running a file with relative imports as a script.</strong><br>
+<code>python pay/cli.py</code> does not treat <code>cli.py</code> as part of a package, so <code>from .db import ...</code> fails. Use <code>python -m pay.cli</code> instead, or keep the entry point outside the package.</p>
+</li>
+<li>
+<p><strong>Doing heavy work at module top level.</strong><br>
+   If a single import triggers a network call or a large file load, that cost shows up as soon as the module is imported. Move heavy work into functions and call them when needed.</p>
+</li>
+<li>
+<p><strong>Circular imports.</strong><br>
+   If <code>a.py</code> imports <code>b</code> and <code>b.py</code> imports <code>a</code>, one side sees the other half-built. Pull the shared dependency into a third module, or move the import inside a function to break the cycle.</p>
+</li>
+<li>
+<p><strong>Mutating <code>sys.path</code> from inside library code.</strong><br>
+   Scattered <code>sys.path.insert(0, "...")</code> calls make it hard to predict how any import resolves. Installing the package (<code>pip install -e .</code>) or setting <code>PYTHONPATH</code> is much easier to reason about.</p>
+</li>
+</ol>
+<h2>In practice</h2>
+<p>Real projects use modules and packages roughly like this.</p>
+<ul>
+<li><strong>Layered structure</strong>: subpackages such as <code>myapp/api</code>, <code>myapp/db</code>, and <code>myapp/services</code> keep responsibilities separated, and each module sticks to its layer.</li>
+<li><strong>CLI entry point</strong>: shipping a <code>python -m myapp.cli</code> entry point lets relative imports inside the package work naturally.</li>
+<li><strong>Reuse surface</strong>: re-exporting selected functions from <code>__init__.py</code> lets users write <code>from myapp import do_something</code> instead of digging into submodules.</li>
+<li><strong>Tests</strong>: importing modules individually lets <code>pytest</code> pick out specific functions. A monolithic file forces tests to drag everything in.</li>
+<li><strong>Config split</strong>: environment-specific settings live in their own modules (<code>config_dev.py</code>, <code>config_prod.py</code>) and the entry point picks one.</li>
+</ul>
+<p>This shape often stays similar as a project grows. You can start with a single <code>myapp/__init__.py</code> and add subpackages later as needed.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can turn a <code>.py</code> file into a module and import it from another file.</li>
+<li>[ ] You can build a package by adding <code>__init__.py</code> to a directory and call its modules as <code>pkg.mod</code>.</li>
+<li>[ ] You can describe the difference between <code>import x</code>, <code>from x import y</code>, and <code>import x as alias</code> in one sentence each.</li>
+<li>[ ] You can explain <code>if __name__ == "__main__":</code> for both direct execution and import.</li>
+<li>[ ] You can use <code>from .sibling import ...</code> for relative imports inside a package.</li>
+<li>[ ] You can describe in one line how <code>sys.path</code> and <code>PYTHONPATH</code> participate in import lookup.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write <code>mathx.py</code> with <code>square(x)</code> and <code>cube(x)</code>, then <code>import mathx</code> in a REPL and call them.</li>
+<li>Build a <code>tools/</code> directory with <code>__init__.py</code>, <code>text.py</code>, and <code>numbers.py</code>, and have <code>text.py</code> use a relative import to call a function in <code>numbers.py</code>.</li>
+<li>Add <code>tools/cli.py</code> so that <code>python -m tools.cli</code> runs it, and use the <code>__name__ == "__main__"</code> guard.</li>
+<li>Make a module that prints one line when imported, then import it twice in the same REPL session and confirm the body runs only once.</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>A module is one <code>.py</code> file; a package is a directory that contains <code>__init__.py</code>.</li>
+<li>Import runs a module's top-level code once and stores the result in <code>sys.modules</code> for later reuse.</li>
+<li><code>import x</code>, <code>from x import y</code>, <code>as alias</code>, and <code>from .sibling import ...</code> are different ways of using the same import system.</li>
+<li><code>if __name__ == "__main__":</code> lets one file act as both a library and a script.</li>
+<li><code>sys.path</code> and <code>PYTHONPATH</code> are the source of truth for import lookup, so installing the package or setting an environment variable is safer than mutating the list at runtime.</li>
+</ul>
+<p>The next chapter covers file I/O and exception handling, where the modules you just organized start touching outside resources.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/modules.html">Python tutorial — Modules</a> — Practical introduction to module execution, import caching, and <code>sys.path</code> lookup order.</li>
+<li><a href="https://docs.python.org/3/reference/import.html">Python Language Reference — The import system</a> — Formal description of finders, loaders, module caching, and package imports.</li>
+<li><a href="https://docs.python.org/3/library/__main__.html">Python docs — <code>__main__</code></a> — Clarifies the <code>if __name__ == "__main__"</code> guard and package entry-point behavior.</li>
+<li><a href="https://peps.python.org/pep-0328/">PEP 328 — Imports: Multi-Line and Absolute/Relative</a> — Primary source for absolute imports and leading-dot relative imports.</li>
+<li><a href="https://peps.python.org/pep-0420/">PEP 420 — Implicit Namespace Packages</a> — Relevant for the chapter’s note on packages that do not rely on <code>__init__.py</code>.</li>
+</ul>
+<p class="tags-line">Tags: import-system, module-vs-package, init-py, name-main-guard, relative-imports, namespace-packages</p>
+</body>
+</html>

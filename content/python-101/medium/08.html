@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>File I/O and exception handling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>File I/O and exception handling</h1>
+<p>A file is a three-step resource: open it, read or write it, then close it. Exceptions are the labels that tell you which step failed and what kind of failure you hit.</p>
+<p>This post is the 8th article in the Python 101 series. This is the point in the series where resource handling and failure paths become part of normal coding.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you can do the following.</p>
+<ul>
+<li>Open and close files safely using <code>open()</code> together with the <code>with</code> statement.</li>
+<li>Tell text mode (<code>"r"</code>, <code>"w"</code>, <code>"a"</code>) apart from binary mode (<code>"rb"</code>, <code>"wb"</code>) and pick the right one.</li>
+<li>Describe the difference between <code>read</code>, <code>readline</code>, <code>readlines</code>, and iterating the file object in one sentence each.</li>
+<li>Use the four blocks of <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code> for their distinct roles.</li>
+<li>Catch narrow exceptions like <code>FileNotFoundError</code> and <code>PermissionError</code> instead of using a bare <code>except:</code> clause.</li>
+<li>Use <code>pathlib.Path</code> for path manipulation and <code>read_text</code> / <code>write_text</code> for short file operations.</li>
+</ul>
+<h2>Why it matters</h2>
+<p>File code touches outside resources. Unlike in-memory variables, a file handle is a limited operating system resource, and many failure modes come along with it. The disk may be full, permissions may be missing, or another process may hold the file open.</p>
+<p>Code that ignores these conditions tends to work fine in development and break in production. Forgetting to close a handle leaks file descriptors in long-running servers; swallowing exceptions can leave half-written data behind. Catching unexpected exceptions with a bare <code>except:</code> hides real bugs in plain sight.</p>
+<p>The <code>with</code> statement and narrow <code>except</code> clauses are the simplest tools for avoiding both traps. This chapter shows where each tool fits and how to combine them.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of <code>with</code> and <code>try</code> blocks fall out naturally.<br>
+The diagram below shows the flow that runs whenever you open a file and do work with it.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Two ideas hold this together.</p>
+<ul>
+<li><strong><code>with</code> calls <code>__exit__</code> on both normal exit and exception exit, so the handle is closed in both cases.</strong> That removes most of the need to write <code>try</code>/<code>finally</code> and call <code>close()</code> by hand.</li>
+<li><strong>Uncaught exceptions propagate up the call stack.</strong> When <code>except</code> does not match, the function exits at that point and the caller sees the same exception. This is what lets one place own the error policy for many callers.</li>
+</ul>
+<h2>Core concepts</h2>
+<p><strong><code>open()</code> and modes</strong></p>
+<p><code>open(path, mode, encoding=...)</code> returns a file object. The most common modes are:</p>
+<ul>
+<li><code>"r"</code> — read; raises <code>FileNotFoundError</code> when the file is missing</li>
+<li><code>"w"</code> — write; truncates the file when it already exists</li>
+<li><code>"a"</code> — append; creates the file when missing</li>
+<li><code>"x"</code> — create; raises <code>FileExistsError</code> when the file already exists</li>
+<li><code>"b"</code> — binary suffix (<code>"rb"</code>, <code>"wb"</code>)</li>
+</ul>
+<p>In text mode the <code>encoding</code> argument falls back to a platform default when omitted. That default differs across operating systems, so passing <code>encoding="utf-8"</code> for text files is the safer choice.</p>
+<p><strong>The <code>with</code> statement</strong></p>
+<p><code>with</code> uses the context-manager protocol (<code>__enter__</code>/<code>__exit__</code>). File objects implement this protocol, which is why exiting a <code>with</code> block also closes the handle.</p>
+<pre><code class="language-python">with open(&quot;notes.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+    text = f.read()
+# f is already closed here
+</code></pre>
+<p>The handle is closed even when an exception is raised inside the block, so resource leaks are no longer a concern at this layer.</p>
+<p><strong>Four ways to read</strong></p>
+<ul>
+<li><code>f.read()</code> — read the whole file into one string. Fits small files.</li>
+<li><code>f.readline()</code> — read one line, advance to the next on the next call.</li>
+<li><code>f.readlines()</code> — read the remaining lines into a list at once.</li>
+<li><code>for line in f:</code> — iterate one line at a time. Stays small in memory for large files.</li>
+</ul>
+<p>For a large log file the last form fits best. For a tiny config file <code>read()</code> is the simpler option.</p>
+<p><strong>Writing</strong></p>
+<p><code>write(s)</code> writes a single string; <code>writelines(seq)</code> writes a sequence of strings in order. <code>writelines</code> does not add line separators on its own, so include them when you need them.</p>
+<pre><code class="language-python">with open(&quot;out.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    f.write(&quot;first line\n&quot;)
+    f.writelines([&quot;a\n&quot;, &quot;b\n&quot;, &quot;c\n&quot;])
+</code></pre>
+<p><strong>Text vs binary</strong></p>
+<p>Text mode reads and writes <code>str</code>; binary mode reads and writes <code>bytes</code>. Images, compressed archives, and executables belong in binary mode. Text mode may translate line endings depending on the platform, so reach for binary mode when you need the bytes preserved exactly.</p>
+<p><strong><code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code></strong></p>
+<p>The four blocks play distinct roles.</p>
+<ul>
+<li><code>try</code> — code that may raise.</li>
+<li><code>except</code> — code that responds to a specific exception class.</li>
+<li><code>else</code> — code that runs only when <code>try</code> finished without raising.</li>
+<li><code>finally</code> — code that runs at the end whether or not an exception was raised.</li>
+</ul>
+<p><code>else</code> and <code>finally</code> are not used as often, but they are useful when you want to separate the success path from the cleanup path.</p>
+<p><strong>Catching narrow exceptions</strong></p>
+<p>A bare <code>except:</code> or even <code>except Exception:</code> swallows real bugs (a typo that raises <code>NameError</code>, for example) along with the failure you actually expected. Catching only the exception classes you anticipate makes debugging much easier.</p>
+<pre><code class="language-python">try:
+    with open(path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+        return f.read()
+except FileNotFoundError:
+    return &quot;&quot;
+except PermissionError:
+    raise
+</code></pre>
+<p><strong><code>pathlib.Path</code></strong></p>
+<p><code>pathlib.Path</code> treats paths as objects. The <code>/</code> operator joins parts, and <code>read_text</code> / <code>write_text</code> collapse short file work into a single line.</p>
+<pre><code class="language-python">from pathlib import Path
+
+config_dir = Path.home() / &quot;.myapp&quot;
+config_dir.mkdir(parents=True, exist_ok=True)
+(config_dir / &quot;config.txt&quot;).write_text(&quot;debug=true\n&quot;, encoding=&quot;utf-8&quot;)
+</code></pre>
+<p>Joining paths with string <code>+</code> invites separator and double-slash bugs across platforms. <code>pathlib</code> removes most of those small mistakes.</p>
+<h2>Before-After</h2>
+<p>The function below reads a config file and returns its content as a string.</p>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def load_config(path):
+    f = open(path)
+    try:
+        return f.read()
+    except:
+        return &quot;&quot;
+</code></pre>
+<p>This snippet has three problems.</p>
+<ul>
+<li><code>open()</code> is used without <code>with</code>, so an exception during <code>read()</code> can leak the handle.</li>
+<li><code>encoding</code> is not specified, so the result depends on the platform default.</li>
+<li>The bare <code>except:</code> swallows unexpected exceptions too, so a permission error and a code bug both end up as an empty string.</li>
+</ul>
+<p><strong>After</strong></p>
+<pre><code class="language-python">from pathlib import Path
+
+def load_config(path):
+    try:
+        return Path(path).read_text(encoding=&quot;utf-8&quot;)
+    except FileNotFoundError:
+        return &quot;&quot;
+</code></pre>
+<p>Three changes happened.</p>
+<ul>
+<li><code>pathlib.Path.read_text</code> uses <code>with</code> internally, so handle management moves out of this function.</li>
+<li><code>encoding="utf-8"</code> removes the platform difference.</li>
+<li>Only <code>FileNotFoundError</code> is caught; permission problems, disk errors, and code bugs propagate to the caller.</li>
+</ul>
+<h2>Step-by-step practice</h2>
+<p>Open a REPL and follow along. Blocks marked with <code>&gt;&gt;&gt;</code> are REPL transcripts; the other code blocks are illustrative snippets.</p>
+<p><strong>1. Write a text file and read it back</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; with open(&quot;hello.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+...     f.write(&quot;hello\n&quot;)
+...
+6
+&gt;&gt;&gt; with open(&quot;hello.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+...     print(f.read())
+...
+hello
+</code></pre>
+<p>The number returned by <code>write</code> is the count of characters that were written.</p>
+<p><strong>2. Open a missing file safely</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; try:
+...     with open(&quot;missing.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+...         data = f.read()
+... except FileNotFoundError:
+...     data = &quot;&quot;
+...
+&gt;&gt;&gt; data
+''
+</code></pre>
+<p>A narrow <code>except</code> covers exactly one failure mode. Other errors keep propagating.</p>
+<p><strong>3. Read the first 4 bytes in binary mode</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; with open(&quot;hello.txt&quot;, &quot;rb&quot;) as f:
+...     header = f.read(4)
+...
+&gt;&gt;&gt; header
+b'hell'
+</code></pre>
+<p>The same file opened in binary mode shows the raw bytes that text mode would have decoded.</p>
+<p><strong>4. Use <code>pathlib</code> to make a directory and write a file</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; base = Path(&quot;scratch&quot;)
+&gt;&gt;&gt; base.mkdir(exist_ok=True)
+&gt;&gt;&gt; (base / &quot;note.txt&quot;).write_text(&quot;hi\n&quot;, encoding=&quot;utf-8&quot;)
+3
+&gt;&gt;&gt; (base / &quot;note.txt&quot;).read_text(encoding=&quot;utf-8&quot;)
+'hi\n'
+</code></pre>
+<p><strong>5. Walk through <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; def safe_read(p):
+...     try:
+...         text = Path(p).read_text(encoding=&quot;utf-8&quot;)
+...     except FileNotFoundError:
+...         print(&quot;missing&quot;)
+...         return None
+...     else:
+...         print(&quot;ok&quot;)
+...         return text
+...     finally:
+...         print(&quot;done&quot;)
+...
+&gt;&gt;&gt; safe_read(&quot;scratch/note.txt&quot;)
+ok
+done
+'hi\n'
+&gt;&gt;&gt; safe_read(&quot;scratch/none.txt&quot;)
+missing
+done
+</code></pre>
+<p><code>else</code> runs only when there was no exception; <code>finally</code> runs in either case.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Using <code>open()</code> without <code>with</code></strong> — an exception inside the block can leave the handle open. Reach for <code>with</code> by default, even in short scripts.</li>
+<li><strong>Omitting <code>encoding</code></strong> — relying on the platform default makes the same code behave differently in different environments. Pass <code>encoding="utf-8"</code> for text files.</li>
+<li><strong>Catching with bare <code>except:</code></strong> — real bugs disappear along with the expected failures. Name the exception classes you mean to handle.</li>
+<li><strong>Silently swallowing exceptions</strong> — <code>except FileNotFoundError: pass</code> makes debugging painful later. At minimum, log the failure.</li>
+<li><strong>Opening a binary file in text mode</strong> — decoding errors or line-ending translation can corrupt the data. Use <code>"rb"</code> / <code>"wb"</code> for images, archives, and executables.</li>
+<li><strong>Joining paths with <code>+</code></strong> — separators differ across platforms and double slashes show up easily. Use <code>pathlib.Path</code> with <code>/</code> or <code>os.path.join</code>.</li>
+<li><strong>Reading a large file with <code>read()</code></strong> — the whole content lands in memory at once. Iterate line by line with <code>for line in f:</code> instead.</li>
+</ul>
+<h2>In real projects</h2>
+<p>In real projects file I/O and exception handling tend to show up in these places.</p>
+<ul>
+<li><strong>Config loaders</strong>: read a short config with <code>pathlib.Path.read_text</code>, fall back to defaults when missing, and let permission errors propagate so the program fails fast.</li>
+<li><strong>Log and report writers</strong>: append (<code>"a"</code>) one line at a time. Group writes inside a single <code>with</code> block instead of opening and closing the file per line.</li>
+<li><strong>CSV / JSON processing</strong>: line-oriented formats (CSV, JSONL) work well with <code>for line in f:</code>, which keeps even large files within reasonable memory.</li>
+<li><strong>Temporary files</strong>: pair <code>tempfile.NamedTemporaryFile</code> with <code>with</code> so the file is cleaned up automatically when the block ends.</li>
+<li><strong>Retries and recovery</strong>: catch transient errors (a brief network filesystem outage, for example) with a narrow <code>except</code> and retry, but let permanent errors propagate so the caller decides what to do.</li>
+</ul>
+<p>The shape stays the same: close resources with <code>with</code>, catch exceptions narrowly, and let unfamiliar errors travel up.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can use <code>open()</code> together with <code>with</code> by default.</li>
+<li>[ ] You can describe the difference between text mode and binary mode and explain why <code>encoding</code> matters in one sentence.</li>
+<li>[ ] You can describe the difference between <code>read</code>, <code>readline</code>, <code>readlines</code>, and <code>for line in f:</code>.</li>
+<li>[ ] You can use the four blocks of <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code> for their distinct roles.</li>
+<li>[ ] You can avoid <code>except:</code> and <code>except Exception:</code> and pick narrow exception classes instead.</li>
+<li>[ ] You can join paths with <code>pathlib.Path</code> and use <code>read_text</code> / <code>write_text</code> for short file work.</li>
+<li>[ ] You can choose <code>for line in f:</code> over <code>read()</code> when the file is large.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Write <code>append_note(text)</code> that appends a line to <code>notes.txt</code>. Use append mode (<code>"a"</code>) together with <code>with</code>, and add the line break yourself.</li>
+<li>Write <code>count_lines(path)</code> that returns <code>0</code> when the file is missing and otherwise counts lines using <code>for line in f:</code>.</li>
+<li>Write <code>safe_copy(src, dst)</code> that reads <code>src</code> in binary mode and writes the same bytes to <code>dst</code>. Let <code>FileNotFoundError</code> propagate when <code>src</code> is missing.</li>
+<li>Using only <code>pathlib</code>, write a script that creates a <code>data/</code> directory, writes <code>hello.txt</code> inside it, and reads the file back. Make the directory creation safe to run more than once.</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>Files are operating system resources, so opening them inside a <code>with</code> block is the safer default for closing the handle.</li>
+<li>Text mode exchanges <code>str</code> and binary mode exchanges <code>bytes</code>, and passing <code>encoding="utf-8"</code> for text files removes platform differences.</li>
+<li>Exceptions split into <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code> so the success path and the cleanup path stay separate from the recovery path.</li>
+<li>Pick narrow exception classes and let unfamiliar errors propagate so the caller decides the policy.</li>
+<li><code>pathlib.Path</code> is the standard tool that collapses path manipulation and short file work into one line.</li>
+</ul>
+<p>The next chapter covers classes and objects. The functions and modules from earlier chapters get one more layer of abstraction, where data and behavior live together.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/inputoutput.html">Python tutorial — Input and Output</a> — Covers <code>open()</code>, core read/write methods, and text-versus-binary file handling.</li>
+<li><a href="https://docs.python.org/3/tutorial/errors.html">Python tutorial — Errors and Exceptions</a> — Official walkthrough of <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code>, propagation, and exception design.</li>
+<li><a href="https://docs.python.org/3/library/functions.html#open">Python docs — <code>open()</code></a> — Precise reference for file modes, encodings, and text/binary semantics.</li>
+<li><a href="https://docs.python.org/3/library/pathlib.html">Python docs — <code>pathlib</code></a> — Documents <code>Path</code>, path composition, and convenience helpers like <code>read_text()</code> and <code>write_text()</code>.</li>
+<li><a href="https://peps.python.org/pep-0343/">PEP 343 — The "with" Statement</a> — Defines the context-manager protocol that makes <code>with open(...)</code> safe and idiomatic.</li>
+</ul>
+<p class="tags-line">Tags: file-io, context-manager, text-vs-binary, exception-handling, try-except-finally, pathlib</p>
+</body>
+</html>
