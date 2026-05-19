@@ -1,0 +1,12 @@
+flowchart TD
+    A["mock fields"] --> B["공급가액"]
+    A --> C["45,000원 + lineBreak=True"]
+    A --> D["부가세"]
+    A --> E["4,500원 + lineBreak=True"]
+    B --> F["reconstruct_lines()"]
+    C --> F
+    D --> F
+    E --> F
+    F --> G["amount 45,000 KRW\nmin_conf=0.994"]
+    F --> H["VAT 4,500 KRW\nmin_conf=0.991"]
+    F --> I["total 49,500 KRW\nmin_conf=0.989"]
