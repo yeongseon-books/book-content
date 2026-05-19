@@ -1,0 +1,28 @@
+flowchart LR
+    ClassStmt["class User:"] --> ClassObj["class object User"]
+    ClassObj --> MethodDef["label(self) method definition"]
+    ClassObj --> ConstructorCall["User('Ada', 'a@x') call"]
+    ConstructorCall --> Instance["instance u created"]
+    Instance --> Init["__init__(self, name, email)"]
+    Init --> Attributes["instance attributes<br/>self.name, self.email"]
+
+    InstanceCall["u.label() call"] --> Lookup["Look up label on instance"]
+    Lookup --> ClassObj
+    MethodDef --> BoundMethod["Create bound method tied to u"]
+    Instance --> BoundMethod
+    BoundMethod --> Dispatch["Actual call: User.label(u)"]
+    Attributes --> Dispatch
+    Dispatch --> Result["Read data through self<br/>return label string"]
+
+    style ClassStmt fill:#e3f2fd,stroke:#1976d2
+    style ClassObj fill:#ede7f6,stroke:#5e35b1
+    style MethodDef fill:#ede7f6,stroke:#5e35b1
+    style ConstructorCall fill:#fff3e0,stroke:#f57c00
+    style Instance fill:#e8f5e9,stroke:#388e3c
+    style Init fill:#fff8e1,stroke:#f9a825
+    style Attributes fill:#e8f5e9,stroke:#388e3c
+    style InstanceCall fill:#f3e5f5,stroke:#7b1fa2
+    style Lookup fill:#f3e5f5,stroke:#7b1fa2
+    style BoundMethod fill:#fce4ec,stroke:#c2185b
+    style Dispatch fill:#e0f7fa,stroke:#00838f
+    style Result fill:#e0f7fa,stroke:#00838f
