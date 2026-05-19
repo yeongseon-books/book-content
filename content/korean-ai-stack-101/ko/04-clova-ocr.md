@@ -202,10 +202,6 @@ print(doc)
 
 ### Step 5 — Swap in the real API call (optional)
 
-![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
-
-*엔지니어가 헷갈리는 지점*
-
 ```python
 import os, requests
 
@@ -228,6 +224,10 @@ def call_clova_ocr(image_path):
 - 실제 키를 붙인 뒤에도 mock 기반 테스트를 CI에 남겨 두면 빌드가 결정적으로 유지됩니다.
 
 ## 자주 하는 실수
+
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
+
+*엔지니어가 헷갈리는 지점*
 
 - **OCR 정확도가 높으면 RAG도 좋아질 거라고 믿는 것** — 토큰 정확도와 의미 단위 정확도는 다릅니다. 줄 복원이 틀리면 99% OCR도 소용없습니다.
 - **절대 confidence 임계값을 쓰는 것** — 0.95라는 숫자는 모델 버전에 따라 의미가 달라집니다. 하위 5% 분포를 보는 편이 안전합니다.

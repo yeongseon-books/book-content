@@ -194,8 +194,6 @@ print(doc)
 </code></pre>
 <p>Storing the raw payload path beside the text keeps reprocessing simple when the OCR model is upgraded. Text-only storage loses provenance.</p>
 <p><strong>Step 5 — Swap in the real API call (optional)</strong></p>
-<p><img alt="Where engineers get confused" src="https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png"></p>
-<p><em>Where engineers get confused</em></p>
 <pre><code class="language-python">import os, requests
 
 def call_clova_ocr(image_path):
@@ -215,6 +213,8 @@ def call_clova_ocr(image_path):
 <li>Even with a real key in place, keeping the mock test in CI makes the build deterministic.</li>
 </ul>
 <h2>Common mistakes</h2>
+<p><img alt="Where engineers get confused" src="https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png"></p>
+<p><em>Where engineers get confused</em></p>
 <ul>
 <li><strong>Assuming higher OCR accuracy means better RAG</strong> — token accuracy and meaning-unit accuracy are different problems. Bad line reconstruction defeats 99% OCR.</li>
 <li><strong>Using absolute confidence thresholds</strong> — a 0.95 cutoff means different things across model versions. Prefer reviewing the bottom 5% of the score distribution.</li>
