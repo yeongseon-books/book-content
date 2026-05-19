@@ -58,7 +58,7 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 
 > 규칙 기반은 사람이 규칙을 적고, 머신러닝은 데이터로부터 규칙을 추론합니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
 *규칙 기반 시스템은 사람이 규칙을 쓰고, 머신러닝은 데이터로 규칙을 추정합니다*
 
 ## 핵심 용어

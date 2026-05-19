@@ -44,7 +44,7 @@ Real data is *full of missing values*. How you handle them decides *model perfor
 
 ## Concept at a Glance
 
-![A missing-data workflow that starts with cause before drop or fill](../../../assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
+![A missing-data workflow that starts with cause before drop or fill](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
 *A missing-data workflow that starts with cause before drop or fill*
 
 ## Key Terms

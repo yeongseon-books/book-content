@@ -79,7 +79,7 @@ HPA가 기본적으로 잘 다루지 못하는 `minReplicas` 아래, 즉 `0 ↔ 
 이 관계를 먼저 잡으면 operator와 adapter의 책임 분리가 선명해집니다.
 특히 HPA가 여전히 가운데 중요한 자리를 차지하고 있다는 점을 눈으로 확인할 수 있습니다.
 
-![이벤트 소스와 HPA를 잇는 KEDA 구조](../../../assets/azure-aks-deep-dive/06/06-01-the-keda-structure.ko.png)
+![이벤트 소스와 HPA를 잇는 KEDA 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.ko.png)
 
 *이벤트 소스와 HPA를 잇는 KEDA 구조*
 
@@ -113,7 +113,7 @@ Service Bus, Kafka 같은 각 이벤트 소스가 KEDA에 통합되는 방식도
 `provider.go`는 adapter가 `scaledobject.keda.sh/name` selector를 읽고 metrics service에 gRPC로 질의하는 경로를 보여 줍니다.
 즉 HPA는 external metric을 그냥 “어디선가 magically 나타나는 값”으로 받는 것이 아니라, adapter가 열어 놓은 API 표면을 통해 읽습니다.
 
-![이벤트 메트릭이 HPA로 전달되는 경로](../../../assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.ko.png)
+![이벤트 메트릭이 HPA로 전달되는 경로](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-02-the-external-metrics-path.ko.png)
 
 *이벤트 메트릭이 HPA로 전달되는 경로*
 
@@ -126,7 +126,7 @@ ScaledObject 선언 문제인지, adapter 응답 문제인지, scaler 구현 문
 이 구조가 존재하는 이유는 HPA가 기본적으로 `minReplicas` 아래 경계를 자연스럽게 다루지 못하기 때문입니다.
 따라서 `1 ↔ N`은 generated HPA가 맡고, `0 ↔ 1`은 KEDA가 직접 `/scale`을 업데이트합니다.
 
-![KEDA와 HPA가 나뉘는 0↔1 확장 경계](../../../assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.ko.png)
+![KEDA와 HPA가 나뉘는 0↔1 확장 경계](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.ko.png)
 
 *KEDA와 HPA가 나뉘는 0↔1 확장 경계*
 

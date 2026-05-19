@@ -46,7 +46,7 @@ The wrong storage choice is *expensive, slow, and fragile*. The right one quietl
 
 ## Concept at a Glance
 
-![Block, object, file, and archive storage split by access pattern and operating need](../../../assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
+![Block, object, file, and archive storage split by access pattern and operating need](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
 
 *Block, object, file, and archive storage split by access pattern and operating need*
 

@@ -56,7 +56,7 @@ Bit-level understanding is the foundation of debugging and performance work.
 
 > Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.
 
-![Concept at a Glance](../../../assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
 *The same bit sequence changes meaning depending on the decoding rule*
 
 ## Key Terms

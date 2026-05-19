@@ -48,7 +48,7 @@ That is why mathematical framing matters so much. It is not decoration around im
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png)
 *Algorithm design combines counting, structure, uncertainty, optimization, and lower bounds into one decision-making workflow before code is finalized.*
 
 ## Key Terms

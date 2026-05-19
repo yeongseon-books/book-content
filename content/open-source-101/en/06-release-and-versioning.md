@@ -46,7 +46,7 @@ The same is true for internal libraries. As dependencies increase, versioning an
 
 ## The Basic Release Map
 
-![The basic release map](../../../assets/open-source-101/06/06-01-the-basic-release-map.en.png)
+![The basic release map](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png)
 
 *The basic map showing how MAJOR, MINOR, and PATCH communicate different levels of upgrade risk*
 Memorizing semantic versioning as a formula is not enough. The more useful framing is user-centered. MAJOR means “be careful.” MINOR means “new capability without breaking the main path.” PATCH means “small fix, lower upgrade anxiety.”

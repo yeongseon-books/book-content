@@ -42,7 +42,7 @@ Logistic regression is the standard classification baseline. It is interpretable
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
 
 *Logistic regression turns a linear score into a probability, then turns that probability into a class decision with a threshold.*
 

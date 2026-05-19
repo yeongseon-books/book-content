@@ -33,7 +33,7 @@ This is the final post in the AI App Patterns 101 series. Here we cover how to p
 
 > Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
 
-![Questions this post answers](../../../assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 > AI App Patterns 101 (6/6)
@@ -55,7 +55,7 @@ Topics:
 
 ### Human review by risk level
 
-![Human review by risk level](../../../assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
+![Human review by risk level](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
 
 *Human review by risk level*
 HITL adds latency and cost. Use it when the cost of an unchecked error is high.
@@ -74,7 +74,7 @@ HITL adds latency and cost. Use it when the cost of an unchecked error is high.
 
 ### Draft generation with approval gate
 
-![Draft generation with approval gate](../../../assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
+![Draft generation with approval gate](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-02-draft-generation-with-approval-gate.en.png)
 
 *Draft generation with approval gate*
 The simplest HITL pattern is a blocking prompt that waits for human input before the pipeline continues.
@@ -149,7 +149,7 @@ if final_response:
 
 ### Confidence threshold routing
 
-![Confidence threshold routing](../../../assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
+![Confidence threshold routing](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-03-confidence-threshold-routing.en.png)
 
 *Confidence threshold routing*
 Ask the LLM to return a confidence score alongside its output. Route low-confidence results to a human reviewer automatically.
@@ -215,7 +215,7 @@ for text in texts:
 
 ### Review decisions with audit events
 
-![Review decisions with audit events](../../../assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
+![Review decisions with audit events](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-04-review-decisions-with-audit-events.en.png)
 
 *Review decisions with audit events*
 HITL systems require a record of who reviewed what and when. The audit log also becomes training data for improving the model over time.
@@ -301,7 +301,7 @@ print(f"audit log: {LOG_FILE}")
 
 ### Human feedback back into policy loop
 
-![Human feedback back into policy loop](../../../assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
+![Human feedback back into policy loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-05-human-feedback-back-into-policy-loop.en.png)
 
 *Human feedback back into policy loop*
 - HITL does not always sit at the very end; human review can appear before classification, before sending, or before money moves.

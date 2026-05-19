@@ -46,7 +46,7 @@ Most security incidents start with excessive permissions and forgotten keys. Sol
 
 ## Concept at a Glance
 
-![Core IAM relationship between users, roles, policies, and protected resources](../../../assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
+![Core IAM relationship between users, roles, policies, and protected resources](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
 
 *Core IAM relationship between users, roles, policies, and protected resources*
 

@@ -34,7 +34,7 @@ This is post 3 in the RAG Deep Dive series.
 
 > A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
 
-![Questions this post answers](../../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -129,7 +129,7 @@ That policy lives in several places at once. `BaseRetriever` wraps retrieval in 
 
 In LangChain 0.2.17, the foundational retriever interface is `langchain_core.retrievers.BaseRetriever`. At first glance it looks simple: take a string query, return a list of `Document` objects. In source, though, it is already part of the Runnable system. That design choice is the reason the recommended entry points are `invoke()` and `ainvoke()` rather than the older `get_relevant_documents()` methods.
 
-![Invoke path into retriever callbacks](../../../assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
+![Invoke path into retriever callbacks](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
 
 *Invoke path into retriever callbacks*
 
@@ -187,7 +187,7 @@ The baseline here is straightforward: `BaseRetriever` is not merely a semantic c
 
 `VectorStoreRetriever` is the default adapter that turns a vector store into a retriever. Its implementation is short, but the shortness is deceptive. The class stores two policy fields, `search_type` and `search_kwargs`, and its `_get_relevant_documents()` method dispatches to different vector-store methods based on those settings. Retrieval quality is therefore shaped at this adapter boundary before it reaches FAISS or any other backend.
 
-![Search type dispatch and parameters](../../../assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png)
+![Search type dispatch and parameters](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-02-vectorstore-retriever-dispatch.en.png)
 
 *Search type dispatch and parameters*
 
@@ -260,7 +260,7 @@ So `VectorStoreRetriever` is simple in code size but not trivial in effect. It i
 
 MMR exists to counter one of the most common retrieval failure modes: a top-k list that is locally accurate and globally repetitive. If a corpus contains many near-duplicate chunks, plain similarity search happily returns them because each chunk is individually close to the query. The user then gets redundancy instead of coverage. MMR addresses that by selecting documents that are both query-relevant and mutually less redundant.
 
-![MMR candidate expansion and selection](../../../assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png)
+![MMR candidate expansion and selection](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-03-mmr-selection-flow.en.png)
 
 *MMR candidate expansion and selection*
 
@@ -327,7 +327,7 @@ MMR is therefore best understood as a second-stage selector over an expanded can
 
 Threshold retrieval sounds simple until you ask what the threshold is actually applied to. In FAISS `IndexFlatL2`, the backend returns L2 distance values, not similarity scores. Lower is better. If you apply a “score threshold” directly to those raw numbers, you are really applying a distance ceiling. LangChain adds an intermediate relevance-score layer precisely to make threshold retrieval more backend-independent.
 
-![Distance values becoming relevance scores](../../../assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png)
+![Distance values becoming relevance scores](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-04-threshold-score-conversion.en.png)
 
 *Distance values becoming relevance scores*
 
@@ -384,7 +384,7 @@ So the lesson is not just that L2 is a distance. It is that threshold retrieval 
 
 `VectorStoreRetriever` is a solid default, but it is not always the right boundary for retrieval policy. Sometimes the real requirement is to narrow the search space before vector search begins. A common example is source scoping. If the application already knows the user should only search documents from one source, tenant, or repository, then searching a global index and discarding cross-source results afterward is structurally wasteful.
 
-![Source-filtered routing before vector search](../../../assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png)
+![Source-filtered routing before vector search](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-05-custom-source-retriever.en.png)
 
 *Source-filtered routing before vector search*
 

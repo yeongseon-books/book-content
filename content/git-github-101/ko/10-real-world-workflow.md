@@ -45,7 +45,7 @@ GitHub Flow는 그 약속을 가장 단순한 형태로 보여 줍니다. `main`
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/10/10-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.ko.png)
 
 *Mental Model*
 
@@ -192,7 +192,7 @@ Closed • yeongseon opened about 1 hour ago
 
 실전에서는 "PR을 열었다"와 "이제 merge해도 된다" 사이에 생각보다 많은 판단이 들어갑니다. 아래 흐름은 작은 팀이 GitHub Flow를 운영할 때 최소한으로 확인할 질문을 정리한 것입니다.
 
-![merge 직전 의사결정 흐름](../../../assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.ko.png)
+![merge 직전 의사결정 흐름](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.ko.png)
 
 *Issue 범위 점검부터 merge 방식과 release tag 판단까지 이어지는 GitHub Flow 의사결정 흐름*
 

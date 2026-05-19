@@ -50,7 +50,7 @@ This is the 5th article in the LLM from Scratch 101 series.
 
 The input is a tensor of token IDs with shape `(B, T)`. We add token and position embeddings, then pass them through six blocks sequentially. After a final `ln_f` layer, we project to the vocab dimension via `lm_head` to produce logits of shape `(B, T, vocab_size)`.
 
-![Full GPT forward-pass structure](../../../assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
+![Full GPT forward-pass structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
 
 *Full GPT forward-pass structure*
 All the components we created earlier appear here. The model class acts more as assembly code than a new algorithm.

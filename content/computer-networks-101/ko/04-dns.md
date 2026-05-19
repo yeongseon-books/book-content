@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 > 클라이언트는 운영 체제의 stub resolver에 물어보고, stub resolver는 보통 ISP나 회사의 recursive resolver에 질의를 넘깁니다. recursive resolver는 루트 서버, TLD 서버, authoritative 서버를 순서대로 따라가며 답을 찾고, 그 결과를 TTL 동안 캐시합니다.
 
-![DNS 조회가 루트에서 authoritative까지 내려가는 흐름](../../../assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
+![DNS 조회가 루트에서 authoritative까지 내려가는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
 *recursive resolver가 위임 체인을 따라 내려가 답을 찾고, TTL 동안 캐시해 다음 조회를 빠르게 만듭니다.*
 
 ## 핵심 용어

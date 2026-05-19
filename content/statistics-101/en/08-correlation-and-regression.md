@@ -45,7 +45,7 @@ This is post 8 in the Statistics 101 series. Here we will compare correlation co
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
 
 *Correlation summarizes movement together, while regression turns that movement into an equation and then checks the fit with R² and residuals.*
 ## Key Terms

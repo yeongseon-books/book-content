@@ -36,12 +36,12 @@ Early in an ops pipeline, the pragmatic move is not to build a brilliant judge. 
 > The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 
 ## Big picture
-![LLM output quality evaluation pipeline](../../../assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
+![LLM output quality evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
 
 *LLM output quality evaluation pipeline*
 
 ## Why this layer matters
-![Rule checks catch obvious failures first](../../../assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)
+![Rule checks catch obvious failures first](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)
 
 *Rule checks catch obvious failures first*
 
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Format length and keyword checks split](../../../assets/llm-apps-ops-101/03/03-02-what-to-notice-in-this-code.en.png)
+![Format length and keyword checks split](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-02-what-to-notice-in-this-code.en.png)
 
 *Format length and keyword checks split*
 - Forcing JSON output narrows the shape of the problem before evaluation starts.
@@ -229,7 +229,7 @@ In practice, the sequence usually looks like this:
 The point is cost control as much as quality control. Cheap gates should protect expensive ones.
 
 ## Where engineers get confused
-![Rule checks layer before judge models](../../../assets/llm-apps-ops-101/03/03-03-where-engineers-get-confused.en.png)
+![Rule checks layer before judge models](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-03-where-engineers-get-confused.en.png)
 
 *Rule checks layer before judge models*
 - Passing format checks does not mean the answer is good. Failing format checks usually means the answer is unusable.

@@ -27,7 +27,7 @@ sqlite3 starts transactions for you, which is convenient until an implicit `BEGI
 
 This is the 5th article in the Python DB-API 101 series.
 
-![Transactions and isolation levels (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
+![Transactions and isolation levels (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 
 *Transactions and isolation levels (sqlite3, PEP 249)*
 ## Questions this post answers
@@ -68,7 +68,7 @@ This post compares the five modes through code and lock scenarios. Once you have
 
 ## Mental Model — connection is the transaction scope
 
-![Mental model - connection is the transaction scope](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
+![Mental model - connection is the transaction scope](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
 
 *Mental model - connection is the transaction scope*
 ```text
@@ -97,7 +97,7 @@ Two essentials:
 
 ## Core concepts
 
-![Core concepts](../../../assets/python-dbapi-101/05/05-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.en.png)
 
 *Core concepts*
 ### The five `isolation_level` values
@@ -175,7 +175,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ### Step 1 — observe default behaviour

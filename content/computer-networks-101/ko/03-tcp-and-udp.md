@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 > TCP는 두 호스트 사이에 가상 회선을 만들고, 데이터가 순서대로 빠짐없이 너무 빠르지 않게 흐르도록 관리합니다. UDP는 그런 회선 없이 데이터그램을 바로 던집니다. 신뢰성이 필요하다면 애플리케이션이 그 위에 따로 얹어야 합니다.
 
-![TCP와 UDP의 책임 분담 비교](../../../assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)
+![TCP와 UDP의 책임 분담 비교](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)
 *TCP는 운영 체제가 신뢰성을 맡고, UDP는 애플리케이션이 필요한 만큼만 기능을 얹는 구조입니다.*
 
 ## 핵심 용어

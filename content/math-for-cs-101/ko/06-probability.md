@@ -62,7 +62,7 @@ A/B 테스트 결과를 읽을 때도, 분류기의 오탐률을 볼 때도, 장
 
 ## 한 장으로 보는 확률의 흐름
 
-![한 장으로 보는 확률의 흐름](../../../assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 확률의 흐름](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
 *확률은 가능한 결과를 세는 데서 시작해, 조건을 붙이고, 믿음을 갱신하고, 평균과 흔들림까지 함께 읽게 해 줍니다.*
 
 ---

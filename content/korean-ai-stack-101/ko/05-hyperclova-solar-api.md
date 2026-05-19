@@ -107,13 +107,13 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
 
 *Core flow*
 
 ## 왜 공급자 대체 실습도 충분히 도움이 될까
 
-![최소 실행 예제](../../../assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.ko.png)
+![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.ko.png)
 
 *최소 실행 예제*
 
@@ -144,7 +144,7 @@ print(response.choices[0].message.content)
 
 ### Step 2 — Constrain output format (force JSON)
 
-![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.ko.png)
+![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
 
@@ -218,7 +218,7 @@ clean = sanitize(validate(raw))
 
 ### Step 5 — Switching to HyperCLOVA / Solar (concept)
 
-![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.ko.png)
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.ko.png)
 
 *엔지니어가 헷갈리는 지점*
 

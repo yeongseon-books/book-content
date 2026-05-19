@@ -46,7 +46,7 @@ The upside is equally real. Once you can read issues patiently, even a small con
 
 ## Fix the Reading Order First
 
-![Fix the reading order first](../../../assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
+![Fix the reading order first](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
 
 *The safest reading order from title to comments when you want the full issue context*
 That order matters because issue information accumulates in that order. If you read only the title, you see a symptom. If you jump straight into comments, you lose the framing. Move from broad context to detailed context and you will make far fewer mistakes.

@@ -57,7 +57,7 @@ We are moving from an era of one specialized model per task (ResNet for classifi
 
 The cleanest way to understand multimodal AI is to stop thinking in terms of input channels and start thinking in terms of evidence preservation. A text-only pipeline asks, "How quickly can I compress everything into text?" A multimodal pipeline asks, "What information becomes unrecoverable if I compress too early?"
 
-![Mental model: multimodal expands the reasoning boundary](../../../assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
+![Mental model: multimodal expands the reasoning boundary](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
 *A multimodal pipeline is valuable when it preserves visual evidence long enough for retrieval and reasoning to use it instead of discarding it up front.*
 
 That shift immediately changes engineering priorities. Resolution policy matters because cost now depends on pixels. OCR is no longer the whole story because layout and iconography may carry the meaning. Privacy review changes because PII may live inside screenshots, IDs, and scanned forms rather than inside typed text.

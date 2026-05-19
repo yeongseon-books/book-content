@@ -54,7 +54,7 @@ If you learn the context well, even small improvements land with more credibilit
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
 
 *The first 90 days work best when data mapping, stakeholder learning, wins, and documentation reinforce each other*
 ## Key Terms

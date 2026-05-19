@@ -46,7 +46,7 @@ The most common incident is a *secret committed to git*. Once pushed, it is *for
 
 ## Concept at a Glance
 
-![The flow that keeps secrets outside the code and under managed rotation](../../../assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
+![The flow that keeps secrets outside the code and under managed rotation](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
 
 *The flow that keeps secrets outside the code and under managed rotation*
 ## Key Terms

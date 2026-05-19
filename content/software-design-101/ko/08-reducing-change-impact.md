@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
 *새 경로를 추가하고 병행 검증한 뒤 점진적으로 전환하고 정리하는 expand-contract 흐름*
 
 흐름은 보통 확장하고, 나란히 돌려 보고, 점진적으로 갈아탄 뒤, 마지막에 옛 경로를 정리하는 순서로 갑니다. 정리까지 끝나야 변경이 완료됩니다.

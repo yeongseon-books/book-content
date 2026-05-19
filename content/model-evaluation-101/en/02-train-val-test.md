@@ -44,7 +44,7 @@ A wrong split invalidates every measurement that follows. Model comparisons beco
 
 ## Concept at a Glance
 
-![dataset split into train validation and test roles](../../../assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
+![dataset split into train validation and test roles](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
 
 *dataset split into train validation and test roles*
 ## Key Terms

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/04/04-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-diagram.ko.png)
 
 *상태는 위에서 아래로 흐르고 이벤트는 아래에서 위로 올라오는 컴포넌트 구조*
 

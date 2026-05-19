@@ -47,7 +47,7 @@ DOM에 대한 감각이 없으면 페이지가 왜 느린지 설명하기 어렵
 
 ## 한눈에 보는 개념 지도
 
-![한눈에 보는 개념 지도](../../../assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)
 
 *HTML 파싱부터 layout과 paint까지 이어지는 브라우저 렌더링 파이프라인 요약입니다.*
 

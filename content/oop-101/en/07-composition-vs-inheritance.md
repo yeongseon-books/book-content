@@ -65,7 +65,7 @@ Inheritance (is-a)                Composition (has-a)
 Tight coupling                 Loose coupling
 ```
 
-![Concept Overview](../../../assets/oop-101/07/07-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png)
 *The composition-versus-inheritance decision starts with substitutability and change radius, not with how much code you can reuse.*
 
 ## Key Concepts

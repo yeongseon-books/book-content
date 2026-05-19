@@ -44,7 +44,7 @@ Every prior decision is *validated together in production*. One weak link makes 
 
 ## Concept at a Glance
 
-![Production container flow from build and signing to least-privilege runtime, logs, and metrics](../../../assets/docker-101/10/10-01-concept-at-a-glance.en.png)
+![Production container flow from build and signing to least-privilege runtime, logs, and metrics](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png)
 
 *A production image is built, signed, pushed, then run with minimal privileges and standard observability channels*
 

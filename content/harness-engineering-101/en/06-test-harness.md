@@ -39,7 +39,7 @@ This is post 6 in the Harness Engineering 101 series. Here we turn completion cr
 
 > “Works in the demo” is not proof. A test you can rerun on every change is proof.
 
-![Test harness - turning completion criteria into tests](../../../assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
+![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 
 *Test harness - turning completion criteria into tests*
 ## "It Works" Is Not Evidence
@@ -54,7 +54,7 @@ This article covers the kinds of tests for agents, building eval datasets, and a
 
 ## Three Tiers of Agent Tests
 
-![Three tiers of agent tests](../../../assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png)
+![Three tiers of agent tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-02-three-tiers-of-agent-tests.en.png)
 
 *Three tiers of agent tests*
 Similar to traditional software testing, with non-determinism added.
@@ -99,7 +99,7 @@ All three are needed. Without unit tests, debugging is impossible. Without eval 
 
 ## Building an Eval Dataset
 
-![Building an eval dataset](../../../assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png)
+![Building an eval dataset](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-03-building-an-eval-dataset.en.png)
 
 *Building an eval dataset*
 Without an eval dataset, quality is unmeasurable. Datasets come from three sources.
@@ -191,7 +191,7 @@ LLM-as-judge is powerful but risky. The judge model's bias flows directly into t
 
 ## Automating Regression Prevention
 
-![Automating regression prevention](../../../assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png)
+![Automating regression prevention](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-04-automating-regression-prevention.en.png)
 
 *Automating regression prevention*
 Tests that exist but don't run are worthless. Wire them into CI/CD to run on every change.

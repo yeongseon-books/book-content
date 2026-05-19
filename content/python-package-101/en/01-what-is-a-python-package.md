@@ -65,7 +65,7 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
                      models.py
 ```
 
-![Mental Model](../../../assets/python-package-101/01/01-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.en.png)
 *How a module becomes a package, a distribution, and finally an installable artifact*
 
 ## Core Concepts

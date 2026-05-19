@@ -29,7 +29,7 @@ seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안
 
 중요한 점은 동기 ORM과 완전히 다른 제품을 배우는 것이 아니라, 거의 같은 API를 더 명시적인 IO 규칙 위에서 다시 읽는 일이라는 사실입니다. 어디에서 `await`가 필요하고, 왜 eager loading이 더 중요해지는지를 이번 글에서 정리합니다.
 
-![비동기 SQLAlchemy: aiosqlite와 AsyncSession](../../../assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.ko.png)
+![비동기 SQLAlchemy: aiosqlite와 AsyncSession](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.ko.png)
 
 *비동기 SQLAlchemy: aiosqlite와 AsyncSession*
 ## 이 글에서 다룰 문제
@@ -42,7 +42,7 @@ seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안
 
 ## 왜 중요한가
 
-![핵심 개념](../../../assets/sqlalchemy-101/09/09-02-why-this-matters.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.ko.png)
 
 *핵심 개념*
 FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy를 그대로 쓰면 이벤트 루프가 블록됩니다. SQLAlchemy 2.x의 async API는 1.4부터 정식 도입돼 안정화됐고, SQLite도 `aiosqlite` 드라이버로 같은 패턴을 쓸 수 있습니다.
@@ -51,7 +51,7 @@ FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy
 
 ## 멘탈 모델
 
-![Mental model](../../../assets/sqlalchemy-101/09/09-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-03-mental-model.ko.png)
 
 *멘탈 모델*
 > async SQLAlchemy는 **기존 ORM의 얇은 awaitable wrapper**입니다. 내부적으로 동기 ORM을 thread pool 위에서 돌리지 않고, greenlet 기반 어댑터로 동기 호출을 비동기 경계에 노출합니다. 그래서 API는 거의 같지만, "암묵적 IO"가 일어날 자리는 모두 명시적 `await`이 필요합니다.
@@ -63,7 +63,7 @@ FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/sqlalchemy-101/09/09-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### `create_async_engine` / `AsyncEngine`
@@ -130,7 +130,7 @@ async def list_users():
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/sqlalchemy-101/09/09-05-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-05-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 1단계: 환경 준비

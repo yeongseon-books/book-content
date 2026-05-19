@@ -50,7 +50,7 @@ The git diff analogy fits: autogenerate is a line-level diff. A semantically equ
 
 ### Diagram: the autogenerate diff pipeline
 
-![Diagram: the autogenerate diff pipeline](../../../assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
+![Diagram: the autogenerate diff pipeline](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
 *Autogenerate builds a diff, but intent-heavy decisions such as renames still belong to a human review.*
 
 ## Core concepts

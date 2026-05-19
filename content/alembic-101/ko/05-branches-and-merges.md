@@ -47,7 +47,7 @@ git 비유로 보면 `alembic merge`는 `git merge`입니다. 다만 merge revis
 
 ### 다이어그램: multi-head를 single head로 되돌리는 merge
 
-![다이어그램: multi-head를 single head로 되돌리는 merge](../../../assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.ko.png)
+![다이어그램: multi-head를 single head로 되돌리는 merge](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.ko.png)
 *동시에 만들어진 두 head는 merge revision 하나로 다시 단일 head가 됩니다*
 
 ## 핵심 개념

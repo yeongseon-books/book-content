@@ -45,7 +45,7 @@ External clients depend on your API. One break stops *dozens or hundreds* of cli
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
 *Older versions do not disappear instantly. They move through deprecation notices toward a clearly announced sunset date.*
 
 That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.

@@ -43,7 +43,7 @@ Async bugs make up *half of frontend defects*. They hide on a fast network and e
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
 
 *The async UI state machine moving between idle, loading, success, and error*
 

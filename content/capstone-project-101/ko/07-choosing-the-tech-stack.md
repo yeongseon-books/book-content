@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/07/07-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.ko.png)
 *요구사항에서 ADR 기록까지 이어지는 기술 선택 흐름*
 
 ## 실전 문서 예시: 간단한 ADR

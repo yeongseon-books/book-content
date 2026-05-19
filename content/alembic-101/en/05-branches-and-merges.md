@@ -48,7 +48,7 @@ Borrowing from git: `alembic merge` is `git merge`. The difference is that the m
 
 ### Diagram: merging multiple heads back to one
 
-![Diagram: merging multiple heads back to one](../../../assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
+![Diagram: merging multiple heads back to one](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
 *Two concurrent heads become one head again through a merge revision that only repairs the graph.*
 
 ## Core concepts

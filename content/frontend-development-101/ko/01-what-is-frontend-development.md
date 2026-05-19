@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/01/01-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-diagram.ko.png)
 
 *브라우저, HTML, CSS, JavaScript, API 호출이 한 사용자 경험으로 이어지는 흐름*
 

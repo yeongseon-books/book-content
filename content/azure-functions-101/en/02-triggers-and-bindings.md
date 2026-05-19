@@ -48,7 +48,7 @@ The rules are simple:
 
 The point worth holding onto: a trigger decides both *when* and *with what*. Visually:
 
-![Trigger deciding timing and input payload](../../../assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png)
+![Trigger deciding timing and input payload](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png)
 
 *Trigger deciding timing and input payload*
 ---
@@ -67,7 +67,7 @@ The full list is in the official docs, but in practice 90%+ of real-world work f
 
 When you design a new function, the question is always the same: **“What should cause this function to wake up?”** The answer is your trigger.
 
-![Common triggers and their typical uses](../../../assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.en.png)
+![Common triggers and their typical uses](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-02-trigger-catalog-the-ones-youll-actually.en.png)
 
 *Common triggers and their typical uses*
 ---
@@ -125,7 +125,7 @@ For example, you might have a function that says: “When an HTTP request comes 
 
 The three pieces in one diagram:
 
-![Role differences among trigger and bindings](../../../assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.en.png)
+![Role differences among trigger and bindings](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-03-input-bindings-vs-output-bindings.en.png)
 
 *Role differences among trigger and bindings*
 The function sits in the middle, and it talks to the outside world through three lanes: trigger, input, output. **Bindings are simply the declarative expression of those three lanes.**

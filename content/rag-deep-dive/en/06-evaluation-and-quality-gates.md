@@ -34,7 +34,7 @@ This is the final post in the RAG Deep Dive series.
 
 > Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
 
-![Questions this post answers](../../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -137,7 +137,7 @@ The first important thing to understand about RAGAS is that it is not a generic 
 
 Those four columns form the core frame for RAG evaluation. `question` is the user query. `contexts` is the ordered list of retrieved chunks. `answer` is the model output. `ground_truth` is the human reference answer. If you do not keep the original question, you cannot compute answer relevancy. If you do not keep retrieved context, you cannot check faithfulness. If you do not keep a reference answer, you lose metrics that need a target outcome.
 
-![Sample fields controlling metric eligibility](../../../assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
+![Sample fields controlling metric eligibility](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
 
 *Sample fields controlling metric eligibility*
 
@@ -199,7 +199,7 @@ First, RAGAS does not judge the answer as one indivisible block. It uses an LLM 
 
 Second, each atomic claim is checked against the retrieved context list. The `NLI_STATEMENTS_MESSAGE` prompt asks whether every statement can be directly inferred from the provided context, returning a binary `verdict` for each one. In `_create_nli_prompt()`, the metric joins `contexts` into one context string and passes the claim list in JSON form. Then `_compute_score()` reduces the result to a ratio.
 
-![Claim decomposition and support verification flow](../../../assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png)
+![Claim decomposition and support verification flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-02-faithfulness-claim-decomposition-and-verification.en.png)
 
 *Claim decomposition and support verification flow*
 
@@ -252,7 +252,7 @@ Where faithfulness asks whether an answer stayed inside the evidence boundary, a
 
 The implementation uses a reverse-question generation prompt. `QUESTION_GEN` takes the `answer` together with `context`, then asks the LLM to produce a question plus a `noncommittal` flag. The default `strictness` is 3, so the metric usually generates multiple reverse questions for the same answer. `_calculate_score()` then embeds the original `question` and the generated reverse questions, computes cosine similarity, and averages the result.
 
-![Reverse questions measuring answer focus](../../../assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png)
+![Reverse questions measuring answer focus](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-03-answer-relevancy-reverse-question-flow.en.png)
 
 *Reverse questions measuring answer focus*
 
@@ -294,7 +294,7 @@ Context precision is the metric that looks most directly at retrieval ranking qu
 
 The input contract matters here too. `ragas==0.1.22` expects a `Dataset` with `question`, `contexts`, `answer`, and `ground_truth`, and `evaluate()` first normalizes aliases through `remap_column_names(dataset, column_map)`. After that normalization, context precision evaluates each context chunk against the question and the answer target carried by the dataset, which is why it is better understood as a retrieval metric than a generation metric.
 
-![Rank-weighted precision at k scoring](../../../assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png)
+![Rank-weighted precision at k scoring](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-04-context-precision-at-k-ranking.en.png)
 
 *Rank-weighted precision at k scoring*
 
@@ -338,7 +338,7 @@ Computing metrics is only half the job. The real value appears when those metric
 
 One versioning detail matters. In `ragas==0.1.22`, the executable dataset uses `question`, `contexts`, `answer`, and `ground_truth`. If your stored dataset uses names like `query`, `retrieved_passages`, `prediction`, or `reference_answer`, pass a `column_map` in the direction canonical name -> existing dataset column. For example, `{"question": "query"}` means the RAGAS `question` slot should read from the dataset column named `query`.
 
-![CI gate around faithfulness thresholds](../../../assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png)
+![CI gate around faithfulness thresholds](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-05-quality-gate-pipeline-integration.en.png)
 
 *CI gate around faithfulness thresholds*
 

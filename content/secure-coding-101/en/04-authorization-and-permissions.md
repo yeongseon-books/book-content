@@ -46,7 +46,7 @@ OWASP Top 10 is often led by *Broken Access Control*. Hiding a button in the UI 
 
 ## Concept at a Glance
 
-![The flow from authentication to resource loading, authorization, and action execution](../../../assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
+![The flow from authentication to resource loading, authorization, and action execution](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
 
 *The flow from authentication to resource loading, authorization, and action execution*
 ## Key Terms

@@ -66,7 +66,7 @@ This is also the chapter that makes autoscaling behavior easier to read. HPA can
 
 ## The three steps
 
-![Scheduling stages from pending Pod to Binding](../../../assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
+![Scheduling stages from pending Pod to Binding](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
 
 *Scheduling stages from pending Pod to Binding*
 ---
@@ -85,7 +85,7 @@ Operationally, Filter and Score answer two different questions:
 
 Confusing those two questions is one reason placement policies become hard to explain during incidents.
 
-![Node filtering and scoring in placement](../../../assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png)
+![Node filtering and scoring in placement](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png)
 
 *Node filtering and scoring in placement*
 ---

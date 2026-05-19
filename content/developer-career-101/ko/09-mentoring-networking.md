@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![학습, 질문, 기여로 이어지는 네트워킹 루프](../../../assets/developer-career-101/09/09-01-concept-at-a-glance.ko.png)
+![학습, 질문, 기여로 이어지는 네트워킹 루프](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.ko.png)
 
 *학습, 질문, 기여로 이어지는 네트워킹 루프*
 

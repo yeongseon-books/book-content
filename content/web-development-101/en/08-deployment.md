@@ -43,7 +43,7 @@ Manual deploys cause weekly accidents. Automated deploys change *team velocity* 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
 
 *A release flow where source code becomes one artifact that moves across environments.*
 

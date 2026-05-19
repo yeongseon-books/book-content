@@ -46,7 +46,7 @@ Correctness is just as important. A query that returns the wrong answer quickly 
 
 ## WHERE evaluation flow
 
-![WHERE evaluation flow](../../../assets/sql-101/03/03-01-where-evaluation-flow.en.png)
+![WHERE evaluation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
 ## Key Terms
 
 - **Predicate**: a *condition expression* deciding row passage.

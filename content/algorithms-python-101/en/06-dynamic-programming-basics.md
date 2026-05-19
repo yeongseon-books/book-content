@@ -57,7 +57,7 @@ After DP: each fib(n) computed only once
 fib(1)=1 → fib(2)=1 → fib(3)=2 → fib(4)=3 → fib(5)=5
 ```
 
-![Naive recursion versus DP state reuse](../../../assets/algorithms-python-101/06/06-01-concept-overview.en.png)
+![Naive recursion versus DP state reuse](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.en.png)
 
 *Naive recursion recomputes the same states, while DP fills each state once and reuses it.*
 

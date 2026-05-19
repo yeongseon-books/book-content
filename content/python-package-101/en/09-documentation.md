@@ -60,7 +60,7 @@ docs/guide.md      →  5-minute tutorial: main features
 docs/api.md        →  detailed reference: specs for every function/class
 ```
 
-![Mental Model](../../../assets/python-package-101/09/09-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.en.png)
 *How README, guides, and API reference fit together into a documentation site*
 
 ## Core Concepts

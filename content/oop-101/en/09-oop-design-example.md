@@ -61,7 +61,7 @@ OrderService
 └── OrderRepository -> order persistence (DIP)
 ```
 
-![Concept Overview](../../../assets/oop-101/09/09-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png)
 *The service does not do everything itself. It pushes discount, payment, and persistence concerns behind collaborators that can change independently.*
 
 ## Key Concepts

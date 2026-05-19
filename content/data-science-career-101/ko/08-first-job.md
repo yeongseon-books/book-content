@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.ko.png)
 
 *데이터 지도, 이해관계자, 빠른 성과, 문서화 순서로 신뢰를 쌓는 첫 90일 구조*
 온보딩의 우선순위는 이 순서로 이해하면 좋습니다. 지도를 그리고, 사람을 파악하고, 작은 승리를 만들고, 그 과정을 문서화해야 자산이 남습니다.

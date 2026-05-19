@@ -64,7 +64,7 @@ This diagram is the map for the whole series.
 Later parts zoom into one box at a time.
 Get the boundaries straight now and kubelet, CNI, scheduler, and autoscaling all line up cleanly.
 
-![Managed control plane and node data plane](../../../assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
+![Managed control plane and node data plane](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
 
 *Managed control plane and node data plane*
 The `kube-apiserver`, `etcd`, `kube-controller-manager`, and `kube-scheduler` boxes belong to this episode,
@@ -128,7 +128,7 @@ That split narrows the search space fast.
 
 ## The path of one request
 
-![API request path to node execution](../../../assets/azure-aks-deep-dive/01/01-02-the-path-of-one-request.en.png)
+![API request path to node execution](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-02-the-path-of-one-request.en.png)
 
 *API request path to node execution*
 The API server is the coordinator.

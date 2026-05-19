@@ -42,7 +42,7 @@ Building only the frontend lets you ship *what the user sees*. Building the back
 
 ## Concept at a Glance
 
-![client request path across HTTP server, router, service, and database](../../../assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
+![client request path across HTTP server, router, service, and database](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
 
 *client request path across HTTP server, router, service, and database*
 Requests flow left to right; responses retrace the same path.

@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/05/05-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
 
 *로지스틱 회귀는 선형 점수를 먼저 만들고, 이를 확률로 바꾼 뒤 임계값으로 최종 클래스를 정합니다.*
 

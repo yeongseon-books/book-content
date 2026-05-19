@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 안전한 변경 흐름
 
-![안전한 변경 흐름](../../../assets/sql-101/08/08-01-safe-data-change-flow.ko.png)
+![안전한 변경 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.ko.png)
 안전한 데이터 변경 작업은 대개 이런 흐름을 따릅니다. 트랜잭션을 시작하고, 변경을 실행하고, 영향을 받은 행을 확인한 뒤, 맞으면 커밋하고 아니면 롤백합니다.
 
 ## 핵심 개념 정리

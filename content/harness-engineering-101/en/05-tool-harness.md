@@ -39,7 +39,7 @@ This is post 5 in the Harness Engineering 101 series. Here we design tool surfac
 
 > Strong capability is not enough. Agent tools must be easy to call correctly and hard to misuse disastrously.
 
-![Tool harness - designing safe tools for agents](../../../assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
+![Tool harness - designing safe tools for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
 
 *Tool harness - designing safe tools for agents*
 ## Tools Are an Agent's Hands and Feet
@@ -54,7 +54,7 @@ Tool Harness is the principle of designing tools that are safe and predictable f
 
 ## Five Principles of a Good Tool
 
-![Five principles of a good tool](../../../assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.en.png)
+![Five principles of a good tool](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-02-five-principles-of-a-good-tool.en.png)
 
 *Five principles of a good tool*
 Five rules to follow when designing a tool.
@@ -142,7 +142,7 @@ Schemas like this have two effects. First, the agent is less likely to construct
 
 ## The Idempotency Key Pattern
 
-![The idempotency key pattern](../../../assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.en.png)
+![The idempotency key pattern](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-03-the-idempotency-key-pattern.en.png)
 
 *The idempotency key pattern*
 Agents retry often — network errors, timeouts, "couldn't confirm" cases all lead to repeating the same tool call. Non-idempotent tools then run twice and cause incidents.
@@ -250,7 +250,7 @@ The `retryable` flag matters. On `retryable=False`, the agent immediately tries 
 
 ## Sandboxing Dangerous Tools
 
-![Sandboxing dangerous tools](../../../assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.en.png)
+![Sandboxing dangerous tools](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-04-sandboxing-dangerous-tools.en.png)
 
 *Sandboxing dangerous tools*
 Code execution, filesystem access, and arbitrary shell commands are extremely powerful and extremely dangerous. These tools must not be exposed without sandboxing.

@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![외부 공개 지점은 로드밸런서로 제한하고 앱과 데이터는 내부 서브넷으로 숨기는 패턴](../../../assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
+![외부 공개 지점은 로드밸런서로 제한하고 앱과 데이터는 내부 서브넷으로 숨기는 패턴](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
 
 *외부 공개 지점은 로드밸런서로 제한하고 앱과 데이터는 내부 서브넷으로 숨기는 패턴*
 외부 인터넷은 로드밸런서로만 들어오고, 애플리케이션과 데이터베이스는 내부망에 둡니다. 이런 구성이 흔한 이유는 멋져서가 아니라, 공개 지점을 최소화하는 편이 가장 강력한 기본 보안이기 때문입니다.

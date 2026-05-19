@@ -44,7 +44,7 @@ Strong boundaries make the system easier to scale, easier to retry safely, and e
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
 
 *A thin edge function, queued background work, and explicit state boundaries keep the app easier to scale and recover.*
 This shape captures the default serverless instinct worth keeping: keep the request-path function thin, push long work behind a queue, store durable state explicitly, and separate notification from the business-critical path.

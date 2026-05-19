@@ -54,7 +54,7 @@ If they can quickly understand the question, the data source, the method, the co
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
 
 *A portfolio becomes credible when problem framing, results, and reproducibility stay connected*
 ## Key Terms

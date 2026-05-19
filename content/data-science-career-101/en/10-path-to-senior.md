@@ -54,7 +54,7 @@ Two people with similar technical skill can have very different impact depending
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
 
 *As scope widens from junior to senior and lead, problem choice and impact measurement matter more*
 ## Key Terms

@@ -43,7 +43,7 @@ This is the first post in the Docker 101 series. It sets the mental model for th
 
 ## Concept at a Glance
 
-![Code and dependencies bundled into one image that runs the same container across laptop, CI, and server](../../../assets/docker-101/01/01-01-concept-at-a-glance.en.png)
+![Code and dependencies bundled into one image that runs the same container across laptop, CI, and server](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
 
 *One image packages code and dependencies so the same container can run across local development, CI, and servers*
 

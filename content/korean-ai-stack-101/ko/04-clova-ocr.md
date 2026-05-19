@@ -105,13 +105,13 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
 
 *Core flow*
 
 ## 왜 mock payload부터 시작할까
 
-![최소 실행 예제](../../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.ko.png)
+![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.ko.png)
 
 *최소 실행 예제*
 
@@ -142,7 +142,7 @@ MOCK_RESPONSE = {
 
 ### Step 2 — Reconstruct lines
 
-![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.ko.png)
+![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
 
@@ -204,7 +204,7 @@ print(doc)
 
 ### Step 5 — Swap in the real API call (optional)
 
-![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
 
 *엔지니어가 헷갈리는 지점*
 

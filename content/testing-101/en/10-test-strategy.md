@@ -46,7 +46,7 @@ Tests are *not free*. They cost time to write, to run, and to fix. A strategy-le
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

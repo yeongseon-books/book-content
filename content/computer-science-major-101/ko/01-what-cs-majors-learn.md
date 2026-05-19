@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![컴퓨터학과 전공 학습 흐름](../../../assets/computer-science-major-101/01/01-01-major-learning-map.ko.png)
+![컴퓨터학과 전공 학습 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.ko.png)
 
 *컴퓨터학과 전공이 기초에서 프로젝트로 이어지는 큰 흐름*
 

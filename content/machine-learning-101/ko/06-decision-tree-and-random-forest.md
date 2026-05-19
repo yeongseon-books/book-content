@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/06/06-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-diagram.ko.png)
 
 *하나의 깊은 트리는 쉽게 과적합되지만, 여러 트리를 모은 포레스트는 같은 아이디어를 더 안정적으로 사용합니다.*
 

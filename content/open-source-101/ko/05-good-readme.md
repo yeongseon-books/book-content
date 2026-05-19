@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 사용자의 읽기 순서를 따라가기
 
-![사용자의 읽기 순서를 따라가기](../../../assets/open-source-101/05/05-01-follow-the-reader-s-order.ko.png)
+![사용자의 읽기 순서를 따라가기](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.ko.png)
 
 *처음 방문한 사용자가 제목에서 설치와 사용 예시로 이동하는 읽기 순서*
 이 흐름이 중요한 이유는 읽는 사람의 관심사가 이 순서로 움직이기 때문입니다. 먼저 이 프로젝트가 무엇인지 알고 싶고, 다음에는 설치 가능한지 보고, 그다음 실제로 어떻게 쓰는지 확인합니다. 라이선스와 기여 안내는 그 다음입니다.

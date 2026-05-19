@@ -57,7 +57,7 @@ Pipeline visualization:
 
 ## 파이프라인이 읽히는 방식
 
-![함수 파이프라인의 단계별 흐름](../../../assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
+![함수 파이프라인의 단계별 흐름](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
 
 *좋은 파이프라인은 각 단계의 책임이 분명해서, 어느 지점에서 데이터를 바꾸는지 한눈에 보입니다.*
 

@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 메인테이너 일을 한 줄로 그리면
 
-![메인테이너 일을 한 줄로 그리면](../../../assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
+![메인테이너 일을 한 줄로 그리면](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
 
 *트리아지, 리뷰, 릴리스, 위임이 하나의 운영 루프로 이어지는 메인테이너 일상*
 이 순서가 중요한 이유는 일이 쌓이는 방식이 이 흐름을 따르기 때문입니다. triage가 흔들리면 리뷰가 밀리고, 리뷰가 밀리면 릴리스가 늦어지고, 릴리스가 늦어지면 메인테이너에게 더 많은 요청이 몰립니다. 결국 위임이 없으면 루프 전체가 막힙니다.

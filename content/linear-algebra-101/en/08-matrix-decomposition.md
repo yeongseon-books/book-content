@@ -43,7 +43,7 @@ This is one of the most useful mindset shifts in the series. Stable linear algeb
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
 
 *This diagram compares LU, QR, eigendecomposition, and SVD as different ways to break a matrix into useful parts.*
 

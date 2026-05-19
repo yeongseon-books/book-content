@@ -45,7 +45,7 @@ If schemas wobble, *everything* on the client wobbles. Good schemas are *readabl
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
 *Validate at the boundary on the way in, and serialize into a stable response shape on the way out.*
 
 That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.

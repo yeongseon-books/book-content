@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)
 
 *중심화된 데이터에서 주성분을 찾고 상위 축으로 투영하는 PCA의 핵심 절차입니다.*
 

@@ -44,7 +44,7 @@ In this post, we'll connect average rate of change, tangent lines, limits, and n
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
 
 *Concept flow: changes in a function become limits, derivatives, and finally an ML training signal.*
 ## Key Terms

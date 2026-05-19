@@ -54,7 +54,7 @@ slot 7 empty?    yes  -> store there
 
 ## Dict Probe and Resize
 
-![Dict Probe and Resize](../../../assets/data-structures-python-101/04/04-01-dict-probe-and-resize.en.png)
+![Dict Probe and Resize](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-and-resize.en.png)
 
 *How `dict` turns a key into a probe path in a sparse table, then resizes before collision chains grow too long*
 

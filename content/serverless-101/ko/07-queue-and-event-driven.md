@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.ko.png)
 
 *큐와 토픽은 생산자와 소비자를 시간과 책임 양쪽에서 분리해 줍니다.*
 이 그림이 보여 주는 핵심은 생산자와 소비자가 서로의 내부를 몰라도 된다는 점입니다. 생산자는 이벤트를 발행하고, 소비자는 자신의 책임에 맞게 그것을 처리합니다. 이 분리가 있어야 서비스 간 결합도가 낮아지고, 각 단계의 실패를 개별적으로 다룰 수 있습니다.

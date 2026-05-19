@@ -60,7 +60,7 @@ source code → python -m build → dist/
                                 └── mylib-0.1.0-py3-none-any.whl  (wheel)
 ```
 
-![Mental Model](../../../assets/python-package-101/04/04-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.en.png)
 *How source turns into build artifacts and then into an installation check*
 
 ## Core Concepts

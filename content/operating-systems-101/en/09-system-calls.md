@@ -55,7 +55,7 @@ Two programs processing the same 100MB of data can be many times faster or slowe
 
 ### The privilege boundary a syscall crosses
 
-![The privilege boundary a syscall crosses](../../../assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
+![The privilege boundary a syscall crosses](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
 *A syscall is the only door into kernel work, which is why both performance cost and security policy accumulate there.*
 
 ```text

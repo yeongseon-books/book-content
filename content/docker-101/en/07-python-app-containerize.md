@@ -44,7 +44,7 @@ This is post 7 in the Docker 101 series. It turns a simple FastAPI example into 
 
 ## Concept at a Glance
 
-![Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling](../../../assets/docker-101/07/07-01-concept-at-a-glance.en.png)
+![Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
 
 *A production-grade Python container includes PID 1 handling, an honest healthcheck, and graceful shutdown behavior*
 

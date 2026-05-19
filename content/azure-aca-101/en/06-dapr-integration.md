@@ -63,7 +63,7 @@ Think of Dapr at two levels:
 App level is **per-app opt-in**. Environment level is a **shared infrastructure catalog**.
 Register one component on the Environment, and many apps in the same Environment can share it through scope settings.
 
-![Dapr sidecar next to the app and connections to external services](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
+![Dapr sidecar next to the app and connections to external services](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
 
 *Dapr sidecar next to the app and connections to external services*
 

@@ -31,7 +31,7 @@ seo_description: 완성된 벤치마크는 같은 설정과 같은 입력에서 
 - 최종 파이프라인 벤치마크에서 가장 먼저 고정해야 할 실험 변수는 무엇일까요?
 - 이 벤치마크를 CI에 붙여 회귀를 자동 차단하려면 어떤 구조가 필요할까요?
 
-![이 글에서 답할 질문](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -115,7 +115,7 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 
 ### 2단계 — 검색, 생성, 평가를 하나의 함수로 묶기
 
-![검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
+![검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
 
 *검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인*
 
@@ -161,7 +161,7 @@ def run_benchmark(config):
 
 ### 3단계 — 리포트를 검색과 생성으로 분리하기
 
-![검색 리포트와 생성 리포트를 나누는 구조](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.ko.png)
+![검색 리포트와 생성 리포트를 나누는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.ko.png)
 
 *검색 리포트와 생성 리포트를 나누는 구조*
 
@@ -203,7 +203,7 @@ def compare(report, baseline):
 
 ### 5단계 — CI 게이트 만들기
 
-![검색 문제와 생성 문제를 분기해 차단하는 흐름](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.ko.png)
+![검색 문제와 생성 문제를 분기해 차단하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.ko.png)
 
 *검색 문제와 생성 문제를 분기해 차단하는 흐름*
 
@@ -239,7 +239,7 @@ def gate(deltas):
 
 ## 체크리스트
 
-![기준선 비교부터 의사결정까지 이어지는 벤치마크 루프](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png)
+![기준선 비교부터 의사결정까지 이어지는 벤치마크 루프](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png)
 
 *기준선 비교부터 의사결정까지 이어지는 벤치마크 루프*
 

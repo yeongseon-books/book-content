@@ -68,7 +68,7 @@ RAG가 어려운 이유는 단계 수가 많아서가 아니라, **단계별 책
 
 ## 멘탈 모델 — 4단계 파이프라인
 
-![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 
 *Core flow*
 
@@ -160,7 +160,7 @@ index.add(vectors)
 
 ### Step 2 — retrieval
 
-![최소 실행 예제](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.ko.png)
+![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.ko.png)
 
 *최소 실행 예제*
 
@@ -181,7 +181,7 @@ for h in hits:
 
 ### Step 3 — generation
 
-![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.ko.png)
+![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
 
@@ -368,7 +368,7 @@ Failures = []
 
 ## 자주 하는 실수
 
-![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.ko.png)
+![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.ko.png)
 
 *엔지니어가 헷갈리는 지점*
 

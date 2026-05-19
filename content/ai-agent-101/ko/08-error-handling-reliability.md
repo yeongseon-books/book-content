@@ -58,7 +58,7 @@ agent는 성공 경로만 설계해서는 배포할 수 없습니다. 외부 검
 
 ### 신뢰성 제어 루프
 
-![신뢰성 제어 루프](../../../assets/ai-agent-101/08/08-01-reliability-control-loop.ko.png)
+![신뢰성 제어 루프](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.ko.png)
 ## 핵심 개념
 
 ### LLM 응답 에러는 가장 흔한 입력 실패입니다

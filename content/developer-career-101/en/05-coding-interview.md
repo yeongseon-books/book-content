@@ -50,7 +50,7 @@ Without patterns, you waste time.
 
 ## Concept at a Glance
 
-![Interview practice loop from patterns to feedback](../../../assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
+![Interview practice loop from patterns to feedback](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
 
 *Interview practice loop from patterns to feedback*
 

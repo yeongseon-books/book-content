@@ -50,7 +50,7 @@ Under pressure, the first instinct is "what did we just change?" That is necessa
 
 ## Concept at a Glance
 
-![Layer-by-layer order for narrowing a network incident](../../../assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
+![Layer-by-layer order for narrowing a network incident](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
 *Start with the simplest tools, mark healthy layers off quickly, and leave packet capture for the few hypotheses that survive.*
 
 Each step you confirm as healthy cuts the hypothesis space roughly in half.

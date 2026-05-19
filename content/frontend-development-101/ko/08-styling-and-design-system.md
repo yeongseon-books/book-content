@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/08/08-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
 
 *디자인 토큰, 컴포넌트, 페이지, 테마가 한 시스템으로 연결되는 구조*
 

@@ -60,7 +60,7 @@ and `runc` finally spawns the real process.
 
 ## The execution path in one picture
 
-![Execution path from API server to runc](../../../assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
+![Execution path from API server to runc](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
 
 *Execution path from API server to runc*
 ---
@@ -85,7 +85,7 @@ and `StartContainer` are the most important names in the startup path.
 
 ## kubelet talks to a Unix socket
 
-![Local CRI path from kubelet to containerd](../../../assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png)
+![Local CRI path from kubelet to containerd](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png)
 
 *Local CRI path from kubelet to containerd*
 This is a local call chain.
@@ -124,7 +124,7 @@ The effective chain is kubelet -> CRI -> containerd -> `runc` -> process.
 
 ## Startup path as control flow
 
-![Kubelet control flow for Pod startup](../../../assets/azure-aks-deep-dive/02/02-03-startup-path-as-control-flow.en.png)
+![Kubelet control flow for Pod startup](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-03-startup-path-as-control-flow.en.png)
 
 *Kubelet control flow for Pod startup*
 ---

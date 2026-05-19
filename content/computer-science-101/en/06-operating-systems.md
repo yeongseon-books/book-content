@@ -56,7 +56,7 @@ Without understanding OS abstractions, debugging starts to feel like magic.
 
 > A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.
 
-![Concept at a Glance](../../../assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
 *Processes stay isolated from one another while the OS multiplexes hardware resources*
 
 ## Key Terms

@@ -53,7 +53,7 @@ When interpretation is *exaggerated*, it leads to *bad decisions*; when it is *u
 
 ## Concept at a Glance
 
-![How numbers gain context and uncertainty before they become a decision](../../../assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
+![How numbers gain context and uncertainty before they become a decision](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
 
 *How numbers gain context and uncertainty before they become a decision*
 ## Key Terms

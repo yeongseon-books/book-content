@@ -44,7 +44,7 @@ In young companies the *#1 line on the AWS bill* is often *observability*. When 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
 *Observability cost is largely determined by label combinations, log volume, and how aggressively trace volume is sampled and retained.*
 
 ## Key Terms

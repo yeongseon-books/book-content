@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![Raft의 리더 중심 로그 복제](../../../assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
+![Raft의 리더 중심 로그 복제](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
 
 *Raft의 리더 중심 로그 복제*
 

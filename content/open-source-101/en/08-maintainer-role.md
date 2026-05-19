@@ -46,7 +46,7 @@ Maintainers also become the reference point for project culture. Review tone, re
 
 ## The Maintainer Loop in One Line
 
-![The Maintainer Loop in One Line](../../../assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
+![The Maintainer Loop in One Line](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
 
 *The operating loop where triage, review, release, and delegation keep maintainership sustainable*
 That order matters because work accumulates along that path. Weak triage slows review. Slow review delays releases. Delayed releases attract even more demand to the maintainer. Without delegation, the whole loop clogs.

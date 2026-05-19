@@ -48,7 +48,7 @@ Math helps you separate those concerns. Sets make boundaries explicit. Logic mak
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
 *Math for CS connects abstraction, proof, modeling, and analysis into one mental model for understanding why code works and where it breaks.*
 
 ## Key Terms

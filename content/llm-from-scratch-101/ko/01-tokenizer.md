@@ -95,7 +95,7 @@ print(decode(ids))
 
 문자 단위는 어휘 수가 작고 투명하지만 시퀀스가 길어집니다. 반대로 단어 단위는 시퀀스가 짧아지지만 어휘가 폭발하고 OOV 문제가 커집니다. 실전 모델이 서브워드를 선호하는 이유는 바로 이 중간 지점을 노릴 수 있기 때문입니다.
 
-![단어 단위와 서브워드의 균형점](../../../assets/llm-from-scratch-101/01/01-01-vs.ko.png)
+![단어 단위와 서브워드의 균형점](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-vs.ko.png)
 
 *문자 단위, 단어 단위, 서브워드가 만드는 균형점을 한 장으로 비교한 그림입니다.*
 

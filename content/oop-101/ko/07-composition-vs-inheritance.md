@@ -53,7 +53,7 @@ Inheritance (is-a)                Composition (has-a)
 Tight coupling                 Loose coupling
 ```
 
-![핵심 개념 잡기](../../../assets/oop-101/07/07-01-concept-overview.ko.png)
+![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.ko.png)
 *합성과 상속의 갈림길은 재사용 욕심보다 대체 가능성과 변경 반경을 먼저 보는 데서 시작합니다.*
 
 ## 핵심 개념

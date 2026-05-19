@@ -35,12 +35,12 @@ This is the final post in the AI Evaluation 101 series. Here we cover sampling e
 > Mental model: offline evaluation is rehearsal; production evaluation is the ongoing operating loop. Its job is to observe live behavior, detect drift, and feed failures back into the next release gate.
 
 ---
-![Continuous evaluation in production](../../../assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
+![Continuous evaluation in production](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
 
 *Continuous evaluation in production*
 ## Deployment Is Where It Starts
 
-![Deployment is where it starts](../../../assets/ai-evaluation-101/10/10-02-deployment-is-where-it-starts.en.png)
+![Deployment is where it starts](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-02-deployment-is-where-it-starts.en.png)
 
 *Deployment is where it starts*
 Pre-deployment evaluation is a controlled simulation. Real users send unexpected inputs, model providers silently update their models, and data distributions drift over time. When evaluation stops at deployment, quality regressions go unnoticed.
@@ -60,7 +60,7 @@ This is the final episode, connecting the previous nine into a continuous operat
 
 ## Section 1 — Production Trace Sampling
 
-![Section 1 - production trace sampling](../../../assets/ai-evaluation-101/10/10-03-section-1-production-trace-sampling.en.png)
+![Section 1 - production trace sampling](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-03-section-1-production-trace-sampling.en.png)
 
 *Section 1 - production trace sampling*
 Evaluating every production request is prohibitively expensive. You need to sample, but without bias.
@@ -118,7 +118,7 @@ def failure_biased_sample(traces, rate_pass=0.005, rate_fail=0.5):
 
 ## Section 2 — Online Metric Collection
 
-![Section 2 - online metric collection](../../../assets/ai-evaluation-101/10/10-04-section-2-online-metric-collection.en.png)
+![Section 2 - online metric collection](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-04-section-2-online-metric-collection.en.png)
 
 *Section 2 - online metric collection*
 Heavy LLM-as-judge evaluation runs daily. Lightweight online signals run in real time.
@@ -162,7 +162,7 @@ Online metrics are an **early warning system**. Judge evaluations run daily beca
 
 ## Section 3 — Drift Detection
 
-![Section 3 - drift detection](../../../assets/ai-evaluation-101/10/10-05-section-3-drift-detection.en.png)
+![Section 3 - drift detection](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-05-section-3-drift-detection.en.png)
 
 *Section 3 - drift detection*
 When the input distribution changes (user behavior shift, new traffic source), your existing evaluation set no longer reflects production quality.

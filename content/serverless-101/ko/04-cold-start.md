@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
 
 *콜드 스타트는 환경 생성, 런타임 로딩, 코드 초기화가 합쳐진 지연 시간입니다.*
 이 흐름을 보면 콜드 스타트가 단일 원인이 아니라는 점이 보입니다. 실행 환경 생성, 런타임 초기화, 코드와 의존성 로딩이 모두 합쳐져 첫 호출 지연으로 나타납니다. 그래서 해결책도 하나가 아니라 여러 층에서 나옵니다.

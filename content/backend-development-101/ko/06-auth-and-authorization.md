@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![로그인부터 토큰 검증과 역할 검사까지 이어지는 인증·권한 흐름](../../../assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
+![로그인부터 토큰 검증과 역할 검사까지 이어지는 인증·권한 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
 
 *로그인부터 토큰 검증과 역할 검사까지 이어지는 인증·권한 흐름*
 authentication은 “누구인가”를 묻고, authorization은 “무엇을 할 수 있는가”를 묻습니다. 두 문제를 섞어 생각하면 인증 흐름이 점점 불명확해집니다.

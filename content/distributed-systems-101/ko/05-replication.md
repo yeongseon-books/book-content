@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![대표적인 복제 토폴로지 비교](../../../assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
+![대표적인 복제 토폴로지 비교](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
 
 *대표적인 복제 토폴로지 비교*
 

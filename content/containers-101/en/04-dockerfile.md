@@ -45,7 +45,7 @@ A Dockerfile directly drives team productivity and security. Get it right once a
 
 ## Concept at a Glance
 
-![Builder stage separated from the runtime stage](../../../assets/containers-101/04/04-01-concept-at-a-glance.en.png)
+![Builder stage separated from the runtime stage](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png)
 
 *Builder stage separated from the runtime stage*
 ## Key Terms

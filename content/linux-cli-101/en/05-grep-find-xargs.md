@@ -47,7 +47,7 @@ Instead of opening files one by one in an editor, `grep -rn "connection timeout"
 
 > `grep` is a specialist librarian who searches book contents, `find` is a search party that locates books by title or size on the shelves, and `xargs` is the courier who hands the found books to someone else.
 
-![How grep, find, and xargs fit together](../../../assets/linux-cli-101/05/05-01-mental-model.en.png)
+![How grep, find, and xargs fit together](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
 
 *How content search, file search, and follow-up actions fit into one workflow*
 

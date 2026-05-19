@@ -113,7 +113,7 @@ You cannot defend against everything. Prioritize by domain. A medical chatbot ra
 
 Guardrails fit at four points in the call pipeline:
 
-![section 4: four guardrail locations](../../../assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
+![section 4: four guardrail locations](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
 *Guardrails sit on the request boundary before and after the model, while audit traces every decision.*
 
 ```text

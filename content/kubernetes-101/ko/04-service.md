@@ -46,7 +46,7 @@ Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
 *Service는 변하는 파드 집합 앞에 고정된 가상 IP와 이름을 세워 호출 경로를 안정화합니다.*
 
 

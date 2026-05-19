@@ -28,7 +28,7 @@ This is the final post in the LLM Fine-tuning 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -97,13 +97,13 @@ What matters is (1) the model is behind an HTTP contract, (2) `TestClient` valid
 
 ## What this demo isolates on purpose
 
-![Separation of model preparation and HTTP contract](../../../assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
+![Separation of model preparation and HTTP contract](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
 
 *Separation of model preparation and HTTP contract*
 
 In production, model loading, request validation, generation options, response serialization, and observability logs are all separate responsibilities. This article's example shows only **model preparation** and the **HTTP contract** at minimum scale. Even in a small demo, separating health check and generate endpoints makes it easy to grow into production code.
 
-![What this demo isolates on purpose](../../../assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png)
+![What this demo isolates on purpose](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png)
 
 *What this demo isolates on purpose*
 
@@ -176,7 +176,7 @@ You can now call from another machine with `curl` or test in Postman.
 
 ## What to notice in this code
 
-![FastAPI inference request and endpoint branching flow](../../../assets/llm-finetuning-101/06/06-03-what-to-notice-in-this-code.en.png)
+![FastAPI inference request and endpoint branching flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-03-what-to-notice-in-this-code.en.png)
 
 *FastAPI inference request and endpoint branching flow*
 
@@ -187,7 +187,7 @@ You can now call from another machine with `curl` or test in Postman.
 
 ## Common mistakes
 
-![Latency vs. quality decision criteria for serving](../../../assets/llm-finetuning-101/06/06-04-where-engineers-get-confused.en.png)
+![Latency vs. quality decision criteria for serving](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-04-where-engineers-get-confused.en.png)
 
 *Latency vs. quality decision criteria for serving*
 

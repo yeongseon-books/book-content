@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
 
 *서버리스 비용은 호출 수만이 아니라 실행 시간, 네트워크, 연계 서비스까지 합쳐서 만들어집니다.*
 이 그림은 비용이 하나의 숫자에서 오지 않는다는 점을 분명하게 보여 줍니다. 호출 수만 낮추는 것으로는 충분하지 않을 수 있고, 코드 최적화만으로도 전체 비용을 다 설명할 수 없습니다. 네트워크와 주변 서비스 비용까지 포함한 전체 시나리오를 봐야 합니다.

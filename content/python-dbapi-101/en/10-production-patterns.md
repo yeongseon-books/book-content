@@ -30,7 +30,7 @@ This post does not introduce many new ideas. It composes the patterns from earli
 
 This is the final article in the Python DB-API 101 series.
 
-![SQLite production Patterns: retry, timeout, observability, backup](../../../assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png)
+![SQLite production Patterns: retry, timeout, observability, backup](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png)
 
 *SQLite production Patterns: retry, timeout, observability, backup*
 ## Questions this post answers
@@ -49,7 +49,7 @@ The goal here is to remove luck from the picture. Retries become measurable than
 
 ## Mental Model: SQLite is still a DBMS
 
-![SQLite is still a DBMS](../../../assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
+![SQLite is still a DBMS](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
 
 *SQLite is still a DBMS*
 > SQLite being a single file simplifies operations, but treating it as "just a file" is dangerous. Copying a file mid-transaction yields a corrupted backup. SQLite is light, but it is a DBMS.
@@ -63,7 +63,7 @@ Four production axes:
 
 ## Core Concepts
 
-![Core concepts](../../../assets/python-dbapi-101/10/10-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-03-core-concepts.en.png)
 
 *Core concepts*
 ### timeout vs busy_timeout vs retry
@@ -181,7 +181,7 @@ A connection factory with WAL+busy_timeout, a retry decorator scoped to BUSY/LOC
 
 ## Step by Step
 
-![Step by step](../../../assets/python-dbapi-101/10/10-04-step-by-step.en.png)
+![Step by step](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-04-step-by-step.en.png)
 
 *Step by step*
 ### Step 1. OpenTelemetry SQL spans

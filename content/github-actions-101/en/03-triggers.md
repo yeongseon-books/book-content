@@ -44,7 +44,7 @@ Trigger design dictates your *cost and noise*. Running *every workflow on every 
 
 ## Concept at a Glance
 
-![A workflow triggered by push, pull_request, schedule, and workflow_dispatch events](../../../assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)
+![A workflow triggered by push, pull_request, schedule, and workflow_dispatch events](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)
 
 *A workflow triggered by push, pull_request, schedule, and workflow_dispatch events*
 

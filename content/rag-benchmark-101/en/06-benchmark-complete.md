@@ -28,7 +28,7 @@ This is the final article in the RAG Evaluation and Benchmarking 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -115,7 +115,7 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 
 ### Step 2 — Write the integrated function
 
-![End-to-end benchmark pipeline in one run](../../../assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
+![End-to-end benchmark pipeline in one run](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
 
 *End-to-end benchmark pipeline in one run*
 
@@ -159,7 +159,7 @@ def run_benchmark(config):
 
 ### Step 3 — Split the report
 
-![Retrieval and generation report split](../../../assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
+![Retrieval and generation report split](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-02-retrieval-and-generation-report-split.en.png)
 
 *Retrieval and generation report split*
 
@@ -197,7 +197,7 @@ def compare(report, baseline):
 
 ### Step 5 — The CI gate
 
-![Branching search failures from generation failures](../../../assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
+![Branching search failures from generation failures](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-03-branching-search-failures-from-generatio.en.png)
 
 *Branching search failures from generation failures*
 
@@ -223,7 +223,7 @@ def gate(deltas):
 
 ## Field notes
 
-![Baseline-to-decision benchmark loop](../../../assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
+![Baseline-to-decision benchmark loop](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png)
 
 *Baseline-to-decision benchmark loop*
 

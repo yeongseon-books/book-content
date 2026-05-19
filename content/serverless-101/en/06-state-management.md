@@ -44,7 +44,7 @@ State management is not a side concern in serverless. It determines where sessio
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
 
 *Functions do the work, while caches, databases, and workflow engines hold the durable state.*
 This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.

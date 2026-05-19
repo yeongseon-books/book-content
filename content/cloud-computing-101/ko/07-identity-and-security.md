@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![사용자와 역할, 정책이 자원 접근 권한을 연결하는 IAM 기본 구조](../../../assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
+![사용자와 역할, 정책이 자원 접근 권한을 연결하는 IAM 기본 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
 
 *사용자와 역할, 정책이 자원 접근 권한을 연결하는 IAM 기본 구조*
 사람은 사용자와 그룹으로 관리하는 경우가 많고, 애플리케이션은 역할을 통해 임시 자격 증명을 받는 구조가 일반적입니다. 정책은 이 둘에게 어떤 자원에 무엇을 할 수 있는지 정의합니다.

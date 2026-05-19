@@ -42,7 +42,7 @@ Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
 
 *How source files move through resolve, transform, bundle, and output stages*
 

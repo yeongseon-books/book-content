@@ -52,7 +52,7 @@ If you memorize an IP address as "the number for one machine", routing, NAT, and
 
 > An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (`/24`, `/16`, etc.) writes the length of that ruler in bits.
 
-![How CIDR splits an address into network and host parts](../../../assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)
+![How CIDR splits an address into network and host parts](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)
 *The prefix defines where the network part ends and where the host part begins, which is exactly what routers use to pick the next hop.*
 
 ## Key Terms

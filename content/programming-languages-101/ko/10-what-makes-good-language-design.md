@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![일관성, 단순성, 표현력, 안전성, 성능이 서로 맞물리는 언어 설계 축](../../../assets/programming-languages-101/10/10-01-concept-at-a-glance.ko.png)
+![일관성, 단순성, 표현력, 안전성, 성능이 서로 맞물리는 언어 설계 축](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.ko.png)
 
 *일관성, 단순성, 표현력, 안전성, 성능이 서로 맞물리는 언어 설계 축*
 

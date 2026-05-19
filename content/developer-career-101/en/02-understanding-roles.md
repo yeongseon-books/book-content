@@ -50,7 +50,7 @@ A bad role fit shortens the path to burnout.
 
 ## Concept at a Glance
 
-![Comparison flow across common developer roles](../../../assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
+![Comparison flow across common developer roles](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
 
 *Comparison flow across common developer roles*
 

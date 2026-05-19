@@ -45,7 +45,7 @@ If A *directly calls* B, C, and D when it changes, A knows all three. Observer t
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
 *Observer separates publication from reaction so a publisher can announce change without knowing which listeners will respond.*
 
 ## Key Terms

@@ -58,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 > 인덱스는 책의 색인과 같습니다. 본문 전체를 뒤지지 않고 색인을 따라 곧장 페이지를 펼칩니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
 *인덱스는 모든 행을 훑는 경로를 트리 탐색 경로로 바꿔 조회 비용을 크게 낮춥니다*
 
 ## 핵심 용어

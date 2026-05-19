@@ -46,7 +46,7 @@ Most security incidents are *known patterns* repeated. *Skipped input validation
 
 ## Concept at a Glance
 
-![The basic secure-coding flow across input, auth, storage, and logs](../../../assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
+![The basic secure-coding flow across input, auth, storage, and logs](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
 
 *The basic secure-coding flow across input, auth, storage, and logs*
 ## Key Terms

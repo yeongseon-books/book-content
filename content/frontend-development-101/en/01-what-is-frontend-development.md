@@ -43,7 +43,7 @@ This is the first post in the Frontend Development 101 series. In this chapter, 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
 
 *How the browser, HTML, CSS, JavaScript, and API calls combine into one user-facing flow*
 

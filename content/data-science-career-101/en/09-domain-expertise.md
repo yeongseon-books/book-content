@@ -54,7 +54,7 @@ You cannot reliably interpret retention, fraud, churn, utilization, or margin if
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
 
 *Domain expertise compounds through vocabulary, metrics, field exposure, and review loops*
 ## Key Terms

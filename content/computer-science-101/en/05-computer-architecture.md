@@ -56,7 +56,7 @@ An algorithm written without hardware awareness is fast only on paper.
 
 > Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.
 
-![Concept at a Glance](../../../assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
 *Higher layers are faster and smaller; lower layers are slower but larger*
 
 ## Key Terms

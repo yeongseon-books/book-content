@@ -49,7 +49,7 @@ This is post 5 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-![Request-to-database flow](../../../assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
+![Request-to-database flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
 
 *The basic service path from network request to database query*
 

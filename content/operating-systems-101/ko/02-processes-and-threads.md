@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 프로세스와 스레드의 공유 경계
 
-![프로세스와 스레드의 공유 경계](../../../assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
+![프로세스와 스레드의 공유 경계](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
 *프로세스는 자원을 묶어 격리하고, 스레드는 그 안에서 실행 흐름만 늘립니다.*
 
 ```text

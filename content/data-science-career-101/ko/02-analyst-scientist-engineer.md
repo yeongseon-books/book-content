@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
 
 *분석가, 사이언티스트, 엔지니어가 각각 의사결정, 가설 검증, 데이터 흐름에 무게를 두는 구조*
 이 그림은 세 역할의 중심축을 압축합니다. 분석가는 의사결정 지원, 사이언티스트는 가설 검증, 엔지니어는 데이터 흐름 보장에 무게를 둡니다.

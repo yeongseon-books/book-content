@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 프로세스 메모리의 큰 네 구역
 
-![프로세스 메모리의 큰 네 구역](../../../assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
+![프로세스 메모리의 큰 네 구역](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
 *메모리 문제를 볼 때는 스택, 힙, 전역 영역 가운데 어디가 커지고 있는지부터 나눠 보는 편이 빠릅니다.*
 
 ```text

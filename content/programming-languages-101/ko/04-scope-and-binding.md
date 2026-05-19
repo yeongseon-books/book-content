@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![이름을 찾을 때 안쪽에서 바깥쪽으로 올라가는 LEGB 순서](../../../assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)
+![이름을 찾을 때 안쪽에서 바깥쪽으로 올라가는 LEGB 순서](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)
 
 *이름을 찾을 때 안쪽에서 바깥쪽으로 올라가는 LEGB 순서*
 

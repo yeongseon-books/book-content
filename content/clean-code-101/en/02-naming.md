@@ -49,7 +49,7 @@ Names are the most-read element of code. Pick a wrong one and you keep saying it
 
 ## Concept at a Glance
 
-![Naming](../../../assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
+![Naming](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
 
 *Naming flow: once intent is visible in the name, search, reading, and documentation all get easier.*
 

@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/08/08-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 좋은 회귀 테스트 흐름은 버그 보고에서 끝나지 않습니다. 먼저 실패하는 재현 테스트를 만들고, 그 테스트를 통과하도록 코드를 고친 뒤, CI에 넣어 다시는 조용히 돌아오지 못하게 만듭니다.

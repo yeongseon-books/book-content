@@ -45,7 +45,7 @@ Compose는 이 문제를 짧고 명시적인 선언으로 바꿉니다. `docker 
 
 ## 한눈에 보는 개념
 
-![하나의 Compose 파일이 웹·DB·캐시 서비스와 공용 네트워크를 함께 정의하는 구조](../../../assets/docker-101/05/05-01-concept-at-a-glance.ko.png)
+![하나의 Compose 파일이 웹·DB·캐시 서비스와 공용 네트워크를 함께 정의하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.ko.png)
 
 *Compose가 여러 서비스를 하나의 선언 파일로 묶어 같은 네트워크와 볼륨 위에서 재현하는 방식*
 

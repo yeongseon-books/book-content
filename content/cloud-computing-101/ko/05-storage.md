@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![접근 패턴에 따라 블록, 객체, 파일, 아카이브 스토리지가 나뉘는 구조](../../../assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
+![접근 패턴에 따라 블록, 객체, 파일, 아카이브 스토리지가 나뉘는 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
 
 *접근 패턴에 따라 블록, 객체, 파일, 아카이브 스토리지가 나뉘는 구조*
 블록 스토리지는 디스크처럼, 객체 스토리지는 키-값 저장소처럼, 파일 스토리지는 공유 디렉터리처럼 동작합니다. 아카이브는 거의 읽지 않지만 오래 보관해야 하는 데이터를 위한 계층입니다.

@@ -44,7 +44,7 @@ This is post 4 in the Docker 101 series. It focuses on when to use named volumes
 
 ## Concept at a Glance
 
-![Host storage, Docker volumes, and a bridge network connecting containers for data and service discovery](../../../assets/docker-101/04/04-01-concept-at-a-glance.en.png)
+![Host storage, Docker volumes, and a bridge network connecting containers for data and service discovery](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
 
 *Persistent data lives outside the container while a bridge network provides name-based communication between services*
 

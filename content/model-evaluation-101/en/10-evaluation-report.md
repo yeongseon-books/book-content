@@ -44,7 +44,7 @@ Reviews, audits, and post-incident analyses all read the same report. A consiste
 
 ## Concept at a Glance
 
-![evaluation report structure linking metrics slices reproducibility and risk](../../../assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
+![evaluation report structure linking metrics slices reproducibility and risk](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
 
 *evaluation report structure linking metrics slices reproducibility and risk*
 ## Key Terms

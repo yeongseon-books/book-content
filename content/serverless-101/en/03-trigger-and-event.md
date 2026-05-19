@@ -45,7 +45,7 @@ If you ignore those differences, code that looks perfectly reasonable in a singl
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.en.png)
 
 *The fastest debugging starts when you separate the event source, the invocation path, and the failure-isolation path instead of treating “the function” as one black box.*
 

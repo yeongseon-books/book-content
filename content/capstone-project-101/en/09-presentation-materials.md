@@ -55,7 +55,7 @@ Separating demo planning and Q&A planning also makes the talk more resilient. Pr
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
 *A presentation narrative from problem to next step*
 
 ## Practical artifact: a presentation run sheet

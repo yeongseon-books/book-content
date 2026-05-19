@@ -49,7 +49,7 @@ Duplication multiplies bugs. Fix one site and you forget the other.
 
 ## Concept at a Glance
 
-![Removing Duplication](../../../assets/clean-code-101/05/05-01-concept-at-a-glance.en.png)
+![Removing Duplication](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png)
 
 *Duplication-removal flow: only knowledge that changes for the same reason should move into a single source.*
 

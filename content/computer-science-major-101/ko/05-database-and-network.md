@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![요청에서 데이터베이스까지의 흐름](../../../assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
+![요청에서 데이터베이스까지의 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
 
 *네트워크 요청이 데이터베이스 조회로 이어지는 서비스 기본 경로*
 

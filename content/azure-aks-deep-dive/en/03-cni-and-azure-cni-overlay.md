@@ -63,7 +63,7 @@ The practical payoff of this chapter is simple. Once you can answer “where did
 
 ## Put the three models side by side
 
-![Comparison of three AKS network models](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
+![Comparison of three AKS network models](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
 
 *Comparison of three AKS network models*
 ---
@@ -96,7 +96,7 @@ The design trade-off becomes clearer if you phrase it operationally:
 - **Node Subnet** is easiest to picture, but it is also the quickest path to subnet exhaustion.
 - **Overlay** preserves VNet IP space best, but you must reason about egress and external policy through node-facing addresses rather than native Pod-IP reachability.
 
-![IP path differences across three AKS network models](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
+![IP path differences across three AKS network models](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
 
 *IP path differences across three AKS network models*
 ---

@@ -50,7 +50,7 @@ Learning without a plan disperses.
 
 ## Concept at a Glance
 
-![Learning loop from quarterly goal to retrospective](../../../assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
+![Learning loop from quarterly goal to retrospective](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
 
 *Learning loop from quarterly goal to retrospective*
 

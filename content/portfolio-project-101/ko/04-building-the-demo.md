@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 데모는 랜딩 화면에서 시작해 샘플 데이터, 핵심 행동, 결과, 다음 행동으로 이어지는 짧은 흐름으로 보는 편이 좋습니다.
 
-![첫 방문자가 데모를 체험하는 핵심 흐름](../../../assets/portfolio-project-101/04/04-01-diagram.ko.png)
+![첫 방문자가 데모를 체험하는 핵심 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-diagram.ko.png)
 
 *첫 방문자가 데모를 체험하는 핵심 흐름*
 

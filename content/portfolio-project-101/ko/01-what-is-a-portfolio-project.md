@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 포트폴리오 프로젝트를 설명할 때는 문제에서 시작해 해결, 코드, 배포, 설명 문서로 이어지는 흐름으로 보면 이해가 쉽습니다.
 
-![포트폴리오 프로젝트를 설명하는 기본 흐름](../../../assets/portfolio-project-101/01/01-01-diagram.ko.png)
+![포트폴리오 프로젝트를 설명하는 기본 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-diagram.ko.png)
 
 *포트폴리오 프로젝트를 설명하는 기본 흐름*
 

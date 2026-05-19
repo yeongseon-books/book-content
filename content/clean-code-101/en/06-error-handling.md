@@ -49,7 +49,7 @@ When error handling code outweighs business logic, the code stops being readable
 
 ## Concept at a Glance
 
-![Error Handling](../../../assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
+![Error Handling](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
 
 *Error-handling flow: validate early, return values for expected failures, chain exceptions, and catch broadly only at boundaries.*
 

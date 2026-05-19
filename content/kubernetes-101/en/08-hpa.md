@@ -44,7 +44,7 @@ Here, we will treat HPA as a control loop that adjusts Deployment replica count 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
 *HPA reads metrics and changes the Deployment replica target; the Deployment still owns the actual Pod creation and replacement work.*
 
 

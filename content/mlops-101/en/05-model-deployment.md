@@ -48,7 +48,7 @@ That is why deployment is not the final training step. It is the first operating
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/05/05-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.

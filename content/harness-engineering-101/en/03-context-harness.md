@@ -39,7 +39,7 @@ This is post 3 in the Harness Engineering 101 series. Here we treat context as a
 
 > Context quality is decided less by raw length than by density. The real job is putting the right information into the right slots.
 
-![Context harness - designing what the agent should know and not know](../../../assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
+![Context harness - designing what the agent should know and not know](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
 
 *Context harness - designing what the agent should know and not know*
 ## Context Is a Resource
@@ -54,7 +54,7 @@ Context Harness is the explicit design of what information the agent receives, w
 
 ## The Five Components of Context
 
-![The five components of context](../../../assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png)
+![The five components of context](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-02-the-five-components-of-context.en.png)
 
 *The five components of context*
 The context an agent sees in a single inference splits into five parts.
@@ -164,7 +164,7 @@ The right strategy depends on the task. Short conversations need only sliding. L
 
 ## Precision in Retrieved Context
 
-![Precision in retrieved context](../../../assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png)
+![Precision in retrieved context](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.en.png)
 
 *Precision in retrieved context*
 RAG-retrieved documents take up a large fraction of context. The precision of what you retrieve matters more than the volume.
@@ -251,7 +251,7 @@ Hiding is as much a design decision as showing.
 
 ## Context Snapshots for Reproducibility
 
-![Context snapshots for reproducibility](../../../assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png)
+![Context snapshots for reproducibility](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.en.png)
 
 *Context snapshots for reproducibility*
 A production agent must produce the same output for the same input. But context is assembled through many stages, which makes reproduction hard. Context snapshots solve this.

@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
 
 *얇은 엣지 함수와 큐 뒤 워커, 명시적인 상태 저장소가 서버리스 앱의 기본 경계를 이룹니다.*
 이 구조는 서버리스 앱 설계의 기본 원칙을 한 장에 담고 있습니다. 요청 경계에 선 함수는 얇게 유지하고, 시간이 걸리는 작업은 큐 뒤로 넘기고, 처리 완료 상태는 저장소에 남기고, 사용자 알림은 별도 책임으로 분리합니다. 이렇게 해야 각 단계가 독립적으로 확장되고 독립적으로 실패할 수 있습니다.

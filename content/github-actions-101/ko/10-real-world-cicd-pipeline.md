@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 전체 파이프라인
 
-![PR, main push, tag push가 서로 다른 책임의 파이프라인 단계로 분리되는 전체 흐름](../../../assets/github-actions-101/10/10-01-diagram.ko.png)
+![PR, main push, tag push가 서로 다른 책임의 파이프라인 단계로 분리되는 전체 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-diagram.ko.png)
 
 *PR, main push, tag push가 서로 다른 책임의 파이프라인 단계로 분리되는 전체 흐름*
 

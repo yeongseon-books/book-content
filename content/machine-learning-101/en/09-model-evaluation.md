@@ -42,7 +42,7 @@ Wrong metric, wrong decision. When business cost and metric drift apart, the mod
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
 
 *Predicted classes feed confusion-matrix metrics, while probability outputs support threshold-free views such as ROC-AUC and PR-AUC.*
 

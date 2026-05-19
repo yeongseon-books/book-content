@@ -46,7 +46,7 @@ Without this distinction, people either trust means too quickly or fail to expla
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

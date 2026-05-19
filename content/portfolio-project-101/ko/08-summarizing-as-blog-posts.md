@@ -45,7 +45,7 @@ GitHub 저장소는 결과물을 보여 주는 장소이지만, 검색으로 사
 
 좋은 기술 글은 문제에서 출발해 접근, 핵심 코드, 결과, 학습으로 이어집니다.
 
-![문제에서 학습으로 이어지는 기술 글의 기본 흐름](../../../assets/portfolio-project-101/08/08-01-diagram.ko.png)
+![문제에서 학습으로 이어지는 기술 글의 기본 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-diagram.ko.png)
 
 *문제에서 학습으로 이어지는 기술 글의 기본 흐름*
 

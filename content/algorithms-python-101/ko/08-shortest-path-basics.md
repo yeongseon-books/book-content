@@ -59,7 +59,7 @@ A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 ```
 
-![다익스트라의 우선순위 큐와 거리 갱신 흐름](../../../assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
+![다익스트라의 우선순위 큐와 거리 갱신 흐름](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
 
 *다익스트라는 가장 가까운 후보를 먼저 꺼내고, 더 짧은 경로를 찾을 때마다 거리와 우선순위 큐를 갱신합니다.*
 

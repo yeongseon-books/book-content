@@ -44,7 +44,7 @@ Reading errors quickly, picking up new language syntax fast, and understanding w
 
 ## Concept at a Glance
 
-![The pipeline from tokenization to execution, split into syntax and semantics](../../../assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
+![The pipeline from tokenization to execution, split into syntax and semantics](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
 
 *The pipeline from tokenization to execution, split into syntax and semantics*
 

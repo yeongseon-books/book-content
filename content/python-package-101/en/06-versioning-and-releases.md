@@ -63,7 +63,7 @@ MINOR  (1.2.4 → 1.3.0): New feature, existing API preserved
 MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 ```
 
-![Mental Model](../../../assets/python-package-101/06/06-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
 *How a code change becomes a version bump, a changelog entry, a tag, and a release*
 
 ## Core Concepts

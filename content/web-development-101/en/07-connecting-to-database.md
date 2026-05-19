@@ -43,7 +43,7 @@ Almost all *state* in a web app lives in the database. Mishandle the connection 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
 
 *A high-level view of an app talking to a database through a reusable connection pool.*
 

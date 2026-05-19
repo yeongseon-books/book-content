@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/08/08-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.ko.png)
 *마일스톤에서 버퍼 조정까지 이어지는 일정 운영 흐름*
 
 ## 실전 문서 예시: 주간 실행 보드

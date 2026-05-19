@@ -48,7 +48,7 @@ mitigation과 resolution을 혼동하면 같은 incident가 밤에 다시 열릴
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/07/07-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 incident 대응은 보통 이 순서를 따릅니다. 먼저 서비스를 안정화하고, 그 뒤에 근본 조치를 적용합니다. 두 단계를 섞으면 판단과 공지가 함께 흔들립니다.

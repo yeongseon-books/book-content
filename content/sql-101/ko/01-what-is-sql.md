@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 질의 흐름 한눈에 보기
 
-![질의 흐름 한눈에 보기](../../../assets/sql-101/01/01-01-query-flow-at-a-glance.ko.png)
+![질의 흐름 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.ko.png)
 애플리케이션이나 BI 도구는 SQL 문장을 데이터베이스 엔진에 전달합니다. 그러면 엔진은 테이블과 인덱스를 읽어 실행 계획을 세우고, 최종 결과 집합을 반환합니다. 여기서 중요한 점은 사용자가 인덱스를 어떤 순서로 훑으라고 직접 지시하지 않는다는 것입니다. 사용자는 원하는 결과를 말하고, 엔진이 가능한 실행 방법을 고릅니다.
 
 ## 핵심 개념 정리

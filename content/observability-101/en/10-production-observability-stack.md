@@ -44,7 +44,7 @@ There is no *perfect* stack for a small team. The best stack is *operable* and *
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
 *A practical small-team stack: OpenTelemetry standardizes collection, Prometheus/Loki/Tempo store the three signals, and Grafana brings them back together.*
 
 ## Key Terms

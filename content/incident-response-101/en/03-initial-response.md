@@ -48,7 +48,7 @@ A strong first-response routine creates enough order to keep the incident legibl
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The response path is intentionally simple. Acknowledge ownership, triage the rough severity, open one channel, and assign roles before the room grows noisy.

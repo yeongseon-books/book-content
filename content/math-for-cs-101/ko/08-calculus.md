@@ -62,7 +62,7 @@ seo_description: 미분의 도함수와 그래디언트를 학습하고, 연쇄 
 
 ## 한 장으로 보는 미분과 최적화
 
-![한 장으로 보는 미분과 최적화](../../../assets/math-for-cs-101/08/08-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 미분과 최적화](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.ko.png)
 *미분은 한 점의 변화율을 읽는 데서 시작해, 여러 변수의 방향 정보와 반복 최적화 절차로 이어집니다.*
 
 ---

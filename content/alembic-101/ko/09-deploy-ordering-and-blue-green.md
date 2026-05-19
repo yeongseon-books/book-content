@@ -47,7 +47,7 @@ git 비유로 보면 migration은 코드 PR보다 먼저 들어가는 PR이고, 
 
 ### 다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점
 
-![다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점](../../../assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
+![다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
 *확장 단계의 schema는 전환 구간 동안 v1과 v2를 동시에 수용해야 합니다*
 
 ## 핵심 개념

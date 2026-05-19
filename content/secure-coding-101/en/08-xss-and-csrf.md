@@ -46,7 +46,7 @@ A single *XSS* can hijack the session. *CSRF* triggers transfers and deletes *wi
 
 ## Concept at a Glance
 
-![The browser attack path that requires output escaping and CSRF verification](../../../assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
+![The browser attack path that requires output escaping and CSRF verification](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
 
 *The browser attack path that requires output escaping and CSRF verification*
 ## Key Terms

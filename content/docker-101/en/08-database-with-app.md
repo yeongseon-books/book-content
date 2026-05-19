@@ -44,7 +44,7 @@ If the app starts *before* the DB is ready, you get *cold-start incidents*. If m
 
 ## Concept at a Glance
 
-![Database readiness gating migrations before the web application starts serving traffic](../../../assets/docker-101/08/08-01-concept-at-a-glance.en.png)
+![Database readiness gating migrations before the web application starts serving traffic](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)
 
 *PostgreSQL becomes healthy first, migrations run once, and only then does the web app start against the expected schema*
 

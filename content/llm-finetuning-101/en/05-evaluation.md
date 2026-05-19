@@ -29,7 +29,7 @@ This is the fifth post in the LLM Fine-tuning 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -97,13 +97,13 @@ The absolute value does not matter. What matters is (1) evaluation is separated 
 
 ## How to read perplexity correctly
 
-![Relationship between perplexity and quality metrics](../../../assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
+![Relationship between perplexity and quality metrics](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
 
 *Relationship between perplexity and quality metrics*
 
 Perplexity is "lower is better," but you cannot judge quality from the absolute value alone. Tiny demo models, small datasets, and short context lengths cause large swings. So in practice, perplexity is best used as a **regression baseline** — strong at detecting whether things got worse, or whether a setting change improved the trend.
 
-![How to read perplexity correctly](../../../assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
+![How to read perplexity correctly](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png)
 
 *How to read perplexity correctly*
 
@@ -175,7 +175,7 @@ The moment these two lines print together, you see the regression baseline and u
 
 ## What to notice in this code
 
-![Calculation flow from average loss to perplexity](../../../assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
+![Calculation flow from average loss to perplexity](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-03-what-to-notice-in-this-code.en.png)
 
 *Calculation flow from average loss to perplexity*
 
@@ -186,7 +186,7 @@ The moment these two lines print together, you see the regression baseline and u
 
 ## Common mistakes
 
-![Decision flow for overfit signals and comparison baselines](../../../assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
+![Decision flow for overfit signals and comparison baselines](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-04-where-engineers-get-confused.en.png)
 
 *Decision flow for overfit signals and comparison baselines*
 

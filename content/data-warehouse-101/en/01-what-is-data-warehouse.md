@@ -52,7 +52,7 @@ When a product grows, the database that handles *one order* and the one that ans
 
 ## Concept at a Glance
 
-![Analytics path from the service database into the warehouse](../../../assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
+![Analytics path from the service database into the warehouse](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
 
 *The basic analytics path: operational writes stay in the service database, while analytical consumers read from the warehouse layer.*
 

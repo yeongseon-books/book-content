@@ -13,9 +13,9 @@
 
 1. 이미지 원본은 `book-content/assets/<series>/<NN>/`에 저장한다.
 2. 외부 발행용 이미지는 `book-public-assets`를 경유한다.
-3. Canonical source(`ko/*.md`, `en/*.md`)에 public asset URL을 hardcode하지 않는다.
-4. Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
-5. `asset_base_url`에는 trailing slash를 넣지 않는다.
+3. **Canonical source(`ko/*.md`, `en/*.md`)는 `book-public-assets`의 public URL을 직접 참조한다.** Tistory/Hashnode/Medium/MkDocs 모두 동일한 URL을 사용하므로, 발행 시점의 경로 재작성이 필요 없다.
+4. Public URL을 사용하는 글은 `book-public-assets`가 동기화된 뒤에만 안전하게 발행할 수 있다. 새 이미지를 추가한 글은 `make assets-sync` → public-assets commit/push → GitHub Pages 배포 확인 순서를 지킨다.
+5. `series.yaml`의 `meta.asset_base_url`은 정책 참조용 단일 출처(`https://yeongseon-books.github.io/book-public-assets`)로 유지한다. 경로 문자열에 trailing slash를 넣지 않는다.
 
 ## URL 구조
 
@@ -50,12 +50,12 @@ make assets-sync-prune
 
 | Pipeline | 이미지 경로 처리 |
 | --- | --- |
-| Canonical source | 상대 경로 유지 (`../../../assets/...`) |
-| Tistory | 기본: public URL 재작성. `--local-assets`로 상대 경로 유지 가능 |
-| Hashnode | 기본: public URL 재작성. `--local-assets`로 상대 경로 유지 가능 |
-| Medium | `--asset-mode public` (기본): public URL. `inline`: base64. `local`: 상대 경로 |
-| MkDocs | `../../assets/...` (docs 기준 상대 경로) |
-| eBook | `assets/...` (bundle 내부 상대 경로). Public URL 미사용 (self-contained) |
+| Canonical source | `book-public-assets` public URL 직접 참조 |
+| Tistory | 그대로 통과 (canonical과 동일한 public URL) |
+| Hashnode | 그대로 통과 |
+| Medium | 기본: 그대로 통과. `--asset-mode inline`은 base64 내장. `--asset-mode local`은 상대 경로로 강제 변환 |
+| MkDocs | 그대로 통과 |
+| eBook | `assets/...` (bundle 내부 상대 경로). Public URL을 로컬 이미지로 다운로드해 self-contained로 만든다. |
 
 ## check_links.py 정책
 

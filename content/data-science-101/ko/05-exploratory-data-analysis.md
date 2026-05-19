@@ -56,7 +56,7 @@ EDA가 약하면 잘못된 모델을 만들 가능성이 큽니다. 데이터가
 
 ## 핵심 개념 한눈에 보기
 
-![모양 확인에서 상관관계 확인까지 이어지는 EDA 읽기 순서](../../../assets/data-science-101/05/05-01-concept-at-a-glance.ko.png)
+![모양 확인에서 상관관계 확인까지 이어지는 EDA 읽기 순서](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.ko.png)
 
 *모양 확인에서 상관관계 확인까지 이어지는 EDA 읽기 순서*
 ## 핵심 용어

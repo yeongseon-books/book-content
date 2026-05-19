@@ -39,7 +39,7 @@ This is post 2 in the Harness Engineering 101 series. Here we turn business goal
 
 > Goals tell the business where to go. Tasks tell the agent what to do now. Task Harness is the layer that turns one into the other.
 
-![Task harness - turning vague work into executable tasks](../../../assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
+![Task harness - turning vague work into executable tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
 
 *Task harness - turning vague work into executable tasks*
 ## Vague Work Cannot Be Executed
@@ -54,7 +54,7 @@ This article covers the components of a Task, how to write a Task Spec, and how 
 
 ## The Four Components of a Task
 
-![The four components of a task](../../../assets/harness-engineering-101/02/02-02-the-four-components-of-a-task.en.png)
+![The four components of a task](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-02-the-four-components-of-a-task.en.png)
 
 *The four components of a task*
 An executable task has four parts.
@@ -212,7 +212,7 @@ Without `verify()`, you cannot decide whether to retry. Without that decision, t
 
 ## Decomposing Vague Requests Into Tasks
 
-![Decomposing vague requests into tasks](../../../assets/harness-engineering-101/02/02-03-decomposing-vague-requests-into-tasks.en.png)
+![Decomposing vague requests into tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-03-decomposing-vague-requests-into-tasks.en.png)
 
 *Decomposing vague requests into tasks*
 Real users do not deliver TaskSpecs. They say things like "do something about it." Task Harness must convert this into an executable task.
@@ -270,7 +270,7 @@ Asking back is part of Task Harness. An agent that does not ask back is not coll
 
 ## Task Spec As Single Source of Truth
 
-![Task spec as single source of truth](../../../assets/harness-engineering-101/02/02-04-task-spec-as-single-source-of-truth.en.png)
+![Task spec as single source of truth](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-04-task-spec-as-single-source-of-truth.en.png)
 
 *Task spec as single source of truth*
 Once a TaskSpec exists, everything else is derived from it.

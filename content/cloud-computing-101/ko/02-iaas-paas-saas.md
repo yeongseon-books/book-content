@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![서비스 모델이 높아질수록 사용자가 직접 운영하는 범위가 줄어드는 구조](../../../assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png)
+![서비스 모델이 높아질수록 사용자가 직접 운영하는 범위가 줄어드는 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png)
 
 *서비스 모델이 높아질수록 사용자가 직접 운영하는 범위가 줄어드는 구조*
 IaaS에서는 운영 체제와 런타임 관리가 여전히 사용자 쪽에 가깝습니다. PaaS에서는 운영 체제와 런타임을 플랫폼이 더 많이 맡습니다. SaaS에서는 사용자가 완성된 애플리케이션을 소비하는 쪽에 가까워집니다.

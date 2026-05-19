@@ -60,7 +60,7 @@ last_reviewed: '2026-05-12'
 
 training loop의 핵심 흐름은 아래와 같습니다.
 
-![핵심 개념](../../../assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.ko.png)
 
 *학습 루프 흐름: forward, loss, backward, update가 닫힌 순환을 이루며 반복됩니다.*
 ### 모델은 입력을 예측으로 바꾸는 함수입니다

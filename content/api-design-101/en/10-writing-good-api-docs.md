@@ -45,7 +45,7 @@ Documentation drives *adoption* more than the API itself. The same endpoint can 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
 *Good API documentation guides the reader from the first successful call through scenarios, reference detail, change tracking, and tools.*
 
 That means strong reference pages are necessary but not sufficient. Users also need a visible starting point, runnable examples, and a reliable way to see what changed after they integrate.

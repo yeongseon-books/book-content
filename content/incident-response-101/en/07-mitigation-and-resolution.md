@@ -48,7 +48,7 @@ Separating mitigation from resolution keeps the response honest. It improves com
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The response path moves from impact containment to stability and then to root removal. If those states are not separated, both operations and communication get fuzzy.

@@ -51,7 +51,7 @@ Git을 잘 쓰는 사람은 대개 치기 전에 먼저 읽습니다. `status`, 
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/03/03-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
 
 *Mental Model*
 

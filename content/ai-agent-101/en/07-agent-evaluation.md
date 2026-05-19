@@ -48,7 +48,7 @@ Agent evaluation must look beyond "did it answer well" to multiple dimensions. T
 
 ### Evaluation signal path
 
-![Evaluation signal path](../../../assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
+![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
 ### Task Success Rate
 
 The percentage of user requests the agent completes successfully.

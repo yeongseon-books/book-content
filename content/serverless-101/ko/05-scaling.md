@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/05/05-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.ko.png)
 
 *함수 확장은 빠르지만, 안전한 스케일링은 다운스트림 보호 전략까지 포함해야 합니다.*
 이 그림에서 중요한 것은 함수 뒤쪽입니다. 스케일링은 함수 인스턴스를 늘리는 일로 끝나지 않습니다. 늘어난 인스턴스가 데이터베이스와 외부 API, 큐 소비 속도에 어떤 압력을 주는지까지 함께 읽어야 합니다.

@@ -43,7 +43,7 @@ Many production mistakes start as shape mistakes. If you cannot read how many di
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
 
 *This diagram summarizes how multiplication, transpose, and inversion make matrices readable as transformation rules.*
 

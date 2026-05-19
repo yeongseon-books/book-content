@@ -49,7 +49,7 @@ In portfolio work, that matters a lot because the reviewer is not a teammate who
 
 The simplest way to design a README is to follow the visitor’s question order.
 
-![The question order most reviewers follow when reading a README](../../../assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
+![The question order most reviewers follow when reading a README](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
 
 *The question order most reviewers follow when reading a README*
 

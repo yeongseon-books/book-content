@@ -50,7 +50,7 @@ title: Incident Response
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.ko.png)
 
 *탐지부터 분류, 완화, 해결, 포스트모템까지 이어지는 incident response 기본 순서입니다.*
 탐지, 분류, 완화, 해결, 포스트모템이라는 흐름을 기준으로 보면 장애 대응이 훨씬 읽기 쉬워집니다. 복구만 끝내면 되는 일이 아니라, 기록과 후속 학습까지 이어지는 전 과정으로 봐야 합니다.

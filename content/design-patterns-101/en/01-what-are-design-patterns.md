@@ -45,7 +45,7 @@ Patterns are vocabulary, not answers. The biggest payoff is that "let's pull thi
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
 *A pattern becomes useful when the name brings back the problem shape, the solution shape, and the tradeoffs together.*
 
 ## Key Terms

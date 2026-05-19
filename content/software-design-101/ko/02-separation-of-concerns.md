@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
 *하나의 거대한 모듈에 섞인 관심사를 분리해 변경 자유도를 높이는 구조*
 
 UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다. 이 셋을 같은 상자에 넣으면 작은 변경도 넓게 번집니다. 분리를 잘하면 세 관심사가 서로 다른 속도로 움직일 수 있습니다.

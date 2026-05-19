@@ -45,7 +45,7 @@ The tools we covered so far — replication, consensus, queues, transactions —
 
 ## Concept at a Glance
 
-![Timeout, breaker, bulkhead, and backpressure boundaries](../../../assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
+![Timeout, breaker, bulkhead, and backpressure boundaries](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
 
 *Timeout, breaker, bulkhead, and backpressure boundaries*
 

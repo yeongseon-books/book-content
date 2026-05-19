@@ -44,7 +44,7 @@ Modern optimizers like *Adam* work well — and you should *understand why*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png)
 
 *Optimization flow: gradient signals are shaped by momentum, adaptive scaling, and scheduling.*
 ## Key Terms

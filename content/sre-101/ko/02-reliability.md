@@ -50,7 +50,7 @@ title: Reliability
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.ko.png)
 
 *가용성, 지연 시간, 정확성, 내구성이 함께 reliability를 이룬다는 구조입니다.*
 이 그림이 보여 주는 메시지는 단순합니다. 서비스가 살아 있었는지만으로는 충분하지 않습니다. 빨랐는지, 결과가 맞았는지, 저장한 데이터가 유지됐는지도 함께 봐야 신뢰성이라는 말을 제대로 쓸 수 있습니다.

@@ -48,7 +48,7 @@ Applications need visible evidence to start a real conversation. A repository, R
 
 ## Concept at a Glance
 
-![Portfolio publishing flow](../../../assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png)
+![Portfolio publishing flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png)
 
 *How coursework becomes a portfolio through repositories and documentation*
 

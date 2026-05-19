@@ -36,7 +36,7 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
 
-![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
 
 *청크 크기와 오버랩 구조*
 <!-- ebook-only:start -->
@@ -64,7 +64,7 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 
 ## 청크 크기와 오버랩
 
-![Chunk size and overlap structure](../../../assets/vector-search-101/05/05-01-chunk-size-and-overlap.ko.png)
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.ko.png)
 
 *청크 크기와 오버랩 구조*
 청킹을 제어하는 핵심 파라미터는 `chunk_size`와 `chunk_overlap` 두 가지입니다.
@@ -88,7 +88,7 @@ chunk 2: G H I J   ← G repeats
 
 ## 고정 크기 청킹 직접 구현하기
 
-![Fixed size chunking execution flow](../../../assets/vector-search-101/05/05-02-fixed-size-chunking-from-scratch.ko.png)
+![Fixed size chunking execution flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-02-fixed-size-chunking-from-scratch.ko.png)
 
 *고정 크기 청킹 실행 흐름*
 먼저 가장 단순한 구현으로 개념을 고정해 보겠습니다.
@@ -153,7 +153,7 @@ for i, chunk in enumerate(chunks):
 
 ## RecursiveCharacterTextSplitter
 
-![Separator priority fallback path](../../../assets/vector-search-101/05/05-03-recursivecharactertextsplitter.ko.png)
+![Separator priority fallback path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-03-recursivecharactertextsplitter.ko.png)
 
 *분리자 우선순위 하향 경로*
 LangChain의 `RecursiveCharacterTextSplitter`는 자연스러운 경계에서 나누려고 시도합니다. 먼저 `\n\n`, 그다음 `\n`, 그다음 `. `, 공백, 마지막으로 개별 문자 순으로 우선순위를 내려갑니다. 그래서 대부분의 경우 문장을 온전히 유지할 수 있습니다.
@@ -223,7 +223,7 @@ for i, chunk in enumerate(chunks):
 
 ## 전체 흐름: 청킹에서 FAISS까지
 
-![Execution path from chunking to FAISS search](../../../assets/vector-search-101/05/05-04-full-pipeline-chunking-to-faiss.ko.png)
+![Execution path from chunking to FAISS search](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-04-full-pipeline-chunking-to-faiss.ko.png)
 
 *청킹에서 FAISS 검색까지의 실행 경로*
 청킹, 임베딩, 인덱싱을 한 블록으로 연결해 보겠습니다.
@@ -419,7 +419,7 @@ run_experiment(260)
 
 ## 청크 크기가 검색 품질에 미치는 영향
 
-![Retrieval quality across chunk sizes](../../../assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.ko.png)
+![Retrieval quality across chunk sizes](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.ko.png)
 
 *청크 크기별 검색 품질 비교*
 청크가 너무 작으면 쿼리와 정확히 매칭될 만큼의 문맥이 없습니다. 반대로 청크가 너무 크면 관련 없는 내용이 섞여 의미 신호가 희석됩니다.

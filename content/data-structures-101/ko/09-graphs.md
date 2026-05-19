@@ -48,7 +48,7 @@ title: 그래프
 
 ### 그래프 표현 방식
 
-![그래프 표현 방식](../../../assets/data-structures-101/09/09-01-graph-representations.ko.png)
+![그래프 표현 방식](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.ko.png)
 *그림. 방향 간선은 서비스 호출이나 패키지 의존성처럼 한쪽으로 흐르는 관계를 표현할 때 적합합니다. 희소 그래프에는 인접 리스트가 기본 선택이고, 그래프가 조밀하거나 간선 존재 여부를 즉시 확인해야 하면 인접 행렬이 더 잘 맞습니다.*
 
 ## 핵심 용어

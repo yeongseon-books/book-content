@@ -48,7 +48,7 @@ Without drift detection, the loss accumulates quietly. Only later do accuracy or
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/07/07-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This diagram captures the core workflow. A training-time distribution becomes the baseline, live inputs are compared against it with statistical tests, and the system emits a warning when the difference crosses the operating threshold.

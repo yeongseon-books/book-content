@@ -99,7 +99,7 @@ print(emb(idx).shape)
 
 원래 Transformer 논문은 사인·코사인 기반의 sinusoidal positional encoding을 사용했습니다. 좌표를 함수로 생성하기 때문에 더 긴 길이로 일반화하기 쉽다는 장점이 있습니다. 반면 많은 GPT 계열 모델은 learned positional embedding을 사용합니다. 이번 시리즈도 구현 단순성과 가시성을 위해 learned 방식을 택합니다.
 
-![사인파형 위치 임베딩과 학습형 위치 임베딩 비교](../../../assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
+![사인파형 위치 임베딩과 학습형 위치 임베딩 비교](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
 
 *위치 정보를 함수로 계산할지, 파라미터 테이블로 학습할지를 비교한 그림입니다.*
 

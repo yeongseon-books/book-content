@@ -32,7 +32,7 @@ This is the final post in the Azure Kubernetes Service 101 series. Here, we tie 
 
 ## The operations view in one diagram
 
-![Operations observability across logs and metrics](../../../assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
+![Operations observability across logs and metrics](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
 
 *Operations observability across logs and metrics*
 The useful split is between two telemetry paths.
@@ -155,7 +155,7 @@ Those are more useful operations questions than a raw CPU graph on its own becau
 
 ## Where alerts should live
 
-![Layered structure for operations alerts](../../../assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
+![Layered structure for operations alerts](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-02-where-alerts-should-live.en.png)
 
 *Layered structure for operations alerts*
 Good alerting is layered. CPU over 80% by itself is rarely a complete operations strategy.

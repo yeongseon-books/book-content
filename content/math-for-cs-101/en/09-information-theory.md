@@ -48,7 +48,7 @@ Once you see that connection, entropy stops feeling like a standalone definition
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
 *Information theory links distributional uncertainty to coding cost, model loss, and the floor that compression cannot cross.*
 
 ## Key Terms

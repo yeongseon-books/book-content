@@ -55,7 +55,7 @@ Buffer matters because student projects absorb many external shocks at once: exa
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
 *A scheduling loop from milestones to buffer adjustment*
 
 ## Practical artifact: a weekly execution board

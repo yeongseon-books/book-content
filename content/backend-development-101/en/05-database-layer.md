@@ -42,7 +42,7 @@ Databases are *what changes most often* and *what should change least*. Splittin
 
 ## Concept at a Glance
 
-![database layer boundary between service, repository, ORM, cache, and database](../../../assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
+![database layer boundary between service, repository, ORM, cache, and database](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
 
 *database layer boundary between service, repository, ORM, cache, and database*
 The service does not know SQL — only the repository does.

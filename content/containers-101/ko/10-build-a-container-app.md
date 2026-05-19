@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![Compose가 앱과 데이터베이스를 함께 올리는 실행 흐름](../../../assets/containers-101/10/10-01-concept-at-a-glance.ko.png)
+![Compose가 앱과 데이터베이스를 함께 올리는 실행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.ko.png)
 
 *Compose가 앱과 데이터베이스를 함께 올리는 실행 흐름*
 애플리케이션 코드는 이미지가 되고, Compose는 앱과 DB를 함께 올리며, healthcheck와 로그가 운영 가능성을 받쳐 줍니다. 이제 컨테이너는 단일 명령이 아니라 하나의 작은 시스템이 됩니다.

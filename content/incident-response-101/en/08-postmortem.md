@@ -48,7 +48,7 @@ A strong postmortem also protects accuracy. It captures facts before memory fade
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 Publishing the document is only the midpoint. The real payoff comes when the review leads to tracked action items that are still checked later.

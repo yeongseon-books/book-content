@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 secret 흐름
 
-![조직, 저장소, 환경 secret이 잡 런타임으로 전달되고 add-mask로 보호되는 흐름](../../../assets/github-actions-101/09/09-01-secret.ko.png)
+![조직, 저장소, 환경 secret이 잡 런타임으로 전달되고 add-mask로 보호되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-secret.ko.png)
 
 *조직, 저장소, 환경 secret이 잡 런타임으로 전달되고 add-mask로 보호되는 흐름*
 

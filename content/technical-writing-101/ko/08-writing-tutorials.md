@@ -51,7 +51,7 @@ last_reviewed: '2026-05-15'
 
 > 멘탈 모델: 튜토리얼은 강의문이 아니라 안내선입니다. 전제 조건을 먼저 밝히고, 한 단계씩 따라가게 하고, 작은 성공을 빠르게 보여 준 뒤, 다음 학습으로 넘깁니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

@@ -33,11 +33,11 @@ This is the first post in the LLM Apps Ops 101 series. Here, we will define the 
 > Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting across separate systems.
 
 ## Big picture
-![Monitoring and logging component layout](../../../assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
+![Monitoring and logging component layout](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
 
 *Monitoring and logging component layout*
 ## Why this layer matters
-![Request and response logs per call](../../../assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
+![Request and response logs per call](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
 
 *Request and response logs per call*
 Observability starts with a log record that can fully explain one call after the fact.
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Shared log schema for operating questions](../../../assets/llm-apps-ops-101/01/01-02-what-to-notice-in-this-code.en.png)
+![Shared log schema for operating questions](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-02-what-to-notice-in-this-code.en.png)
 
 *Shared log schema for operating questions*
 - `JsonFormatter` keeps every event in one schema, so downstream ingestion stays simple.
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 - Logging a short preview instead of the full answer reduces both data leakage risk and log volume.
 
 ## Where engineers get confused
-![Metrics and logs narrow failures together](../../../assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.en.png)
+![Metrics and logs narrow failures together](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.en.png)
 
 *Metrics and logs narrow failures together*
 - Structured logs do not replace metrics. Metrics show trends; logs explain individual failures.

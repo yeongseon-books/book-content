@@ -43,7 +43,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/serverless-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.ko.png)
 
 *함수는 일을 처리하고, 실제 상태는 캐시·데이터베이스·워크플로 엔진에 남기는 구조입니다.*
 이 그림이 보여 주는 메시지는 단순합니다. 함수는 상태를 소유하는 주체가 아니라 상태를 읽고 갱신하는 작업자입니다. 짧은 세션성 데이터는 캐시로, 영속 데이터는 데이터베이스로, 여러 단계의 진행 상태는 워크플로 엔진이나 상태 머신으로 분리하면 책임이 선명해집니다.

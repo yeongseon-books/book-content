@@ -45,7 +45,7 @@ PR은 이 빈자리를 메웁니다. 변경 설명, 파일 diff, 리뷰 댓글, 
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/07/07-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.ko.png)
 
 *Mental Model*
 

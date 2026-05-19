@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름](../../../assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
+![소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
 
 *소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름*
 코드는 이미지가 되고, 이미지는 어디에서나 같은 방식으로 실행되어야 합니다. 이 재현성이 있어야 운영 문제를 환경 탓으로만 돌리지 않을 수 있습니다.

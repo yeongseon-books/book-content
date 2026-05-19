@@ -48,7 +48,7 @@ To borrow a git analogy: schema changes are code refactors, and data changes are
 
 ### Diagram: the three-stage split for data migrations
 
-![Diagram: the three-stage split for data migrations](../../../assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
+![Diagram: the three-stage split for data migrations](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
 *Isolating row transformation in the middle stage keeps long-running work separate from short schema changes.*
 
 ## Core concepts

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 서브쿼리 분해 흐름
 
-![서브쿼리 분해 흐름](../../../assets/sql-101/06/06-01-subquery-layering-flow.ko.png)
+![서브쿼리 분해 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.ko.png)
 내부 쿼리는 바깥 쿼리에 재료를 제공합니다. 이 재료를 이름 붙여 꺼내 놓은 형태가 CTE입니다. 의미는 비슷하지만, 사람이 읽는 경험은 꽤 달라집니다.
 
 ## 핵심 개념 정리

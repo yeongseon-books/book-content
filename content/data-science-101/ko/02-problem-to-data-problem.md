@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![막연한 질문을 지표, 기간, 대상 집단, 가설로 좁혀 가는 프레이밍 흐름](../../../assets/data-science-101/02/02-01-concept-at-a-glance.ko.png)
+![막연한 질문을 지표, 기간, 대상 집단, 가설로 좁혀 가는 프레이밍 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.ko.png)
 
 *막연한 질문을 지표, 기간, 대상 집단, 가설로 좁혀 가는 프레이밍 흐름*
 ## 핵심 용어

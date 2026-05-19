@@ -48,7 +48,7 @@ When those streams are mixed together, everyone gets either too little or too mu
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 The important idea is audience branching. One incident can require three communication streams, each with its own channel, level of detail, and timing expectation.

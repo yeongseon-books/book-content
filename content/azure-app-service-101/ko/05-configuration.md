@@ -51,7 +51,7 @@ seo_description: App Settings, slot setting, Key Vault를 나눠 App Service 설
 
 App Service는 **App Settings**를 통해 환경 변수를 주입합니다.
 
-![Settings injected into app environment](../../../assets/azure-app-service-101/05/configuration-flow.ko.png)
+![Settings injected into app environment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/configuration-flow.ko.png)
 
 *설정이 앱 환경 변수로 주입되는 흐름*
 
@@ -117,7 +117,7 @@ SCM_DO_BUILD_DURING_DEPLOYMENT true
 
 ### Environment Separation Pattern
 
-![Configuration strategy by environment stage](../../../assets/azure-app-service-101/05/environment-strategy.ko.png)
+![Configuration strategy by environment stage](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/environment-strategy.ko.png)
 
 *환경 단계별 설정 전략*
 
@@ -224,7 +224,7 @@ Deployment Slot을 쓰는 경우, 어떤 설정은 **slot에 고정**되어야 �
 | `LOG_LEVEL` | No | 대개 동일함 |
 | `FEATURE_FLAG_X` | Depends | slot별 테스트면 sticky 필요 |
 
-![Settings that stay during slot swap](../../../assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
+![Settings that stay during slot swap](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/slot-settings-behavior.ko.png)
 
 *slot swap 중에도 유지되는 설정*
 
@@ -249,7 +249,7 @@ az webapp config appsettings set \
 
 비밀번호와 API 키 같은 민감 값은 **Key Vault**에 저장하고 참조합니다.
 
-![Secrets flowing from Key Vault to app](../../../assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
+![Secrets flowing from Key Vault to app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/key-vault-reference-flow.ko.png)
 
 *Key Vault에서 앱으로 흘러가는 secret 참조 흐름*
 

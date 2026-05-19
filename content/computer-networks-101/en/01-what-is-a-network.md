@@ -52,7 +52,7 @@ Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, 
 
 > Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.
 
-![Layered model and packet travel across a network](../../../assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
+![Layered model and packet travel across a network](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
 *Packets are encapsulated layer by layer, traverse intermediate devices, and are reassembled at the destination.*
 
 ## Key Terms

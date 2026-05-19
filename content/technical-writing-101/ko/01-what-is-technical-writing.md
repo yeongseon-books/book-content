@@ -51,7 +51,7 @@ title: 기술 글쓰기란 무엇인가
 
 > 멘탈 모델: 기술 글은 정보를 나열하는 글이 아니라, 독자의 질문을 답으로 연결하고 그 답을 실제 행동으로 넘기는 글입니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

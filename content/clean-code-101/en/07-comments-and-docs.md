@@ -49,7 +49,7 @@ Comments tend to lie. Code changes; comments rarely follow.
 
 ## Concept at a Glance
 
-![Comments and Documentation](../../../assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
+![Comments and Documentation](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
 
 *Commenting flow: code should explain what, while comments and docs explain why, risk, and contract.*
 

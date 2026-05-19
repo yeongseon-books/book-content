@@ -44,7 +44,7 @@ Here, we will connect probes, RBAC, network boundaries, observability, GitOps, a
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
 *Operations become repeatable only when probes, telemetry, runbooks, and GitOps all feed the same response system.*
 
 

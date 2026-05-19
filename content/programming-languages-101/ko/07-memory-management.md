@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![스택 프레임, 힙 객체, 참조 카운트와 GC가 만나는 메모리 수명 흐름](../../../assets/programming-languages-101/07/07-01-concept-at-a-glance.ko.png)
+![스택 프레임, 힙 객체, 참조 카운트와 GC가 만나는 메모리 수명 흐름](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.ko.png)
 
 *스택 프레임, 힙 객체, 참조 카운트와 GC가 만나는 메모리 수명 흐름*
 

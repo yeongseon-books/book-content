@@ -44,7 +44,7 @@ The parts you have learned only improve *DORA* (deploy frequency, lead time, cha
 
 ## Concept at a Glance
 
-![A full pipeline split into PR feedback, main integration, and tag-based release promotion](../../../assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
+![A full pipeline split into PR feedback, main integration, and tag-based release promotion](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
 
 *A full pipeline split into PR feedback, main integration, and tag-based release promotion*
 

@@ -80,7 +80,7 @@ There's no code to start a server, open a port, or configure a router. **You onl
 
 The simplest picture of what happens between a request coming in and the response going out looks like this:
 
-![HTTP request waking a function](../../../assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
+![HTTP request waking a function](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
 
 *HTTP request waking a function*
 Everything that follows in this series is essentially the process of refining this picture. Later chapters expand it from three directions: non-HTTP triggers, the Host/Worker execution boundary, and the scaling behavior that adds instances when one is not enough.
@@ -102,7 +102,7 @@ The key difference is **what you're being billed by the unit of**. App Service c
 
 The lifecycle difference becomes clearer side by side.
 
-![Always-on and event-driven lifecycle difference](../../../assets/azure-functions-101/01/01-02-how-is-this-different-from-a-traditional.en.png)
+![Always-on and event-driven lifecycle difference](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-02-how-is-this-different-from-a-traditional.en.png)
 
 *Always-on and event-driven lifecycle difference*
 The "idle → wake → run → idle again" cycle on the right is the essence of serverless. That "wake" segment is the source of what you'll hear called a **cold start**. A later chapter breaks down where that startup time actually goes.
@@ -120,7 +120,7 @@ Four words run through this entire series. For now, just learn the names; later 
 
 Here are those four concepts on a single diagram:
 
-![Relationships among trigger, binding, host, app](../../../assets/azure-functions-101/01/01-03-the-four-core-concepts-of-azure-function.en.png)
+![Relationships among trigger, binding, host, app](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-03-the-four-core-concepts-of-azure-function.en.png)
 
 *Relationships among trigger, binding, host, app*
 Two things matter in this picture: **(1) the Host is a per-instance runtime, while your code runs in a worker process for non-.NET languages, and (2) triggers and bindings are the interface between your functions and the outside world.** That combination is what makes Functions work as an event-driven platform.

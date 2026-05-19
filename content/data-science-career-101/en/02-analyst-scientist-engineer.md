@@ -54,7 +54,7 @@ Someone aiming for analytics may need much stronger metric interpretation and da
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
 
 *Analyst, scientist, and engineer roles anchored on decisions, hypotheses, and pipelines*
 ## Key Terms

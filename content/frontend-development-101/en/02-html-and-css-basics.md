@@ -43,7 +43,7 @@ HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *s
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
 
 *The learning sequence from semantic structure to layout, responsiveness, and accessibility*
 

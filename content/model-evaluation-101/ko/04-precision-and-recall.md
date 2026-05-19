@@ -47,7 +47,7 @@ issue #772는 이 장이 다른 장들과 비슷한 리듬으로 반복된다고
 
 ## 한눈에 보는 멘탈 모델
 
-![임계값에 따라 달라지는 정밀도와 재현율의 균형](../../../assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
+![임계값에 따라 달라지는 정밀도와 재현율의 균형](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
 
 *임계값에 따라 달라지는 정밀도와 재현율의 균형*
 

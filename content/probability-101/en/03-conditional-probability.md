@@ -46,7 +46,7 @@ The risk gets worse when the base rate is small. A rare disease with a sensitive
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

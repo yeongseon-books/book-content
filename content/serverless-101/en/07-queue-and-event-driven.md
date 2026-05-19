@@ -44,7 +44,7 @@ Async messaging changes that shape. It lets producers publish facts and lets con
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
 
 *Queues and topics decouple producers from consumers across both time and failure boundaries.*
 The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.

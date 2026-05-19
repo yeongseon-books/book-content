@@ -42,7 +42,7 @@ Without measuring generalization, you cannot select or compare models. Training 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
 
 *Separating training, tuning, and final evaluation is what lets you measure generalization instead of self-confirmation.*
 

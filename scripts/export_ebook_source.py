@@ -19,8 +19,10 @@ Transforms applied (per EBOOK.md section 5):
 - keep ebook-only blocks (markers stripped, body kept)
 - strip TOC block entirely (book has its own native nav)
 - strip bottom Tags line
-- rewrite image paths from `../../../assets/...` to `assets/...`
-  (matches the relocated `docs/assets/<series>/...` copy)
+- rewrite image paths from `../../../assets/...` and absolute
+  `<asset_base_url>/assets/...` URLs to `assets/...` (matches the
+  relocated `docs/assets/<series>/...` copy; ebook bundles are
+  self-contained per ASSET_POLICY.md)
 - rewrite cross-series links from `../../<other-series>/<lang>/...` to
   absolute `https://github.com/<repo>/tree/<TAG>/content/<other-series>/<lang>/...`
   GitHub URLs (book is self-contained; cross-series refs become
@@ -59,12 +61,27 @@ if "repo" not in _meta or "published_ref" not in _meta:
     )
 REPO = _meta["repo"]
 PUBLISHED_REF = _meta["published_ref"]
+ASSET_BASE_URL = (_meta.get("asset_base_url") or "").rstrip("/")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _transform import rewrite_outside_fences, transform_for_ebook
 
 IMG_PATH_RE = re.compile(r"(!\[[^\]]*\]\()\.\./\.\./\.\./assets/")
 LINK_PATH_RE = re.compile(r"(?<!!)(\[[^\]]+\]\()\.\./\.\./\.\./assets/")
+# Canonical sources now embed absolute public asset URLs (see ASSET_POLICY.md).
+# eBook bundles must be self-contained, so rewrite those URLs back to the
+# local `assets/<rest>` path that the private builder consumes.
+_PUBLIC_BASE_ESC = re.escape(ASSET_BASE_URL) if ASSET_BASE_URL else ""
+PUBLIC_IMG_URL_RE = (
+    re.compile(rf"(!\[[^\]]*\]\(){_PUBLIC_BASE_ESC}/assets/")
+    if ASSET_BASE_URL
+    else None
+)
+PUBLIC_LINK_URL_RE = (
+    re.compile(rf"(?<!!)(\[[^\]]+\]\()(?:{_PUBLIC_BASE_ESC})/assets/")
+    if ASSET_BASE_URL
+    else None
+)
 CROSS_SERIES_LINK_RE = re.compile(
     r"(?<!!)\[[^\]]+\]\(\.\./\.\./[a-z][a-z0-9-]+/(ko|en)/[^)]+\)"
 )
@@ -77,7 +94,12 @@ def rewrite_assets(text: str) -> str:
     def rewrite(line: str) -> str:
         line = IMG_PATH_RE.sub(r"\1assets/", line)
         line = LINK_PATH_RE.sub(r"\1assets/", line)
+        if PUBLIC_IMG_URL_RE is not None:
+            line = PUBLIC_IMG_URL_RE.sub(r"\1assets/", line)
+        if PUBLIC_LINK_URL_RE is not None:
+            line = PUBLIC_LINK_URL_RE.sub(r"\1assets/", line)
         return line
+
     return rewrite_outside_fences(text, rewrite)
 
 
@@ -102,7 +124,9 @@ def validate_catalog(series_id: str, lang: str, series_path: Path, per: dict) ->
     """
     declared = {(a["idx"], a["slug"]) for a in per.get("articles", [])}
     if not declared:
-        raise SystemExit(f"per-series catalog has no articles: {series_path}/series.yaml")
+        raise SystemExit(
+            f"per-series catalog has no articles: {series_path}/series.yaml"
+        )
     lang_dir = series_path / lang
     if not lang_dir.is_dir():
         raise SystemExit(f"missing language directory: {lang_dir}")
@@ -112,7 +136,9 @@ def validate_catalog(series_id: str, lang: str, series_path: Path, per: dict) ->
     extra_on_disk = sorted(set(on_disk_files) - set(declared_files))
     problems: list[str] = []
     if missing_on_disk:
-        problems.append(f"declared in catalog but missing from {lang}/: {missing_on_disk}")
+        problems.append(
+            f"declared in catalog but missing from {lang}/: {missing_on_disk}"
+        )
     if extra_on_disk:
         problems.append(f"present in {lang}/ but missing from catalog: {extra_on_disk}")
     for art in per.get("articles", []):
@@ -196,8 +222,7 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
     base_resolved = EXPORT_BASE.resolve()
     if base_resolved not in out_resolved.parents and out_resolved != base_resolved:
         raise SystemExit(
-            f"refusing to wipe {out_dir}: not under {EXPORT_BASE} "
-            f"(rmtree guard)"
+            f"refusing to wipe {out_dir}: not under {EXPORT_BASE} (rmtree guard)"
         )
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -222,7 +247,9 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         text = rewrite_cross_series_links(text)
         dst = docs / f"{slug}.md"
         dst.write_text(text, encoding="utf-8")
-        chapters.append({"idx": idx, "title": title, "filename": dst.name, "slug": slug})
+        chapters.append(
+            {"idx": idx, "title": title, "filename": dst.name, "slug": slug}
+        )
 
     asset_src = ASSETS_DIR / series_id
     asset_dst = docs / "assets" / series_id
@@ -239,27 +266,34 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         f"- {chapter_label(c['idx'], lang)}: {c['title']}" for c in chapters
     )
 
-    index_md = render_template(TEMPLATES / "ebook-index.md", {
-        "ebook_title": title_field,
-        "ebook_subtitle": desc_field,
-        "author": "Yeongseon Choe",
-        "first_edition_date": "TBD",
-        "this_edition_date": "TBD",
-    })
+    index_md = render_template(
+        TEMPLATES / "ebook-index.md",
+        {
+            "ebook_title": title_field,
+            "ebook_subtitle": desc_field,
+            "author": "Yeongseon Choe",
+            "first_edition_date": "TBD",
+            "this_edition_date": "TBD",
+        },
+    )
     index_md = re.sub(
         r"\{% for chapter in chapters %\}.*?\{% endfor %\}",
         series_overview,
-        index_md, flags=re.DOTALL,
+        index_md,
+        flags=re.DOTALL,
     )
     (docs / "index.md").write_text(index_md, encoding="utf-8")
 
-    preface_md = render_template(TEMPLATES / "ebook-preface.md", {
-        "series_title": title_field,
-        "series_overview": series_overview,
-        "chapter_connections": "(편집 시 보강)",
-        "canonical_links": canonical_links,
-        "last_updated": "TBD",
-    })
+    preface_md = render_template(
+        TEMPLATES / "ebook-preface.md",
+        {
+            "series_title": title_field,
+            "series_overview": series_overview,
+            "chapter_connections": "(편집 시 보강)",
+            "canonical_links": canonical_links,
+            "last_updated": "TBD",
+        },
+    )
     (docs / "preface.md").write_text(preface_md, encoding="utf-8")
 
     nav_lines = ["nav:", "  - Cover: index.md", "  - Preface: preface.md"]
@@ -269,15 +303,18 @@ def build_bundle(series_id: str, lang: str, out_dir: Path) -> int:
         f"site_name: {title_field}\n"
         f"site_description: {desc_field}\n"
         f"docs_dir: docs\n"
-        f"theme:\n  name: material\n  language: {lang}\n"
-        + "\n".join(nav_lines) + "\n"
+        f"theme:\n  name: material\n  language: {lang}\n" + "\n".join(nav_lines) + "\n"
     )
     (out_dir / "mkdocs.yml").write_text(mkdocs_yml, encoding="utf-8")
 
     print(f"wrote {len(chapters)} chapters to {out_dir.relative_to(REPO_ROOT)}/")
     if cross_warnings:
-        print(f"\nWARN: {len(cross_warnings)} cross-series link(s) rewritten to absolute GitHub URLs")
-        print("  (book is self-contained; review whether to footnote, drop, or replace each):")
+        print(
+            f"\nWARN: {len(cross_warnings)} cross-series link(s) rewritten to absolute GitHub URLs"
+        )
+        print(
+            "  (book is self-contained; review whether to footnote, drop, or replace each):"
+        )
         for fname, link in cross_warnings[:10]:
             print(f"    {fname}: {link}")
         if len(cross_warnings) > 10:
@@ -289,8 +326,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("series", help="series id, e.g. azure-functions-101")
     ap.add_argument("--lang", required=True, choices=["ko", "en"])
-    ap.add_argument("--out", default=None,
-                    help=f"override output dir (default: {EXPORT_BASE}/<series>-<lang>)")
+    ap.add_argument(
+        "--out",
+        default=None,
+        help=f"override output dir (default: {EXPORT_BASE}/<series>-<lang>)",
+    )
     args = ap.parse_args()
     out = Path(args.out) if args.out else EXPORT_BASE / f"{args.series}-{args.lang}"
     return build_bundle(args.series, args.lang, out)

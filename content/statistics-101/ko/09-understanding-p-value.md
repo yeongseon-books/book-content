@@ -47,7 +47,7 @@ p-value는 그렇게 많은 일을 대신해 주는 숫자가 아닙니다. 이 
 
 p-value는 귀무가설이 참이라는 가정 아래 계산됩니다. 즉, “차이가 없다”는 세계에서 지금처럼 극단적인 결과를 볼 확률을 묻는 값입니다. 그러니 이 값은 가설의 진실도나 효과 크기를 대신하지 못합니다.
 
-![멘탈 모델](../../../assets/statistics-101/09/09-01-concept-at-a-glance.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.ko.png)
 
 *p-value는 귀무가설 아래에서 관측 데이터가 얼마나 이례적인지 계산한 값입니다.*
 이 구조를 이해하면 p-value는 답이 아니라 질문의 시작이라는 말이 자연스럽게 받아들여집니다. 작은 p-value는 “왜 이런 데이터가 나왔을까?”를 묻는 신호입니다.

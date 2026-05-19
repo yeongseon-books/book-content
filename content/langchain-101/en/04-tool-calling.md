@@ -34,7 +34,7 @@ This is the fourth post in the LangChain 101 series. It shows how tool metadata,
 
 > Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
 
-![Questions this post answers](../../../assets/langchain-101/04/04-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 ## Minimal runnable example
@@ -64,7 +64,7 @@ print(response.tool_calls)
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
 
 *The flow at a glance*
 LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.
@@ -83,7 +83,7 @@ Topics:
 
 ## Defining tools
 
-![Function definition into tool metadata](../../../assets/langchain-101/04/04-01-defining-tools.en.png)
+![Function definition into tool metadata](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-defining-tools.en.png)
 
 *Function definition into tool metadata*
 The `@tool` decorator turns a Python function into a LangChain tool. The docstring tells the LLM what the tool does and when to use it. Type hints define the input schema.
@@ -115,7 +115,7 @@ print(f"schema: {add_numbers.args_schema.model_json_schema()}")
 
 ## Connecting tools with bind_tools()
 
-![Binding tool metadata to the model](../../../assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.en.png)
+![Binding tool metadata to the model](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.en.png)
 
 *Binding tool metadata to the model*
 `bind_tools()` informs the LLM which tools are available.
@@ -163,7 +163,7 @@ print(f"tool_calls: {response.tool_calls}")
 
 ## A minimal tool-call loop
 
-![Tool call execution and reinjection loop](../../../assets/langchain-101/04/04-03-a-minimal-tool-call-loop.en.png)
+![Tool call execution and reinjection loop](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-03-a-minimal-tool-call-loop.en.png)
 
 *Tool call execution and reinjection loop*
 After the LLM requests a tool call, the application must execute the function and return the result as a `ToolMessage`.
@@ -384,7 +384,7 @@ This example makes the verification surface explicit. The execution log shows wh
 
 ## What to watch out for
 
-![Guardrails for invalid tool requests](../../../assets/langchain-101/04/04-04-what-to-watch-out-for.en.png)
+![Guardrails for invalid tool requests](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-04-what-to-watch-out-for.en.png)
 
 *Guardrails for invalid tool requests*
 **Docstrings drive tool selection.** The LLM reads docstrings to decide which tool to use and when. Vague or overlapping descriptions cause wrong tool selection.

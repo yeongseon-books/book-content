@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png)
 
 *선형독립에서 기저, 차원, 랭크로 이어지는 판단 흐름을 한 번에 보여 주는 그림입니다.*
 

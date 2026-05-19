@@ -46,7 +46,7 @@ Once the sample space is explicit, many probability problems turn into set probl
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

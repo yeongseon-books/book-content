@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/04/04-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-diagram.ko.png)
 
 *선형 회귀는 입력을 선형 결합해 예측값을 만들고, 손실 함수 기준으로 가중치와 절편을 조정합니다.*
 

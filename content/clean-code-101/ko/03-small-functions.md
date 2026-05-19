@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![함수 작게 만들기](../../../assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
+![함수 작게 만들기](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
 
 *큰 함수를 잘게 나누는 흐름: 추출이 이름을 만들고, 이름이 재사용과 테스트를 쉽게 만듭니다.*
 

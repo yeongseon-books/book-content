@@ -49,7 +49,7 @@ Year-one *foundations* underlie *algorithms*, *AI*, and *systems* — every late
 
 ## Concept at a Glance
 
-![First-year foundation map](../../../assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
+![First-year foundation map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
 
 *How first-year subjects support later CS courses*
 

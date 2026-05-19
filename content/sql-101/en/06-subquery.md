@@ -46,7 +46,7 @@ Readable layers are operationally valuable. Once each step has a name, you can t
 
 ## Subquery layering flow
 
-![Subquery layering flow](../../../assets/sql-101/06/06-01-subquery-layering-flow.en.png)
+![Subquery layering flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)
 ## Key Terms
 
 - **Scalar subquery**: returns a *single value*.

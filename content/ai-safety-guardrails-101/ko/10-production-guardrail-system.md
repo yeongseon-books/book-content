@@ -58,7 +58,7 @@ guardrail 시스템을 계층 구조로 정리하면 팀은 개별 정책보다 
 
 ### 네 계층으로 나누면 책임이 선명해집니다
 
-![네 계층으로 나누면 책임이 선명해집니다](../../../assets/ai-safety-guardrails-101/10/10-01-diagram.ko.png)
+![네 계층으로 나누면 책임이 선명해집니다](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-diagram.ko.png)
 *프로덕션 가드레일은 입력 직후, 프롬프트 직전, 출력 직후, audit 네 경계로 나눠야 어떤 판단이 어디서 일어났는지 설명할 수 있습니다.*
 
 | Layer | When it runs | Guardrails |

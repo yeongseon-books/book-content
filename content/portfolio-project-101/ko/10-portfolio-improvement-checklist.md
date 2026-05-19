@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 공개 전 점검은 README, 데모, 코드, 서사, 공개 채널 순서로 보면 빠뜨릴 부분이 적습니다.
 
-![공개 전 최종 점검의 기본 순서](../../../assets/portfolio-project-101/10/10-01-diagram.ko.png)
+![공개 전 최종 점검의 기본 순서](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-diagram.ko.png)
 
 *공개 전 최종 점검의 기본 순서*
 

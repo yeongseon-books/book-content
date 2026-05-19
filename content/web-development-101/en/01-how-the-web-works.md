@@ -43,7 +43,7 @@ Web developers must see the *whole picture*. Knowing one layer well lets you bui
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
 
 *A compact map of the path from a typed URL to visible pixels.*
 

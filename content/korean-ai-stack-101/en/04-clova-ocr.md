@@ -103,13 +103,13 @@ What matters: (1) lines are bound at the meaning level so BGE-M3 retrieval lifts
 
 ## Core flow
 
-![Core flow](../../../assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
+![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
 
 *Core flow*
 
 ## Why start from a mock payload
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
+![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
 
 *Minimal runnable example*
 
@@ -140,7 +140,7 @@ Once a real key is available, swap the dict construction for `requests.post(...)
 
 ### Step 2 — Reconstruct lines
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
+![What to notice in this code](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
 
 *What to notice in this code*
 
@@ -202,7 +202,7 @@ Storing the raw payload path beside the text keeps reprocessing simple when the 
 
 ### Step 5 — Swap in the real API call (optional)
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
 
 *Where engineers get confused*
 

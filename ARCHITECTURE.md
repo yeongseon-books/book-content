@@ -14,7 +14,7 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 - `en/`: 영어 원본 또는 번역본
 - `medium/`: Medium 발행용 생성 산출물 (`.sisyphus/medium/to-medium.py` 생성)
 
-`medium/`은 직접 수정하지 않는다. 이미지는 Markdown 변환 단계에서 상대 경로를 유지하고, HTML 렌더링 단계에서 public GitHub Pages URL로 재작성한다(기본). `--asset-mode inline`을 사용하면 base64 data URI로 인라인할 수도 있다.
+`medium/`은 직접 수정하지 않는다. 이미지는 canonical source의 public GitHub Pages URL을 그대로 통과시킨다(기본). `--asset-mode inline`은 base64 data URI로 내장하고, `--asset-mode local`은 상대 경로로 강제 변환한다.
 
 ## Repository Split
 
@@ -23,7 +23,7 @@ Canonical source는 `content/<series>/{ko,en}/`에 둔다.
 | `yeongseon-books/book-content` | private | Canonical source, scripts, exports |
 | `yeongseon-books/book-public-assets` | **public** | GitHub Pages로 호스팅하는 이미지 CDN |
 
-Canonical source에는 public asset URL을 hardcode하지 않는다. Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
+Canonical source는 `book-public-assets`의 public URL(`{asset_base_url}/assets/...`)을 직접 참조한다. Tistory/Hashnode/Medium/MkDocs는 동일한 URL을 그대로 통과시키며, eBook exporter만 bundle을 self-contained로 만들기 위해 로컬 `assets/...` 경로로 역재작성한다. 상세는 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 
 ## Publication Pipelines
 

@@ -43,7 +43,7 @@ The component mindset is not exclusive to React. The same pattern works in Vue, 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
 
 *A component tree where state flows down and events travel back up*
 

@@ -55,7 +55,7 @@ Non-functional constraints deserve their own space too. Requirements such as mob
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
 *Connecting requirements to criteria, priority, and trace links*
 
 ## Practical artifact: a requirements sheet

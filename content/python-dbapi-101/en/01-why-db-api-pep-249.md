@@ -32,7 +32,7 @@ This is the first article in the Python DB-API 101 series.
 
 <!-- a-grade-intro:begin -->
 
-![Why DB-API 2.0 - the problem PEP 249 solved](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
+![Why DB-API 2.0 - the problem PEP 249 solved](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
 ## Key Questions
@@ -48,7 +48,7 @@ This is the first article in the Python DB-API 101 series.
 
 ## 1. The Chaos Before DB-API
 
-![The chaos before DB-API](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
+![The chaos before DB-API](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
 
 *The chaos before DB-API*
 Before the standard, every database library had its own API.
@@ -69,7 +69,7 @@ Function names, argument order, and return types were all different. Even within
 
 ## 2. Five Things PEP 249 Standardized
 
-![Five things PEP 249 standardized](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
+![Five things PEP 249 standardized](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
 
 *Five things PEP 249 standardized*
 DB-API 2.0 defines a minimal contract every driver must satisfy.
@@ -127,7 +127,7 @@ These seven steps are nearly identical for PostgreSQL and MySQL. The differences
 
 ## 4. Only paramstyle Really Differs
 
-![Only paramstyle really differs](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
+![Only paramstyle really differs](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
 
 *Only paramstyle really differs*
 PEP 249 allows five paramstyles.

@@ -55,7 +55,7 @@ Half of all data-loss incidents trace back to "we did not call fsync" or "we ass
 
 ### The path from write to durable storage
 
-![The path from write to durable storage](../../../assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
+![The path from write to durable storage](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
 *A successful write and durable storage are different milestones, which is why fsync and journaling matter.*
 
 ```text

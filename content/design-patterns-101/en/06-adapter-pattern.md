@@ -45,7 +45,7 @@ When external library calls scatter through the domain, every library tweak shak
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
 *The Adapter keeps the domain on its own contract while infrastructure-specific calls stay behind the boundary.*
 
 ## Key Terms

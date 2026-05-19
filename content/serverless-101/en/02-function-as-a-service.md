@@ -45,7 +45,7 @@ That is why performance and reliability problems rarely live in the handler body
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
 
 *In FaaS, production behavior is shaped as much by package structure and runtime initialization as by the handler itself.*
 

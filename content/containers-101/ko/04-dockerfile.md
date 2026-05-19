@@ -46,7 +46,7 @@ Dockerfile 하나가 팀의 생산성과 보안 수준을 동시에 좌우합니
 
 ## 한눈에 보는 개념
 
-![빌더 스테이지와 런타임 스테이지 분리 흐름](../../../assets/containers-101/04/04-01-concept-at-a-glance.ko.png)
+![빌더 스테이지와 런타임 스테이지 분리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.ko.png)
 
 *빌더 스테이지와 런타임 스테이지 분리 흐름*
 빌드용 스테이지와 실행용 스테이지를 분리하면, 최종 이미지는 필요한 결과물만 포함하고 불필요한 도구는 버릴 수 있습니다.

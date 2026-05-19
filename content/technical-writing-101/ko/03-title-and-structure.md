@@ -51,7 +51,7 @@ title: 제목과 구조 잡기
 
 > 멘탈 모델: 제목은 약속이고, 개요는 지도이고, 본문은 전달이며, 정리는 독자를 다음 행동으로 밀어 주는 마무리입니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

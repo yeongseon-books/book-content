@@ -50,7 +50,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.ko.png)
 
 *측정 지표가 내부 목표를 거쳐 외부 약속으로 이어지는 책임층 구조입니다.*
 이 흐름을 머릿속에 넣어 두면 문서 구조가 바로 정리됩니다. 먼저 측정 대상을 정하고, 그다음 내부 목표를 세우고, 마지막으로 외부 약속이 필요하면 별도 합의를 문서화합니다.

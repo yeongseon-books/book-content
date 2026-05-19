@@ -51,7 +51,7 @@ title: 블로그와 문서 차이
 
 > 멘탈 모델: 블로그는 경험과 해석을 담고, 문서는 지금 따라야 할 기준을 담습니다. 둘은 연결할 수 있지만 서로를 대신하면 안 됩니다.
 
-![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.ko.png)
 
 *한눈에 보는 멘탈 모델*
 ## 핵심 용어

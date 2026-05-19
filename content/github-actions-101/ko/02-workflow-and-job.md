@@ -44,7 +44,7 @@ GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “
 
 ## 한눈에 보는 잡 그래프
 
-![lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프](../../../assets/github-actions-101/02/02-01-diagram.ko.png)
+![lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
 
 *lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프*
 

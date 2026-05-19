@@ -45,7 +45,7 @@ Over half of code defects originate at the requirements stage. The later you fin
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
 *How user needs become acceptance criteria and tests*
 
 Requirements only become real when they map to tests.

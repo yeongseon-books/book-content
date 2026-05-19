@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![학습 검증 테스트로 나뉜 데이터 분할 구조](../../../assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
+![학습 검증 테스트로 나뉜 데이터 분할 구조](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
 
 *학습 검증 테스트로 나뉜 데이터 분할 구조*
 먼저 나누고, 그다음 학습해야 합니다. 전처리 역시 같은 원칙을 따릅니다. 나누기 전에 전체를 들여다보며 통계를 맞추는 순간, 답이 조금씩 새어 들어갑니다.

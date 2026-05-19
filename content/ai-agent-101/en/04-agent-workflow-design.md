@@ -49,7 +49,7 @@ Agents need systematic workflows to handle complex tasks. Let's explore the main
 
 ### Draw the control flow before you tune the prompt
 
-![Draw the control flow before you tune the prompt](../../../assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
+![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
 *A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.*
 
 ### ReAct (Reasoning + Acting)

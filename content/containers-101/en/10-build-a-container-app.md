@@ -45,7 +45,7 @@ Every concept above only sticks once you *integrate* it into *one running result
 
 ## Concept at a Glance
 
-![Compose bringing up the app and database as one flow](../../../assets/containers-101/10/10-01-concept-at-a-glance.en.png)
+![Compose bringing up the app and database as one flow](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png)
 
 *Compose bringing up the app and database as one flow*
 ## Key Terms

@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 검증은 보통 작은 단위에서 시작해 전체 흐름과 문서, 자동화로 확장됩니다.
 
-![테스트와 문서, 자동화가 이어지는 검증 흐름](../../../assets/portfolio-project-101/06/06-01-diagram.ko.png)
+![테스트와 문서, 자동화가 이어지는 검증 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-diagram.ko.png)
 
 *테스트와 문서, 자동화가 이어지는 검증 흐름*
 

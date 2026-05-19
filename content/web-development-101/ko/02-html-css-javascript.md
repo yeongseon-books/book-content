@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념 지도
 
-![한눈에 보는 개념 지도](../../../assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
 
 *구조, 스타일, 동작이 한 페이지를 함께 만드는 책임 분리를 보여 주는 그림입니다.*
 

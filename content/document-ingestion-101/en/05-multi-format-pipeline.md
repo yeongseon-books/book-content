@@ -35,7 +35,7 @@ This is the fifth post in the Document Ingestion 101 series. Here, we route mult
 
 Example code: `en/05-multi-format-pipeline/main.py`
 
-![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.
@@ -44,14 +44,14 @@ This example reads three formats separately but emits the same `Document` struct
 
 ## Loader routing by file format
 
-![Loader routing by file format](../../../assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
+![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
 
 *Loader routing by file format*
 The first step in a multi-format pipeline is centralizing routing so later stages do not need to rediscover file type.
 
 ## Format-specific preprocessing
 
-![Format-specific preprocessing branches](../../../assets/document-ingestion-101/05/05-02-format-specific-preprocessing.en.png)
+![Format-specific preprocessing branches](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-02-format-specific-preprocessing.en.png)
 
 *Format-specific preprocessing branches*
 Preprocessing can differ by source format as long as the final output converges on one body-text contract.
@@ -207,7 +207,7 @@ One short block like this tells you what the pipeline read, what it skipped, and
 
 ### Shared Document contract schema
 
-![Shared Document contract schema](../../../assets/document-ingestion-101/05/05-01-shared-document-contract-schema.en.png)
+![Shared Document contract schema](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-shared-document-contract-schema.en.png)
 
 *Shared Document contract schema*
 Once `page_content`, `source`, and `format` are normalized, later stages can stay format-agnostic much longer.
@@ -220,7 +220,7 @@ Once `page_content`, `source`, and `format` are normalized, later stages can sta
 
 ### Error handling across file formats
 
-![Format error handling fallback flow](../../../assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.en.png)
+![Format error handling fallback flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-02-error-handling-across-file-formats.en.png)
 
 *Format error handling fallback flow*
 As the format count grows, explicit fallback paths matter more than pretending every loader fails the same way.

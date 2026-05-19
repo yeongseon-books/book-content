@@ -44,7 +44,7 @@ Observability is also a cost design problem. What you log, how long you retain i
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
 
 *Logs, metrics, and traces become operationally useful only when one investigation can cross all three.*
 The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.

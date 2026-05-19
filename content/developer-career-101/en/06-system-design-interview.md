@@ -50,7 +50,7 @@ Design is the senior-level filter.
 
 ## Concept at a Glance
 
-![Four-stage flow for system design interview answers](../../../assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
+![Four-stage flow for system design interview answers](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
 
 *Four-stage flow for system design interview answers*
 

@@ -62,7 +62,7 @@ seo_description: 선형대수로 데이터와 변환을 한 문법으로 읽는 
 
 ## 한 장으로 보는 선형대수의 기본 구조
 
-![한 장으로 보는 선형대수의 기본 구조](../../../assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 선형대수의 기본 구조](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)
 *선형대수는 데이터를 벡터로 보고, 변환을 행렬로 보게 하면서 계산과 해석을 한 문법으로 묶습니다.*
 
 ---

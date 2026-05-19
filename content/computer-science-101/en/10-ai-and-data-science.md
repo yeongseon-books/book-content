@@ -56,7 +56,7 @@ Tools change quickly; foundations stay valid for a long time.
 
 > A rule-based system has humans write the rules. Machine learning infers the rules from data.
 
-![Concept at a Glance](../../../assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
 *Rule-based systems rely on human-authored logic, while ML systems infer that logic from data*
 
 ## Key Terms

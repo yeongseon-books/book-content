@@ -49,7 +49,7 @@ Refactoring is not rewriting. It improves internal structure while preserving ex
 
 ## Concept at a Glance
 
-![Refactoring Basics](../../../assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
+![Refactoring Basics](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
 
 *Refactoring rhythm: move from one green test state to the next through small, reversible steps.*
 

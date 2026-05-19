@@ -36,7 +36,7 @@ This post covers the baseline FAISS workflow you need before tuning larger ANN d
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/04-faiss-fundamentals)
 
-![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
+![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
 
 *FAISS index type comparison structure*
 <!-- ebook-only:start -->
@@ -76,7 +76,7 @@ Replace `faiss-cpu` with `faiss-gpu` if a compatible GPU is available.
 
 ## Understanding index types
 
-![FAISS index type comparison structure](../../../assets/vector-search-101/04/04-01-understanding-index-types.en.png)
+![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.en.png)
 
 *FAISS index type comparison structure*
 FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.
@@ -91,7 +91,7 @@ Larger deployments use approximate indexes like `IndexIVFFlat` or `IndexHNSWFlat
 
 ## Exact search with IndexFlatIP
 
-![Flow from embeddings to index creation](../../../assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
+![Flow from embeddings to index creation](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-02-exact-search-with-indexflatip.en.png)
 
 *Flow from embeddings to index creation*
 The standard pattern for text retrieval: normalized vectors plus inner-product index.
@@ -146,7 +146,7 @@ FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, N
 
 ## Running queries
 
-![Query to FAISS result path](../../../assets/vector-search-101/04/04-03-running-queries.en.png)
+![Query to FAISS result path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-03-running-queries.en.png)
 
 *Query to FAISS result path*
 ```python
@@ -327,7 +327,7 @@ Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with 
 
 ## Choosing an index
 
-![float64 input error path](../../../assets/vector-search-101/04/04-04-choosing-an-index.en.png)
+![float64 input error path](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-04-choosing-an-index.en.png)
 
 *float64 input error path*
 | Index | Accuracy | Speed | Memory | Typical scale |

@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/09/09-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-diagram.ko.png)
 
 *예측 클래스는 혼동 행렬과 정밀도·재현율로 읽고, 확률 출력은 ROC-AUC나 PR-AUC처럼 임계값 전반의 지표로 따로 읽습니다.*
 

@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/09/09-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 커밋이나 PR이 올라오면 워크플로가 실행되고, 파이썬과 의존을 준비한 뒤, 테스트를 돌리고, 결과나 커버리지 보고서를 남깁니다. 흐름은 단순하지만 팀 전체 품질 게이트 역할을 합니다.

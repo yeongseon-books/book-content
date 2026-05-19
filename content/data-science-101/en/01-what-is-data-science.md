@@ -53,7 +53,7 @@ In a field full of *overlapping titles*, the boundaries blur fast. A clear *big 
 
 ## Concept at a Glance
 
-![The core data science loop from problem framing to data, insight, and decision](../../../assets/data-science-101/01/01-01-concept-at-a-glance.en.png)
+![The core data science loop from problem framing to data, insight, and decision](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.en.png)
 
 *The core data science loop from problem framing to data, insight, and decision*
 ## Key Terms

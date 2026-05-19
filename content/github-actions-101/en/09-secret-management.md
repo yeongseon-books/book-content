@@ -44,7 +44,7 @@ This is post 9 in the GitHub Actions 101 series. In this post, we will use scope
 
 ## Concept at a Glance
 
-![A flow from organization, repository, and environment secrets into job runtime and masking](../../../assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
+![A flow from organization, repository, and environment secrets into job runtime and masking](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
 
 *A flow from organization, repository, and environment secrets into job runtime and masking*
 

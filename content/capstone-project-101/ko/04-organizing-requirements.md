@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/04/04-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.ko.png)
 *요구사항을 스토리, 기준, 우선순위, 추적으로 연결하는 구조*
 
 ## 실전 문서 예시: 요구사항 시트

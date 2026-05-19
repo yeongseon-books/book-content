@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.ko.png)
 
 *문제 정의에서 결과와 재현 가능성까지 이어져야 포트폴리오가 실무 증거로 읽힌다는 흐름*
 좋은 포트폴리오는 이 흐름을 빠짐없이 보여 줍니다. 질문이 없으면 맥락이 없고, 결과만 있으면 신뢰가 약하며, 재현 방법이 없으면 협업 가능성이 잘 드러나지 않습니다.

@@ -58,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 > 모든 데이터는 비트(0/1)로 표현됩니다. 인코딩 규칙이 비트열에 의미를 부여합니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)
 *같은 비트열도 해석 규칙에 따라 숫자, 문자, 색상으로 달라집니다*
 
 ## 핵심 용어

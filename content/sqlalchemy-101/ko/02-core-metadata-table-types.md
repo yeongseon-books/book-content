@@ -29,7 +29,7 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 
 1편에서 `Engine`과 `Connection`이 실행 경로를 맡는다는 점을 봤다면, 이번에는 그 위에 올릴 스키마 명세를 다룹니다. 이 객체들은 3편의 `select`와 `insert`의 재료가 되고, 4편 이후 ORM 모델이 어떤 Core 구조 위에 올라가는지도 자연스럽게 이어 줍니다.
 
-![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](../../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
+![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
 ## 이 글에서 다룰 문제
@@ -42,7 +42,7 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 
 ## 왜 중요한가
 
-![핵심 개념](../../../assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
 
 *핵심 개념*
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
@@ -55,7 +55,7 @@ SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체
 
 ## 멘탈 모델
 
-![Mental model](../../../assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
 
 *멘탈 모델*
 `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
@@ -90,7 +90,7 @@ Core 단계에서는 다음 흐름이 핵심입니다.
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/sqlalchemy-101/02/02-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### MetaData
@@ -301,7 +301,7 @@ with engine.begin() as conn:
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/sqlalchemy-101/02/02-05-step-by-step-practice.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-05-step-by-step-practice.ko.png)
 
 *단계별 실습*
 ### 1단계: schema 모듈 만들기

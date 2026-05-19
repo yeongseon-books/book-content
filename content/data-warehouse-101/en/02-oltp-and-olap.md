@@ -52,7 +52,7 @@ OLTP processes *one record right now* fast. OLAP scans *all of history* in one s
 
 ## Concept at a Glance
 
-![Separated OLTP-to-OLAP flow](../../../assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
+![Separated OLTP-to-OLAP flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
 
 *Short transactional writes stay on OLTP, while change capture feeds a separate OLAP engine for broad analytical reads.*
 

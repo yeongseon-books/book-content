@@ -39,7 +39,7 @@ This is post 9 in the Harness Engineering 101 series. Here we treat observabilit
 
 > Logging the answer is not enough. Observability begins when you can reconstruct the run, not just read the result.
 
-![Observability - tracing and replaying agent work](../../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
+![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 
 *Observability - tracing and replaying agent work*
 ## What Is Observability?
@@ -69,7 +69,7 @@ A `Span` is one unit of work in the agent. One tool call, one LLM call, one refl
 
 ## What Should You Record?
 
-![What should you Record](../../../assets/harness-engineering-101/09/09-02-what-should-you-record.en.png)
+![What should you Record](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-02-what-should-you-record.en.png)
 
 *What should you Record*
 You need three layers of information to make traces useful.
@@ -102,7 +102,7 @@ Note that prompt and response go into events, not attributes. Attributes are sho
 
 ## Trace Model — Following One Run End to End
 
-![Trace model - following one run end to end](../../../assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.en.png)
+![Trace model - following one run end to end](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.en.png)
 
 *Trace model - following one run end to end*
 A single agent run produces a trace shaped like this tree:
@@ -147,7 +147,7 @@ With this tree alone you can answer "where was it slow?", "where did the cost sp
 
 ## Replay — Reproducing a Run from Logs
 
-![Replay - reproducing a run from logs](../../../assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.en.png)
+![Replay - reproducing a run from logs](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.en.png)
 
 *Replay - reproducing a run from logs*
 A good trace is reproducible. You should be able to run the same step with the same input again and verify the same output comes back.

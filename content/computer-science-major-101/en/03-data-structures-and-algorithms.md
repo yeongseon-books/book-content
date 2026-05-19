@@ -49,7 +49,7 @@ This is post 3 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-![DSA problem-solving flow](../../../assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
+![DSA problem-solving flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
 
 *How data structures and algorithms feed problem solving*
 

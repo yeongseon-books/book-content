@@ -60,7 +60,7 @@ PyTorch, TensorFlow, JAX는 모두 gradient를 자동으로 계산해 줍니다.
 
 역전파의 전체 흐름은 아래처럼 볼 수 있습니다.
 
-![핵심 개념](../../../assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
 
 *역전파 흐름: 손실에서 시작한 gradient가 계산 그래프를 따라 입력 방향으로 누적됩니다.*
 ### 가장 작은 계산 그래프 노드부터 시작합니다

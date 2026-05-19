@@ -59,7 +59,7 @@ and why App Service keeps pushing you toward stateless design.
 
 ## The routing path in three stages
 
-![Three-stage path from ingress to worker](../../../assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
+![Three-stage path from ingress to worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
 
 *Three-stage path from ingress to worker*
 At the public-documentation level, this is the safe mental model.
@@ -85,7 +85,7 @@ These decisions happen before your code runs:
 - which workers are eligible to receive traffic
 - whether an affinity cookie should keep the client on the same worker
 
-![Front-End filtering workers by host, slot, affinity](../../../assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png)
+![Front-End filtering workers by host, slot, affinity](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-02-what-the-front-end-decides-first.en.png)
 
 *Front-End filtering workers by host, slot, affinity*
 This post avoids inventing undocumented selection algorithms.
@@ -117,7 +117,7 @@ They are not the same thing.
 
 ## Request flow with ARR Affinity enabled
 
-![Affinity cookie keeping a client on one worker](../../../assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png)
+![Affinity cookie keeping a client on one worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-03-request-flow-with-arr-affinity-enabled.en.png)
 
 *Affinity cookie keeping a client on one worker*
 This is not inherently bad.
@@ -133,7 +133,7 @@ The problem is that this convenience fights App Service's horizontal scaling mod
 
 ## Request flow with ARR Affinity disabled
 
-![Requests spreading across workers without affinity](../../../assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png)
+![Requests spreading across workers without affinity](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-04-request-flow-with-arr-affinity-disabled.en.png)
 
 *Requests spreading across workers without affinity*
 With affinity disabled,
@@ -186,7 +186,7 @@ but a subset of users keep seeing latency or errors.”
 
 ARR Affinity is a strong suspect in that situation.
 
-![ARR stickiness creating a partial outage](../../../assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png)
+![ARR stickiness creating a partial outage](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-05-why-only-some-users-fail-sometimes.en.png)
 
 *ARR stickiness creating a partial outage*
 If Worker 2 is degraded because of memory pressure,
@@ -226,7 +226,7 @@ Slots share the same plan capacity.
 The Front-End resolves host and slot context,
 then routes into the correct slot on that shared plan.
 
-![Slot routing inside one shared plan](../../../assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.en.png)
+![Slot routing inside one shared plan](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-slots-are-also-part-of-request-routing.en.png)
 
 *Slot routing inside one shared plan*
 The Learn slot-swap flow is more precise than “swap the workers.”

@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 운영체제가 끼어드는 위치
 
-![운영체제가 끼어드는 위치](../../../assets/operating-systems-101/01/01-01-diagram.ko.png)
+![운영체제가 끼어드는 위치](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-diagram.ko.png)
 *사용자 코드와 하드웨어 사이에서 운영체제가 개입하는 경계*
 
 ```text

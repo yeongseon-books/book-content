@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 커뮤니티가 굴러가는 최소 구조
 
-![커뮤니티가 굴러가는 최소 구조](../../../assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)
+![커뮤니티가 굴러가는 최소 구조](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)
 
 *행동 강령에서 환영 메시지까지 이어지는 최소 커뮤니티 운영 구조*
 이 흐름에서 빠지기 쉬운 부분이 마지막 단계입니다. 규칙과 문서만 있다고 커뮤니티가 돌아가지는 않습니다. 신규 기여자가 실제로 환영받는 경험을 해야 다음 참여가 이어집니다.

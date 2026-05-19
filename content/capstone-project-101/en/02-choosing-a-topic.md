@@ -55,7 +55,7 @@ A shared comparison method makes those conversations faster. Instead of arguing 
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
 *Filtering topic candidates into a final decision*
 
 ## Practical artifact: a topic comparison matrix

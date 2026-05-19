@@ -46,7 +46,7 @@ Most bugs live at *the seams* — DB schema, API contracts, authorization checks
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

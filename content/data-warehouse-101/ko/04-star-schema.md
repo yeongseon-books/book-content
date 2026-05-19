@@ -50,7 +50,7 @@ last_reviewed: '2026-05-15'
 
 ## 개념 한눈에 보기
 
-![Star schema 조인 구조](../../../assets/data-warehouse-101/04/04-01-concept-at-a-glance.ko.png)
+![Star schema 조인 구조](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.ko.png)
 
 *중앙 fact 하나에 여러 dimension이 한 번씩만 조인되는 전형적인 star schema 구조*
 

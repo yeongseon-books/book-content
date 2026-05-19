@@ -51,7 +51,7 @@ HTTP is the common language of essentially every service — backend, frontend, 
 
 ## Concept at a Glance
 
-![HTTP request and the TLS layer that turns it into HTTPS](../../../assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
+![HTTP request and the TLS layer that turns it into HTTPS](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
 *HTTP defines the message shape, while HTTPS adds TLS so the same message travels with confidentiality, integrity, and identity checks.*
 
 Both requests and responses are "start line + headers + blank line + body".

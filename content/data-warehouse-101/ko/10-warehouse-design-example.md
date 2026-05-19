@@ -50,7 +50,7 @@ last_reviewed: '2026-05-15'
 
 ## 개념 한눈에 보기
 
-![엔드투엔드 Warehouse 설계 흐름](../../../assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
+![엔드투엔드 Warehouse 설계 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
 
 *원천 시스템에서 staging, fact/dimension, mart를 거쳐 최종 대시보드로 이어지는 전체 Warehouse 설계 흐름*
 

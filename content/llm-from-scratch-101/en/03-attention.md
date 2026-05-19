@@ -72,7 +72,7 @@ That division is not cosmetic. Without it, softmax can become too sharp too earl
 
 An autoregressive model learns next-token prediction. The current position must not peek at the answer to its right. We enforce that rule by masking the upper triangle of the score matrix and filling those entries with `-inf`, which softmax converts into zero probability.
 
-![Causal mask blocking future-token attention](../../../assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
+![Causal mask blocking future-token attention](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
 
 *Causal mask blocking future-token attention.*
 

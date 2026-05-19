@@ -45,7 +45,7 @@ If your algorithm does not state how nodes break, you cannot reason about its co
 
 ## Concept at a Glance
 
-![Failure-model spectrum from crash to Byzantine](../../../assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
+![Failure-model spectrum from crash to Byzantine](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
 
 *Failure-model spectrum from crash to Byzantine*
 

@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![조건문 줄이기](../../../assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
+![조건문 줄이기](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
 
 *조건문 단순화의 흐름: 가드 절, 다형성, 테이블 방식이 분기 깊이를 줄여 핵심 흐름을 드러냅니다.*
 

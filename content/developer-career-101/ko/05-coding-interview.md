@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![패턴 학습에서 피드백까지 이어지는 인터뷰 연습 루프](../../../assets/developer-career-101/05/05-01-concept-at-a-glance.ko.png)
+![패턴 학습에서 피드백까지 이어지는 인터뷰 연습 루프](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.ko.png)
 
 *패턴 학습에서 피드백까지 이어지는 인터뷰 연습 루프*
 

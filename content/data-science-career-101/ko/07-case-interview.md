@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.ko.png)
 
 *명확화에서 지표, 가설, 데이터, 결정으로 이어지는 케이스 인터뷰 답변 프레임*
 이 다섯 단계는 답변 템플릿으로 그대로 써도 좋습니다. 문제를 명확히 하지 않으면 뒤의 지표와 데이터 계획이 모두 흔들립니다.

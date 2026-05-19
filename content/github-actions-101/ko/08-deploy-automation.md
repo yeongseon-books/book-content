@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 배포 흐름
 
-![main 머지 뒤 staging 자동 배포와 production 승인 게이트로 이어지는 배포 흐름](../../../assets/github-actions-101/08/08-01-diagram.ko.png)
+![main 머지 뒤 staging 자동 배포와 production 승인 게이트로 이어지는 배포 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-diagram.ko.png)
 
 *main 머지 뒤 staging 자동 배포와 production 승인 게이트로 이어지는 배포 흐름*
 

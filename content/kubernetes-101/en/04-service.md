@@ -44,7 +44,7 @@ For *microservices* to call each other by *name*, a *Service* is mandatory.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
 *Service stabilizes calling patterns by placing one virtual IP and DNS name in front of a changing Pod set.*
 
 

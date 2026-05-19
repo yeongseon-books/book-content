@@ -37,7 +37,7 @@ In Python, abstraction is not mainly about sounding theoretical. It is about dec
 
 ## Concept Overview
 
-![Concept Overview](../../../assets/oop-101/06/06-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png)
 *Start by eliminating caller-specific method names, then decide whether the shared contract should be enforced through explicit inheritance (ABC) or structural compatibility (Protocol).* 
 
 Without a contract, one ingestion source exposes `read_file()`, another exposes `fetch_rows()`, and a third exposes `pull()`. The orchestrator becomes a bundle of `if` statements. With abstraction, the team agrees on a small contract first, then lets implementations vary behind it.

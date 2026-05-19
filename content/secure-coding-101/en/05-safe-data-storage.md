@@ -46,7 +46,7 @@ Both legally (GDPR, regional privacy laws) and in incident cost, *sensitive data
 
 ## Concept at a Glance
 
-![The safe storage path across the application, database, and KMS](../../../assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png)
+![The safe storage path across the application, database, and KMS](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png)
 
 *The safe storage path across the application, database, and KMS*
 ## Key Terms

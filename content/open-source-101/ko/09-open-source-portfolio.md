@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 포트폴리오를 구성하는 최소 구조
 
-![포트폴리오를 구성하는 최소 구조](../../../assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
+![포트폴리오를 구성하는 최소 구조](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
 
 *프로필, 대표 작업, 기여 증거, 서사가 연결될 때 포트폴리오가 되는 구조*
 이 그림에서 마지막 단계가 중요합니다. 링크만 모아 두면 자료실에 가깝고, 서사만 있으면 자기소개에 그칩니다. 둘이 합쳐져야 포트폴리오가 됩니다.

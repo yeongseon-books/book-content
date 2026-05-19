@@ -47,7 +47,7 @@ Layers separate units of change. The UI, the domain, and the infrastructure all 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
 *Layered architecture protects the stable domain by isolating presentation, application flow, and infrastructure details*
 
 The domain is the stable core that nothing points away from.

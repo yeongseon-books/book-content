@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념 지도
 
-![한눈에 보는 개념 지도](../../../assets/web-development-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.ko.png)
 
 *클라이언트 요청과 서버 응답이 HTTP 계약으로 만나는 가장 단순한 흐름입니다.*
 

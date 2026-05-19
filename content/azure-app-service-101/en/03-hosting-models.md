@@ -51,7 +51,7 @@ The flow for deciding your App Service hosting strategy:
 3. Choose Plan Tier (Dev → Production)
 ```
 
-![Plan choice after OS and deployment](../../../assets/azure-app-service-101/03/01-decision-flow.en.png)
+![Plan choice after OS and deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/01-decision-flow.en.png)
 
 *Plan choice after OS and deployment*
 
@@ -200,7 +200,7 @@ az webapp create \
 
 ## Shared Plan vs Dedicated Plan
 
-![Shared and dedicated resource tradeoffs](../../../assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
+![Shared and dedicated resource tradeoffs](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/03-shared-vs-dedicated.en.png)
 
 *Shared and dedicated resource tradeoffs*
 
@@ -241,7 +241,7 @@ Internal tools, low traffic apps → Shared Plan
 
 Which features depend on Plan vs Deployment Model:
 
-![Feature availability across plan tiers](../../../assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
+![Feature availability across plan tiers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/02-tier-feature-matrix.en.png)
 
 *Feature availability across plan tiers*
 

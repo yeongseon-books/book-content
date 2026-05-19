@@ -46,7 +46,7 @@ When auth leaks, *every permission leaks*. The most common incidents are *weak h
 
 ## Concept at a Glance
 
-![The flow from password verification to session issuance and subsequent requests](../../../assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
+![The flow from password verification to session issuance and subsequent requests](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
 
 *The flow from password verification to session issuance and subsequent requests*
 ## Key Terms

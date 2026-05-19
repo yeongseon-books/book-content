@@ -34,7 +34,7 @@ This is the final post in the LangChain 101 series. It assembles the earlier pie
 
 > The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
 
-![Questions this post answers](../../../assets/langchain-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 ## Minimal runnable example
@@ -58,7 +58,7 @@ print(chain.invoke("What is LCEL?"))
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
 
 *The flow at a glance*
 The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
@@ -74,7 +74,7 @@ Topics:
 
 ## Document indexing pipeline
 
-![From document chunking to index build](../../../assets/langchain-101/06/06-01-document-indexing-pipeline.en.png)
+![From document chunking to index build](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-document-indexing-pipeline.en.png)
 
 *From document chunking to index build*
 ```python
@@ -173,7 +173,7 @@ That one inspection step lets you separate three failure modes quickly: wrong to
 
 ## Assembling the RAG chain
 
-![Retriever prompt llm parser assembly](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
+![Retriever prompt llm parser assembly](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
 
 *Retriever prompt llm parser assembly*
 ```python
@@ -255,7 +255,7 @@ This guard looks small, but it removes one of the most common failure patterns i
 
 ## Running with streaming
 
-![Integrated RAG streaming execution path](../../../assets/langchain-101/06/06-03-running-with-streaming.en.png)
+![Integrated RAG streaming execution path](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-03-running-with-streaming.en.png)
 
 *Integrated RAG streaming execution path*
 ```python
@@ -280,7 +280,7 @@ That is useful beyond UX. Running the same question once with `invoke()` and onc
 
 ## Multi-turn RAG with conversation history
 
-![Multi turn RAG with history flow](../../../assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png)
+![Multi turn RAG with history flow](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png)
 
 *Multi turn RAG with history flow*
 A simple RAG chain treats each question independently. To reference earlier turns, pass conversation history to the chain.

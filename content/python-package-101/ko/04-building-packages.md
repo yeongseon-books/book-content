@@ -57,7 +57,7 @@ source code → python -m build → dist/
                                 └── mylib-0.1.0-py3-none-any.whl  (wheel)
 ```
 
-![멘탈 모델](../../../assets/python-package-101/04/04-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.ko.png)
 *소스 코드가 sdist와 wheel로 빌드된 뒤 설치 검증으로 이어지는 흐름*
 
 ## 핵심 개념

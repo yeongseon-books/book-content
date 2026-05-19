@@ -62,7 +62,7 @@ TOC는 글의 위치에 따라 세 가지 상태를 반영한다:
 `medium/*.html`은 `en/*.md`에서 생성되는 파생물이다. 직접 수정 금지.
 
 생성: `.sisyphus/medium/to-medium.py`
-특징: H1-first, Markdown 변환 단계에서 local image path 유지, HTML 렌더링 단계에서 public GitHub Pages URL로 재작성(기본) 또는 base64-inline, trailing visible Tags line.
+특징: H1-first, canonical source의 public GitHub Pages 이미지 URL을 그대로 통과(기본) 또는 `--asset-mode inline`로 base64 내장 / `--asset-mode local`로 상대 경로 강제 변환, trailing visible Tags line.
 
 ## Quality Gates
 
@@ -113,9 +113,9 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 
 - 이미지 원본은 `assets/<series>/<NN>/`에 저장한다 (private `book-content`).
 - 외부 발행용 이미지는 `book-public-assets` 저장소(public)를 경유한다.
-- Canonical source(`ko/*.md`, `en/*.md`)에 public asset URL을 hardcode하지 않는다.
-- Exporter가 `series.yaml`의 `meta.asset_base_url`를 읽어 경로를 재작성한다.
-- 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다.
+- Canonical source(`ko/*.md`, `en/*.md`)는 `book-public-assets`의 public URL을 직접 참조한다. Tistory/Hashnode/Medium/MkDocs는 동일한 URL을 그대로 통과시킨다.
+- eBook exporter만 예외: bundle을 self-contained로 만들기 위해 public URL을 로컬 `assets/...` 경로로 역재작성한다 (`series.yaml`의 `meta.asset_base_url` 기준).
+- 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다. 새 이미지를 추가한 글은 sync → public commit/push → Pages 배포 확인 순서를 지킨다.
 - 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 ## When Adding a New Post
 

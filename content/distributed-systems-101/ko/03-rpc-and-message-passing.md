@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![RPC와 메시지 전달의 통신 모델 비교](../../../assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
+![RPC와 메시지 전달의 통신 모델 비교](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
 
 *RPC와 메시지 전달의 통신 모델 비교*
 

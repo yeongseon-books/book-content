@@ -48,7 +48,7 @@ The *start* of your *portfolio* is often a *major project*.
 
 ## Concept at a Glance
 
-![Project delivery flow](../../../assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
+![Project delivery flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
 
 *How a project moves from planning to demo*
 

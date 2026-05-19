@@ -44,7 +44,7 @@ In this post, we'll treat the gradient as a direction vector on a loss landscape
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
 
 *Gradient flow: multiple partial derivatives combine into one vector with direction and magnitude.*
 ## Key Terms

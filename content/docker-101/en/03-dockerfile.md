@@ -43,7 +43,7 @@ This is post 3 in the Docker 101 series. It explains the role of the core Docker
 
 ## Concept at a Glance
 
-![Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command](../../../assets/docker-101/03/03-01-concept-at-a-glance.en.png)
+![Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
 
 *A cache-friendly Dockerfile keeps low-change dependency steps above high-change application code*
 

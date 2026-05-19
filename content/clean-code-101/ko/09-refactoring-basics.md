@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![리팩토링 기초](../../../assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
+![리팩토링 기초](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
 
 *리팩토링의 기본 리듬: 초록 테스트 사이를 작은 단계로 이동하며 구조를 바꿉니다.*
 

@@ -44,7 +44,7 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
 *A simple decision model: route each operational question to the signal that answers it with the least cost and ambiguity.*
 
 ## Key Terms

@@ -65,7 +65,7 @@ Think of scaling as a three-stage declarative pipeline:
 Signal → Rule → Bounds. Once those three are set, ACA does the rest.
 You don't write YAML or imperative scaling code — you declare "if this signal arrives, scale up to N."
 
-![Scale signals changing replica counts](../../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
+![Scale signals changing replica counts](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
 
 *Scale signals changing replica counts*
 

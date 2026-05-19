@@ -45,7 +45,7 @@ Data has *thousands of rows*, but humans decide with *one or two numbers*. *Whic
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
 
 *A useful summary needs both a center metric and a spread metric, not just one representative number.*
 ## Key Terms

@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.ko.png)
 *메트릭 조건이 경보 규칙을 거쳐 호출과 채팅 채널로 라우팅되는 기본 온콜 흐름*
 
 ## 핵심 용어

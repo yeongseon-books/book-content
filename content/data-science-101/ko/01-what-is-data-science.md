@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![문제, 데이터, 인사이트, 의사결정으로 이어지는 데이터 사이언스의 기본 흐름](../../../assets/data-science-101/01/01-01-concept-at-a-glance.ko.png)
+![문제, 데이터, 인사이트, 의사결정으로 이어지는 데이터 사이언스의 기본 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.ko.png)
 
 *문제, 데이터, 인사이트, 의사결정으로 이어지는 데이터 사이언스의 기본 흐름*
 ## 핵심 용어

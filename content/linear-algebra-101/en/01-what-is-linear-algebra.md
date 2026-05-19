@@ -43,7 +43,7 @@ If your linear algebra intuition is weak, the inside of a model stays opaque. On
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
 
 *This diagram shows how vectors, matrices, and linear transformations connect into one learning path.*
 

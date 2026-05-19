@@ -36,12 +36,12 @@ Cost optimization does not work as a slogan. You need to know which calls create
 > Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 
 ## Big picture
-![Cost tracking flow and optimization points](../../../assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
+![Cost tracking flow and optimization points](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
 
 *Cost tracking flow and optimization points*
 
 ## Why this layer matters
-![Per-call tokens become cumulative cost](../../../assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)
+![Per-call tokens become cumulative cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)
 
 *Per-call tokens become cumulative cost*
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Repeated prompts become cache candidates](../../../assets/llm-apps-ops-101/02/02-02-what-to-notice-in-this-code.en.png)
+![Repeated prompts become cache candidates](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-02-what-to-notice-in-this-code.en.png)
 
 *Repeated prompts become cache candidates*
 - Separate input and output pricing constants keep the example aligned with how Groq bills this model.
@@ -212,7 +212,7 @@ In early production systems, this order is usually the fastest:
 The important part is not the sequence itself. It is refusing to optimize based on intuition alone.
 
 ## Where engineers get confused
-![Optimization levers need quality checks](../../../assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png)
+![Optimization levers need quality checks](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png)
 
 *Optimization levers need quality checks*
 - Many vendors price input and output tokens differently. Model your cost records that way from the start.

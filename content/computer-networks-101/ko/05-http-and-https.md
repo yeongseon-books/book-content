@@ -42,7 +42,7 @@ HTTP는 백엔드, 프론트엔드, 모바일, 데이터 서비스, ML 서빙까
 
 ## 핵심 그림
 
-![HTTP 요청과 HTTPS 보호 계층](../../../assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
+![HTTP 요청과 HTTPS 보호 계층](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
 *HTTP는 메시지 형식이고, HTTPS는 그 메시지가 이동하는 경로에 TLS 보호 계층을 더합니다.*
 
 요청과 응답은 모두 "시작줄 + 헤더 + 빈 줄 + 본문"이라는 같은 구조를 가집니다.

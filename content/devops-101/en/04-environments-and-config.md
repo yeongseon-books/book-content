@@ -44,7 +44,7 @@ This is post 4 in the DevOps 101 series. Here we look at how to separate code fr
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

@@ -46,7 +46,7 @@ Log4j, event-stream, ua-parser-js — *supply-chain attacks* succeed with *zero 
 
 ## Concept at a Glance
 
-![The supply-chain defense flow from manifest to lockfile, SCA, and update PRs](../../../assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
+![The supply-chain defense flow from manifest to lockfile, SCA, and update PRs](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
 
 *The supply-chain defense flow from manifest to lockfile, SCA, and update PRs*
 ## Key Terms

@@ -36,12 +36,12 @@ A believable example should bring up the server, pass health, and complete one r
 > A deployable example is not defined by nice-looking server code. It is defined by whether the same script can start the server, hit health, and complete a real chat request.
 
 ## Big picture
-![Self-test flow for health and chat](../../../assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
+![Self-test flow for health and chat](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
 
 *Self-test flow for health and chat*
 
 ## Why this layer matters
-![Startup verification reaches health check](../../../assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png)
+![Startup verification reaches health check](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png)
 
 *Startup verification reaches health check*
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Async endpoint offloads sync model calls](../../../assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png)
+![Async endpoint offloads sync model calls](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png)
 
 *Async endpoint offloads sync model calls*
 - `asyncio.to_thread` prevents the synchronous Groq SDK from blocking the FastAPI event loop.
@@ -224,7 +224,7 @@ Treat these as different failures, not one generic “deployment bug”:
 Self-tests are valuable because they make those failure boundaries obvious.
 
 ## Where engineers get confused
-![Self-test verifies startup and shutdown](../../../assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png)
+![Self-test verifies startup and shutdown](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png)
 
 *Self-test verifies startup and shutdown*
 - A health endpoint does not guarantee model quality. It only confirms basic service readiness.

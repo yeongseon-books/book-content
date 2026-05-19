@@ -46,7 +46,7 @@ Strong SQL reviewers do not just read the ON clause. They ask what kind of match
 
 ## JOIN result flow
 
-![JOIN result flow](../../../assets/sql-101/04/04-01-join-result-flow.en.png)
+![JOIN result flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
 ## Key Terms
 
 - **Join key**: the columns that *connect two tables*.

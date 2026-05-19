@@ -43,7 +43,7 @@ At the beginning, the blurry part is rarely model quality. The blurry part is th
 
 If that structure is clear, later topics become easier. Token accounting, prompt design, streaming responses, RAG context injection, and evaluation workflows all build on the same first round trip. If the structure stays fuzzy, every later feature feels like “it works somehow, but I do not really know why.”
 
-![Overview of a basic AI API call](../../../assets/ai-web-dev-101/01/api-call-overview.en.png)
+![Overview of a basic AI API call](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
 
 *Overview of a basic AI API call*
 
@@ -108,7 +108,7 @@ The first three blocks to read in the response are `model`, `choices`, and `usag
 }
 ```
 
-![Key fields in the response JSON](../../../assets/ai-web-dev-101/01/request-response-anatomy.en.png)
+![Key fields in the response JSON](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/request-response-anatomy.en.png)
 
 *Key fields in the response JSON*
 
@@ -242,7 +242,7 @@ def log_usage(result: dict) -> None:
     )
 ```
 
-![How token count and response cost relate](../../../assets/ai-web-dev-101/01/tokens-and-cost-flow.en.png)
+![How token count and response cost relate](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/tokens-and-cost-flow.en.png)
 
 *How token count and response cost relate*
 
@@ -307,7 +307,7 @@ print(translate_ko_to_en("오늘은 API 응답 구조를 먼저 이해하는 것
 Today, it is important to understand the API response structure first.
 ```
 
-![How a system prompt and user prompt combine in a translation request](../../../assets/ai-web-dev-101/01/translation-exercise-flow.en.png)
+![How a system prompt and user prompt combine in a translation request](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/translation-exercise-flow.en.png)
 
 *How a system prompt and user prompt combine in a translation request*
 

@@ -44,7 +44,7 @@ Once you understand the object model precisely, "why is this method being called
 
 ## Concept at a Glance
 
-![Class-based lookup and prototype chains meeting at the same delegation idea](../../../assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
+![Class-based lookup and prototype chains meeting at the same delegation idea](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
 
 *Class-based lookup and prototype chains meeting at the same delegation idea*
 

@@ -59,7 +59,7 @@ Handling strings precisely prevents these mistakes upfront, and the code becomes
 > In Python 3, `str` is an immutable sequence of Unicode code points and `bytes` is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.
 Python's `str` is a sequence of code points. It is abstracted at the level humans read; it only becomes `bytes` when it leaves memory for disk or the network.
 
-![Mental model](../../../assets/python-101/03/03-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
 
 *Mental model*
 Three rules make most of the confusion disappear.

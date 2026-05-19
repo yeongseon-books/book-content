@@ -46,7 +46,7 @@ Without tests, *every change is a gamble*. You fix signup and *payments* break; 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/01/01-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

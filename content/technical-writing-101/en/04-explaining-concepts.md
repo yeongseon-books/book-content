@@ -44,7 +44,7 @@ If the *concept* stays blurry, everything after it is a *sandcastle*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

@@ -44,7 +44,7 @@ ML models are *function compositions*, and training pushes signals through *each
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
 
 *Concept flow: the input-function-output contract gains meaning once slope and derivative are layered onto it.*
 ## Key Terms

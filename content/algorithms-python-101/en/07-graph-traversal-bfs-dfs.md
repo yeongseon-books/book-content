@@ -56,7 +56,7 @@ Example graph:     BFS order:           DFS order:
   E   F
 ```
 
-![BFS layers compared with a DFS-first path](../../../assets/algorithms-python-101/07/07-01-concept-overview.en.png)
+![BFS layers compared with a DFS-first path](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.en.png)
 
 *BFS expands level by level, while DFS commits to one branch first and backtracks later.*
 

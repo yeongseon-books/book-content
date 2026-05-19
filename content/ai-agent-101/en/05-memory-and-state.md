@@ -47,12 +47,12 @@ This is post 5 in the AI Agent 101 series. Here we cover the difference between 
 
 ### Memory and state split
 
-![Memory and state split](../../../assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
+![Memory and state split](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
 ## Short-term Memory vs Long-term Memory
 
 Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.
 
-![Short-term Memory vs Long-term Memory](../../../assets/ai-agent-101/05/05-01-short-term-memory-vs-long-term-memory.en.png)
+![Short-term Memory vs Long-term Memory](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-short-term-memory-vs-long-term-memory.en.png)
 *A practical memory design separates the working set for the current turn, the execution state for the current workflow position, and the long-term store for information worth retrieving later.*
 
 ### Short-term Memory

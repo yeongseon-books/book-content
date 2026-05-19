@@ -44,7 +44,7 @@ Here, we will define a Pod as the smallest deployable execution bundle in Kubern
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
 *A Pod groups the app container, sidecars, shared storage, and shared networking into one scheduled execution unit.*
 
 

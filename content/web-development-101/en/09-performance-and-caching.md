@@ -43,7 +43,7 @@ A fast site is *money* — conversion, search rank, and user satisfaction all sc
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
 
 *A layered cache picture from the user edge down to the database.*
 

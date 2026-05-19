@@ -42,7 +42,7 @@ A good structure lets *a new teammate find anything in 30 minutes*. A bad struct
 
 ## Concept at a Glance
 
-![production request flow with observability attached to each layer](../../../assets/backend-development-101/10/10-01-concept-at-a-glance.en.png)
+![production request flow with observability attached to each layer](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png)
 
 *production request flow with observability attached to each layer*
 Each arrow should align with a *directory boundary*.

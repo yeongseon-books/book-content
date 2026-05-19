@@ -42,7 +42,7 @@ Python does not enforce type hints at runtime. A function can declare `-> str` a
 
 mypy and pyright both do that, but the useful operational question is bigger than tool choice. You need one example that fails, gets fixed, becomes stricter, and then gets enforced in CI. Otherwise the article stops at installation commands instead of giving readers a runnable workflow.
 
-![Type-check feedback loop from local editing to the CI gate](../../../assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
+![Type-check feedback loop from local editing to the CI gate](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
 
 *Type-check feedback loop from local editing to the CI gate*
 

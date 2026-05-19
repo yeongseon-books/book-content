@@ -50,7 +50,7 @@ title: Capacity Planning
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.ko.png)
 
 *예측 수요와 부하 테스트 결과를 바탕으로 증설과 모니터링을 반복하는 용량 계획 흐름입니다.*
 이 흐름은 용량 계획이 한 번의 계산으로 끝나지 않는다는 점을 보여 줍니다. 예측하고, 검증하고, 증설하고, 실제 사용량을 다시 보면서 계속 보정해야 합니다.

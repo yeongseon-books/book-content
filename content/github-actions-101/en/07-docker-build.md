@@ -44,7 +44,7 @@ The *slowest CI step* is usually the *Docker build*. Done right (cache + multi-s
 
 ## Concept at a Glance
 
-![A Docker build path from Dockerfile through Buildx and cache to GHCR](../../../assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)
+![A Docker build path from Dockerfile through Buildx and cache to GHCR](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)
 
 *A Docker build path from Dockerfile through Buildx and cache to GHCR*
 

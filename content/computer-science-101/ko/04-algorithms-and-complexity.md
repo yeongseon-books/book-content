@@ -58,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 > 같은 결과를 내는 두 알고리즘도 입력이 커지면 차이가 수천 배로 벌어집니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
 *같은 문제도 알고리즘과 자료구조 선택에 따라 비용 곡선이 완전히 달라집니다*
 
 ## 핵심 용어

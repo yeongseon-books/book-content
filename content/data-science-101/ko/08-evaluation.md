@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![분류와 회귀 문제에서 핵심 평가지표를 나눠 보는 평가 지도](../../../assets/data-science-101/08/08-01-concept-at-a-glance.ko.png)
+![분류와 회귀 문제에서 핵심 평가지표를 나눠 보는 평가 지도](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.ko.png)
 
 *분류와 회귀 문제에서 핵심 평가지표를 나눠 보는 평가 지도*
 ## 핵심 용어

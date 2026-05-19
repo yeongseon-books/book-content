@@ -45,7 +45,7 @@ Containers are immutable, but the data they manage must survive. A bad volume de
 
 ## Concept at a Glance
 
-![Storage paths for volumes, bind mounts, and tmpfs](../../../assets/containers-101/05/05-01-concept-at-a-glance.en.png)
+![Storage paths for volumes, bind mounts, and tmpfs](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
 
 *Storage paths for volumes, bind mounts, and tmpfs*
 ## Key Terms

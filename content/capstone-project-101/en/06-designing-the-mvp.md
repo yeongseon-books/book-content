@@ -55,7 +55,7 @@ The out-of-scope list protects that flow. Naming postponed items such as payment
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
 *An MVP structure that links hypothesis, demo bar, and feedback*
 
 ## Practical artifact: an MVP contract

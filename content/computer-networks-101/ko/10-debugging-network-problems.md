@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 그림
 
-![네트워크 장애를 계층별로 줄여 가는 진단 순서](../../../assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
+![네트워크 장애를 계층별로 줄여 가는 진단 순서](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
 *간단한 도구부터 순서대로 써서 정상인 층을 빠르게 지우면, 마지막에 남는 층이 실제 장애 후보가 됩니다.*
 
 한 단계씩 정상으로 판정할 때마다 가능한 원인 후보가 크게 줄어듭니다.

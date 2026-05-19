@@ -50,7 +50,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![시스템 디자인 인터뷰의 네 단계 흐름](../../../assets/developer-career-101/06/06-01-concept-at-a-glance.ko.png)
+![시스템 디자인 인터뷰의 네 단계 흐름](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.ko.png)
 
 *시스템 디자인 인터뷰의 네 단계 흐름*
 

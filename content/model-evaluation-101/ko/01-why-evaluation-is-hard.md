@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![예측에서 지표와 결정으로 이어지는 평가 흐름](../../../assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
+![예측에서 지표와 결정으로 이어지는 평가 흐름](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
 
 *예측에서 지표와 결정으로 이어지는 평가 흐름*
 이 그림에서 중요한 점은 지표가 종착점이 아니라는 사실입니다. 예측은 지표로 요약되지만, 그 지표는 다시 실제 결정으로 이어집니다. 그리고 그 결정의 기준은 늘 비용 구조와 연결됩니다.

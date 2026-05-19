@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![코드 밖의 secret을 저장소와 회전 절차로 관리하는 흐름](../../../assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
+![코드 밖의 secret을 저장소와 회전 절차로 관리하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
 
 *코드 밖의 secret을 저장소와 회전 절차로 관리하는 흐름*
 이 구조에서 코드에는 secret이 직접 들어 있지 않고, 런타임이 환경 변수나 secret manager를 통해 값을 읽습니다. secret manager는 저장뿐 아니라 접근 감사와 회전을 함께 담당합니다. 회전 경로가 처음부터 설계돼 있어야 사고 대응 속도가 나옵니다.

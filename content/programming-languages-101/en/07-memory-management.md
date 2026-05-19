@@ -44,7 +44,7 @@ Long-running services often slowly creep up in memory. Finding the cause means b
 
 ## Concept at a Glance
 
-![The lifetime flow from stack frames to heap objects, refcounts, and tracing GC](../../../assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
+![The lifetime flow from stack frames to heap objects, refcounts, and tracing GC](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
 
 *The lifetime flow from stack frames to heap objects, refcounts, and tracing GC*
 

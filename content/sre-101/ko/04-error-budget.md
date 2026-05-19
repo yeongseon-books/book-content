@@ -50,7 +50,7 @@ title: Error Budget
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
 
 *SLO에서 나온 허용 실패량이 실제 오류와 만나 릴리스 정책을 바꾸는 흐름입니다.*
 이 그림은 에러 버짓이 단지 계산식이 아니라 의사결정 체계라는 점을 보여 줍니다. 목표에서 버짓이 나오고, 실제 오류가 그 버짓을 소모하며, 남은 정도에 따라 팀의 릴리스 속도와 우선순위가 바뀝니다.

@@ -47,7 +47,7 @@ Most systems are not built well from the start. They are built to change well. T
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
 *Expand-contract keeps live changes safe by adding a new path, comparing it, migrating traffic, and cleaning up*
 
 Expand → switch → contract.

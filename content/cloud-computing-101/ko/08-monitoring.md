@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![메트릭이 알람으로 이어지고 로그가 분석 쿼리로 이어지는 관측 흐름](../../../assets/cloud-computing-101/08/08-01-concept-at-a-glance.ko.png)
+![메트릭이 알람으로 이어지고 로그가 분석 쿼리로 이어지는 관측 흐름](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.ko.png)
 
 *메트릭이 알람으로 이어지고 로그가 분석 쿼리로 이어지는 관측 흐름*
 메트릭은 추세와 임계값에 강하고, 로그는 사건의 세부 맥락에 강하며, 트레이스는 분산 호출의 흐름을 보여 줍니다. 이 셋을 구분해야 “지금 상태가 이상한가”와 “왜 이상한가”를 함께 풀 수 있습니다.

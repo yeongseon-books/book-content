@@ -60,7 +60,7 @@ The goal of this chapter is to remove both. By the end you should be able to pic
 
 A merge produces "a new commit that combines two commits." When the two commits sit on the same line of history, Git skips the new commit and just slides a pointer forward (fast-forward). When the two commits sit on diverged lines, Git creates a new merge commit with two parents (three-way).
 
-![Mental Model](../../../assets/git-github-101/05/05-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png)
 
 *Mental Model*
 Three things to internalize:

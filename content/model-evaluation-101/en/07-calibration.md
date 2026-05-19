@@ -44,7 +44,7 @@ Systems that multiply probabilities by costs to make decisions need calibration 
 
 ## Concept at a Glance
 
-![calibration flow comparing predicted probability buckets to observed frequency](../../../assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
+![calibration flow comparing predicted probability buckets to observed frequency](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
 
 *calibration flow comparing predicted probability buckets to observed frequency*
 ## Key Terms

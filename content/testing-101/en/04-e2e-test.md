@@ -46,7 +46,7 @@ A passing E2E test means *frontend, backend, and DB work together*. It is the *m
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

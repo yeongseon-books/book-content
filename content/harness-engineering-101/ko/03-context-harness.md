@@ -41,7 +41,7 @@ Context Harness가 중요한 첫 번째 이유는 비용입니다. 너무 많은
 ## 핵심 개념
 Agent가 받는 컨텍스트는 결과를 결정합니다. 너무 적으면 추측하고, 너무 많으면 길을 잃습니다. Context Harness는 Agent에게 줄 정보와 숨길 정보를 설계하는 일입니다.
 
-![Context Harness - Agent에게 줄 정보와 숨길 정보 설계하기](../../../assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.ko.png)
+![Context Harness - Agent에게 줄 정보와 숨길 정보 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.ko.png)
 
 ### Context는 자원입니다
 
@@ -53,7 +53,7 @@ Context Harness는 Agent가 어떤 정보를 어느 시점에 받고, 어떤 정
 
 ### Context의 5가지 구성 요소
 
-![Context의 5가지 구성 요소](../../../assets/harness-engineering-101/03/03-02-the-five-components-of-context.ko.png)
+![Context의 5가지 구성 요소](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-02-the-five-components-of-context.ko.png)
 
 Agent가 한 번의 추론에서 보는 context는 다섯 가지로 나뉩니다.
 
@@ -158,7 +158,7 @@ class HistoryManager:
 
 ### Retrieved Context의 정밀도
 
-![Retrieved Context의 정밀도](../../../assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.ko.png)
+![Retrieved Context의 정밀도](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-03-precision-in-retrieved-context.ko.png)
 
 RAG로 가져온 문서는 context의 큰 부분을 차지합니다. 가져오는 양보다 가져오는 정밀도가 중요합니다.
 
@@ -240,7 +240,7 @@ def trim_tool_history(history: list[dict], keep_last: int = 3) -> list[dict]:
 
 ### Context Snapshot으로 재현성 확보
 
-![Context Snapshot으로 재현성 확보](../../../assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.ko.png)
+![Context Snapshot으로 재현성 확보](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-04-context-snapshots-for-reproducibility.ko.png)
 
 Production agent는 같은 입력에 같은 출력을 내야 합니다. 그런데 context는 여러 단계를 거쳐 조립되기 때문에 재현이 어렵습니다. Context Snapshot으로 해결합니다.
 

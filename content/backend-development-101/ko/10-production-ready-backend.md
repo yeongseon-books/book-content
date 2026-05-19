@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조](../../../assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
+![운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
 
 *운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조*
 각 화살표는 물리적인 디렉터리 경계와 맞물려야 합니다. 구조가 좋다면 요청 흐름도 파일 구조를 따라 자연스럽게 읽힙니다.

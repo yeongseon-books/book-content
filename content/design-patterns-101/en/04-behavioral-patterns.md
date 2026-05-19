@@ -45,7 +45,7 @@ Cooperation between objects quickly hardens into piles of if/elif. Behavioral pa
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
 *Behavioral patterns organize cooperation by separating algorithms, notifications, requests, states, and traversal into named structures.*
 
 ## Key Terms

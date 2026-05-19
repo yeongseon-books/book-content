@@ -48,7 +48,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조](../../../assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
+![지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
 
 *지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조*
 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.

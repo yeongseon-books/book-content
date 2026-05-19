@@ -75,7 +75,7 @@ That table matters because these are the questions operators actually ask. Why d
 
 In practice, I look for three things first in a multi-agent graph: whether the supervisor really behaves like a supervisor, whether workers avoid mutating too much shared state, and whether the finalizer absorbs final-output responsibility. Once those three are clear, you can add workers without losing the shape of the system.
 
-![Questions this post answers](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -85,7 +85,7 @@ In practice, I look for three things first in a multi-agent graph: whether the s
 
 Start with the smallest supervisor-worker example that still resembles a real multi-agent skeleton. The supervisor reads the request and chooses either a `research` worker or a `code` worker. The worker writes only its dedicated result. A finalizer then assembles the response format. The example is deliberately small, but it already contains the structural bones that matter later.
 
-![Supervisor worker delegation structure](../../../assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
+![Supervisor worker delegation structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
 
 *Supervisor worker delegation structure*
 
@@ -185,7 +185,7 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 Do not try to absorb the whole file with equal attention. Three things matter first.
 
-![Route and worker_result state flow](../../../assets/langgraph-101/05/05-02-what-to-notice-in-this-code.en.png)
+![Route and worker_result state flow](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-02-what-to-notice-in-this-code.en.png)
 
 *Route and worker_result state flow*
 
@@ -205,7 +205,7 @@ The third point is the finalizer. Without one, output style and completion rules
 
 The most common mistake in multi-agent design is believing that “more agents” automatically means “better results.” In practice, agent count usually matters less than **who controls delegation, who performs work, and who owns the final response.**
 
-![Role boundaries across supervisor and workers](../../../assets/langgraph-101/05/05-03-where-engineers-get-confused.en.png)
+![Role boundaries across supervisor and workers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-03-where-engineers-get-confused.en.png)
 
 *Role boundaries across supervisor and workers*
 

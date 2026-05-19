@@ -45,7 +45,7 @@ Design decisions outlive code. Bad design cannot be hidden under good code.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
 *How design decisions flow into implementation and back through observation*
 
 Design sets the ceiling for implementation.

@@ -48,7 +48,7 @@ This is the 7th article in the LLM from Scratch 101 series.
 
 We input the current context `idx`, extract only the last step's logits, and then append the sampled token to the sequence.
 
-![Autoregressive loop with token-by-token appends](../../../assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
+![Autoregressive loop with token-by-token appends](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
 
 *Autoregressive loop with token-by-token appends*
 ## Greedy Decoding — Why argmax is Boring

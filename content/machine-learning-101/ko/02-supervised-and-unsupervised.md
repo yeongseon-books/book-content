@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/02/02-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-diagram.ko.png)
 
 *레이블이 있으면 지도학습으로, 없으면 구조 탐색 중심의 비지도학습으로 출발점이 갈린다는 점을 한 장에 정리한 그림입니다.*
 

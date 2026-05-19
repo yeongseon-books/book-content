@@ -42,7 +42,7 @@ A 0.95 score in a notebook is worth zero if the model never reaches users. Ownin
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
 
 *An ML project is a loop, not a notebook milestone: problem framing, data, modeling, deployment, and monitoring all feed back into each other.*
 

@@ -60,7 +60,7 @@ Functions를 운영하면서 가장 자주 만나는 오해 중 하나는 “호
 
 먼저 전체 구조를 한 장으로 보겠습니다.
 
-![외부 스케일아웃과 내부 워커 확장 경계](../../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
+![외부 스케일아웃과 내부 워커 확장 경계](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
 
 핵심은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 점입니다.
 
@@ -156,7 +156,7 @@ if (throttleManager != null)
 
 health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변이라면, `ScaleMonitor`와 `TargetScaler`는 “일이 얼마나 쌓였나”에 대한 trigger 쪽 답변입니다.
 
-![Trigger metrics flowing into scale decisions](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
+![Trigger metrics flowing into scale decisions](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
 
 두 모드는 성격이 다릅니다.
 
@@ -200,7 +200,7 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 
 아래 그림은 같은 코드가 플랜마다 다른 운영 의미를 갖는 이유를 보여 줍니다.
 
-![Plan-specific scaling decision differences](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
+![Plan-specific scaling decision differences](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
 
 #### Consumption
 

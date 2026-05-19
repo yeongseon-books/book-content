@@ -55,7 +55,7 @@ Data and next actions strengthen the discussion further. Metrics such as bug cou
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
 *Turning a retrospective into input for the next project*
 
 ## Practical artifact: a retrospective action log

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![인코딩, 자료형, 헤더를 점검하며 파일을 읽는 적재 흐름](../../../assets/pandas-101/03/03-01-concept-at-a-glance.ko.png)
+![인코딩, 자료형, 헤더를 점검하며 파일을 읽는 적재 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.ko.png)
 *인코딩, 자료형, 헤더를 점검하며 파일을 읽는 적재 흐름*
 
 ## 핵심 용어

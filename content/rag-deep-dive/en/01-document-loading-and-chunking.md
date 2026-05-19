@@ -34,7 +34,7 @@ This is the first post in the RAG Deep Dive series.
 
 > Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
 
-![Questions this post answers](../../../assets/rag-deep-dive/01/01-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
@@ -163,7 +163,7 @@ The operating principle for this post is simple: **chunking is a meaning-preserv
 
 In LangChain, a loader does two things. First, it reads bytes from somewhere. Second, it emits one or more `Document(page_content=..., metadata=...)` objects. That second step matters more than it first appears to. The splitter, vector store, retriever, and often the citation layer all inherit the loader's original decision about document boundaries and metadata.
 
-![Loader metadata flow into documents](../../../assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
+![Loader metadata flow into documents](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
 
 *Loader metadata flow into documents*
 
@@ -234,7 +234,7 @@ The operational lesson is straightforward. **Before tuning `chunk_size`, inspect
 
 Most high-level explanations say that `CharacterTextSplitter` splits on a separator and then stops there. The source says otherwise. In [`character.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py), `CharacterTextSplitter.split_text()` first breaks the input into smaller pieces through `_split_text_with_regex()`. The final chunk boundaries are then decided by `TextSplitter._merge_splits()` in [`base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/base.py). That merge stage is where `chunk_size`, `chunk_overlap`, and `length_function` interact.
 
-![Merge window inside CharacterTextSplitter](../../../assets/rag-deep-dive/01/01-02-character-splitter-merge-window.en.png)
+![Merge window inside CharacterTextSplitter](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-02-character-splitter-merge-window.en.png)
 
 *Merge window inside CharacterTextSplitter*
 
@@ -292,7 +292,7 @@ If you run it, you will notice that overlap feels irregular rather than exact. T
 `RecursiveCharacterTextSplitter` is widely used not because it is magical, but because its failure mode is relatively gentle. In [`character.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/text-splitters/langchain_text_splitters/character.py), the default separator priority is `[
 "\n\n", "\n", " ", ""]`. In plain terms: try paragraph breaks first, then line breaks, then spaces, and only then fall all the way back to character-level splitting.
 
-![Separator priority in recursive splitting](../../../assets/rag-deep-dive/01/01-03-recursive-separator-fallback.en.png)
+![Separator priority in recursive splitting](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-03-recursive-separator-fallback.en.png)
 
 *Separator priority in recursive splitting*
 
@@ -344,7 +344,7 @@ That is why `RecursiveCharacterTextSplitter` is such a good default for mixed pr
 
 Character count and token count are not the same thing, and language models only care about the second one. That mismatch is one of the easiest ways to create a RAG system that looks healthy during ingest and then fails when the final prompt is assembled.
 
-![Character counts diverging from token counts](../../../assets/rag-deep-dive/01/01-04-token-aware-splitting.en.png)
+![Character counts diverging from token counts](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-04-token-aware-splitting.en.png)
 
 *Character counts diverging from token counts*
 
@@ -395,7 +395,7 @@ On multilingual text, logs, code, and text dense with identifiers, the gap betwe
 
 There is no universal best chunk size. There are only chunk sizes that are better or worse for a domain, a model budget, and a question style. The most common mistake is applying one number everywhere, such as `chunk_size=1000` and `chunk_overlap=200`, across policy documents, API docs, legal contracts, logs, and source code.
 
-![Chunk quality feedback loop](../../../assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.en.png)
+![Chunk quality feedback loop](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-05-chunk-quality-feedback-loop.en.png)
 
 *Chunk quality feedback loop*
 

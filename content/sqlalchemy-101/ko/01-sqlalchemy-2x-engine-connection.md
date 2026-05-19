@@ -29,7 +29,7 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 
 `pip install sqlalchemy` 뒤에 가장 먼저 생기는 오해는 "SQLAlchemy가 `sqlite3` 같은 드라이버를 대체한다"는 생각입니다. 실제로는 반대입니다. SQLAlchemy는 PEP 249 DB-API 드라이버 위에 올라가는 계층이고, `create_engine("sqlite:///app.db")`를 호출하면 내부에서는 여전히 `sqlite3` 같은 드라이버가 실제 통신을 맡습니다. 이 구조를 이해하면 이후에 나올 Session, ORM, connection pool도 같은 선에서 읽힙니다.
 
-![SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](../../../assets/sqlalchemy-101/01/01-01-getting-started-with-sqlalchemy-2-x-engi.ko.png)
+![SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-01-getting-started-with-sqlalchemy-2-x-engi.ko.png)
 
 *SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질*
 
@@ -43,7 +43,7 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 
 ## 왜 중요한가
 
-![핵심 개념](../../../assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
 
 *핵심 개념*
 많은 SQLAlchemy 입문 자료가 ORM의 `Base = declarative_base()`부터 시작합니다. 그 결과 ORM이 아닌 곳에서 문제가 발생했을 때, 예컨대 connection이 끊어졌거나 transaction이 의도와 다르게 commit되었을 때, 어디를 들여다봐야 할지 감을 잡기 어렵습니다. Engine과 Connection은 ORM의 Session을 받쳐주는 토대이고, Session 내부에서 문제가 생기면 결국 Connection 수준에서 디버깅해야 합니다.
@@ -54,7 +54,7 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 
 ## 멘탈 모델
 
-![Mental model](../../../assets/sqlalchemy-101/01/01-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-03-mental-model.ko.png)
 
 *멘탈 모델*
 SQLAlchemy의 Engine은 "데이터베이스와 통신할 수 있는 능력 그 자체를 객체화한 것"입니다. Connection 객체가 실제 통신 채널이고, Engine은 그 채널을 만들 수 있는 권한과 설정을 들고 있는 factory입니다.
@@ -88,7 +88,7 @@ Application code
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/sqlalchemy-101/01/01-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### Core와 ORM의 두 계층
@@ -205,7 +205,7 @@ def add_user(name: str) -> None:
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/sqlalchemy-101/01/01-05-step-by-step-practice.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-05-step-by-step-practice.ko.png)
 
 *단계별 실습*
 이 절은 빈 디렉터리에서 시작해서 첫 번째 SQLAlchemy 2.x 코드를 돌려보는 과정을 따라갑니다.

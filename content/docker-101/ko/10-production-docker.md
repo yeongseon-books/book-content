@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![빌드·서명·레지스트리 push 뒤 최소 권한 런타임과 로그·메트릭 수집으로 이어지는 프로덕션 흐름](../../../assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
+![빌드·서명·레지스트리 push 뒤 최소 권한 런타임과 로그·메트릭 수집으로 이어지는 프로덕션 흐름](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
 
 *이미지를 빌드하고 서명한 뒤 최소 권한으로 실행하고 표준 로그·메트릭 채널로 관측하는 프로덕션 운영 흐름*
 

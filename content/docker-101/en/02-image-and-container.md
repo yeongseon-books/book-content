@@ -43,7 +43,7 @@ If you do not understand how containers behave, *debugging becomes luck*. Knowin
 
 ## Concept at a Glance
 
-![Immutable image flowing into a mutable container lifecycle from run to stop to removal](../../../assets/docker-101/02/02-01-concept-at-a-glance.en.png)
+![Immutable image flowing into a mutable container lifecycle from run to stop to removal](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
 
 *An immutable image becomes a mutable container instance that can be created, run, stopped, and removed without changing the source artifact*
 

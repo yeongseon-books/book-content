@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ### 한 증가 연산이 섞여 깨지는 순간
 
-![한 증가 연산이 섞여 깨지는 순간](../../../assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.ko.png)
+![한 증가 연산이 섞여 깨지는 순간](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.ko.png)
 *경쟁 상태는 두 흐름이 같은 값을 읽고 각자 덮어쓰면서 일부 결과를 잃는 식으로 나타납니다.*
 
 ```text

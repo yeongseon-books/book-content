@@ -55,7 +55,7 @@ last_reviewed: '2026-05-15'
 
 ## 그래프 표현을 그림으로 보면
 
-![그래프 표현을 그림으로 보면](../../../assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
+![그래프 표현을 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
 
 *같은 관계 데이터를 그래프와 인접 리스트로 읽는 방식을 함께 보여 주는 그림*
 

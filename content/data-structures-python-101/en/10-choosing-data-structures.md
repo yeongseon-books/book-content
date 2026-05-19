@@ -71,7 +71,7 @@ Relationship network? -> graph
 
 ## Decision Flow at a Glance
 
-![Decision Flow at a Glance](../../../assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.en.png)
+![Decision Flow at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.en.png)
 
 *A quick decision flow for choosing between list, dict, set, deque, and heapq*
 

@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/devops-101/07/07-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-diagram.ko.png)
 
 *한눈에 보는 개념*
 

@@ -48,7 +48,7 @@ That is why experiment tracking alone is not enough. A high metric becomes hard 
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/03/03-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This picture explains why a tool such as DVC exists. The git repository stores a pointer file instead of the large dataset itself, the real data lives in remote storage, and the pipeline reads the pointer to recover the exact input state.

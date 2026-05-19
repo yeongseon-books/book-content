@@ -48,7 +48,7 @@ runbook은 이 탐색 비용을 줄이는 장치입니다. 더 나아가 운영 
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/10/10-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 이 그림은 runbook이 한 문서가 아니라 연결 구조라는 점을 보여 줍니다. severity에서 시작해 호출, 공지, 대응 순서, 사후 기록까지 한 흐름으로 이어져야 현장에서 바로 쓸 수 있습니다.

@@ -48,7 +48,7 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 > A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.
 A GitHub Flow cycle looks like this.
 
-![Mental model](../../../assets/git-github-101/10/10-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
 
 *Mental model*
 The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.
@@ -230,7 +230,7 @@ That is one full cycle. The next change starts at a new issue.
 
 In practice, the risky part is rarely opening the PR. The risky part is deciding whether the branch is truly ready to merge. A simple decision flow makes that judgment repeatable.
 
-![The decision flow before you press merge](../../../assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.en.png)
+![The decision flow before you press merge](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.en.png)
 
 *A GitHub Flow decision map from issue scope to merge method and release tagging*
 

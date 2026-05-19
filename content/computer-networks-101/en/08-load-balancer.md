@@ -50,7 +50,7 @@ A load balancer is more than a distributor — it is the device that decides rel
 
 ## Concept at a Glance
 
-![How a load balancer keeps traffic on healthy backends](../../../assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
+![How a load balancer keeps traffic on healthy backends](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
 *The load balancer is less a traffic splitter than a control point that keeps only healthy, ready backends in the active pool.*
 
 An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.

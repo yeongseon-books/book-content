@@ -46,7 +46,7 @@ The opposite is also true. A messy GitHub profile can work against you. If all p
 
 ## The Smallest Portfolio Structure
 
-![The smallest portfolio structure](../../../assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
+![The smallest portfolio structure](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
 
 *A portfolio emerges when profile, representative work, evidence, and narrative are connected*
 That final step matters most. A page full of links is only a storage shelf. A page full of personal claims is only a self-introduction. A portfolio appears when evidence and explanation meet.

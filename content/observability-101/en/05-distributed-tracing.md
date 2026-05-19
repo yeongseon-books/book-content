@@ -44,7 +44,7 @@ In a microservice world, finding the cause of a *slow request* with logs and met
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)
 *One request becomes a trace tree whose spans show where latency accumulated across services and storage.*
 
 ## Key Terms

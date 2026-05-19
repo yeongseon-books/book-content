@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![클라이언트 요청이 HTTP 서버, 라우터, 서비스, 데이터베이스를 통과하는 흐름](../../../assets/backend-development-101/01/01-01-concept-at-a-glance.ko.png)
+![클라이언트 요청이 HTTP 서버, 라우터, 서비스, 데이터베이스를 통과하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.ko.png)
 
 *클라이언트 요청이 HTTP 서버, 라우터, 서비스, 데이터베이스를 통과하는 흐름*
 요청은 왼쪽에서 오른쪽으로 흘러가고, 응답은 같은 길을 되짚어 돌아옵니다. 이 그림만 이해해도 이후 글에서 배우는 HTTP, 라우팅, 서비스, 데이터베이스, 인증, 로깅, 테스트, 배포가 모두 하나의 구조 안에 들어간다는 감각을 잡을 수 있습니다.

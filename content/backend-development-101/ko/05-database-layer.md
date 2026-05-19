@@ -44,7 +44,7 @@ repository는 데이터베이스와 service 사이의 번역기 역할을 합니
 
 ## 한눈에 보는 개념
 
-![서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계](../../../assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
+![서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
 
 *서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계*
 service는 SQL을 몰라도 되고, repository만 데이터 접근 세부 구현을 알면 됩니다. 이 단순한 분리가 데이터 계층을 교체 가능한 형태로 만들어 줍니다.

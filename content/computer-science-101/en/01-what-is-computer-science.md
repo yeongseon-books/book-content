@@ -56,7 +56,7 @@ This series walks through the major subjects of a CS curriculum, one at a time, 
 
 > Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.
 
-![Concept at a Glance](../../../assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
 *The main CS layers, moving from theory into systems and applications*
 
 ## Key Terms

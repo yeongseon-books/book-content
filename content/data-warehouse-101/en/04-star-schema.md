@@ -52,7 +52,7 @@ Analytical queries get faster as joins decrease. A star schema keeps *one fact* 
 
 ## Concept at a Glance
 
-![Star schema join structure](../../../assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
+![Star schema join structure](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
 
 *A classic star schema keeps one central fact table surrounded by dimensions that each join in a single hop.*
 

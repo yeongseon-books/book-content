@@ -42,7 +42,7 @@ Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkw
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
 
 *The form-validation flow from input and format checks to business rules and server validation*
 

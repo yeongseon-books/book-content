@@ -46,7 +46,7 @@ Without monitoring, your *customers* tell you about outages first. A single well
 
 ## Concept at a Glance
 
-![Monitoring flow from application signals to alarms, notifications, and log analysis](../../../assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
+![Monitoring flow from application signals to alarms, notifications, and log analysis](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
 
 *Monitoring flow from application signals to alarms, notifications, and log analysis*
 

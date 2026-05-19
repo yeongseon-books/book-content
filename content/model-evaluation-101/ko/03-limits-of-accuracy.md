@@ -48,7 +48,7 @@ last_reviewed: '2026-05-17'
 
 ## 한눈에 보는 멘탈 모델
 
-![균형 데이터와 불균형 데이터에서 달라지는 정확도 해석](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
+![균형 데이터와 불균형 데이터에서 달라지는 정확도 해석](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
 
 *균형 데이터와 불균형 데이터에서 달라지는 정확도 해석*
 

@@ -57,7 +57,7 @@ After DP: each fib(n) computed only once
 fib(1)=1 → fib(2)=1 → fib(3)=2 → fib(4)=3 → fib(5)=5
 ```
 
-![순진한 재귀와 DP 상태 재사용 비교](../../../assets/algorithms-python-101/06/06-01-concept-overview.ko.png)
+![순진한 재귀와 DP 상태 재사용 비교](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.ko.png)
 
 *순진한 재귀는 같은 상태를 여러 번 계산하지만, DP는 상태를 한 번 채운 뒤 재사용합니다.*
 

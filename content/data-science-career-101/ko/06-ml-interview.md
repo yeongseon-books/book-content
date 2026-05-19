@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.ko.png)
 
 *문제 정의에서 모델 선택, 평가, 배포로 이어지는 ML 인터뷰 답변 구조*
 이 흐름을 답변 구조로 잡으면 훨씬 단단해집니다. 문제를 정의하고, 모델을 선택하고, 평가 기준을 설명한 뒤, 배포와 모니터링까지 연결해야 합니다.

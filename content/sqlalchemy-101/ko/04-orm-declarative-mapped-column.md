@@ -29,7 +29,7 @@ Core에서 `Table`과 `Column`으로 스키마를 다뤘다면 이제 같은 구
 
 중요한 점은 ORM이 Core와 분리된 세계가 아니라는 사실입니다. 모델 클래스를 정의하는 순간 내부에서는 여전히 `Table`과 `Column`이 만들어지고, `MetaData`에 등록됩니다. 이 연결을 이해해야 이후 Session과 relationship도 덜 헷갈립니다.
 
-![ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](../../../assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.ko.png)
+![ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.ko.png)
 
 *ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기*
 
@@ -43,7 +43,7 @@ Core에서 `Table`과 `Column`으로 스키마를 다뤘다면 이제 같은 구
 
 ## 왜 중요한가
 
-![핵심 개념](../../../assets/sqlalchemy-101/04/04-02-why-it-matters.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.ko.png)
 
 *핵심 개념*
 Core만으로도 데이터베이스 작업은 충분히 가능합니다. 그러나 애플리케이션이 커지면 다음과 같은 부담이 빠르게 늘어납니다.
@@ -57,7 +57,7 @@ ORM은 마법이 아니라, Core 위에 얇은 레이어를 얹어 위 비용을
 
 ## 멘탈 모델
 
-![Mental model](../../../assets/sqlalchemy-101/04/04-03-mental-model.ko.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-03-mental-model.ko.png)
 
 *멘탈 모델*
 > ORM 모델 클래스는 "파이썬 클래스 + Core `Table`"의 결합입니다. `DeclarativeBase`는 그 바인딩의 그릇(`MetaData`)이고, `mapped_column`은 그 안에 들어갈 `Column`을 타입 힌트로부터 만들어 주는 헬퍼입니다.
@@ -77,7 +77,7 @@ DeclarativeBase
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/sqlalchemy-101/04/04-04-core-concepts.ko.png)
+![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-04-core-concepts.ko.png)
 
 *핵심 개념*
 ### 1) DeclarativeBase
@@ -228,7 +228,7 @@ with Session(engine) as session:
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/sqlalchemy-101/04/04-05-step-by-step-walkthrough.ko.png)
+![단계별 실습](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-05-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 준비물은 SQLite와 SQLAlchemy 2.x뿐입니다. 다음 코드를 한 파일에 저장해 실행해 보면 ORM의 흐름이 손에 익습니다.

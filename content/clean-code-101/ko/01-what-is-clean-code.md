@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![Clean Code의 정의](../../../assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)
+![Clean Code의 정의](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)
 
 *Clean Code의 핵심 흐름: 동작하는 코드가 읽기 쉬운 코드가 되고, 결국 바꾸기 쉬운 코드가 됩니다.*
 

@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/09/09-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.ko.png)
 *문제에서 다음 단계까지 이어지는 발표 서사 구조*
 
 ## 실전 문서 예시: 발표 운영 시트

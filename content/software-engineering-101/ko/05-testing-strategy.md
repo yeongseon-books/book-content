@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/05/05-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.ko.png)
 *단위 테스트에서 E2E까지 비용과 속도를 조절하는 테스트 피라미드*
 
 테스트 피라미드는 속도와 비용, 진단 가능성의 균형을 맞추는 구조입니다.

@@ -215,7 +215,7 @@ assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png
 python3 .sisyphus/medium/mermaid-to-png.py <ko-file> <en-file>
 ```
 
-ko/en 본문은 로컬 상대 경로를, 외부 발행 변형(medium, tistory, hashnode)은 `series.yaml`의 `meta.asset_base_url` 기준 공개 URL로 재작성된다.
+ko/en canonical source는 `book-public-assets`의 public URL(`{asset_base_url}/assets/...`)을 직접 참조한다. Tistory/Hashnode/Medium은 동일한 URL을 그대로 통과시키고, eBook bundle은 self-contained를 위해 로컬 `assets/...` 경로로 역재작성된다.
 
 ---
 
@@ -291,12 +291,13 @@ Generated PNG assets are stored under `assets/<series>/<NN>/`.
 - Medium publishing must not depend on private raw GitHub image URLs.
 - If repository size exceeds the agreed threshold, migrate assets to Git LFS or external hosting.
 - 외부 발행용 이미지는 `book-public-assets` 저장소(public)를 경유한다.
-- Canonical source에 public asset URL을 hardcode하지 않는다.
+- Canonical source는 `book-public-assets`의 public URL을 직접 참조한다.
 
 ### Public Asset Workflow
 
 - 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다.
-- Exporter가 발행 시점에 `series.yaml`의 `meta.asset_base_url`을 읽어 경로를 재작성한다.
+- 새 이미지를 추가한 글은 sync → public commit/push → GitHub Pages 배포 확인 순서를 지킨다.
+- eBook exporter만 예외: bundle을 self-contained로 만들기 위해 public URL을 로컬 `assets/...` 경로로 역재작성한다.
 - 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
 
 ### Future Options

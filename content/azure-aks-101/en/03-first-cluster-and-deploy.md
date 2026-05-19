@@ -40,7 +40,7 @@ This is the third post in the Azure Kubernetes Service 101 series. Here, we take
 
 ## Today's flow
 
-![Cluster creation and deployment flow](../../../assets/azure-aks-101/03/03-01-today-s-flow.en.png)
+![Cluster creation and deployment flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.en.png)
 
 *Cluster creation and deployment flow*
 The split matters. `az` creates and configures Azure resources. `kubectl` talks to the Kubernetes API once the cluster exists.
@@ -289,7 +289,7 @@ The `-o wide` output is especially useful because it shows where the pods actual
 
 ## 8. The request path
 
-![External request path to Service and pods](../../../assets/azure-aks-101/03/03-02-8-the-request-path.en.png)
+![External request path to Service and pods](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-02-8-the-request-path.en.png)
 
 *External request path to Service and pods*
 This is the pre-Ingress version of exposure. The Service is carrying both the stable service identity and the external publication path. In the next networking post, an Ingress layer will sit in front of ClusterIP services instead.

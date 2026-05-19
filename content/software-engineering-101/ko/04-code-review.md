@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.ko.png)
 *자동화와 사람 리뷰가 합쳐져 PR 품질을 높이는 흐름*
 
 형식 검사와 테스트는 기계가 맡고, 사람은 의도와 판단을 봐야 리뷰 품질이 올라갑니다.

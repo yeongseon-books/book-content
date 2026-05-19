@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.ko.png)
 *사용자 요구가 인수 기준과 테스트로 구체화되는 흐름*
 
 요구사항은 테스트로 연결될 때 비로소 실제 개발 계약이 됩니다.

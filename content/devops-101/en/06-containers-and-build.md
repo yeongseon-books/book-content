@@ -44,7 +44,7 @@ The same build artifact must *behave the same* in *every environment*. Container
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

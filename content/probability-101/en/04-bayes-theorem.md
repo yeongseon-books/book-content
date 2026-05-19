@@ -46,7 +46,7 @@ Bayes' theorem is the compact rule that ties those pieces together. It is both a
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
 *안정적인 도메인 쪽에서 포트를 정의하고 변동이 큰 어댑터가 이를 구현하는 의존성 방향*
 
 핵심 아이디어는 간단합니다. 세부 구현이 코어를 향하게 하고, 코어는 자신이 필요한 모양만 추상으로 선언합니다. 그러면 구현 교체가 코어를 직접 흔들지 않습니다.

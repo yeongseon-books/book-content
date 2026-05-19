@@ -56,13 +56,13 @@ Groq SDK는 편리하지만, 실제 계약을 바꾸지는 않습니다. `client
 
 ## 핵심 개념
 
-![첫 번째 LLM API 호출의 최소 왕복 구조](../../../assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
+![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
 
 *첫 번째 LLM API 호출의 최소 왕복 구조*
 
 가장 먼저 기억할 문장은 단순합니다. LLM API도 결국 API입니다. 애플리케이션은 모델과 직접 대화하는 것이 아니라, 모델 서비스를 호출합니다. 따라서 요청에는 모델과 입력 메시지가 들어가고, 응답에는 생성 텍스트와 사용량 같은 메타데이터가 들어옵니다.
 
-![텍스트 입력과 JSON 응답으로 이어지는 흐름](../../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.ko.png)
+![텍스트 입력과 JSON 응답으로 이어지는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.ko.png)
 
 *텍스트 입력과 JSON 응답으로 이어지는 흐름*
 
@@ -120,7 +120,7 @@ source .venv/bin/activate
 pip install groq
 ```
 
-![클라이언트 생성부터 첫 호출까지 이어지는 흐름](../../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.ko.png)
+![클라이언트 생성부터 첫 호출까지 이어지는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-02-sending-your-first-request.ko.png)
 
 *클라이언트 생성부터 첫 호출까지 이어지는 흐름*
 
@@ -148,7 +148,7 @@ print(completion.choices[0].message.content)
 
 이제 본문만 보지 말고 응답 객체 전체를 읽어야 합니다. 그래야 모델명, 토큰 사용량, 종료 이유까지 함께 추적할 수 있습니다.
 
-![응답 객체에서 본문과 메타데이터를 읽는 구조](../../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.ko.png)
+![응답 객체에서 본문과 메타데이터를 읽는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.ko.png)
 
 *응답 객체에서 본문과 메타데이터를 읽는 구조*
 
@@ -175,13 +175,13 @@ print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 
 실전에서 최소한 기록할 값은 생성 텍스트, `usage`, 모델명, `finish_reason`입니다. 이 네 값만 있어도 비용과 잘림 문제를 설명할 재료가 생깁니다.
 
-![인증 오류, 속도 제한, 재시도 분기로 이어지는 HTTP 경계](../../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.ko.png)
+![인증 오류, 속도 제한, 재시도 분기로 이어지는 HTTP 경계](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.ko.png)
 
 *인증 오류, 속도 제한, 재시도 분기로 이어지는 HTTP 경계*
 
 SDK를 쓰더라도 네트워크 경계는 사라지지 않습니다. 느린 응답은 네트워크와 토큰 길이 문제일 수 있고, `401`은 인증 문제일 수 있으며, `429`는 속도 제한 문제일 수 있습니다. 그래서 첫 호출을 이해할 때는 프롬프트보다 경계 조건을 먼저 읽는 습관이 중요합니다.
 
-![동기 대기와 비동기 병렬 실행의 차이](../../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.ko.png)
+![동기 대기와 비동기 병렬 실행의 차이](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.ko.png)
 
 *동기 대기와 비동기 병렬 실행의 차이*
 

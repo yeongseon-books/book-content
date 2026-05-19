@@ -44,7 +44,7 @@ Tests alone are not enough. *Lint, type checks, and security scans* must be bund
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

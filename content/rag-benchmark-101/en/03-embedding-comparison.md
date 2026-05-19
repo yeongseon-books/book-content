@@ -28,7 +28,7 @@ This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -128,7 +128,7 @@ def benchmark_model(model_name: str):
 
 ### Step 2 — Run two models
 
-![Fixed-corpus embedding comparison structure](../../../assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
+![Fixed-corpus embedding comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
 
 *Fixed-corpus embedding comparison structure*
 
@@ -150,7 +150,7 @@ print(json.dumps(results, indent=2))
 
 ### Step 3 — Compare results
 
-![Quality and latency comparison axes](../../../assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
+![Quality and latency comparison axes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-02-quality-and-latency-comparison-axes.en.png)
 
 *Quality and latency comparison axes*
 
@@ -168,7 +168,7 @@ index_build_s = round(time.perf_counter() - t0, 2)
 
 ## Common mistakes
 
-![One-variable-at-a-time experiment boundary](../../../assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
+![One-variable-at-a-time experiment boundary](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-03-one-variable-at-a-time-experiment-bounda.en.png)
 
 *One-variable-at-a-time experiment boundary*
 
@@ -188,7 +188,7 @@ index_build_s = round(time.perf_counter() - t0, 2)
 
 ## Checklist
 
-![Speed, quality, and cost selection flow](../../../assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
+![Speed, quality, and cost selection flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-04-speed-quality-and-cost-selection-flow.en.png)
 
 *Speed, quality, and cost selection flow*
 

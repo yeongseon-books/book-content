@@ -42,7 +42,7 @@ Recommendation, medicine, finance, autonomous driving — *every industry* is be
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
 
 *Machine learning starts by fitting a function on data, then reuses that function on inputs the model has never seen before.*
 

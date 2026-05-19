@@ -55,7 +55,7 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 Let's start by drawing the entire path of a single invocation in one diagram.
 
-![Invocation path from trigger to worker](../../../assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
+![Invocation path from trigger to worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
 
 *Invocation path from trigger to worker*
 This diagram is what Part 4 is about. Let's walk through each step in code.
@@ -226,7 +226,7 @@ But **there's no guarantee about the order in which response messages come back.
 
 That said, **some message ordering does need to be preserved** — for example, log messages within the same invocation. That's why [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) exists — it preserves message order *within* an invocation while keeping invocations in parallel with each other.
 
-![Concurrent invocation handling in one worker](../../../assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.en.png)
+![Concurrent invocation handling in one worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.en.png)
 
 *Concurrent invocation handling in one worker*
 Messages with the same `invocation_id` are processed in arrival order, but different `invocation_id`s are processed in parallel.

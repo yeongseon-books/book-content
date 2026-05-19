@@ -46,7 +46,7 @@ Weak probability intuition leads to predictable mistakes. People mix up likeliho
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

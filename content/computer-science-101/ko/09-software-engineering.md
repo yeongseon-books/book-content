@@ -58,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 > 엔지니어링은 "지금 동작" 위에 "내일도 동작"을 보장하는 활동입니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
 *엔지니어링은 단순 실행 성공 위에 변경 안전성과 운영 지속성을 추가합니다*
 
 ## 핵심 용어

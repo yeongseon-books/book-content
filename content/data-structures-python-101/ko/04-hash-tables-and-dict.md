@@ -54,7 +54,7 @@ slot 7 empty?    yes  -> 여기에 저장
 
 ## dict probe와 resize를 그림으로 보면
 
-![dict probe와 resize를 그림으로 보면](../../../assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
+![dict probe와 resize를 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
 
 *dict가 키를 해시한 뒤 sparse table 안에서 probe path를 따라 찾고, 충돌이 길어지기 전에 resize하는 과정을 보여 주는 그림*
 

@@ -44,7 +44,7 @@ The *README* is the *first impression* of a project.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

@@ -39,12 +39,12 @@ This is post 8 in the Harness Engineering 101 series. It defines Approval Gates 
 
 > The point of an Approval Gate is not to fight automation. It is to restore human accountability exactly where only humans should own the risk.
 
-![Approval gates - designing where humans must approve](../../../assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
+![Approval gates - designing where humans must approve](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
 
 *Approval gates - designing where humans must approve*
 ## What Is an Approval Gate?
 
-![What is an approval Gate](../../../assets/harness-engineering-101/08/08-02-what-is-an-approval-gate.en.png)
+![What is an approval Gate](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-02-what-is-an-approval-gate.en.png)
 
 *What is an approval Gate*
 An Approval Gate is a point where the agent must request human approval before executing a specific action. Automated flow pauses, decision authority hands off to a human, and the agent resumes only after receiving the response.
@@ -95,7 +95,7 @@ This function is a checkpoint the agent must pass before invoking a tool. Plug i
 
 ## Designing the Approval Workflow
 
-![Designing the approval workflow](../../../assets/harness-engineering-101/08/08-03-designing-the-approval-workflow.en.png)
+![Designing the approval workflow](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-03-designing-the-approval-workflow.en.png)
 
 *Designing the approval workflow*
 The workflow has four stages.
@@ -143,7 +143,7 @@ class ApprovalWorkflow:
 
 ## Separating Dry-run from Commit
 
-![Separating Dry-run from commit](../../../assets/harness-engineering-101/08/08-04-separating-dry-run-from-commit.en.png)
+![Separating Dry-run from commit](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-04-separating-dry-run-from-commit.en.png)
 
 *Separating Dry-run from commit*
 If you include a preview of "what would actually happen" in the approval request, the human can decide far more accurately. A dry-run computes the result without producing side effects.

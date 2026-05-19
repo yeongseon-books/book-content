@@ -57,7 +57,7 @@ docs/guide.md      →  5-minute tutorial: main features
 docs/api.md        →  detailed reference: specs for every function/class
 ```
 
-![멘탈 모델](../../../assets/python-package-101/09/09-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.ko.png)
 *README, 가이드, API Reference가 문서 사이트로 연결되는 구조*
 
 ## 핵심 개념

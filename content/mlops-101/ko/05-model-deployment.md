@@ -54,7 +54,7 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-![모델 배포 전달 경로](../../../assets/mlops-101/05/05-01-see-the-flow-first.ko.png)
+![모델 배포 전달 경로](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.ko.png)
 
 *모델 배포 전달 경로*
 이 그림은 모델 배포를 파일 복사 작업이 아니라 전달 경로로 보게 해 줍니다. 모델 파일은 API 안으로 들어가고, API는 Docker 이미지로 묶이고, 이미지는 프로덕션에 배포된 뒤 점진적으로 트래픽을 받습니다.

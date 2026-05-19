@@ -63,7 +63,7 @@ Linked list problems are among the most frequently tested in coding interviews. 
 
 ## Linked Structure at a Glance
 
-![Linked Structure at a Glance](../../../assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)
+![Linked Structure at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)
 
 *How node references flow in singly linked lists and doubly linked lists*
 

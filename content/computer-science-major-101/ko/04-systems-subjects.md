@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![시스템 과목 이해 구조](../../../assets/computer-science-major-101/04/04-01-systems-stack-map.ko.png)
+![시스템 과목 이해 구조](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.ko.png)
 
 *하드웨어에서 운영체제, 컴파일러, 프로그램 실행으로 이어지는 층*
 

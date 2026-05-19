@@ -51,7 +51,7 @@ Goals:
 
 Guardrails live in four positions in an LLM system.
 
-![Four-Layer Architecture](../../../assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
+![Four-Layer Architecture](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
 *A production guardrail pipeline separates pre-input, pre-prompt, post-output, and audit responsibilities so that every block and bypass has a visible stage.*
 
 | Layer | When it runs | Guardrails |

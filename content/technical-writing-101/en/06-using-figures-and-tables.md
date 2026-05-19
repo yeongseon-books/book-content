@@ -44,7 +44,7 @@ One *figure* often replaces *five* paragraphs.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms
@@ -76,12 +76,12 @@ Captions should answer the same question. `Architecture diagram` is too broad to
 
 ### Step 1 — Flowchart
 
-![request flow from client to server and database](../../../assets/technical-writing-101/06/06-02-step-1-flowchart.en.png)
+![request flow from client to server and database](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-02-step-1-flowchart.en.png)
 
 *This flowchart shows the basic path from the client to the server and database.*
 ### Step 2 — Sequence
 
-![call order between the client server and database](../../../assets/technical-writing-101/06/06-03-step-2-sequence.en.png)
+![call order between the client server and database](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-03-step-2-sequence.en.png)
 
 *This sequence diagram shows the call order between the client, server, and database.*
 ### Step 3 — Comparison table

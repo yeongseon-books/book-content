@@ -45,7 +45,7 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/09/09-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
 
 *Mental Model*
 

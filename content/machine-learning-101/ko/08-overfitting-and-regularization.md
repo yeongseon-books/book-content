@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/machine-learning-101/08/08-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
 
 *모델 자유도가 너무 낮으면 과소적합, 너무 높으면 과적합으로 흐르고, 정규화는 그 균형점을 다시 찾게 돕습니다.*
 

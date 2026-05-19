@@ -74,7 +74,7 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 현업에서 저는 멀티 에이전트 그래프를 볼 때 먼저 세 가지를 봅니다. supervisor가 실제로 supervisor 역할만 하는가, worker가 shared state를 과하게 건드리지 않는가, finalizer가 출력 책임을 흡수하는가. 이 세 가지를 먼저 읽으면, agent 수가 늘어도 구조가 어디서부터 흔들릴지 빨리 감이 옵니다.
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -84,7 +84,7 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 가장 작은 supervisor-worker 예제로 보겠습니다. supervisor가 요청을 읽고 `research` 또는 `code` worker 중 하나를 선택하고, worker는 자신의 전용 결과를 남기며, 마지막에 finalizer가 출력 형식을 정리합니다. 구조는 단순하지만 멀티 에이전트의 핵심 뼈대가 모두 들어 있습니다.
 
-![supervisor가 worker에게 위임하는 구조](../../../assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
+![supervisor가 worker에게 위임하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
 
 *supervisor가 worker에게 위임하는 구조*
 
@@ -184,7 +184,7 @@ def build_graph():
 
 코드 전체를 한 번에 읽기보다, 아래 세 지점부터 잡는 편이 좋습니다.
 
-![route와 worker_result가 상태를 따라 흐르는 구조](../../../assets/langgraph-101/05/05-02-what-to-notice-in-this-code.ko.png)
+![route와 worker_result가 상태를 따라 흐르는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-02-what-to-notice-in-this-code.ko.png)
 
 *route와 worker_result가 상태를 따라 흐르는 구조*
 
@@ -204,7 +204,7 @@ def build_graph():
 
 멀티 에이전트 입문에서 가장 흔한 오해는 “agent를 여러 개 쓰면 자동으로 더 좋아진다”는 기대입니다. 실제로는 agent 수보다 **누가 위임을 결정하고, 누가 작업하고, 누가 최종 책임을 지는가**가 더 중요할 때가 많습니다.
 
-![supervisor와 worker 사이의 역할 경계](../../../assets/langgraph-101/05/05-03-where-engineers-get-confused.ko.png)
+![supervisor와 worker 사이의 역할 경계](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-03-where-engineers-get-confused.ko.png)
 
 *supervisor와 worker 사이의 역할 경계*
 

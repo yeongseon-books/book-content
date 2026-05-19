@@ -46,7 +46,7 @@ Strong teams therefore design the operational path on purpose. They ask not only
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
 
 *Operability emerges when observability, automation, safe change, and resilience are designed together.*
 ## Key Terms

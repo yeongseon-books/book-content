@@ -45,7 +45,7 @@ Inheritance freezes the structure quickly. Composition lets you assemble respons
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
 *Structural patterns show five ways to translate, wrap, simplify, proxy, and tree-shape object relationships without freezing the design.*
 
 ## Key Terms

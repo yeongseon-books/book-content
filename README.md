@@ -131,7 +131,7 @@ book-content/                               # private — canonical source
 │   ├── medium/                             # Medium 발행용 HTML 사본
 │   └── ebook-source/                       # private mkdocs-ebook 입력용 source bundle
 ├── templates/, scripts/
-├── assets/<series>/<NN>/...                # 이미지 (본문에서 ../../../assets/ 로 참조)
+├── assets/<series>/<NN>/...                # 이미지 원본 (book-public-assets로 sync, canonical은 public URL 참조)
 └── .sisyphus/medium/                       # finalize-posts.py / to-medium.py / _catalog.py
 
 book-public-assets/                         # public — GitHub Pages 호스팅
@@ -149,12 +149,10 @@ book-public-assets/                         # public — GitHub Pages 호스팅
 - Public publishing assets: `yeongseon-books/book-public-assets`
 - Public URL base: `https://yeongseon-books.github.io/book-public-assets`
 
-Canonical articles keep local relative image paths such as:
-
-`../../../assets/<series>/<episode>/<file>.png`
-
-External publishing outputs may rewrite those paths to public asset URLs:
+Canonical articles reference public asset URLs directly:
 
 `https://yeongseon-books.github.io/book-public-assets/assets/<series>/<episode>/<file>.png`
+
+Tistory, Hashnode, Medium, and MkDocs pass these URLs through unchanged. The eBook exporter is the only consumer that rewrites them back to bundle-local `assets/...` paths so the eBook source is self-contained (see [`ASSET_POLICY.md`](./ASSET_POLICY.md)).
 
 Only image assets are mirrored publicly. Manuscripts, example code, publishing scripts, and eBook source bundles remain private.

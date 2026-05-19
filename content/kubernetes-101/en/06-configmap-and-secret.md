@@ -44,7 +44,7 @@ Pulling *environment differences* out of the image is what makes things *reprodu
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
 *ConfigMap and Secret can both enter the same Pod, but they intentionally represent different operational and security boundaries.*
 
 

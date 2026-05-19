@@ -52,7 +52,7 @@ Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulatio
 
 ### Heap array mapping
 
-![Heap array mapping](../../../assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
+![Heap array mapping](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
 *Figure. A heap stays complete, so the tree can be packed into a flat array without gaps. That is what makes index arithmetic enough to recover parent and child relationships while keeping the minimum value at the root.*
 
 ## Key Terms

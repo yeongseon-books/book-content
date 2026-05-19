@@ -58,7 +58,7 @@ Testable structure is not only about making tests pleasant. It also narrows fail
   clock / id factory
 ```
 
-![Diagram of a pure-logic core surrounded by injected adapters such as payment gateway, repository, notifier, and clock](../../../assets/pytest-101/10/10-01-testable-code-boundary.en.png)
+![Diagram of a pure-logic core surrounded by injected adapters such as payment gateway, repository, notifier, and clock](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.en.png)
 *The center is where business rules should live. Payment gateways, repositories, notifiers, and time or ID providers stay outside that core and are injected at the boundary. This keeps most tests focused on input and output instead of environment setup.*
 
 ## Core Concepts

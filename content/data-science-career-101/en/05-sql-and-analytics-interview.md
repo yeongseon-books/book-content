@@ -54,7 +54,7 @@ They are also watching how you define the metric, whether you surface assumption
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
 
 *The SQL interview loop from question framing to query output to interpretation*
 ## Key Terms

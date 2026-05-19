@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
 *PVC와 StorageClass를 거치면 파드 수명과 데이터 수명을 분리한 저장소 모델이 만들어집니다.*
 
 

@@ -48,7 +48,7 @@ incident가 끝나면 팀은 잠깐 안도합니다. 서비스가 복구됐고, 
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/08/08-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 postmortem은 publish로 끝나면 안 됩니다. 공유 뒤에 action item 등록과 추적이 이어져야 학습이 행동으로 바뀝니다.

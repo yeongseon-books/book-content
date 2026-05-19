@@ -34,7 +34,7 @@ This is the second post in the LangChain 101 series. It shows how prompt templat
 
 > A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
 
-![Questions this post answers](../../../assets/langchain-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 ## Minimal runnable example
@@ -64,7 +64,7 @@ print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemp
 
 ## The flow at a glance
 
-![The flow at a glance](../../../assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
 
 *The flow at a glance*
 Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
@@ -81,7 +81,7 @@ Topics:
 
 ## ChatPromptTemplate structure
 
-![System human ai message roles](../../../assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
+![System human ai message roles](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
 
 *System human ai message roles*
 `ChatPromptTemplate` constructs conversation-style prompts and renders them into the message format the LLM expects.
@@ -174,7 +174,7 @@ Placeholder names like `{language}` and `{question}` must match the keys in the 
 
 ## Prompts with multiple variables
 
-![Multiple variables into one prompt](../../../assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
+![Multiple variables into one prompt](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-prompts-with-multiple-variables.en.png)
 
 *Multiple variables into one prompt*
 More complex tasks need more template variables. Pass them all in the same dict.
@@ -219,7 +219,7 @@ print(result)
 
 ## StrOutputParser vs JsonOutputParser
 
-![String parser and JSON parser outputs](../../../assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
+![String parser and JSON parser outputs](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-03-stroutputparser-vs-jsonoutputparser.en.png)
 
 *String parser and JSON parser outputs*
 Output parsers convert the LLM response into the format you need.
@@ -321,7 +321,7 @@ print(result)
 
 ## Adding a fallback to a chain
 
-![Primary failure and fallback switch](../../../assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
+![Primary failure and fallback switch](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-04-adding-a-fallback-to-a-chain.en.png)
 
 *Primary failure and fallback switch*
 `.with_fallbacks()` runs an alternative chain when the primary call fails.

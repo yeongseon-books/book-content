@@ -64,7 +64,7 @@ ACA observability splits into three independent layers:
 The three layers can land in the same Application Insights instance or stay separate.
 The discipline is to always know "which layer does this signal come from?"
 
-![Where logs and traces converge](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
+![Where logs and traces converge](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png)
 
 *Where logs and traces converge*
 

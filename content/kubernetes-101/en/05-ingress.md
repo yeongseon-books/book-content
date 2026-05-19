@@ -44,7 +44,7 @@ A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
 *Ingress keeps one external entry point while the controller fans HTTP traffic out to multiple Services by host and path.*
 
 

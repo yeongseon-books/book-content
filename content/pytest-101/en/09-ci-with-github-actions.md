@@ -55,7 +55,7 @@ push or pull_request
   -> PR shows pass/fail signal for merge decision
 ```
 
-![GitHub Actions CI flow from push or pull request to Python matrix jobs and coverage artifact upload](../../../assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
+![GitHub Actions CI flow from push or pull request to Python matrix jobs and coverage artifact upload](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
 *A push or pull request starts the same workflow definition. GitHub Actions expands it into Python 3.10, 3.11, and 3.12 jobs, and one designated run also uploads an HTML coverage artifact so reviewers can inspect failures without recreating the environment locally.*
 
 ## Core Concepts

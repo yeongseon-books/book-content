@@ -44,7 +44,7 @@ A *neural network* is a *long composition* of functions, and only the chain rule
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png)
 
 *Chain-rule flow: local derivatives from each stage connect to produce the full derivative.*
 ## Key Terms

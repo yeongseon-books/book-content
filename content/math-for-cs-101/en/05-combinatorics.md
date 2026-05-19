@@ -48,7 +48,7 @@ The useful habit is to ask structural questions first: does order matter, is rep
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
 *Counting principles help you detect search-space explosion early, before an implementation commits you to impossible work.*
 
 ## Key Terms

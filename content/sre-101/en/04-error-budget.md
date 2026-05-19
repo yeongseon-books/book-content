@@ -46,7 +46,7 @@ With a budget, the discussion becomes more precise. If the service still has roo
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
 
 *An error budget matters only when actual failure spend changes release behavior.*
 ## Key Terms

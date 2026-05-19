@@ -42,7 +42,7 @@ When deploys become *scary*, release frequency drops, and rare deploys carry *mo
 
 ## Concept at a Glance
 
-![deployment flow from source code to container image, runtime, and users](../../../assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
+![deployment flow from source code to container image, runtime, and users](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
 
 *deployment flow from source code to container image, runtime, and users*
 Code becomes an *image*; the image runs the same way *everywhere*.

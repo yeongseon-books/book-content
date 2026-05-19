@@ -46,7 +46,7 @@ Reducing toil is therefore not just a productivity topic. It is a reliability to
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.en.png)
 
 *The goal is to identify repetitive manual work and convert it into automation that gives time back.*
 ## Key Terms

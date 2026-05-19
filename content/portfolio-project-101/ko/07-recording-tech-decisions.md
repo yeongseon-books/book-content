@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 결정 기록은 상황, 대안, 선택, 결과, 다음 변화 가능성으로 이어집니다.
 
-![상황에서 결과까지 이어지는 ADR 기록 흐름](../../../assets/portfolio-project-101/07/07-01-diagram.ko.png)
+![상황에서 결과까지 이어지는 ADR 기록 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-diagram.ko.png)
 
 *상황에서 결과까지 이어지는 ADR 기록 흐름*
 

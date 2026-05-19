@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![이름 짓기](../../../assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
+![이름 짓기](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
 
 *좋은 이름의 흐름: 의도가 이름으로 드러나면 검색, 읽기, 문서화가 함께 쉬워집니다.*
 

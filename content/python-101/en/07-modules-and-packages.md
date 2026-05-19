@@ -54,7 +54,7 @@ Modules and packages are among Python's main tools for solving this. You break c
 > A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by `__init__.py` that holds modules". Hold those two definitions and most import behavior collapses into one diagram.
 A module is "a `.py` file that runs once and produces a namespace." A package is "a directory that holds such modules." `import` is the act of attaching that namespace to your current code.
 
-![Mental model](../../../assets/python-101/07/07-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png)
 
 *Mental model*
 Two ideas matter most. First, **module top-level code runs once, top to bottom, the first time it is imported**. Second, **the resulting namespace object is cached and reused**. A second import does not re-read the file; it pulls the same object from cache.

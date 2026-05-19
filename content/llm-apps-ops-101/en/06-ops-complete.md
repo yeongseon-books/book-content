@@ -34,11 +34,11 @@ This is the final post in the LLM Apps Ops 101 series. Here, we will connect the
 > Operational maturity is not about stacking features. It is about making one request produce connected signals for validation, cost, quality, and logs.
 
 ## Big picture
-![LLM ops pipeline complete overview](../../../assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
+![LLM ops pipeline complete overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
 
 *LLM ops pipeline complete overview*
 ## Why this layer matters
-![Ops flow from validation to logging](../../../assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
+![Ops flow from validation to logging](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
 
 *Ops flow from validation to logging*
 An integrated pipeline matters because one request should leave connected traces for validation, cost, quality, and logging.
@@ -233,7 +233,7 @@ if __name__ == "__main__":
 ```
 
 ## What to notice in this code
-![Health state exposes cumulative calls and cost](../../../assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
+![Health state exposes cumulative calls and cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
 
 *Health state exposes cumulative calls and cost*
 - Returning `quality`, `total_tokens`, and `cost_usd` in one response gives both server and client immediate operating context.
@@ -241,7 +241,7 @@ if __name__ == "__main__":
 - The structured `quality` payload can later be aligned with batch evaluation jobs and dashboards.
 
 ## Where engineers get confused
-![Deploy monitor evaluate optimize redeploy loop](../../../assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
+![Deploy monitor evaluate optimize redeploy loop](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
 
 *Deploy monitor evaluate optimize redeploy loop*
 - An integrated pipeline does not remove the need for storage, alerts, and dashboards. It just gives them better signals.

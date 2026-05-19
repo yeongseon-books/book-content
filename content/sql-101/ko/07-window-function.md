@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 윈도 계산 흐름
 
-![윈도 계산 흐름](../../../assets/sql-101/07/07-01-window-calculation-flow.ko.png)
+![윈도 계산 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
 원본 행이 먼저 있고, 그 행들을 어떤 그룹으로 나눌지와 어떤 순서로 볼지를 `OVER (...)` 안에서 정의합니다. 그 위에 순위 함수나 누적 합계 함수를 얹어 계산 열을 추가하는 방식입니다.
 
 ## 핵심 개념 정리

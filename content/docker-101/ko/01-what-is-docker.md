@@ -45,7 +45,7 @@ Docker가 중요한 이유는 단순합니다. 코드만 공유하는 것이 아
 
 ## 한눈에 보는 개념
 
-![코드와 실행 환경이 이미지로 묶여 어디서나 같은 컨테이너를 만드는 흐름](../../../assets/docker-101/01/01-01-concept-at-a-glance.ko.png)
+![코드와 실행 환경이 이미지로 묶여 어디서나 같은 컨테이너를 만드는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.ko.png)
 
 *코드와 의존성을 이미지로 묶은 뒤 로컬·CI·서버에서 같은 컨테이너를 실행하는 흐름*
 

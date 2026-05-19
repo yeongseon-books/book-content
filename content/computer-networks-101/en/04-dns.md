@@ -52,7 +52,7 @@ Half of "the Internet does not work" turns out to be DNS, and a large share of t
 
 > A client asks the OS stub resolver, which usually asks the ISP or company recursive resolver. The recursive resolver walks root → TLD → authoritative, finds the answer, and caches it for the TTL.
 
-![DNS lookup path from the stub resolver to the authoritative server](../../../assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png)
+![DNS lookup path from the stub resolver to the authoritative server](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png)
 *The recursive resolver walks the delegation chain, finds the answer, and caches it for the TTL so the next lookup is faster.*
 
 ## Key Terms

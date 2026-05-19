@@ -56,7 +56,7 @@ Reading complexity is one of the clearest dividing lines between senior and juni
 
 > Two algorithms that produce the same result can diverge by thousands of times once the input grows.
 
-![Concept at a Glance](../../../assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
 *The same task can stay manageable or become impossible depending on algorithmic choice*
 
 ## Key Terms

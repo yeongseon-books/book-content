@@ -58,13 +58,13 @@ seo_description: Groq tools와 Pydantic 검증으로 안전한 툴 호출 루프
 
 ## 핵심 개념
 
-![툴 호출: 함수를 모델에 연결하기](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png)
+![툴 호출: 함수를 모델에 연결하기](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png)
 
 *툴 호출: 함수를 모델에 연결하기*
 
 ### 왜 문자열 기반 디스패치는 금방 흔들리는가
 
-![문자열 분기와 툴 계약의 차이 비교](../../../assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.ko.png)
+![문자열 분기와 툴 계약의 차이 비교](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.ko.png)
 
 *문자열 분기와 툴 계약의 차이 비교*
 
@@ -81,7 +81,7 @@ elif "refund" in user_question:
 
 ### `tools` 파라미터에는 무엇이 들어가는가
 
-![툴 정의를 이루는 구성 요소 구조](../../../assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.ko.png)
+![툴 정의를 이루는 구성 요소 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.ko.png)
 
 *툴 정의를 이루는 구성 요소 구조*
 
@@ -114,7 +114,7 @@ tools = [
 
 ### 첫 번째 툴 사용 요청 보내기
 
-![첫 툴 호출 요청에서 모델이 고르는 흐름](../../../assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.ko.png)
+![첫 툴 호출 요청에서 모델이 고르는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.ko.png)
 
 *첫 툴 호출 요청에서 모델이 고르는 흐름*
 
@@ -256,7 +256,7 @@ for tool_call in message.tool_calls or []:
 
 ### 함수 실행 루프를 끝까지 만들기
 
-![툴 호출 왕복 실행 루프 흐름](../../../assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png)
+![툴 호출 왕복 실행 루프 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png)
 
 *툴 호출 왕복 실행 루프 흐름*
 
@@ -419,7 +419,7 @@ print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
 
 ### 운영에서 특히 지켜야 할 방어선
 
-![툴 실행 전에 거치는 운영 방어 단계](../../../assets/llm-api-production-101/02/02-05-what-to-guard-in-production.ko.png)
+![툴 실행 전에 거치는 운영 방어 단계](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-05-what-to-guard-in-production.ko.png)
 
 *툴 실행 전에 거치는 운영 방어 단계*
 

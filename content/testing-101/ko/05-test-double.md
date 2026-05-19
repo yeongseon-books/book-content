@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/testing-101/05/05-01-diagram.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-diagram.ko.png)
 
 *한눈에 보는 구조*
 테스트 대상 시스템은 실제 의존 대신 테스트 더블을 바라봅니다. 여기서 핵심은 대체 자체보다 대체 목적입니다. 값을 돌려주기 위해 바꾸는지, 호출 기록을 남기기 위해 바꾸는지, 간단한 실제 구현처럼 동작하게 만들려는지에 따라 선택이 달라집니다.

@@ -45,7 +45,7 @@ This is post 3 in the Statistics 101 series. Here we will build intuition for re
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
 
 *Distribution diagnosis starts with shape, then moves to the summary statistics and tools that fit that shape.*
 ## Key Terms

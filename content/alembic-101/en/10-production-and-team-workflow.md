@@ -48,7 +48,7 @@ The starting point of the operational workflow is: one PR equals one revision, a
 
 ### Diagram: the team-level Alembic operating loop
 
-![Diagram: the team-level Alembic operating loop](../../../assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
+![Diagram: the team-level Alembic operating loop](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
 *PR policy, CI, deploy ordering, monitoring, and incident response need to close into one operating loop.*
 
 ## Core concepts

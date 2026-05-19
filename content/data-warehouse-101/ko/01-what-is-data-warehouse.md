@@ -50,7 +50,7 @@ last_reviewed: '2026-05-15'
 
 ## 개념 한눈에 보기
 
-![서비스 DB에서 Warehouse로 이어지는 분석 경로](../../../assets/data-warehouse-101/01/01-01-concept-at-a-glance.ko.png)
+![서비스 DB에서 Warehouse로 이어지는 분석 경로](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.ko.png)
 
 *서비스 DB에서 Warehouse와 BI, ML 소비 계층으로 이어지는 기본 분석 경로*
 

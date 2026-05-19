@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![라우터에서 컨트롤러, 서비스, 리포지토리로 이어지는 요청 처리 흐름](../../../assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png)
+![라우터에서 컨트롤러, 서비스, 리포지토리로 이어지는 요청 처리 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png)
 
 *라우터에서 컨트롤러, 서비스, 리포지토리로 이어지는 요청 처리 흐름*
 router는 지도를, controller는 접수창구를, service는 실제 규칙을 처리하는 전문가를 떠올리면 이해하기 쉽습니다. 이 비유가 중요한 이유는, 요청이 복잡해져도 각 층이 맡아야 할 일이 달라지지 않기 때문입니다.

@@ -48,7 +48,7 @@ That is why the real value of a feature store is consistency rather than storage
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/09/09-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/09/09-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 The center of this picture is the feature registry. Raw data becomes a shared feature definition, that definition flows into offline and online paths, training reads one side, serving reads the other, and both consume the same contract.

@@ -46,7 +46,7 @@ If everything sits in one AZ, a single data center fire takes down your service.
 
 ## Concept at a Glance
 
-![A Region contains multiple Availability Zones that separate failure boundaries](../../../assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
+![A Region contains multiple Availability Zones that separate failure boundaries](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
 
 *A Region contains multiple Availability Zones that separate failure boundaries*
 

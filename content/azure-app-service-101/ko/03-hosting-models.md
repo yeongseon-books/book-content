@@ -48,7 +48,7 @@ App Service 호스팅 전략을 고르는 흐름은 아래와 같습니다.
 3. Choose Plan Tier (Dev → Production)
 ```
 
-![Plan choice after OS and deployment](../../../assets/azure-app-service-101/03/01-decision-flow.ko.png)
+![Plan choice after OS and deployment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/01-decision-flow.ko.png)
 
 *OS와 배포 모델을 거친 뒤의 플랜 선택 흐름*
 
@@ -201,7 +201,7 @@ az webapp create \
 
 ## Shared Plan vs Dedicated Plan
 
-![Shared and dedicated resource tradeoffs](../../../assets/azure-app-service-101/03/03-shared-vs-dedicated.ko.png)
+![Shared and dedicated resource tradeoffs](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/03-shared-vs-dedicated.ko.png)
 
 *공유 Plan과 전용 Plan의 트레이드오프*
 
@@ -244,7 +244,7 @@ Internal tools, low traffic apps → Shared Plan
 
 어떤 기능이 Plan에 의존하고, 어떤 기능이 배포 모델에 의존하는지 정리하면 아래와 같습니다.
 
-![Feature availability across plan tiers](../../../assets/azure-app-service-101/03/02-tier-feature-matrix.ko.png)
+![Feature availability across plan tiers](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/03/02-tier-feature-matrix.ko.png)
 
 *플랜 티어별 기능 가용성*
 

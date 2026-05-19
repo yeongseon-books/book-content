@@ -52,7 +52,7 @@ This is the fifth post in the Azure App Service 101 series. Here, the goal is to
 
 App Service injects environment variables through **App Settings**:
 
-![Settings injected into app environment](../../../assets/azure-app-service-101/05/configuration-flow.en.png)
+![Settings injected into app environment](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/configuration-flow.en.png)
 
 *Settings injected into app environment*
 
@@ -116,7 +116,7 @@ SCM_DO_BUILD_DURING_DEPLOYMENT true
 
 ### Environment Separation Pattern
 
-![Configuration strategy by environment stage](../../../assets/azure-app-service-101/05/environment-strategy.en.png)
+![Configuration strategy by environment stage](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/environment-strategy.en.png)
 
 *Configuration strategy by environment stage*
 
@@ -223,7 +223,7 @@ When using Deployment Slots, some settings should be **sticky to the slot**.
 | `LOG_LEVEL` | No | Usually the same |
 | `FEATURE_FLAG_X` | Depends | Sticky when testing per slot |
 
-![Settings that stay during slot swap](../../../assets/azure-app-service-101/05/slot-settings-behavior.en.png)
+![Settings that stay during slot swap](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/slot-settings-behavior.en.png)
 
 *Settings that stay during slot swap*
 
@@ -248,7 +248,7 @@ az webapp config appsettings set \
 
 Store sensitive values like passwords and API keys in **Key Vault** and reference them.
 
-![Secrets flowing from Key Vault to app](../../../assets/azure-app-service-101/05/key-vault-reference-flow.en.png)
+![Secrets flowing from Key Vault to app](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-101/05/key-vault-reference-flow.en.png)
 
 *Secrets flowing from Key Vault to app*
 

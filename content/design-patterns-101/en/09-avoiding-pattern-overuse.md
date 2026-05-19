@@ -45,7 +45,7 @@ Pre-applied patterns easily become misapplied patterns. A simple piece of code c
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
 *A healthy pattern emerges from repeated pain and refactoring; a premature one usually leaves behind only extra complexity.*
 
 ## Key Terms

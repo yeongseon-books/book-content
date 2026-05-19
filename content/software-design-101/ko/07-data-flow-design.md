@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/07/07-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.ko.png)
 *입력에서 검증과 정규화, 보강 단계를 거쳐 출력으로 이어지는 단방향 데이터 흐름*
 
 좋은 흐름은 짧고 분명합니다. 각 단계는 작은 책임만 맡고, 다음 단계로 값을 넘깁니다.

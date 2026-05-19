@@ -34,7 +34,7 @@ seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정
 
 > 워크플로 자동화는 모델의 선택권을 줄이고, 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인으로 바꾸는 설계입니다.
 
-![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (5/6)
@@ -56,12 +56,12 @@ seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정
 
 ### 단계 사이의 순차 handoff
 
-![단계 사이의 순차 handoff](../../../assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
+![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
 
 *단계 사이의 순차 handoff*
 ### 병렬 작업을 포함한 DAG 스타일 분기
 
-![병렬 작업을 포함한 DAG 스타일 분기](../../../assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
+![병렬 작업을 포함한 DAG 스타일 분기](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
 
 *병렬 작업을 포함한 DAG 스타일 분기*
 LCEL의 `|` 연산자는 단계를 연결합니다. 왼쪽 단계의 출력이 오른쪽 단계의 입력이 됩니다.
@@ -142,12 +142,12 @@ print(f"title: {step3}")
 
 ### 분류가 결정하는 라우팅
 
-![분류가 결정하는 라우팅](../../../assets/ai-app-patterns-101/05/05-03-classification-driven-routing.ko.png)
+![분류가 결정하는 라우팅](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-03-classification-driven-routing.ko.png)
 
 *분류가 결정하는 라우팅*
 ### 승인 게이트와 재시도 복구
 
-![승인 게이트와 재시도 복구](../../../assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.ko.png)
+![승인 게이트와 재시도 복구](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-04-approval-gate-and-retry-recovery.ko.png)
 
 *승인 게이트와 재시도 복구*
 먼저 입력을 분류하고, 그 결과에 따라 적절한 체인으로 보냅니다. 두 단계 사이의 유일한 의존성은 분류기의 출력입니다.
@@ -242,7 +242,7 @@ for inquiry in test_inquiries:
 
 ### 코드 리뷰 산출물 계약
 
-![코드 리뷰 산출물 계약](../../../assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.ko.png)
+![코드 리뷰 산출물 계약](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-05-code-review-artifact-contract.ko.png)
 
 *코드 리뷰 산출물 계약*
 각 단계는 이전 단계의 출력을 다른 형태로 변환합니다. 아래 코드 리뷰 파이프라인은 analysis → suggestions → report라는 세 단계 변환을 보여 줍니다.

@@ -64,7 +64,7 @@ site-packages/             project-a/.venv/site-packages/
                               django 4.2
 ```
 
-![멘탈 모델](../../../assets/python-package-101/03/03-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.ko.png)
 *프로젝트별 가상환경과 버전 고정 파일이 분리되는 구조*
 
 ## 핵심 개념

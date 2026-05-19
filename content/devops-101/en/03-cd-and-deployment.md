@@ -44,7 +44,7 @@ Deployment is *the most dangerous moment*. A good strategy *shrinks the blast ra
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

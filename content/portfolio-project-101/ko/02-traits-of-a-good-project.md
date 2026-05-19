@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 좋은 프로젝트는 초점, 문제 선명도, 결과, 유지보수성, 재현성이 한 흐름으로 이어집니다.
 
-![좋은 프로젝트를 이루는 다섯 가지 조건의 연결](../../../assets/portfolio-project-101/02/02-01-diagram.ko.png)
+![좋은 프로젝트를 이루는 다섯 가지 조건의 연결](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-diagram.ko.png)
 
 *좋은 프로젝트를 이루는 다섯 가지 조건의 연결*
 

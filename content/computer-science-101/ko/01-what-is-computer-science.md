@@ -58,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 > 컴퓨터과학은 계산 이론, 시스템, 응용의 세 축으로 구성됩니다. 모든 과목은 "추상화"라는 공통 도구로 연결됩니다.
 
-![한눈에 보는 개념](../../../assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)
 *컴퓨터과학의 주요 층이 이론에서 시스템과 응용으로 이어지는 구조*
 
 ## 핵심 용어

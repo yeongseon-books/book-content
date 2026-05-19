@@ -48,7 +48,7 @@ incident는 한 번 해결했다고 사라지지 않습니다. 같은 조건이 
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 이 흐름은 선형이 아니라 반복 루프입니다. action item이 테스트로 바뀌고, 테스트가 guardrail로 이어지며, chaos 실험이 실제로 잘 막히는지 확인합니다. 그 결과를 다시 학습으로 돌려 다음 action item을 만듭니다.

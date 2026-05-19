@@ -52,7 +52,7 @@ Graphs are the most general and powerful data structure in computer science. Soc
 
 ### Graph representations
 
-![Graph representations](../../../assets/data-structures-101/09/09-01-graph-representations.en.png)
+![Graph representations](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png)
 *Figure. Directed edges capture one-way relationships such as service calls or package dependencies. Adjacency lists are the better default for sparse graphs, while adjacency matrices are the better fit when the graph is dense or you need constant-time edge-existence checks.*
 
 ## Key Terms

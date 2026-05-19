@@ -47,7 +47,7 @@ That does not mean you need to expose every feature. Portfolio demos are usually
 
 A useful demo often follows a short path: landing screen, sample context, one action, visible result, then a next step.
 
-![The shortest path from landing screen to felt value in a demo](../../../assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
+![The shortest path from landing screen to felt value in a demo](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
 
 *The shortest path from landing screen to felt value in a demo*
 

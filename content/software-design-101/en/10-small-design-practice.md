@@ -47,7 +47,7 @@ The same principles work in small code. The mini-project here is small but it is
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/10/10-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.en.png)
 *The URL shortener example brings presentation, use case, domain, ports, and adapters together in one flow*
 
 Domain → port → adapter → infrastructure.

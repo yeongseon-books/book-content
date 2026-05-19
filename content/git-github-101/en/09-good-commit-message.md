@@ -48,7 +48,7 @@ The benefit shows up in code review too. Even when a PR description is thin, wel
 > A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.
 A solid commit message has a fixed skeleton.
 
-![Mental model](../../../assets/git-github-101/09/09-01-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png)
 
 *Mental model*
 Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.

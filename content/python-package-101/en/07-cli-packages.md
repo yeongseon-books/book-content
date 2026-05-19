@@ -65,7 +65,7 @@ greet = "mylib.cli:main"    →    Hello, Alice!
    runs the main() function in mylib/cli.py
 ```
 
-![Mental Model](../../../assets/python-package-101/07/07-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.en.png)
 *How an installed package turns an entry point into a usable command-line workflow*
 
 ## Core Concepts

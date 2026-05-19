@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 품질 게이트
 
-![코드 변경이 Ruff와 Mypy를 거쳐 CI 품질 게이트로 이어지는 흐름](../../../assets/github-actions-101/05/05-01-diagram.ko.png)
+![코드 변경이 Ruff와 Mypy를 거쳐 CI 품질 게이트로 이어지는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-diagram.ko.png)
 
 *코드 변경이 Ruff와 Mypy를 거쳐 CI 품질 게이트로 이어지는 흐름*
 

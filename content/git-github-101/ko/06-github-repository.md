@@ -48,7 +48,7 @@ remote는 외부 저장소의 별칭입니다. URL을 매번 길게 입력하지
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/06/06-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.ko.png)
 
 *Mental Model*
 

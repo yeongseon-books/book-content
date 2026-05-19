@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.ko.png)
 *요구사항부터 운영과 유지보수까지 이어지는 순환 구조*
 
 소프트웨어 엔지니어링은 시작과 끝이 분리된 직선 작업이 아니라, 계속 되돌아오는 순환입니다.

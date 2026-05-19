@@ -49,7 +49,7 @@ Hard-to-test code is a sign of hard-to-change structure. Testability is a measur
 
 ## Concept at a Glance
 
-![Testable Code](../../../assets/clean-code-101/08/08-01-concept-at-a-glance.en.png)
+![Testable Code](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.en.png)
 
 *Testability flow: separate pure logic from IO boundaries so unit tests and integration tests each get the right job.*
 

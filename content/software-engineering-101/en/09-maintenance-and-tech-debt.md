@@ -45,7 +45,7 @@ There is no codebase without debt. The question is whether you are aware of it, 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
 *The cycle for measuring, prioritizing, and paying down tech debt*
 
 Debt is a cycle, not an event.

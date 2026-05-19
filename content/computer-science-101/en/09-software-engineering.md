@@ -56,7 +56,7 @@ Good code is not the code that's quickest to write today; it's the code that's e
 
 > Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."
 
-![Concept at a Glance](../../../assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
 *Engineering adds repeatable safety and long-term maintainability on top of “it runs”*
 
 ## Key Terms

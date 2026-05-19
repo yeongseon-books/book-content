@@ -53,7 +53,7 @@ Data is fastest to read as a *picture*. The wrong chart leads to the *wrong deci
 
 ## Concept at a Glance
 
-![A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views](../../../assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
+![A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
 
 *A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views*
 ## Key Terms

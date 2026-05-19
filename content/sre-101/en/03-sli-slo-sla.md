@@ -46,7 +46,7 @@ Separating them makes ownership and consequences clearer. The indicator tells yo
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png)
 
 *Indicators feed internal objectives, and only a subset of those objectives should become external promises.*
 ## Key Terms

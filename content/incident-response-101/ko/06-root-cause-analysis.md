@@ -48,7 +48,7 @@ RCA는 비난을 위한 절차가 아니라 재발 방지를 위한 분석입니
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
 
 *한눈에 보는 구조*
 이 흐름에서 핵심은 한 번 더 묻는 습관입니다. 처음 눈에 보이는 설명에서 멈추지 않고, 왜 그 설명이 가능했는지 계속 내려가야 root cause에 가까워집니다.

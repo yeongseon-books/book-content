@@ -44,7 +44,7 @@ To find the responsible line *within five minutes* of an incident, logs must be 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)
 *Application events become one-line JSON records, flow to a log backend, and come back as field-based queries during incident response.*
 
 ## Key Terms

@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png)
 
 *벡터, 행렬, 선형변환이 하나의 학습 흐름으로 이어지는 선형대수의 기본 지도입니다.*
 

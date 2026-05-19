@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
 *기능 브랜치부터 카나리와 프로덕션까지 이어지는 릴리스 흐름*
 
 단계를 잘게 나누면 이상 신호가 생겼을 때 회수 비용도 같이 줄어듭니다.

@@ -45,7 +45,7 @@ A single spec file produces *docs + validation + client code + mock server*. Han
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
 *One OpenAPI spec can drive documentation, request validation, SDK generation, and mock behavior at the same time.*
 
 The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.

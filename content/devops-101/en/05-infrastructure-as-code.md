@@ -44,7 +44,7 @@ Console-built infrastructure exists *only in memory*. Replicating it elsewhere r
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

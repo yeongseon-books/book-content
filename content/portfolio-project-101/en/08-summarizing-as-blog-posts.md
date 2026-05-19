@@ -47,7 +47,7 @@ Posts also preserve context better than code alone. The reason you chose the pro
 
 Strong technical posts usually move from problem to approach, then into code, result, and lesson.
 
-![The standard flow of a technical post from problem to lesson](../../../assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
+![The standard flow of a technical post from problem to lesson](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
 
 *The standard flow of a technical post from problem to lesson*
 

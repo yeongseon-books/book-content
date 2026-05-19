@@ -55,7 +55,7 @@ The most common cause of "the server gets slow after a while" is a memory leak, 
 
 ### The four major regions of process memory
 
-![The four major regions of process memory](../../../assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
+![The four major regions of process memory](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
 *A useful first question in any memory problem is which region is growing and who owns its lifetime.*
 
 ```text

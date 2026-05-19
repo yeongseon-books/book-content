@@ -28,7 +28,7 @@ Production SQLAlchemy has three knobs: the pool, observability, and deployment s
 
 This is the final article in the SQLAlchemy 101 series.
 
-![Production patterns: pools, observability, migrations, and deploys](../../../assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png)
+![Production patterns: pools, observability, migrations, and deploys](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png)
 
 *Production patterns: pools, observability, migrations, and deploys*
 ## What you will learn
@@ -42,7 +42,7 @@ This is the final article in the SQLAlchemy 101 series.
 
 ## Why this matters
 
-![Why this matters](../../../assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
+![Why this matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
 
 *Why this matters*
 Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.
@@ -51,7 +51,7 @@ This article is about that layer. The examples use SQLite, but most of the patte
 
 ## Mental model
 
-![Mental model](../../../assets/sqlalchemy-101/10/10-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-03-mental-model.en.png)
 
 *Mental model*
 > Production SQLAlchemy has three knobs. The **pool** sets concurrency and tail latency. **Observability** tells you where slow is. The **migration policy** defines the safety line for deploys. Leave any one of them empty and the other two lose most of their value.
@@ -60,7 +60,7 @@ A pool that is too small queues requests; too large blows past the DB-side conne
 
 ## Core concepts
 
-![Core concepts](../../../assets/sqlalchemy-101/10/10-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-04-core-concepts.en.png)
 
 *Core concepts*
 ### Pool options
@@ -129,7 +129,7 @@ The "after" version (1) recovers automatically from a dead connection on the nex
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/sqlalchemy-101/10/10-05-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-05-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ### Step 1: Sizing the pool

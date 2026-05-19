@@ -44,7 +44,7 @@ That is why experienced operators treat concurrency like a budget. The point is 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png)
 
 *Function elasticity is only safe when downstream systems can absorb the resulting parallelism.*
 The most important part of this diagram is what happens *after* the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.

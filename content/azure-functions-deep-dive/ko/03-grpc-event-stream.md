@@ -200,7 +200,7 @@ message FunctionLoadRequest {
 
 이 네 단계가 끝나야 워커는 invocation을 받을 준비를 갖춥니다.
 
-![Common worker protocol lifecycle flow](../../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
+![Common worker protocol lifecycle flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
 
 ### 호스트 쪽 gRPC 서버는 `FunctionRpcService`입니다
 
@@ -217,7 +217,7 @@ message FunctionLoadRequest {
 
 `FunctionRpcService.EventStream()`는 먼저 `StartStream`으로 워커 ID를 확인한 뒤 `TryGetGrpcChannels(workerId, out inbound, out outbound)`를 호출합니다. 그 다음은 기계적입니다. gRPC에서 읽은 `StreamingMessage`를 inbound 채널에 쓰고, outbound 채널에서 꺼낸 메시지를 다시 gRPC 응답 스트림으로 밀어 넣습니다.
 
-![Per-worker channel pairs and gRPC pump](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
+![Per-worker channel pairs and gRPC pump](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
 
 따라서 `FunctionRpcService`는 실제 gRPC 스트림과 호스트 내부 워커별 큐 사이의 펌프입니다. `IScriptEventManager`가 있기는 하지만, 적어도 함수 호출 트래픽을 이해하는 데는 “워커별 큐 + gRPC 펌프”라는 멘탈 모델이 소스와 가장 잘 맞습니다.
 

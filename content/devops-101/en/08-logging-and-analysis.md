@@ -44,7 +44,7 @@ The era of *ssh-ing* into a single server and running *grep* is over. In distrib
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/devops-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

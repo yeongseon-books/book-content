@@ -44,7 +44,7 @@ This is post 8 in the Observability 101 series.
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/08/08-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png)
 *Measured reliability becomes an SLI, the target becomes an SLO, and the remaining room for failure becomes an error budget that alerts can track.*
 
 ## Key Terms

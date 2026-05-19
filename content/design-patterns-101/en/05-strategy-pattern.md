@@ -45,7 +45,7 @@ Branching algorithms with if/elif means editing existing code every time a new o
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
 *Strategy works when the context stays ignorant of algorithm internals and concrete behavior can swap in at the edge.*
 
 ## Key Terms

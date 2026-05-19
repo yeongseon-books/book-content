@@ -34,7 +34,7 @@ This is the final post in the LLM API Production 101 series. Here we focus on to
 
 The main idea is simple: **rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens**.
 
-![Rate limit management: patterns for staying within limits](../../../assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
+![Rate limit management: patterns for staying within limits](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
 
 *Rate limit management: patterns for staying within limits*
 ---
@@ -62,7 +62,7 @@ export GROQ_API_KEY="your-issued-key"
 
 ## Why the application needs its own limiter
 
-![Local limiter controlling flow before the provider](../../../assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.en.png)
+![Local limiter controlling flow before the provider](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-why-the-application-needs-its-own-limite.en.png)
 
 *Local limiter controlling flow before the provider*
 Retries and backoff are necessary, but they are still reactive once you have already exceeded the provider’s allowance. A local limiter is useful for three reasons:
@@ -77,7 +77,7 @@ Imagine twenty web requests arriving at the same moment, all triggering the same
 
 ## Where a token bucket fits best
 
-![Refill and consume cycle of a token bucket](../../../assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.en.png)
+![Refill and consume cycle of a token bucket](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-02-where-a-token-bucket-fits-best.en.png)
 
 *Refill and consume cycle of a token bucket*
 A token bucket refills at a steady rate. Each request consumes one or more tokens. That gives you a useful balance: short bursts are allowed up to the bucket size, but the long-term average stays bounded.
@@ -186,7 +186,7 @@ This keeps only recent events inside the active window and rejects requests once
 
 ## Putting a limiter in front of Groq calls
 
-![Execution path from local gate to provider call](../../../assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png)
+![Execution path from local gate to provider call](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png)
 
 *Execution path from local gate to provider call*
 Here is a small end-to-end example using a token bucket as a gate before the provider call.
@@ -296,7 +296,7 @@ The important detail is ordering: the application acquires local permission befo
 
 ## What to do after a 429 anyway
 
-![Recovery path after a provider 429](../../../assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.en.png)
+![Recovery path after a provider 429](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-04-what-to-do-after-a-429-anyway.en.png)
 
 *Recovery path after a provider 429*
 Even with a local limiter, you may still receive a 429. Multiple workers may be competing. The provider may enforce token-based limits that your simple request counter does not see. That is why 429 handling still matters.
@@ -376,7 +376,7 @@ def limited_completion_with_429(prompt: str) -> str:
 
 ## Choosing token bucket versus sliding window
 
-![Comparison for choosing a limiter](../../../assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.en.png)
+![Comparison for choosing a limiter](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-05-choosing-token-bucket-versus-sliding-win.en.png)
 
 *Comparison for choosing a limiter*
 Both are valid. The better choice depends on the traffic pattern.

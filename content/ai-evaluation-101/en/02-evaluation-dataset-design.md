@@ -35,12 +35,12 @@ This is post 2 in the AI Evaluation 101 series. Here we cover the principles for
 > Mental model: an eval dataset is not a scrapbook of pretty demos. It is an operating sample of the traffic you must protect plus the edge cases that would hurt most if they broke.
 
 ---
-![Designing evaluation datasets](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
+![Designing evaluation datasets](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
 
 *Designing evaluation datasets*
 ## What Makes a Good Evaluation Dataset?
 
-![What makes a good evaluation Dataset](../../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
+![What makes a good evaluation Dataset](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
 
 *What makes a good evaluation Dataset*
 A good eval set satisfies two things at once.
@@ -66,7 +66,7 @@ Adding `category` explicitly lets you "look at edge case scores separately." Loo
 
 ## Where Do You Source the Data?
 
-![Where do you source the Data](../../../assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png)
+![Where do you source the Data](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.en.png)
 
 *Where do you source the Data*
 Combine three sources.
@@ -105,7 +105,7 @@ A domain expert hand-writes cases they suspect will break — prompt injection, 
 
 ## How Many Cases Do You Need?
 
-![How many cases do you Need](../../../assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png)
+![How many cases do you Need](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.en.png)
 
 *How many cases do you Need*
 The size depends on the purpose.
@@ -121,7 +121,7 @@ Start at 10-30, add 5-10 from production each week, and you reach 200 within thr
 
 ## Labeling — How Do You Fill `expected`?
 
-![Labeling - how do you fill expected](../../../assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png)
+![Labeling - how do you fill expected](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.en.png)
 
 *Labeling - how do you fill expected*
 There are three labeling styles, and you can use different ones per case.

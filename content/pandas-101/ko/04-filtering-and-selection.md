@@ -44,7 +44,7 @@ Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법
 
 ## 한눈에 보는 개념
 
-![레이블, 위치, 조건에 따라 선택 도구를 나눠 쓰는 기준](../../../assets/pandas-101/04/04-01-concept-at-a-glance.ko.png)
+![레이블, 위치, 조건에 따라 선택 도구를 나눠 쓰는 기준](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.ko.png)
 *레이블, 위치, 조건에 따라 선택 도구를 나눠 쓰는 기준*
 
 ## 핵심 용어

@@ -46,7 +46,7 @@ list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 
 > 네 자료구조는 "가변성, 순서, 중복 허용, 해시 가능성"이라는 네 축의 조합으로 구분되며, 자료구조를 고른다는 것은 이 네 축에서 어떤 보장을 받고 어떤 보장을 포기할지를 결정하는 일입니다.
 네 자료구조를 가변성·순서·해시 가능성으로 묶으면 머릿속에 잘 박힙니다.
 
-![Mental Model](../../../assets/python-101/04/04-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.ko.png)
 
 *Mental Model*
 세 가지 핵심 규칙입니다.

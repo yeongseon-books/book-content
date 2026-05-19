@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프](../../../assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
+![문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
 
 *문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프*
 ## 핵심 용어

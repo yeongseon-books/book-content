@@ -44,7 +44,7 @@ Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름
 > Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서 일어나는 거의 모든 함정이 같은 그림으로 설명됩니다.
 Python에서 변수는 값을 담는 상자가 아닙니다. **객체에 붙는 이름표**입니다. 같은 객체에 여러 이름표가 붙을 수도 있고, 이름표를 다른 객체로 옮길 수도 있습니다.
 
-![Mental Model](../../../assets/python-101/02/02-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.ko.png)
 
 *Mental Model*
 위 그림에서 `a = 42; b = a`를 실행하면 `a`와 `b`는 모두 같은 정수 객체 `42`를 가리킵니다. 그리고 `a = "hi"`를 실행하면 `a`만 새 문자열 객체로 옮겨가고, `b`는 여전히 `42`를 가리킵니다.

@@ -44,7 +44,7 @@ IaC는 이 문제를 구조적으로 줄입니다. 인프라를 코드로 정의
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/devops-101/05/05-01-diagram.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-diagram.ko.png)
 
 *한눈에 보는 개념*
 

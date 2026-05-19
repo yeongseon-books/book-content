@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 라이선스 지도를 먼저 그려 보기
 
-![라이선스 지도를 먼저 그려 보기](../../../assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
+![라이선스 지도를 먼저 그려 보기](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
 
 *허용형과 카피레프트 계열을 비교할 때 먼저 떠올리면 좋은 라이선스 분류 지도*
 이 분류를 선악 구도로 읽을 필요는 없습니다. 허용형 라이선스는 재사용이 쉽고, 카피레프트 라이선스는 수정과 공유의 의무를 더 강하게 밀어 줍니다. 어느 쪽이 더 낫다기보다, 프로젝트 목표와 배포 방식에 따라 부담과 이점이 달라진다고 보는 편이 현실적입니다.

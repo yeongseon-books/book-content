@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.ko.png)
 
 *기초에서 분석과 모델링을 거쳐 제품 맥락으로 이어지는 12주 학습 경로의 큰 흐름*
 입문 단계에서는 이 순서가 중요합니다. 기초가 받쳐 줘야 분석이 흔들리지 않고, 분석 감각이 있어야 모델링 결과를 해석할 수 있으며, 마지막에는 제품과 사용자 맥락으로 연결해야 합니다.

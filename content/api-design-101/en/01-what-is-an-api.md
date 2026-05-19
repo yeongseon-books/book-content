@@ -45,7 +45,7 @@ An API is the *face* of a system. The internals can change freely as long as the
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
 *The client talks to the API contract, not to the server's internal implementation.*
 
 That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.

@@ -68,7 +68,7 @@ cookiecutter/copier + template
     ...
 ```
 
-![Mental Model](../../../assets/python-package-101/10/10-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.en.png)
 *How template inputs expand into a standard package skeleton and validation setup*
 
 ## Core Concepts

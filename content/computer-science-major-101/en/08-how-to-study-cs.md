@@ -48,7 +48,7 @@ Study efficiency creates a large share of the gap between students in a CS major
 
 ## Concept at a Glance
 
-![Study loop for CS majors](../../../assets/computer-science-major-101/08/08-01-study-loop.en.png)
+![Study loop for CS majors](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)
 
 *The study loop from lecture to questions and practice*
 

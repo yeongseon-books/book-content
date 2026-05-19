@@ -26,7 +26,7 @@ Example code: [github.com/yeongseon-books/llm-app-foundations-101](https://githu
 
 The diagram below shows the basic event flow of a streamed response.
 
-![Handling streaming responses: real-time output](../../../assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
+![Handling streaming responses: real-time output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
 
 *Handling streaming responses: real-time output*
 One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.
@@ -96,7 +96,7 @@ That distinction is worth keeping in mind throughout this article. Streaming is 
 
 ## The smallest Groq streaming example
 
-![Stream chunks arriving before full completion](../../../assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.en.png)
+![Stream chunks arriving before full completion](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-the-smallest-groq-streaming-example.en.png)
 
 *Stream chunks arriving before full completion*
 With the Groq SDK, streaming starts with one parameter: `stream=True`. Instead of receiving one completed response object, you receive an iterable stream of chunks.
@@ -142,7 +142,7 @@ You usually want all three, not just the first one.
 
 ## Extracting text from each chunk
 
-![Chunk fields for text finish and usage](../../../assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.en.png)
+![Chunk fields for text finish and usage](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.en.png)
 
 *Chunk fields for text finish and usage*
 In chat streaming, the text you usually want to render lives in `chunk.choices[0].delta.content`. Not every chunk contains visible text, so your loop should treat missing content as normal.
@@ -189,7 +189,7 @@ There is also an important defensive habit here: always expect some chunks to co
 
 ## Streaming versus sync and async patterns
 
-![Sync and async streaming execution comparison](../../../assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.en.png)
+![Sync and async streaming execution comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-03-streaming-versus-sync-and-async-patterns.en.png)
 
 *Sync and async streaming execution comparison*
 Streaming and async are related in practice, but they are not the same concept.
@@ -256,7 +256,7 @@ If you keep those boundaries clear, the decision becomes much easier. Pick strea
 
 ## Reading token usage during or after streaming
 
-![Final chunk usage and fallback aggregation](../../../assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.en.png)
+![Final chunk usage and fallback aggregation](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-04-reading-token-usage-during-or-after-stre.en.png)
 
 *Final chunk usage and fallback aggregation*
 In non-streaming responses, reading usage is straightforward: check `completion.usage` after the request finishes. Streaming changes the timing. Intermediate chunks often contain only incremental deltas, while usage metadata usually appears at the end.
@@ -392,7 +392,7 @@ The downstream consumer here could be almost anything: a moderation layer, a tra
 
 ## Relaying the stream through FastAPI
 
-![FastAPI relaying chunks to the browser](../../../assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.en.png)
+![FastAPI relaying chunks to the browser](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-05-relaying-the-stream-through-fastapi.en.png)
 
 *FastAPI relaying chunks to the browser*
 In a browser-based product, your frontend usually should not call the model provider directly. The server remains the right place for API keys, authentication, prompt policy, logging, and usage tracking. That means the server needs to receive the provider stream and relay it onward.

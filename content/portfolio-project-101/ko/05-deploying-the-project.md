@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 배포를 복잡하게 볼 필요는 없습니다. 코드가 저장소로 올라가고, 빌드되고, 배포되고, 상태를 확인한 뒤, 안정적으로 열리는 URL로 이어지면 됩니다.
 
-![배포 이후 공개 URL에 도달하기까지의 흐름](../../../assets/portfolio-project-101/05/05-01-diagram.ko.png)
+![배포 이후 공개 URL에 도달하기까지의 흐름](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-diagram.ko.png)
 
 *배포 이후 공개 URL에 도달하기까지의 흐름*
 

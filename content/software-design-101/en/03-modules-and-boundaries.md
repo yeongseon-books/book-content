@@ -47,7 +47,7 @@ Module boundaries are walls that contain change. Good walls keep changes on one 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
 *A deep module keeps a small public surface while hiding rich internal behavior behind it*
 
 Small surface, deep interior.

@@ -46,7 +46,7 @@ The response process also shapes trust. Customers, leadership, and the team itse
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/06/06-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png)
 
 *A healthy incident process moves from detection to triage, mitigation, resolution, and learning in order.*
 ## Key Terms

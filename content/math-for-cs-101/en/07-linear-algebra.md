@@ -48,7 +48,7 @@ That shift matters in engineering work because many bugs are not arithmetic mist
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
 *Linear algebra treats vectors as data and matrices as the transformations that move or reinterpret that data.*
 
 ## Key Terms

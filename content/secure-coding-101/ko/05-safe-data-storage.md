@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![애플리케이션, 데이터베이스, KMS로 이어지는 안전한 저장 경로](../../../assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
+![애플리케이션, 데이터베이스, KMS로 이어지는 안전한 저장 경로](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
 
 *애플리케이션, 데이터베이스, KMS로 이어지는 안전한 저장 경로*
 이 구조에서 데이터는 애플리케이션과 데이터베이스 사이를 이동할 때도 보호돼야 하고, 데이터베이스가 디스크에 저장할 때도 보호돼야 합니다. 동시에 암호화 키는 데이터와 분리된 KMS에서 관리돼야 진짜 분리 효과가 생깁니다.

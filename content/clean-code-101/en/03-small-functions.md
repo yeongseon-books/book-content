@@ -49,7 +49,7 @@ A small function explains itself by name. A large function asks for comments, an
 
 ## Concept at a Glance
 
-![Small Functions](../../../assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
+![Small Functions](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
 
 *Small-function flow: extraction enables names, and names enable reuse and testing.*
 

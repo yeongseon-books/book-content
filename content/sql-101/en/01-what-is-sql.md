@@ -46,7 +46,7 @@ SQL also ages unusually well. PostgreSQL, MySQL, SQLite, BigQuery, and Snowflake
 
 ## Query flow at a glance
 
-![Query flow at a glance](../../../assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
+![Query flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
 ## Key Terms
 
 - **Table**: the basic unit, made of *rows* and *columns*.

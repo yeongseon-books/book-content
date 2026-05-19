@@ -46,7 +46,7 @@ last_reviewed: '2026-05-12'
 
 ### 같은 그래프를 세 가지 표현으로 보기
 
-![무방향 그래프와 인접 리스트 및 인접 행렬](../../../assets/discrete-math-101/08/08-01-graph-representations.ko.png)
+![무방향 그래프와 인접 리스트 및 인접 행렬](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.ko.png)
 *왼쪽은 무방향 그래프 자체이고, 가운데는 같은 구조를 인접 리스트로 풀어 쓴 모습이며, 오른쪽은 정점 순서를 `A, B, C, D`로 고정했을 때의 인접 행렬입니다. 그래프를 배울 때 중요한 것은 그림, 리스트, 행렬이 서로 다른 데이터 구조가 아니라 같은 관계를 다른 관점에서 본 표현이라는 점입니다.*
 
 ## 핵심 용어

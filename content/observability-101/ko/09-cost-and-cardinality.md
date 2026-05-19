@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
 *라벨 조합, 로그 양, 트레이스 수가 각각 시계열 수와 색인 비용, 샘플링 정책으로 이어지는 비용 구조*
 
 ## 핵심 용어

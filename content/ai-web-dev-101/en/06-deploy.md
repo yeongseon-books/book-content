@@ -46,7 +46,7 @@ Before you deploy, verify four things:
 - the application entry point is explicit
 - the app can bind to the platform-provided port
 
-![From local development to live deployment](../../../assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
+![From local development to live deployment](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
 
 *From local development to live deployment*
 
@@ -60,7 +60,7 @@ Before you deploy, verify four things:
 
 A common combination is simple: frontend on Vercel, Python API on Azure.
 
-![Comparing the Vercel and Azure hosting structure](../../../assets/ai-web-dev-101/06/vercel-azure-hosting-overview.en.png)
+![Comparing the Vercel and Azure hosting structure](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/vercel-azure-hosting-overview.en.png)
 
 *Comparing the Vercel and Azure hosting structure*
 
@@ -88,7 +88,7 @@ Add `OPENAI_API_KEY` through the Vercel project settings. Do not commit the real
 
 After deployment, inspect the build log first. Missing dependencies, missing environment variables, and type errors usually show up there before you ever open the app URL.
 
-![The runtime path from deployed app to model call](../../../assets/ai-web-dev-101/06/production-request-path.en.png)
+![The runtime path from deployed app to model call](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/production-request-path.en.png)
 
 *The runtime path from deployed app to model call*
 
@@ -157,7 +157,7 @@ node_modules/
 
 Only commit an example file such as `.env.example`. Keep the real values in local environments and deployment platform settings.
 
-![Environment-variable boundaries versus hardcoded secret exposure](../../../assets/ai-web-dev-101/06/secret-key-boundary.en.png)
+![Environment-variable boundaries versus hardcoded secret exposure](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/secret-key-boundary.en.png)
 
 *Environment-variable boundaries versus hardcoded secret exposure*
 
@@ -170,7 +170,7 @@ Even if hosting starts on a free tier, model calls can still create ongoing cost
 - inspect deployment logs immediately after each rollout
 - watch cold-start behavior and 500-level errors on the live URL
 
-![Operational checks from budget guardrails to error visibility](../../../assets/ai-web-dev-101/06/cost-guardrails-flow.en.png)
+![Operational checks from budget guardrails to error visibility](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/cost-guardrails-flow.en.png)
 
 *Operational checks from budget guardrails to error visibility*
 

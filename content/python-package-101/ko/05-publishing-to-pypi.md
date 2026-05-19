@@ -65,7 +65,7 @@ python -m build → dist/*.whl, dist/*.tar.gz
           twine upload dist/*          (production)
 ```
 
-![멘탈 모델](../../../assets/python-package-101/05/05-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
 *빌드부터 TestPyPI 검증, 실제 PyPI 배포까지의 운영 흐름*
 
 ## 핵심 개념

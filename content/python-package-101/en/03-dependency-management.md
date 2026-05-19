@@ -67,7 +67,7 @@ site-packages/             project-a/.venv/site-packages/
                               django 4.2
 ```
 
-![Mental Model](../../../assets/python-package-101/03/03-01-mental-model.en.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.en.png)
 *How per-project environments isolate package versions and lock files*
 
 ## Core Concepts

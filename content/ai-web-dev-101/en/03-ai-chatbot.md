@@ -47,7 +47,7 @@ The Vercel AI SDK helps with that in three ways:
 - `useChat` gives you a structured state layer for messages and request status
 - Next.js App Router fits naturally with server routes and client components
 
-![High-level architecture of the chatbot service](../../../assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
+![High-level architecture of the chatbot service](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
 
 *High-level architecture of the chatbot service*
 
@@ -98,11 +98,11 @@ Read this route in terms of responsibility:
 - `convertToModelMessages(...)`: transforms UI messages into model-facing messages
 - `toUIMessageStreamResponse()`: converts the model stream into a response the client can consume incrementally
 
-![Request handling flow inside the API route](../../../assets/ai-web-dev-101/03/api-route-handler-flow.en.png)
+![Request handling flow inside the API route](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/api-route-handler-flow.en.png)
 
 *Request handling flow inside the API route*
 
-![How a user message turns into a model response](../../../assets/ai-web-dev-101/03/chat-message-roundtrip.en.png)
+![How a user message turns into a model response](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chat-message-roundtrip.en.png)
 
 *How a user message turns into a model response*
 
@@ -164,7 +164,7 @@ What matters here:
 - `status` lets the UI avoid duplicate submissions and communicate activity
 - `message.parts` keeps the rendering future-proof for non-text response parts
 
-![State flow inside the useChat hook](../../../assets/ai-web-dev-101/03/usechat-state-flow.en.png)
+![State flow inside the useChat hook](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/usechat-state-flow.en.png)
 
 *State flow inside the useChat hook*
 
@@ -174,7 +174,7 @@ With `useChat` on the client and `streamText` on the server, you get streaming w
 
 That matters because users trust a system more when they see progress quickly. A response that starts rendering immediately feels much faster than a response that stays silent for three seconds and then appears all at once.
 
-![How streaming responses arrive incrementally](../../../assets/ai-web-dev-101/03/streaming-response-flow.en.png)
+![How streaming responses arrive incrementally](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/streaming-response-flow.en.png)
 
 *How streaming responses arrive incrementally*
 

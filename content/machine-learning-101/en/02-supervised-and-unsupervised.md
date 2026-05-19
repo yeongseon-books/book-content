@@ -42,7 +42,7 @@ Picking the wrong paradigm makes any model improvement meaningless. Problem fram
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
 
 *The first branch in the workflow is whether labels exist; that choice determines whether you are predicting targets or discovering structure.*
 

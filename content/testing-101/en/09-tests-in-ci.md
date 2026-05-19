@@ -46,7 +46,7 @@ Local environments *differ from person to person*. *CI* validates *every PR* in 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/testing-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 ## Key Terms

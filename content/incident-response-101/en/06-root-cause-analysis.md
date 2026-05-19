@@ -48,7 +48,7 @@ RCA is valuable when it changes the system. That means tracing beyond the obviou
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 Each “why” step is a reminder not to stop at the first explanation. The useful endpoint is the structural condition that can be changed, not the easiest object to blame.

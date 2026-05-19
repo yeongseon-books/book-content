@@ -28,7 +28,7 @@ This is the 5th article in the RAG Evaluation and Benchmarking 101 series.
 
 ## Questions this post answers
 
-![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -98,7 +98,7 @@ Faithfulness rising from 0.78 to 0.91 is direct evidence that hallucinations dro
 
 ### Step 1 — Build the evaluation dataset
 
-![Dataset structure for end-to-end evaluation](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
+![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
 
 *Dataset structure for end-to-end evaluation*
 
@@ -123,7 +123,7 @@ dataset = Dataset.from_list(samples)
 
 ### Step 2 — Wire LLM and embeddings via wrappers
 
-![Wrapper path into the RAGAS evaluator](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
+![Wrapper path into the RAGAS evaluator](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
 
 *Wrapper path into the RAGAS evaluator*
 
@@ -167,7 +167,7 @@ python3 main.py
 
 ### Step 4 — Read the results
 
-![Reading retrieval and generation failure separately](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
+![Reading retrieval and generation failure separately](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
 
 *Reading retrieval and generation failure separately*
 
@@ -190,7 +190,7 @@ The "Low / High" cell is the system confidently giving wrong answers. Make it th
 
 ## In production
 
-![Verification flow before metric execution](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
+![Verification flow before metric execution](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
 
 *Verification flow before metric execution*
 

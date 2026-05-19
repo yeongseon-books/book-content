@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/04/04-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.ko.png)
 *애플리케이션 이벤트가 JSON 로그가 되어 저장소로 흘러가고 필드 기반 질의로 이어지는 구조*
 
 ## 핵심 용어

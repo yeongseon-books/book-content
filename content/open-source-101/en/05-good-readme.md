@@ -46,7 +46,7 @@ Good README quality lowers support cost and builds trust. Small projects especia
 
 ## Follow the Reader's Order
 
-![Follow the Reader's Order](../../../assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
+![Follow the Reader's Order](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
 
 *The order most first-time visitors follow from title to install and usage when reading a README*
 That flow matters because the reader's attention usually moves in that order. First they want to know what the project is. Then whether it is installable. Then how to use it. License and contribution details come after that.

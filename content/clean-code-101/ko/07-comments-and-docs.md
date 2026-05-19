@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![주석과 문서화](../../../assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
+![주석과 문서화](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
 
 *주석과 문서화의 흐름: 코드는 무엇을 설명하고, 주석과 문서는 왜와 계약을 설명합니다.*
 

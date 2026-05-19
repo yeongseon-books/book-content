@@ -48,7 +48,7 @@ A runbook repository reduces both costs. It makes the response path reviewable, 
 
 ## Diagram at a glance
 
-![Diagram at a glance](../../../assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
+![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
 
 *Diagram at a glance*
 Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.

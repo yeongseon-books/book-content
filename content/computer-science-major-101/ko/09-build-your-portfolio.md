@@ -48,7 +48,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![과제에서 포트폴리오로 가는 흐름](../../../assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
+![과제에서 포트폴리오로 가는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
 
 *과제가 저장소와 README를 거쳐 포트폴리오로 바뀌는 흐름*
 

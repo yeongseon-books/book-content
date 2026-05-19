@@ -48,7 +48,7 @@ That is why the real problem is policy, not automation for its own sake. The tea
 
 ## See the Flow First
 
-![See the Flow First](../../../assets/mlops-101/08/08-01-see-the-flow-first.en.png)
+![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png)
 
 *See the Flow First*
 This structure explains retraining well. A trigger fires, a challenger is trained, the challenger is evaluated against the champion, and the system either promotes it or rejects it.

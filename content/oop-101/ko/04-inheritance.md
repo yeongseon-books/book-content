@@ -56,7 +56,7 @@ Animal (parent class)
     └── purr() added
 ```
 
-![핵심 개념 잡기](../../../assets/oop-101/04/04-01-concept-overview.ko.png)
+![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.ko.png)
 *상속 계층은 공통 인터페이스를 공유하지만, 부모의 변경 반경도 함께 커집니다.*
 
 ## 핵심 개념

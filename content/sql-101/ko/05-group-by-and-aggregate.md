@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 집계 흐름
 
-![집계 흐름](../../../assets/sql-101/05/05-01-aggregation-flow.ko.png)
+![집계 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.ko.png)
 `WHERE`는 집계 전에 행을 걸러 내고, `GROUP BY`는 남은 행을 묶고, 집계 함수는 그룹마다 숫자를 계산합니다. 그 뒤 `HAVING`은 계산된 그룹 결과를 다시 걸러 냅니다. 이 순서를 머리에 넣어 두면 `WHERE COUNT(*) > 1` 같은 오류가 왜 생기는지 바로 이해됩니다.
 
 ## 핵심 개념 정리

@@ -52,7 +52,7 @@ BSTs are the foundation of database indexes, file system metadata, memory alloca
 
 ### BST balanced vs skewed
 
-![BST balanced vs skewed](../../../assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
+![BST balanced vs skewed](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
 *Figure. With the same seven keys, the balanced BST keeps the search path short while the skewed BST stretches the path almost linearly. That difference in height is why a BST can deliver average O(log n) search yet still collapse to O(n) in the worst case.*
 
 ## Key Terms

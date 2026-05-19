@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 상관은 두 변수가 같은 방향으로 움직이는지와 그 강도를 보여 줍니다. 회귀는 그 관계를 식으로 적어, x가 바뀔 때 y가 어떻게 달라지는지 예측 가능한 형태로 만듭니다. 마지막으로 R²와 잔차는 그 식이 데이터를 얼마나 설명하는지 점검하게 합니다.
 
-![멘탈 모델](../../../assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
 
 *상관은 방향과 강도를 요약하고, 회귀는 그 관계를 식으로 바꾼 뒤 R²와 잔차로 모델을 점검합니다.*
 이 흐름을 이해하면 상관계수는 요약 지표이고, 회귀는 모델이며, 잔차 진단은 모델 검토 단계라는 점이 분명해집니다.

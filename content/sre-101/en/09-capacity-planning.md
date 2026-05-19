@@ -46,7 +46,7 @@ At the same time, excess capacity is not free. Good planning explains how much u
 
 ## Concept at a glance
 
-![Concept at a glance](../../../assets/sre-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
 
 *Capacity planning combines demand forecasts, load tests, provisioning, and monitoring into one loop.*
 ## Key Terms

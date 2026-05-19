@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 전체 그림
 
-![전체 그림](../../../assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
+![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
 *요구사항이 설계 결정을 거쳐 다음 변경 비용으로 이어지는 흐름*
 
 요구사항은 설계 결정으로 바뀌고, 설계 결정은 코드로 굳어집니다. 그리고 그 코드는 다음 요구사항이 들어왔을 때의 변경 비용을 결정합니다. 이 순환을 이해하면 설계를 단발성 산출물이 아니라 계속 누적되는 비용 구조로 보게 됩니다.

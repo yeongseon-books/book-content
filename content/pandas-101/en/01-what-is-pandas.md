@@ -44,7 +44,7 @@ CSV, Excel, databases, APIs — *80% of real-world data* is *tabular*. If you ca
 
 ## Concept at a Glance
 
-![Pandas between raw files, tabular transforms, and analysis outputs](../../../assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
+![Pandas between raw files, tabular transforms, and analysis outputs](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
 *Pandas between raw files, tabular transforms, and analysis outputs*
 
 ## Key Terms

@@ -45,7 +45,7 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)
 *하나의 OpenAPI spec이 문서, 요청 검증, SDK 생성, mock server까지 동시에 연결됩니다.*
 
 핵심은 spec 파일을 부차 산출물이 아니라 중심 계약으로 다루는 데 있습니다. 그래야 PR에서 바뀐 요청 필드 하나가 문서와 클라이언트 코드까지 같은 순간에 반영됩니다.

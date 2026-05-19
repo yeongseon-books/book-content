@@ -64,7 +64,7 @@ The seating (Revision) is a snapshot of the office at one point in time. Move a 
 
 Environment is a boundary. Container App is a logical service. Revision is an immutable snapshot of image and configuration.
 
-![environment, container app, and revision hierarchy](../../../assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
+![environment, container app, and revision hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 
 *environment, container app, and revision hierarchy*
 

@@ -45,7 +45,7 @@ Python gives you functions, modules, `dataclass`, `NamedTuple`, `TypedDict`, and
 
 ## Concept Overview
 
-![Concept Overview](../../../assets/oop-101/10/10-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png)
 *The goal is not to avoid classes forever. The goal is to reserve classes for places where state, invariants, and coordinated behavior truly move together.*
 
 The practical question is simple: does this behavior need persistent state and lifecycle coordination, or is it mostly a data transformation pipeline? If the answer is "pipeline," classes are often extra weight.

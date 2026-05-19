@@ -50,7 +50,7 @@ A resume is the ticket into the interview.
 
 ## Concept at a Glance
 
-![Resume flow from summary to supporting portfolio evidence](../../../assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
+![Resume flow from summary to supporting portfolio evidence](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
 
 *Resume flow from summary to supporting portfolio evidence*
 

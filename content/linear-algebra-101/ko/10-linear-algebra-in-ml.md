@@ -43,7 +43,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png)
+![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png)
 
 *데이터 행렬, 모델, 손실, 그래디언트, 업데이트가 하나의 선형대수 흐름으로 연결되는 모습을 보여 줍니다.*
 

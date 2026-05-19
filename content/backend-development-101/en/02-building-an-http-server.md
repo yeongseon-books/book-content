@@ -42,7 +42,7 @@ Once you have *seen* what frameworks hide, every future debugging session gets f
 
 ## Concept at a Glance
 
-![raw HTTP request and response flow between client and server](../../../assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
+![raw HTTP request and response flow between client and server](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
 
 *raw HTTP request and response flow between client and server*
 Both request and response are just *blocks of text*.

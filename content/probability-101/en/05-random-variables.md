@@ -46,7 +46,7 @@ The same move happens in production systems. Sensor readings, response times, us
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/probability-101/05/05-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)
 
 *Concept at a Glance*
 

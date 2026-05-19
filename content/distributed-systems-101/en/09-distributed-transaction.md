@@ -45,7 +45,7 @@ As microservices and multi-store architectures grow, "two systems in one transac
 
 ## Concept at a Glance
 
-![Coordinator and participant flow in 2PC](../../../assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
+![Coordinator and participant flow in 2PC](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
 
 *Coordinator and participant flow in 2PC*
 

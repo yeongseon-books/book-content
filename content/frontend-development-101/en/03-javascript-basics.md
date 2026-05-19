@@ -43,7 +43,7 @@ JavaScript stays the same *across frameworks*. Inside React components, inside V
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)
 
 *The core JavaScript flow from variables and functions to DOM updates and events*
 

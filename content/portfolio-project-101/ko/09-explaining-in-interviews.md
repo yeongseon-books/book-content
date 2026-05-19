@@ -45,7 +45,7 @@ last_reviewed: '2026-05-15'
 
 프로젝트 설명은 상황, 과제, 행동, 결과 순서로 정리하면 놓치기 쉽지 않습니다.
 
-![상황에서 결과로 이어지는 STAR 답변 구조](../../../assets/portfolio-project-101/09/09-01-diagram.ko.png)
+![상황에서 결과로 이어지는 STAR 답변 구조](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-diagram.ko.png)
 
 *상황에서 결과로 이어지는 STAR 답변 구조*
 

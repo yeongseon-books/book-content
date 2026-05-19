@@ -208,7 +208,7 @@ The pattern that works in practice has five stages.
 [Structured output]
 ```
 
-![OCR + VLM hybrid pipeline](../../../assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
+![OCR + VLM hybrid pipeline](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
 *OCR recovers exact strings and locations. Captioning and VLM description recover scene meaning. The fusion stage is where production quality is decided.*
 
 Below is a minimal implementation of that hybrid.

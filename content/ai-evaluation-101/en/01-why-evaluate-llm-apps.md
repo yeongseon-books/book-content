@@ -35,12 +35,12 @@ This is the first post in the AI Evaluation 101 series. Here we cover why LLM ev
 > Mental model: evaluation is not a research luxury. It is the change-management dashboard that tells you whether a prompt, model, or retrieval change improved the system or quietly pushed it backward.
 
 ---
-![Why evaluate LLM applications](../../../assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
+![Why evaluate LLM applications](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
 
 *Why evaluate LLM applications*
 ## Why Is LLM Evaluation Different from Regular Testing?
 
-![Why is LLM evaluation different from regular Testing](../../../assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png)
+![Why is LLM evaluation different from regular Testing](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png)
 
 *Why is LLM evaluation different from regular Testing*
 Traditional unit tests are deterministic: `assert add(2, 3) == 5`. The same input produces the same output, and there is exactly one right answer.
@@ -64,7 +64,7 @@ Send the same `text` twice and the two responses will not match exactly. Several
 
 ## What Breaks if You Run Without Evaluation?
 
-![What breaks if you run without Evaluation](../../../assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.en.png)
+![What breaks if you run without Evaluation](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-03-what-breaks-if-you-run-without-evaluatio.en.png)
 
 *What breaks if you run without Evaluation*
 Three things break at once.
@@ -82,7 +82,7 @@ Three things break at once.
 
 ## What Should You Measure?
 
-![What should you Measure](../../../assets/ai-evaluation-101/01/01-04-what-should-you-measure.en.png)
+![What should you Measure](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-04-what-should-you-measure.en.png)
 
 *What should you Measure*
 LLM responses have at least four dimensions, and each needs a different measurement approach.
@@ -107,7 +107,7 @@ Later posts in this series cover which metrics fit each dimension, one at a time
 
 ## The Four Stages of an Evaluation Pipeline
 
-![The four stages of an evaluation pipeline](../../../assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.en.png)
+![The four stages of an evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-05-the-four-stages-of-an-evaluation-pipelin.en.png)
 
 *The four stages of an evaluation pipeline*
 Whatever tool you use, an LLM evaluation system has the same four stages.

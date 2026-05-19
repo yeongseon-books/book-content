@@ -28,7 +28,7 @@ The ORM models from Ep4 do nothing on their own. To push instances back to the d
 
 This is the 5th article in the SQLAlchemy 101 series.
 
-![Session in Depth: how unit of work and identity map actually work](../../../assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png)
+![Session in Depth: how unit of work and identity map actually work](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png)
 
 *Session in Depth: how unit of work and identity map actually work*
 ## Questions this post answers
@@ -43,7 +43,7 @@ This is the 5th article in the SQLAlchemy 101 series.
 
 ## Why it matters
 
-![Why it matters](../../../assets/sqlalchemy-101/05/05-02-why-it-matters.en.png)
+![Why it matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png)
 
 *Why it matters*
 If you use the ORM without understanding the Session, you bump into mysterious behavior often:
@@ -57,7 +57,7 @@ Every one of these reduces to a single question: "What objects does the Session 
 
 ## Mental Model
 
-![Mental model](../../../assets/sqlalchemy-101/05/05-03-mental-model.en.png)
+![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-03-mental-model.en.png)
 
 *Mental model*
 > A `Session` is a notebook that bundles a working scratch pad (Unit of Work) and a cache page (Identity Map) into one cover. While the notebook is open, the same PK is the same object; when you close it (`commit`), all changes are flushed to SQL at once.
@@ -79,7 +79,7 @@ Two things matter most:
 
 ## Core concepts
 
-![Core concepts](../../../assets/sqlalchemy-101/05/05-04-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-04-core-concepts.en.png)
 
 *Core concepts*
 ### 1) Session is a transactional context
@@ -188,7 +188,7 @@ The Session tracks attribute changes and, on flush, emits an UPDATE that touches
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/sqlalchemy-101/05/05-05-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-05-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 Save the snippet below and run it; you can watch the SQL and the Identity Map at work.

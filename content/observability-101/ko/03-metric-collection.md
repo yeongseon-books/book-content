@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/03/03-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.ko.png)
 *애플리케이션이 메트릭을 노출하고 Prometheus가 수집한 뒤 Grafana가 질문 형태의 그래프로 바꾸는 흐름*
 
 ## 핵심 용어

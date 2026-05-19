@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![타입 검사와 IDE 지원이 하나의 타입 정보에 기대는 구조](../../../assets/programming-languages-101/03/03-01-concept-at-a-glance.ko.png)
+![타입 검사와 IDE 지원이 하나의 타입 정보에 기대는 구조](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.ko.png)
 
 *타입 검사와 IDE 지원이 하나의 타입 정보에 기대는 구조*
 

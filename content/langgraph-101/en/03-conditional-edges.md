@@ -75,7 +75,7 @@ That table matters because these are the questions operators actually ask. Why d
 
 In practice, I look for three things first in a branching graph: whether routing evidence is preserved in state, whether unexpected inputs have a default path, and whether loop control is separated from route choice. Once those three are visible, “it only fails on some strange requests” becomes much easier to interpret.
 
-![Questions this post answers](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -85,7 +85,7 @@ In practice, I look for three things first in a branching graph: whether routing
 
 Start with the smallest branch that still looks like a real routing skeleton. The graph reads the user’s question, classifies it as `code`, `concept`, or `debug`, and uses a conditional edge to choose the next node. The example is intentionally plain, but the structure is already close to what real agents use.
 
-![Three way branch from classify node](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
+![Three way branch from classify node](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
 
 *Three way branch from classify node*
 
@@ -231,7 +231,7 @@ This is why I recommend reading branch-heavy graphs in a fixed order: inspect th
 
 Do not read every line with equal weight on a first pass. Three details matter first.
 
-![Question to route field flow](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.en.png)
+![Question to route field flow](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-02-what-to-notice-in-this-code.en.png)
 
 *Question to route field flow*
 
@@ -251,7 +251,7 @@ The third point is the path map. It looks small, but it is operationally importa
 
 The most common mistake with conditional edges is thinking the job is done once “a route comes back.” In practice, route values matter less than **how unknown routes are handled, where termination is guaranteed, and what the fallback behavior is.**
 
-![Termination design for branches and loops](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.en.png)
+![Termination design for branches and loops](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-03-where-engineers-get-confused.en.png)
 
 *Termination design for branches and loops*
 

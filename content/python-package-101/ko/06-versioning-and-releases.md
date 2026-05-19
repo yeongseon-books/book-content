@@ -60,7 +60,7 @@ MINOR  (1.2.4 → 1.3.0): New feature, existing API preserved
 MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 ```
 
-![멘탈 모델](../../../assets/python-package-101/06/06-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.ko.png)
 *코드 변경이 버전 판단, 릴리스 기록, 태그, 배포로 이어지는 흐름*
 
 ## 핵심 개념

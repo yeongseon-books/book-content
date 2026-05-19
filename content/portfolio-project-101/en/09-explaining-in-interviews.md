@@ -47,7 +47,7 @@ The first minute or two matters a lot because it shapes the quality of the follo
 
 A project answer becomes much easier to control when it follows situation, task, action, and result.
 
-![The STAR answer shape from situation to measurable result](../../../assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
+![The STAR answer shape from situation to measurable result](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
 
 *The STAR answer shape from situation to measurable result*
 

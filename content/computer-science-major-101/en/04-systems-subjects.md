@@ -49,7 +49,7 @@ This is post 4 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-![Systems stack map](../../../assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
+![Systems stack map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
 
 *How hardware, OS, compilers, and programs connect*
 

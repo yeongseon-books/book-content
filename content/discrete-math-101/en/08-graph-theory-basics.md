@@ -54,7 +54,7 @@ Shortest path in navigation, friend recommendations on Instagram, npm dependency
 
 ### One graph, three representations
 
-![One undirected graph shown as a drawing, adjacency list, and adjacency matrix](../../../assets/discrete-math-101/08/08-01-graph-representations.en.png)
+![One undirected graph shown as a drawing, adjacency list, and adjacency matrix](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.en.png)
 *Left: the undirected graph itself. Middle: the same structure written as an adjacency list. Right: the adjacency matrix when the vertex order is fixed to `A, B, C, D`. The important idea is that these are not three different facts — they are three views of the same relationship data.*
 
 ## Key Terms

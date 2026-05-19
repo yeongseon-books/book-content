@@ -55,7 +55,7 @@ Concurrency bugs are quiet during development and loud in production, especially
 
 ### How one increment gets lost
 
-![How one increment gets lost](../../../assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
+![How one increment gets lost](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
 *A race condition often looks like two flows reading the same old value and then overwriting each other's work.*
 
 ```text

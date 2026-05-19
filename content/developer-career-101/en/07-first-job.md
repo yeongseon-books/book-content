@@ -50,7 +50,7 @@ The first impression frames the next eighteen months.
 
 ## Concept at a Glance
 
-![Onboarding loop from learning to feedback](../../../assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
+![Onboarding loop from learning to feedback](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
 
 *Onboarding loop from learning to feedback*
 

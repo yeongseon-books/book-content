@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 실행 계획 선택 흐름
 
-![실행 계획 선택 흐름](../../../assets/sql-101/09/09-01-plan-selection-flow.ko.png)
+![실행 계획 선택 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.ko.png)
 사용자가 SQL을 보내면 플래너가 여러 실행 방식을 검토합니다. 그리고 비용 추정을 바탕으로 순차 스캔을 할지, 인덱스 스캔을 할지, 어떤 조인 순서를 택할지 결정합니다. 성능 튜닝은 결국 이 선택을 읽고 이해하는 과정입니다.
 
 ## 핵심 개념 정리

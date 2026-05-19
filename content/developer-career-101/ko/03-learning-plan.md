@@ -49,7 +49,7 @@ last_reviewed: '2026-05-14'
 
 ## 핵심 개념 한눈에 보기
 
-![분기 목표에서 회고로 이어지는 학습 루프](../../../assets/developer-career-101/03/03-01-concept-at-a-glance.ko.png)
+![분기 목표에서 회고로 이어지는 학습 루프](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.ko.png)
 
 *분기 목표에서 회고로 이어지는 학습 루프*
 

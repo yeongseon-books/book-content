@@ -42,7 +42,7 @@ Python 인터프리터는 타입 힌트를 강제하지 않습니다. 즉, `-> s
 
 둘 다 소스 코드를 실행하지 않고 읽으면서 타입 불일치를 찾지만, 운영 관점에서는 더 중요한 질문이 있습니다. "어떤 예제 코드에서 어떤 오류가 나고, 그 코드를 어떻게 고치며, 그 검사를 어떻게 CI까지 연결할 것인가?" 이 글은 그 질문에 답하도록 하나의 흐름으로 설명합니다.
 
-![로컬 편집에서 CI 차단까지 이어지는 타입 검사 피드백 루프](../../../assets/type-hints-python-101/08/08-01-concept-at-a-glance.ko.png)
+![로컬 편집에서 CI 차단까지 이어지는 타입 검사 피드백 루프](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.ko.png)
 
 *로컬 편집에서 CI 차단까지 이어지는 타입 검사 피드백 루프*
 

@@ -44,7 +44,7 @@ New-hire setup finishes in *under five minutes*. The *README setup section* simp
 
 ## Concept at a Glance
 
-![One Compose file declaring web, database, and cache services on a shared network](../../../assets/docker-101/05/05-01-concept-at-a-glance.en.png)
+![One Compose file declaring web, database, and cache services on a shared network](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
 
 *Compose turns a multi-container environment into one reviewable declaration of services, networks, volumes, and health checks*
 

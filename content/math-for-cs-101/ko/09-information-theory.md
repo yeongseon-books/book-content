@@ -62,7 +62,7 @@ title: 정보이론
 
 ## 한 장으로 보는 정보이론
 
-![한 장으로 보는 정보이론](../../../assets/math-for-cs-101/09/09-01-concept-at-a-glance.ko.png)
+![한 장으로 보는 정보이론](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.ko.png)
 *정보이론은 놀라움의 크기와 평균 부호 길이를 연결해 압축과 예측의 공통 바닥선을 보여 줍니다.*
 
 ---

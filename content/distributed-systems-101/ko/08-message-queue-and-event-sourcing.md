@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![메시지 큐를 통한 생산자-소비자 분리](../../../assets/distributed-systems-101/08/08-01-concept-at-a-glance.ko.png)
+![메시지 큐를 통한 생산자-소비자 분리](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.ko.png)
 
 *메시지 큐를 통한 생산자-소비자 분리*
 

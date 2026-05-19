@@ -47,7 +47,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![하이퍼바이저 기반 VM과 커널 공유 컨테이너 비교](../../../assets/containers-101/09/09-01-concept-at-a-glance.ko.png)
+![하이퍼바이저 기반 VM과 커널 공유 컨테이너 비교](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.ko.png)
 
 *하이퍼바이저 기반 VM과 커널 공유 컨테이너 비교*
 VM은 하이퍼바이저 위에서 자체 커널을 부팅하고, 컨테이너는 호스트 커널 위에서 프로세스를 격리합니다. 출발 구조 자체가 다르기 때문에 격리, 속도, 밀도도 달라집니다.

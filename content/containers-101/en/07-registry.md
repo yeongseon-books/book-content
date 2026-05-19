@@ -45,7 +45,7 @@ A reproducible image is useless if there is *no place to fetch it from*. *Deploy
 
 ## Concept at a Glance
 
-![Push and pull flow between build output and a registry](../../../assets/containers-101/07/07-01-concept-at-a-glance.en.png)
+![Push and pull flow between build output and a registry](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
 
 *Push and pull flow between build output and a registry*
 ## Key Terms

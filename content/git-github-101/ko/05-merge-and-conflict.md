@@ -47,7 +47,7 @@ merge에 대한 그림이 없으면 두 가지 문제가 빨리 나타납니다.
 
 ## 핵심 그림
 
-![Mental Model](../../../assets/git-github-101/05/05-01-mental-model.ko.png)
+![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.ko.png)
 
 *Mental Model*
 

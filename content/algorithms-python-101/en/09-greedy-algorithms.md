@@ -57,7 +57,7 @@ Make change for 1,260:
 Total: 6 coins — optimal via greedy
 ```
 
-![Greedy rule selection and counterexample validation flow](../../../assets/algorithms-python-101/09/09-01-concept-overview.en.png)
+![Greedy rule selection and counterexample validation flow](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.en.png)
 
 *A greedy algorithm is not “pick the biggest thing.” It is a rule that still has to survive counterexamples.*
 

@@ -50,7 +50,7 @@ title: Monitoring
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
 
 *메트릭과 로그가 알림과 대시보드를 거쳐 실제 대응으로 이어지는 모니터링 흐름입니다.*
 메트릭과 로그는 그냥 저장되는 데이터가 아니라, 알림과 대시보드를 거쳐 대응으로 이어져야 합니다. 이 연결이 없으면 관측은 하고 있어도 운영 판단은 여전히 느립니다.

@@ -75,7 +75,7 @@ That table matters because these are the questions operators actually ask. Why d
 
 In practice, I look for three things first when a graph uses checkpoints: how much state is persisted, how trustworthy the session key is, and whether merge behavior matches the shape of each field. Once you can answer those three, the system stops feeling like “it remembers” or “it does not remember” and starts feeling understandable.
 
-![Questions this post answers](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
 
 *Questions this post answers*
 
@@ -85,7 +85,7 @@ In practice, I look for three things first when a graph uses checkpoints: how mu
 
 Start with the smallest possible resume example. The first invocation saves the user message. The second invocation uses the same `thread_id` to continue from the earlier conversation state. Then `get_state()` is used to inspect what was actually persisted.
 
-![Resume flow through thread_id](../../../assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
+![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
 
 *Resume flow through thread_id*
 
@@ -222,7 +222,7 @@ That is why I encourage readers to ask two questions together: is the saved valu
 
 Do not try to interpret every line at once. Three observations matter first.
 
-![Message accumulation and turn_count updates](../../../assets/langgraph-101/02/02-02-what-to-notice-in-this-code.en.png)
+![Message accumulation and turn_count updates](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-02-what-to-notice-in-this-code.en.png)
 
 *Message accumulation and turn_count updates*
 
@@ -242,7 +242,7 @@ The third point is the session key. Give the graph the same `thread_id`, and the
 
 The most common mistake in checkpointing is believing that “saved” automatically means “safe.” In practice, what matters more is **what gets merged, how it gets merged, and under which key it survives.**
 
-![Checkpointer and merge rule relationships](../../../assets/langgraph-101/02/02-03-where-engineers-get-confused.en.png)
+![Checkpointer and merge rule relationships](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-03-where-engineers-get-confused.en.png)
 
 *Checkpointer and merge rule relationships*
 

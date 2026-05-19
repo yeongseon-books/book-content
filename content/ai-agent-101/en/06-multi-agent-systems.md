@@ -46,7 +46,7 @@ This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, i
 
 There are several patterns for handling complex tasks through cooperation among multiple agents.
 
-![Multi-Agent Patterns](../../../assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
 *Multi-agent systems are easier to reason about when you draw them as delegation graphs: who routes work, who writes to shared state, and who is allowed to return the final answer.*
 
 ### Orchestrator Pattern (Centralized Coordination)

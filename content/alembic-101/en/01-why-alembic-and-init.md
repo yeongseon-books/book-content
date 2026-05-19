@@ -49,7 +49,7 @@ Once that analogy lands, almost every command makes sense. `revision` creates a 
 
 ### Diagram: how revision history reaches the database
 
-![Diagram: how revision history reaches the database](../../../assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
+![Diagram: how revision history reaches the database](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
 *The revision file, `alembic_version`, and the deploy command form one auditable history chain.*
 
 ## Core concepts

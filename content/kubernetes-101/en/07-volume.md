@@ -44,7 +44,7 @@ A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require*
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
 *PVC and StorageClass separate Pod lifetime from data lifetime so state can survive rescheduling and replacement.*
 
 

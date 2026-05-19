@@ -45,7 +45,7 @@ When `new SomeService()` is sprinkled throughout the code, coupling is already l
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
 *Creational patterns give four common ways to pull construction responsibility away from callers and into a safer assembly boundary.*
 
 ## Key Terms

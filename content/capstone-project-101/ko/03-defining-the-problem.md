@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 흐름
 
-![한눈에 보는 흐름](../../../assets/capstone-project-101/03/03-01-the-flow-at-a-glance.ko.png)
+![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.ko.png)
 *문제 정의를 사용자, 가정, 지표까지 연결하는 흐름*
 
 ## 실전 문서 예시: 문제 카드

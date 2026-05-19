@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/observability-101/02/02-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.ko.png)
 *운영 질문 하나를 메트릭, 로그, 트레이스 중 어떤 신호로 풀어야 하는지 나누는 기준*
 
 ## 핵심 용어

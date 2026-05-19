@@ -28,7 +28,7 @@ Tuple-shaped rows are fast, but they turn schema changes and type drift into sub
 
 This is the 6th article in the Python DB-API 101 series.
 
-![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
+![Row factories and type adapters (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 
 *Row factories and type adapters (sqlite3, PEP 249)*
 ## Questions this post answers
@@ -65,7 +65,7 @@ This post unifies row factories and type adapters so your repository layer survi
 
 ## Mental Model — two-step conversion
 
-![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+![Mental model - two-step conversion](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
 
 *Mental model - two-step conversion*
 ```text
@@ -92,7 +92,7 @@ Separating these two concerns naturally separates where they live in code.
 
 ## Core concepts
 
-![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
+![Core concepts](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-03-core-concepts.en.png)
 
 *Core concepts*
 ### `sqlite3.Row`
@@ -224,7 +224,7 @@ Order-independent and precise.
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
 
 *Step-by-step walkthrough*
 ### Step 1 — `sqlite3.Row`

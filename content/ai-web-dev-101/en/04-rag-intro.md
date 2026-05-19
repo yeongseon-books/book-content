@@ -51,7 +51,7 @@ RAG is easier to understand if you compare it to human work. Even a very capable
 2. augment the prompt with the retrieved evidence
 3. generate the answer using that evidence
 
-![Plain model memory versus retrieval-based answering](../../../assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
+![Plain model memory versus retrieval-based answering](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
 
 *Plain model memory versus retrieval-based answering*
 
@@ -72,7 +72,7 @@ In RAG, exact string matching is often not enough. A user may ask, “I want my 
 
 That is what embeddings are for. They map text into numeric vectors so semantically similar texts sit closer together in vector space.
 
-![Representing semantic similarity with embeddings](../../../assets/ai-web-dev-101/04/embedding-similarity-concept.en.png)
+![Representing semantic similarity with embeddings](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/embedding-similarity-concept.en.png)
 
 *Representing semantic similarity with embeddings*
 
@@ -156,7 +156,7 @@ for score, chunk in hits:
 
 The top hit should be the refund policy sentence. If it is not, your first suspects are chunk design, the query wording, the embedding model, or the similarity logic.
 
-![Meaning-based retrieval with vector search](../../../assets/ai-web-dev-101/04/vector-search-flow.en.png)
+![Meaning-based retrieval with vector search](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/vector-search-flow.en.png)
 
 *Meaning-based retrieval with vector search*
 
@@ -202,11 +202,11 @@ print(answer_with_rag("How do I get a refund?"))
 Refunds can be requested within 7 days of purchase through customer support. [evidence: "Refunds can be requested within 7 days of purchase through customer support."]
 ```
 
-![Five-stage RAG pipeline](../../../assets/ai-web-dev-101/04/rag-five-step-pipeline.en.png)
+![Five-stage RAG pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/rag-five-step-pipeline.en.png)
 
 *Five-stage RAG pipeline*
 
-![How the FAQ bot runs the RAG loop](../../../assets/ai-web-dev-101/04/faq-bot-example-flow.en.png)
+![How the FAQ bot runs the RAG loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/faq-bot-example-flow.en.png)
 
 *How the FAQ bot runs the RAG loop*
 

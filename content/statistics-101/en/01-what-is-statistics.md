@@ -45,7 +45,7 @@ As data piles up, the question *“is this really true?”* shows up more and mo
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
 
 *The basic flow of statistics: summarize the data, infer beyond the sample, then write the decision.*
 ## Key Terms

@@ -48,7 +48,7 @@ That is why the starting point for MLOps is not buying a larger platform. It is 
 
 ## See the Loop First
 
-![See the Loop First](../../../assets/mlops-101/01/01-01-see-the-loop-first.en.png)
+![See the Loop First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png)
 
 *See the Loop First*
 This loop is the shortest useful picture of MLOps. Data and code feed a training pipeline, the trained model moves into a registry, deployment sends that version into production, and monitoring feeds real operating signals back into the next training cycle.

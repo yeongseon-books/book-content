@@ -64,7 +64,7 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 
 pre-training은 거대한 말뭉치에서 next-token prediction을 학습하는 단계입니다. SFT는 이미 학습된 모델을 instruction-response 형식에 맞추는 단계입니다. RLHF는 여기에 사람 선호 기반 신호를 더해 응답 정책을 더 조정하는 단계입니다.
 
-![사전학습, SFT, RLHF의 역할 비교](../../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
+![사전학습, SFT, RLHF의 역할 비교](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
 
 *베이스 지식 형성, 형식 적응, 선호 정렬이 각각 어느 단계에서 일어나는지 비교한 그림입니다.*
 

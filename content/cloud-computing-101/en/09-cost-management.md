@@ -46,7 +46,7 @@ A surprise on the first invoice is a rite of passage. FinOps is part of engineer
 
 ## Concept at a Glance
 
-![The basic cost-control loop of visibility, alerts, commitments, and optimization](../../../assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
+![The basic cost-control loop of visibility, alerts, commitments, and optimization](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
 
 *The basic cost-control loop of visibility, alerts, commitments, and optimization*
 

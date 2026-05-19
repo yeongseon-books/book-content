@@ -55,7 +55,7 @@ A lock is the seat belt of concurrent code, but a wrongly fastened belt can pin 
 
 ### How synchronization tools gate entry
 
-![How synchronization tools gate entry](../../../assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
+![How synchronization tools gate entry](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
 *Each synchronization primitive controls entry differently, which is why the wrong one changes both safety and throughput.*
 
 ```text

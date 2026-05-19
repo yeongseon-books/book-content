@@ -48,7 +48,7 @@ That clarity pays off when business rules get complicated. If you blur together 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png)
 *Sets define the boundary of values, while functions define the rule that moves values through the system.*
 
 ## Key Terms

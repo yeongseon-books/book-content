@@ -44,7 +44,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![적재부터 지표 집계와 시각화까지 이어지는 재현 가능한 분석 파이프라인](../../../assets/pandas-101/10/10-01-concept-at-a-glance.ko.png)
+![적재부터 지표 집계와 시각화까지 이어지는 재현 가능한 분석 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.ko.png)
 *적재부터 지표 집계와 시각화까지 이어지는 재현 가능한 분석 파이프라인*
 
 ## 핵심 용어

@@ -44,7 +44,7 @@ Most modern languages have some kind of type system, and even Python, JavaScript
 
 ## Concept at a Glance
 
-![One layer of type information feeding both compile-time checks and IDE tooling](../../../assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
+![One layer of type information feeding both compile-time checks and IDE tooling](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
 
 *One layer of type information feeding both compile-time checks and IDE tooling*
 

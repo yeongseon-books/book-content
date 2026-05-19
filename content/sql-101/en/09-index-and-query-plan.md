@@ -46,7 +46,7 @@ Indexes are powerful precisely because they are selective. They make some reads 
 
 ## Plan selection flow
 
-![Plan selection flow](../../../assets/sql-101/09/09-01-plan-selection-flow.en.png)
+![Plan selection flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)
 ## Key Terms
 
 - **B-tree index**: the most common *balanced-tree* index.

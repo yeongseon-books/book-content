@@ -54,7 +54,7 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](../../../assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)
+![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)
 
 *질문에서 데이터와 분석을 거쳐 제품 변화로 이어지는 데이터 직무의 기본 흐름*
 데이터 직무를 가장 단순하게 보면 질문에서 출발해 데이터를 거쳐 분석과 제품 변화로 이어지는 흐름입니다. 차이는 이 흐름의 어느 구간을 책임지느냐에 있습니다.

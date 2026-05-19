@@ -47,7 +47,7 @@ Code is a graph. Where the arrows point determines whether a change in one place
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
 *Dependency direction stays healthy when the stable core defines the port and volatile adapters implement it*
 
 Details point toward the core.

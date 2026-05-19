@@ -44,7 +44,7 @@ Production systems break in *unpredictable ways*. Pre-built dashboards cannot ex
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/observability-101/01/01-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
 *The baseline observability loop: one application emits metrics, logs, and traces, and each signal answers a different operational question.*
 
 ## Key Terms

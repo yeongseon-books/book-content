@@ -48,7 +48,7 @@ This is the 8th article in the LLM from Scratch 101 series.
 
 Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.
 
-![Roles of pre-training, SFT, and RLHF](../../../assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
+![Roles of pre-training, SFT, and RLHF](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
 
 *Roles of pre-training, SFT, and RLHF*
 ## Anatomy of an Instruction Data Row

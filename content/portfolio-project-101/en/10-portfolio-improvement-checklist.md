@@ -47,7 +47,7 @@ A portfolio is also something you reuse. You send the link more than once. You r
 
 The most practical review order often follows the same sequence a visitor follows: README, demo, code, story, then public sharing channels.
 
-![The final review order before you share a portfolio project publicly](../../../assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
+![The final review order before you share a portfolio project publicly](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
 
 *The final review order before you share a portfolio project publicly*
 

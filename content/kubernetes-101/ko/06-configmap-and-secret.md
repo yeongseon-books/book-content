@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](../../../assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
+![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
 *ConfigMap과 Secret은 같은 파드로 들어가더라도 일반 설정과 민감한 값을 다른 운영 경계로 다루게 합니다.*
 
 

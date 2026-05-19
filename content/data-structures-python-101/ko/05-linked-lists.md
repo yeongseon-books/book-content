@@ -55,7 +55,7 @@ last_reviewed: '2026-05-15'
 
 ## 연결 구조를 그림으로 보면
 
-![연결 구조를 그림으로 보면](../../../assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
+![연결 구조를 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
 
 *단일 연결 리스트와 이중 연결 리스트에서 참조가 어떻게 이어지는지 보여 주는 그림*
 

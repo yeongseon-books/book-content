@@ -50,7 +50,7 @@ last_reviewed: '2026-05-12'
 
 ### 레지스터와 ALU 데이터 흐름
 
-![레지스터와 ALU 데이터 흐름](../../../assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
+![레지스터와 ALU 데이터 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
 *빠른 실행은 살아 있는 값이 레지스터 안에 머물고, ALU가 바로 다음 결과를 만들고, 분기가 방금 갱신된 FLAGS를 읽을 때 일어납니다. 레지스터 압박 때문에 스택으로 스필이 생기면, 같은 루프에도 추가 로드와 스토어가 붙습니다.*
 
 ## 핵심 용어

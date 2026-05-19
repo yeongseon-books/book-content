@@ -49,7 +49,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![테스트 가능한 코드](../../../assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)
+![테스트 가능한 코드](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)
 
 *테스트 가능성의 흐름: 순수 로직과 IO 경계를 나누면 단위 테스트와 통합 테스트가 각자 자리를 찾습니다.*
 

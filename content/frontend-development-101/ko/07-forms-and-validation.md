@@ -44,7 +44,7 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-![개념 한눈에 보기](../../../assets/frontend-development-101/07/07-01-diagram.ko.png)
+![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-diagram.ko.png)
 
 *입력, 형식 검사, 비즈니스 규칙, 서버 검증으로 이어지는 폼 검증 흐름*
 

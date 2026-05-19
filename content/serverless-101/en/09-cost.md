@@ -44,7 +44,7 @@ That is why cost belongs in architecture review, not just in monthly reporting. 
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
 
 *A serverless bill is the sum of invocation, compute time, network transfer, and downstream service usage.*
 The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.

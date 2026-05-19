@@ -42,7 +42,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 그림
 
-![로드밸런서가 살아 있는 백엔드로 트래픽을 보내는 방식](../../../assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
+![로드밸런서가 살아 있는 백엔드로 트래픽을 보내는 방식](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
 *로드밸런서는 단순 분산기보다, 헬스체크와 알고리즘으로 살아 있는 서버만 트래픽 풀에 남기는 제어 장치에 가깝습니다.*
 
 L4 로드밸런서는 TCP 흐름만 보고, L7 로드밸런서는 HTTP 요청 단위로 판단합니다.

@@ -64,7 +64,7 @@ pyproject.toml          tests/
                         pyproject.toml
 ```
 
-![멘탈 모델](../../../assets/python-package-101/02/02-01-mental-model.ko.png)
+![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.ko.png)
 *src layout이 소스, 메타데이터, 설치 검증을 분리하는 구조*
 
 ## 핵심 개념

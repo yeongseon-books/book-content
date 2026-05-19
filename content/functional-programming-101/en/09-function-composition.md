@@ -57,7 +57,7 @@ Pipeline visualization:
 
 ## How a readable pipeline flows
 
-![Step-by-step function pipeline](../../../assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
+![Step-by-step function pipeline](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
 
 *A good pipeline makes each transformation stage explicit, so reviewers and operators can spot where data changes shape.*
 

@@ -56,7 +56,7 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![파일, API, 데이터베이스, 로그를 스테이징으로 모아 분석에 연결하는 수집 경로](../../../assets/data-science-101/03/03-01-concept-at-a-glance.ko.png)
+![파일, API, 데이터베이스, 로그를 스테이징으로 모아 분석에 연결하는 수집 경로](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.ko.png)
 
 *파일, API, 데이터베이스, 로그를 스테이징으로 모아 분석에 연결하는 수집 경로*
 ## 핵심 용어

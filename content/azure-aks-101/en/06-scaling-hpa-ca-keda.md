@@ -40,7 +40,7 @@ This is the sixth post in the Azure Kubernetes Service 101 series. Here, we sort
 
 ## One diagram first
 
-![Relationship among HPA, CA, and KEDA](../../../assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
+![Relationship among HPA, CA, and KEDA](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
 
 *Relationship among HPA, CA, and KEDA*
 That is the whole relationship.
@@ -77,7 +77,7 @@ If the input signal is bad, autoscaling decisions get noisy or misleading.
 
 ## The HPA loop
 
-![Metric-driven HPA scaling loop](../../../assets/azure-aks-101/06/06-02-the-hpa-loop.en.png)
+![Metric-driven HPA scaling loop](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-02-the-hpa-loop.en.png)
 
 *Metric-driven HPA scaling loop*
 Suppose a FastAPI API is running with two pods and the target CPU utilization is 60%. If the average keeps sitting around 90%, HPA will try to raise the replica count.
@@ -103,7 +103,7 @@ That makes HPA and Cluster Autoscaler complementary, not competing.
 
 ## HPA and Cluster Autoscaler together
 
-![Pod growth and node expansion flow](../../../assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png)
+![Pod growth and node expansion flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-03-hpa-and-cluster-autoscaler-together.en.png)
 
 *Pod growth and node expansion flow*
 This explains a very common operational moment: pod count increases, but response quality does not improve immediately because the new pods still need actual node capacity.
@@ -132,7 +132,7 @@ That is why the most accurate short description is: KEDA translates external eve
 
 ## KEDA sits on top of HPA
 
-![Extension relationship between KEDA and HPA](../../../assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png)
+![Extension relationship between KEDA and HPA](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-04-keda-sits-on-top-of-hpa.en.png)
 
 *Extension relationship between KEDA and HPA*
 This relationship is worth being exact about.

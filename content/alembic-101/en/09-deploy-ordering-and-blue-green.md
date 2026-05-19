@@ -49,7 +49,7 @@ If git is your analogy, a migration is a PR that lands earlier than the code PR,
 
 ### Diagram: the blue/green compatibility window
 
-![Diagram: the blue/green compatibility window](../../../assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
+![Diagram: the blue/green compatibility window](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
 *The expanded schema must stay compatible with both versions throughout the overlap window.*
 
 ## Core concepts

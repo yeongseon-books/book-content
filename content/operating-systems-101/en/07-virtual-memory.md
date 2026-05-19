@@ -55,7 +55,7 @@ Without virtual memory you cannot diagnose "RSS is small but the system is slow"
 
 ### How a virtual address reaches RAM
 
-![How a virtual address reaches RAM](../../../assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)
+![How a virtual address reaches RAM](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)
 *The cost of virtual memory depends on whether translation stays hot in cache or falls through to a page fault.*
 
 ```text

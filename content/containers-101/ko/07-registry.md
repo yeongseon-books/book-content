@@ -46,7 +46,7 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름](../../../assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
+![빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
 
 *빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름*
 개발 환경에서 만든 이미지는 레지스트리에 올라가고, 운영 환경은 다시 그 이미지를 당겨 옵니다. 이 흐름이 일관되어야 같은 아티팩트를 여러 환경에서 재사용할 수 있습니다.

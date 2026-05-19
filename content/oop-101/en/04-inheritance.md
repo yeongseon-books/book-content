@@ -68,7 +68,7 @@ Animal (parent class)
     └── purr() added
 ```
 
-![Concept Overview](../../../assets/oop-101/04/04-01-concept-overview.en.png)
+![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png)
 *Inheritance centralizes shared behavior, but it also widens the blast radius of parent-class changes.*
 
 ## Key Concepts

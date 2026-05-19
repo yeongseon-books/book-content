@@ -46,7 +46,7 @@ The first question in incident response is *when, who, what*. If you cannot answ
 
 ## Concept at a Glance
 
-![The audit flow across structured logs, masking, immutable storage, and SIEM](../../../assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
+![The audit flow across structured logs, masking, immutable storage, and SIEM](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
 
 *The audit flow across structured logs, masking, immutable storage, and SIEM*
 ## Key Terms

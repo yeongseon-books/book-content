@@ -44,7 +44,7 @@ Here, we will frame Helm as a repeatable deployment unit that separates shared s
 
 ## Concept at a Glance
 
-![Concept at a Glance](../../../assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
 *Helm renders shared templates with environment-specific values so you can keep one deployment shape across many environments.*
 
 

@@ -56,7 +56,7 @@ Each layer trusts the one below it and focuses on its own job.
 
 > Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.
 
-![Concept at a Glance](../../../assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
+![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
 *A request starts at the application layer and picks up lower-layer headers on the way down*
 
 ## Key Terms

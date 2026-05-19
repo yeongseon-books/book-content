@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 ### 힙 배열 매핑
 
-![힙 배열 매핑](../../../assets/data-structures-101/08/08-01-heap-array-mapping.ko.png)
+![힙 배열 매핑](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.ko.png)
 *그림. 힙은 완전 이진 트리 형태를 유지하므로 빈 칸 없이 배열에 압축해 담을 수 있습니다. 그래서 루트의 최솟값을 빠르게 꺼내면서도 부모·자식 관계를 인덱스 계산만으로 복원할 수 있습니다.*
 
 ## 핵심 용어

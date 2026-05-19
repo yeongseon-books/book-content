@@ -55,7 +55,7 @@ push or pull_request
   -> PR shows pass/fail signal for merge decision
 ```
 
-![push/PR 이벤트에서 Python 매트릭스와 커버리지 아티팩트까지 이어지는 GitHub Actions CI 흐름](../../../assets/pytest-101/09/09-01-github-actions-workflow-overview.ko.png)
+![push/PR 이벤트에서 Python 매트릭스와 커버리지 아티팩트까지 이어지는 GitHub Actions CI 흐름](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.ko.png)
 *push 또는 pull request 이벤트가 들어오면 같은 workflow 정의를 기준으로 Python 3.10, 3.11, 3.12 잡이 병렬로 실행됩니다. 그중 대표 실행 하나는 HTML 커버리지 리포트를 아티팩트로 업로드하므로, 리뷰어는 로컬 재현 없이도 실패 지점과 누락 라인을 바로 확인할 수 있습니다.*
 
 ## 핵심 개념
