@@ -1,0 +1,10 @@
+flowchart LR
+    A["문서 이미지 / PDF"] --> B["CLOVA OCR 호출"]
+    B --> C["fields\ninferText / confidence / bbox / lineBreak"]
+    C --> D["줄 재구성"]
+    C --> E["좌표 기반 표/컬럼 복원"]
+    D --> F["금액·날짜 정규식 검증"]
+    E --> F
+    F --> G["정리된 텍스트 + 메타"]
+    G --> H["BGE-M3 검색 코퍼스"]
+    G --> I["RAG 입력 문맥"]
