@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-05-19T15:03:20+00:00",
+  "generated_at": "2026-05-19T15:21:17+00:00",
   "series_count": 92,
   "problem_series_count": 66,
   "series_with_5_plus": 50,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
+  "warnings": [],
   "totals": {
     "BadImg": 668,
     "Synt": 0,
