@@ -69,7 +69,7 @@ A simplified version of the four-layer pipeline. In production each function is 
 
 ```python
 from dataclasses import dataclass
-from typing import Callable
+from collections.abc import Callable
 
 @dataclass
 class GuardrailResult:

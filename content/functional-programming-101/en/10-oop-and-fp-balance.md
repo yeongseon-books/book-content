@@ -213,7 +213,8 @@ handle_registration("", "invalid-email")
 
 ```python
 from dataclasses import dataclass
-from typing import Callable, Iterator
+from collections.abc import Callable
+from typing import Iterator
 
 
 @dataclass

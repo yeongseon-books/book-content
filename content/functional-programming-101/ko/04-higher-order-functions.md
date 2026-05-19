@@ -88,7 +88,7 @@ def get_seniors(people: list[dict]) -> list[dict]:
 
 ```python
 # after: higher-order function with condition as argument
-from typing import Callable
+from collections.abc import Callable
 
 def filter_people(
     people: list[dict],
@@ -105,7 +105,7 @@ seniors = filter_people(people, lambda p: p["age"] >= 65)
 ### Step 1: 함수를 인자로 전달하기
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def apply_operation(
@@ -176,7 +176,7 @@ for s in by_grade_score:
 ### Step 3: 함수를 반환하는 팩토리 함수
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def make_multiplier(factor: int) -> Callable[[int], int]:
@@ -210,7 +210,8 @@ print(is_valid_rate(0.75))  # True
 
 ```python
 import time
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 from functools import wraps
 
 
@@ -265,7 +266,8 @@ print(f"Result: {result}")
 ### Step 5: 고차 함수로 파이프라인 만들기
 
 ```python
-from typing import Callable, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
 
 T = TypeVar("T")
 

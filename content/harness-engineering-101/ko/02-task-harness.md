@@ -177,7 +177,7 @@ def decompose_goal(goal: str) -> list[TaskSpec]:
 위 예시를 쪼개면 다음과 같습니다.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 class VerifiableTask(TaskSpec):
     """Task with executable completion criteria."""

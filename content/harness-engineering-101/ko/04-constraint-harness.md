@@ -117,7 +117,7 @@ policy = ConstraintPolicy(
 핵심 원칙은 화이트리스트입니다. "이 도구는 금지"가 아니라 "이 도구만 허용". 블랙리스트는 새 도구가 추가될 때마다 업데이트해야 하지만, 화이트리스트는 명시적으로 추가하지 않으면 자동으로 차단됩니다.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 from dataclasses import dataclass
 
 @dataclass

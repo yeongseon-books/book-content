@@ -104,7 +104,8 @@ result = pipe(
 ### Step 1: compose와 pipe의 기본
 
 ```python
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 from functools import reduce
 
 
@@ -191,7 +192,7 @@ print(slugify("  Functional Programming — A Composition Guide  "))
 ### Step 3: 데이터 처리 파이프라인
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def pipe_data(*funcs: Callable) -> Callable:
@@ -266,7 +267,8 @@ print(process_students(raw_data))
 ### Step 4: 제너레이터 파이프라인
 
 ```python
-from typing import Iterator, Callable
+from collections.abc import Callable
+from typing import Iterator
 
 
 def gen_pipe(*funcs: Callable) -> Callable:
@@ -332,7 +334,8 @@ for line in clean_text(lines(text)):
 ### Step 5: 조건부 파이프라인
 
 ```python
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 
 
 def conditional(

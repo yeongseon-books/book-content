@@ -208,7 +208,7 @@ If you typo a dict key such as `config["chnanel"]`, plain runtime dict access st
 Many strategy classes are really just named formatting functions.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def format_currency(value: int) -> str:
@@ -248,7 +248,8 @@ Now the mini-app can become one readable pipeline instead of a collection of tin
 
 ```python
 from dataclasses import dataclass
-from typing import Callable, TypedDict
+from collections.abc import Callable
+from typing import TypedDict
 
 
 @dataclass(frozen=True)

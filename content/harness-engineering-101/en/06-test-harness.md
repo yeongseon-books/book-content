@@ -147,7 +147,7 @@ Three scoring approaches.
 **3. LLM-as-judge**: hand scoring to another LLM. Costly but enables semantic evaluation.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 @dataclass
 class Rubric:

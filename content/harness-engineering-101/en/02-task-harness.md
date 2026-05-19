@@ -170,7 +170,7 @@ Not every task is good. Three properties separate good tasks from bad.
 **3. Auto-verifiable completion criteria.** Criteria a human must read and judge cannot be tested, cannot be evaluated automatically, and cannot trigger retry decisions. Criteria must be expressible as code.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 class VerifiableTask(TaskSpec):
     """Task with executable completion criteria."""

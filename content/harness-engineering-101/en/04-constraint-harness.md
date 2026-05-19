@@ -121,7 +121,7 @@ The simplest and most effective constraint is restricting tool exposure. An agen
 The core principle is whitelisting. Not "this tool is forbidden" but "only this tool is allowed." A blacklist must be updated each time a new tool is added; a whitelist blocks anything not explicitly added.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 from dataclasses import dataclass
 
 @dataclass

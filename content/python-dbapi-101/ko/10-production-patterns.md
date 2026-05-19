@@ -116,7 +116,8 @@ import random
 import logging
 import functools
 from contextlib import contextmanager
-from typing import Callable, Iterator, ParamSpec, TypeVar
+from collections.abc import Callable
+from typing import Iterator, ParamSpec, TypeVar
 
 log = logging.getLogger("db")
 SLOW_QUERY_THRESHOLD_MS = 200.0

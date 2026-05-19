@@ -194,7 +194,8 @@ def is_retryable(exc: BaseException) -> bool:
 import functools
 import random
 import time
-from typing import Callable, TypeVar, ParamSpec
+from collections.abc import Callable
+from typing import TypeVar, ParamSpec
 
 P = ParamSpec("P")
 R = TypeVar("R")

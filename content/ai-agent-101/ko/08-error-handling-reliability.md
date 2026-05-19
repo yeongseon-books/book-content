@@ -125,7 +125,8 @@ recoverable 구분이 중요한 이유는 retry 정책을 분기하기 위해서
 ```python
 import time
 import random
-from typing import Callable, Type, Tuple
+from collections.abc import Callable
+from typing import Type, Tuple
 
 def retry_with_backoff(
     fn: Callable,

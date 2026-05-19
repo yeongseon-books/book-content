@@ -146,7 +146,8 @@ The most basic reliability mechanism. Exponential backoff is the standard.
 ```python
 import time
 import random
-from typing import Callable, Type, Tuple
+from collections.abc import Callable
+from typing import Type, Tuple
 
 def retry_with_backoff(
     fn: Callable,

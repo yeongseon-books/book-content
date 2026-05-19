@@ -200,7 +200,7 @@ email
 많은 전략 클래스는 사실상 이름 붙은 포매팅 함수 하나에 가깝습니다.
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
 def format_currency(value: int) -> str:
@@ -240,7 +240,8 @@ $12,500
 
 ```python
 from dataclasses import dataclass
-from typing import Callable, TypedDict
+from collections.abc import Callable
+from typing import TypedDict
 
 
 @dataclass(frozen=True)
