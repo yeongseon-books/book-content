@@ -62,7 +62,7 @@ TOC는 글의 위치에 따라 세 가지 상태를 반영한다:
 `medium/*.html`은 `en/*.md`에서 생성되는 파생물이다. 직접 수정 금지.
 
 생성: `.sisyphus/medium/to-medium.py`
-특징: H1-first, Markdown 변환 단계에서 local image path 유지, HTML 렌더링 단계에서 public GitHub Pages URL로 재작성(기본) 또는 base64-inline, trailing visible Tags line.
+특징: H1-first, canonical source의 public GitHub Pages 이미지 URL을 그대로 통과(기본) 또는 `--asset-mode inline`로 base64 내장 / `--asset-mode local`로 상대 경로 강제 변환, trailing visible Tags line.
 
 ## Quality Gates
 
