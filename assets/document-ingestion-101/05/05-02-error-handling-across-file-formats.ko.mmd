@@ -1,0 +1,5 @@
+flowchart TD
+  A["파일 처리 중 오류"] --> B["포맷별 예외 잡기"]
+  B --> C["중앙 에러 핸들러"]
+  C --> D["재시도 (Retry)"]
+  C --> E["실패 큐 (Dead Letter Queue)"]

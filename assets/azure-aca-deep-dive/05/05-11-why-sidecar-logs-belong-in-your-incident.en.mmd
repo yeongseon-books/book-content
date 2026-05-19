@@ -1,0 +1,4 @@
+flowchart TD
+  Error["App throws 500"] --> DaprLog["Dapr Log: Component Connection Refused"]
+  DaprLog --> Investigate["Fix Azure Service Bus Connection"]
+  Investigate --> Resolved["Incident Resolved"]

@@ -1,0 +1,17 @@
+flowchart TD
+  subgraph Activation["0 to 1 Scale"]
+    Metric["Metric > 0"] --> Controller["KEDA Controller"]
+    Controller --> Pod["Creates 1st Pod"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

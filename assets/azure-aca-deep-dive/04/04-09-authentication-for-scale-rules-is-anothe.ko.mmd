@@ -1,0 +1,4 @@
+flowchart TD
+  Rule["스케일 규칙"] --> Identity["관리 ID / 비밀"]
+  Identity --> Auth["트리거 인증 (TriggerAuthentication)"]
+  Auth --> External["외부 서비스 (인증 성공)"]

@@ -1,0 +1,6 @@
+flowchart TD
+  A["User Query"] --> B["Vector Similarity Search"]
+  A --> C["Metadata Filter"]
+  B --> D["Intersection"]
+  C --> D
+  D --> E["Final Documents"]

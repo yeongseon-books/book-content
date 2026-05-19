@@ -1,0 +1,15 @@
+flowchart TD
+  Probe["준비성 프로브(Readiness) 실패"] --> Endpoints["서비스 엔드포인트에서 파드 제거됨"]
+  Endpoints --> Envoy["Envoy가 트래픽 전송 중단"]
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

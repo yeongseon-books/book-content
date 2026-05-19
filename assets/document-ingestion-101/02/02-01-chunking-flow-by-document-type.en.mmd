@@ -1,0 +1,6 @@
+flowchart TD
+  A["Document Type Classify"] --> B["Text (TXT/MD)"]
+  B --> C["Newline Split"]
+  A --> D["Structured (PDF)"]
+  D --> E["Semantic Split"]
+  E --> F["Final Chunks"]

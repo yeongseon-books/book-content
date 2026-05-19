@@ -1,0 +1,5 @@
+flowchart TD
+  A["Pipeline Monitoring"] --> B{"Failure Detected?"}
+  B -->|No| C["Normal Logging"]
+  B -->|Yes| D["Trigger Alert"]
+  D --> E["Automated Recovery Path"]

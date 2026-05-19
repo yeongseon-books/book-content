@@ -1,0 +1,5 @@
+flowchart TD
+  A["Event Failure"] --> B["Exponential Backoff Retry"]
+  B --> C{"Max Retries Exceeded?"}
+  C -->|No| B
+  C -->|Yes| D["Store for Manual Replay"]

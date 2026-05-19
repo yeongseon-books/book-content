@@ -1,0 +1,8 @@
+flowchart TD
+    subgraph Pod["Kubernetes Pod"]
+        App["App Container"]
+        Dapr["Dapr Sidecar (Optional)"]
+        KEDA["KEDA Scaler"]
+    end
+    Ingress["Ingress Traffic"] --> App
+    App <--> Dapr

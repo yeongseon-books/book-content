@@ -1,0 +1,7 @@
+flowchart TD
+  subgraph Pod["Pod Network Namespace"]
+    App["App (localhost)"]
+    Dapr["Dapr (localhost)"]
+  end
+  App -- "No network hop, fast" --> Dapr
+  Dapr --> Outside["Outside Network"]

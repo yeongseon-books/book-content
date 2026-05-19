@@ -1,0 +1,8 @@
+flowchart TD
+  App["앱"] --> Dapr["Dapr API"]
+  subgraph DaprServices["Dapr 컨트롤 플레인"]
+    Sentry["Sentry (mTLS)"]
+    Operator["Operator (업데이트)"]
+    Placement["Placement (액터)"]
+  end
+  Dapr --> DaprServices

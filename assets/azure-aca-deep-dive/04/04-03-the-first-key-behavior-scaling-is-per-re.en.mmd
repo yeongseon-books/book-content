@@ -1,0 +1,19 @@
+flowchart TD
+  subgraph Rev1["Revision 1"]
+    SO1["ScaledObject"] --> HPA1["HPA"] --> Pods1["Replicas"]
+  end
+  subgraph Rev2["Revision 2"]
+    SO2["ScaledObject"] --> HPA2["HPA"] --> Pods2["Replicas"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

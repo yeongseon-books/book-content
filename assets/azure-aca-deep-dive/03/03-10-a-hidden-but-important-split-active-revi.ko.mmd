@@ -1,0 +1,18 @@
+flowchart TD
+  subgraph Status["리비전 상태"]
+    Active["Active = true (트래픽 수신 가능)"]
+    Inactive["Active = false (종료됨, 0 레플리카)"]
+  end
+  Traffic["트래픽 가중치 > 0"] --> Active
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

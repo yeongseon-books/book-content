@@ -1,0 +1,4 @@
+flowchart TD
+  Config["dapr.enabled = true"] --> Operator["Dapr 오퍼레이터/인젝터"]
+  Operator --> PodSpec["파드 사양 수정"]
+  PodSpec --> Run["앱과 함께 daprd 실행"]

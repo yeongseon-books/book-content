@@ -1,0 +1,20 @@
+flowchart TD
+    Client["Client Request"] --> Envoy["Envoy Proxy Edge"]
+    subgraph Routing["Envoy Routing"]
+        Rules["Route Rules"] --> Split["Traffic Split (Weight)"]
+    end
+    Envoy --> Routing
+    Split -- "80%" --> Rev1["Revision 1 (Active)"]
+    Split -- "20%" --> Rev2["Revision 2 (Canary)"]
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

@@ -1,0 +1,8 @@
+flowchart TD
+    subgraph Pod["Kubernetes 파드"]
+        App["앱 컨테이너"]
+        Dapr["Dapr 사이드카 (선택 사항)"]
+        KEDA["KEDA 스케일러"]
+    end
+    Ingress["수신 트래픽"] --> App
+    App <--> Dapr

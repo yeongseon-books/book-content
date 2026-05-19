@@ -1,0 +1,6 @@
+flowchart TD
+  subgraph EnvoyCluster["Upstream Clusters"]
+    C1["Cluster A (Weight 50)"]
+    C2["Cluster B (Weight 50)"]
+  end
+  Route["Route Action"] --> EnvoyCluster

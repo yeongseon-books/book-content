@@ -1,0 +1,19 @@
+flowchart TD
+    subgraph Comp["Dapr Component (Secret Store)"]
+        Scope["Scopes: app-a, app-b"]
+    end
+    AppA["Dapr App ID: app-a"] -. "Allowed" .-> Comp
+    AppB["Dapr App ID: app-b"] -. "Allowed" .-> Comp
+    AppC["Dapr App ID: app-c"] -. "Denied" .-x Comp
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

@@ -1,0 +1,7 @@
+flowchart TD
+  Client["Client"] --> LB["Azure LB"]
+  LB --> TLS["TLS Termination"]
+  TLS --> Route["Envoy Routing & Weights"]
+  Route --> Svc["K8s Service"]
+  Svc --> Dapr["Dapr Sidecar"]
+  Dapr --> App["App Container"]

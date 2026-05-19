@@ -1,0 +1,19 @@
+flowchart TD
+  subgraph AppToSidecar["App -> Sidecar"]
+    A1["App"] --> S1["Sidecar (Service Invocation)"]
+  end
+  subgraph SidecarToApp["Sidecar -> App"]
+    S2["Sidecar"] --> A2["App (Pub/Sub Callback)"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

@@ -1,0 +1,4 @@
+flowchart TD
+  Weight["Ingress Weight (Traffic % )"] --> Load["Load on Revision"]
+  Load --> KEDA["KEDA Metrics"]
+  KEDA --> Scale["Scale Up/Down (Replicas)"]

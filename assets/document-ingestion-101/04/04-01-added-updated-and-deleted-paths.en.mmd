@@ -1,0 +1,5 @@
+flowchart TD
+  A["Change Detection"] --> B["Classify Added/Updated/Deleted"]
+  B --> C["New Indexing (Added)"]
+  C --> D["Re-indexing (Updated)"]
+  D --> E["Delete from Index (Deleted)"]

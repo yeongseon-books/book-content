@@ -1,0 +1,4 @@
+flowchart TD
+  Rule["Scale Rule (Definition)"] --> Config["KEDA ScaledObject Config"]
+  Config --> HPA["HPA (Execution)"]
+  HPA --> Pods["App Replicas"]

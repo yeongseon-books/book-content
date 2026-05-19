@@ -1,0 +1,11 @@
+flowchart TD
+  subgraph Pod["ACA 파드"]
+    App["앱 컨테이너"]
+    subgraph Sidecar["Dapr 사이드카"]
+      HTTP["HTTP: 3500"]
+      gRPC["gRPC: 50001"]
+      Internal["내부 gRPC: 50002"]
+    end
+  end
+  App --> HTTP
+  App --> gRPC
