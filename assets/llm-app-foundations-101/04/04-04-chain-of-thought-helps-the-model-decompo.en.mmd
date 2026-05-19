@@ -1,0 +1,13 @@
+flowchart TB
+    Question["Question\n120000 won\n10% coupon first\nthen 10% VAT"] --> Cue["Let's think step by step"]
+    Cue --> Step1["Step 1\nFind 10% of 120000 = 12000 won"]
+    Step1 --> Step2["Step 2\n120000 - 12000 = 108000 won"]
+    Step2 --> Step3["Step 3\nFind 10% VAT of 108000 = 10800 won"]
+    Step3 --> Final["Step 4\n108000 + 10800\nfinal_answer: 118800 won"]
+
+    style Question fill:#e3f2fd,stroke:#1976d2
+    style Cue fill:#f3e5f5,stroke:#7b1fa2
+    style Step1 fill:#fff3e0,stroke:#f57c00
+    style Step2 fill:#fff3e0,stroke:#f57c00
+    style Step3 fill:#fff3e0,stroke:#f57c00
+    style Final fill:#fff8e1,stroke:#f9a825

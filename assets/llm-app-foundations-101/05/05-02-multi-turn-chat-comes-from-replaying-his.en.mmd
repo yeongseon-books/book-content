@@ -1,0 +1,18 @@
+flowchart TB
+    Memory["Application-owned history\nmessages[]"] --> AddUser["1. Append new user turn"]
+    AddUser --> Send["2. Send full history to model"]
+    Send --> ReadAll["3. Model reads\nsystem + prior user + prior assistant + latest user"]
+    ReadAll --> Reply["4. assistant reply"]
+    Reply --> AddAssistant["5. Append assistant reply to history"]
+    AddAssistant --> NextTurn["6. Next user turn can say\nwhich one, then, that"]
+    NextTurn --> Reuse["Loop repeats with richer context"]
+    Reuse --> AddUser
+
+    style Memory fill:#e3f2fd,stroke:#1976d2
+    style AddUser fill:#f3e5f5,stroke:#7b1fa2
+    style Send fill:#fff3e0,stroke:#f57c00
+    style ReadAll fill:#e8f5e9,stroke:#388e3c
+    style Reply fill:#ede7f6,stroke:#5e35b1
+    style AddAssistant fill:#fff8e1,stroke:#f9a825
+    style NextTurn fill:#e0f7fa,stroke:#00838f
+    style Reuse fill:#e8f5e9,stroke:#388e3c

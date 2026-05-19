@@ -1,0 +1,20 @@
+flowchart TB
+    App["Python app"] --> Key["GROQ_API_KEY"]
+    Key --> SDK["Groq SDK client"]
+    SDK --> Request["HTTP request\nmodel + messages"]
+    Request --> Service["Groq model service\nllama-3.1-8b-instant"]
+    Service --> Response["JSON response\nchoices + usage + model"]
+    Response --> Output["Generated text\ncompletion.choices[0].message.content"]
+    Response --> Usage["Token accounting\nprompt_tokens\ncompletion_tokens\ntotal_tokens"]
+    Output --> AppRead["App reads answer"]
+    Usage --> AppRead
+
+    style App fill:#e3f2fd,stroke:#1976d2
+    style SDK fill:#f3e5f5,stroke:#7b1fa2
+    style Request fill:#fff3e0,stroke:#f57c00
+    style Service fill:#e8f5e9,stroke:#388e3c
+    style Response fill:#ede7f6,stroke:#5e35b1
+    style Output fill:#fff8e1,stroke:#f9a825
+    style Usage fill:#e0f7fa,stroke:#00838f
+    style Key fill:#fce4ec,stroke:#c2185b
+    style AppRead fill:#fff8e1,stroke:#f9a825
