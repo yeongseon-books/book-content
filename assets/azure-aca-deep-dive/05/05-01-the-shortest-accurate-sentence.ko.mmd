@@ -1,0 +1,3 @@
+flowchart TD
+  App["앱 컨테이너"] -- "로컬 API 호출" --> Dapr["Dapr 사이드카 (daprd)"]
+  Dapr -- "변환하여 호출" --> External["외부 Azure 서비스"]

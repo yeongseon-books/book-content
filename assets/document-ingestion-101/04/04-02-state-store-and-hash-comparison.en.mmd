@@ -1,0 +1,6 @@
+flowchart TD
+  A["State Store"] --> B["Old File Hash"]
+  C["New File Hash"] --> D{"Hash Match?"}
+  B --> D
+  D -->|Yes| E["Skip"]
+  D -->|No| F["Process Update"]

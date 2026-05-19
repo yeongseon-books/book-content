@@ -1,0 +1,4 @@
+flowchart TD
+  Rule["스케일 규칙 (정의)"] --> Config["KEDA ScaledObject 구성"]
+  Config --> HPA["HPA (실행)"]
+  HPA --> Pods["앱 레플리카"]

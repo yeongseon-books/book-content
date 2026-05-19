@@ -1,0 +1,6 @@
+flowchart TD
+  subgraph EnvoyCluster["업스트림 클러스터"]
+    C1["클러스터 A (가중치 50)"]
+    C2["클러스터 B (가중치 50)"]
+  end
+  Route["라우팅 작업"] --> EnvoyCluster

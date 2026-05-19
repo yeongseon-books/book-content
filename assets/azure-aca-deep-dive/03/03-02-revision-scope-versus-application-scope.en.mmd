@@ -1,0 +1,11 @@
+flowchart TD
+  subgraph AppScope["Application-Scope Changes"]
+    Secrets["Secrets"]
+    Dapr["Dapr Components"]
+  end
+  subgraph RevScope["Revision-Scope Changes"]
+    Image["Container Image"]
+    Scale["Scale Rules"]
+  end
+  AppScope --> App["Container App"]
+  RevScope --> NewRev["Creates New Revision"]

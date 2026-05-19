@@ -1,0 +1,3 @@
+flowchart TD
+  App["App Container"] -- "Local API Call" --> Dapr["Dapr Sidecar (daprd)"]
+  Dapr -- "Translates to" --> External["External Azure Service"]

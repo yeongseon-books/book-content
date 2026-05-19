@@ -1,0 +1,5 @@
+flowchart TD
+  A["이벤트 실패"] --> B["지수 백오프 (Exponential Backoff) 재시도"]
+  B --> C{"최대 횟수 초과?"}
+  C -->|No| B
+  C -->|Yes| D["수동 Replay를 위해 저장"]

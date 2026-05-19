@@ -1,0 +1,4 @@
+flowchart TD
+  Env["ACA Environment"] --> Fetch["Sidecar fetches scopes"]
+  Fetch --> InitComp["Sidecar initializes matching components"]
+  InitComp --> Ready["Dapr ready"]

@@ -1,0 +1,5 @@
+flowchart TD
+  Req["HTTP Requests"] --> Envoy["Envoy Proxy"]
+  Envoy --> Prom["Prometheus/Metrics"]
+  Prom --> KEDA["KEDA HTTP Scaler"]
+  KEDA --> Scale["Scale Action"]

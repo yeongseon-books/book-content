@@ -1,0 +1,4 @@
+flowchart TD
+  Envoy["Envoy Proxy"] --> Svc["ClusterIP Service"]
+  Svc --> Endpoints["Endpoints (Pod IPs)"]
+  Endpoints --> Pod["App Pod"]

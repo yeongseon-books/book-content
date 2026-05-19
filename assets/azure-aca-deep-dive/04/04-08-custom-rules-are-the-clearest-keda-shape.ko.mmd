@@ -1,0 +1,4 @@
+flowchart TD
+  Custom["사용자 지정 규칙 (예: Azure Service Bus)"] --> Meta["메타데이터 (큐 이름, 메시지 수)"]
+  Meta --> Scaler["외부 시스템 메트릭"]
+  Scaler --> KEDA["KEDA 메트릭 어댑터"]

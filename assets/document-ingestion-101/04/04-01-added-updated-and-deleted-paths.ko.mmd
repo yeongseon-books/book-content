@@ -1,0 +1,5 @@
+flowchart TD
+  A["문서 변경 감지"] --> B["추가/수정/삭제 분류"]
+  B --> C["신규 인덱싱 (Added)"]
+  C --> D["재인덱싱 (Updated)"]
+  D --> E["인덱스 삭제 (Deleted)"]

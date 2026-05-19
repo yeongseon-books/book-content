@@ -1,0 +1,4 @@
+flowchart TD
+  Client["Client Request (HTTPS)"] --> TLS["TLS Termination at Envoy"]
+  TLS --> Cleartext["Cleartext (HTTP) to App"]
+  Cleartext --> App["Container App"]

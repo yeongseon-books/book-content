@@ -1,0 +1,8 @@
+flowchart TD
+  A["Ingested File"] --> B{"Check Extension"}
+  B -->|PDF| C["PDF Loader"]
+  B -->|DOCX| D["Word Loader"]
+  B -->|CSV| E["CSV Loader"]
+  C --> F["Common Pipeline"]
+  D --> F
+  E --> F

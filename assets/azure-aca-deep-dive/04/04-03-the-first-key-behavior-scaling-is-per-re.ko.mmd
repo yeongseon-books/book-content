@@ -1,0 +1,19 @@
+flowchart TD
+  subgraph Rev1["리비전 1"]
+    SO1["ScaledObject"] --> HPA1["HPA"] --> Pods1["레플리카"]
+  end
+  subgraph Rev2["리비전 2"]
+    SO2["ScaledObject"] --> HPA2["HPA"] --> Pods2["레플리카"]
+  end
+
+    
+
+    Sp1["."] --> Sp2["."]
+    Sp2 --> Sp3["."]
+    Sp3 --> Sp4["."]
+    style Sp1 fill:none,stroke:none,color:transparent
+    style Sp2 fill:none,stroke:none,color:transparent
+    style Sp3 fill:none,stroke:none,color:transparent
+    style Sp4 fill:none,stroke:none,color:transparent
+    linkStyle default stroke:transparent,stroke-width:0px
+    

@@ -1,0 +1,5 @@
+flowchart TD
+  A["Error during processing"] --> B["Format-specific Exception"]
+  B --> C["Central Error Handler"]
+  C --> D["Retry"]
+  C --> E["Dead Letter Queue"]

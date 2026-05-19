@@ -1,0 +1,4 @@
+flowchart TD
+  Config["dapr.enabled = true"] --> Operator["Dapr Operator/Injector"]
+  Operator --> PodSpec["Modifies Pod Spec"]
+  PodSpec --> Run["Runs daprd alongside App"]
