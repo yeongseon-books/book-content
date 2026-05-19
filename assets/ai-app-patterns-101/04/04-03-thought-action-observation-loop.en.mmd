@@ -1,0 +1,14 @@
+flowchart TD
+  Q["Question arrives\nuser asks for help"] --> T["Thought\nWhat information is missing?"]
+  T --> A["Action\nchoose one tool and inputs"]
+  A --> O["Observation\nread tool result"]
+  O --> D{"Enough evidence\nto answer?"}
+  D -->|"No"| T
+  D -->|"Yes"| F["Final Answer\nstop the loop"]
+
+  style Q fill:#e3f2fd,stroke:#1976d2
+  style T fill:#fff3e0,stroke:#f57c00
+  style A fill:#fce4ec,stroke:#c2185b
+  style O fill:#e8f5e9,stroke:#388e3c
+  style D fill:#fffde7,stroke:#f9a825
+  style F fill:#f3e5f5,stroke:#7b1fa2

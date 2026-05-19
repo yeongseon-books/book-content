@@ -1,0 +1,11 @@
+flowchart TD
+  T["비정형 텍스트\n채용 공고나 리포트"] --> S["추출 스키마\n후속 시스템이 요구하는 필드"]
+  S --> P["LLM 프롬프트\nJSON만 반환"]
+  P --> J["JSON 출력\ncompany, role, skills, salary"]
+  J --> O["JsonOutputParser\n검증된 구조화 객체"]
+
+  style T fill:#e3f2fd,stroke:#1976d2
+  style S fill:#fff3e0,stroke:#f57c00
+  style P fill:#fffde7,stroke:#f9a825
+  style J fill:#f3e5f5,stroke:#7b1fa2
+  style O fill:#e8f5e9,stroke:#388e3c
