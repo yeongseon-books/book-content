@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-19T15:21:17+00:00
+Generated: 2026-05-19T21:47:53+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **66**
+- Series with any issue: **65**
 - Series at or above 5 issues: **50**
-- Total issues: **706**
-  - BadImg: **668**
+- Total issues: **702**
+  - BadImg: **664**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **38**
@@ -98,15 +98,14 @@ Warnings:
 | 55 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 56 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 57 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 58 | `python-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 59 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 60 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
-| 61 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 62 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 63 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 64 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 65 | `math-for-cs-101` | 1 | 0 | 0 | 0 | 1 | 0 |
-| 66 | `technical-writing-101` | 1 | 0 | 0 | 0 | 1 | 0 |
+| 58 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 59 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
+| 60 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 61 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 62 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 63 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 64 | `math-for-cs-101` | 1 | 0 | 0 | 0 | 1 | 0 |
+| 65 | `technical-writing-101` | 1 | 0 | 0 | 0 | 1 | 0 |
 
 ## harness-engineering-101 — Total 54
 
@@ -814,16 +813,6 @@ Warnings:
 - `assets/programming-languages-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1042x67)
 - `assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1140x67)
 - `assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1140x67)
-
-## python-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/python-101/07/07-01-mental-model.en.png:1` — PNG height 72px <= 100px (size=1384x72)
-- `assets/python-101/07/07-01-mental-model.ko.png:1` — PNG height 72px <= 100px (size=1384x72)
-- `assets/python-101/09/09-01-mental-model.en.png:1` — PNG height 58px <= 100px (size=1384x58)
-- `assets/python-101/09/09-01-mental-model.ko.png:1` — PNG height 58px <= 100px (size=1384x58)
 
 ## multimodal-ai-101 — Total 3
 
