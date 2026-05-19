@@ -1,0 +1,19 @@
+flowchart LR
+    Task["Agent task\nanalyze, draft, search, execute"] --> Visible["Visible tools and permissions"]
+    Visible --> Unsafe["Without constraints\nwrite, send, delete, or loop if exposed"]
+
+    Visible --> Harness["Constraint Harness\nenforce rules before and during execution"]
+    Harness --> Capability["Capability\nwhich tools are allowed"]
+    Harness --> Resource["Resource\nhow much time, cost, and tokens"]
+    Harness --> Behavioral["Behavioral\nwhat output and behavior are allowed"]
+    Harness --> Scope["Scope\nwhich data and resources are reachable"]
+
+    Capability --> Safe["Runtime contract\nuseful but bounded agent behavior"]
+    Resource --> Safe
+    Behavioral --> Safe
+    Scope --> Safe
+
+    style Task fill:#e3f2fd,stroke:#1976d2
+    style Harness fill:#f3e5f5,stroke:#7b1fa2
+    style Safe fill:#fff8e1,stroke:#f9a825
+    style Unsafe fill:#ffebee,stroke:#c62828

@@ -1,0 +1,18 @@
+flowchart LR
+    Policy["ConstraintPolicy"] --> Capability["Capability constraints\nTool whitelist"]
+    Policy --> Resource["Resource constraints\nToken / call / time caps"]
+    Policy --> Behavioral["Behavioral constraints\nOutput rules and priorities"]
+    Policy --> Scope["Scope constraints\nData and mutation boundaries"]
+
+    Capability --> ToolLayer["Enforced at tool exposure"]
+    Resource --> Meter["Enforced by runtime metering"]
+    Behavioral --> Validator["Enforced by output validation"]
+    Scope --> DataLayer["Enforced by data-layer permissions"]
+
+    ToolLayer --> Safety["Different risks handled\nby different enforcement layers"]
+    Meter --> Safety
+    Validator --> Safety
+    DataLayer --> Safety
+
+    style Policy fill:#f3e5f5,stroke:#7b1fa2
+    style Safety fill:#fff8e1,stroke:#f9a825

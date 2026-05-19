@@ -1,0 +1,13 @@
+flowchart LR
+    Registry["ToolRegistry\nread_db · write_db · send_email"] --> Whitelist["Whitelist allowed_names\nonly tools for this task"]
+    Whitelist --> Danger["Apply max_danger threshold\nblock destructive tools again"]
+    Danger --> Exposed["Exposed tools\nread_db only"]
+    Exposed --> Agent["Agent can call only\nwhat it actually needs"]
+
+    Registry --> Blocked["Anything not listed\nor too dangerous stays hidden"]
+
+    style Registry fill:#e3f2fd,stroke:#1976d2
+    style Whitelist fill:#f3e5f5,stroke:#7b1fa2
+    style Exposed fill:#e8f5e9,stroke:#388e3c
+    style Agent fill:#fff8e1,stroke:#f9a825
+    style Blocked fill:#ffebee,stroke:#c62828

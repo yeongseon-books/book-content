@@ -1,0 +1,13 @@
+flowchart LR
+    Prod["Production logs\nreal user requests\nneeds PII handling"] --> Dataset["Balanced eval dataset"]
+    Synthetic["Synthetic generation\nfast variations from an LLM"] --> Dataset
+    Adversarial["Adversarial examples\nedge cases and prompt injections"] --> Dataset
+
+    Dataset --> Mix["Mix categories\nhappy path · edge · adversarial"]
+    Mix --> Score["Run rubrics and trend scores\nacross repeated releases"]
+
+    style Prod fill:#e3f2fd,stroke:#1976d2
+    style Synthetic fill:#e8f5e9,stroke:#388e3c
+    style Adversarial fill:#ffebee,stroke:#c62828
+    style Dataset fill:#f3e5f5,stroke:#7b1fa2
+    style Score fill:#fff8e1,stroke:#f9a825

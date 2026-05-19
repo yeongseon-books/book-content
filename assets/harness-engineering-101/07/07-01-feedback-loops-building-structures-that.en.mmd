@@ -1,0 +1,14 @@
+flowchart LR
+    Attempt["Attempt 1"] --> Failure["Failure\nwrong tool, bad args, policy violation"]
+    Failure --> Classify["Classify the failure"]
+    Classify --> Retry["Retry path\ntransient problem"]
+    Classify --> Reflect["Reflect path\nreasoning or format problem"]
+    Retry --> Next["New attempt"]
+    Reflect --> Next
+    Next --> Pass["Passes verifier"]
+    Next --> Stop["Still failing after safeguards\nescalate to a human"]
+
+    style Attempt fill:#e3f2fd,stroke:#1976d2
+    style Classify fill:#f3e5f5,stroke:#7b1fa2
+    style Pass fill:#e8f5e9,stroke:#388e3c
+    style Stop fill:#fff8e1,stroke:#f9a825

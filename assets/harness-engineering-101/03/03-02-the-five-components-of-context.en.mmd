@@ -1,0 +1,15 @@
+flowchart LR
+    System["System prompt\nrole, rules, goals\n~2k tokens"] --> Inference["One inference context"]
+    Task["Task spec\nGoal, Inputs, Completion criteria\n~1k tokens"] --> Inference
+    History["Conversation history\nsliding / summarized / recalled\n~5k tokens"] --> Inference
+    Retrieval["Retrieved context\nrelevant docs only\n~10k tokens"] --> Inference
+    Tools["Tool schemas and recent outputs\nwhat can be called now\n~3k tokens"] --> Inference
+
+    Inference --> Budget["Allocate each slot explicitly\nso no component grows without bound"]
+
+    style System fill:#e3f2fd,stroke:#1976d2
+    style Task fill:#e8f5e9,stroke:#388e3c
+    style History fill:#fff3e0,stroke:#ef6c00
+    style Retrieval fill:#f3e5f5,stroke:#7b1fa2
+    style Tools fill:#ede7f6,stroke:#5e35b1
+    style Budget fill:#fff8e1,stroke:#f9a825

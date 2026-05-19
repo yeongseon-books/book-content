@@ -1,0 +1,12 @@
+flowchart LR
+    Action["Agent wants to act\npayment · deploy · delete · send"] --> Gate["Approval Gate\npause before high-liability actions"]
+    Gate --> Human["Human decision authority"]
+    Human --> Approve["Approve\nresume the automated flow"]
+    Human --> Reject["Reject\nstop or redirect the task"]
+    Approve --> Log["Record who, when, why, and what executed"]
+    Reject --> Log
+
+    style Action fill:#e3f2fd,stroke:#1976d2
+    style Gate fill:#f3e5f5,stroke:#7b1fa2
+    style Human fill:#e8f5e9,stroke:#388e3c
+    style Log fill:#fff8e1,stroke:#f9a825

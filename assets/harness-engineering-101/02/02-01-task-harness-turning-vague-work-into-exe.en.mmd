@@ -1,0 +1,16 @@
+flowchart LR
+    Goal["Business goal\nImprove support quality"] --> Request["Human request\n'Tidy up our team report'"]
+    Request --> Guess["Without Task Harness\nagent guesses source, scope, and format"]
+    Guess --> Incident["Wrong data, wrong deliverable,\nand expensive retries"]
+
+    Request --> Harness["Task Harness\nrewrite request as one executable task"]
+    Harness --> Spec["TaskSpec\nGoal · Inputs · Outputs · Completion criteria"]
+    Spec --> Execute["Agent executes one bounded unit"]
+    Spec --> Downstream["Context / Constraint / Test\ncan derive from the same spec"]
+    Execute --> Done["Verifiable completion instead of guessing"]
+
+    style Goal fill:#e3f2fd,stroke:#1976d2
+    style Harness fill:#f3e5f5,stroke:#7b1fa2
+    style Spec fill:#e8f5e9,stroke:#388e3c
+    style Done fill:#fff8e1,stroke:#f9a825
+    style Incident fill:#ffebee,stroke:#c62828

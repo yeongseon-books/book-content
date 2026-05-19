@@ -1,0 +1,15 @@
+flowchart LR
+    Goal["Goal\nOne sentence on what must be achieved"] --> Spec["Executable TaskSpec"]
+    Inputs["Inputs\nData sources, parameters, preconditions"] --> Spec
+    Outputs["Outputs\nFormat, schema, destination"] --> Spec
+    Criteria["Completion criteria\nAuto-verifiable pass/fail checks"] --> Spec
+
+    Spec --> Ready["All four present\nagent can execute without guessing"]
+    Missing["Any field missing"] --> Guessing["The agent fills in blanks on its own"]
+
+    style Goal fill:#e3f2fd,stroke:#1976d2
+    style Inputs fill:#e8f5e9,stroke:#388e3c
+    style Outputs fill:#fff3e0,stroke:#ef6c00
+    style Criteria fill:#f3e5f5,stroke:#7b1fa2
+    style Ready fill:#fff8e1,stroke:#f9a825
+    style Guessing fill:#ffebee,stroke:#c62828
