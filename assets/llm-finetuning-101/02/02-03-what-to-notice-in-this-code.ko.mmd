@@ -1,0 +1,22 @@
+flowchart TB
+    JSONL["JSONL 원본"] --> 로드["datasets.load_dataset()"]
+    로드 --> 컬럼확인["column_names 확인\ninstruction · input · output"]
+    컬럼확인 --> 렌더["템플릿 적용\n하나의 text 컬럼 생성"]
+    렌더 --> 토크나이즈["tokenizer()\ntruncation · padding · max_length"]
+
+    토크나이즈 --> 패드["pad_token 없으면\neos_token 재사용"]
+    토크나이즈 --> 길이["input_ids 길이와\n분포를 먼저 관측"]
+    토크나이즈 --> 경계["Response 이전 구간은\n나중에 -100 마스킹 후보"]
+
+    패드 --> 안정성["학습 크래시 예방"]
+    길이 --> 조정["max_length · 동적 패딩\ntrain/eval 분할 판단"]
+    경계 --> 확장["collator와 모델별 템플릿으로\n확장 준비"]
+
+    안정성 --> 다음결정["형식 점검과 길이 검증을 분리해\n다음 실험을 결정"]
+    조정 --> 다음결정
+    확장 --> 다음결정
+
+    style JSONL fill:#e3f2fd,stroke:#1976d2
+    style 렌더 fill:#f3e5f5,stroke:#7b1fa2
+    style 토크나이즈 fill:#e8f5e9,stroke:#388e3c
+    style 다음결정 fill:#fff8e1,stroke:#f9a825

@@ -1,0 +1,18 @@
+flowchart LR
+    Start["Questions a serving system must answer"] --> Structure["What is the minimum structure for\na fine-tuned small model service?"]
+    Start --> Boundary["Where should training code stop\nand inference code begin?"]
+    Start --> Validation["How do we validate the endpoint\nwithout opening a browser?"]
+    Start --> Deployment["What do we gain by deploying\nbase model and LoRA separately?"]
+
+    Structure --> API["FastAPI + Pydantic\nA predictable HTTP contract"]
+    Boundary --> ModelLayer["Isolate tokenizer, generate, and decode\ninside the model layer"]
+    Validation --> Tests["TestClient, /health, and /generate\nfor automated checks"]
+    Deployment --> Store["One base model plus many adapters\nexpands serving options"]
+
+    API --> Service["Minimal serving system"]
+    ModelLayer --> Service
+    Tests --> Service
+    Store --> Service
+
+    style Start fill:#e3f2fd,stroke:#1976d2
+    style Service fill:#fff8e1,stroke:#f9a825

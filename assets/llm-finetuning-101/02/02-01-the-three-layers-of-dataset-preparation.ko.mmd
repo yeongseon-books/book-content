@@ -1,0 +1,18 @@
+flowchart LR
+    원본["1층 원본 샘플\nJSONL 행 · 필드 이름 · 공백"] --> 템플릿["2층 템플릿 텍스트\nInstruction/Input/Response 결합"]
+    템플릿 --> 텐서["3층 토큰 텐서\ninput_ids · attention_mask · labels"]
+
+    원본 --> 원본점검["사람이 검수\n누락 필드 · 중복 · PII"]
+    템플릿 --> 템플릿점검["모델별 특수 토큰\nEOS · 역할 경계"]
+    텐서 --> 텐서점검["길이 분포 · padding\nlabel masking"]
+
+    원본점검 --> 분리효과["문제 원인을 층별로 분리"]
+    템플릿점검 --> 분리효과
+    텐서점검 --> 분리효과
+
+    분리효과 --> 결과["필터링 문제, 길이 문제,\n마스킹 문제를 섞지 않고 진단"]
+
+    style 원본 fill:#e3f2fd,stroke:#1976d2
+    style 템플릿 fill:#f3e5f5,stroke:#7b1fa2
+    style 텐서 fill:#e8f5e9,stroke:#388e3c
+    style 결과 fill:#fff8e1,stroke:#f9a825

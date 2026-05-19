@@ -1,0 +1,18 @@
+flowchart LR
+    Raw["Layer 1: raw samples\nJSONL rows, field names, whitespace"] --> Templated["Layer 2: templated text\nInstruction/Input/Response in one string"]
+    Templated --> Tensors["Layer 3: token tensors\ninput_ids, attention_mask, labels"]
+
+    Raw --> RawChecks["Human review\nmissing fields, duplicates, PII"]
+    Templated --> TemplateChecks["Model-specific special tokens\nEOS and role boundaries"]
+    Tensors --> TensorChecks["Length distribution, padding,\nlabel masking"]
+
+    RawChecks --> Isolation["Separate failure causes by layer"]
+    TemplateChecks --> Isolation
+    TensorChecks --> Isolation
+
+    Isolation --> Result["Diagnose filtering, length, and masking\nwithout mixing them together"]
+
+    style Raw fill:#e3f2fd,stroke:#1976d2
+    style Templated fill:#f3e5f5,stroke:#7b1fa2
+    style Tensors fill:#e8f5e9,stroke:#388e3c
+    style Result fill:#fff8e1,stroke:#f9a825

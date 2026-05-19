@@ -1,0 +1,18 @@
+flowchart LR
+    Start["To make one training step succeed"] --> Args["What is the minimum set of\nTrainingArguments?"]
+    Start --> Labels["Why do labels and a data collator\nstill matter in tiny experiments?"]
+    Start --> Debug["If training breaks, which output\nshould you read first?"]
+    Start --> Interaction["How do learning rate, batch size,\nand accumulation move together?"]
+
+    Args --> OneStep["Use max_steps=1\nfor a small integrity check"]
+    Labels --> LossPath["Only response tokens should\ncarry the loss"]
+    Debug --> Signals["finite loss, global_step=1,\nno exception"]
+    Interaction --> EffBatch["Interpret effective batch size\nand learning rate together"]
+
+    OneStep --> Update["One honest weight update"]
+    LossPath --> Update
+    Signals --> Update
+    EffBatch --> Update
+
+    style Start fill:#e3f2fd,stroke:#1976d2
+    style Update fill:#fff8e1,stroke:#f9a825
