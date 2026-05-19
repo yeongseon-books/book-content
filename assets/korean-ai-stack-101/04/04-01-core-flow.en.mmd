@@ -1,0 +1,10 @@
+flowchart LR
+    A["Document image / PDF"] --> B["CLOVA OCR call"]
+    B --> C["fields\ninferText / confidence / bbox / lineBreak"]
+    C --> D["Line reconstruction"]
+    C --> E["Table / column recovery"]
+    D --> F["Amount and date regex checks"]
+    E --> F
+    F --> G["Clean text + metadata"]
+    G --> H["BGE-M3 retrieval corpus"]
+    G --> I["RAG context input"]

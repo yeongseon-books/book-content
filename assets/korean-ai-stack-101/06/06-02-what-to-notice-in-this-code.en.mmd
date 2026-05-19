@@ -1,0 +1,7 @@
+flowchart TD
+    A["hits"] --> B["Build context with chunk ids"]
+    B --> C["Blank lines preserve chunk boundaries"]
+    C --> D["System prompt fixes\ncontext-first + no speculation"]
+    D --> E["temperature=0.0"]
+    E --> F["Force answer to end with [sources: ...]"]
+    F --> G["Validate not only answer quality\nbut evidence usage"]

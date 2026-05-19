@@ -1,0 +1,8 @@
+flowchart TD
+    A["retrieve() 결과"] --> B["[chunk:id] 형식으로 문맥 구성"]
+    B --> C["system prompt\n문맥 밖이면 모른다고 답변\n출처 라인 강제"]
+    C --> D["LLM generate"]
+    D --> E["근거 기반 답변"]
+    D --> F["[sources: 0,1] 인용"]
+    E --> G["retrieval과 generation을\n분리해 감사 가능"]
+    F --> G

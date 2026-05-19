@@ -1,0 +1,10 @@
+flowchart TD
+    A["fields 배열 순회"] --> B{"lineBreak?"}
+    B -->|False| C["현재 줄에 토큰 추가"]
+    C --> A
+    B -->|True| D["현재 줄 종료"]
+    D --> E["text = 토큰 join"]
+    D --> F["min_confidence 계산"]
+    E --> G["줄 객체 저장"]
+    F --> G
+    G --> H["다음 줄 버퍼 초기화"]

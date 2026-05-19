@@ -200,10 +200,6 @@ Storing the raw payload path beside the text keeps reprocessing simple when the 
 
 ### Step 5 — Swap in the real API call (optional)
 
-![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
-
-*Where engineers get confused*
-
 ```python
 import os, requests
 
@@ -226,6 +222,10 @@ Returns the same shape as the mock dict, so steps 1-4 stay unchanged.
 - Even with a real key in place, keeping the mock test in CI makes the build deterministic.
 
 ## Common mistakes
+
+![Where engineers get confused](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
+
+*Where engineers get confused*
 
 - **Assuming higher OCR accuracy means better RAG** — token accuracy and meaning-unit accuracy are different problems. Bad line reconstruction defeats 99% OCR.
 - **Using absolute confidence thresholds** — a 0.95 cutoff means different things across model versions. Prefer reviewing the bottom 5% of the score distribution.

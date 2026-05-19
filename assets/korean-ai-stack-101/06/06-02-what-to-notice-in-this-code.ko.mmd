@@ -1,0 +1,7 @@
+flowchart TD
+    A["hits"] --> B["chunk id를 붙여 context 생성"]
+    B --> C["빈 줄로 청크 경계 유지"]
+    C --> D["system prompt가\n문맥 우선·추측 금지 고정"]
+    D --> E["temperature=0.0"]
+    E --> F["답변 끝에 [sources: ...] 강제"]
+    F --> G["정답 여부뿐 아니라\n근거 사용 여부도 검증"]

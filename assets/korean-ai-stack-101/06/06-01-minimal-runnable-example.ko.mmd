@@ -1,0 +1,10 @@
+flowchart LR
+    A["청크 4개"] --> B["KoSimCSE 인코딩"]
+    B --> C["정규화 벡터"]
+    C --> D["FAISS IndexFlatIP"]
+    E["질문\n결제는 됐는데 주문 내역이 없을 때"] --> F["같은 모델 인코딩"]
+    F --> G["질의 벡터"]
+    G --> D
+    D --> H["retrieve(top_k=2)"]
+    H --> I["chunk 0\n주문 동기화 지연 확인"]
+    H --> J["chunk 1\n결제 실패 / 저장 실패 분리"]

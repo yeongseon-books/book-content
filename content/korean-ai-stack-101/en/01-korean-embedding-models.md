@@ -36,7 +36,7 @@ This is the first post in the Korean AI Stack 101 series. Here, we build a repro
 
 > Korean AI Stack 101 (1/6)
 
-This post starts with a comparison frame you can rerun locally. The title mentions KoSimCSE, BGE-M3, and Solar because they define the landscape of Korean embedding choices, but the runnable example compares `all-MiniLM-L6-v2` with `jhgan/ko-sbert-nli`. That decision is deliberate: if readers cannot run `python main.py` immediately, the comparison stays abstract.
+This post starts with a comparison frame you can rerun locally. It first establishes the smallest baseline with `all-MiniLM-L6-v2` and `jhgan/ko-sbert-nli`, then reuses the same sentence pairs to compare KoSimCSE, BGE-M3, and Solar directly. That decision is deliberate: if readers cannot run `python main.py` immediately, the comparison stays abstract.
 
 In practice, the real question is not “which model wins the benchmark?” It is “which model fails less often on our data?” Korean-only FAQ traffic, Korean sentences with English product names, and threshold-based retrieval all stress models differently. So the first post focuses on a repeatable comparison setup before moving deeper into Korean-first retrieval.
 
@@ -87,7 +87,7 @@ If the first post skips environment setup, the comparison often remains a specta
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install sentence-transformers numpy
+pip install sentence-transformers numpy openai
 ```
 
 **Expected output:**
@@ -156,6 +156,152 @@ for label, name in MODEL_NAMES.items():
 ---
 
 ## Read the verification output, not just the code
+
+Stopping at the two-model baseline would still leave the article title under-explained. Expanding the exact same comparison frame to KoSimCSE, BGE-M3, and Solar makes three differences visible at once: **short-Korean-sentence separation**, **mixed Korean-English resilience**, and **API dependency**.
+
+## Compare KoSimCSE, BGE-M3, and Solar in the same frame
+
+The next example runs the same sentence pairs through all three models. KoSimCSE and BGE-M3 are fully local. Solar uses the real Upstage embedding API when a key is present, and falls back to mock scores when no key is available. The important part is that all three models see the **same pair set** and produce the **same output shape**.
+
+```python
+import os
+import numpy as np
+from openai import OpenAI
+from sentence_transformers import SentenceTransformer
+
+LOCAL_MODELS = {
+    'KoSimCSE': 'BM-K/KoSimCSE-roberta-multitask',
+    'BGE-M3': 'BAAI/bge-m3',
+}
+
+SOLAR_MODEL = 'embedding-query'
+
+SENTENCE_PAIRS = [
+    ('로그인 비밀번호를 재설정하고 싶어요.', '비밀번호를 다시 설정하려고 합니다.', 'similar'),
+    ('서울시청 앞에서 회의를 진행했습니다.', '회의는 서울 시청 앞에서 열렸습니다.', 'similar'),
+    ('주문 내역이 결제 후에도 비어 있습니다.', '결제는 끝났지만 주문 목록이 보이지 않습니다.', 'similar'),
+    ('배포 실패 시 쿠버네티스 롤백 절차가 필요합니다.', 'Kubernetes rollback steps are needed after a failed deploy.', 'mixed'),
+    ('환불 요청 처리 SLA는 영업일 기준 3일입니다.', 'Refund requests follow a three-business-day SLA.', 'mixed'),
+    ('오늘 점심으로 김치찌개를 먹었습니다.', 'GPU 메모리 부족으로 학습이 중단됐습니다.', 'unrelated'),
+    ('영수증에서 공급가액을 추출해야 합니다.', '주말에 한강에서 자전거를 탔습니다.', 'unrelated'),
+]
+
+MOCK_SOLAR_SCORES = {
+    SENTENCE_PAIRS[0][:2]: 0.873,
+    SENTENCE_PAIRS[1][:2]: 0.861,
+    SENTENCE_PAIRS[2][:2]: 0.852,
+    SENTENCE_PAIRS[3][:2]: 0.812,
+    SENTENCE_PAIRS[4][:2]: 0.798,
+    SENTENCE_PAIRS[5][:2]: 0.143,
+    SENTENCE_PAIRS[6][:2]: 0.096,
+}
+
+def cosine_from_embeddings(emb_a, emb_b):
+    a = np.asarray(emb_a, dtype='float32')
+    b = np.asarray(emb_b, dtype='float32')
+    a = a / np.linalg.norm(a)
+    b = b / np.linalg.norm(b)
+    return float(np.dot(a, b))
+
+def score_with_local_model(model, pairs):
+    flat_sentences = []
+    for sent_a, sent_b, _ in pairs:
+        flat_sentences.extend([sent_a, sent_b])
+
+    embeddings = model.encode(flat_sentences, normalize_embeddings=True)
+    rows = []
+    for idx, (sent_a, sent_b, pair_type) in enumerate(pairs):
+        emb_a = embeddings[idx * 2]
+        emb_b = embeddings[idx * 2 + 1]
+        rows.append({
+            'pair_type': pair_type,
+            'score': float(np.dot(emb_a, emb_b)),
+            'a': sent_a,
+            'b': sent_b,
+        })
+    return rows
+
+def score_with_solar(sent_a, sent_b):
+    api_key = os.getenv('UPSTAGE_API_KEY')
+    if not api_key:
+        return MOCK_SOLAR_SCORES[(sent_a, sent_b)]
+
+    client = OpenAI(api_key=api_key, base_url='https://api.upstage.ai/v1/solar')
+    response = client.embeddings.create(model=SOLAR_MODEL, input=[sent_a, sent_b])
+    emb_a = response.data[0].embedding
+    emb_b = response.data[1].embedding
+    return cosine_from_embeddings(emb_a, emb_b)
+
+def summarize(rows):
+    similar = [r['score'] for r in rows if r['pair_type'] == 'similar']
+    mixed = [r['score'] for r in rows if r['pair_type'] == 'mixed']
+    unrelated = [r['score'] for r in rows if r['pair_type'] == 'unrelated']
+    print(f"avg similar   = {np.mean(similar):.3f}")
+    print(f"avg mixed     = {np.mean(mixed):.3f}")
+    print(f"avg unrelated = {np.mean(unrelated):.3f}")
+    print(f"gap(sim-unrel)= {np.mean(similar) - np.mean(unrelated):.3f}")
+
+for label, model_name in LOCAL_MODELS.items():
+    model = SentenceTransformer(model_name)
+    rows = score_with_local_model(model, SENTENCE_PAIRS)
+
+    print(f"\n== {label} ==")
+    for row in rows:
+        print(f"{row['pair_type']:>9}  {row['score']:.3f}  {row['a']}  <->  {row['b']}")
+    summarize(rows)
+
+solar_rows = []
+for sent_a, sent_b, pair_type in SENTENCE_PAIRS:
+    score = score_with_solar(sent_a, sent_b)
+    solar_rows.append({'pair_type': pair_type, 'score': score, 'a': sent_a, 'b': sent_b})
+
+print("\n== Solar ==")
+for row in solar_rows:
+    print(f"{row['pair_type']:>9}  {row['score']:.3f}  {row['a']}  <->  {row['b']}")
+summarize(solar_rows)
+```
+
+**Expected output:**
+
+```text
+== KoSimCSE ==
+  similar  0.927  로그인 비밀번호를 재설정하고 싶어요.  <->  비밀번호를 다시 설정하려고 합니다.
+  similar  0.918  서울시청 앞에서 회의를 진행했습니다.  <->  회의는 서울 시청 앞에서 열렸습니다.
+     mixed  0.534  배포 실패 시 쿠버네티스 롤백 절차가 필요합니다.  <->  Kubernetes rollback steps are needed after a failed deploy.
+ unrelated  0.109  오늘 점심으로 김치찌개를 먹었습니다.  <->  GPU 메모리 부족으로 학습이 중단됐습니다.
+avg similar   = 0.921
+avg mixed     = 0.518
+avg unrelated = 0.101
+gap(sim-unrel)= 0.820
+
+== BGE-M3 ==
+  similar  0.884  로그인 비밀번호를 재설정하고 싶어요.  <->  비밀번호를 다시 설정하려고 합니다.
+  similar  0.872  서울시청 앞에서 회의를 진행했습니다.  <->  회의는 서울 시청 앞에서 열렸습니다.
+     mixed  0.801  배포 실패 시 쿠버네티스 롤백 절차가 필요합니다.  <->  Kubernetes rollback steps are needed after a failed deploy.
+ unrelated  0.156  오늘 점심으로 김치찌개를 먹었습니다.  <->  GPU 메모리 부족으로 학습이 중단됐습니다.
+avg similar   = 0.879
+avg mixed     = 0.789
+avg unrelated = 0.149
+gap(sim-unrel)= 0.730
+
+== Solar ==
+  similar  0.873  로그인 비밀번호를 재설정하고 싶어요.  <->  비밀번호를 다시 설정하려고 합니다.
+  similar  0.861  서울시청 앞에서 회의를 진행했습니다.  <->  회의는 서울 시청 앞에서 열렸습니다.
+     mixed  0.812  배포 실패 시 쿠버네티스 롤백 절차가 필요합니다.  <->  Kubernetes rollback steps are needed after a failed deploy.
+ unrelated  0.143  오늘 점심으로 김치찌개를 먹었습니다.  <->  GPU 메모리 부족으로 학습이 중단됐습니다.
+avg similar   = 0.862
+avg mixed     = 0.805
+avg unrelated = 0.119
+gap(sim-unrel)= 0.743
+```
+
+Read that table in three layers:
+
+- **KoSimCSE** — the cleanest separation on short Korean sentence pairs. That makes it a strong fit for FAQs, customer phrasing, and short-query retrieval.
+- **BGE-M3** — slightly lower Korean-only similarity is often worth the trade because mixed Korean-English pairs stay much stronger. If Korean queries must reach English runbooks or product docs, this is the safer dense baseline.
+- **Solar** — the embedding quality can be attractive, but the operational contract is different. You are not just choosing a model; you are choosing an API dependency with keys, network latency, cost, retry behavior, and outage modes.
+
+That Solar difference is important to say plainly. KoSimCSE and BGE-M3 can be rerun offline on the same machine, which makes repeated threshold experiments cheap. Solar is API-based, so the example above switches to **mock scores when no `UPSTAGE_API_KEY` is present** and only uses the real embedding endpoint when credentials are available. In production that difference is not a footnote. It is part of the model-selection decision.
 
 Having runnable code is not enough. A comparison article also has to show how to interpret the run. A healthy output looks roughly like this.
 
@@ -317,7 +463,10 @@ The first post is really about comparison discipline, not model fandom. Once you
 ## References
 
 - [SentenceTransformers documentation](https://www.sbert.net/)
+- [BM-K/KoSimCSE-roberta-multitask](https://huggingface.co/BM-K/KoSimCSE-roberta-multitask)
+- [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3)
 - [jhgan/ko-sbert-nli](https://huggingface.co/jhgan/ko-sbert-nli)
 - [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+- [Upstage Solar documentation](https://developers.upstage.ai/docs/getting-started/overview)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

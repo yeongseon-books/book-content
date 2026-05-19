@@ -1,0 +1,17 @@
+flowchart TD
+    A["공급자 교체"] --> B{"무엇이 바뀌고\n무엇이 남는가?"}
+    B --> C["endpoint / auth / 에러 코드"]
+    B --> D["messages / validation / masking"]
+    C --> E["다시 검증 필요"]
+    D --> F["대부분 재사용 가능"]
+    A --> G["system 메시지 생략"]
+    A --> H["기본 temperature 신뢰"]
+    A --> I["max_tokens 제한 없음"]
+    G --> J["페르소나 흔들림"]
+    H --> K["환경별 재현성 붕괴"]
+    I --> L["비용과 길이 폭주"]
+    E --> M["호출·메시지·샘플링·응답을\n한 세트로 고정"]
+    F --> M
+    J --> M
+    K --> M
+    L --> M
