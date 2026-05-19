@@ -1,0 +1,9 @@
+flowchart TD
+    A["한국어 질의 + 영어/한국어 문서"] --> B["하나의 BGE-M3로 인코딩"]
+    B --> C["언어별 인덱스를 나누지 않음"]
+    B --> D["normalize_embeddings=True"]
+    D --> E["IndexFlatIP와 자연스럽게 연결"]
+    C --> F["교차 언어 정렬 효과 유지"]
+    E --> G["dense 기준선을 먼저 측정"]
+    F --> G
+    G --> H["출력에 언어 태그와 Recall을 같이 남김"]
