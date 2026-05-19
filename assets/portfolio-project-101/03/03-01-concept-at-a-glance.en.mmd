@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Poor README"]
+        A1["Default Template"] --> A2["Missing Dependencies"]
+        A1 --> A5["Empty Description"]
+        A2 --> A3["No Start Guide"]
+        A5 --> A3
+        A3 --> A4["Fail to Understand"]
+        A3 --> A6["Fail to Deliver Value"]
+    end
+
+    subgraph B["Excellent README"]
+        B1["Project Summary"] --> B2["Visual Demo"]
+        B1 --> B5["Architecture Diagram"]
+        B2 --> B3["Quick Start Guide"]
+        B5 --> B3
+        B3 --> B4["Contribution Guide"]
+        B3 --> B6["Provide Instant Grasp"]
+    end
+
+    A3 -. "Determines First Impression" .- B3

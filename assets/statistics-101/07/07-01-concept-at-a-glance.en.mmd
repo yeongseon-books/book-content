@@ -1,0 +1,10 @@
+flowchart LR
+    A["Set Hypotheses"] --> B["Null Hypothesis (H0)"]
+    A --> C["Alternative Hypothesis (H1)"]
+    B --> D["Status quo, no effect"]
+    C --> E["Effect exists, want to prove"]
+    A --> F["Calculate Test Statistic"]
+    F --> G["Determine p-value"]
+    G --> H{"p < 0.05?"}
+    H -->|Yes| I["Reject H0 (Accept H1)"]
+    H -->|No| J["Fail to Reject H0"]

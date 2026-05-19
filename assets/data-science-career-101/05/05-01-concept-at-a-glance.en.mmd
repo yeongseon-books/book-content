@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph D["SQL & Analytics Interview"]
+        D1["Basic Queries (SELECT/JOIN)"] --> D2["Window Functions"]
+        D2 --> D3["Complex Subquery Optimization"]
+        D3 --> D4{"Apply to Business Case"}
+        D4 -->|"Pass"| D5["Next Round"]
+        D4 -->|"Fail"| D6["Identify Weaknesses"]
+    end

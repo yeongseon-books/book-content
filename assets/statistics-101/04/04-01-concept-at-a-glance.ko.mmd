@@ -1,0 +1,8 @@
+flowchart TD
+    A["모집단(Population)"] -->|표본 추출 Sampling| B["표본(Sample)"]
+    A --> C["모수(Parameter: μ, σ²)"]
+    B --> D["통계량(Statistic: x̄, s²)"]
+    D -->|추정 Estimation| C
+    B --> E["무작위 추출(Random Sampling)"]
+    E --> F["대표성 확보(Representativeness)"]
+    F -->|편향 최소화| D

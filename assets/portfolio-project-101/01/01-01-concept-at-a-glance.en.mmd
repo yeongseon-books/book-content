@@ -1,0 +1,22 @@
+flowchart LR
+    subgraph A["Simple Toy Project"]
+        A1["Write Code"] --> A2["Upload to GitHub"]
+        A2 --> A3["No Documentation"]
+        A2 --> A6["No Tests"]
+        A3 --> A4["Unknown How to Run"]
+        A6 --> A4
+        A4 --> A5["Interviewer Leaves"]
+        A4 --> A7["Fail to Prove Skills"]
+    end
+
+    subgraph B["Portfolio Project"]
+        B1["Define Problem"] --> B2["Implement Solution"]
+        B2 --> B3["Record Decisions"]
+        B2 --> B6["Test Code"]
+        B3 --> B4["README / Demo"]
+        B6 --> B4
+        B4 --> B5["Interviewer Engages"]
+        B4 --> B7["Successfully Appeal"]
+    end
+
+    A1 -. "Difference in Purpose" .- B1

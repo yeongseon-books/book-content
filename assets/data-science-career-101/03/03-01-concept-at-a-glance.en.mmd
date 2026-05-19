@@ -1,0 +1,8 @@
+flowchart LR
+    subgraph B["Learning Path"]
+        B1["Math/Stats Basics"] --> B2["Programming (Python/SQL)"]
+        B2 --> B3["Data Manipulation"]
+        B3 --> B4{"Choose Path"}
+        B4 -->|"Analytics"| B5["Visualization/Business"]
+        B4 -->|"Science"| B6["ML Algorithms"]
+    end

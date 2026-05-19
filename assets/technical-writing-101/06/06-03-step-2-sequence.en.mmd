@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant User as User
+    participant System as System
+    participant DB as Database
+    User->>System: Request Data (API)
+    activate System
+    System->>DB: Execute Query
+    activate DB
+    DB-->>System: Return Result
+    deactivate DB
+    System-->>User: Response Data (JSON)
+    deactivate System

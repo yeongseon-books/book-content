@@ -1,0 +1,11 @@
+flowchart TD
+    A["Estimation"] --> B["Point Estimation"]
+    A --> C["Interval Estimation"]
+    B --> B1["Estimate parameter with single value"]
+    C --> C1["Provide Confidence Interval"]
+    B1 --> D["Sample Mean"]
+    C1 --> E["Consider Margin of Error"]
+    D --> F["Hard to reflect uncertainty"]
+    E --> G["Accompanied by Confidence Level"]
+    F --> H["Needs complement"]
+    G --> I["Not the prob of parameter in interval"]

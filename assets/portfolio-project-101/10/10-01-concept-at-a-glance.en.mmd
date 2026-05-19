@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph A["Stagnant Project"]
+        A1["Initial Release"] --> A2["Abandoned"]
+        A1 --> A5["One-Off Work"]
+        A2 --> A3["Outdated Libraries"]
+        A5 --> A3
+        A3 --> A4["Dead Portfolio"]
+        A3 --> A6["Lowered Interest"]
+    end
+
+    subgraph B["Continuous Improvement"]
+        B1["Regular Review"] --> B2["Dependency Updates"]
+        B1 --> B5["Reflect Feedback"]
+        B2 --> B3["Optimize Performance"]
+        B5 --> B3
+        B3 --> B4["Living Project"]
+        B3 --> B6["Prove Growth"]
+    end
+
+    A2 -. "Project Vitality" .- B2
