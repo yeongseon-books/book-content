@@ -1,0 +1,10 @@
+flowchart LR
+    A["4 chunks"] --> B["KoSimCSE embedding"]
+    B --> C["Normalized vectors"]
+    C --> D["FAISS IndexFlatIP"]
+    E["Question\npayment succeeded but order missing"] --> F["Same-model embedding"]
+    F --> G["Query vector"]
+    G --> D
+    D --> H["retrieve(top_k=2)"]
+    H --> I["chunk 0\ncheck order-sync delay"]
+    H --> J["chunk 1\nseparate payment vs order-save failure"]
