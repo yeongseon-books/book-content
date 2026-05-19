@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Strings and formatting</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Strings and formatting</h1>
+<p>In Python 3, <code>str</code> is an immutable sequence of Unicode code points, while <code>bytes</code> is an immutable sequence of raw bytes. Keeping those two layers separate makes encoding and formatting issues much easier to reason about.</p>
+<p>This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you will be able to explain and code the following:</p>
+<ul>
+<li>Why Python 3's <code>str</code> is a Unicode string and how it differs from <code>bytes</code></li>
+<li>When to reach for single, double, triple, raw, or byte literals</li>
+<li>The core methods <code>split</code>, <code>join</code>, <code>strip</code>, <code>replace</code>, <code>find</code>, <code>startswith</code></li>
+<li>How slicing reads parts of a string and what it means that <code>str</code> is immutable</li>
+<li>f-strings and format specs (<code>:&gt;10</code>, <code>:.2f</code>, <code>:%Y-%m-%d</code>, <code>!r</code>) end to end</li>
+<li>Where <code>str.format</code> and <code>%</code> formatting still fit, and why we prefer f-strings</li>
+<li>Common encoding pitfalls (<code>UnicodeDecodeError</code>) and whitespace traps</li>
+<li>Your first encounter with regular expressions through the <code>re</code> module</li>
+</ul>
+<p>Most examples are REPL blocks marked by <code>&gt;&gt;&gt;</code> — paste them in and you will see the same output. Code blocks without <code>&gt;&gt;&gt;</code> are illustrative excerpts that assume the surrounding variables already exist.</p>
+<h2>Why this matters</h2>
+<p>Strings are the input and output of almost every program. User input, a line read from a file, an HTTP response, a log line, a JSON field — all of them are <code>str</code>. Mishandle strings and you walk into recurring accidents:</p>
+<ul>
+<li>Reading a file with Korean characters explodes with <code>UnicodeDecodeError</code>.</li>
+<li>A growing log built by <code>+=</code> wastes memory and time on every iteration.</li>
+<li>Trusted-looking user input goes straight into a SQL query and opens an injection.</li>
+<li>Without format specs, code degenerates into <code>round</code> plus <code>str.zfill</code> patchwork.</li>
+</ul>
+<p>Handling strings precisely prevents these mistakes upfront, and the code becomes shorter and clearer. It also leads naturally into the next chapter on collections — most values inside lists and dicts end up being strings.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>In Python 3, <code>str</code> is an immutable sequence of Unicode code points and <code>bytes</code> is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.<br>
+Python's <code>str</code> is a sequence of code points. It is abstracted at the level humans read; it only becomes <code>bytes</code> when it leaves memory for disk or the network.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three rules make most of the confusion disappear.</p>
+<ol>
+<li><strong><code>str</code> is a sequence of Unicode code points.</strong> It carries no encoding information.</li>
+<li><strong><code>bytes</code> is a sequence of integers in <code>0..255</code>.</strong> Which encoding produced them is something the programmer must remember.</li>
+<li><strong>Encode and decode only at the boundary with the outside world.</strong> Inside the program, work in <code>str</code>.</li>
+</ol>
+<p><code>str</code> is also <strong>immutable</strong>. <code>s = "hi"; s[0] = "H"</code> raises <code>TypeError</code>. Every "mutating" method actually returns a brand new <code>str</code>.</p>
+<h2>Core concepts</h2>
+<p><strong>1) String literals</strong></p>
+<p>Python accepts several quote styles. They mean the same thing; you pick whichever lets you avoid escaping the quotes inside.</p>
+<pre><code class="language-text">&gt;&gt;&gt; 'hello'
+'hello'
+&gt;&gt;&gt; &quot;she said \&quot;hi\&quot;&quot;
+'she said &quot;hi&quot;'
+&gt;&gt;&gt; 'she said &quot;hi&quot;'        # easier: wrap in single quotes
+'she said &quot;hi&quot;'
+&gt;&gt;&gt; &quot;&quot;&quot;multi
+... line
+... strings work too&quot;&quot;&quot;
+'multi\nline\nstrings work too'
+</code></pre>
+<p>Raw strings keep backslashes as-is. Use them for Windows paths and regex.</p>
+<pre><code class="language-text">&gt;&gt;&gt; path = r&quot;C:\Users\name\file.txt&quot;
+&gt;&gt;&gt; print(path)
+C:\Users\name\file.txt
+</code></pre>
+<p><code>b"..."</code> is a byte literal. ASCII characters can appear directly; other byte values must be written with escape sequences such as <code>\xFF</code>.</p>
+<pre><code class="language-text">&gt;&gt;&gt; b&quot;hello&quot;
+b'hello'
+&gt;&gt;&gt; b&quot;안녕&quot;
+  File &quot;&lt;stdin&gt;&quot;, line 1
+SyntaxError: bytes can only contain ASCII literal characters
+</code></pre>
+<p><strong>2) The boundary between str and bytes</strong></p>
+<p>At the OS and protocol boundary the data is bytes. Many Python text APIs (such as <code>open(..., "r")</code> or <code>requests.Response.text</code>) already decode it to <code>str</code> for you. When you do work with raw bytes, assume UTF-8 and call <code>decode</code> to get a <code>str</code>.</p>
+<pre><code class="language-text">&gt;&gt;&gt; data = &quot;hi&quot;.encode(&quot;utf-8&quot;)
+&gt;&gt;&gt; data
+b'hi'
+&gt;&gt;&gt; data.decode(&quot;utf-8&quot;)
+'hi'
+&gt;&gt;&gt; &quot;안녕&quot;.encode(&quot;utf-8&quot;).decode(&quot;ascii&quot;)
+Traceback (most recent call last):
+  ...
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xec in position 0: ordinal not in range(128)
+</code></pre>
+<p>Guess the encoding wrong and you hit <code>UnicodeDecodeError</code>. When unsure, try UTF-8 first; if it fails, ask the sender what encoding they actually used.</p>
+<p><strong>3) Core methods</strong></p>
+<p>Every <code>str</code> method returns a new <code>str</code>. The original is left untouched.</p>
+<pre><code class="language-text">&gt;&gt;&gt; &quot;  hello, world  &quot;.strip()
+'hello, world'
+&gt;&gt;&gt; &quot;user@example.com&quot;.split(&quot;@&quot;)
+['user', 'example.com']
+&gt;&gt;&gt; &quot;, &quot;.join([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])
+'a, b, c'
+&gt;&gt;&gt; &quot;Python&quot;.lower()
+'python'
+&gt;&gt;&gt; &quot;Python&quot;.replace(&quot;P&quot;, &quot;J&quot;)
+'Jython'
+&gt;&gt;&gt; &quot;image.png&quot;.endswith(&quot;.png&quot;)
+True
+&gt;&gt;&gt; &quot;report.txt&quot;.startswith((&quot;draft&quot;, &quot;report&quot;))    # tuple is allowed
+True
+&gt;&gt;&gt; &quot;find me here&quot;.find(&quot;me&quot;)
+5
+&gt;&gt;&gt; &quot;needle&quot; in &quot;haystack with needle&quot;
+True
+</code></pre>
+<p><code>split</code> with no argument splits on runs of whitespace (spaces, tabs, newlines). When you need a deterministic result, pass an explicit separator.</p>
+<p><strong>4) Slicing and immutability</strong></p>
+<p><code>str</code> is a sequence, so indexing and slicing work as expected.</p>
+<pre><code class="language-text">&gt;&gt;&gt; s = &quot;Python&quot;
+&gt;&gt;&gt; s[0], s[-1]
+('P', 'n')
+&gt;&gt;&gt; s[0:3]
+'Pyt'
+&gt;&gt;&gt; s[::-1]
+'nohtyP'
+</code></pre>
+<p>To "change" part of a string, build a new one.</p>
+<pre><code class="language-text">&gt;&gt;&gt; s = &quot;hello&quot;
+&gt;&gt;&gt; s = &quot;H&quot; + s[1:]
+&gt;&gt;&gt; s
+'Hello'
+</code></pre>
+<p><strong>5) f-strings and format specs</strong></p>
+<p>f-strings (PEP 498) are the clearest default for inline formatting. Variables and expressions go directly into braces.</p>
+<pre><code class="language-text">&gt;&gt;&gt; name = &quot;yeongseon&quot;
+&gt;&gt;&gt; count = 3
+&gt;&gt;&gt; f&quot;{name} has {count} books&quot;
+'yeongseon has 3 books'
+&gt;&gt;&gt; f&quot;{count * 2}&quot;
+'6'
+</code></pre>
+<p>After a colon comes the format spec — alignment, width, precision, base, dates — all in one line.</p>
+<pre><code class="language-text">&gt;&gt;&gt; import math
+&gt;&gt;&gt; f&quot;{math.pi:.2f}&quot;           # two decimal places
+'3.14'
+&gt;&gt;&gt; f&quot;{42:&gt;6}&quot;                 # width 6, right-aligned
+'    42'
+&gt;&gt;&gt; f&quot;{42:0&gt;6}&quot;                # width 6, left-padded with zeros
+'000042'
+&gt;&gt;&gt; f&quot;{255:#x}&quot;                # hex with the 0x prefix
+'0xff'
+&gt;&gt;&gt; from datetime import date
+&gt;&gt;&gt; today = date(2026, 5, 3)
+&gt;&gt;&gt; f&quot;{today:%Y-%m-%d}&quot;
+'2026-05-03'
+</code></pre>
+<p><code>!r</code> is great for debugging — it applies <code>repr()</code> so quotes show up.</p>
+<pre><code class="language-text">&gt;&gt;&gt; name = &quot;ada&quot;
+&gt;&gt;&gt; f&quot;name={name!r}&quot;
+&quot;name='ada'&quot;
+</code></pre>
+<p>Since Python 3.8, adding <code>=</code> prints both the variable name and its value. Debugging gets noticeably easier.</p>
+<pre><code class="language-text">&gt;&gt;&gt; count = 3
+&gt;&gt;&gt; f&quot;{count=}&quot;
+'count=3'
+</code></pre>
+<p><strong>6) str.format and % formatting</strong></p>
+<p>Two older styles you will still meet in legacy code. New code prefers f-strings, but you should be able to read these.</p>
+<pre><code class="language-text">&gt;&gt;&gt; &quot;{} has {} books&quot;.format(&quot;yeongseon&quot;, 3)
+'yeongseon has 3 books'
+&gt;&gt;&gt; &quot;%s has %d books&quot; % (&quot;yeongseon&quot;, 3)
+'yeongseon has 3 books'
+</code></pre>
+<p><code>format</code> accepts keyword arguments. That is useful when a template comes from outside. f-strings capture variables at the spot where they are written, so they are awkward as templates.</p>
+<pre><code class="language-text">&gt;&gt;&gt; template = &quot;{name} owes {amount}&quot;
+&gt;&gt;&gt; template.format(name=&quot;ada&quot;, amount=12000)
+'ada owes 12000'
+</code></pre>
+<p><strong>7) A first look at regular expressions</strong></p>
+<p>The <code>re</code> module manipulates strings via patterns. A full tour deserves its own chapter, but pulling email addresses out of a sentence fits in one line.</p>
+<pre><code class="language-text">&gt;&gt;&gt; import re
+&gt;&gt;&gt; text = &quot;Contact ada@example.com or bob@example.org&quot;
+&gt;&gt;&gt; re.findall(r&quot;[\w.+-]+@[\w-]+\.[\w.-]+&quot;, text)
+['ada@example.com', 'bob@example.org']
+</code></pre>
+<p>Use raw strings (<code>r"..."</code>) so backslashes do not have to be doubled.</p>
+<h2>Before / after</h2>
+<p>The same task in the old style versus modern f-string style. f-strings show intent at a glance and reduce the chances of a wrong conversion.</p>
+<pre><code class="language-python"># Before: % formatting + manual zfill
+name = &quot;ada&quot;
+count = 3
+price = 1234.5
+line = &quot;%s | %s | %s&quot; % (name.ljust(10), str(count).zfill(3), &quot;%.2f&quot; % price)
+print(line)
+# 'ada        | 003 | 1234.50'
+
+# After: f-string + format spec
+line = f&quot;{name:&lt;10} | {count:0&gt;3} | {price:.2f}&quot;
+print(line)
+# 'ada        | 003 | 1234.50'
+</code></pre>
+<p>Another common comparison is concatenation. Replace repeated <code>+</code> with <code>join</code>.</p>
+<pre><code class="language-python"># Before: repeated + concatenation
+parts = [&quot;alpha&quot;, &quot;beta&quot;, &quot;gamma&quot;, &quot;delta&quot;]
+out = &quot;&quot;
+for p in parts:
+    out = out + p + &quot;, &quot;
+out = out.rstrip(&quot;, &quot;)
+print(out)
+
+# After: a single join
+print(&quot;, &quot;.join(parts))
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p>Build a function that takes a CSV-like line and prints a tidy aligned row. We will exercise f-strings, format specs, and a handful of methods.</p>
+<ol>
+<li><strong>Parse the input.</strong> Split on commas, then strip each field.</li>
+</ol>
+<p><code>python
+   raw = "ada, 30, 1700000.5"
+   name, age_str, salary_str = [field.strip() for field in raw.split(",")]</code></p>
+<ol start="2">
+<li><strong>Convert types.</strong> Cast numeric fields explicitly. Never trust that user input is already a number.</li>
+</ol>
+<p><code>python
+   age = int(age_str)
+   salary = float(salary_str)</code></p>
+<ol start="3">
+<li><strong>Format.</strong> Pad widths and add thousands separators.</li>
+</ol>
+<p><code>python
+   line = f"{name:&lt;10} | {age:&gt;3}y | {salary:&gt;14,.2f} KRW"
+   print(line)
+   # 'ada        |  30y |   1,700,000.50 KRW'</code></p>
+<ol start="4">
+<li><strong>Apply to many rows.</strong></li>
+</ol>
+<p><code>python
+   rows = [
+       "ada, 30, 1700000.5",
+       "bob, 28, 2300000",
+       "charlie, 41, 5400000.25",
+   ]
+   for raw in rows:
+       name, age_str, salary_str = [f.strip() for f in raw.split(",")]
+       age = int(age_str)
+       salary = float(salary_str)
+       print(f"{name:&lt;10} | {age:&gt;3}y | {salary:&gt;14,.2f} KRW")</code></p>
+<ol start="5">
+<li><strong>Extend.</strong> When a new requirement arrives — say the salary may use other currencies — pull the symbol into a variable and interpolate it inside the f-string. Do not splice strings together with <code>+</code>; let the f-string do the work.</li>
+</ol>
+<h2>Common mistakes</h2>
+<ol>
+<li>
+<p><strong>Calling <code>str</code> "a UTF-8 string."</strong><br>
+<code>str</code> is a sequence of Unicode code points. UTF-8 is one of several encodings used when converting to <code>bytes</code>.</p>
+</li>
+<li>
+<p><strong>Mixing <code>bytes</code> and <code>str</code>.</strong><br>
+<code>b"a" + "b"</code> raises <code>TypeError</code>. Decode <code>bytes</code> from the outside world as soon as you can, work in <code>str</code> internally, and encode once at the boundary on the way out.</p>
+</li>
+<li>
+<p><strong>Building a big string with repeated <code>+</code>.</strong><br>
+   Each step allocates a new string, so the cost grows with the number of pieces. Collect into a list and finish with <code>"".join(...)</code>.</p>
+</li>
+<li>
+<p><strong>Inserting user input into SQL via f-string.</strong><br>
+<code>f"SELECT * FROM users WHERE name = '{name}'"</code> is the start of a SQL injection. Use the DB API placeholders (<code>?</code> or <code>%s</code>) instead. The database series goes deeper.</p>
+</li>
+<li>
+<p><strong>Confusing <code>format</code> and f-strings.</strong><br>
+   f-strings capture variables at the moment they are defined. When the template needs to be filled in later, use <code>template.format(...)</code> or <code>string.Template</code>.</p>
+</li>
+<li>
+<p><strong>Not noticing <code>split()</code> versus <code>split(" ")</code>.</strong><br>
+<code>split()</code> with no argument collapses runs of whitespace. <code>split(" ")</code> keeps empty strings between consecutive spaces. Argument-less <code>split()</code> is usually the safer default for messy input.</p>
+</li>
+</ol>
+<h2>In practice</h2>
+<ul>
+<li><strong>Log messages.</strong> <code>logger.info(f"user={user_id} action={action}")</code> produces lines that are easy to grep and parse. Note that <code>logger.info("user=%s", user_id)</code> lets logging skip formatting when the level is disabled, which can matter in hot paths.</li>
+<li><strong>File paths.</strong> For Windows paths prefer <code>pathlib.Path("C:/Users/name") / "file.txt"</code> over raw strings; the OS picks the right separator.</li>
+<li><strong>Email and URL validation.</strong> Regex alone never validates them perfectly. Filter for shape, then confirm via an out-of-band signal such as sending a confirmation email.</li>
+<li><strong>Tabular output.</strong> When you keep aligning console output by hand, switch to <code>tabulate</code> or <code>rich.table</code>. Hand-counted widths are fragile.</li>
+<li><strong>Internationalization.</strong> Do not bake user-facing strings into the code. Use <code>gettext</code> or an i18n library. Translation extraction tools struggle with bare f-strings.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain that <code>str</code> is a Unicode sequence, distinct from <code>bytes</code></li>
+<li>[ ] I do not get confused about the direction of <code>decode</code> (in) versus <code>encode</code> (out)</li>
+<li>[ ] I use <code>split</code>, <code>join</code>, <code>strip</code>, <code>replace</code>, <code>find</code>, <code>startswith</code>/<code>endswith</code> deliberately</li>
+<li>[ ] I can write <code>:.2f</code>, <code>:&gt;10</code>, <code>:%Y-%m-%d</code>, <code>!r</code>, <code>{var=}</code> from memory</li>
+<li>[ ] I know <code>str</code> is immutable and that every method returns a new string</li>
+<li>[ ] I collect into a list and <code>join</code> instead of repeated <code>+</code> for big strings</li>
+<li>[ ] I never splice user input into SQL with an f-string</li>
+<li>[ ] I have used <code>re.findall</code> with a raw string at least once</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Aligned table printer</strong><br>
+   Given a list like <code>[("ada", 30), ("bob", 28), ("charlie", 41)]</code>, write <code>print_table(rows)</code> that prints the name left-aligned to width 10 and the age right-aligned to width 3.<br>
+   - Success criterion: <code>print_table([("ada", 30)])</code> prints <code>'ada        |  30'</code>.</p>
+</li>
+<li>
+<p><strong>CSV row parser</strong><br>
+   Write <code>parse_row(line: str)</code> that takes <code>"ada, 30, 1700000.5"</code> and returns <code>(name: str, age: int, salary: float)</code>. Strip whitespace; let <code>ValueError</code> propagate when a numeric field cannot parse.<br>
+   - Success criterion: <code>parse_row("ada, 30, 1700000.5")</code> returns <code>('ada', 30, 1700000.5)</code>.</p>
+</li>
+<li>
+<p><strong>Email extractor</strong><br>
+   Write <code>extract_emails(text: str) -&gt; list[str]</code> that returns every email address in the text. Use <code>re.findall</code> with a raw string.<br>
+   - Success criterion: <code>extract_emails("ada@example.com and bob@example.org")</code> returns <code>['ada@example.com', 'bob@example.org']</code>.</p>
+</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>Python 3's <code>str</code> is a sequence of Unicode code points; <code>bytes</code> is a sequence of integers in <code>0..255</code>.</li>
+<li>Encode and decode only at the boundary; inside the program, work exclusively in <code>str</code>.</li>
+<li><code>str</code> is immutable; every method returns a new string.</li>
+<li>f-strings with format specs (<code>:.2f</code>, <code>:&gt;10</code>, <code>:%Y-%m-%d</code>, <code>!r</code>, <code>{var=}</code>) cover almost every output need.</li>
+<li>For big strings, collect into a list and <code>join</code> once. Never splice user input into SQL via an f-string.</li>
+</ul>
+<p>The next chapter compares the four core collections — list, tuple, set, dict — and explains when to reach for each one. Mutability, order, duplicates, and hashability fit on a single page.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Canonical reference for <code>str</code>, <code>bytes</code>, immutability, and core text methods.</li>
+<li><a href="https://docs.python.org/3/howto/unicode.html">Unicode HOWTO</a> — Explains code points, encodings, and the <code>encode</code>/<code>decode</code> boundary model used throughout the chapter.</li>
+<li><a href="https://docs.python.org/3/library/string.html">Python docs — <code>string</code></a> — Documents format string syntax and the format specification mini-language behind aligned output.</li>
+<li><a href="https://peps.python.org/pep-0498/">PEP 498 — Literal String Interpolation</a> — Defines f-strings, expression interpolation, and format specifier behavior.</li>
+<li><a href="https://docs.python.org/3/library/re.html">Python docs — <code>re</code></a> — Relevant for the chapter’s raw-string and backslash guidance around regular expressions.</li>
+<li><a href="https://docs.python.org/3/tutorial/inputoutput.html">Python docs — Input and Output</a> — Adds official examples for <code>repr()</code>, <code>str()</code>, and text formatting in I/O contexts.</li>
+</ul>
+<p class="tags-line">Tags: strings, f-string, format-spec, unicode, string-methods, bytes-and-str</p>
+</body>
+</html>

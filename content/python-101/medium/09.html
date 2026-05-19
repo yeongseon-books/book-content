@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Classes and objects: bundling data with behavior</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Classes and objects: bundling data with behavior</h1>
+<p>A class is not just a mold for data; it is a shared definition of behavior for objects of the same kind. An instance is one concrete object carrying that behavior with its own state.</p>
+<p>This post is the 9th article in the Python 101 series. This is the stage in the series where behavior, state, and object design come together.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you can do the following.</p>
+<ul>
+<li>Define a class with the <code>class</code> statement and create instances from it.</li>
+<li>Explain the role of <code>__init__</code> in instance initialization.</li>
+<li>Explain what <code>self</code> refers to and why it is the first parameter of a method.</li>
+<li>Tell instance attributes apart from class attributes and pick the right one.</li>
+<li>Describe the basic role of dunder methods like <code>__repr__</code>, <code>__str__</code>, and <code>__eq__</code>.</li>
+<li>Describe single inheritance and method overriding.</li>
+<li>Use <code>@dataclass</code> for simple data containers.</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Functions and modules from earlier chapters kept behavior and data apart. A function takes input and returns output; a module groups related functions. When data and the behavior that operates on it are tightly paired, however, keeping them separate scatters the code.</p>
+<p>Imagine modeling user information. You end up with <code>format_user(name, email)</code>, <code>validate_user(name, email)</code>, <code>serialize_user(name, email)</code> — many functions taking the same arguments. Callers have to gather the same fields on each call, and adding a new field forces a change across the related signatures.</p>
+<p>A class bundles data (attributes) and behavior (methods) into a single unit. A <code>User(name, email)</code> instance carries <code>format</code>, <code>validate</code>, and <code>serialize</code> together. The caller passes one object instead of a list of fields.</p>
+<p>This chapter introduces the simplest tools for building that bundle: the <code>class</code> statement and dunder methods.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A class is not a mold for data; it is the definition of behavior shared by objects of the same kind. An instance is an individual object that follows that definition. With that one line in mind, <code>self</code>, class attributes, and dunder methods all find their place.<br>
+The diagram below shows the path from a class definition to a method call on an instance.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three ideas hold this together.</p>
+<ul>
+<li><strong>A class is a template for objects.</strong> The <code>class User:</code> statement creates a class object named <code>User</code>, and calling <code>User(...)</code> produces an instance from that template.</li>
+<li><strong><code>__init__</code> initializes the instance.</strong> Python calls it right after the instance is created, and it is the place where you set attributes with <code>self.attr = value</code>.</li>
+<li><strong>A method call <code>obj.method(x)</code> is really <code>method(obj, x)</code>.</strong> Python passes the instance as the first argument automatically, which is why methods take <code>self</code> as their first parameter.</li>
+</ul>
+<h2>Core concepts</h2>
+<p><strong><code>class</code> and instances</strong></p>
+<p>The simplest class looks like this.</p>
+<pre><code class="language-python">class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+</code></pre>
+<p><code>User("Ada", "a@x")</code> creates an instance and attaches <code>name</code> and <code>email</code> to it. Each instance keeps its own copy.</p>
+<p><strong><code>__init__</code> and <code>self</code></strong></p>
+<p><code>__init__</code> initializes an instance that has been created already. Python handles object creation behind the scenes, and <code>__init__</code> fills in the attributes.</p>
+<p><code>self</code> refers to that newly created instance. The name is a convention rather than syntax, but the rest of the Python ecosystem uses <code>self</code>, so picking another name confuses readers.</p>
+<p><strong>Instance and class attributes</strong></p>
+<pre><code class="language-python">class User:
+    role = &quot;member&quot;  # class attribute
+
+    def __init__(self, name):
+        self.name = name  # instance attribute
+</code></pre>
+<ul>
+<li><code>User.role</code> is shared across instances.</li>
+<li><code>self.name</code> is stored per instance.</li>
+</ul>
+<p>When you write <code>u = User("Ada"); u.role = "admin"</code>, the assignment creates a new attribute on that instance and leaves the class attribute untouched.</p>
+<p><strong>Methods</strong></p>
+<p>A method is a function defined inside a class. Its first parameter receives the instance (<code>self</code>).</p>
+<pre><code class="language-python">class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def label(self):
+        return f&quot;{self.name} &lt;{self.email}&gt;&quot;
+</code></pre>
+<p>When you call <code>u = User("Ada", "a@x"); u.label()</code>, Python rewrites the call as <code>User.label(u)</code>. Inside the method, <code>self.name</code> reads the instance's data.</p>
+<p><strong>Dunder methods: <code>__repr__</code>, <code>__str__</code>, <code>__eq__</code></strong></p>
+<p>Methods with two underscores on each side of the name are called dunder (double-underscore) methods. Many language constructs are defined to call them.</p>
+<ul>
+<li><code>__repr__(self)</code> — debug-friendly string. Returned by <code>repr(obj)</code> and shown when you type the object at a REPL. A reproducible form like <code>User('Ada', 'a@x')</code> is a good default.</li>
+<li><code>__str__(self)</code> — human-readable string. Returned by <code>str(obj)</code> and used by <code>print(obj)</code>. When undefined, Python falls back to <code>__repr__</code>.</li>
+<li><code>__eq__(self, other)</code> — equality comparison. <code>obj1 == obj2</code> calls this method. When undefined, equality compares object identity (<code>is</code>) only.</li>
+</ul>
+<pre><code class="language-python">class User:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def __repr__(self):
+        return f&quot;User({self.name!r}, {self.email!r})&quot;
+
+    def __eq__(self, other):
+        if not isinstance(other, User):
+            return NotImplemented
+        return (self.name, self.email) == (other.name, other.email)
+</code></pre>
+<p><strong>Inheritance and method overriding</strong></p>
+<p>Inheritance creates a new class on top of an existing one.</p>
+<pre><code class="language-python">class Member(User):
+    def label(self):
+        return f&quot;[member] {super().label()}&quot;
+</code></pre>
+<ul>
+<li><code>Member</code> inherits attributes and methods from <code>User</code>.</li>
+<li>Redefining <code>label</code> overrides it for <code>Member</code> instances.</li>
+<li><code>super().label()</code> calls the parent's method without rewriting it.</li>
+</ul>
+<p>Inheritance is powerful, but deep hierarchies make it hard to track where a method came from. For straightforward cases, composition (holding another object as an attribute) is often the safer first choice.</p>
+<p><strong>Simplifying with <code>@dataclass</code></strong></p>
+<p>When you write classes that are mostly data containers, you write <code>__init__</code>, <code>__repr__</code>, and <code>__eq__</code> by hand again and again. <code>@dataclass</code> generates those three methods for you.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    email: str
+</code></pre>
+<p>This block generates field-based <code>__init__</code>, <code>__eq__</code>, and a default <code>__repr__</code> automatically. Its default <code>__repr__</code> includes field names, such as <code>User(name='Ada', email='a@x')</code>, so it is not identical to the hand-written example above.</p>
+<h2>Before-After</h2>
+<p>The code below models user information.</p>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def make_user(name, email):
+    return {&quot;name&quot;: name, &quot;email&quot;: email}
+
+def user_label(user):
+    return f&quot;{user['name']} &lt;{user['email']}&gt;&quot;
+
+def user_equal(a, b):
+    return a[&quot;name&quot;] == b[&quot;name&quot;] and a[&quot;email&quot;] == b[&quot;email&quot;]
+</code></pre>
+<p>This snippet has three problems.</p>
+<ul>
+<li>The shape <code>{"name": ..., "email": ...}</code> repeats across the codebase. Adding a field forces a change to multiple functions.</li>
+<li>The caller has to remember the dict keys exactly. A typo only shows up at runtime.</li>
+<li>Equality has to be implemented by hand.</li>
+</ul>
+<p><strong>After</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    email: str
+
+    def label(self):
+        return f&quot;{self.name} &lt;{self.email}&gt;&quot;
+</code></pre>
+<p>Three changes happened.</p>
+<ul>
+<li>The data shape lives in one class definition. Adding a field is one new line.</li>
+<li>Attribute access lets the IDE and static analyzers help with completion and checks.</li>
+<li><code>__init__</code>, <code>__repr__</code>, and <code>__eq__</code> are produced by <code>@dataclass</code>.</li>
+</ul>
+<h2>Step-by-step practice</h2>
+<p>Open a REPL and follow along. Blocks marked with <code>&gt;&gt;&gt;</code> are REPL transcripts; the other code blocks are illustrative snippets.</p>
+<p><strong>1. Build the simplest class</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...
+&gt;&gt;&gt; u = User(&quot;Ada&quot;, &quot;a@x&quot;)
+&gt;&gt;&gt; u.name
+'Ada'
+&gt;&gt;&gt; u.email
+'a@x'
+</code></pre>
+<p><strong>2. Add a method</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def label(self):
+...         return f&quot;{self.name} &lt;{self.email}&gt;&quot;
+...
+&gt;&gt;&gt; User(&quot;Ada&quot;, &quot;a@x&quot;).label()
+'Ada &lt;a@x&gt;'
+</code></pre>
+<p><code>label()</code> receives <code>self</code> automatically, so the call site does not pass it.</p>
+<p><strong>3. Define <code>__repr__</code> for a useful display</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def __repr__(self):
+...         return f&quot;User({self.name!r}, {self.email!r})&quot;
+...
+&gt;&gt;&gt; User(&quot;Ada&quot;, &quot;a@x&quot;)
+User('Ada', 'a@x')
+</code></pre>
+<p>Without <code>__repr__</code>, the default shows something like <code>&lt;__main__.User object at 0x...&gt;</code> with a memory address.</p>
+<p><strong>4. Define <code>__eq__</code> for value comparison</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def __eq__(self, other):
+...         if not isinstance(other, User):
+...             return NotImplemented
+...         return (self.name, self.email) == (other.name, other.email)
+...
+&gt;&gt;&gt; User(&quot;Ada&quot;, &quot;a@x&quot;) == User(&quot;Ada&quot;, &quot;a@x&quot;)
+True
+&gt;&gt;&gt; User(&quot;Ada&quot;, &quot;a@x&quot;) == User(&quot;Bob&quot;, &quot;b@x&quot;)
+False
+</code></pre>
+<p><strong>5. Inheritance with <code>super()</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; class User:
+...     def __init__(self, name, email):
+...         self.name = name
+...         self.email = email
+...     def label(self):
+...         return f&quot;{self.name} &lt;{self.email}&gt;&quot;
+...
+&gt;&gt;&gt; class Member(User):
+...     def label(self):
+...         return f&quot;[member] {super().label()}&quot;
+...
+&gt;&gt;&gt; Member(&quot;Ada&quot;, &quot;a@x&quot;).label()
+'[member] Ada &lt;a@x&gt;'
+</code></pre>
+<p><strong>6. Compress with <code>@dataclass</code></strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; from dataclasses import dataclass
+&gt;&gt;&gt; @dataclass
+... class User:
+...     name: str
+...     email: str
+...
+&gt;&gt;&gt; u = User(&quot;Ada&quot;, &quot;a@x&quot;)
+&gt;&gt;&gt; u
+User(name='Ada', email='a@x')
+&gt;&gt;&gt; u == User(&quot;Ada&quot;, &quot;a@x&quot;)
+True
+</code></pre>
+<p><code>__init__</code>, <code>__repr__</code>, and <code>__eq__</code> are generated automatically.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Forgetting <code>self</code></strong> — when the first parameter is missing, calls fail with a <code>TypeError</code> about argument count.</li>
+<li><strong>Mutable class attributes</strong> — writing <code>class C: items = []</code> makes one list shared across instances, which is a frequent source of bugs. Build mutable defaults inside <code>__init__</code>.</li>
+<li><strong>Returning a value from <code>__init__</code></strong> — <code>__init__</code> is meant to return <code>None</code>. Returning anything else raises <code>TypeError</code>.</li>
+<li><strong>Defining only <code>__str__</code></strong> — the REPL and most logs will still show a memory address. Define <code>__repr__</code> first as your debug-friendly default.</li>
+<li><strong>Stacking deep inheritance</strong> — once a hierarchy is three or more layers deep, tracking methods becomes painful. Try composition first.</li>
+<li><strong>Hand-writing data containers</strong> — <code>@dataclass</code> removes much of the boilerplate when the class is mostly fields.</li>
+<li><strong>Mixing up <code>is</code> and <code>==</code></strong> — <code>is</code> checks object identity; <code>==</code> checks equality. They agree until you define <code>__eq__</code>, and then they diverge by design.</li>
+</ul>
+<h2>In real projects</h2>
+<p>Classes tend to show up in these places.</p>
+<ul>
+<li><strong>Domain models</strong>: business concepts like <code>User</code>, <code>Order</code>, and <code>Invoice</code> map directly to classes. <code>@dataclass</code> fits simple models well.</li>
+<li><strong>External resource handles</strong>: DB connections, HTTP clients, and file handles carry state, and a class is a natural wrapper. Adding <code>__enter__</code>/<code>__exit__</code> lets the object work inside a <code>with</code> block.</li>
+<li><strong>Policy or strategy objects</strong>: implementations that share an interface (for example <code>JSONFormatter</code>, <code>TextFormatter</code>) sit naturally in classes, and the caller depends only on the interface.</li>
+<li><strong>Test doubles</strong>: <code>Fake</code>, <code>Stub</code>, and <code>Spy</code> helpers are usually small classes.</li>
+<li><strong>State machines</strong>: workflows with explicit state transitions (order status, job stages) gather their transition logic neatly inside one class.</li>
+</ul>
+<p>Plenty of business logic is fine as plain functions. Classes earn their cost when data and behavior are tightly paired or when several implementations need to share an interface.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can define a class with <code>class</code> and create instances from it.</li>
+<li>[ ] You can describe the role of <code>__init__</code> and <code>self</code> in one sentence each.</li>
+<li>[ ] You can tell instance attributes apart from class attributes.</li>
+<li>[ ] You can describe the basic role of <code>__repr__</code>, <code>__str__</code>, and <code>__eq__</code>.</li>
+<li>[ ] You can use single inheritance and call <code>super()</code>.</li>
+<li>[ ] You can apply <code>@dataclass</code> to a simple data container.</li>
+<li>[ ] You can describe the difference between <code>is</code> and <code>==</code> in one sentence.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Define a <code>Point</code> class with <code>__init__(x, y)</code> and a <code>distance_to(other)</code> method that returns the distance between two points.</li>
+<li>Add <code>__repr__</code> and <code>__eq__</code> to <code>Point</code> so that <code>Point(1, 2) == Point(1, 2)</code> evaluates to <code>True</code>.</li>
+<li>Rewrite <code>Point</code> using <code>@dataclass</code> and confirm in a REPL that the behavior matches.</li>
+<li>Define an <code>Animal</code> class and a <code>Dog(Animal)</code> subclass that overrides <code>speak()</code>. Have <code>Dog.speak</code> call <code>super().speak()</code> as part of its result.</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>A class bundles data and behavior so the caller can pass one object instead of a list of fields.</li>
+<li><code>__init__</code> initializes an instance, and <code>self</code> refers to that instance inside methods.</li>
+<li>Dunder methods like <code>__repr__</code>, <code>__str__</code>, and <code>__eq__</code> define how language constructs interact with your objects.</li>
+<li>Inheritance is powerful but harder to follow as it deepens, so composition is often a safer first option.</li>
+<li><code>@dataclass</code> removes the <code>__init__</code>/<code>__repr__</code>/<code>__eq__</code> boilerplate for simple data containers.</li>
+</ul>
+<p>The next chapter is a tour of the standard library. Now that functions, modules, and classes are in place, you will see what Python ships with by default.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/classes.html">Python tutorial — Classes</a> — Core guide to <code>class</code>, instances, methods, inheritance, and class-versus-instance variables.</li>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python docs — Data model</a> — Formal source for attribute lookup, method binding, and special method behavior.</li>
+<li><a href="https://docs.python.org/3/library/functions.html">Python docs — Built-in Functions</a> — Useful reference for <code>isinstance()</code>, <code>super()</code>, and related builtins used with classes.</li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python docs — <code>dataclasses</code></a> — Standard-library tool for generating <code>__init__</code>, <code>__repr__</code>, and comparison methods automatically.</li>
+<li><a href="https://peps.python.org/pep-0557/">PEP 557 — Data Classes</a> — Explains the rationale and semantics behind dataclass generation.</li>
+</ul>
+<p class="tags-line">Tags: class-and-instance, init-method, self-parameter, dunder-methods, inheritance, dataclass</p>
+</body>
+</html>

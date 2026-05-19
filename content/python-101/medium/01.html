@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why Python, and how to install and use venv</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why Python, and how to install and use venv</h1>
+<p>One computer can host many Pythons at once, and every project gets its own. If you miss that model early, environment problems pile up faster than syntax problems.</p>
+<p>This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>Why "just installing Python" is risky, and why you must separate system Python from project Python</li>
+<li>How to install Python 3.12 safely on macOS, Windows, and Linux</li>
+<li>What a venv (virtual environment) actually solves</li>
+<li>The difference between <code>python</code> and <code>python3</code>, and which one to use when</li>
+<li>How to create, activate, and <strong>verify</strong> that you are inside a project venv</li>
+<li>How to install packages with pip and reproduce environments with <code>requirements.txt</code></li>
+</ul>
+<h2>Why this matters</h2>
+<p>The single biggest source of pain when you start with Python is not syntax. It is <strong>environment</strong>.</p>
+<p>Code that ran fine yesterday breaks today. A script that works on your laptop throws import errors on your colleague's machine. <code>pip install</code> fails with a permission error. The cause behind almost all of these is the same: <strong>you are installing packages into the system Python.</strong></p>
+<p>System Python is the Python that the operating system itself uses. macOS uses it for some tools, Linux relies on it for <code>apt</code>, and many system scripts trust it to behave a specific way. The moment you install or upgrade packages into it, you risk silently breaking parts of your OS. Experienced Python users follow one rule: <strong>never touch system Python.</strong> Instead, they create one isolated Python environment per project and install packages only inside it. That isolated environment is a venv.</p>
+<p>Make venv a habit on day one and roughly 80% of the dependency conflicts, version mismatches, and "works on my machine" stories you would otherwise meet just disappear.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>One computer can host many Pythons at once, and every project gets its own.</p>
+</blockquote>
+<p>That single sentence is the heart of this article.</p>
+<ul>
+<li>system Python: belongs to the OS. You do not touch it.</li>
+<li>project Python (venv): a copy living inside the project folder. You install packages only here.</li>
+<li>Ten projects? Ten venvs. They cannot affect each other.</li>
+</ul>
+<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png"></p>
+<p><em>Mental Model</em><br>
+System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.</p>
+<h2>Core Concepts</h2>
+<p><strong>1. Flavors of Python</strong></p>
+<ul>
+<li><strong>CPython</strong>: the official Python implementation, the one you download from python.org. Almost every tutorial assumes CPython, and so does this article (CPython 3.12).</li>
+<li><strong>system Python</strong>: the Python preinstalled by your OS. macOS and Linux usually ship one. It is often older, and the OS depends on it.</li>
+<li><strong>user-installed Python</strong>: Python installed via the python.org installer, Homebrew, pyenv, uv, etc. This is the one you actually develop against.</li>
+</ul>
+<p><strong>2. <code>python</code> vs <code>python3</code></strong></p>
+<p>Two commands, same name, lots of confusion. The rule is simple:</p>
+<ul>
+<li>On macOS and Linux, <code>python3</code> points to Python 3. <code>python</code> may not exist or may point to the ancient Python 2, which is dangerous. So <strong>in a shell, always use <code>python3</code> before activating a venv.</strong></li>
+<li>On Windows, the official installer creates <code>python</code> (and the <code>py</code> launcher). <code>python3</code> may not exist.</li>
+<li>After activating a venv, just <code>python</code> is fine on every OS — it points to the venv's Python.</li>
+</ul>
+<p>In this article we use <code>python3</code> (or <code>py -3</code> on Windows) before activation, and plain <code>python</code> after activation.</p>
+<p><strong>3. venv (virtual environment)</strong></p>
+<p><code>venv</code> is built into the Python standard library. Running <code>python3.12 -m venv .venv</code> (always pin the version explicitly — see Common Mistake 6) creates a <code>.venv/</code> folder containing a copy (or link to) the Python interpreter and an empty <code>site-packages/</code>. Activating the venv makes <code>python</code> and <code>pip</code> point at the binaries inside it. Deactivating returns you to the system environment.</p>
+<p><strong>4. pip and requirements.txt</strong></p>
+<p><code>pip</code> is Python's package manager. <code>pip install requests</code> installs the package into the active venv's <code>site-packages/</code>. <code>pip freeze &gt; requirements.txt</code> writes the current state to a file, and a teammate can run <code>pip install -r requirements.txt</code> to reproduce the same environment. This is the basic unit of collaboration and deployment in Python.</p>
+<h2>Before / After</h2>
+<p><strong>Before — installing into system Python</strong></p>
+<pre><code class="language-bash">$ pip install requests
+ERROR: Could not install packages due to an EnvironmentError: [Errno 13] Permission denied
+$ sudo pip install requests   # please don't
+</code></pre>
+<p><code>sudo pip install</code> may appear to work, but it pollutes the system Python. The next OS update or <code>brew</code> invocation may fail in ways that take hours to diagnose.</p>
+<p><strong>After — installing inside a venv</strong></p>
+<pre><code class="language-bash">$ python3.12 -m venv .venv
+$ source .venv/bin/activate         # macOS/Linux
+(.venv) $ pip install requests
+Successfully installed requests-2.32.3
+(.venv) $ which python
+/Users/me/myproj/.venv/bin/python
+</code></pre>
+<p>The <code>(.venv)</code> prompt appears, and <code>which python</code> points inside your project. Every package installed in this state lives only under <code>.venv/</code>, and deleting the folder removes it cleanly.</p>
+<h2>Step-by-step Walkthrough</h2>
+<p><strong>1) Install Python 3.12</strong></p>
+<p><strong>macOS</strong> (using Homebrew):</p>
+<pre><code class="language-bash">brew install python@3.12
+python3.12 --version
+# Python 3.12.x
+</code></pre>
+<p><strong>Windows</strong> (using the python.org installer):</p>
+<ol>
+<li>Download the Python 3.12 installer from https://www.python.org/downloads/.</li>
+<li><strong>Check "Add python.exe to PATH"</strong> during installation.</li>
+<li>After installation, in PowerShell:</li>
+</ol>
+<pre><code class="language-powershell">py -3.12 --version
+# Python 3.12.x
+</code></pre>
+<p><strong>Linux</strong> (Ubuntu/Debian):</p>
+<pre><code class="language-bash">sudo apt update
+sudo apt install python3 python3-venv     # whichever Python 3 your distro ships
+python3 --version
+</code></pre>
+<p>On Debian-family distros you must install the matching <code>-venv</code> package or <code>python3 -m venv</code> will fail with a cryptic error — a classic trap. If your distro's packaged Python is older than 3.12, the safest route is the <code>deadsnakes</code> PPA on Ubuntu (<code>sudo add-apt-repository ppa:deadsnakes/ppa</code> then <code>sudo apt install python3.12 python3.12-venv</code>), or installing Python 3.12 separately via <code>pyenv</code> or <code>uv</code>. The point is: never replace or upgrade the system Python itself.</p>
+<p><strong>2) Create the project folder and the venv</strong></p>
+<pre><code class="language-bash">mkdir hello-python &amp;&amp; cd hello-python
+python3.12 -m venv .venv
+</code></pre>
+<p>A <code>.venv/</code> folder appears. Do not commit it to git — add <code>.venv/</code> to your <code>.gitignore</code> later in this article.</p>
+<p><strong>3) Activate</strong></p>
+<p><strong>macOS / Linux</strong>:</p>
+<pre><code class="language-bash">source .venv/bin/activate
+</code></pre>
+<p><strong>Windows PowerShell</strong>:</p>
+<pre><code class="language-powershell">.\.venv\Scripts\Activate.ps1
+</code></pre>
+<p>If PowerShell complains "running scripts is disabled on this system," set the user-level execution policy once:</p>
+<pre><code class="language-powershell">Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+</code></pre>
+<p>When activation succeeds, your prompt is prefixed with <code>(.venv)</code>.</p>
+<p><strong>4) Verify the isolation (do not skip this)</strong></p>
+<p>This step is the most important one in the entire article. Activation alone is not proof — confirm that you are really running the venv's Python with three commands.</p>
+<p>macOS / Linux:</p>
+<pre><code class="language-bash">(.venv) $ which python
+/Users/me/hello-python/.venv/bin/python
+
+(.venv) $ python -c &quot;import sys; print(sys.executable)&quot;
+/Users/me/hello-python/.venv/bin/python
+
+(.venv) $ pip --version
+pip 24.x from /Users/me/hello-python/.venv/lib/python3.12/site-packages/pip (python 3.12)
+</code></pre>
+<p>Windows:</p>
+<pre><code class="language-powershell">(.venv) PS&gt; where python
+C:\Users\me\hello-python\.venv\Scripts\python.exe
+
+(.venv) PS&gt; python -c &quot;import sys; print(sys.executable)&quot;
+C:\Users\me\hello-python\.venv\Scripts\python.exe
+
+(.venv) PS&gt; pip --version
+pip 24.x from C:\Users\me\hello-python\.venv\Lib\site-packages\pip (python 3.12)
+</code></pre>
+<p>If all three commands point inside <code>.venv</code>, isolation is working. If you see a system path (e.g., <code>/usr/bin/python</code> on macOS/Linux, <code>C:\Python312\python.exe</code> on Windows), activation failed — re-run <code>source .venv/bin/activate</code> (macOS/Linux) or <code>.\.venv\Scripts\Activate.ps1</code> (Windows) and try again.</p>
+<p><strong>5) Your first script (no network needed)</strong></p>
+<p>Start with something that proves Python is running, with zero external dependencies. <code>hello.py</code>:</p>
+<pre><code class="language-python">import sys
+import platform
+
+print(f&quot;Hello from Python {sys.version_info.major}.{sys.version_info.minor}&quot;)
+print(f&quot;Running on: {platform.system()} {platform.release()}&quot;)
+print(f&quot;Interpreter path: {sys.executable}&quot;)
+</code></pre>
+<p>Run it:</p>
+<pre><code class="language-bash">(.venv) $ python hello.py
+Hello from Python 3.12
+Running on: Darwin 23.x.x
+Interpreter path: /Users/me/hello-python/.venv/bin/python
+</code></pre>
+<p>If you see this output, Python inside your venv is executing your code correctly. The script has no external dependencies, so it works the same way offline.</p>
+<p><strong>6) Install a package and pin it</strong></p>
+<p>Now install a real package (network required):</p>
+<pre><code class="language-bash">(.venv) $ pip install requests
+(.venv) $ pip freeze &gt; requirements.txt
+(.venv) $ cat requirements.txt
+certifi==2024.x.x
+charset-normalizer==3.x.x
+idna==3.x
+requests==2.32.3
+urllib3==2.x.x
+</code></pre>
+<p>Commit <code>requirements.txt</code> to git, and a teammate can reproduce the same environment:</p>
+<pre><code class="language-bash">python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+</code></pre>
+<p><strong>7) Deactivate</strong></p>
+<p>When you finish:</p>
+<pre><code class="language-bash">(.venv) $ deactivate
+$
+</code></pre>
+<p>The <code>(.venv)</code> prefix disappears. You are back in the system environment.</p>
+<h2>Common Mistakes</h2>
+<p><strong>1. Reaching for <code>sudo pip install</code></strong><br>
+Seeing a "permission denied" error makes you want to add <code>sudo</code>. Do not. The permission error itself is a signal that you are about to write into system Python. Move into a project folder and create a venv instead.</p>
+<p><strong>2. Mixing <code>python</code> and <code>python3</code></strong><br>
+Typing <code>python</code> in a shell can resolve to almost anything depending on the OS and history. <strong>Before activating a venv, always type <code>python3</code> (or <code>py -3</code> on Windows).</strong> After activation, plain <code>python</code> is safe — it resolves to the venv.</p>
+<p><strong>3. Creating the venv but forgetting to activate it</strong><br>
+A surprising number of beginners run <code>python3.12 -m venv .venv</code>, then immediately <code>pip install ...</code> without activating. The install lands in system Python again. Always confirm the <code>(.venv)</code> prompt <strong>and</strong> the output of <code>which python</code>.</p>
+<p><strong>4. Misreading PowerShell activation errors as "Python errors"</strong><br>
+"Running scripts is disabled on this system" is a Windows security policy issue, not a Python problem. One-time fix: <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code>.</p>
+<p><strong>5. Committing <code>.venv/</code> to git</strong><br>
+<code>.venv/</code> contains binaries tied to your specific OS and Python version, so it cannot be reused by anyone else. Always add it to <code>.gitignore</code> and let <code>requirements.txt</code> carry the reproducibility burden.</p>
+<p><strong>6. Using <code>python3 -m venv</code> instead of <code>python3.12 -m venv</code></strong><br>
+If you have multiple Python versions installed (3.10 and 3.12, say), <code>python3</code> is ambiguous. <strong>Always pick the version explicitly when creating a venv</strong>, e.g., <code>python3.12 -m venv .venv</code>. Once created, the venv is permanently bound to that interpreter version.</p>
+<h2>Production Patterns</h2>
+<p><strong>1. Standard project layout</strong></p>
+<p>Start every project with the same shape so you have zero cognitive overhead when you open it months later:</p>
+<pre><code class="language-text">hello-python/
+├── .venv/              # not committed
+├── .gitignore          # includes .venv/ and __pycache__/
+├── requirements.txt    # runtime dependencies
+├── requirements-dev.txt # dev tools (pytest, ruff, etc.)
+└── src/
+    └── hello.py
+</code></pre>
+<p><strong>2. Split runtime and dev dependencies</strong></p>
+<p>Put runtime-only packages in <code>requirements.txt</code> and testing/lint tools in <code>requirements-dev.txt</code>. CI installs both, but production containers only install <code>requirements.txt</code> — smaller image, smaller attack surface.</p>
+<p><strong>3. Pin versions explicitly</strong></p>
+<p><code>pip freeze</code> produces lines like <code>requests==2.32.3</code> with the version locked. This is intentional. Allowing "any version" means a working build today can break tomorrow when an upstream release ships a regression. Pin everything that ends up in production.</p>
+<p><strong>4. Pin the Python version too</strong></p>
+<p>Drop a <code>.python-version</code> file at the project root containing <code>3.12</code>. pyenv, uv, and several IDEs respect it automatically and pick the right interpreter, which removes the "what Python version are you on?" question from every code review.</p>
+<p><strong>5. Treat uv and Poetry as next steps</strong></p>
+<p>Newer tools like <code>uv</code> and <code>poetry</code> are faster and more powerful, but they are built on top of the same venv concept. Get fluent with plain venv + pip first, and you will recognize the same primitives no matter which tool you adopt later.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Installed Python 3.12 and verified with <code>python3.12 --version</code> (or <code>py -3.12 --version</code> on Windows)</li>
+<li>[ ] Created a venv with <code>python3.12 -m venv .venv</code> inside a project folder</li>
+<li>[ ] Saw the <code>(.venv)</code> prefix appear after activation</li>
+<li>[ ] <code>which python</code> (or <code>where python</code> on Windows) points into <code>.venv</code></li>
+<li>[ ] <code>python -c "import sys; print(sys.executable)"</code> prints the same path</li>
+<li>[ ] Added <code>.venv/</code> to <code>.gitignore</code></li>
+<li>[ ] Captured dependencies with <code>pip freeze &gt; requirements.txt</code></li>
+<li>[ ] Reproduced the same environment in a fresh folder using <code>pip install -r requirements.txt</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Two venvs, two versions of the same package</strong><br>
+   Create two folders, <code>proj-a</code> and <code>proj-b</code>. In <code>proj-a</code>, install <code>requests==2.20.0</code>. In <code>proj-b</code>, install <code>requests==2.32.3</code>. Run <code>python -c "import requests; print(requests.__version__)"</code> in each.<br>
+   - Success criterion: each venv reports a different version, and installing in one does not affect the other.</p>
+</li>
+<li>
+<p><strong>Reproduce an environment from requirements.txt</strong><br>
+   In <code>proj-a</code>, run <code>pip freeze &gt; requirements.txt</code>. Then create a third folder <code>proj-c</code>, make a fresh venv, and run <code>pip install -r requirements.txt</code> from <code>proj-a</code>'s file.<br>
+   - Success criterion: <code>pip list</code> in <code>proj-c</code> matches <code>proj-a</code> exactly, including transitive packages.</p>
+</li>
+<li>
+<p><strong>See system vs venv Python with your own eyes</strong><br>
+   Run <code>python3 -c "import sys; print(sys.executable)"</code> once with no venv active and once after activating any venv.<br>
+   - Success criterion: deactivated state shows a system path (e.g., <code>/usr/bin/python3</code>); activated state shows a path under <code>.venv</code>.</p>
+</li>
+</ol>
+<h2>Summary</h2>
+<ul>
+<li>System Python belongs to the OS. Never <code>pip install</code> into it.</li>
+<li>Create an isolated environment per project with <code>python3.12 -m venv .venv</code>.</li>
+<li>After activation, verify isolation with <code>which python</code> — this single step prevents half of your future environment bugs.</li>
+<li>Document your environment with <code>pip freeze &gt; requirements.txt</code>; teammates reproduce it with <code>pip install -r requirements.txt</code>.</li>
+<li>Use <code>python</code> inside a venv, but always <code>python3</code> outside one.</li>
+</ul>
+<h2>Next</h2>
+<p>The next article covers variables, types, and operators: what dynamic typing really means, why type hints exist, and how int, float, str, bool, and None behave differently in practice.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/venv.html">Python docs — venv</a> — Authoritative reference for <code>python -m venv</code>, activation scripts, and environment isolation.</li>
+<li><a href="https://peps.python.org/pep-0405/">PEP 405 — Python Virtual Environments</a> — Explains the design behind venv, including <code>sys.prefix</code> and site-packages separation.</li>
+<li><a href="https://pip.pypa.io/en/stable/user_guide/">pip User Guide</a> — Canonical guide for <code>python -m pip</code>, <code>pip freeze</code>, and requirements-based installs.</li>
+<li><a href="https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/">Python Packaging User Guide — Install packages in a virtual environment using pip and venv</a> — Maps directly to the project-level <code>.venv</code> workflow used in the chapter.</li>
+<li><a href="https://www.python.org/downloads/">Python.org Downloads</a> — Official source for installer downloads and supported release lines.</li>
+<li><a href="https://docs.python.org/3/using/windows.html">Python docs — Using Python on Windows</a> — Covers the Windows launcher, install manager, and venv usage described for Windows users.</li>
+</ul>
+<p class="tags-line">Tags: Python, virtual-environments, environment-isolation, python-installation, package-management, developer-setup</p>
+</body>
+</html>

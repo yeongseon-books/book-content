@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>list, tuple, set, dict</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>list, tuple, set, dict</h1>
+<p>These four collections diverge along four axes: mutability, order, duplicates, and hashability. Picking the right one is really about choosing which trade-offs matter for the job.</p>
+<p>This post is the 4th article in the Python 101 series. This is the stage in the series where collection trade-offs become concrete.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you will be able to explain and code the following:</p>
+<ul>
+<li>How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability</li>
+<li>A first-cut decision rule for which collection to reach for</li>
+<li>Core methods like slicing, <code>append</code>/<code>extend</code>, <code>pop</code>, <code>update</code></li>
+<li>One-line data transformations through list, set, and dict comprehensions</li>
+<li>What "hashable" means and why dict keys and set members must be hashable</li>
+<li>The aliasing accidents that come from confusing assignment with copying</li>
+<li>The mutable-default-argument trap and how to avoid it</li>
+<li>How <code>dict.get</code>, <code>setdefault</code>, and <code>collections.defaultdict</code> keep missing keys safe</li>
+</ul>
+<p>Code blocks marked with <code>&gt;&gt;&gt;</code> are REPL transcripts you can paste directly. Blocks without <code>&gt;&gt;&gt;</code> are illustrative excerpts that assume the surrounding variables already exist.</p>
+<h2>Why this matters</h2>
+<p>Choosing a collection determines both the performance and the meaning of the code. Reach for <code>dict</code> where a <code>list</code> would do, and the code grows heavy. Reach for a <code>list</code> where a <code>set</code> belongs, and a single membership check becomes O(n) — slowing down with every new element. Conversely, expressing an immutable bundle as a <code>list</code> invites someone to mutate what was supposed to be fixed; the type system gives no warning.</p>
+<p>Recurring accidents in production code:</p>
+<ul>
+<li>"Copying" a list with <code>=</code>, mutating one side, and finding both sides changed because they shared the same object.</li>
+<li>Writing <code>def f(items=[]):</code> and watching the default list grow with every call.</li>
+<li>Crashing with <code>KeyError</code> because a missing key was fetched with <code>d[key]</code> instead of <code>d.get(key)</code>.</li>
+<li>Hitting <code>TypeError: unhashable type</code> after putting a <code>list</code> or <code>dict</code> into a <code>set</code>.</li>
+</ul>
+<p>This chapter consolidates the four collections onto a single page so the next chapter on control flow can pick the right structure deliberately.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>The four collections differ along four axes: mutability, order, duplicates allowed, and hashability. Choosing a collection is choosing which guarantees on those four axes you accept and which you give up.<br>
+Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three rules carry most of the weight.</p>
+<ol>
+<li><strong>Mutable (list, dict, set)</strong> can be changed in place after creation; <strong>immutable (tuple, str, int)</strong> cannot.</li>
+<li><strong>Dict keys and set elements must be hashable.</strong> A tuple is hashable when every element inside it is hashable.</li>
+<li><strong>Dict and set lookup is O(1) on average,</strong> while list membership is O(n). When "is X here?" is a frequent question, reach for set or dict.</li>
+</ol>
+<h2>Core concepts</h2>
+<p><strong>1) list — ordered and mutable</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; nums = [3, 1, 4, 1, 5]
+&gt;&gt;&gt; nums.append(9)
+&gt;&gt;&gt; nums
+[3, 1, 4, 1, 5, 9]
+&gt;&gt;&gt; nums[0]
+3
+&gt;&gt;&gt; nums[-1]
+9
+&gt;&gt;&gt; nums[1:4]
+[1, 4, 1]
+&gt;&gt;&gt; sorted(nums)
+[1, 1, 3, 4, 5, 9]
+&gt;&gt;&gt; nums.sort()      # in place; returns None
+&gt;&gt;&gt; nums
+[1, 1, 3, 4, 5, 9]
+</code></pre>
+<p><code>sorted(nums)</code> returns a <strong>new list</strong>; <code>nums.sort()</code> sorts <strong>in place</strong> and returns <code>None</code>. The <code>None</code> return trips up beginners who try <code>for n in nums.sort():</code>.</p>
+<p><code>append</code> versus <code>extend</code> is another classic confusion.</p>
+<pre><code class="language-text">&gt;&gt;&gt; a = [1, 2]
+&gt;&gt;&gt; a.append([3, 4])
+&gt;&gt;&gt; a
+[1, 2, [3, 4]]            # the whole list is added as one element
+&gt;&gt;&gt; a = [1, 2]
+&gt;&gt;&gt; a.extend([3, 4])
+&gt;&gt;&gt; a
+[1, 2, 3, 4]              # elements are added one by one
+</code></pre>
+<p><strong>2) tuple — ordered and immutable</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; point = (3, 4)
+&gt;&gt;&gt; x, y = point          # unpacking
+&gt;&gt;&gt; x, y
+(3, 4)
+&gt;&gt;&gt; point[0] = 10
+Traceback (most recent call last):
+  ...
+TypeError: 'tuple' object does not support item assignment
+</code></pre>
+<p>Tuples express identity for a small bundle of values: a coordinate <code>(x, y)</code>, an RGB triple <code>(255, 0, 0)</code>, a row from a database. To make the meaning even more explicit, reach for <code>collections.namedtuple</code> or <code>dataclasses.dataclass(frozen=True)</code>.</p>
+<p>A single-element tuple needs the trailing comma. <code>(1)</code> is just an integer.</p>
+<pre><code class="language-text">&gt;&gt;&gt; type((1))
+&lt;class 'int'&gt;
+&gt;&gt;&gt; type((1,))
+&lt;class 'tuple'&gt;
+</code></pre>
+<p><strong>3) set — unordered, no duplicates</strong></p>
+<p>Sets shine at membership checks and deduplication.</p>
+<pre><code class="language-text">&gt;&gt;&gt; seen = {1, 2, 3}
+&gt;&gt;&gt; seen.add(2)             # already present; ignored
+&gt;&gt;&gt; seen
+{1, 2, 3}
+&gt;&gt;&gt; 2 in seen
+True
+&gt;&gt;&gt; {1, 2, 3} &amp; {2, 3, 4}   # intersection
+{2, 3}
+&gt;&gt;&gt; {1, 2, 3} | {2, 3, 4}   # union
+{1, 2, 3, 4}
+&gt;&gt;&gt; {1, 2, 3} - {2}         # difference
+{1, 3}
+</code></pre>
+<p>The empty set is <code>set()</code>, not <code>{}</code>. <code>{}</code> is an empty dict.</p>
+<pre><code class="language-text">&gt;&gt;&gt; type({})
+&lt;class 'dict'&gt;
+&gt;&gt;&gt; type(set())
+&lt;class 'set'&gt;
+</code></pre>
+<p>A set's iteration order is not guaranteed. When tests compare output, sort first: <code>sorted(seen)</code>.</p>
+<p><strong>4) dict — key-to-value mapping, mutable, keys unique</strong></p>
+<p><code>dict</code> is the workhorse. From Python 3.7 onward it preserves insertion order.</p>
+<pre><code class="language-text">&gt;&gt;&gt; user = {&quot;name&quot;: &quot;ada&quot;, &quot;age&quot;: 30}
+&gt;&gt;&gt; user[&quot;name&quot;]
+'ada'
+&gt;&gt;&gt; user[&quot;email&quot;] = &quot;ada@example.com&quot;
+&gt;&gt;&gt; user
+{'name': 'ada', 'age': 30, 'email': 'ada@example.com'}
+&gt;&gt;&gt; &quot;age&quot; in user
+True
+&gt;&gt;&gt; user.get(&quot;phone&quot;)          # missing → None
+&gt;&gt;&gt; user.get(&quot;phone&quot;, &quot;N/A&quot;)
+'N/A'
+&gt;&gt;&gt; list(user.keys())
+['name', 'age', 'email']
+&gt;&gt;&gt; list(user.items())
+[('name', 'ada'), ('age', 30), ('email', 'ada@example.com')]
+</code></pre>
+<p><code>d[key]</code> raises <code>KeyError</code> for a missing key. When the key may legitimately be absent, use <code>get</code>.</p>
+<p><strong>5) What hashable means</strong></p>
+<p>Dict keys and set members must be <strong>hashable</strong> — once created their value cannot change, and they implement <code>__hash__</code>.</p>
+<ul>
+<li>Hashable: <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>bytes</code>, and a <code>tuple</code> whose elements are all hashable.</li>
+<li>Not hashable: <code>list</code>, <code>set</code>, <code>dict</code> — being mutable, their hash could change underneath the container.</li>
+</ul>
+<pre><code class="language-text">&gt;&gt;&gt; {(1, 2), (3, 4)}                    # tuples are hashable
+{(1, 2), (3, 4)}
+&gt;&gt;&gt; {[1, 2], [3, 4]}
+Traceback (most recent call last):
+  ...
+TypeError: unhashable type: 'list'
+</code></pre>
+<p>To put a set inside a set, use <code>frozenset</code>.</p>
+<p><strong>6) Comprehensions — transform in one line</strong></p>
+<p>list, set, and dict each support comprehension syntax.</p>
+<pre><code class="language-text">&gt;&gt;&gt; [n * n for n in range(5)]
+[0, 1, 4, 9, 16]
+&gt;&gt;&gt; [n for n in range(10) if n % 2 == 0]
+[0, 2, 4, 6, 8]
+&gt;&gt;&gt; {word.lower() for word in [&quot;Python&quot;, &quot;PYTHON&quot;, &quot;python&quot;]}
+{'python'}
+&gt;&gt;&gt; {n: n * n for n in range(4)}
+{0: 0, 1: 1, 2: 4, 3: 9}
+</code></pre>
+<p>Comprehensions are short, but as conditions multiply or nesting deepens, readability suffers. Fall back to a regular <code>for</code> loop in those cases.</p>
+<h2>Before / after</h2>
+<p>Compare the awkward way with the version that picks the right collection.</p>
+<pre><code class="language-python"># Before: list membership is O(n)
+seen = []
+duplicates = []
+for x in stream:
+    if x in seen:                # scans the whole list every time
+        duplicates.append(x)
+    else:
+        seen.append(x)
+
+# After: set membership is O(1) on average
+seen = set()
+duplicates = []
+for x in stream:
+    if x in seen:
+        duplicates.append(x)
+    else:
+        seen.add(x)
+</code></pre>
+<p>Missing-key handling can shrink too.</p>
+<pre><code class="language-python"># Before: explicit existence check every time
+counts = {}
+for word in words:
+    if word in counts:
+        counts[word] = counts[word] + 1
+    else:
+        counts[word] = 1
+
+# After: dict.get or defaultdict
+counts = {}
+for word in words:
+    counts[word] = counts.get(word, 0) + 1
+
+# After (shortest): collections.Counter
+from collections import Counter
+counts = Counter(words)
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p>Process a list of log lines to compute per-IP access counts and the first-seen timestamp. We will exercise dict, set, tuple, and comprehensions together.</p>
+<ol>
+<li><strong>Sample data.</strong></li>
+</ol>
+<p><code>python
+   logs = [
+       ("10.0.0.1", "2026-05-03 09:00:01"),
+       ("10.0.0.2", "2026-05-03 09:00:02"),
+       ("10.0.0.1", "2026-05-03 09:00:05"),
+       ("10.0.0.3", "2026-05-03 09:00:07"),
+       ("10.0.0.2", "2026-05-03 09:00:10"),
+   ]</code></p>
+<ol start="2">
+<li><strong>Unique IPs.</strong> A set comprehension does it in one line.</li>
+</ol>
+<p><code>python
+   unique_ips = {ip for ip, _ in logs}
+   # {'10.0.0.1', '10.0.0.2', '10.0.0.3'}</code></p>
+<ol start="3">
+<li><strong>Per-IP counts.</strong> Use <code>dict.get</code>.</li>
+</ol>
+<p><code>python
+   counts = {}
+   for ip, _ in logs:
+       counts[ip] = counts.get(ip, 0) + 1
+   # {'10.0.0.1': 2, '10.0.0.2': 2, '10.0.0.3': 1}</code></p>
+<ol start="4">
+<li><strong>First-seen timestamps.</strong> <code>dict.setdefault</code> covers it.</li>
+</ol>
+<p><code>python
+   first_seen = {}
+   for ip, ts in logs:
+       first_seen.setdefault(ip, ts)
+   # {'10.0.0.1': '2026-05-03 09:00:01', '10.0.0.2': '...', '10.0.0.3': '...'}</code></p>
+<ol start="5">
+<li><strong>Sort the result.</strong> Dicts do not sort themselves; <code>sorted</code> returns a new list.</li>
+</ol>
+<p><code>python
+   ranked = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)
+   # [('10.0.0.1', 2), ('10.0.0.2', 2), ('10.0.0.3', 1)]</code></p>
+<p>If you already know <code>Counter</code>, steps 2 and 3 collapse into a single line. After the next chapter on functions you can wrap the whole flow into a reusable helper.</p>
+<h2>Common mistakes</h2>
+<ol>
+<li>
+<p><strong>Treating <code>b = a</code> as a copy.</strong><br>
+<code>b = a</code> simply binds another name to the same object. Mutate one side and both change. For a shallow copy use <code>b = a[:]</code> or <code>b = list(a)</code>; for nested structures use <code>copy.deepcopy(a)</code>.</p>
+</li>
+<li>
+<p><strong>Mutable default arguments.</strong><br>
+<code>def f(items=[]):</code> evaluates the default list once, at definition time, and shares it across every call. The list grows on every invocation. Use <code>def f(items=None): items = items if items is not None else []</code> instead.</p>
+</li>
+<li>
+<p><strong>Indexing a missing dict key.</strong><br>
+<code>d[key]</code> raises <code>KeyError</code>. When the key may be absent, use <code>d.get(key)</code> or <code>d.get(key, default)</code>. The "create on demand" pattern fits <code>setdefault</code> or <code>defaultdict</code>.</p>
+</li>
+<li>
+<p><strong>Trusting set order.</strong><br>
+   Sets do not guarantee iteration order. Sort before comparing in tests. Dicts do guarantee insertion order from 3.7, but do not extend that guarantee to sets.</p>
+</li>
+<li>
+<p><strong>Using a list as a set member or dict key.</strong><br>
+   You will see <code>TypeError: unhashable type: 'list'</code>. Convert with <code>tuple(seq)</code> if it really should be a key.</p>
+</li>
+<li>
+<p><strong>Assuming <code>dict.keys()</code> and <code>dict.values()</code> are lists.</strong><br>
+   Both are view objects. They reflect later changes to the dict. When a snapshot is needed, materialize: <code>list(d.keys())</code>.</p>
+</li>
+</ol>
+<h2>In practice</h2>
+<ul>
+<li><strong>Counting and grouping.</strong> <code>Counter</code> and <code>defaultdict(list)</code> remove the repeated "if missing, initialize" pattern. When you see <code>if key not in d: d[key] = []</code> more than once in your code, switch to <code>defaultdict</code>.</li>
+<li><strong>Ordered dicts.</strong> From Python 3.7 onward, plain <code>dict</code> preserves insertion order. Reach for <code>OrderedDict</code> only when you need its extras like <code>move_to_end</code> or comparison that respects order.</li>
+<li><strong>Immutable bundles.</strong> Express "do not mutate this bundle" with <code>tuple</code>, <code>frozenset</code>, or <code>dataclass(frozen=True)</code>. The type alone signals intent to the next reader.</li>
+<li><strong>JSON serialization.</strong> <code>json.dumps</code> cannot serialize a set directly. Convert with <code>list(my_set)</code> or <code>sorted(my_set)</code> right before the call.</li>
+<li><strong>Bulk membership checks.</strong> A list of 100,000 blocked user IDs costs O(n) per check. Convert to a set once and reuse the structure across checks.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can sketch a small table comparing list / tuple / set / dict on mutability, order, duplicates, hashability</li>
+<li>[ ] I know <code>=</code> does not copy a list</li>
+<li>[ ] I know the mutable default argument trap and the standard fix</li>
+<li>[ ] I can pick between <code>dict.get</code>, <code>setdefault</code>, <code>defaultdict</code>, and <code>Counter</code> deliberately</li>
+<li>[ ] I can define "hashable" in one sentence</li>
+<li>[ ] I have written a list, set, and dict comprehension at least once</li>
+<li>[ ] I never assume set iteration order</li>
+<li>[ ] I know when <code>tuple</code> and <code>namedtuple</code>/<code>dataclass(frozen=True)</code> are the right choice</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Word frequency</strong><br>
+   Write <code>word_counts(text: str) -&gt; dict[str, int]</code> returning the count of each word, lowercased and stripped of punctuation.<br>
+   - Success criterion: <code>word_counts("Python is great. PYTHON is fun.")</code> returns <code>{'python': 2, 'is': 2, 'great': 1, 'fun': 1}</code> (key order is free).</p>
+</li>
+<li>
+<p><strong>Deduplicate while preserving order</strong><br>
+   Write <code>unique_in_order(items: list) -&gt; list</code> that drops duplicates yet keeps the first appearance order. Track membership with a single set.<br>
+   - Success criterion: <code>unique_in_order([3, 1, 3, 2, 1, 4])</code> returns <code>[3, 1, 2, 4]</code>.</p>
+</li>
+<li>
+<p><strong>Group by</strong><br>
+   Given <code>[("ada", "engineer"), ("bob", "designer"), ("charlie", "engineer")]</code>, write <code>group_by_role(rows)</code> returning a dict mapping each role to the list of names. Use <code>defaultdict(list)</code>.<br>
+   - Success criterion: the input above produces <code>{'engineer': ['ada', 'charlie'], 'designer': ['bob']}</code>.</p>
+</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>list and tuple are ordered bundles; set is an unordered collection of unique hashable elements; dict is a key→value mapping.</li>
+<li>Mutable (list, set, dict) versus immutable (tuple) is a deliberate choice.</li>
+<li>Dict keys and set members must be hashable; lists are not.</li>
+<li><code>b = a</code> aliases; copy with <code>list(a)</code> or <code>copy.deepcopy(a)</code> when needed.</li>
+<li>Handle missing keys with <code>dict.get</code>, <code>setdefault</code>, <code>defaultdict</code>, or <code>Counter</code>.</li>
+</ul>
+<p>The next chapter covers control flow — <code>if</code>, <code>for</code>, <code>while</code> — and shows how <code>enumerate</code>, <code>zip</code>, <code>range</code>, and comprehensions combine into loops that read well.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Official behavior reference for list, tuple, set, dict, and hashability constraints.</li>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html">Python tutorial — Data Structures</a> — Walks through list methods, tuples, sets, dictionaries, and comprehensions with beginner-friendly examples.</li>
+<li><a href="https://peps.python.org/pep-0274/">PEP 274 — Dict Comprehensions</a> — Primary source for the dict-comprehension syntax discussed in the chapter.</li>
+<li><a href="https://wiki.python.org/moin/TimeComplexity">Python Wiki — TimeComplexity</a> — Useful for the chapter’s performance comparison between linear list membership and average O(1) dict/set lookups.</li>
+<li><a href="https://docs.python.org/3/library/collections.html">Python docs — <code>collections</code></a> — Introduces supporting containers such as <code>namedtuple</code> and <code>deque</code> that refine data-structure choices.</li>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python docs — Data Model</a> — Adds formal background on mutable versus immutable objects.</li>
+</ul>
+<p class="tags-line">Tags: list-and-tuple, dict, set, mutability, comprehensions, hashable</p>
+</body>
+</html>

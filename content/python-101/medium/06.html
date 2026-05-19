@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Functions and arguments: def, args, kwargs, default, lambda</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Functions and arguments: def, args, kwargs, default, lambda</h1>
+<p>A function signature is a contract: what the caller must supply and what the function returns. Argument forms, plus <code>/</code> and <code>*</code>, let you make that contract clearer and harder to misuse.</p>
+<p>This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.</p>
+<h2>What you will learn</h2>
+<p>By the end of this chapter you will be able to explain and code the following:</p>
+<ul>
+<li>How to define a function with <code>def</code> and control what <code>return</code> hands back</li>
+<li>The five argument forms — positional, keyword, default, <code>*args</code>, <code>**kwargs</code> — and how they bind at call time</li>
+<li>How positional-only (<code>/</code>) and keyword-only (<code>*</code>) markers shape an API</li>
+<li>The mutable default argument trap and a safe replacement pattern</li>
+<li>Where <code>lambda</code> fits and where it does not</li>
+<li>How to add light type hints to a function signature to document intent</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Functions are the smallest unit you bundle code into. Once you carve branches and loops into functions, you stop repeating yourself, and the function becomes the unit of testing and change. Python's argument handling is rich, however, so beginners often struggle to choose between forms. Positional only ties calls to order; bad defaults leak state between calls; overusing <code>*args</code> and <code>**kwargs</code> makes signatures opaque.</p>
+<p>This chapter consolidates the five argument forms onto a single page so you can design signatures deliberately. In the next chapter on modules and packages, function signatures become the public interface across module boundaries — better to settle this first.</p>
+<p>There is one more reason: the mutable default argument trap is one of the most common function-related bugs newcomers hit. Understanding it once prevents repeated mistakes.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the <code>/</code> and <code>*</code> markers tune how strict that contract is.<br>
+Lay the function signature out on a page, and the call-time rules line up in your head.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three rules carry most of the weight.</p>
+<ol>
+<li><strong>Arguments bind at call time and the body runs on top of that binding.</strong> The signature is an interface that promises "this is the name and shape I will accept".</li>
+<li><strong>The order inside the signature is fixed:</strong> positional-only → positional/keyword → <code>*args</code> or <code>*</code> → keyword-only → <code>**kwargs</code>. Break the order and you get a <code>SyntaxError</code>.</li>
+<li><strong>Defaults are evaluated once, at definition time.</strong> Use a mutable object as a default and that single object is shared between calls.</li>
+</ol>
+<h2>Core concepts</h2>
+<p><strong>1. <code>def</code> and <code>return</code></strong></p>
+<p><code>def</code> creates a new function object and binds it to the given name. Functions are first-class objects, so you can store them in variables or pass them as arguments.</p>
+<pre><code class="language-python">def add(a, b):
+    return a + b
+
+f = add
+print(f(2, 3))   # 5
+</code></pre>
+<p>A function without <code>return</code> returns <code>None</code>. If <code>None</code> is what you want, say so in the signature and docstring. A function that focuses on either "compute a value" or "cause a side effect" — but not both — keeps the call site simpler.</p>
+<p><strong>2. Positional and keyword arguments</strong></p>
+<p>The same function can accept arguments either by position or by name.</p>
+<pre><code class="language-python">def greet(name, message):
+    return f&quot;{message}, {name}&quot;
+
+greet(&quot;ada&quot;, &quot;hello&quot;)               # positional
+greet(name=&quot;ada&quot;, message=&quot;hello&quot;)  # keyword
+greet(&quot;ada&quot;, message=&quot;hello&quot;)       # mixed (positional first)
+</code></pre>
+<p>When mixing, every positional argument must come before any keyword argument. The longer the signature, the more keyword calls help the caller see what each value means.</p>
+<p><strong>3. Default arguments</strong></p>
+<p>A default is evaluated once at definition time and used when the caller leaves the argument out.</p>
+<pre><code class="language-python">def power(base, exp=2):
+    return base ** exp
+
+power(3)          # 9
+power(3, 3)       # 27
+power(3, exp=4)   # 81
+</code></pre>
+<p>Arguments with defaults sit toward the end of the signature so positional calls line up naturally.</p>
+<p><strong>4. <code>*args</code> and <code>**kwargs</code></strong></p>
+<p><code>*args</code> collects positional arguments not bound to a named parameter into a tuple. <code>**kwargs</code> collects keyword arguments not bound to a named parameter into a dict.</p>
+<pre><code class="language-python">def collect(*args, **kwargs):
+    return list(args), dict(kwargs)
+
+collect(1, 2, 3, x=10, y=20)
+# ([1, 2, 3], {'x': 10, 'y': 20})
+</code></pre>
+<p>Reach for <code>*args</code>/<code>**kwargs</code> (a) in decorators or wrappers that must pass everything through, or (b) in APIs that are genuinely variadic. Otherwise, named parameters keep the signature readable.</p>
+<p><strong>5. Positional-only (<code>/</code>) and keyword-only (<code>*</code>)</strong></p>
+<p>Since Python 3.8, you can add <code>/</code> and <code>*</code> to enforce how a parameter may be passed.</p>
+<pre><code class="language-python">def write(path, /, *, mode=&quot;w&quot;, encoding=&quot;utf-8&quot;):
+    ...
+</code></pre>
+<p>Here <code>path</code> must be passed positionally, and <code>mode</code> and <code>encoding</code> must be passed by keyword. Calls look like <code>write("a.txt", mode="w")</code>, and the signature evolves more safely. Positional-only means you can later rename the parameter without breaking callers; keyword-only means you can later reorder parameters without breaking callers.</p>
+<p><strong>6. <code>lambda</code></strong></p>
+<p><code>lambda</code> defines a small anonymous function that contains a single expression.</p>
+<pre><code class="language-python">nums = [3, 1, 4, 1, 5, 9, 2, 6]
+nums.sort(key=lambda n: -n)
+print(nums)  # [9, 6, 5, 4, 3, 2, 1, 1]
+</code></pre>
+<p>If a named function reads better, write one. <code>lambda</code> shines for "a one-line transform used right here, only once". When the body grows past a single line or you need the same logic again, lift it out to a <code>def</code>.</p>
+<p><strong>7. Light type hints</strong></p>
+<p>Type hints are not enforced at runtime, but they document intent for readers and IDEs.</p>
+<pre><code class="language-python">def label(score: int) -&gt; str:
+    if score &gt;= 60:
+        return &quot;pass&quot;
+    return &quot;fail&quot;
+</code></pre>
+<p>Adding even input/output types to each function reduces misunderstandings at the call site noticeably.</p>
+<h2>Before-after</h2>
+<p>Rewrite the same behavior from "verbose signature" to "intent-bearing signature". The function builds a greeting from user data.</p>
+<p><strong>Before — a long positional signature</strong></p>
+<pre><code class="language-python">def make_greeting(name, lang, formal, prefix, suffix):
+    head = &quot;Dear&quot; if formal else &quot;Hi&quot;
+    if lang == &quot;ko&quot;:
+        head = &quot;안녕하세요&quot; if formal else &quot;안녕&quot;
+    return f&quot;{prefix}{head} {name}{suffix}&quot;
+
+print(make_greeting(&quot;ada&quot;, &quot;en&quot;, True, &quot;&gt;&gt; &quot;, &quot;!&quot;))
+</code></pre>
+<p>The call site <code>make_greeting("ada", "en", True, "&gt;&gt; ", "!")</code> does not tell the reader what <code>True</code> means. The fifth argument <code>"!"</code> requires another look at the signature to identify what it appends.</p>
+<p><strong>After — keyword-only options with defaults</strong></p>
+<pre><code class="language-python">def make_greeting(name: str, *, lang: str = &quot;en&quot;, formal: bool = False,
+                  prefix: str = &quot;&quot;, suffix: str = &quot;&quot;) -&gt; str:
+    head = &quot;Dear&quot; if formal else &quot;Hi&quot;
+    if lang == &quot;ko&quot;:
+        head = &quot;안녕하세요&quot; if formal else &quot;안녕&quot;
+    return f&quot;{prefix}{head} {name}{suffix}&quot;
+
+print(make_greeting(&quot;ada&quot;, lang=&quot;en&quot;, formal=True, prefix=&quot;&gt;&gt; &quot;, suffix=&quot;!&quot;))
+</code></pre>
+<p>Each argument labels itself. The arguments after <code>*</code> may only be passed by keyword, so the call no longer relies on a meaningless positional boolean. Defaults make the lightweight call possible too.</p>
+<pre><code class="language-python">print(make_greeting(&quot;ada&quot;))                # &quot;Hi ada&quot;
+print(make_greeting(&quot;ada&quot;, lang=&quot;ko&quot;))     # &quot;안녕 ada&quot;
+</code></pre>
+<p>You will see this pattern across library functions. Signatures stay short while expressing the intent: "core arguments are positional, options are keyword-only".</p>
+<h2>Step-by-step practice</h2>
+<p>Run these in the REPL. Lines starting with <code>&gt;&gt;&gt;</code> are inputs; the lines below are outputs.</p>
+<ol>
+<li><strong>Reproduce the mutable default trap.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; def buggy(item, items=[]):
+...     items.append(item)
+...     return items
+&gt;&gt;&gt; buggy(1)
+[1]
+&gt;&gt;&gt; buggy(2)
+[1, 2]
+&gt;&gt;&gt; buggy(3)
+[1, 2, 3]
+</code></pre>
+<p>The same list object is shared across calls. The safe pattern is:</p>
+<pre><code class="language-text">&gt;&gt;&gt; def safe(item, items=None):
+...     items = items if items is not None else []
+...     items.append(item)
+...     return items
+&gt;&gt;&gt; safe(1)
+[1]
+&gt;&gt;&gt; safe(2)
+[2]
+</code></pre>
+<p><code>items if items is not None else []</code> distinguishes "the caller explicitly passed <code>items=[]</code>" from "the caller omitted the argument". <code>items or []</code> collapses both into the same case and blurs the intent.</p>
+<ol start="2">
+<li><strong>Collect arguments with <code>*args</code> and <code>**kwargs</code>.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; def show(*args, **kwargs):
+...     print(&quot;args =&quot;, args)
+...     print(&quot;kwargs =&quot;, kwargs)
+&gt;&gt;&gt; show(1, 2, x=10)
+args = (1, 2)
+kwargs = {'x': 10}
+</code></pre>
+<p>Unpacking on the call side uses the same notation:</p>
+<pre><code class="language-text">&gt;&gt;&gt; def add3(a, b, c):
+...     return a + b + c
+&gt;&gt;&gt; nums = [1, 2, 3]
+&gt;&gt;&gt; add3(*nums)
+6
+&gt;&gt;&gt; kw = {&quot;a&quot;: 1, &quot;b&quot;: 2, &quot;c&quot;: 3}
+&gt;&gt;&gt; add3(**kw)
+6
+</code></pre>
+<ol start="3">
+<li><strong>Lock the signature with positional-only and keyword-only.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; def make_url(host, /, *, scheme=&quot;https&quot;, path=&quot;/&quot;):
+...     return f&quot;{scheme}://{host}{path}&quot;
+&gt;&gt;&gt; make_url(&quot;example.com&quot;)
+'https://example.com/'
+&gt;&gt;&gt; make_url(&quot;example.com&quot;, scheme=&quot;http&quot;, path=&quot;/api&quot;)
+'http://example.com/api'
+&gt;&gt;&gt; make_url(host=&quot;example.com&quot;)
+Traceback (most recent call last):
+    ...
+TypeError: make_url() got some positional-only arguments passed as keyword arguments: 'host'
+</code></pre>
+<p><code>host</code> is positional-only. <code>scheme</code> and <code>path</code> are keyword-only. The call shape is enforced, which makes future signature changes easier to roll out without breaking callers.</p>
+<ol start="4">
+<li><strong>Use <code>lambda</code> as a sort key.</strong></li>
+</ol>
+<pre><code class="language-text">&gt;&gt;&gt; users = [{&quot;name&quot;: &quot;ada&quot;, &quot;score&quot;: 71}, {&quot;name&quot;: &quot;bob&quot;, &quot;score&quot;: 92}]
+&gt;&gt;&gt; sorted(users, key=lambda u: u[&quot;score&quot;], reverse=True)
+[{'name': 'bob', 'score': 92}, {'name': 'ada', 'score': 71}]
+</code></pre>
+<p>When the key function is a single expression, <code>lambda</code> is short and clear. Once it grows beyond two lines, lift it into a <code>def</code> for readability.</p>
+<h2>Common mistakes</h2>
+<ol>
+<li>
+<p><strong>Mutable default arguments.</strong><br>
+<code>def f(items=[]):</code> builds the list once at definition time and shares it across calls. As calls accumulate, the list grows. If you really want an empty list as the default, write <code>def f(items=None): items = items if items is not None else []</code>.</p>
+</li>
+<li>
+<p><strong>Forgetting <code>return</code>.</strong><br>
+   A function without <code>return</code> returns <code>None</code>. If <code>result = compute(...)</code> keeps coming back as <code>None</code>, the body is often missing a <code>return</code>.</p>
+</li>
+<li>
+<p><strong>Mixing positional and keyword arguments and clashing.</strong><br>
+<code>f(1, a=2)</code> raises <code>TypeError</code> if the first positional already binds to <code>a</code>. Re-check the signature to see which slot maps to which name.</p>
+</li>
+<li>
+<p><strong>Overusing <code>*args</code> and <code>**kwargs</code>.</strong><br>
+   Unless the function is genuinely variadic, named parameters keep the signature readable. Hide everything behind <code>**kwargs</code> and IDE autocomplete and type checkers can no longer help you.</p>
+</li>
+<li>
+<p><strong>Cramming a multi-line behavior into <code>lambda</code>.</strong><br>
+<code>lambda</code> accepts a single expression. When the logic grows, write a <code>def</code> and give it a name. The name itself becomes documentation.</p>
+</li>
+<li>
+<p><strong>Scope confusion.</strong><br>
+   You can read a module-level variable inside a function, but assigning a new value to the same name creates a local variable. To rebind the global, use the <code>global</code> keyword explicitly. Better still, avoid the pattern: take the value as an argument and return the result instead.</p>
+</li>
+</ol>
+<h2>In practice</h2>
+<p>In production code function signatures act as a public API. Two patterns are worth keeping in mind.</p>
+<p><strong>(1) Make options keyword-only.</strong></p>
+<pre><code class="language-python">def export_csv(rows, path, *, encoding=&quot;utf-8&quot;, delimiter=&quot;,&quot;, quote_all=False):
+    ...
+</code></pre>
+<p>Calls like <code>export_csv(rows, "out.csv", quote_all=True)</code> keep options keyword-only, so reordering the option list later does not break callers. Libraries lean on this pattern heavily.</p>
+<p><strong>(2) Pass everything through in a wrapper.</strong></p>
+<pre><code class="language-python">def with_logging(fn):
+    def wrapper(*args, **kwargs):
+        print(&quot;call&quot;, fn.__name__, args, kwargs)
+        result = fn(*args, **kwargs)
+        print(&quot;done&quot;, fn.__name__)
+        return result
+    return wrapper
+</code></pre>
+<p>This is where <code>*args</code>/<code>**kwargs</code> truly fits — decorators or middleware that must accept any function and pass arguments through unchanged.</p>
+<p>Both patterns reappear in the next chapter, where modules and packages introduce import boundaries.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define a function with <code>def</code> and explain the difference between returning a value and causing a side effect.</li>
+<li>[ ] I can mix positional, keyword, default, <code>*args</code>, and <code>**kwargs</code> in a single signature.</li>
+<li>[ ] I can state the mutable default trap in one sentence and write the safe pattern.</li>
+<li>[ ] I have used <code>/</code> and <code>*</code> to enforce positional-only and keyword-only arguments.</li>
+<li>[ ] I can give one example each of where <code>lambda</code> fits and where it does not.</li>
+<li>[ ] I have added light type hints to a function signature.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Safe accumulator.</strong><br>
+   With the signature <code>def append_item(item, items=None) -&gt; list:</code>, append to <code>items</code> if the caller provides one, otherwise build a new list and return it.<br>
+   - Success criterion: <code>append_item(1) == [1]</code> and <code>append_item(2) == [2]</code> (no carryover between calls).</p>
+</li>
+<li>
+<p><strong>Keyword-only option.</strong><br>
+   With the signature <code>def join_path(*parts, sep="/") -&gt; str:</code>, join the substrings using <code>sep</code>. Force <code>sep</code> to be keyword-only.<br>
+   - Success criterion: <code>join_path("a", "b", "c") == "a/b/c"</code> and <code>join_path("a", "b", sep="-") == "a-b"</code>.</p>
+</li>
+<li>
+<p><strong>Refactor <code>lambda</code> to <code>def</code>.</strong><br>
+   Refactor <code>sorted(users, key=lambda u: (u["score"], u["name"]))</code> into an explicit function <code>def by_score_then_name(u): ...</code>, then call <code>sorted(users, key=by_score_then_name)</code>.<br>
+   - Success criterion: both calls produce the same result.</p>
+</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>A function signature is the interface between caller and body. Combine positional, keyword, default, <code>*args</code>, and <code>**kwargs</code> deliberately.</li>
+<li>Defaults are evaluated once at definition time. Use the <code>None</code> + <code>is not None</code> pattern instead of mutable defaults.</li>
+<li><code>/</code> and <code>*</code> lock the call shape, making signature evolution easier.</li>
+<li><code>lambda</code> fits one-line transforms. When it grows, use <code>def</code> and a name.</li>
+<li>Light type hints are not enforced at runtime, but they reduce misunderstandings at the call site.</li>
+</ul>
+<p>The next chapter covers modules and packages — <code>import</code>, <code>__init__.py</code>, and <code>__name__</code> — and shows how functions are exposed and hidden across module boundaries.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/controlflow.html">Python tutorial — More on Defining Functions</a> — Practical overview of defaults, keyword arguments, <code>*args</code>, <code>**kwargs</code>, and <code>lambda</code>.</li>
+<li><a href="https://docs.python.org/3/reference/compound_stmts.html">Python docs — Compound Statements</a> — Formal reference for function definitions, parameter kinds, and <code>return</code> behavior.</li>
+<li><a href="https://docs.python.org/3/reference/expressions.html">Python docs — Expressions</a> — Documents <code>lambda</code> as an expression form and clarifies its limitations.</li>
+<li><a href="https://peps.python.org/pep-3102/">PEP 3102 — Keyword-Only Arguments</a> — Design rationale for forcing options to be passed by name.</li>
+<li><a href="https://peps.python.org/pep-0570/">PEP 570 — Python Positional-Only Parameters</a> — Explains the <code>/</code> separator and its API design benefits.</li>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a> — Standard basis for annotating function signatures with types.</li>
+</ul>
+<p class="tags-line">Tags: function-definition, default-arguments, args-kwargs, keyword-only, lambda, type-hints</p>
+</body>
+</html>

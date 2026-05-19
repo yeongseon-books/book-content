@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Variables, types, and operators</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Variables, types, and operators</h1>
+<p>In Python, a variable is not a box that holds a value but a name attached to an object. That one model clears up most beginner confusion around assignment, comparison, and copying.</p>
+<p>This post is the 2nd article in the Python 101 series. This is the point in the series where Python's name-and-object model starts to matter.</p>
+<h2>What you'll learn</h2>
+<p>By the end of this chapter you will be able to explain and code the following yourself.</p>
+<ul>
+<li>Why a Python variable is not a "box that holds a value" but a name tag attached to an object</li>
+<li>The five primitive types — <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code> — and what each one guarantees</li>
+<li>What dynamic typing buys you, and how type hints make that freedom safe again</li>
+<li>How arithmetic, comparison, logical, and assignment operators behave, including the precedence rules people get wrong</li>
+<li>The classic traps every beginner hits at least once: <code>is</code> versus <code>==</code>, floating-point comparison, and mutable defaults</li>
+</ul>
+<p>This chapter targets Python 3.12. Blocks shown as REPL sessions (with the <code>&gt;&gt;&gt;</code> prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is a Python variable a name tag attached to an object rather than a box that holds a value?</li>
+<li>What does each of the five primitive types — <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code> — actually guarantee?</li>
+<li>Where does dynamic typing meet type hints, and how do hints make that freedom safer?</li>
+<li>When do <code>is</code> and <code>==</code> agree, and when do they disagree?</li>
+<li>Which floating-point comparisons surprise beginners, and how do you avoid them?</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Variables and types are the skeleton of every program you'll ever write. It's tempting to dismiss <code>x = 1</code> as trivial, but here are the bugs you keep hitting if the model is fuzzy.</p>
+<ul>
+<li><code>total = total + items</code> raises <code>TypeError</code> because you accidentally added a string to a number.</li>
+<li><code>if user.age == "18":</code> always returns <code>False</code> and the gate never opens.</li>
+<li><code>0.1 + 0.2 == 0.3</code> is <code>False</code>, so a payment validation rejects valid input.</li>
+<li>A function mutates a list it received as an argument, and the caller sees the change too — and you spend an afternoon hunting the source.</li>
+</ul>
+<p>The common root is one of two confusions: not knowing exactly what a variable points to, or not knowing what a type guarantees. Nail this once and the chapters on data structures, functions, and classes get noticeably easier.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.<br>
+In Python, a variable is not a box that holds a value. It's a <strong>name tag attached to an object</strong>. One object can have many name tags, and a name tag can be moved to a different object at any time.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+In the diagram above, after <code>a = 42; b = a</code> both <code>a</code> and <code>b</code> point at the same integer object <code>42</code>. After <code>a = "hi"</code>, only <code>a</code> moves to a fresh string object; <code>b</code> still points at <code>42</code>.</p>
+<p>Holding this picture in your head makes two behaviors feel natural.</p>
+<ul>
+<li><code>id(a) == id(b)</code> tells you whether two name tags refer to the same object.</li>
+<li>If two name tags point at a mutable object such as a list, mutating it through one name tag is visible through the other.</li>
+</ul>
+<h2>Core concepts</h2>
+<p><strong>1) Dynamic typing and type hints</strong></p>
+<p>Python does not bind a type to the variable. Types live on the objects the variable points to.</p>
+<pre><code class="language-python">x = 1          # the name now points at an int object
+x = &quot;hello&quot;    # the same name now points at a str object
+</code></pre>
+<p>This freedom lets you write code fast, but in a large codebase it blurs the question "what does this function take and return?" That's why Python adopted <strong>type hints</strong> as a standard with PEP 484.</p>
+<pre><code class="language-python">def total_price(quantity: int, unit_price: float) -&gt; float:
+    return quantity * unit_price
+</code></pre>
+<p>Type hints do not change runtime behavior. A separate static checker such as <code>mypy</code> or <code>pyright</code> validates them. "Free at runtime, safe at build time" is the trade-off Python chose.</p>
+<p><strong>2) The five primitive types</strong></p>
+<p><strong><code>int</code></strong><br>
+- Examples: <code>42</code>, <code>-7</code>, <code>1_000_000</code><br>
+- Notes: Arbitrary precision. No overflow.</p>
+<p><strong><code>float</code></strong><br>
+- Examples: <code>3.14</code>, <code>1e-9</code><br>
+- Notes: 64-bit IEEE 754. Floating-point error applies.</p>
+<p><strong><code>str</code></strong><br>
+- Examples: <code>"hello"</code>, <code>'world'</code><br>
+- Notes: Immutable Unicode text.</p>
+<p><strong><code>bool</code></strong><br>
+- Examples: <code>True</code>, <code>False</code><br>
+- Notes: Subtype of <code>int</code> (<code>True == 1</code>).</p>
+<p><strong><code>None</code></strong><br>
+- Examples: <code>None</code><br>
+- Notes: The single object that means "no value".</p>
+<p>Three things to memorize. First, <code>int</code> has no overflow, unlike C or Java. Second, <code>float</code> is IEEE 754, so <code>0.1 + 0.2</code> is not exactly <code>0.3</code>. Third, <code>None</code> is the standard way to express "absent", and you compare it with <code>if x is None:</code>, never <code>if x == None:</code>.</p>
+<p><strong>3) Operators</strong></p>
+<p>Arithmetic looks familiar, but integer division and exponentiation surprise newcomers.</p>
+<pre><code class="language-python">7 / 2     # 3.5 (always returns a float)
+7 // 2    # 3   (floor division)
+7 % 2     # 1   (remainder)
+2 ** 10   # 1024 (exponentiation)
+</code></pre>
+<p>Comparison operators chain. <code>0 &lt;= x &lt; 10</code> is the same as <code>x &gt;= 0 and x &lt; 10</code>, and the chained form is more readable. Use it.</p>
+<p>Logical operators short-circuit. In <code>a and b</code>, if <code>a</code> is falsy, <code>b</code> is never evaluated. That's why this idiom is everywhere:</p>
+<pre><code class="language-python">name = user.name or &quot;guest&quot;          # if user.name is empty, fall back to &quot;guest&quot;
+config = override_config or default_config
+</code></pre>
+<h2>Before / After</h2>
+<p>Compare how type hints and explicit names change readability.</p>
+<p><strong>Before — the intent is hidden</strong></p>
+<pre><code class="language-python">def calc(q, p, r):
+    return q * p * (1 - r)
+</code></pre>
+<p>Is <code>q</code> quantity or quality? Is <code>r</code> a discount rate or an exchange rate? You can't tell from the function alone.</p>
+<p><strong>After — names and types reveal the intent</strong></p>
+<pre><code class="language-python">def discounted_total(quantity: int, unit_price: float, discount_rate: float) -&gt; float:
+    return quantity * unit_price * (1 - discount_rate)
+</code></pre>
+<p>The function name got longer, but the call site became shorter to read: <code>discounted_total(3, 9_900, 0.1)</code> is self-explanatory.</p>
+<h2>Step by step</h2>
+<p>Open a REPL and type these lines yourself. If a result differs from what's printed here, stop and figure out why before moving on.</p>
+<p><strong>1) Same object versus different object</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; a = [1, 2]
+&gt;&gt;&gt; b = [1, 2]
+&gt;&gt;&gt; a == b      # value comparison: True
+True
+&gt;&gt;&gt; a is b      # identity comparison: False (two distinct list objects)
+False
+&gt;&gt;&gt; c = a
+&gt;&gt;&gt; c is a      # True — two name tags on the same list object
+True
+</code></pre>
+<p>In the example above, <code>a</code> and <code>b</code> hold lists with the same contents but distinct objects, so <code>a == b</code> is <code>True</code> while <code>a is b</code> is <code>False</code>. Once you bind another name with <code>c = a</code>, both <code>c</code> and <code>a</code> point at the same object and <code>c is a</code> is <code>True</code>. The rule: <code>==</code> compares values, <code>is</code> compares object identity. Use <code>is None</code> for None checks; for almost everything else, use <code>==</code>.</p>
+<p><strong>2) The floating-point trap</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; 0.1 + 0.2
+0.30000000000000004
+&gt;&gt;&gt; 0.1 + 0.2 == 0.3
+False
+&gt;&gt;&gt; import math
+&gt;&gt;&gt; math.isclose(0.1 + 0.2, 0.3)
+True
+</code></pre>
+<p>For computed float results, use <code>math.isclose</code> when tolerance matters, or switch to <code>Decimal</code> when exactness matters. Even if the constant itself is exactly representable, equality can still fail when the other side is a computed float, so do not generalize this into a rule.</p>
+<p><strong>3) Type conversion</strong></p>
+<pre><code class="language-text">&gt;&gt;&gt; int(&quot;42&quot;)           # 42
+&gt;&gt;&gt; float(&quot;3.14&quot;)       # 3.14
+&gt;&gt;&gt; str(42)             # '42'
+&gt;&gt;&gt; bool(0), bool(1)    # (False, True)
+&gt;&gt;&gt; bool(&quot;&quot;), bool(&quot;hi&quot;)  # (False, True)
+&gt;&gt;&gt; int(&quot;3.14&quot;)         # ValueError
+</code></pre>
+<p><code>int("3.14")</code> raises because the string isn't an integer literal. To convert a decimal string to an integer, go through float first: <code>int(float("3.14"))</code>.</p>
+<h2>Common mistakes</h2>
+<p><strong>1. Mixing <code>==</code> and <code>is</code></strong><br>
+Use <code>==</code> unless you genuinely care about object identity. <code>if name is "admin":</code> may work by accident due to CPython's string interning, but it's wrong code.</p>
+<p><strong>2. Comparing floats with <code>==</code></strong><br>
+The <code>0.1 + 0.2 != 0.3</code> case above is the canonical trap. Use <code>decimal.Decimal</code> for money, taxes, and discount rates; use <code>math.isclose</code> for general floating-point comparison.</p>
+<p><strong>3. Mutable default arguments</strong><br>
+Default arguments are evaluated once, when the function is defined. Writing <code>def f(x, items=[]):</code> makes the same list accumulate across calls. Use <code>None</code> as the default and create a fresh list inside.</p>
+<pre><code class="language-python">def append_id(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+</code></pre>
+<p><strong>4. Confusing strings and numbers</strong><br>
+User input always arrives as a string. <code>input("Age: ")</code> returns <code>"25"</code>, not <code>25</code>. Convert explicitly with <code>int(...)</code> before comparing or doing arithmetic.</p>
+<p><strong>5. Adding booleans like integers</strong><br>
+<code>True + True</code> is <code>2</code>. You can lean on this for tricks, but it hurts readability. Use <code>sum(1 for x in xs if cond(x))</code> to make the intent obvious.</p>
+<p><strong>6. Writing big numbers without separators</strong><br>
+<code>10000000</code> is harder to read than <code>10_000_000</code>. Python ignores underscores in numeric literals, so use them freely as thousands separators.</p>
+<h2>Real-world patterns</h2>
+<p><strong>1. Validate type hints with mypy in CI</strong><br>
+Type hints alone don't make your code safer; you have to actually run a checker. Add this to <code>pyproject.toml</code> and run <code>mypy src/</code> in CI.</p>
+<pre><code class="language-toml">[tool.mypy]
+strict = true
+python_version = &quot;3.12&quot;
+</code></pre>
+<p><strong>2. Use <code>Decimal</code> for money and taxes</strong><br>
+Floating-point rounding errors compound when you process payments.</p>
+<pre><code class="language-python">from decimal import Decimal
+
+price = Decimal(&quot;9900&quot;)
+tax = price * Decimal(&quot;0.1&quot;)
+total = price + tax  # Decimal('10890')
+</code></pre>
+<p>The string literal is the key part. <code>Decimal(0.1)</code> accepts a float that already carries floating-point error, which defeats the purpose.</p>
+<p><strong>3. Always cast environment variables</strong><br>
+<code>os.environ["PORT"]</code> is a string. Convert it before using it for comparison or arithmetic, and handle the case where the value isn't a valid integer.</p>
+<pre><code class="language-python">import os
+
+port = int(os.environ.get(&quot;PORT&quot;, &quot;8000&quot;))
+</code></pre>
+<p><strong>4. Reach for <code>dataclass</code> once you have several fields</strong><br>
+Once a dict grows to three or four related fields, switch to a <code>dataclass</code>. Type hints and defaults live in one place, and your IDE can autocomplete the field names.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class Order:
+    order_id: str
+    quantity: int
+    unit_price: float
+</code></pre>
+<h2>Checklist</h2>
+<p>Before moving to the next chapter, walk through these by hand at least once.</p>
+<ul>
+<li>[ ] Ran <code>a = [1, 2]; b = [1, 2]; print(a == b, a is b)</code> in the REPL</li>
+<li>[ ] Confirmed that <code>0.1 + 0.2</code> is not equal to <code>0.3</code></li>
+<li>[ ] Can describe <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, and <code>None</code> in one sentence each</li>
+<li>[ ] Understand that type hints do not change runtime behavior</li>
+<li>[ ] Ran <code>mypy</code> at least once on a small file</li>
+<li>[ ] Performed a money calculation with <code>Decimal</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>
+<p><strong>Tax-inclusive price calculator</strong><br>
+   Write <code>total_with_tax(unit_price: Decimal, quantity: int, tax_rate: Decimal = Decimal("0.1")) -&gt; Decimal</code>. Apply full type hints and validate with mypy strict.<br>
+   - Success criteria: <code>total_with_tax(Decimal("9900"), 3)</code> returns <code>Decimal('32670')</code>, and <code>mypy --strict</code> reports 0 errors.</p>
+</li>
+<li>
+<p><strong>Floating-point comparison helper</strong><br>
+   Implement <code>almost_equal(a: float, b: float, tol: float = 1e-9) -&gt; bool</code> from scratch, then compare its results with <code>math.isclose</code>.<br>
+   - Success criteria: <code>almost_equal(0.1 + 0.2, 0.3)</code> returns <code>True</code> and matches <code>math.isclose(0.1 + 0.2, 0.3)</code>.</p>
+</li>
+<li>
+<p><strong>Safe user input conversion</strong><br>
+   Write <code>read_age() -&gt; int</code> that calls <code>input("Age: ")</code>, converts to int, and re-prompts on negative numbers or non-numeric input.<br>
+   - Success criteria: <code>"25"</code> returns <code>25</code>; <code>"-1"</code> and <code>"abc"</code> both re-prompt without raising.</p>
+</li>
+</ol>
+<h2>Summary and next chapter</h2>
+<ul>
+<li>A Python variable is a name tag attached to an object. <code>=</code> doesn't copy the value; it moves the tag.</li>
+<li>Dynamic typing is convenient, but at scale you reinforce it with type hints and mypy.</li>
+<li><code>int</code> has no overflow, <code>float</code> carries IEEE 754 error, and <code>bool</code> is a subtype of <code>int</code>.</li>
+<li><code>==</code> compares values, <code>is</code> compares identity. The only <code>is</code> you write regularly is <code>is None</code>.</li>
+<li>Use <code>Decimal</code> for money, <code>math.isclose</code> for floating-point checks, and explicit casts for user input.</li>
+</ul>
+<p>The next chapter dives into strings: f-strings and format specs, the difference between <code>str</code> and <code>bytes</code>, and a first look at regular expressions.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Primary reference for <code>int</code>, <code>float</code>, <code>bool</code>, <code>None</code>, truth-value testing, and sequence behavior.</li>
+<li><a href="https://docs.python.org/3/reference/expressions.html">Python docs — Expressions</a> — Defines arithmetic, comparison, identity, and boolean operator semantics and precedence.</li>
+<li><a href="https://docs.python.org/3/tutorial/floatingpoint.html">Python tutorial — Floating-Point Arithmetic: Issues and Limitations</a> — Official explanation for representation error behind examples like <code>0.1 + 0.2</code>.</li>
+<li><a href="https://docs.python.org/3/library/decimal.html">Python docs — <code>decimal</code></a> — Covers exact decimal arithmetic, which is the chapter’s recommended alternative for money-like values.</li>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a> — Source for Python’s standard type-hinting model and its static-analysis intent.</li>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">Python Data Model</a> — Reinforces the object model behind identity, mutability, and names bound to objects.</li>
+</ul>
+<p class="tags-line">Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints</p>
+</body>
+</html>
