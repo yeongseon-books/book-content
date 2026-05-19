@@ -1,10 +1,10 @@
 flowchart LR
     흐름["자동화된 실행 흐름"] --> 일시정지["게이트 대상 행동 직전에 멈춤"]
-    일시정지 --> 요청["ApprovalRequest\naction type · summary · risk · payload"]
+    일시정지 --> 요청["ApprovalRequest\n행동 유형 · 요약 · 위험도 · 입력값"]
     요청 --> 검토["사람이 요청을 검토"]
-    검토 -->|approve| 재개["흐름을 재개하고 실행"]
-    검토 -->|reject| 중단["실행하지 않음"]
-    재개 --> 결정["ApprovalDecision\napprover + reason"]
+    검토 -->|승인| 재개["흐름을 재개하고 실행"]
+    검토 -->|거절| 중단["실행하지 않음"]
+    재개 --> 결정["ApprovalDecision\n승인자 + 사유"]
     중단 --> 결정
 
     style 일시정지 fill:#f3e5f5,stroke:#7b1fa2

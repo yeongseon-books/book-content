@@ -1,9 +1,9 @@
 flowchart LR
-    시스템["System prompt\n역할 · 규칙 · 목표\n약 2k tokens"] --> 추론["한 번의 추론 context"]
-    태스크["Task spec\nGoal · Inputs · Completion criteria\n약 1k tokens"] --> 추론
-    히스토리["Conversation history\nsliding / summarize / selective recall\n약 5k tokens"] --> 추론
-    검색["Retrieved context\ntask와 관련된 문서만\n약 10k tokens"] --> 추론
-    도구["Tool schemas와 최근 outputs\n지금 호출 가능한 기능\n약 3k tokens"] --> 추론
+    시스템["시스템 프롬프트\n역할 · 규칙 · 목표\n약 2k 토큰"] --> 추론["한 번의 추론 컨텍스트"]
+    태스크["작업 명세\n목표 · 입력 · 완료 조건\n약 1k 토큰"] --> 추론
+    히스토리["대화 이력\n최근 구간 유지 / 요약 / 선택적 재호출\n약 5k 토큰"] --> 추론
+    검색["검색 컨텍스트\n작업과 관련된 문서만\n약 10k 토큰"] --> 추론
+    도구["도구 스키마와 최근 출력\n지금 호출 가능한 기능\n약 3k 토큰"] --> 추론
 
     추론 --> 예산["슬롯별 예산을 먼저 정해야\n어느 한 요소도 무한정 커지지 않음"]
 
