@@ -47,17 +47,11 @@ This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns
 
 Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
 
-<<<<<<< HEAD
 ### Draw the control flow before you tune the prompt
 
 ![Draw the control flow before you tune the prompt](../../../assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
 *A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.*
 
-=======
-### Workflow pattern map
-
-![Workflow pattern map](../../../assets/ai-agent-101/04/04-01-workflow-pattern-map.en.png)
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 ### ReAct (Reasoning + Acting)
 
 **ReAct** alternates between Reasoning and Acting. The agent thinks, uses tools, and observes results iteratively.
@@ -84,11 +78,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -157,11 +147,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": plan_prompt}]
     )
     
@@ -196,11 +182,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     final_response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": summary_prompt}]
     )
     
@@ -266,11 +248,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         """
         
         reflection_response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=[{"role": "user", "content": reflection_prompt}]
         )
         
@@ -336,11 +314,7 @@ def decompose_task_topdown(task: str) -> List[Dict[str, Any]]:
     """
     
     response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -386,11 +360,7 @@ def decompose_task_bottomup(task: str, available_tools: List[str]) -> List[str]:
     """
     
     response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -472,11 +442,7 @@ def dynamic_decomposition(task: str, initial_context: Dict) -> str:
         """
         
         response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=[{"role": "user", "content": next_step_prompt}]
         )
         

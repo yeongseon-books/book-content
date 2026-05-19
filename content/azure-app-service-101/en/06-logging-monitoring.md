@@ -151,17 +151,17 @@ import json
 from datetime import datetime
 
 class JsonFormatter(logging.Formatter):
- def format(self, record):
- log_obj = {
- "timestamp": datetime.utcnow().isoformat() + "Z",
- "level": record.levelname.lower(),
- "message": record.getMessage(),
- "logger": record.name,
- }
- # Merge additional fields
- if hasattr(record, "custom_dimensions"):
- log_obj.update(record.custom_dimensions)
- return json.dumps(log_obj)
+    def format(self, record):
+        log_obj = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "level": record.levelname.lower(),
+            "message": record.getMessage(),
+            "logger": record.name,
+        }
+        # Merge additional fields
+        if hasattr(record, "custom_dimensions"):
+            log_obj.update(record.custom_dimensions)
+        return json.dumps(log_obj)
 
 # Handler setup
 handler = logging.StreamHandler()
@@ -176,9 +176,9 @@ logger.setLevel(logging.INFO)
 
 ```python
 logger.info("Order created", extra={"custom_dimensions": {
- "orderId": "ORD-12345",
- "userId": "user-789",
- "totalAmount": 150.00
+    "orderId": "ORD-12345",
+    "userId": "user-789",
+    "totalAmount": 150.00
 }})
 ```
 

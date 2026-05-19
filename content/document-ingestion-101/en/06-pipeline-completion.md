@@ -109,20 +109,15 @@ def seed_files() -> list[Path]:
     txt_path = DATA_DIR / 'ops.txt'
     md_path = DATA_DIR / 'faq.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.
-', encoding='utf-8')
-    md_path.write_text('# FAQ
-
-MD source: metadata filters reduce the candidate set before answer generation.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.\n', encoding='utf-8')
+    md_path.write_text('# FAQ\n\nMD source: metadata filters reduce the candidate set before answer generation.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_file(path: Path) -> list[Document]:
     suffix = path.suffix.lower()
     if suffix == '.pdf':
         reader = PdfReader(str(path))
-        text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+        text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
         return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
     if suffix == '.txt':
         return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'txt'})]
@@ -134,10 +129,7 @@ def chunk_documents(documents: list[Document]) -> list[Document]:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=90,
         chunk_overlap=20,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_documents(documents)
     for index, chunk in enumerate(chunks):
@@ -163,8 +155,7 @@ def main() -> None:
     print(f'chunks: {len(chunks)}')
     print(f'faiss_saved: {INDEX_DIR}')
     for doc in results:
-        preview = doc.page_content.replace('
-', ' ')[:90]
+        preview = doc.page_content.replace('\n', ' ')[:90]
         print(f"result={doc.metadata['source']} chunk_id={doc.metadata['chunk_id']} preview={preview}")
 
 if __name__ == '__main__':

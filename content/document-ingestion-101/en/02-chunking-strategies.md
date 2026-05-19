@@ -68,13 +68,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 SAMPLES = {
     'faq': 'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
     'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4,
-    'manual': '# Deployment guide
-
-1. Review the config file.
-2. Validate sample documents before rollout.
-3. Check logs and chunk counts after deployment.
-
-'
+    'manual': '# Deployment guide\n\n1. Review the config file.\n2. Validate sample documents before rollout.\n3. Check logs and chunk counts after deployment.\n\n'
     'When the structure is explicit, larger chunks can stay readable. ' * 4,
     'policy': 'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
     'rules together, so context breaks if the overlap is too small. ' * 5,
@@ -90,10 +84,7 @@ def summarize(name: str, text: str, chunk_size: int, chunk_overlap: int) -> None
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_text(text)
     sizes = [len(chunk) for chunk in chunks]

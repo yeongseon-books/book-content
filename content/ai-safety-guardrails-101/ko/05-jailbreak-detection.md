@@ -187,7 +187,8 @@ Reply with one JSON object: {"jailbreak": true|false, "category": "persona|hypot
 Do not add any other text.
 
 USER REQUEST:
-"""{text}""""""
+\"\"\"{text}\"\"\"
+"""
 
 import json
 

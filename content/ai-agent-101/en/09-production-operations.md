@@ -46,15 +46,9 @@ This is post 9 in the AI Agent 101 series. Here we cover agent observability, co
 
 Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.
 
-<<<<<<< HEAD
 ![Observability](../../../assets/ai-agent-101/09/09-01-observability.en.png)
 *Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.*
 
-=======
-### Operations feedback loop
-
-![Operations feedback loop](../../../assets/ai-agent-101/09/09-01-operations-feedback-loop.en.png)
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 ### Structured Logging
 
 Plaintext logs are hard to parse and query. JSON-structured logs are the standard.
@@ -234,13 +228,8 @@ class BudgetEnforcer:
     """Budget enforcement."""
 
     PRICING = {
-<<<<<<< HEAD
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
         "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
-=======
-        "gpt-4o": {"prompt": 0.0025 / 1000, "completion": 0.01 / 1000},
-        "gpt-4o-mini": {"prompt": 0.00015 / 1000, "completion": 0.0006 / 1000}
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     }
 
     def __init__(self):

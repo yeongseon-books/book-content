@@ -105,8 +105,7 @@ class OrchestratorAgent:
 
     def plan(self, request: str) -> List[Dict]:
         """Decompose the request into subtasks."""
-        worker_list = "
-".join([
+        worker_list = "\n".join([
             f"- {name}: {w.role}"
             for name, w in self.workers.items()
         ])
@@ -177,10 +176,7 @@ class PeerAgent:
 
     def receive_message(self, sender: "PeerAgent", message: str) -> str:
         """Receive a message and respond."""
-        prompt = f"""You are {self.name}, a {self.role}.
-Message from {sender.name}: {message}
-
-Respond appropriately. If you need help from another peer, mention it."""
+        prompt = f"""You are {self.name}, a {self.role}.\nMessage from {sender.name}: {message}\n\nRespond appropriately. If you need help from another peer, mention it."""
 
         response = self.client.chat.completions.create(
             model="gpt-4o",

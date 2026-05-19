@@ -391,8 +391,10 @@ print(result)
     ```python
     try:
         # Code that might raise an exception
+        pass
     except ExceptionType:
         # Code to handle the exception
+        pass
     ```
 
     Here's an example:

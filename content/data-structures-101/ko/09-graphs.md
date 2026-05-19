@@ -65,7 +65,7 @@ title: 그래프
 
 **Before — ad-hoc dict-of-dict representation:**
 
-```python
+```text
 graph = {"A": {"B": 1}, "B": {"A": 1, "C": 2}, ...}
 # It works, but with no consistent interface every algorithm becomes awkward
 ```

@@ -219,7 +219,7 @@ REPL 또는 짧은 스크립트에서 차례대로 실행해 봅니다. 아래 `
 
 1. **truthy·falsy를 직접 확인합니다.**
 
-```python
+```text
 >>> for v in [0, 1, "", "x", [], [0], None, {"a": 1}]:
 ...     print(repr(v), bool(v))
 0 False
@@ -236,7 +236,7 @@ None False
 
 2. **`enumerate`와 `zip`을 결합합니다.**
 
-```python
+```text
 >>> names = ["ada", "bob", "carol"]
 >>> roles = ["engineer", "designer", "engineer"]
 >>> for idx, (name, role) in enumerate(zip(names, roles), start=1):
@@ -250,7 +250,7 @@ None False
 
 3. **`for`-`else`로 검색 결과를 분기합니다.**
 
-```python
+```text
 >>> def find_first_negative(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -263,7 +263,7 @@ None False
 
 같은 일을 `for`-`else`로 쓰면 다음과 같습니다. 둘 중 어느 쪽이 더 읽기 쉬운지 판단해 봅니다.
 
-```python
+```text
 >>> def find_first_negative_v2(nums):
 ...     for n in nums:
 ...         if n < 0:
@@ -276,7 +276,7 @@ None False
 
 4. **comprehension과 일반 루프 사이를 옮겨 다닙니다.**
 
-```python
+```text
 >>> nums = list(range(10))
 >>> [x * x for x in nums if x % 2 == 0]
 [0, 4, 16, 36, 64]

@@ -165,9 +165,7 @@ The top hit should be the refund policy sentence. If it is not, your first suspe
 ```python
 def answer_with_rag(question: str) -> str:
     top_docs = retrieve(question, top_k=2)
-    context = "
-
-".join(
+    context = "\n\n".join(
         f"[score={score:.4f}] {chunk}" for score, chunk in top_docs
     )
 

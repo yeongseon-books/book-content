@@ -89,21 +89,15 @@ better = run_prompt(
         "You write concise ecommerce copy for practical buyers. Avoid hype and keep the tone clear."
     ),
     user_prompt=(
-        "Product: silent mechanical keyboard
-"
-        "Audience: developers working from home
-"
-        "Highlights: low noise, soft typing feel, pastel blue color
-"
+        "Product: silent mechanical keyboard\n"
+        "Audience: developers working from home\n"
+        "Highlights: low noise, soft typing feel, pastel blue color\n"
         "Output: exactly 3 bullet points, 1 sentence each"
     ),
 )
 
-print("[bad]
-", bad)
-print("
-[better]
-", better)
+print("[bad]\n", bad)
+print("\n[better]\n", better)
 ```
 
 A better prompt is not “more beautiful.” It simply makes the contract tighter.
@@ -222,9 +216,7 @@ system_prompt = "You summarize support information briefly and precisely."
 
 for case in test_cases:
     answer = run_prompt(system_prompt, case["user"])
-    print(f"
-[{case['name']}]
-{answer}")
+    print(f"\n[{case['name']}]\n{answer}")
 ```
 
 ## Common failure modes in real services

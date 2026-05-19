@@ -76,25 +76,14 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     """ReAct pattern: Thought → Action → Observation loop"""
 
     messages = [
-        {"role": "system", "content": """You are an agent that solves problems step-by-step.
-
-        At each step:
-        1. Thought: Think about what to do next
-        2. Action: Use tools to gather information
-        3. Observation: Observe results and plan next step
-
-        When you reach the goal, provide an answer starting with "Final Answer:"."""},
+        {"role": "system", "content": """You are an agent that solves problems step-by-step.\n\n        At each step:\n        1. Thought: Think about what to do next\n        2. Action: Use tools to gather information\n        3. Observation: Observe results and plan next step\n\n        When you reach the goal, provide an answer starting with "Final Answer:"."""},
         {"role": "user", "content": user_query}
     ]
 
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -149,18 +138,12 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
 
     response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": plan_prompt}]
     )
 
     plan = response.choices[0].message.content
-    print(f"Plan:
-{plan}
-")
+    print(f"Plan:\n{plan}\n")
 
     # Step 2: Execute plan
     steps = parse_plan(plan)  # "1. step - Tool: name" → structured
@@ -177,8 +160,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
             "result": tool_result
         })
 
-        print(f"Result: {tool_result}
-")
+        print(f"Result: {tool_result}\n")
 
     # Step 3: Generate final answer
     summary_prompt = f"""
@@ -191,11 +173,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
 
     final_response = openai.chat.completions.create(
-<<<<<<< HEAD
         model="gpt-4.1",
-=======
-        model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": summary_prompt}]
     )
 
@@ -213,12 +191,10 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
     reflections = []
 
     for attempt in range(max_retries):
-        print(f"
-=== Attempt {attempt + 1} ===")
+        print(f"\n=== Attempt {attempt + 1} ===")
 
         # Include previous reflections in context
-        context = "
-".join([f"Reflection {i+1}: {r}" for i, r in enumerate(reflections)])
+        context = "\n".join([f"Reflection {i+1}: {r}" for i, r in enumerate(reflections)])
 
         prompt = f"""
         Task: {user_query}
@@ -248,11 +224,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         """
 
         reflection_response = openai.chat.completions.create(
-<<<<<<< HEAD
             model="gpt-4.1",
-=======
-            model="gpt-4o",
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=[{"role": "user", "content": reflection_prompt}]
         )
 

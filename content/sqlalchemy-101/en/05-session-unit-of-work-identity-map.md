@@ -243,7 +243,7 @@ With `echo=True`, you can see exactly when SQL is emitted. Early on, leave it on
 
 ### 1) Sharing a module-level Session
 
-```python
+```text
 session = Session(engine)         # built once at import time
 
 def handler(...):

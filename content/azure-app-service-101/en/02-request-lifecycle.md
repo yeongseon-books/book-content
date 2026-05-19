@@ -272,16 +272,16 @@ Health Check determines whether an instance is **eligible** to receive traffic.
 ```python
 @app.route('/health')
 def health():
- # 1. Keep it lightweight
- # 2. Check only dependencies critical for traffic handling
- # 3. Avoid slow external calls
- 
- try:
- # Simple check of critical dependencies
- db.execute("SELECT 1")
- return {"status": "healthy"}, 200
- except Exception as e:
- return {"status": "unhealthy", "reason": str(e)}, 503
+    # 1. Keep it lightweight
+    # 2. Check only dependencies critical for traffic handling
+    # 3. Avoid slow external calls
+
+    try:
+        # Simple check of critical dependencies
+        db.execute("SELECT 1")
+        return {"status": "healthy"}, 200
+    except Exception as e:
+        return {"status": "unhealthy", "reason": str(e)}, 503
 ```
 
 ---

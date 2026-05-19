@@ -145,13 +145,8 @@ class CostTracker:
     """Tracks API call cost."""
 
     PRICING = {
-<<<<<<< HEAD
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
         "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
-=======
-        "gpt-4o": {"prompt": 0.0025 / 1000, "completion": 0.01 / 1000},
-        "gpt-4o-mini": {"prompt": 0.00015 / 1000, "completion": 0.0006 / 1000}
->>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     }
 
     def __init__(self):

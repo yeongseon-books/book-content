@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
 ### 1) 모듈 전역 Session 공유
 
-```python
+```text
 session = Session(engine)         # 모듈 로드 시 한 번 생성
 
 def handler(...):

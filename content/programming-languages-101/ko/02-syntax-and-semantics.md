@@ -62,7 +62,7 @@ last_reviewed: '2026-05-15'
 
 ### 서로 다른 층위의 두 에러
 
-```python
+```text
 # Both are "errors," but they live in different layers.
 print("hello"   # SyntaxError
 divide(10, 0)   # legal syntax, throws ZeroDivisionError at runtime
