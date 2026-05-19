@@ -1,0 +1,18 @@
+flowchart LR
+    Agent["Agent plan\nread data · call API · write result"] --> Surface["Tool Harness\ndesign a narrow and honest tool surface"]
+
+    Surface --> Schema["Precise schema\nclear field meaning and constraints"]
+    Surface --> Effects["Explicit side effects\nshow what actually mutates or sends"]
+    Surface --> Output["Structured output\nparseable result for the next step"]
+    Surface --> Errors["Actionable errors\nwhat failed, why, how to fix"]
+    Surface --> Retry["Idempotent retry path\nsame call does not double-execute"]
+
+    Schema --> Safe["Useful tools that are easy to call right\nand hard to misuse disastrously"]
+    Effects --> Safe
+    Output --> Safe
+    Errors --> Safe
+    Retry --> Safe
+
+    style Agent fill:#e3f2fd,stroke:#1976d2
+    style Surface fill:#f3e5f5,stroke:#7b1fa2
+    style Safe fill:#fff8e1,stroke:#f9a825

@@ -1,0 +1,15 @@
+flowchart LR
+    시스템["System prompt\n역할 · 규칙 · 목표\n약 2k tokens"] --> 추론["한 번의 추론 context"]
+    태스크["Task spec\nGoal · Inputs · Completion criteria\n약 1k tokens"] --> 추론
+    히스토리["Conversation history\nsliding / summarize / selective recall\n약 5k tokens"] --> 추론
+    검색["Retrieved context\ntask와 관련된 문서만\n약 10k tokens"] --> 추론
+    도구["Tool schemas와 최근 outputs\n지금 호출 가능한 기능\n약 3k tokens"] --> 추론
+
+    추론 --> 예산["슬롯별 예산을 먼저 정해야\n어느 한 요소도 무한정 커지지 않음"]
+
+    style 시스템 fill:#e3f2fd,stroke:#1976d2
+    style 태스크 fill:#e8f5e9,stroke:#388e3c
+    style 히스토리 fill:#fff3e0,stroke:#ef6c00
+    style 검색 fill:#f3e5f5,stroke:#7b1fa2
+    style 도구 fill:#ede7f6,stroke:#5e35b1
+    style 예산 fill:#fff8e1,stroke:#f9a825

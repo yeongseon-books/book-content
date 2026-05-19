@@ -1,0 +1,18 @@
+flowchart LR
+    Versions["Baseline + candidate versions"] --> Router["Canary router\nchoose version by traffic percent"]
+    Router --> One["1% traffic"]
+    One --> Ten["10% traffic"]
+    Ten --> Fifty["50% traffic"]
+    Fifty --> Full["100% traffic"]
+
+    One --> Compare["Compare error rate, p95 latency, and cost"]
+    Ten --> Compare
+    Fifty --> Compare
+    Compare -->|healthy| Promote["Promote to the next step"]
+    Compare -->|regression| Rollback["Rollback to 0% immediately"]
+    Promote --> Full
+
+    style Versions fill:#e3f2fd,stroke:#1976d2
+    style Router fill:#f3e5f5,stroke:#7b1fa2
+    style Promote fill:#e8f5e9,stroke:#388e3c
+    style Rollback fill:#ffebee,stroke:#c62828

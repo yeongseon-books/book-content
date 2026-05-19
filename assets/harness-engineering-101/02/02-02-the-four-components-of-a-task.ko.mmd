@@ -1,0 +1,15 @@
+flowchart LR
+    목표["Goal\n무엇을 달성해야 하는가"] --> 명세["실행 가능한 TaskSpec"]
+    입력["Inputs\n데이터 소스 · 파라미터 · 사전 조건"] --> 명세
+    출력["Outputs\n형식 · 스키마 · 저장 위치"] --> 명세
+    기준["Completion criteria\n자동 검증 가능한 통과/실패 기준"] --> 명세
+
+    명세 --> 준비["네 가지가 모두 있으면\n추측 없이 실행 가능"]
+    누락["하나라도 비어 있으면"] --> 추측["에이전트가 빈칸을 임의로 채움"]
+
+    style 목표 fill:#e3f2fd,stroke:#1976d2
+    style 입력 fill:#e8f5e9,stroke:#388e3c
+    style 출력 fill:#fff3e0,stroke:#ef6c00
+    style 기준 fill:#f3e5f5,stroke:#7b1fa2
+    style 준비 fill:#fff8e1,stroke:#f9a825
+    style 추측 fill:#ffebee,stroke:#c62828

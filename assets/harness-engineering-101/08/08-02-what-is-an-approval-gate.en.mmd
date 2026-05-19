@@ -1,0 +1,13 @@
+flowchart LR
+    Flow["Automated flow"] --> Pause["Pause before a gated action"]
+    Pause --> Request["ApprovalRequest\naction type · summary · risk · payload"]
+    Request --> Human["Human reviews the request"]
+    Human -->|approve| Resume["Resume and execute"]
+    Human -->|reject| Stop["Do not execute"]
+    Resume --> Decision["ApprovalDecision\napprover + reason"]
+    Stop --> Decision
+
+    style Pause fill:#f3e5f5,stroke:#7b1fa2
+    style Request fill:#e3f2fd,stroke:#1976d2
+    style Human fill:#e8f5e9,stroke:#388e3c
+    style Decision fill:#fff8e1,stroke:#f9a825

@@ -1,0 +1,18 @@
+flowchart LR
+    버전들["Baseline + candidate 버전"] --> 라우터["Canary router\n트래픽 비율로 버전 선택"]
+    라우터 --> 일퍼센트["1% 트래픽"]
+    일퍼센트 --> 십퍼센트["10% 트래픽"]
+    십퍼센트 --> 오십퍼센트["50% 트래픽"]
+    오십퍼센트 --> 백퍼센트["100% 트래픽"]
+
+    일퍼센트 --> 비교["error rate, p95 latency, cost 비교"]
+    십퍼센트 --> 비교
+    오십퍼센트 --> 비교
+    비교 -->|healthy| 승격["다음 단계로 승격"]
+    비교 -->|regression| 되돌리기["즉시 0%로 롤백"]
+    승격 --> 백퍼센트
+
+    style 버전들 fill:#e3f2fd,stroke:#1976d2
+    style 라우터 fill:#f3e5f5,stroke:#7b1fa2
+    style 승격 fill:#e8f5e9,stroke:#388e3c
+    style 되돌리기 fill:#ffebee,stroke:#c62828

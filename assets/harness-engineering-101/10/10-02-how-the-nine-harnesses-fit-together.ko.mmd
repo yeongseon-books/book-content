@@ -1,0 +1,14 @@
+flowchart TB
+    테스트["Test Harness\n배포 전에 버전을 검증"] --> 버전["버전된 stack"]
+    버전 --> 관측성["Observability\nagent.run trace 열기"]
+    관측성 --> 작업["Task Harness\n사용자 입력을 TaskSpec으로 파싱"]
+    작업 --> 컨텍스트["Context Harness\n맞는 context 조립"]
+    컨텍스트 --> 피드백["Feedback Loop\n완료되거나 escalate될 때까지 반복"]
+    피드백 --> 제약["Constraint Harness\n각 실행 step을 검사"]
+    제약 --> 승인["Approval Gate\n위험한 step이면 사람에게 승인 요청"]
+    승인 --> 도구["Tool Harness\n노출된 안전한 도구만 호출"]
+    도구 --> 결과["응답 + trace + 결정 로그"]
+
+    style 버전 fill:#e3f2fd,stroke:#1976d2
+    style 관측성 fill:#f3e5f5,stroke:#7b1fa2
+    style 결과 fill:#fff8e1,stroke:#f9a825

@@ -1,0 +1,13 @@
+flowchart LR
+    Failure["Failure event"] --> Classify["Classify failure mode"]
+    Classify -->|Transient| Retry["Retry\nwait and run the same input again"]
+    Classify -->|Reasoning| Reflect["Reflect\nfeed back what was wrong, why, and how to change"]
+    Classify -->|Deterministic| Escalate["Escalate or stop\nproblem will not improve by repeating"]
+
+    Retry --> Fast["Good for timeout, network, rate limit"]
+    Reflect --> Better["Good for wrong arguments,\nformat violations, policy failures"]
+
+    style Classify fill:#f3e5f5,stroke:#7b1fa2
+    style Retry fill:#e3f2fd,stroke:#1976d2
+    style Reflect fill:#e8f5e9,stroke:#388e3c
+    style Escalate fill:#fff8e1,stroke:#f9a825

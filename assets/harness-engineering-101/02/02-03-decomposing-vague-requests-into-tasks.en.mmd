@@ -1,0 +1,15 @@
+flowchart LR
+    Request["Vague request\n'Do something about productivity'"] --> Step1["Step 1\nRestate it as a business Goal"]
+    Step1 --> Goal["Goal\nImprove the team's productivity"]
+    Goal --> Step2["Step 2\nGenerate candidate tasks"]
+    Step2 --> Candidates["Candidates\nweekly retrospective · meeting-load chart · blocker alerts"]
+    Candidates --> Step3["Step 3\nFill Goal, Inputs, Outputs, Completion criteria"]
+    Step3 --> Check["Can every field be filled?"]
+    Check -->|Yes| Queue["Executable task queue\nready for the agent"]
+    Check -->|No| Ask["Clarifying question for the human\nfill recipient, source, time range, etc."]
+    Ask --> Step3
+
+    style Request fill:#e3f2fd,stroke:#1976d2
+    style Goal fill:#f3e5f5,stroke:#7b1fa2
+    style Candidates fill:#e8f5e9,stroke:#388e3c
+    style Queue fill:#fff8e1,stroke:#f9a825

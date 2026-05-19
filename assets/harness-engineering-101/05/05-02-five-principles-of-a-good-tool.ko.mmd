@@ -1,0 +1,11 @@
+flowchart LR
+    단일책임["1. Single responsibility\n도구 하나는 한 가지 일만"] --> 좋은도구["좋은 에이전트용 도구"]
+    멱등성["2. Idempotent when possible\n재시도가 안전해야 함"] --> 좋은도구
+    부작용명시["3. Explicit side effects\n숨은 발송·쓰기 금지"] --> 좋은도구
+    구조화["4. Structured output\n자유 텍스트 대신 schema"] --> 좋은도구
+    오류메시지["5. Actionable errors\nwhat / why / how"] --> 좋은도구
+
+    좋은도구 --> 예측성["예측 가능한 동작\n명확한 호출, 안전한 재시도, 쉬운 검증"]
+
+    style 좋은도구 fill:#f3e5f5,stroke:#7b1fa2
+    style 예측성 fill:#fff8e1,stroke:#f9a825

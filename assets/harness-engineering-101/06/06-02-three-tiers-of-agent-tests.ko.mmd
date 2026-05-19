@@ -1,0 +1,14 @@
+flowchart TB
+    신뢰["릴리스 신뢰도"]
+    평가["3. Eval tests\n데이터셋 + rubric\n비결정적이지만 통계적으로 안정"] --> 신뢰
+    통합["2. Integration tests\nmulti-step task 흐름\n실제 또는 mock LLM"] --> 신뢰
+    유닛["1. Unit tests\n도구 schema와 validation\n결정적이고 빠름"] --> 신뢰
+
+    유닛 --> 기반["빠르게 디버깅\n어디가 깨졌는지 즉시 확인"]
+    통합 --> 시나리오["도구 조합이\n실제 task 경로에서 맞는지 확인"]
+    평가 --> 품질["실사용자 품질을\n배포 전에 측정"]
+
+    style 신뢰 fill:#fff8e1,stroke:#f9a825
+    style 유닛 fill:#e3f2fd,stroke:#1976d2
+    style 통합 fill:#e8f5e9,stroke:#388e3c
+    style 평가 fill:#f3e5f5,stroke:#7b1fa2

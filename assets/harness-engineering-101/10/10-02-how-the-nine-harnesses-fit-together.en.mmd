@@ -1,0 +1,14 @@
+flowchart TB
+    Test["Test Harness\nqualify the version before rollout"] --> Version["Versioned stack"]
+    Version --> Obs["Observability\nopen trace: agent.run"]
+    Obs --> Task["Task Harness\nparse user input into TaskSpec"]
+    Task --> Context["Context Harness\nassemble the right context"]
+    Context --> Feedback["Feedback Loop\nrun until done or escalate"]
+    Feedback --> Constraint["Constraint Harness\ncheck each planned step"]
+    Constraint --> Approval["Approval Gate\nask a human if the step is risky"]
+    Approval --> Tools["Tool Harness\ninvoke only the exposed safe tool"]
+    Tools --> Result["Response + trace + decision logs"]
+
+    style Version fill:#e3f2fd,stroke:#1976d2
+    style Obs fill:#f3e5f5,stroke:#7b1fa2
+    style Result fill:#fff8e1,stroke:#f9a825

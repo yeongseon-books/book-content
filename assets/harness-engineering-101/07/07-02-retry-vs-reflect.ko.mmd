@@ -1,0 +1,13 @@
+flowchart LR
+    실패["실패 이벤트"] --> 분류["실패 모드 분류"]
+    분류 -->|Transient| 재시도["Retry\n잠시 기다린 뒤 같은 입력으로 다시 실행"]
+    분류 -->|Reasoning| 성찰["Reflect\n무엇이 왜 틀렸는지와 다음 변경점을 피드백"]
+    분류 -->|Deterministic| 에스컬레이트["Escalate 또는 중단\n반복해도 좋아지지 않는 문제"]
+
+    재시도 --> 예시1["타임아웃, 네트워크, rate limit에 적합"]
+    성찰 --> 예시2["잘못된 인자, 형식 위반, 정책 실패에 적합"]
+
+    style 분류 fill:#f3e5f5,stroke:#7b1fa2
+    style 재시도 fill:#e3f2fd,stroke:#1976d2
+    style 성찰 fill:#e8f5e9,stroke:#388e3c
+    style 에스컬레이트 fill:#fff8e1,stroke:#f9a825
