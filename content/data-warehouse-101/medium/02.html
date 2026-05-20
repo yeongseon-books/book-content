@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>OLTP and OLAP</title>
+<title>Data Warehouse 101 (2/10): OLTP and OLAP</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,31 @@
 </style>
 </head>
 <body>
-<h1>OLTP and OLAP</h1>
+<h1>Data Warehouse 101 (2/10): OLTP and OLAP</h1>
 <p>From far away, both systems speak SQL. Up close, they solve opposite problems. One is built to confirm a payment in milliseconds. The other is built to scan months of history without dragging production down with it.</p>
 <p>This is post 2 in the Data Warehouse 101 series.</p>
 <p>In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying OLTP and OLAP?</li>
+<li>Which signal should the example or diagram make visible for OLTP and OLAP?</li>
+<li>What failure should be prevented first when OLTP and OLAP reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data warehouse 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>data warehouse 101 chapter 2 flow overview</em></p>
+<p>This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How do OLTP and OLAP differ in the workloads they are built to handle?</li>
+<li>Where does the gap between row storage and column storage become most visible?</li>
+<li>Why does one engine become a bad compromise when you ask it to serve both workloads?</li>
+<li>How should you think about CDC and replication lag in a split architecture?</li>
+<li>What practical criteria do teams use to decide when to separate OLTP from OLAP?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The workload difference between <em>OLTP</em> and <em>OLAP</em></li>
@@ -71,8 +92,6 @@
 <p><em>Pick the right tool. Trying to do both with one makes both unhappy.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Separated OLTP-to-OLAP flow" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Short transactional writes stay on OLTP, while change capture feeds a separate OLAP engine for broad analytical reads.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>OLTP</strong>: Short, <em>concurrent</em> read/write workloads.</li>
@@ -146,8 +165,18 @@ SELECT date_trunc('day', created_at), COUNT(*) FROM fact_orders GROUP BY 1;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>OLTP and OLAP optimize for opposite directions. Next we cover <em>facts and dimensions</em>, the core OLAP modeling unit.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><strong>What boundary should you inspect first when applying OLTP and OLAP?</strong></li>
+<li>The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for OLTP and OLAP?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when OLTP and OLAP reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">Data Warehouse 101 (1/10): What Is a Data Warehouse?</a></li>
 <li><strong>OLTP and OLAP (current)</strong></li>
 <li>Fact and Dimension (upcoming)</li>
 <li>Star Schema (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 8
-title: Data Mart
+title: "Data Warehouse 101 (8/10): Data Mart"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: What a data mart is, how it differs from a warehouse, and why t
 last_reviewed: '2026-05-15'
 ---
 
-# Data Mart
+# Data Warehouse 101 (8/10): Data Mart
 
 One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.
 
 This is post 8 in the Data Warehouse 101 series.
 
 In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Mart?
+- Which signal should the example or diagram make visible for Data Mart?
+- What failure should be prevented first when Data Mart reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 8 flow overview*
+
+This picture places Data Mart inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Mart is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *d
 > *Common in the warehouse, domain in the mart.*
 
 ## Concept at a Glance
-
-![Warehouse-to-mart split](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
-
-*The warehouse keeps conformed shared assets, while domain-specific marts reshape them for sales, finance, and operations consumers.*
 
 ## Key Terms
 
@@ -167,17 +179,29 @@ dbt's *marts/* folder is split *by domain*. Sales, finance, product, and marketi
 
 A mart is a *thin bridge* between the team and the data. Next, we cover *performance optimization patterns*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Mart?**
+  - The article treats Data Mart as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Mart?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Mart reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
-- [BI and Dashboard](./07-bi-and-dashboard.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
+- [Data Warehouse 101 (7/10): BI and Dashboard](./07-bi-and-dashboard.md)
 - **Data Mart (current)**
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

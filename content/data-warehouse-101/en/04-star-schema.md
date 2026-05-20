@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 4
-title: Star Schema
+title: "Data Warehouse 101 (4/10): Star Schema"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: The structure of a star schema, comparison with the snowflake s
 last_reviewed: '2026-05-15'
 ---
 
-# Star Schema
+# Data Warehouse 101 (4/10): Star Schema
 
 Analytical models become fragile the moment every answer needs another hop through another lookup table. A star schema works because it keeps the path from question to answer short enough that both humans and BI tools can follow it without hesitation.
 
 This is post 4 in the Data Warehouse 101 series.
 
 In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Star Schema?
+- Which signal should the example or diagram make visible for Star Schema?
+- What failure should be prevented first when Star Schema reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 4 flow overview*
+
+This picture places Star Schema inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Star Schema is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ Analytical queries get faster as joins decrease. A star schema keeps *one fact* 
 > *Analytics is a read game. The simpler the shape, the faster the answer.*
 
 ## Concept at a Glance
-
-![Star schema join structure](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
-
-*A classic star schema keeps one central fact table surrounded by dimensions that each join in a single hop.*
 
 ## Key Terms
 
@@ -171,10 +183,21 @@ Tableau, Looker, and Power BI *assume* a star schema. dbt's *mart* layer is typi
 
 Star schema is the *simplest analytical shape*. Next, we tackle *partitioning and clustering* for fast reads.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Star Schema?**
+  - The article treats Star Schema as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Star Schema?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Star Schema reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
 - **Star Schema (current)**
 - Partition and Clustering (upcoming)
 - ETL and ELT (upcoming)
@@ -182,6 +205,7 @@ Star schema is the *simplest analytical shape*. Next, we tackle *partitioning an
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Fact and Dimension</title>
+<title>Data Warehouse 101 (3/10): Fact and Dimension</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,31 @@
 </style>
 </head>
 <body>
-<h1>Fact and Dimension</h1>
+<h1>Data Warehouse 101 (3/10): Fact and Dimension</h1>
 <p>Most analytical questions hide the same structure: how much happened, and by which slice do you want to explain it? The moment you mix those two jobs in one wide table, every later change becomes more expensive than it needs to be.</p>
 <p>This is post 3 in the Data Warehouse 101 series.</p>
 <p>In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Fact and Dimension?</li>
+<li>Which signal should the example or diagram make visible for Fact and Dimension?</li>
+<li>What failure should be prevented first when Fact and Dimension reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data warehouse 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>data warehouse 101 chapter 3 flow overview</em></p>
+<p>This picture places Fact and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Fact and Dimension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What do fact tables and dimension tables each hold?</li>
+<li>What do you gain by separating measures from descriptive attributes?</li>
+<li>Why do you need to define the grain first in an analytical model?</li>
+<li>Why do surrogate keys and conformed dimensions appear so often in warehouse design?</li>
+<li>What is the first sentence you should write before you start OLAP modeling?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>fact</em> table</li>
@@ -71,8 +92,6 @@
 <p><em>Split measures from attributes. Together they slow each other down.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Fact-to-dimension relationship" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Facts carry the measurable events, while user, product, and date dimensions provide the context needed to group and explain them.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Fact</strong>: A <em>measurable event</em>. Amount, quantity, duration — numbers.</li>
@@ -163,9 +182,19 @@ ORDER BY 1, 2;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Splitting facts and dimensions is the <em>starting point</em> of analytical modeling. Next, we cover the <em>star schema</em> — the most common shape.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><strong>What boundary should you inspect first when applying Fact and Dimension?</strong></li>
+<li>The article treats Fact and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Fact and Dimension?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Fact and Dimension reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">Data Warehouse 101 (1/10): What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">Data Warehouse 101 (2/10): OLTP and OLAP</a></li>
 <li><strong>Fact and Dimension (current)</strong></li>
 <li>Star Schema (upcoming)</li>
 <li>Partition and Clustering (upcoming)</li>

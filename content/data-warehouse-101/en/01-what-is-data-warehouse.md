@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 1
-title: What Is a Data Warehouse?
+title: "Data Warehouse 101 (1/10): What Is a Data Warehouse?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: What a data warehouse is, how it differs from a service databas
 last_reviewed: '2026-05-15'
 ---
 
-# What Is a Data Warehouse?
+# Data Warehouse 101 (1/10): What Is a Data Warehouse?
 
 The service database that happily writes one order at a time usually becomes miserable the moment someone asks for six months of revenue by country, product, and hour. The query is not wrong. It is just asking an operational store to behave like an analytical engine.
 
 This is the first post in the Data Warehouse 101 series.
 
 In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Data Warehouse??
+- Which signal should the example or diagram make visible for What Is a Data Warehouse??
+- What failure should be prevented first when What Is a Data Warehouse? reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 1 flow overview*
+
+This picture places What Is a Data Warehouse? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Data Warehouse? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ When a product grows, the database that handles *one order* and the one that ans
 > *Run analytics on its own road; keep operations on its own.*
 
 ## Concept at a Glance
-
-![Analytics path from the service database into the warehouse](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
-
-*The basic analytics path: operational writes stay in the service database, while analytical consumers read from the warehouse layer.*
 
 ## Key Terms
 
@@ -163,7 +175,18 @@ Startups often start with a *Postgres replica* as the warehouse. As scale grows,
 
 A warehouse is a *separate store for analysis*. Next, we look at *OLTP vs OLAP* in more depth.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Data Warehouse??**
+  - The article treats What Is a Data Warehouse? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Data Warehouse??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Data Warehouse? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Data Warehouse? (current)**
 - OLTP and OLAP (upcoming)
 - Fact and Dimension (upcoming)
@@ -174,6 +197,7 @@ A warehouse is a *separate store for analysis*. Next, we look at *OLTP vs OLAP* 
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Mart</title>
+<title>Data Warehouse 101 (8/10): Data Mart</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,31 @@
 </style>
 </head>
 <body>
-<h1>Data Mart</h1>
+<h1>Data Warehouse 101 (8/10): Data Mart</h1>
 <p>One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.</p>
 <p>This is post 8 in the Data Warehouse 101 series.</p>
 <p>In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Mart?</li>
+<li>Which signal should the example or diagram make visible for Data Mart?</li>
+<li>What failure should be prevented first when Data Mart reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data warehouse 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>data warehouse 101 chapter 8 flow overview</em></p>
+<p>This picture places Data Mart inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Mart is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How is a data mart different from the warehouse itself?</li>
+<li>Why separate organization-wide shared data from team-specific analytical space?</li>
+<li>What gets better when you reflect domain vocabulary directly in the data model?</li>
+<li>What role do conformed dimensions play across multiple marts?</li>
+<li>Why do access boundaries and self-service analysis matter so much in mart design?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>data mart</em></li>
@@ -71,8 +92,6 @@
 <p><em>Common in the warehouse, domain in the mart.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Warehouse-to-mart split" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>The warehouse keeps conformed shared assets, while domain-specific marts reshape them for sales, finance, and operations consumers.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Data Mart</strong>: A <em>domain-scoped</em> analytical zone — a <em>subset</em> of the warehouse.</li>
@@ -161,14 +180,24 @@ GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A mart is a <em>thin bridge</em> between the team and the data. Next, we cover <em>performance optimization patterns</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Partition and Clustering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/06-etl-and-elt.md">ETL and ELT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/07-bi-and-dashboard.md">BI and Dashboard</a></li>
+<li><strong>What boundary should you inspect first when applying Data Mart?</strong></li>
+<li>The article treats Data Mart as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Mart?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Mart reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">Data Warehouse 101 (1/10): What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">Data Warehouse 101 (2/10): OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Data Warehouse 101 (3/10): Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Data Warehouse 101 (4/10): Star Schema</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Data Warehouse 101 (5/10): Partition and Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/06-etl-and-elt.md">Data Warehouse 101 (6/10): ETL and ELT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/07-bi-and-dashboard.md">Data Warehouse 101 (7/10): BI and Dashboard</a></li>
 <li><strong>Data Mart (current)</strong></li>
 <li>Performance Optimization (upcoming)</li>
 <li>Warehouse Design Example (upcoming)</li>

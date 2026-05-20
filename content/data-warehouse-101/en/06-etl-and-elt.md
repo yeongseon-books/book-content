@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 6
-title: ETL and ELT
+title: "Data Warehouse 101 (6/10): ETL and ELT"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: How ETL and ELT differ, where to perform transformations, and w
 last_reviewed: '2026-05-15'
 ---
 
-# ETL and ELT
+# Data Warehouse 101 (6/10): ETL and ELT
 
 The argument is not really about acronym order. It is about where you want complexity to live when a pipeline fails at 2 a.m. If raw data disappears before you can replay it, the recovery story gets expensive fast.
 
 This is post 6 in the Data Warehouse 101 series.
 
 In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying ETL and ELT?
+- Which signal should the example or diagram make visible for ETL and ELT?
+- What failure should be prevented first when ETL and ELT reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 6 flow overview*
+
+This picture places ETL and ELT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ETL and ELT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ As warehouse *compute became cheap*, loading the *raw source* and *transforming 
 > *Pull transforms into SQL. Visibility and reproducibility come along for the ride.*
 
 ## Concept at a Glance
-
-![ELT pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
-
-*In a typical ELT pipeline, raw data lands first, then warehouse SQL transforms it into marts for downstream consumption.*
 
 ## Key Terms
 
@@ -165,17 +177,29 @@ INSERT INTO marts.fact_orders SELECT ...;
 
 ELT is the shape of the *SQL era*. Next, we look at *BI and dashboards* — turning data into a story.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying ETL and ELT?**
+  - The article treats ETL and ELT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for ETL and ELT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when ETL and ELT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
 - **ETL and ELT (current)**
 - BI and Dashboard (upcoming)
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

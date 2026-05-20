@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 10
-title: Warehouse Design Example
+title: "Data Warehouse 101 (10/10): Warehouse Design Example"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: An end-to-end e-commerce warehouse walkthrough — grain, dimen
 last_reviewed: '2026-05-15'
 ---
 
-# Warehouse Design Example
+# Data Warehouse 101 (10/10): Warehouse Design Example
 
 Knowing the parts of warehouse design is useful. Designing one coherent system from source data to dashboard is the harder skill. That is where grain, dimensions, loading strategy, and marts stop being isolated concepts and start becoming engineering decisions.
 
 This is the final post in the Data Warehouse 101 series.
 
 In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Warehouse Design Example?
+- Which signal should the example or diagram make visible for Warehouse Design Example?
+- What failure should be prevented first when Warehouse Design Example reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 10 flow overview*
+
+This picture places Warehouse Design Example inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Warehouse Design Example is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ Knowing the parts is not enough — *putting them together* is the real skill. A
 > *All clean designs begin with one line of grain.*
 
 ## Concept at a Glance
-
-![End-to-end warehouse design flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
-
-*An end-to-end warehouse design flows from source systems through staging, facts and dimensions, marts, and finally into dashboard consumption.*
 
 ## Key Terms
 
@@ -171,17 +183,29 @@ Data teams write a *one-page design doc* listing *grain, dimensions, partition, 
 
 You can now see a warehouse *as one flow*, from *grain to dashboard*. The next series moves into *Data Science* and *MLOps* — where this warehouse becomes the *training ground* for models.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Warehouse Design Example?**
+  - The article treats Warehouse Design Example as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Warehouse Design Example?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Warehouse Design Example reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
-- [OLTP and OLAP](./02-oltp-and-olap.md)
-- [Fact and Dimension](./03-fact-and-dimension.md)
-- [Star Schema](./04-star-schema.md)
-- [Partition and Clustering](./05-partition-and-clustering.md)
-- [ETL and ELT](./06-etl-and-elt.md)
-- [BI and Dashboard](./07-bi-and-dashboard.md)
-- [Data Mart](./08-data-mart.md)
-- [Performance Optimization](./09-performance-optimization.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+- [Data Warehouse 101 (2/10): OLTP and OLAP](./02-oltp-and-olap.md)
+- [Data Warehouse 101 (3/10): Fact and Dimension](./03-fact-and-dimension.md)
+- [Data Warehouse 101 (4/10): Star Schema](./04-star-schema.md)
+- [Data Warehouse 101 (5/10): Partition and Clustering](./05-partition-and-clustering.md)
+- [Data Warehouse 101 (6/10): ETL and ELT](./06-etl-and-elt.md)
+- [Data Warehouse 101 (7/10): BI and Dashboard](./07-bi-and-dashboard.md)
+- [Data Warehouse 101 (8/10): Data Mart](./08-data-mart.md)
+- [Data Warehouse 101 (9/10): Performance Optimization](./09-performance-optimization.md)
 - **Warehouse Design Example (current)**
+
 <!-- toc:end -->
 
 ## References

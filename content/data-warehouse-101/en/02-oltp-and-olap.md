@@ -1,7 +1,7 @@
 ---
 series: data-warehouse-101
 episode: 2
-title: OLTP and OLAP
+title: "Data Warehouse 101 (2/10): OLTP and OLAP"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: How OLTP and OLAP workloads differ, why row vs column storage m
 last_reviewed: '2026-05-15'
 ---
 
-# OLTP and OLAP
+# Data Warehouse 101 (2/10): OLTP and OLAP
 
 From far away, both systems speak SQL. Up close, they solve opposite problems. One is built to confirm a payment in milliseconds. The other is built to scan months of history without dragging production down with it.
 
 This is post 2 in the Data Warehouse 101 series.
 
 In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying OLTP and OLAP?
+- Which signal should the example or diagram make visible for OLTP and OLAP?
+- What failure should be prevented first when OLTP and OLAP reaches a real system?
+
+## Big Picture
+
+![data warehouse 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
+
+*data warehouse 101 chapter 2 flow overview*
+
+This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -51,10 +67,6 @@ OLTP processes *one record right now* fast. OLAP scans *all of history* in one s
 > *Pick the right tool. Trying to do both with one makes both unhappy.*
 
 ## Concept at a Glance
-
-![Separated OLTP-to-OLAP flow](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
-
-*Short transactional writes stay on OLTP, while change capture feeds a separate OLAP engine for broad analytical reads.*
 
 ## Key Terms
 
@@ -152,8 +164,19 @@ Payments live on *Postgres / MySQL*. Revenue reports live on *Snowflake / BigQue
 
 OLTP and OLAP optimize for opposite directions. Next we cover *facts and dimensions*, the core OLAP modeling unit.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying OLTP and OLAP?**
+  - The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for OLTP and OLAP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when OLTP and OLAP reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
+## In this series
+
+- [Data Warehouse 101 (1/10): What Is a Data Warehouse?](./01-what-is-data-warehouse.md)
 - **OLTP and OLAP (current)**
 - Fact and Dimension (upcoming)
 - Star Schema (upcoming)
@@ -163,6 +186,7 @@ OLTP and OLAP optimize for opposite directions. Next we cover *facts and dimensi
 - Data Mart (upcoming)
 - Performance Optimization (upcoming)
 - Warehouse Design Example (upcoming)
+
 <!-- toc:end -->
 
 ## References

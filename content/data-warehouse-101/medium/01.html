@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Data Warehouse?</title>
+<title>Data Warehouse 101 (1/10): What Is a Data Warehouse?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,31 @@
 </style>
 </head>
 <body>
-<h1>What Is a Data Warehouse?</h1>
+<h1>Data Warehouse 101 (1/10): What Is a Data Warehouse?</h1>
 <p>The service database that happily writes one order at a time usually becomes miserable the moment someone asks for six months of revenue by country, product, and hour. The query is not wrong. It is just asking an operational store to behave like an analytical engine.</p>
 <p>This is the first post in the Data Warehouse 101 series.</p>
 <p>In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is a Data Warehouse??</li>
+<li>Which signal should the example or diagram make visible for What Is a Data Warehouse??</li>
+<li>What failure should be prevented first when What Is a Data Warehouse? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data warehouse 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>data warehouse 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Data Warehouse? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Data Warehouse? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What exactly is a data warehouse, and why should it live separately?</li>
+<li>Where do the limits show up when you try to do analytics directly on the service database?</li>
+<li>How do OLTP and OLAP differ in what they need from a system?</li>
+<li>Why do time-based analysis and aggregation become the default in an analytical store?</li>
+<li>What problems do early teams run into when they try to operate without a warehouse?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>definition</em> and <em>purpose</em> of a data warehouse</li>
@@ -71,8 +92,6 @@
 <p><em>Run analytics on its own road; keep operations on its own.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Analytics path from the service database into the warehouse" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The basic analytics path: operational writes stay in the service database, while analytical consumers read from the warehouse layer.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>OLTP</strong>: <em>Online Transaction Processing</em>. Short transactions like orders and payments.</li>
@@ -157,6 +176,16 @@ LIMIT 10;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A warehouse is a <em>separate store for analysis</em>. Next, we look at <em>OLTP vs OLAP</em> in more depth.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is a Data Warehouse??</strong></li>
+<li>The article treats What Is a Data Warehouse? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is a Data Warehouse??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is a Data Warehouse? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Data Warehouse? (current)</strong></li>
 <li>OLTP and OLAP (upcoming)</li>
