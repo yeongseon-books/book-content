@@ -42,7 +42,7 @@ This is post 6 in the Capstone Project 101 series. It designs the MVP as a packa
 
 This picture places Designing the MVP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Designing the MVP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> An MVP is not a small feature set; it is a single user flow that creates enough confidence to proceed. A good MVP fits one scenario completely.
 
 ## What You Will Learn
 

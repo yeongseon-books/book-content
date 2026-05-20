@@ -42,7 +42,7 @@ This is post 3 in the Capstone Project 101 series. It separates feature talk fro
 
 This picture places Defining the Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Defining the Problem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A problem statement earns its clarity by testing against real usage patterns. Good problems narrow toward specific users and specific pain.
 
 ## What You Will Learn
 

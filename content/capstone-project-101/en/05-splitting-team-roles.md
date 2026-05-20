@@ -42,7 +42,7 @@ This is post 5 in the Capstone Project 101 series. It outlines a simple role mod
 
 This picture places Splitting Team Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Splitting Team Roles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Role clarity matters most when communication breaks down. Each role owns specific outcomes and handoff points.
 
 ## What You Will Learn
 

@@ -42,7 +42,7 @@ This is the final post in the Capstone Project 101 series. It shows how to combi
 
 This picture places Project Retrospective inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Project Retrospective is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A retrospective done well becomes a bridge to the next project. Bad retros feel like filing a report; good ones feel like unpacking lessons.
 
 ## What You Will Learn
 

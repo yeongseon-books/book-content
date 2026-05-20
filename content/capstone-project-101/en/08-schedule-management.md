@@ -42,7 +42,7 @@ This is post 8 in the Capstone Project 101 series. It explains how to combine mi
 
 This picture places Schedule Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Schedule Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The real skill in Schedule Management is knowing which decision points matter most for your team and how to recognize them in real projects.
 
 ## What You Will Learn
 

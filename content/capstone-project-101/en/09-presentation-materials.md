@@ -42,7 +42,7 @@ This is post 9 in the Capstone Project 101 series. It uses a problem-solution-re
 
 This picture places Building Presentation Materials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building Presentation Materials is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A strong presentation does not show all features. It shows the problem, the path taken, and the learning captured.
 
 ## What You Will Learn
 

@@ -42,7 +42,7 @@ This is the first post in the Capstone Project 101 series. It defines what separ
 
 This picture places What is a Capstone Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is a Capstone Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The real distinction in a capstone is that you control the entire flow: problem choice, scope, demo shape, and retrospective. That control is the main learning.
 
 ## What You Will Learn
 

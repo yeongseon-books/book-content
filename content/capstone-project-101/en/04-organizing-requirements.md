@@ -42,7 +42,7 @@ This is post 4 in the Capstone Project 101 series. It turns the problem statemen
 
 This picture places Organizing Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Organizing Requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Strong requirements emerge from the gap between what users need and what's buildable. Documentation captures that tension so priorities stay visible.
 
 ## What You Will Learn
 

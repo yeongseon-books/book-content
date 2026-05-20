@@ -42,7 +42,7 @@ This is post 7 in the Capstone Project 101 series. It defines a practical stack-
 
 This picture places Choosing the Tech Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Choosing the Tech Stack is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Stack choices matter less than knowing why you picked each piece and how to explain it in a demo.
 
 ## What You Will Learn
 
