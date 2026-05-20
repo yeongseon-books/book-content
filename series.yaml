@@ -2613,10 +2613,10 @@ series:
 - id: capstone-project-101
   category: software-engineering
   title:
-    ko: 측스톤 프로젝트 101
+    ko: 캡스톤 프로젝트 101
     en: Capstone Project 101
   description:
-    ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 측스톤 전체 흐름을 다룬 입문 시리즈.
+    ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 캡스톤 전체 흐름을 다룬 입문 시리즈.
     en: An introductory series covering the full capstone flow — topic, problem, MVP, team roles, demo, and retrospective.
   languages:
   - ko
