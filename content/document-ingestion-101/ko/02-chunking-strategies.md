@@ -1,5 +1,5 @@
 ---
-title: 청킹 전략 — 문서 유형별 최적화
+title: "Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화"
 series: document-ingestion-101
 episode: 2
 language: ko
@@ -18,35 +18,29 @@ last_reviewed: '2026-05-15'
 seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 신뢰할 최소 문맥 단위를 설계하는 일입니다.
 ---
 
-# 청킹 전략 — 문서 유형별 최적화
+# Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화
 
 청킹은 많은 검색 시스템이 조용히 품질을 잃는 지점입니다. FAQ에 잘 맞는 분할기가 매뉴얼이나 정책 문서의 구조를 그대로 망가뜨리는 일은 흔합니다.
 
 이 글은 Document Ingestion 101 시리즈의 2번째 글입니다. 여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- FAQ 페이지, 매뉴얼, 정책 문서에 같은 청크 크기를 써도 될까요?
-- `RecursiveCharacterTextSplitter`는 어디에서 잘라야 할지 어떻게 결정할까요?
-- 청크를 임베딩하기 전에 어떤 빠른 통계를 먼저 확인해야 할까요?
+- 모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?
+- Recursive splitter는 어떤 순서로 경계를 포기하며 텍스트를 나눌까요?
+- 임베딩 전에 청크 품질을 빠르게 검토하려면 무엇을 봐야 할까요?
 
-> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
-
-예제 코드: `en/02-chunking-strategies/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-questions-this-post-answers.ko.png)
-
-*Questions this post answers*
-
-나쁜 청킹 선택은 뒤의 모든 단계에 흔적을 남깁니다. 너무 작으면 문맥이 끊기고, 너무 크면 검색 잡음이 커집니다.
-
-이 예제는 FAQ, 매뉴얼, 정책 문서처럼 보이는 텍스트를 같은 분할기에 넣고, 왜 문서별 프리셋이 필요한지 숫자로 보여 줍니다.
-
-## 문서 유형별 청킹 흐름
+## 큰 그림
 
 ![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
 
 *Chunking strategy selection flow*
+
+이 그림에서는 문서 유형마다 다른 구조를 가진 원문이 splitter 설정을 거쳐 검색 가능한 청크로 바뀌는 흐름을 봅니다. 좋은 청킹은 크기 하나를 고르는 일이 아니라 문서 구조와 검색 질문을 함께 맞추는 일입니다.
+
+> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
+
+## 문서 유형별 청킹 흐름
 
 분할기가 하나여도, 시작하는 `chunk_size`와 `chunk_overlap`은 문서 형태에 맞춰 달라져야 합니다.
 
@@ -220,15 +214,26 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 
 그래서 문서 유형별 기본값을 다르게 잡고, 청크 수만이 아니라 길이 분포와 미리보기를 함께 점검해야 합니다. 다음 단계에서는 이렇게 만든 청크에 어떤 메타데이터를 붙여야 검색 후보군을 더 안정적으로 줄일 수 있는지 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?**
+  정책 문서, FAQ, 코드, 표는 의미 경계가 다르므로 같은 크기로 자르면 어떤 문서는 맥락이 끊기고 어떤 문서는 잡음이 섞입니다.
+
+- **Recursive splitter는 어떤 순서로 경계를 포기하며 텍스트를 나눌까요?**
+  Recursive splitter는 보통 큰 구분자부터 시도하고 실패하면 더 작은 구분자로 내려가며 마지막에는 문자 단위에 가까워집니다.
+
+- **임베딩 전에 청크 품질을 빠르게 검토하려면 무엇을 봐야 할까요?**
+  청크 길이 분포, overlap 실현 여부, 제목·본문 분리, 너무 짧거나 긴 청크, 원문 위치 메타데이터를 확인해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
-- **청킹 전략 — 문서 유형별 최적화 (현재 글)**
-- 메타데이터 설계와 필터링 (예정)
-- 증분 인덱싱 — 변경된 문서만 업데이트 (예정)
-- 다중 포맷 문서 파이프라인 (예정)
-- 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
+- **Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화 (현재 글)**
+- Document Ingestion 101 (3/6): 메타데이터 설계와 필터링 (예정)
+- Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트 (예정)
+- Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (예정)
+- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
 
 <!-- toc:end -->
 

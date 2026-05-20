@@ -1,5 +1,5 @@
 ---
-title: 증분 인덱싱 — 변경된 문서만 업데이트
+title: "Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트"
 series: document-ingestion-101
 episode: 4
 language: ko
@@ -18,35 +18,29 @@ last_reviewed: '2026-05-15'
 seo_description: 증분 인덱싱은 벡터 저장소 기법이라기보다 무엇이 바뀌었는지 기억하는 운영 문제입니다.
 ---
 
-# 증분 인덱싱 — 변경된 문서만 업데이트
+# Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트
 
 전체 인덱스를 다시 만드는 방식은 단순합니다. 하지만 코퍼스가 커지면 생각보다 빨리 한계가 옵니다. 그 시점부터 중요한 질문은 무엇이 바뀌었는지 기억하고, 나머지는 안전하게 건너뛰는 방법입니다.
 
 이 글은 Document Ingestion 101 시리즈의 4번째 글입니다. 여기서는 파일 해시와 작은 상태 저장소를 이용해 추가된 문서, 변경 없는 문서, 수정된 문서를 구분합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 전체를 다시 만들지 않고 변경된 문서만 처리하려면 무엇이 필요할까요?
-- 해시 기반 상태 저장소의 가장 단순한 형태는 무엇일까요?
-- 실행 로그에서 변경 없음, 수정됨, 신규 파일을 어떻게 구분할 수 있을까요?
+- 문서가 조금 바뀔 때마다 전체 인덱스를 다시 만들면 어떤 비용이 생길까요?
+- 변경 감지는 파일 시간보다 왜 content hash와 상태 저장소가 더 안전할까요?
+- 삭제된 문서와 수정된 청크를 인덱스에서 어떻게 구분해야 할까요?
 
-> 증분 인덱싱은 벡터 저장소 트릭이라기보다 무엇을 기억할지 정하는 운영 문제에 더 가깝습니다.
-
-예제 코드: `en/04-incremental-indexing/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-questions-this-post-answers.ko.png)
-
-*Questions this post answers*
-
-파일 수가 수십 개일 때는 전체 재색인도 감당할 수 있습니다. 하지만 수천 개로 커지면 전체 재실행은 금방 낭비가 됩니다.
-
-이 예제는 파일 해시와 JSON 상태 파일만으로 `added`, `unchanged`, `updated`를 구분합니다. 이 단순한 분류기가 이후 모든 벡터 저장소 업데이트 흐름의 기초가 됩니다.
-
-## 증분 스캔과 변경 감지
+## 큰 그림
 
 ![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.ko.png)
 
 *Incremental scan and change detection flow*
+
+이 그림에서는 현재 문서 상태와 이전 인덱싱 상태를 비교해 추가, 수정, 삭제만 처리하는 흐름을 봅니다. 증분 인덱싱은 속도 최적화가 아니라 인덱스와 원문 상태를 일치시키는 운영 계약입니다.
+
+> 증분 인덱싱은 벡터 저장소 트릭이라기보다 무엇을 기억할지 정하는 운영 문제에 더 가깝습니다.
+
+## 증분 스캔과 변경 감지
 
 증분 인덱싱의 첫 이득은 비싼 후속 처리를 시작하기 전에 작업 집합을 먼저 줄이는 데 있습니다.
 
@@ -203,15 +197,26 @@ python main.py
 
 해시와 작은 상태 저장소만으로도 그 출발점은 충분히 만들 수 있습니다. 다음 글에서는 이렇게 구분된 문서를 여러 파일 형식에서 공통 `Document` 계약으로 모으는 다중 포맷 파이프라인을 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **문서가 조금 바뀔 때마다 전체 인덱스를 다시 만들면 어떤 비용이 생길까요?**
+  전체 재빌드는 시간이 오래 걸리고 비용이 커지며, 큰 corpus에서는 배포 중 검색 품질이 흔들릴 수 있습니다.
+
+- **변경 감지는 파일 시간보다 왜 content hash와 상태 저장소가 더 안전할까요?**
+  mtime은 복사·배포 과정에서 바뀌거나 보존될 수 있지만 content hash는 실제 내용 변경을 더 직접적으로 나타냅니다. 상태 저장소는 이전 hash와 chunk ID를 비교하게 해 줍니다.
+
+- **삭제된 문서와 수정된 청크를 인덱스에서 어떻게 구분해야 할까요?**
+  삭제는 해당 문서의 기존 벡터와 메타데이터를 제거해야 하고, 수정은 이전 chunk 세트를 새 chunk 세트로 교체해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
-- [청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
-- [메타데이터 설계와 필터링](./03-metadata-filtering.md)
-- **증분 인덱싱 — 변경된 문서만 업데이트 (현재 글)**
-- 다중 포맷 문서 파이프라인 (예정)
-- 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): 메타데이터 설계와 필터링](./03-metadata-filtering.md)
+- **Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트 (현재 글)**
+- Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (예정)
+- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: 다중 포맷 문서 파이프라인
+title: "Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인"
 series: document-ingestion-101
 episode: 5
 language: ko
@@ -18,35 +18,29 @@ last_reviewed: '2026-05-15'
 seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 Document 계약으로 수렴시키는 일입니다.
 ---
 
-# 다중 포맷 문서 파이프라인
+# Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인
 
 실제 문서 수집 작업은 한 파일 형식 안에 머무르지 않습니다. 팀은 보통 PDF, 일반 텍스트 메모, Markdown 문서를 섞어 다루면서도 뒤 단계가 그 차이를 계속 신경 쓰지 않게 만들고 싶어 합니다.
 
 이 글은 Document Ingestion 101 시리즈의 5번째 글입니다. 여기서는 여러 형식을 각자 다른 로더로 읽고, 최종적으로는 하나의 공통 `Document` 계약으로 정규화합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- PDF, TXT, MD를 하나의 파이프라인으로 어떻게 묶을 수 있을까요?
-- 로더가 형식마다 달라도 공통 `Document` 형태가 왜 중요할까요?
-- 형식 분기와 메타데이터 정규화는 어디에서 처리해야 할까요?
+- PDF, Markdown, HTML을 한 파이프라인에 넣으려면 무엇을 먼저 공통 계약으로 맞춰야 할까요?
+- 파일 형식별 loader routing은 어디까지 분기하고 어디서 다시 합쳐져야 할까요?
+- 정규화 계층이 없으면 후속 청킹과 메타데이터 필터링에서 어떤 문제가 생길까요?
 
-> 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
-
-예제 코드: `en/05-multi-format-pipeline/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-questions-this-post-answers.ko.png)
-
-*Questions this post answers*
-
-실제 수집 시스템은 PDF만 다루지 않습니다. 운영 메모는 TXT일 수 있고, 팀 런북은 Markdown일 수 있으며, 외부 보고서는 PDF일 수 있습니다.
-
-이 예제는 세 가지 형식을 각각 따로 읽지만, 모든 출력은 같은 `Document` 구조를 내보냅니다. 그래서 뒤의 청킹과 인덱싱 단계는 파일 형식을 모른 채로도 계속 동작할 수 있습니다.
-
-## 파일 형식별 로더 라우팅
+## 큰 그림
 
 ![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
 
 *Loader routing by file format*
+
+이 그림에서는 파일 형식별 loader가 서로 다른 원문을 읽고, 정규화 계층이 공통 Document 계약으로 다시 맞추는 흐름을 봅니다. 다중 포맷 파이프라인은 분기를 많이 만드는 것이 아니라 분기 뒤에 다시 합칠 기준을 고정하는 일입니다.
+
+> 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
+
+## 파일 형식별 로더 라우팅
 
 다중 포맷 파이프라인의 첫 단계는 뒤 단계가 파일 형식을 다시 추론하지 않도록 라우팅 책임을 한곳에 모으는 일입니다.
 
@@ -252,15 +246,26 @@ source=diagram.docx format=docx status=unsupported reason=unsupported format: .d
 
 형식별 전처리는 얼마든지 달라질 수 있습니다. 다만 `page_content`, `source`, `format` 같은 공통 계약이 안정적이어야 청킹, 메타데이터 처리, 인덱싱이 단순해집니다. 다음 글에서는 이 계약을 끝까지 이어 붙여 엔드투엔드 파이프라인을 완성해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **PDF, Markdown, HTML을 한 파이프라인에 넣으려면 무엇을 먼저 공통 계약으로 맞춰야 할까요?**
+  텍스트 본문, source, doc_type, title, page_or_section, version 같은 공통 필드를 먼저 정해야 합니다.
+
+- **파일 형식별 loader routing은 어디까지 분기하고 어디서 다시 합쳐져야 할까요?**
+  로딩과 전처리는 형식별로 분기하되, 정규화된 Document 목록을 만드는 지점에서 다시 합쳐져야 합니다.
+
+- **정규화 계층이 없으면 후속 청킹과 메타데이터 필터링에서 어떤 문제가 생길까요?**
+  정규화가 없으면 어떤 형식은 제목이 빠지고 어떤 형식은 source가 달라져 청킹 기준과 필터 조건이 흔들립니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
-- [청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
-- [메타데이터 설계와 필터링](./03-metadata-filtering.md)
-- [증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
-- **다중 포맷 문서 파이프라인 (현재 글)**
-- 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): 메타데이터 설계와 필터링](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
+- **Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (현재 글)**
+- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
 
 <!-- toc:end -->
 

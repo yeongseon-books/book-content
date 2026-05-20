@@ -1,5 +1,5 @@
 ---
-title: Multi-format document pipeline
+title: "Document Ingestion 101 (5/6): Multi-format document pipeline"
 series: document-ingestion-101
 episode: 5
 language: en
@@ -19,34 +19,30 @@ seo_description: The essence of a multi-format pipeline is forcing varied inputs
   one shared Document contract.
 ---
 
-# Multi-format document pipeline
+# Document Ingestion 101 (5/6): Multi-format document pipeline
 
 Real ingestion work rarely stays inside one file format. Teams usually need to mix PDFs, plain text notes, and Markdown documents without forcing every later stage to care about those differences.
 
 This is the fifth post in the Document Ingestion 101 series. Here, we route multiple formats through separate loaders and normalize them into one shared `Document` contract.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do you combine PDF, TXT, and MD into one pipeline?
-- Why is a shared `Document` shape important even when loaders differ by format?
-- Where should format branching and metadata normalization happen?
+- What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?
+- Where should loader routing branch by file format, and where should it merge again?
+- What breaks in chunking and metadata filtering without a normalization layer?
 
-> The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
-
-Example code: `en/05-multi-format-pipeline/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.
-
-This example reads three formats separately but emits the same `Document` structure for all of them. That keeps later chunking and indexing stages format-agnostic.
-
-## Loader routing by file format
+## Big Picture
 
 ![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
 
 *Loader routing by file format*
+
+This picture shows format-specific loaders reading different sources and a normalization layer bringing them back to one Document contract. A multi-format pipeline is about fixing the merge point after format-specific branches.
+
+> The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
+
+## Loader routing by file format
+
 The first step in a multi-format pipeline is centralizing routing so later stages do not need to rediscover file type.
 
 ## Format-specific preprocessing
@@ -242,15 +238,26 @@ Early on, it is better to be strict about the handoff contract than ambitious ab
 
 It is also worth resisting the urge to treat every format as equally mature on day one. PDFs need text-layer verification first. Markdown needs structure preservation first. TXT often needs encoding and newline normalization first. The pipeline is shared, but the first good failure check is still format-specific.
 
+## Answering the Opening Questions
+
+- **What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?**
+  Define shared fields such as text, source, doc_type, title, page_or_section, and version before format-specific logic grows.
+
+- **Where should loader routing branch by file format, and where should it merge again?**
+  Loading and preprocessing can branch by format, but they should merge back at normalized Document objects.
+
+- **What breaks in chunking and metadata filtering without a normalization layer?**
+  Without normalization, titles, sources, and metadata fields differ by format, making chunking rules and filters inconsistent.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- [Metadata design and filtering](./03-metadata-filtering.md)
-- [Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
-- **Multi-format document pipeline (current)**
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): Metadata design and filtering](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
+- **Document Ingestion 101 (5/6): Multi-format document pipeline (current)**
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 

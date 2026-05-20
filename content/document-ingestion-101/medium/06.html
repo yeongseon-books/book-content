@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Completing the document ingestion pipeline</title>
+<title>Document Ingestion 101 (6/6): Completing the document ingestion pipeline</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Completing the document ingestion pipeline</h1>
+<h1>Document Ingestion 101 (6/6): Completing the document ingestion pipeline</h1>
 <p>The value of an ingestion pipeline appears only when the handoff between stages is real. It is not enough to understand loading, chunking, and indexing separately if they do not survive an end-to-end run together.</p>
 <p>This is the final post in the Document Ingestion 101 series. Here, we connect the earlier pieces into one reproducible flow and verify that the index can be saved, reloaded, and queried.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you connect loading, chunking, embedding, and FAISS save-reload in one flow?</li>
-<li>Which outputs are the minimum proof that the whole pipeline actually worked?</li>
-<li>How do you keep the retrieval flow reproducible offline?</li>
+<li>What stage-level verification checkpoints should a complete ingestion pipeline have?</li>
+<li>How can you quickly tell whether parsing, normalization, chunking, or indexing failed?</li>
+<li>What artifacts make the pipeline rerunnable in production?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="End-to-end ingestion pipeline flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png"></p>
+<p><em>End-to-end ingestion pipeline flow</em></p>
+<p>This picture connects file collection, parsing, normalization, chunking, embedding, indexing, and verification reports. A complete pipeline is not a script that succeeds once; it is a staged process that can stop, explain, and rerun.</p>
 <blockquote>
 <p>A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.</p>
 </blockquote>
-<p>Example code: <code>en/06-pipeline-completion/main.py</code></p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em><br>
-The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.</p>
-<p>This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.</p>
 <h2>End-to-end ingestion pipeline</h2>
-<p><img alt="End-to-end ingestion pipeline flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png"></p>
-<p><em>End-to-end ingestion pipeline flow</em><br>
-The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.</p>
+<p>The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.</p>
 <h2>Stage verification checkpoints</h2>
 <p><img alt="Stage verification checkpoint flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png"></p>
 <p><em>Stage verification checkpoint flow</em><br>
@@ -129,20 +126,15 @@ def seed_files() -&gt; list[Path]:
     txt_path = DATA_DIR / 'ops.txt'
     md_path = DATA_DIR / 'faq.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.
-', encoding='utf-8')
-    md_path.write_text('# FAQ
-
-MD source: metadata filters reduce the candidate set before answer generation.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.\n', encoding='utf-8')
+    md_path.write_text('# FAQ\n\nMD source: metadata filters reduce the candidate set before answer generation.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_file(path: Path) -&gt; list[Document]:
     suffix = path.suffix.lower()
     if suffix == '.pdf':
         reader = PdfReader(str(path))
-        text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+        text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
         return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
     if suffix == '.txt':
         return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'txt'})]
@@ -154,10 +146,7 @@ def chunk_documents(documents: list[Document]) -&gt; list[Document]:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=90,
         chunk_overlap=20,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_documents(documents)
     for index, chunk in enumerate(chunks):
@@ -183,8 +172,7 @@ def main() -&gt; None:
     print(f'chunks: {len(chunks)}')
     print(f'faiss_saved: {INDEX_DIR}')
     for doc in results:
-        preview = doc.page_content.replace('
-', ' ')[:90]
+        preview = doc.page_content.replace('\n', ' ')[:90]
         print(f&quot;result={doc.metadata['source']} chunk_id={doc.metadata['chunk_id']} preview={preview}&quot;)
 
 if __name__ == '__main__':
@@ -226,6 +214,21 @@ Retrying and replaying are different control paths, and collapsing them into one
 <li>[ ] You checked that the chunk count was plausible.</li>
 <li>[ ] You saved the FAISS index and loaded it back.</li>
 <li>[ ] You verified retrieval against the reloaded index.</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What stage-level verification checkpoints should a complete ingestion pipeline have?</strong><br>
+  Verify file discovery, parse output, normalized fields, chunk lengths, embedding dimensions, index row counts, and sample retrieval results.</p>
+</li>
+<li>
+<p><strong>How can you quickly tell whether parsing, normalization, chunking, or indexing failed?</strong><br>
+  Log input count, output count, failure list, and sample payload at each stage to locate the broken boundary quickly.</p>
+</li>
+<li>
+<p><strong>What artifacts make the pipeline rerunnable in production?</strong><br>
+  Persist the input manifest, state file, hashes, chunk manifest, index version, and verification report so the same input can be rerun.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Metadata design and filtering</title>
+<title>Document Ingestion 101 (3/6): Metadata design and filtering</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Metadata design and filtering</h1>
+<h1>Document Ingestion 101 (3/6): Metadata design and filtering</h1>
 <p>Good retrieval is not only about semantic similarity. In production, engineers also need explicit ways to narrow results by scope, source, and time window before ranking becomes useful.</p>
 <p>This is the third post in the Document Ingestion 101 series. Here, we design a practical metadata shape and show how filtering changes retrieval behavior in a visible way.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Which retrieval conditions cannot be solved by embedding similarity alone?</li>
-<li>How should you design LangChain Document metadata for later filtering?</li>
-<li>What does the <code>filter</code> parameter look like in a FAISS search flow?</li>
+<li>Why should metadata schema be designed during ingestion rather than after embedding?</li>
+<li>How do filters change the candidate set before vector similarity search?</li>
+<li>What breaks in retrieval and citation when required metadata is missing?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Retrieval metadata schema flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png"></p>
+<p><em>Retrieval metadata schema flow</em></p>
+<p>This picture shows documents receiving a shared metadata schema while filters narrow the candidate set before vector search. Metadata is not decoration; it is the contract for retrieval scope and source explanation.</p>
 <blockquote>
 <p>Metadata is not decoration around the text; it is the first index that shrinks the candidate set.</p>
 </blockquote>
-<p>Example code: <code>en/03-metadata-filtering/main.py</code></p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em><br>
-One of the most common RAG mistakes is mixing “similar meaning” with “allowed scope.” Quarter, source, and category usually need structured filtering, not just vector similarity.</p>
-<p>This example loads three tiny documents into FAISS and changes the <code>filter</code> parameter by category and quarter so the retrieval behavior is explicit.</p>
 <h2>Metadata schema design</h2>
-<p><img alt="Retrieval metadata schema flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png"></p>
-<p><em>Retrieval metadata schema flow</em><br>
-The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.</p>
+<p>The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.</p>
 <h2>How filters narrow the candidate set</h2>
 <p><img alt="Filtered retrieval candidate flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png"></p>
 <p><em>Filtered retrieval candidate flow</em><br>
@@ -157,8 +154,7 @@ def main() -&gt; None:
     for doc in vectorstore.similarity_search(query, k=3, filter={'category': 'marketing'}):
         print(doc.metadata['title'], doc.metadata['quarter'], '-', doc.page_content)
 
-    print('
-[filter=quarter:2024Q4]')
+    print('\n[filter=quarter:2024Q4]')
     for doc in vectorstore.similarity_search(query, k=3, filter={'quarter': '2024Q4'}):
         print(doc.metadata['title'], doc.metadata['category'], '-', doc.page_content)
 
@@ -203,6 +199,21 @@ When an answer looks wrong, source and scope metadata usually explain the failur
 <li>[ ] You compared different filter results against the same query.</li>
 <li>[ ] Field names stay consistent between document creation and retrieval.</li>
 <li>[ ] You trimmed the schema to fields that are operationally useful.</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why should metadata schema be designed during ingestion rather than after embedding?</strong><br>
+  Fields such as source, doc_type, date, and owner must be assigned during ingestion so every chunk and index shares the same filter contract.</p>
+</li>
+<li>
+<p><strong>How do filters change the candidate set before vector similarity search?</strong><br>
+  Filters reduce the document candidate set before similarity scoring, preventing unrelated records from competing in the top results.</p>
+</li>
+<li>
+<p><strong>What breaks in retrieval and citation when required metadata is missing?</strong><br>
+  Missing metadata makes scoped retrieval, citation, page reference, and version tracking unreliable.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

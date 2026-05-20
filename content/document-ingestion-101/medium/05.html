@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Multi-format document pipeline</title>
+<title>Document Ingestion 101 (5/6): Multi-format document pipeline</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Multi-format document pipeline</h1>
+<h1>Document Ingestion 101 (5/6): Multi-format document pipeline</h1>
 <p>Real ingestion work rarely stays inside one file format. Teams usually need to mix PDFs, plain text notes, and Markdown documents without forcing every later stage to care about those differences.</p>
 <p>This is the fifth post in the Document Ingestion 101 series. Here, we route multiple formats through separate loaders and normalize them into one shared <code>Document</code> contract.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you combine PDF, TXT, and MD into one pipeline?</li>
-<li>Why is a shared <code>Document</code> shape important even when loaders differ by format?</li>
-<li>Where should format branching and metadata normalization happen?</li>
+<li>What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?</li>
+<li>Where should loader routing branch by file format, and where should it merge again?</li>
+<li>What breaks in chunking and metadata filtering without a normalization layer?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Loader routing by file format" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png"></p>
+<p><em>Loader routing by file format</em></p>
+<p>This picture shows format-specific loaders reading different sources and a normalization layer bringing them back to one Document contract. A multi-format pipeline is about fixing the merge point after format-specific branches.</p>
 <blockquote>
 <p>The essence of a multi-format pipeline is forcing varied inputs into one shared <code>Document</code> contract.</p>
 </blockquote>
-<p>Example code: <code>en/05-multi-format-pipeline/main.py</code></p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em><br>
-Real ingestion systems rarely deal with PDFs alone. Operational notes may be TXT, team runbooks may be Markdown, and external reports may be PDF.</p>
-<p>This example reads three formats separately but emits the same <code>Document</code> structure for all of them. That keeps later chunking and indexing stages format-agnostic.</p>
 <h2>Loader routing by file format</h2>
-<p><img alt="Loader routing by file format" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png"></p>
-<p><em>Loader routing by file format</em><br>
-The first step in a multi-format pipeline is centralizing routing so later stages do not need to rediscover file type.</p>
+<p>The first step in a multi-format pipeline is centralizing routing so later stages do not need to rediscover file type.</p>
 <h2>Format-specific preprocessing</h2>
 <p><img alt="Format-specific preprocessing branches" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-02-format-specific-preprocessing.en.png"></p>
 <p><em>Format-specific preprocessing branches</em><br>
@@ -105,18 +102,13 @@ def seed_files() -&gt; list[Path]:
     txt_path = DATA_DIR / 'notes.txt'
     md_path = DATA_DIR / 'runbook.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.
-', encoding='utf-8')
-    md_path.write_text('# Runbook
-
-MD source: restart the worker only after checking the dead-letter queue.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: queue backlog grew overnight. Scale-out reduced latency.\n', encoding='utf-8')
+    md_path.write_text('# Runbook\n\nMD source: restart the worker only after checking the dead-letter queue.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_pdf(path: Path) -&gt; list[Document]:
     reader = PdfReader(str(path))
-    text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+    text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
     return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
 
 def load_text_like(path: Path, fmt: str) -&gt; list[Document]:
@@ -136,8 +128,7 @@ def main() -&gt; None:
     for path in seed_files():
         docs = load_document(path)
         for doc in docs:
-            preview = doc.page_content.replace('
-', ' ')[:90]
+            preview = doc.page_content.replace('\n', ' ')[:90]
             print(f&quot;source={doc.metadata['source']} format={doc.metadata['format']} preview={preview}&quot;)
 
 if __name__ == '__main__':
@@ -240,6 +231,21 @@ As the format count grows, explicit fallback paths matter more than pretending e
 <h2>How this looks in production thinking</h2>
 <p>Early on, it is better to be strict about the handoff contract than ambitious about format count. If the <code>Document</code> contract stays stable, chunking and indexing survive much longer. If the contract is vague, every new loader leaks its quirks into the rest of the system.</p>
 <p>It is also worth resisting the urge to treat every format as equally mature on day one. PDFs need text-layer verification first. Markdown needs structure preservation first. TXT often needs encoding and newline normalization first. The pipeline is shared, but the first good failure check is still format-specific.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?</strong><br>
+  Define shared fields such as text, source, doc_type, title, page_or_section, and version before format-specific logic grows.</p>
+</li>
+<li>
+<p><strong>Where should loader routing branch by file format, and where should it merge again?</strong><br>
+  Loading and preprocessing can branch by format, but they should merge back at normalized Document objects.</p>
+</li>
+<li>
+<p><strong>What breaks in chunking and metadata filtering without a normalization layer?</strong><br>
+  Without normalization, titles, sources, and metadata fields differ by format, making chunking rules and filters inconsistent.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>

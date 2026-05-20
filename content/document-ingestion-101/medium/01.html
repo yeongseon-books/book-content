@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>PDF parsing and text extraction</title>
+<title>Document Ingestion 101 (1/6): PDF parsing and text extraction</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,24 @@
 </style>
 </head>
 <body>
-<h1>PDF parsing and text extraction</h1>
+<h1>Document Ingestion 101 (1/6): PDF parsing and text extraction</h1>
 <p>Most document ingestion pipelines fail earlier than people expect. If the very first extraction step is hard to reproduce or hard to inspect, every later chunking and indexing discussion rests on shaky ground.</p>
 <p>This is the first post in the Document Ingestion 101 series. Here, we start with a reproducible PDF sample and inspect what useful text and page-level metadata come out of it.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you make a PDF extraction demo reproducible when no sample file exists?</li>
-<li>How do you inspect page-level text and character counts with pypdf?</li>
-<li>Which metadata is worth keeping at the very first ingestion step?</li>
+<li>Why can a PDF not be treated like a plain text file?</li>
+<li>What breaks in RAG when page structure and metadata are not preserved during extraction?</li>
+<li>What should be validated even when extracted text looks good?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="PDF generation and extraction flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png"></p>
+<p><em>PDF generation and extraction flow</em></p>
+<p>This picture shows a PDF loaded as page-structured content with metadata before extracted text becomes input for chunking and retrieval. The first ingestion failure often starts at the document-reading boundary, not in the model.</p>
 <blockquote>
 <p>The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.</p>
 </blockquote>
-<p>Example code: <code>en/01-pdf-parsing/main.py</code></p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em><br>
-The first practical problem in a PDF parsing tutorial is usually the sample file. If readers cannot reproduce the example from scratch, the pipeline story starts with friction.</p>
-<p>This example generates its own PDF with <code>reportlab</code>, then reads it back with <code>pypdf</code> and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.</p>
 <h2>PDF parsing flow</h2>
-<p><img alt="PDF generation and extraction flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png"></p>
-<p><em>PDF generation and extraction flow</em><br>
-Keeping generation and extraction in one script makes the demo reproducible and the output easy to verify.</p>
+<p>Keeping generation and extraction in one script makes the demo reproducible and the output easy to verify.</p>
 <h2>Page structure and extraction points</h2>
 <p><img alt="Page structure and table detection path" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.en.png"></p>
 <p><em>Page structure and table detection path</em><br>
@@ -139,8 +136,7 @@ def extract_pages(pdf_path: Path) -&gt; list[PageSummary]:
             {
                 'page': index,
                 'chars': len(text),
-                'preview': text.replace('
-', ' ')[:100],
+                'preview': text.replace('\n', ' ')[:100],
             }
         )
     return pages
@@ -194,6 +190,21 @@ OCR is safer as a fallback path after a text-layer check, not as the default pat
 <li>[ ] It prints both page count and character count.</li>
 <li>[ ] The page preview is enough to verify extraction order by eye.</li>
 <li>[ ] You identified which metadata should flow into the next stage.</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why can a PDF not be treated like a plain text file?</strong><br>
+  PDFs are closer to layout documents than plain text, so reading order, page boundaries, tables, headers, and footers need explicit handling.</p>
+</li>
+<li>
+<p><strong>What breaks in RAG when page structure and metadata are not preserved during extraction?</strong><br>
+  Without page numbers, source paths, and section metadata, retrieval results cannot reliably link back to source evidence.</p>
+</li>
+<li>
+<p><strong>What should be validated even when extracted text looks good?</strong><br>
+  Check empty pages, broken encoding, repeated headers, table order, per-page text length, and metadata samples before trusting the output.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

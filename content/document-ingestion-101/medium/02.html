@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Chunking strategies — optimizing by document type</title>
+<title>Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Chunking strategies — optimizing by document type</h1>
+<h1>Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type</h1>
 <p>Chunking is where many retrieval systems quietly lose quality. A splitter that works well for an FAQ can easily damage the structure of a manual or a policy document.</p>
 <p>This is the second post in the Document Ingestion 101 series. Here, we compare chunking presets by document shape and look at the quick signals that tell you whether a split is trustworthy.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Should FAQ pages, manuals, and policy documents use the same chunk size?</li>
-<li>How does RecursiveCharacterTextSplitter decide where to split?</li>
-<li>Which quick stats should you inspect before embedding the chunks?</li>
+<li>Why does one chunk_size for every document type make retrieval quality unstable?</li>
+<li>In what order does a Recursive splitter give up boundaries while splitting text?</li>
+<li>What should be reviewed before embedding to catch bad chunks quickly?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Chunking strategy selection flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png"></p>
+<p><em>Chunking strategy selection flow</em></p>
+<p>This picture shows different document types passing through splitter settings into searchable chunks. Good chunking is not choosing one size; it is matching document structure to retrieval questions.</p>
 <blockquote>
 <p>Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.</p>
 </blockquote>
-<p>Example code: <code>en/02-chunking-strategies/main.py</code></p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em><br>
-A bad chunking choice leaks into every later stage. Too small means broken context, too large means noisy retrieval.</p>
-<p>This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.</p>
 <h2>Chunking flow by document type</h2>
-<p><img alt="Chunking strategy selection flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png"></p>
-<p><em>Chunking strategy selection flow</em><br>
-Even with one splitter, the starting chunk size and overlap should differ by document shape.</p>
+<p>Even with one splitter, the starting chunk size and overlap should differ by document shape.</p>
 <h2>Recursive splitter fallback order</h2>
 <p><img alt="Recursive separator fallback flow" src="https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.en.png"></p>
 <p><em>Recursive separator fallback flow</em><br>
@@ -88,13 +85,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 SAMPLES = {
     'faq': 'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
     'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4,
-    'manual': '# Deployment guide
-
-1. Review the config file.
-2. Validate sample documents before rollout.
-3. Check logs and chunk counts after deployment.
-
-'
+    'manual': '# Deployment guide\n\n1. Review the config file.\n2. Validate sample documents before rollout.\n3. Check logs and chunk counts after deployment.\n\n'
     'When the structure is explicit, larger chunks can stay readable. ' * 4,
     'policy': 'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
     'rules together, so context breaks if the overlap is too small. ' * 5,
@@ -110,10 +101,7 @@ def summarize(name: str, text: str, chunk_size: int, chunk_overlap: int) -&gt; N
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_text(text)
     sizes = [len(chunk) for chunk in chunks]
@@ -239,6 +227,21 @@ Chunk count alone is too weak. Distribution and preview checks reveal whether th
 <h2>How this gets tuned in practice</h2>
 <p>There is rarely a perfect preset on day one. The usual workflow is to set a starting profile per document type, then revisit the retrieval log for <strong>boundaries that cut too aggressively</strong> and <strong>sentences that should have stayed together</strong>. FAQs care about keeping question-answer pairs intact. Manuals care about keeping headings and steps together. Policy documents care about keeping exceptions adjacent to the rule they qualify.</p>
 <p>Just as important, do not confuse chunking failure with embedding-model failure too early. When search results look wrong, inspect chunk previews and warning counts before you swap the model.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why does one chunk_size for every document type make retrieval quality unstable?</strong><br>
+  Policies, FAQs, code, and tables have different semantic boundaries; one size can cut context in one type and mix noise in another.</p>
+</li>
+<li>
+<p><strong>In what order does a Recursive splitter give up boundaries while splitting text?</strong><br>
+  A Recursive splitter tries larger separators first and falls back to smaller ones until it can fit the target size.</p>
+</li>
+<li>
+<p><strong>What should be reviewed before embedding to catch bad chunks quickly?</strong><br>
+  Review length distribution, realized overlap, heading/body separation, very short or long chunks, and source-location metadata before embedding.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/document-ingestion-101/en/01-pdf-parsing.md">PDF parsing and text extraction</a></li>

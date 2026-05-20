@@ -1,5 +1,5 @@
 ---
-title: Chunking strategies — optimizing by document type
+title: "Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type"
 series: document-ingestion-101
 episode: 2
 language: en
@@ -19,34 +19,30 @@ seo_description: Chunking is not just cutting text smaller; it is designing the 
   context unit retrieval can still trust.
 ---
 
-# Chunking strategies — optimizing by document type
+# Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type
 
 Chunking is where many retrieval systems quietly lose quality. A splitter that works well for an FAQ can easily damage the structure of a manual or a policy document.
 
 This is the second post in the Document Ingestion 101 series. Here, we compare chunking presets by document shape and look at the quick signals that tell you whether a split is trustworthy.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Should FAQ pages, manuals, and policy documents use the same chunk size?
-- How does RecursiveCharacterTextSplitter decide where to split?
-- Which quick stats should you inspect before embedding the chunks?
+- Why does one chunk_size for every document type make retrieval quality unstable?
+- In what order does a Recursive splitter give up boundaries while splitting text?
+- What should be reviewed before embedding to catch bad chunks quickly?
 
-> Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
-
-Example code: `en/02-chunking-strategies/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-A bad chunking choice leaks into every later stage. Too small means broken context, too large means noisy retrieval.
-
-This example runs FAQ, manual, and policy-style text through the same splitter and shows with numbers why per-document presets matter.
-
-## Chunking flow by document type
+## Big Picture
 
 ![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
 
 *Chunking strategy selection flow*
+
+This picture shows different document types passing through splitter settings into searchable chunks. Good chunking is not choosing one size; it is matching document structure to retrieval questions.
+
+> Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
+
+## Chunking flow by document type
+
 Even with one splitter, the starting chunk size and overlap should differ by document shape.
 
 ## Recursive splitter fallback order
@@ -210,15 +206,26 @@ There is rarely a perfect preset on day one. The usual workflow is to set a star
 
 Just as important, do not confuse chunking failure with embedding-model failure too early. When search results look wrong, inspect chunk previews and warning counts before you swap the model.
 
+## Answering the Opening Questions
+
+- **Why does one chunk_size for every document type make retrieval quality unstable?**
+  Policies, FAQs, code, and tables have different semantic boundaries; one size can cut context in one type and mix noise in another.
+
+- **In what order does a Recursive splitter give up boundaries while splitting text?**
+  A Recursive splitter tries larger separators first and falls back to smaller ones until it can fit the target size.
+
+- **What should be reviewed before embedding to catch bad chunks quickly?**
+  Review length distribution, realized overlap, heading/body separation, very short or long chunks, and source-location metadata before embedding.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- **Chunking strategies — optimizing by document type (current)**
-- Metadata design and filtering (upcoming)
-- Incremental indexing — updating only changed documents (upcoming)
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- **Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type (current)**
+- Document Ingestion 101 (3/6): Metadata design and filtering (upcoming)
+- Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (upcoming)
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 

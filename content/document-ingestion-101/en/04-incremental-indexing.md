@@ -1,5 +1,5 @@
 ---
-title: Incremental indexing — updating only changed documents
+title: "Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents"
 series: document-ingestion-101
 episode: 4
 language: en
@@ -19,34 +19,30 @@ seo_description: Incremental indexing is less a vector-store trick and more an o
   memory problem.
 ---
 
-# Incremental indexing — updating only changed documents
+# Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents
 
 Rebuilding an entire index is simple, but it stops scaling surprisingly quickly. Once the corpus grows, the real question becomes how to remember what changed and skip the rest safely.
 
 This is the fourth post in the Document Ingestion 101 series. Here, we use file hashes and a small state store to separate added, unchanged, and updated documents.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- What do you need to process only changed documents instead of rebuilding everything?
-- What is the simplest shape for a hash-based state store?
-- How do you distinguish unchanged, updated, and new files in the run log?
+- What cost appears when every small document change rebuilds the full index?
+- Why are content hashes and a state store safer than file timestamps for change detection?
+- How should deleted documents and modified chunks be separated in the index?
 
-> Incremental indexing is less a vector-store trick and more an operational memory problem.
-
-Example code: `en/04-incremental-indexing/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-A full rebuild is acceptable for dozens of files, but it becomes wasteful once the corpus grows into the thousands.
-
-This example uses only file hashes and a JSON state file to classify `added`, `unchanged`, and `updated`. That simple classifier is the foundation for every later vector-store update step.
-
-## Incremental scan and change detection
+## Big Picture
 
 ![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
 
 *Incremental scan and change detection flow*
+
+This picture compares current document state with the previous indexing state so only additions, updates, and deletions are processed. Incremental indexing is not just a speed optimization; it is an operational contract that keeps index and source in sync.
+
+> Incremental indexing is less a vector-store trick and more an operational memory problem.
+
+## Incremental scan and change detection
+
 The first win in incremental indexing is narrowing the work set before any expensive downstream processing starts.
 
 ## State store and hash comparison
@@ -193,15 +189,26 @@ Past a certain scale, knowing which run produced which index version becomes as 
 - [ ] A later file edit resolves to updated.
 - [ ] You identified where deletion handling would plug in.
 
+## Answering the Opening Questions
+
+- **What cost appears when every small document change rebuilds the full index?**
+  Full rebuilds take time and cost more, and at larger corpus sizes they can disrupt search quality during deployment.
+
+- **Why are content hashes and a state store safer than file timestamps for change detection?**
+  Timestamps can change or be preserved by copy and deploy workflows, while content hashes represent actual content changes. A state store lets you compare previous hashes and chunk ids.
+
+- **How should deleted documents and modified chunks be separated in the index?**
+  Deletes should remove existing vectors and metadata for that document; updates should replace the previous chunk set with the new one.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- [Metadata design and filtering](./03-metadata-filtering.md)
-- **Incremental indexing — updating only changed documents (current)**
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): Metadata design and filtering](./03-metadata-filtering.md)
+- **Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (current)**
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: Metadata design and filtering
+title: "Document Ingestion 101 (3/6): Metadata design and filtering"
 series: document-ingestion-101
 episode: 3
 language: en
@@ -19,34 +19,30 @@ seo_description: Metadata is not decoration around the text; it is the first ind
   that shrinks the candidate set.
 ---
 
-# Metadata design and filtering
+# Document Ingestion 101 (3/6): Metadata design and filtering
 
 Good retrieval is not only about semantic similarity. In production, engineers also need explicit ways to narrow results by scope, source, and time window before ranking becomes useful.
 
 This is the third post in the Document Ingestion 101 series. Here, we design a practical metadata shape and show how filtering changes retrieval behavior in a visible way.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Which retrieval conditions cannot be solved by embedding similarity alone?
-- How should you design LangChain Document metadata for later filtering?
-- What does the `filter` parameter look like in a FAISS search flow?
+- Why should metadata schema be designed during ingestion rather than after embedding?
+- How do filters change the candidate set before vector similarity search?
+- What breaks in retrieval and citation when required metadata is missing?
 
-> Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
-
-Example code: `en/03-metadata-filtering/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-One of the most common RAG mistakes is mixing “similar meaning” with “allowed scope.” Quarter, source, and category usually need structured filtering, not just vector similarity.
-
-This example loads three tiny documents into FAISS and changes the `filter` parameter by category and quarter so the retrieval behavior is explicit.
-
-## Metadata schema design
+## Big Picture
 
 ![Retrieval metadata schema flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
 
 *Retrieval metadata schema flow*
+
+This picture shows documents receiving a shared metadata schema while filters narrow the candidate set before vector search. Metadata is not decoration; it is the contract for retrieval scope and source explanation.
+
+> Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
+
+## Metadata schema design
+
 The schema is less about collecting many fields and more about keeping the few keys that actually shrink the candidate set.
 
 ## How filters narrow the candidate set
@@ -196,15 +192,26 @@ When an answer looks wrong, source and scope metadata usually explain the failur
 - [ ] Field names stay consistent between document creation and retrieval.
 - [ ] You trimmed the schema to fields that are operationally useful.
 
+## Answering the Opening Questions
+
+- **Why should metadata schema be designed during ingestion rather than after embedding?**
+  Fields such as source, doc_type, date, and owner must be assigned during ingestion so every chunk and index shares the same filter contract.
+
+- **How do filters change the candidate set before vector similarity search?**
+  Filters reduce the document candidate set before similarity scoring, preventing unrelated records from competing in the top results.
+
+- **What breaks in retrieval and citation when required metadata is missing?**
+  Missing metadata makes scoped retrieval, citation, page reference, and version tracking unreliable.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- **Metadata design and filtering (current)**
-- Incremental indexing — updating only changed documents (upcoming)
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- **Document Ingestion 101 (3/6): Metadata design and filtering (current)**
+- Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (upcoming)
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 

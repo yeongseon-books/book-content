@@ -1,5 +1,5 @@
 ---
-title: 메타데이터 설계와 필터링
+title: "Document Ingestion 101 (3/6): 메타데이터 설계와 필터링"
 series: document-ingestion-101
 episode: 3
 language: ko
@@ -18,35 +18,29 @@ last_reviewed: '2026-05-15'
 seo_description: 메타데이터는 장식이 아니라 검색 후보군을 먼저 줄이는 첫 번째 인덱스입니다.
 ---
 
-# 메타데이터 설계와 필터링
+# Document Ingestion 101 (3/6): 메타데이터 설계와 필터링
 
 좋은 검색은 의미 유사도만으로 완성되지 않습니다. 운영 환경에서는 범위, 출처, 시간 구간처럼 랭킹 전에 먼저 좁혀야 하는 조건이 분명히 생깁니다.
 
 이 글은 Document Ingestion 101 시리즈의 3번째 글입니다. 여기서는 실무에서 바로 쓸 수 있는 메타데이터 형태를 설계하고, 필터가 검색 동작을 어떻게 바꾸는지 눈에 보이게 확인합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 어떤 검색 조건은 임베딩 유사도만으로 해결할 수 없을까요?
-- 나중에 필터링하기 쉽도록 LangChain `Document` 메타데이터를 어떻게 설계해야 할까요?
-- FAISS 검색 흐름에서 `filter` 파라미터는 어떤 모양으로 들어갈까요?
+- 메타데이터 스키마는 왜 임베딩 후가 아니라 수집 단계에서 먼저 설계해야 할까요?
+- 필터는 벡터 유사도 검색 전에 후보군을 어떻게 바꿀까요?
+- 필수 메타데이터가 빠지면 검색과 출처 표시에 어떤 문제가 생길까요?
 
-> 메타데이터는 본문 옆의 장식이 아니라 검색 후보군을 줄이는 첫 번째 인덱스입니다.
-
-예제 코드: `en/03-metadata-filtering/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-questions-this-post-answers.ko.png)
-
-*Questions this post answers*
-
-RAG에서 가장 흔한 실수 중 하나는 "의미가 비슷하다"와 "허용된 범위 안이다"를 섞어 생각하는 것입니다. 분기, 출처, 카테고리 같은 조건은 대개 벡터 유사도만으로 처리되지 않고, 구조화된 필터가 필요합니다.
-
-이 예제는 작은 문서 세 개를 FAISS에 넣고 `category`와 `quarter` 기준으로 `filter`를 바꿔 보면서 검색 동작이 어떻게 달라지는지 분명하게 보여 줍니다.
-
-## 메타데이터 스키마 설계
+## 큰 그림
 
 ![Retrieval metadata schema flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.ko.png)
 
 *Retrieval metadata schema flow*
+
+이 그림에서는 문서가 공통 메타데이터 스키마를 얻고, 필터가 벡터 검색 전에 후보군을 좁히는 흐름을 봅니다. 메타데이터는 부가 정보가 아니라 검색 범위와 출처 설명을 결정하는 계약입니다.
+
+> 메타데이터는 본문 옆의 장식이 아니라 검색 후보군을 줄이는 첫 번째 인덱스입니다.
+
+## 메타데이터 스키마 설계
 
 좋은 스키마는 필드를 많이 모으는 데 있지 않습니다. 실제로 후보군을 줄이는 몇 개의 키를 남기는 데 있습니다.
 
@@ -206,15 +200,26 @@ Q4 infrastructure cost engineering - ...
 
 이 글에서 본 `category`, `quarter`, `source` 같은 키는 단순하지만 강력합니다. 다음 글에서는 이런 메타데이터 계약을 유지한 채, 변경된 문서만 다시 처리하는 증분 인덱싱 흐름으로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **메타데이터 스키마는 왜 임베딩 후가 아니라 수집 단계에서 먼저 설계해야 할까요?**
+  수집 단계에서 source, doc_type, date, owner 같은 필드를 정해야 모든 청크와 인덱스가 같은 필터 계약을 공유합니다.
+
+- **필터는 벡터 유사도 검색 전에 후보군을 어떻게 바꿀까요?**
+  필터는 유사도 계산 전에 검색 대상 문서 집합을 줄여 관련 없는 후보가 상위 결과에 들어오는 것을 줄입니다.
+
+- **필수 메타데이터가 빠지면 검색과 출처 표시에 어떤 문제가 생길까요?**
+  필수 메타데이터가 빠지면 특정 문서군만 검색하거나, 답변에 정확한 출처·페이지·버전을 붙이는 일이 어려워집니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
-- [청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
-- **메타데이터 설계와 필터링 (현재 글)**
-- 증분 인덱싱 — 변경된 문서만 업데이트 (예정)
-- 다중 포맷 문서 파이프라인 (예정)
-- 문서 수집 파이프라인 완성 (예정)
+- [Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+- **Document Ingestion 101 (3/6): 메타데이터 설계와 필터링 (현재 글)**
+- Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트 (예정)
+- Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인 (예정)
+- Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (예정)
 
 <!-- toc:end -->
 

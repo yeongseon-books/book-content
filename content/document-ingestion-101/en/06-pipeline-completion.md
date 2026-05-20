@@ -1,5 +1,5 @@
 ---
-title: Completing the document ingestion pipeline
+title: "Document Ingestion 101 (6/6): Completing the document ingestion pipeline"
 series: document-ingestion-101
 episode: 6
 language: en
@@ -19,34 +19,30 @@ seo_description: A complete ingestion pipeline is not defined by how many stages
   but by whether each stage hands off cleanly to the next.
 ---
 
-# Completing the document ingestion pipeline
+# Document Ingestion 101 (6/6): Completing the document ingestion pipeline
 
 The value of an ingestion pipeline appears only when the handoff between stages is real. It is not enough to understand loading, chunking, and indexing separately if they do not survive an end-to-end run together.
 
 This is the final post in the Document Ingestion 101 series. Here, we connect the earlier pieces into one reproducible flow and verify that the index can be saved, reloaded, and queried.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do you connect loading, chunking, embedding, and FAISS save-reload in one flow?
-- Which outputs are the minimum proof that the whole pipeline actually worked?
-- How do you keep the retrieval flow reproducible offline?
+- What stage-level verification checkpoints should a complete ingestion pipeline have?
+- How can you quickly tell whether parsing, normalization, chunking, or indexing failed?
+- What artifacts make the pipeline rerunnable in production?
 
-> A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
-
-Example code: `en/06-pipeline-completion/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-The final post assembles the earlier isolated examples into one real flow. At this point the important question is whether the stage boundaries still line up.
-
-This example loads three formats, chunks them, stores embeddings in FAISS, reloads the saved index, and runs a search against it. That is enough to prove an ingestion MVP works end to end.
-
-## End-to-end ingestion pipeline
+## Big Picture
 
 ![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
 
 *End-to-end ingestion pipeline flow*
+
+This picture connects file collection, parsing, normalization, chunking, embedding, indexing, and verification reports. A complete pipeline is not a script that succeeds once; it is a staged process that can stop, explain, and rerun.
+
+> A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
+
+## End-to-end ingestion pipeline
+
 The final post is mostly about clean handoffs between stages rather than deeper logic inside any single function.
 
 ## Stage verification checkpoints
@@ -211,15 +207,26 @@ Retrying and replaying are different control paths, and collapsing them into one
 - [ ] You saved the FAISS index and loaded it back.
 - [ ] You verified retrieval against the reloaded index.
 
+## Answering the Opening Questions
+
+- **What stage-level verification checkpoints should a complete ingestion pipeline have?**
+  Verify file discovery, parse output, normalized fields, chunk lengths, embedding dimensions, index row counts, and sample retrieval results.
+
+- **How can you quickly tell whether parsing, normalization, chunking, or indexing failed?**
+  Log input count, output count, failure list, and sample payload at each stage to locate the broken boundary quickly.
+
+- **What artifacts make the pipeline rerunnable in production?**
+  Persist the input manifest, state file, hashes, chunk manifest, index version, and verification report so the same input can be rerun.
+
 <!-- toc:begin -->
 ## In this series
 
-- [PDF parsing and text extraction](./01-pdf-parsing.md)
-- [Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
-- [Metadata design and filtering](./03-metadata-filtering.md)
-- [Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
-- [Multi-format document pipeline](./05-multi-format-pipeline.md)
-- **Completing the document ingestion pipeline (current)**
+- [Document Ingestion 101 (1/6): PDF parsing and text extraction](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): Metadata design and filtering](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents](./04-incremental-indexing.md)
+- [Document Ingestion 101 (5/6): Multi-format document pipeline](./05-multi-format-pipeline.md)
+- **Document Ingestion 101 (6/6): Completing the document ingestion pipeline (current)**
 
 <!-- toc:end -->
 

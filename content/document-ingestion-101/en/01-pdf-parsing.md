@@ -1,5 +1,5 @@
 ---
-title: PDF parsing and text extraction
+title: "Document Ingestion 101 (1/6): PDF parsing and text extraction"
 series: document-ingestion-101
 episode: 1
 language: en
@@ -19,34 +19,30 @@ seo_description: The first goal of PDF parsing is to turn a visual document into
   verifiable list of strings.
 ---
 
-# PDF parsing and text extraction
+# Document Ingestion 101 (1/6): PDF parsing and text extraction
 
 Most document ingestion pipelines fail earlier than people expect. If the very first extraction step is hard to reproduce or hard to inspect, every later chunking and indexing discussion rests on shaky ground.
 
 This is the first post in the Document Ingestion 101 series. Here, we start with a reproducible PDF sample and inspect what useful text and page-level metadata come out of it.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do you make a PDF extraction demo reproducible when no sample file exists?
-- How do you inspect page-level text and character counts with pypdf?
-- Which metadata is worth keeping at the very first ingestion step?
+- Why can a PDF not be treated like a plain text file?
+- What breaks in RAG when page structure and metadata are not preserved during extraction?
+- What should be validated even when extracted text looks good?
 
-> The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
-
-Example code: `en/01-pdf-parsing/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-The first practical problem in a PDF parsing tutorial is usually the sample file. If readers cannot reproduce the example from scratch, the pipeline story starts with friction.
-
-This example generates its own PDF with `reportlab`, then reads it back with `pypdf` and prints page-level text summaries. That is exactly the shape you want for the first ingestion step.
-
-## PDF parsing flow
+## Big Picture
 
 ![PDF generation and extraction flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
 
 *PDF generation and extraction flow*
+
+This picture shows a PDF loaded as page-structured content with metadata before extracted text becomes input for chunking and retrieval. The first ingestion failure often starts at the document-reading boundary, not in the model.
+
+> The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
+
+## PDF parsing flow
+
 Keeping generation and extraction in one script makes the demo reproducible and the output easy to verify.
 
 ## Page structure and extraction points
@@ -187,15 +183,26 @@ OCR is safer as a fallback path after a text-layer check, not as the default pat
 - [ ] The page preview is enough to verify extraction order by eye.
 - [ ] You identified which metadata should flow into the next stage.
 
+## Answering the Opening Questions
+
+- **Why can a PDF not be treated like a plain text file?**
+  PDFs are closer to layout documents than plain text, so reading order, page boundaries, tables, headers, and footers need explicit handling.
+
+- **What breaks in RAG when page structure and metadata are not preserved during extraction?**
+  Without page numbers, source paths, and section metadata, retrieval results cannot reliably link back to source evidence.
+
+- **What should be validated even when extracted text looks good?**
+  Check empty pages, broken encoding, repeated headers, table order, per-page text length, and metadata samples before trusting the output.
+
 <!-- toc:begin -->
 ## In this series
 
-- **PDF parsing and text extraction (current)**
-- Chunking strategies — optimizing by document type (upcoming)
-- Metadata design and filtering (upcoming)
-- Incremental indexing — updating only changed documents (upcoming)
-- Multi-format document pipeline (upcoming)
-- Completing the document ingestion pipeline (upcoming)
+- **Document Ingestion 101 (1/6): PDF parsing and text extraction (current)**
+- Document Ingestion 101 (2/6): Chunking strategies — optimizing by document type (upcoming)
+- Document Ingestion 101 (3/6): Metadata design and filtering (upcoming)
+- Document Ingestion 101 (4/6): Incremental indexing — updating only changed documents (upcoming)
+- Document Ingestion 101 (5/6): Multi-format document pipeline (upcoming)
+- Document Ingestion 101 (6/6): Completing the document ingestion pipeline (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: 문서 수집 파이프라인 완성
+title: "Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성"
 series: document-ingestion-101
 episode: 6
 language: ko
@@ -18,35 +18,29 @@ last_reviewed: '2026-05-15'
 seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간 handoff가 깨지지 않는지로 판단해야 합니다.
 ---
 
-# 문서 수집 파이프라인 완성
+# Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성
 
 수집 파이프라인의 가치는 각 단계를 따로 아는 데서 나오지 않습니다. 로딩, 청킹, 인덱싱을 각각 이해해도, 그것들이 엔드투엔드 실행에서 함께 버티지 못하면 실제 파이프라인이라고 부르기 어렵습니다.
 
 이 글은 Document Ingestion 101 시리즈의 마지막 글입니다. 여기서는 앞선 조각들을 하나의 재현 가능한 흐름으로 연결하고, 인덱스를 저장한 뒤 다시 불러와 검색까지 되는지 확인합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 로딩, 청킹, 임베딩, FAISS 저장·재로드를 하나의 흐름으로 어떻게 연결할 수 있을까요?
-- 전체 파이프라인이 실제로 동작했다는 최소 증거는 무엇일까요?
-- 검색 흐름을 오프라인에서도 재현 가능하게 유지하려면 어떻게 해야 할까요?
+- 완성된 문서 수집 파이프라인은 어떤 단계별 검증 체크포인트를 가져야 할까요?
+- 파싱, 정규화, 청킹, 인덱싱 중 어디서 실패했는지 어떻게 빠르게 알 수 있을까요?
+- 운영에서 재실행 가능한 파이프라인으로 만들려면 어떤 산출물을 남겨야 할까요?
 
-> 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
-
-예제 코드: `en/06-pipeline-completion/main.py`
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-questions-this-post-answers.ko.png)
-
-*Questions this post answers*
-
-마지막 글은 앞에서 따로 보았던 예제들을 하나의 실제 흐름으로 조립합니다. 이제 중요한 질문은 각 단계 경계가 여전히 맞물리는가입니다.
-
-이 예제는 세 가지 형식을 로드하고, 청킹하고, FAISS에 임베딩을 저장한 뒤, 저장한 인덱스를 다시 읽어 검색합니다. 이 정도면 ingestion MVP가 끝에서 끝까지 동작한다는 최소 증거로 충분합니다.
-
-## 엔드투엔드 수집 파이프라인
+## 큰 그림
 
 ![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
 
 *End-to-end ingestion pipeline flow*
+
+이 그림에서는 파일 수집부터 파싱, 정규화, 청킹, 임베딩, 인덱싱, 검증 리포트까지 이어지는 전체 흐름을 봅니다. 완성된 파이프라인은 한 번 성공하는 스크립트가 아니라 단계별로 멈추고 재실행할 수 있는 구조입니다.
+
+> 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
+
+## 엔드투엔드 수집 파이프라인
 
 마지막 글의 핵심은 개별 함수의 깊은 로직보다 단계 사이 handoff가 깨지지 않는지 확인하는 데 있습니다.
 
@@ -221,15 +215,26 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 이 시리즈에서 다룬 PDF 추출, 청킹, 메타데이터, 증분 인덱싱, 다중 포맷 수집은 따로 존재하는 팁이 아닙니다. 하나의 흐름으로 묶였을 때 비로소 문서 수집 시스템의 최소 형태가 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **완성된 문서 수집 파이프라인은 어떤 단계별 검증 체크포인트를 가져야 할까요?**
+  파일 발견, 파싱 결과, 정규화 필드, 청크 길이, 임베딩 차원, 인덱스 row 수, 샘플 검색 결과를 각각 확인해야 합니다.
+
+- **파싱, 정규화, 청킹, 인덱싱 중 어디서 실패했는지 어떻게 빠르게 알 수 있을까요?**
+  각 단계의 입력 수, 출력 수, 실패 목록, 샘플 payload를 로그로 남기면 어느 경계에서 깨졌는지 바로 좁힐 수 있습니다.
+
+- **운영에서 재실행 가능한 파이프라인으로 만들려면 어떤 산출물을 남겨야 할까요?**
+  입력 manifest, 상태 파일, hash, chunk manifest, 인덱스 버전, 검증 리포트를 남겨야 같은 입력으로 다시 실행할 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
-- [청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
-- [메타데이터 설계와 필터링](./03-metadata-filtering.md)
-- [증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
-- [다중 포맷 문서 파이프라인](./05-multi-format-pipeline.md)
-- **문서 수집 파이프라인 완성 (현재 글)**
+- [Document Ingestion 101 (1/6): PDF 파싱과 텍스트 추출](./01-pdf-parsing.md)
+- [Document Ingestion 101 (2/6): 청킹 전략 — 문서 유형별 최적화](./02-chunking-strategies.md)
+- [Document Ingestion 101 (3/6): 메타데이터 설계와 필터링](./03-metadata-filtering.md)
+- [Document Ingestion 101 (4/6): 증분 인덱싱 — 변경된 문서만 업데이트](./04-incremental-indexing.md)
+- [Document Ingestion 101 (5/6): 다중 포맷 문서 파이프라인](./05-multi-format-pipeline.md)
+- **Document Ingestion 101 (6/6): 문서 수집 파이프라인 완성 (현재 글)**
 
 <!-- toc:end -->
 
