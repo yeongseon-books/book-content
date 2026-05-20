@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Lazy Evaluation and Generators</title>
+<title>Functional Programming 101 (8/10): Lazy Evaluation and Generators</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Lazy Evaluation and Generators</h1>
+<h1>Functional Programming 101 (8/10): Lazy Evaluation and Generators</h1>
 <p>The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.</p>
 <p>This is post 8 in the Functional Programming 101 series.</p>
 <p>Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Lazy Evaluation and Generators?</li>
+<li>Which signal should the example or diagram make visible for Lazy Evaluation and Generators?</li>
+<li>What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Functional Programming 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png"></p>
+<p><em>Functional Programming 101 chapter 8 flow overview</em></p>
+<p>This picture places Lazy Evaluation and Generators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Lazy Evaluation and Generators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between eager evaluation and lazy evaluation</li>
@@ -74,8 +87,6 @@
 <blockquote>
 <p>Eager vs Lazy Evaluation</p>
 </blockquote>
-<p><img alt="Pull-based lazy pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png"></p>
-<p><em>In a lazy pipeline, the consumer pulls one record at a time through every stage. That pull model is why a large input stream does not require every intermediate result to live in memory at once.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Lazy evaluation</strong><br>
 - Description: A strategy that computes values only when they are needed</p>
@@ -336,17 +347,27 @@ Diana: 95 points
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Lazy evaluation defers computation to the moment values are needed, keeping memory usage constant. Python's generators and <code>itertools</code> are the core tools for building lazy pipelines. The next article covers combining small functions into complex transformations: <strong>function composition and pipelines</strong>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
+<li><strong>What boundary should you inspect first when applying Lazy Evaluation and Generators?</strong></li>
+<li>The article treats Lazy Evaluation and Generators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Lazy Evaluation and Generators?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">Functional Programming 101 (1/10): What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Functional Programming 101 (2/10): Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Functional Programming 101 (3/10): Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Functional Programming 101 (4/10): Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">Functional Programming 101 (5/10): map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Functional Programming 101 (6/10): Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Functional Programming 101 (7/10): Recursion and Tail Calls</a></li>
 <li><strong>Lazy Evaluation and Generators (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+<li>Function Composition and Pipelines (upcoming)</li>
+<li>Balancing OOP and Functional Programming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

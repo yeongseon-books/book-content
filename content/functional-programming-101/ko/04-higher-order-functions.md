@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 4
-title: 고차 함수
+title: "Functional Programming 101 (4/10): 고차 함수"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 함수를 받고 반환하는 고차 함수의 원리와 Python
 last_reviewed: '2026-05-12'
 ---
 
-# 고차 함수
+# Functional Programming 101 (4/10): 고차 함수
 
 이 글은 Functional Programming 101 시리즈의 네 번째 글입니다.
 
@@ -28,14 +28,21 @@ last_reviewed: '2026-05-12'
 
 중요한 이유는 단순합니다. 코드에서 반복되는 것은 종종 데이터가 아니라 "동작의 뼈대"이기 때문입니다. 변하는 부분을 함수로 분리해 인자로 넘기거나, 설정이 들어간 새 함수를 만들어 반환하면 중복을 줄이면서도 유연성을 확보할 수 있습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 고차 함수는 어떤 두 형태로 나타날까요?
 - `sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?
 - 함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?
-- 데코레이터를 고차 함수 관점으로 보면 무엇이 명확해질까요?
 
-> 멘탈 모델: 고차 함수는 "동작을 하드코딩하지 않고 주입하거나 생성하는 도구"입니다. 값만 파라미터화하는 수준을 넘어, 행동 자체를 조립 가능한 단위로 바꾸는 순간 추상화의 힘이 생깁니다.
+## 큰 그림
+
+![Functional Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/04/04-01-big-picture.ko.png)
+
+*Functional Programming 101 4장 흐름 개요*
+
+이 그림에서는 고차 함수를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 고차 함수의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -107,13 +114,11 @@ seniors = filter_people(people, lambda p: p["age"] >= 65)
 ```python
 from collections.abc import Callable
 
-
 def apply_operation(
     values: list[int],
     operation: Callable[[int], int],
 ) -> list[int]:
     return [operation(v) for v in values]
-
 
 numbers = [1, 2, 3, 4, 5]
 
@@ -137,13 +142,11 @@ print(negated)  # [-1, -2, -3, -4, -5]
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Student:
     name: str
     score: int
     grade: int
-
 
 students = [
     Student("Alice", 85, 3),
@@ -178,7 +181,6 @@ for s in by_grade_score:
 ```python
 from collections.abc import Callable
 
-
 def make_multiplier(factor: int) -> Callable[[int], int]:
     """Creates a multiplier function."""
     def multiplier(x: int) -> int:
@@ -190,7 +192,6 @@ def make_validator(min_val: float, max_val: float) -> Callable[[float], bool]:
     def validate(value: float) -> bool:
         return min_val <= value <= max_val
     return validate
-
 
 double = make_multiplier(2)
 triple = make_multiplier(3)
@@ -213,7 +214,6 @@ import time
 from collections.abc import Callable
 from typing import Any
 from functools import wraps
-
 
 def timer(func: Callable) -> Callable:
     """A decorator that measures execution time."""
@@ -242,7 +242,6 @@ def retry(max_attempts: int) -> Callable:
         return wrapper
     return decorator
 
-
 @timer
 def slow_sum(n: int) -> int:
     return sum(range(n))
@@ -253,7 +252,6 @@ def unstable_operation() -> str:
     if random.random() < 0.7:
         raise ValueError("transient error")
     return "success"
-
 
 result = slow_sum(1_000_000)
 print(f"Result: {result}")
@@ -271,7 +269,6 @@ from typing import TypeVar
 
 T = TypeVar("T")
 
-
 def compose(*funcs: Callable) -> Callable:
     """Composes functions from right to left."""
     def composed(value):
@@ -280,7 +277,6 @@ def compose(*funcs: Callable) -> Callable:
             result = func(result)
         return result
     return composed
-
 
 def strip_whitespace(text: str) -> str:
     return text.strip()
@@ -293,7 +289,6 @@ def replace_spaces(text: str) -> str:
 
 def truncate_20(text: str) -> str:
     return text[:20]
-
 
 slugify = compose(truncate_20, replace_spaces, to_lower, strip_whitespace)
 
@@ -352,17 +347,29 @@ print(slugify("  Functional Programming Guide  "))  # functional-programmi
 
 고차 함수는 함수를 인자로 받거나 반환하면서 동작을 추상화합니다. 팩토리 패턴과 데코레이터는 가장 자주 만나는 응용 형태입니다. 다음 글에서는 이 개념이 가장 직접적으로 드러나는 **map, filter, reduce**를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **고차 함수는 어떤 두 형태로 나타날까요?**
+  - 본문의 기준은 고차 함수를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
-- [immutable 데이터](./03-immutable-data.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
 - **고차 함수 (현재 글)**
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [클로저와 partial](./06-closure-and-partial.md)
-- [재귀와 꼬리 호출](./07-recursion.md)
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
-- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
+- map, filter, reduce (예정)
+- 클로저와 partial (예정)
+- 재귀와 꼬리 호출 (예정)
+- 지연 평가와 제너레이터 (예정)
+- 함수 합성과 파이프라인 (예정)
+- 객체지향과 함수형의 균형 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 6
-title: 클로저와 partial
+title: "Functional Programming 101 (6/10): 클로저와 partial"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 클로저와 functools.partial로 함수를 특화하는 방법
 last_reviewed: '2026-05-12'
 ---
 
-# 클로저와 partial
+# Functional Programming 101 (6/10): 클로저와 partial
 
 이 글은 Functional Programming 101 시리즈의 여섯 번째 글입니다.
 
@@ -28,14 +28,21 @@ last_reviewed: '2026-05-12'
 
 `functools.partial`은 같은 문제를 다른 각도에서 풉니다. 기존 함수의 일부 인자를 미리 고정해 새 함수를 만들기 때문에, 클로저를 직접 쓰지 않고도 함수를 간단히 특화할 수 있습니다. 둘은 비슷해 보이지만 쓰임새가 조금 다릅니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 클로저는 바깥 스코프의 변수를 어떻게 기억할까요?
 - 자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?
 - `functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?
-- 상태를 기억하는 함수와 인자만 고정한 함수는 어떻게 구분할까요?
 
-> 멘탈 모델: 클로저는 "데이터를 들고 다니는 함수"이고, `partial`은 "일부 인자가 미리 채워진 함수"입니다. 둘 다 새 함수를 만든다는 점은 같지만, 기억하는 방식과 적합한 용도가 다릅니다.
+## 큰 그림
+
+![Functional Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
+
+*Functional Programming 101 6장 흐름 개요*
+
+이 그림에서는 클로저와 partial를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 클로저와 partial의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -59,10 +66,6 @@ outer_func(x)
 ```
 
 ## 클로저와 `partial` 선택 흐름
-
-![클로저와 partial 선택 흐름](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
-
-*클로저는 상태를 기억할 때, `partial`은 인자만 고정하면 될 때 더 잘 맞습니다.*
 
 ## 핵심 개념
 
@@ -121,7 +124,6 @@ def make_counter(start: int = 0):
 
     return counter
 
-
 c1 = make_counter()
 print(c1())  # 1
 print(c1())  # 2
@@ -145,7 +147,6 @@ def make_greeter(greeting: str):
         return f"{greeting}, {name}!"
     return greet
 
-
 hello = make_greeter("Hello")
 bye = make_greeter("Goodbye")
 
@@ -165,7 +166,6 @@ print(bye.__closure__[0].cell_contents)    # Goodbye
 ```python
 from functools import partial
 
-
 # basic usage: fix arguments
 def power(base: int, exponent: int) -> int:
     return base ** exponent
@@ -175,7 +175,6 @@ cube = partial(power, exponent=3)
 
 print(square(5))  # 25
 print(cube(5))    # 125
-
 
 # practical example: API client configuration
 def send_request(method: str, url: str, headers: dict) -> str:
@@ -197,13 +196,11 @@ print(api_post("/orders"))
 ```python
 from functools import partial
 
-
 # approach 1: closure
 def make_tax_calculator_closure(rate: float):
     def calculate(amount: float) -> float:
         return round(amount * rate, 2)
     return calculate
-
 
 # approach 2: partial
 def calculate_tax(amount: float, rate: float) -> float:
@@ -211,14 +208,12 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 make_tax_calculator_partial = lambda rate: partial(calculate_tax, rate=rate)
 
-
 # usage is identical
 tax_10 = make_tax_calculator_closure(0.1)
 tax_10_p = make_tax_calculator_partial(0.1)
 
 print(tax_10(50000))    # 5000.0
 print(tax_10_p(50000))  # 5000.0
-
 
 # selection criteria
 # - closure: when state mutation (nonlocal) is needed
@@ -233,7 +228,6 @@ print(tax_10_p(50000))  # 5000.0
 from functools import partial
 from collections.abc import Callable
 
-
 # event system
 class EventBus:
     def __init__(self) -> None:
@@ -246,7 +240,6 @@ class EventBus:
         for handler in self._handlers.get(event, []):
             handler(**data)
 
-
 # closure to create a handler with context
 def make_logger_handler(prefix: str):
     def handler(**data) -> None:
@@ -256,7 +249,6 @@ def make_logger_handler(prefix: str):
 # partial to convert an existing function into a handler
 def log_event(level: str, **data) -> None:
     print(f"[{level}] {data}")
-
 
 bus = EventBus()
 bus.on("user.created", make_logger_handler("UserService"))
@@ -275,13 +267,11 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 from dataclasses import dataclass
 from functools import partial
 
-
 @dataclass(frozen=True)
 class TenantPolicy:
     tenant: str
     retry_limit: int
     audit_channel: str
-
 
 def make_retry_decider(policy: TenantPolicy):
     attempts = 0
@@ -293,10 +283,8 @@ def make_retry_decider(policy: TenantPolicy):
 
     return should_retry
 
-
 def publish_audit(channel: str, event_name: str, payload: dict) -> None:
     print(f"[{channel}] {event_name}: {payload}")
-
 
 policy = TenantPolicy(
     tenant="store-kr",
@@ -365,17 +353,29 @@ if should_retry(event["status"]):
 
 클로저는 함수가 자신이 정의된 환경을 기억하게 만들고, `partial`은 기존 함수의 일부 인자를 고정해 새 함수를 만듭니다. 상태를 기억해야 하면 클로저가, 인자만 고정하면 되면 `partial`이 더 적합합니다. 다음 글에서는 반복을 자기 호출로 표현하는 **재귀와 꼬리 호출**을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **클로저는 바깥 스코프의 변수를 어떻게 기억할까요?**
+  - 본문의 기준은 클로저와 partial를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
-- [immutable 데이터](./03-immutable-data.md)
-- [고차 함수](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): 고차 함수](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
 - **클로저와 partial (현재 글)**
-- [재귀와 꼬리 호출](./07-recursion.md)
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
-- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
+- 재귀와 꼬리 호출 (예정)
+- 지연 평가와 제너레이터 (예정)
+- 함수 합성과 파이프라인 (예정)
+- 객체지향과 함수형의 균형 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

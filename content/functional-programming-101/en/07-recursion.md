@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 7
-title: Recursion and Tail Calls
+title: "Functional Programming 101 (7/10): Recursion and Tail Calls"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn recursive function principles, stack overflow prevention,
 last_reviewed: '2026-05-04'
 ---
 
-# Recursion and Tail Calls
+# Functional Programming 101 (7/10): Recursion and Tail Calls
 
 This is post 7 in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (7/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: Can you solve problems by having a function call itself, without using loops?
 
 > Recursion is a technique where a function calls itself to break a problem into smaller subproblems. In functional programming, it is the core tool for expressing repetition without state changes. This article covers recursion principles, tail call optimization, and practical Python usage.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Recursion and Tail Calls?
+- Which signal should the example or diagram make visible for Recursion and Tail Calls?
+- What failure should be prevented first when Recursion and Tail Calls reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 7 flow overview*
+
+This picture places Recursion and Tail Calls inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Recursion and Tail Calls is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -110,7 +122,6 @@ def factorial(n: int) -> int:
         return 1
     return n * factorial(n - 1)
 
-
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
@@ -141,13 +152,11 @@ factorial_verbose(4)
 ```python
 from functools import lru_cache
 
-
 # naive recursion: O(2^n) — very slow
 def fib_naive(n: int) -> int:
     if n <= 1:
         return n
     return fib_naive(n - 1) + fib_naive(n - 2)
-
 
 # memoization: O(n) — eliminates duplicate computation
 @lru_cache(maxsize=None)
@@ -155,7 +164,6 @@ def fib_memo(n: int) -> int:
     if n <= 1:
         return n
     return fib_memo(n - 1) + fib_memo(n - 2)
-
 
 print(fib_naive(10))  # 55 (slow)
 print(fib_memo(100))  # 354224848179261915075 (fast)
@@ -182,7 +190,6 @@ def factorial_tail(n: int, acc: int = 1) -> int:
         return acc
     return factorial_tail(n - 1, n * acc)  # last operation is the recursive call
 
-
 # Python does NOT support tail call optimization (TCO)
 print(sys.getrecursionlimit())  # default 1000
 print(factorial_tail(900))  # works but...
@@ -203,7 +210,6 @@ print(factorial_iterative(10000))  # no problem
 ```python
 from typing import Any
 
-
 # traverse nested dicts (tree structure)
 def flatten_dict(
     d: dict,
@@ -219,7 +225,6 @@ def flatten_dict(
         else:
             items.append((new_key, v))
     return dict(items)
-
 
 config = {
     "database": {
@@ -257,7 +262,6 @@ def total_size_recursive(tree: dict) -> int:
             total += value
     return total
 
-
 # iterative version: explicit stack management
 def total_size_iterative(tree: dict) -> int:
     total = 0
@@ -270,7 +274,6 @@ def total_size_iterative(tree: dict) -> int:
             else:
                 total += value
     return total
-
 
 file_tree = {
     "src": {
@@ -339,17 +342,29 @@ Recursion is the most natural tool for trees, graphs, and nested structures. How
 
 Recursion decomposes a problem into smaller versions of itself. Python lacks tail call optimization, so you must be aware of depth limits and convert to iteration when needed. The next article covers computing values only when needed: **lazy evaluation and generators**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Recursion and Tail Calls?**
+  - The article treats Recursion and Tail Calls as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Recursion and Tail Calls?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Recursion and Tail Calls reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): Closures and Partial Application](./06-closure-and-partial.md)
 - **Recursion and Tail Calls (current)**
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

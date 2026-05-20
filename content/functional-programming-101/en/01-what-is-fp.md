@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 1
-title: What Is Functional Programming?
+title: "Functional Programming 101 (1/10): What Is Functional Programming?"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Explore the core concepts of functional programming and how it 
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Functional Programming?
+# Functional Programming 101 (1/10): What Is Functional Programming?
 
 This is the first post in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (1/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: What is functional programming, and why should you care?
 
 > Functional programming builds programs by composing functions that transform data. It minimizes state changes and focuses on writing predictable code. This article covers the core philosophy of functional programming and how it applies to Python.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Functional Programming??
+- Which signal should the example or diagram make visible for What Is Functional Programming??
+- What failure should be prevented first when What Is Functional Programming? reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/01/01-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 1 flow overview*
+
+This picture places What Is Functional Programming? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Functional Programming? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -108,7 +120,6 @@ def subtract(a: int, b: int) -> int:
 def apply(func, a: int, b: int) -> int:
     return func(a, b)
 
-
 print(apply(add, 10, 3))       # 13
 print(apply(subtract, 10, 3))  # 7
 
@@ -130,12 +141,10 @@ for w in words:
     upper_words.append(w.upper())
 print(upper_words)  # ['HELLO', 'WORLD', 'PYTHON']
 
-
 # Functional: apply a transformation function
 words = ["hello", "world", "python"]
 upper_words = list(map(str.upper, words))
 print(upper_words)  # ['HELLO', 'WORLD', 'PYTHON']
-
 
 # More Pythonic: list comprehension
 upper_words = [w.upper() for w in words]
@@ -168,7 +177,6 @@ print(passing)  # ['Diana', 'Bob', 'Alice']
 ```python
 from collections.abc import Callable
 
-
 def pipeline(*funcs: Callable) -> Callable:
     """Compose multiple functions into a sequential pipeline."""
     def apply(value):
@@ -177,7 +185,6 @@ def pipeline(*funcs: Callable) -> Callable:
             result = func(result)
         return result
     return apply
-
 
 double = lambda x: x * 2
 add_ten = lambda x: x + 10
@@ -199,13 +206,11 @@ def calculate_total(prices: list[float], tax_rate: float) -> float:
 def format_receipt(total: float) -> str:
     return f"Total: ${total:,.2f}"
 
-
 # Side effects: handle IO only
 def print_receipt(prices: list[float], tax_rate: float) -> None:
     total = calculate_total(prices, tax_rate)
     message = format_receipt(total)
     print(message)  # side effect lives here only
-
 
 print_receipt([10.00, 20.00, 5.00], 0.1)
 # Total: $38.50
@@ -260,17 +265,29 @@ In practice, writing business logic as pure functions and pushing side effects t
 
 Functional programming is a paradigm that focuses on data transformation and function composition. In Python, first-class functions, list comprehensions, and generators make functional style feel natural. The next article dives deeper into the most fundamental building block: **pure functions and side effects**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Functional Programming??**
+  - The article treats What Is Functional Programming? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Functional Programming??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Functional Programming? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Functional Programming? (current)**
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Pure Functions and Side Effects (upcoming)
+- Immutable Data (upcoming)
+- Higher-Order Functions (upcoming)
+- map, filter, reduce (upcoming)
+- Closures and Partial Application (upcoming)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

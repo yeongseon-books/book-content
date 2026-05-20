@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Immutable Data</title>
+<title>Functional Programming 101 (3/10): Immutable Data</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Immutable Data</h1>
+<h1>Functional Programming 101 (3/10): Immutable Data</h1>
 <p>This is post 3 in the Functional Programming 101 series.</p>
 <blockquote>
 <p>Functional Programming 101 Series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: Can you write programs without ever changing existing data?</p>
 <blockquote>
 <p>Immutable data cannot be modified after creation. When you need a new value, you create new data based on the original. This article covers Python's immutable types and patterns for writing safe, predictable code.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Immutable Data?</li>
+<li>Which signal should the example or diagram make visible for Immutable Data?</li>
+<li>What failure should be prevented first when Immutable Data reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Functional Programming 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.en.png"></p>
+<p><em>Functional Programming 101 chapter 3 flow overview</em></p>
+<p>This picture places Immutable Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Immutable Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The distinction between mutable and immutable types in Python</li>
@@ -296,17 +305,27 @@ for i, s in enumerate(history):
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Immutable data eliminates unpredictable changes and increases code stability. Python provides tuple, frozenset, NamedTuple, and frozen dataclass for implementing immutability. The next article covers <strong>higher-order functions</strong> — functions that accept and return other functions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
+<li><strong>What boundary should you inspect first when applying Immutable Data?</strong></li>
+<li>The article treats Immutable Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Immutable Data?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Immutable Data reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">Functional Programming 101 (1/10): What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Functional Programming 101 (2/10): Pure Functions and Side Effects</a></li>
 <li><strong>Immutable Data (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+<li>Higher-Order Functions (upcoming)</li>
+<li>map, filter, reduce (upcoming)</li>
+<li>Closures and Partial Application (upcoming)</li>
+<li>Recursion and Tail Calls (upcoming)</li>
+<li>Lazy Evaluation and Generators (upcoming)</li>
+<li>Function Composition and Pipelines (upcoming)</li>
+<li>Balancing OOP and Functional Programming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

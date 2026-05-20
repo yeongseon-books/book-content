@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Function Composition and Pipelines</title>
+<title>Functional Programming 101 (9/10): Function Composition and Pipelines</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Function Composition and Pipelines</h1>
+<h1>Functional Programming 101 (9/10): Function Composition and Pipelines</h1>
 <p>Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.</p>
 <p>This is post 9 in the Functional Programming 101 series.</p>
 <p>Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Function Composition and Pipelines?</li>
+<li>Which signal should the example or diagram make visible for Function Composition and Pipelines?</li>
+<li>What failure should be prevented first when Function Composition and Pipelines reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Functional Programming 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png"></p>
+<p><em>Functional Programming 101 chapter 9 flow overview</em></p>
+<p>This picture places Function Composition and Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Function Composition and Pipelines is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The mathematical principle behind function composition and its Python implementation</li>
@@ -81,8 +94,6 @@ Pipeline visualization:
   x -&gt; [h] -&gt; [g] -&gt; [f] -&gt; result
 </code></pre>
 <h2>How a readable pipeline flows</h2>
-<p><img alt="Step-by-step function pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png"></p>
-<p><em>A good pipeline makes each transformation stage explicit, so reviewers and operators can spot where data changes shape.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Function composition</strong><br>
 - Description: An operation that combines two functions f, g into f(g(x))</p>
@@ -502,17 +513,27 @@ Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Function composition combines small functions into complex transformations. <code>pipe</code> aligns code order with execution order for better readability. The next article wraps up the series with <strong>balancing OOP and functional programming</strong>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
+<li><strong>What boundary should you inspect first when applying Function Composition and Pipelines?</strong></li>
+<li>The article treats Function Composition and Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Function Composition and Pipelines?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Function Composition and Pipelines reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">Functional Programming 101 (1/10): What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Functional Programming 101 (2/10): Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Functional Programming 101 (3/10): Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Functional Programming 101 (4/10): Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">Functional Programming 101 (5/10): map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Functional Programming 101 (6/10): Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Functional Programming 101 (7/10): Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Functional Programming 101 (8/10): Lazy Evaluation and Generators</a></li>
 <li><strong>Function Composition and Pipelines (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+<li>Balancing OOP and Functional Programming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

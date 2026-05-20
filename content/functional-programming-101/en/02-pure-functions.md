@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 2
-title: Pure Functions and Side Effects
+title: "Functional Programming 101 (2/10): Pure Functions and Side Effects"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn what makes a function pure, how to identify side effects,
 last_reviewed: '2026-05-04'
 ---
 
-# Pure Functions and Side Effects
+# Functional Programming 101 (2/10): Pure Functions and Side Effects
 
 This is post 2 in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (2/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you write functions that always return the same output for the same input?
 
 > A pure function does not depend on external state and does not modify external state. Separating side effects from pure logic makes code easier to test and reason about. This article covers the definition of pure functions, how to identify side effects, and patterns for managing them.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Pure Functions and Side Effects?
+- Which signal should the example or diagram make visible for Pure Functions and Side Effects?
+- What failure should be prevented first when Pure Functions and Side Effects reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 2 flow overview*
+
+This picture places Pure Functions and Side Effects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pure Functions and Side Effects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -110,7 +122,6 @@ print(apply_discount(10000, 0.1))  # 9000.0 — always the same
 import random
 from datetime import datetime
 
-
 # Pure: output determined by input alone
 def add(a: int, b: int) -> int:
     return a + b
@@ -118,14 +129,12 @@ def add(a: int, b: int) -> int:
 def full_name(first: str, last: str) -> str:
     return f"{first} {last}"
 
-
 # Impure: depends on external state
 def get_random_number() -> int:
     return random.randint(1, 100)  # different every time
 
 def get_current_time() -> str:
     return datetime.now().isoformat()  # depends on clock
-
 
 print(add(2, 3))          # always 5
 print(full_name("John", "Doe"))  # always "John Doe"
@@ -144,23 +153,19 @@ def increment() -> int:
     counter += 1  # modifies external state
     return counter
 
-
 # Side effect 2: IO operations
 def save_to_file(data: str) -> None:
     with open("output.txt", "w") as f:
         f.write(data)  # modifies file system
-
 
 # Side effect 3: mutating arguments
 def add_item(items: list, item: str) -> list:
     items.append(item)  # mutates the input list
     return items
 
-
 # Pure alternative: return a new list
 def add_item_pure(items: list, item: str) -> list:
     return [*items, item]  # original untouched, new list created
-
 
 original = ["a", "b"]
 new_list = add_item_pure(original, "c")
@@ -173,13 +178,11 @@ print(new_list)  # ['a', 'b', 'c']
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Order:
     items: list[str]
     quantities: list[int]
     prices: list[float]
-
 
 # Pure functions: computation only
 def calculate_subtotal(order: Order) -> float:
@@ -200,7 +203,6 @@ def format_receipt(order: Order, subtotal: float, tax: float, total: float) -> s
     lines.append(f"  Total: ${total:,.2f}")
     return "\n".join(lines)
 
-
 # Side effects: IO only
 def print_receipt(order: Order, tax_rate: float) -> None:
     subtotal = calculate_subtotal(order)
@@ -208,7 +210,6 @@ def print_receipt(order: Order, tax_rate: float) -> None:
     total = calculate_total(subtotal, tax)
     receipt = format_receipt(order, subtotal, tax, total)
     print(receipt)  # the only side effect
-
 
 order = Order(
     items=["Coffee", "Cake"],
@@ -240,7 +241,6 @@ def classify_bmi(bmi: float) -> str:
         return "overweight"
     return "obese"
 
-
 # Tests are simple — just check input and output
 assert calculate_bmi(70, 1.75) == 22.9
 assert classify_bmi(22.9) == "normal"
@@ -258,7 +258,6 @@ def square(x: int) -> int:
 
 def sum_of_squares(a: int, b: int) -> int:
     return square(a) + square(b)
-
 
 # Equivalent transformations are safe
 result1 = sum_of_squares(3, 4)    # square(3) + square(4)
@@ -321,17 +320,29 @@ This pattern is called "Functional Core, Imperative Shell." Wrap a thick layer o
 
 Pure functions always return the same output for the same input and never modify external state. Pushing side effects to the boundary produces testable, predictable code. The next article covers a concept closely tied to pure functions: **immutable data**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Pure Functions and Side Effects?**
+  - The article treats Pure Functions and Side Effects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Pure Functions and Side Effects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Pure Functions and Side Effects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
 - **Pure Functions and Side Effects (current)**
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Immutable Data (upcoming)
+- Higher-Order Functions (upcoming)
+- map, filter, reduce (upcoming)
+- Closures and Partial Application (upcoming)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

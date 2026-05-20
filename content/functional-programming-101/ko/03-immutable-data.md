@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 3
-title: immutable 데이터
+title: "Functional Programming 101 (3/10): immutable 데이터"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: Python에서 불변 데이터를 사용해 안전하고 예측 
 last_reviewed: '2026-05-12'
 ---
 
-# immutable 데이터
+# Functional Programming 101 (3/10): immutable 데이터
 
 이 글은 Functional Programming 101 시리즈의 세 번째 글입니다.
 
@@ -28,14 +28,21 @@ last_reviewed: '2026-05-12'
 
 Python은 기본적으로 mutable 객체를 많이 쓰는 언어이지만, 동시에 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass` 같은 좋은 불변 도구도 제공합니다. 중요한 것은 "무조건 복사하라"가 아니라, 바뀌지 않아야 하는 값을 명확하게 모델링하는 감각입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Python에서 mutable 타입과 immutable 타입은 어떻게 구분할까요?
 - `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`는 각각 언제 유용할까요?
 - 함수 경계에서 원본 변경을 막으려면 어떤 패턴이 필요할까요?
-- 불변성이 디버깅과 상태 이력 관리에 왜 유리할까요?
 
-> 멘탈 모델: 불변 데이터는 "절대 바뀌지 않는 사실"을 표현하는 수단입니다. 값을 수정하는 대신 새 값을 만들면, 상태 변화는 숨겨진 부작용이 아니라 명시적인 이벤트가 됩니다.
+## 큰 그림
+
+![Functional Programming 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.ko.png)
+
+*Functional Programming 101 3장 흐름 개요*
+
+이 그림에서는 immutable 데이터를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> immutable 데이터의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -112,7 +119,6 @@ upper_name = name.upper()  # creates a new string
 print(name)        # hello — original preserved
 print(upper_name)  # HELLO
 
-
 # tuples are hashable and can serve as dict keys
 grid: dict[tuple[int, int], str] = {
     (0, 0): "start",
@@ -128,7 +134,6 @@ print(grid[(0, 0)])  # start
 ```python
 from typing import NamedTuple
 
-
 class Point(NamedTuple):
     x: float
     y: float
@@ -137,7 +142,6 @@ class Color(NamedTuple):
     r: int
     g: int
     b: int
-
 
 p = Point(3.0, 4.0)
 print(p.x, p.y)  # 3.0 4.0
@@ -159,13 +163,11 @@ print(red)  # Color(r=255, g=0, b=0)
 ```python
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class User:
     name: str
     email: str
     role: str = "viewer"
-
 
 user = User(name="Alice", email="alice@example.com")
 # user.name = "Bob"  # FrozenInstanceError — cannot modify
@@ -174,7 +176,6 @@ user = User(name="Alice", email="alice@example.com")
 admin = replace(user, role="admin")
 print(user)   # User(name='Alice', email='alice@example.com', role='viewer')
 print(admin)  # User(name='Alice', email='alice@example.com', role='admin')
-
 
 # frozen dataclasses are hashable — usable as dict keys and set elements
 users = {user, admin}
@@ -188,14 +189,12 @@ print(len(users))  # 2
 ```python
 from types import MappingProxyType
 
-
 # MappingProxyType — read-only dictionary view
 config = {"host": "localhost", "port": 8080, "debug": True}
 readonly_config = MappingProxyType(config)
 
 print(readonly_config["host"])  # localhost
 # readonly_config["host"] = "0.0.0.0"  # TypeError — cannot modify
-
 
 # dictionary update — create a new dictionary
 def update_config(config: dict, **updates) -> dict:
@@ -215,19 +214,16 @@ print(updated)   # {'host': 'localhost', 'port': 9090, 'debug': False}
 ```python
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class AppState:
     count: int
     message: str
-
 
 def increment(state: AppState) -> AppState:
     return replace(state, count=state.count + 1)
 
 def set_message(state: AppState, msg: str) -> AppState:
     return replace(state, message=msg)
-
 
 # state history — every change is tracked
 history: list[AppState] = []
@@ -303,17 +299,29 @@ for i, s in enumerate(history):
 
 불변 데이터는 예측 불가능한 상태 변경을 줄이고 코드 안정성을 높입니다. Python은 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`를 통해 이를 충분히 실용적으로 지원합니다. 다음 글에서는 함수를 인자로 받고 반환하는 **고차 함수**를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **Python에서 mutable 타입과 immutable 타입은 어떻게 구분할까요?**
+  - 본문의 기준은 immutable 데이터를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`는 각각 언제 유용할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **함수 경계에서 원본 변경을 막으려면 어떤 패턴이 필요할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
 - **immutable 데이터 (현재 글)**
-- [고차 함수](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [클로저와 partial](./06-closure-and-partial.md)
-- [재귀와 꼬리 호출](./07-recursion.md)
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
-- [객체지향과 함수형의 균형](./10-oop-and-fp-balance.md)
+- 고차 함수 (예정)
+- map, filter, reduce (예정)
+- 클로저와 partial (예정)
+- 재귀와 꼬리 호출 (예정)
+- 지연 평가와 제너레이터 (예정)
+- 함수 합성과 파이프라인 (예정)
+- 객체지향과 함수형의 균형 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

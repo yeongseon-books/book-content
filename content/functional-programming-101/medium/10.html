@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Balancing OOP and Functional Programming</title>
+<title>Functional Programming 101 (10/10): Balancing OOP and Functional Programming</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Balancing OOP and Functional Programming</h1>
+<h1>Functional Programming 101 (10/10): Balancing OOP and Functional Programming</h1>
 <p>Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.</p>
 <p>This is the final post in the Functional Programming 101 series.</p>
 <p>Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Balancing OOP and Functional Programming?</li>
+<li>Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?</li>
+<li>What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Functional Programming 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png"></p>
+<p><em>Functional Programming 101 chapter 10 flow overview</em></p>
+<p>This picture places Balancing OOP and Functional Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Balancing OOP and Functional Programming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Comparing the strengths and weaknesses of OOP and FP</li>
@@ -82,8 +95,6 @@ Framework integration         Concurrency / parallelism
 Complex domain models         Mathematical / declarative logic
 </code></pre>
 <h2>Where to draw the OOP/FP boundary</h2>
-<p><img alt="OOP and FP boundary in one service" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png"></p>
-<p><em>Keep handlers and repositories at the edge, and push the important business rules into a pure core. That is the simplest repeatable way to mix OOP and FP without losing consistency.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Multi-paradigm</strong><br>
 - Description: A language that supports multiple programming styles</p>
@@ -436,16 +447,26 @@ Bad port: validation failed: ['port must be 1-65535']
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>OOP and functional programming are not opposites — they complement each other. In Python, the most practical approach is immutable value objects (OOP) + pure functions (FP) + thin class shells. The pure functions, immutable data, higher-order functions, closures, generators, and composition covered in this series will help you write cleaner, more testable code.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Closures and Partial Application</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
+<li><strong>What boundary should you inspect first when applying Balancing OOP and Functional Programming?</strong></li>
+<li>The article treats Balancing OOP and Functional Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">Functional Programming 101 (1/10): What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Functional Programming 101 (2/10): Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Functional Programming 101 (3/10): Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Functional Programming 101 (4/10): Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">Functional Programming 101 (5/10): map, filter, reduce</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/06-closure-and-partial.md">Functional Programming 101 (6/10): Closures and Partial Application</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Functional Programming 101 (7/10): Recursion and Tail Calls</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Functional Programming 101 (8/10): Lazy Evaluation and Generators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Functional Programming 101 (9/10): Function Composition and Pipelines</a></li>
 <li><strong>Balancing OOP and Functional Programming (current)</strong></li>
 </ul>
 <h2>References</h2>

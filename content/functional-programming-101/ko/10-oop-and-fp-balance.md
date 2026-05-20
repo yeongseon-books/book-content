@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 10
-title: 객체지향과 함수형의 균형
+title: "Functional Programming 101 (10/10): 객체지향과 함수형의 균형"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: Python에서 객체지향과 함수형을 함께 쓰는 실전 
 last_reviewed: '2026-05-12'
 ---
 
-# 객체지향과 함수형의 균형
+# Functional Programming 101 (10/10): 객체지향과 함수형의 균형
 
 이 글은 Functional Programming 101 시리즈의 마지막 글입니다.
 
@@ -28,14 +28,21 @@ last_reviewed: '2026-05-12'
 
 Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객체지향적으로 두고, 핵심 계산은 순수 함수로 분리하고, 프레임워크 경계에서는 다시 클래스나 핸들러를 쓰는 식의 혼합 설계가 가장 현실적입니다. 중요한 것은 신념이 아니라 선택 기준입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?
 - 두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?
 - Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?
-- 상태 관리와 데이터 변환 사이에서 어떤 기준으로 설계를 고르면 좋을까요?
 
-> 멘탈 모델: 좋은 설계는 OOP나 FP 중 하나를 신앙처럼 고르는 일이 아니라, 상태가 필요한 부분은 객체로, 계산이 중심인 부분은 함수로 두는 문제 적합성의 선택입니다.
+## 큰 그림
+
+![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
+
+*Functional Programming 101 10장 흐름 개요*
+
+이 그림에서는 객체지향과 함수형의 균형를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 객체지향과 함수형의 균형의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -57,10 +64,6 @@ Complex domain models         Mathematical / declarative logic
 ```
 
 ## OOP와 FP의 경계를 나누는 기준
-
-![OOP와 FP를 함께 쓰는 경계](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
-
-*핸들러와 저장소는 바깥 경계에 두고, 핵심 계산은 순수 함수 코어에 모으면 OOP와 FP를 함께 써도 설계 기준이 흔들리지 않습니다.*
 
 ## 핵심 개념
 
@@ -124,7 +127,6 @@ print(format_receipt(items, 0.1))
 from dataclasses import dataclass, replace
 from typing import NamedTuple
 
-
 # value objects: immutable, equality-based
 @dataclass(frozen=True)
 class Money:
@@ -133,7 +135,6 @@ class Money:
 
 class Percentage(NamedTuple):
     value: float
-
 
 # pure functions: transform value objects
 def apply_discount(price: Money, discount: Percentage) -> Money:
@@ -146,7 +147,6 @@ def add_tax(price: Money, tax: Percentage) -> Money:
 
 def format_money(money: Money) -> str:
     return f"{money.amount:,} {money.currency}"
-
 
 price = Money(50000)
 discounted = apply_discount(price, Percentage(0.1))
@@ -163,7 +163,6 @@ print(f"After tax: {format_money(final)}")       # After tax: 49,500 USD
 
 ```python
 from dataclasses import dataclass
-
 
 # === Functional Core (pure functions) ===
 @dataclass(frozen=True)
@@ -190,7 +189,6 @@ def create_user_data(name: str, email: str) -> User | list[str]:
         return errors
     return User(name=name.strip(), email=email.lower())
 
-
 # === Imperative Shell (side effects) ===
 def handle_registration(name: str, email: str) -> None:
     """Registration handler — contains side effects."""
@@ -201,7 +199,6 @@ def handle_registration(name: str, email: str) -> None:
     else:
         print(f"  Registered: {result}")
         # In production: save to DB, send email, etc.
-
 
 handle_registration("Alice", "alice@example.com")
 # Registered: User(name='Alice', email='alice@example.com', active=True)
@@ -219,7 +216,6 @@ handle_registration("", "invalid-email")
 from dataclasses import dataclass
 from collections.abc import Callable
 from typing import Iterator
-
 
 @dataclass
 class DataPipeline:
@@ -241,7 +237,6 @@ class DataPipeline:
             result = step(result)
         return result
 
-
 # pure function stages
 def normalize(records: list[dict]) -> list[dict]:
     return [{**r, "name": r["name"].strip().title()} for r in records]
@@ -251,7 +246,6 @@ def enrich(records: list[dict]) -> list[dict]:
 
 def filter_valid(records: list[dict]) -> list[dict]:
     return [r for r in records if r.get("score", 0) > 0]
-
 
 # assemble the pipeline (OOP interface + FP execution)
 pipeline = (
@@ -291,7 +285,6 @@ class ShoppingCart:
     def total(self) -> int:
         return sum(i["price"] for i in self._items)
 
-
 # Situation 2: data transformation -> FP
 def transform_prices(
     items: list[dict],
@@ -299,17 +292,14 @@ def transform_prices(
 ) -> list[dict]:
     return [{**i, "price": int(i["price"] * rate)} for i in items]
 
-
 # Situation 3: framework integration -> OOP (framework requires it)
 class UserSerializer:
     def to_dict(self, user) -> dict:
         return {"name": user.name, "email": user.email}
 
-
 # Situation 4: utility -> FP
 def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
-
 
 # mixed usage
 cart = ShoppingCart()
@@ -331,13 +321,11 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 ```python
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class RawConfig:
     host: str
     port: str
     debug: str
-
 
 @dataclass(frozen=True)
 class AppConfig:
@@ -345,14 +333,12 @@ class AppConfig:
     port: int
     debug: bool
 
-
 def normalize_config(raw: RawConfig) -> AppConfig:
     return AppConfig(
         host=raw.host.strip(),
         port=int(raw.port),
         debug=raw.debug.strip().lower() in {"1", "true", "yes"},
     )
-
 
 def validate_config(config: AppConfig) -> list[str]:
     errors = []
@@ -362,7 +348,6 @@ def validate_config(config: AppConfig) -> list[str]:
         errors.append("port must be 1-65535")
     return errors
 
-
 class AppServer:
     def __init__(self, config: AppConfig) -> None:
         self.config = config
@@ -371,7 +356,6 @@ class AppServer:
         mode = "debug" if self.config.debug else "prod"
         return f"starting server on {self.config.host}:{self.config.port} ({mode})"
 
-
 def boot(raw: RawConfig) -> str:
     normalized = normalize_config(raw)
     errors = validate_config(normalized)
@@ -379,7 +363,6 @@ def boot(raw: RawConfig) -> str:
         return f"validation failed: {errors}"
     server = AppServer(normalized)
     return server.start()
-
 
 good = RawConfig(host=" localhost ", port="8080", debug="yes")
 bad_host = RawConfig(host="   ", port="8080", debug="yes")
@@ -467,17 +450,29 @@ Bad port: validation failed: ['port must be 1-65535']
 
 객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다. Python에서는 불변 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸이라는 조합이 가장 실용적인 경우가 많습니다. 이 시리즈에서 다룬 함수형 도구들을 적절히 섞어 쓰면 더 읽기 쉽고 테스트하기 쉬운 코드를 만들 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?**
+  - 본문의 기준은 객체지향과 함수형의 균형를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
-- [순수 함수와 부수효과](./02-pure-functions.md)
-- [immutable 데이터](./03-immutable-data.md)
-- [고차 함수](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [클로저와 partial](./06-closure-and-partial.md)
-- [재귀와 꼬리 호출](./07-recursion.md)
-- [지연 평가와 제너레이터](./08-lazy-evaluation.md)
-- [함수 합성과 파이프라인](./09-function-composition.md)
+## 시리즈 목차
+
+- [Functional Programming 101 (1/10): 함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): 순수 함수와 부수효과](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): immutable 데이터](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): 고차 함수](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): 클로저와 partial](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): 재귀와 꼬리 호출](./07-recursion.md)
+- [Functional Programming 101 (8/10): 지연 평가와 제너레이터](./08-lazy-evaluation.md)
+- [Functional Programming 101 (9/10): 함수 합성과 파이프라인](./09-function-composition.md)
 - **객체지향과 함수형의 균형 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

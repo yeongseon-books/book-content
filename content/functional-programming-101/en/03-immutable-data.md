@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 3
-title: Immutable Data
+title: "Functional Programming 101 (3/10): Immutable Data"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Use immutable data in Python to write safe, predictable code wi
 last_reviewed: '2026-05-04'
 ---
 
-# Immutable Data
+# Functional Programming 101 (3/10): Immutable Data
 
 This is post 3 in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: Can you write programs without ever changing existing data?
 
 > Immutable data cannot be modified after creation. When you need a new value, you create new data based on the original. This article covers Python's immutable types and patterns for writing safe, predictable code.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Immutable Data?
+- Which signal should the example or diagram make visible for Immutable Data?
+- What failure should be prevented first when Immutable Data reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 3 flow overview*
+
+This picture places Immutable Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Immutable Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -118,7 +130,6 @@ upper_name = name.upper()  # creates a new string
 print(name)        # hello — original preserved
 print(upper_name)  # HELLO
 
-
 # tuples are hashable and can serve as dict keys
 grid: dict[tuple[int, int], str] = {
     (0, 0): "start",
@@ -132,7 +143,6 @@ print(grid[(0, 0)])  # start
 ```python
 from typing import NamedTuple
 
-
 class Point(NamedTuple):
     x: float
     y: float
@@ -141,7 +151,6 @@ class Color(NamedTuple):
     r: int
     g: int
     b: int
-
 
 p = Point(3.0, 4.0)
 print(p.x, p.y)  # 3.0 4.0
@@ -161,13 +170,11 @@ print(red)  # Color(r=255, g=0, b=0)
 ```python
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class User:
     name: str
     email: str
     role: str = "viewer"
-
 
 user = User(name="Alice", email="alice@example.com")
 # user.name = "Bob"  # FrozenInstanceError — cannot modify
@@ -176,7 +183,6 @@ user = User(name="Alice", email="alice@example.com")
 admin = replace(user, role="admin")
 print(user)   # User(name='Alice', email='alice@example.com', role='viewer')
 print(admin)  # User(name='Alice', email='alice@example.com', role='admin')
-
 
 # frozen dataclasses are hashable — usable as dict keys and set elements
 users = {user, admin}
@@ -188,14 +194,12 @@ print(len(users))  # 2
 ```python
 from types import MappingProxyType
 
-
 # MappingProxyType — read-only dictionary view
 config = {"host": "localhost", "port": 8080, "debug": True}
 readonly_config = MappingProxyType(config)
 
 print(readonly_config["host"])  # localhost
 # readonly_config["host"] = "0.0.0.0"  # TypeError — cannot modify
-
 
 # dictionary update — create a new dictionary
 def update_config(config: dict, **updates) -> dict:
@@ -213,19 +217,16 @@ print(updated)   # {'host': 'localhost', 'port': 9090, 'debug': False}
 ```python
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class AppState:
     count: int
     message: str
-
 
 def increment(state: AppState) -> AppState:
     return replace(state, count=state.count + 1)
 
 def set_message(state: AppState, msg: str) -> AppState:
     return replace(state, message=msg)
-
 
 # state history — every change is tracked
 history: list[AppState] = []
@@ -299,17 +300,29 @@ For large-scale data processing, copying everything every time can be inefficien
 
 Immutable data eliminates unpredictable changes and increases code stability. Python provides tuple, frozenset, NamedTuple, and frozen dataclass for implementing immutability. The next article covers **higher-order functions** — functions that accept and return other functions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Immutable Data?**
+  - The article treats Immutable Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Immutable Data?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Immutable Data reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
 - **Immutable Data (current)**
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Higher-Order Functions (upcoming)
+- map, filter, reduce (upcoming)
+- Closures and Partial Application (upcoming)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

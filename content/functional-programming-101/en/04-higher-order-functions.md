@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 4
-title: Higher-Order Functions
+title: "Functional Programming 101 (4/10): Higher-Order Functions"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Understand higher-order functions that accept or return functio
 last_reviewed: '2026-05-04'
 ---
 
-# Higher-Order Functions
+# Functional Programming 101 (4/10): Higher-Order Functions
 
 This is post 4 in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: Why is it powerful to pass a function as an argument to another function, or to return a function?
 
 > A higher-order function accepts a function as an argument or returns a function as its result. This pattern abstracts behavior, removes duplication, and enables flexible code. This article covers the principles of higher-order functions and their practical use in Python.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Higher-Order Functions?
+- Which signal should the example or diagram make visible for Higher-Order Functions?
+- What failure should be prevented first when Higher-Order Functions reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/04/04-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 4 flow overview*
+
+This picture places Higher-Order Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Higher-Order Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -113,13 +125,11 @@ seniors = filter_people(people, lambda p: p["age"] >= 65)
 ```python
 from collections.abc import Callable
 
-
 def apply_operation(
     values: list[int],
     operation: Callable[[int], int],
 ) -> list[int]:
     return [operation(v) for v in values]
-
 
 numbers = [1, 2, 3, 4, 5]
 
@@ -141,13 +151,11 @@ print(negated)  # [-1, -2, -3, -4, -5]
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Student:
     name: str
     score: int
     grade: int
-
 
 students = [
     Student("Alice", 85, 3),
@@ -180,7 +188,6 @@ for s in by_grade_score:
 ```python
 from collections.abc import Callable
 
-
 def make_multiplier(factor: int) -> Callable[[int], int]:
     """Creates a multiplier function."""
     def multiplier(x: int) -> int:
@@ -192,7 +199,6 @@ def make_validator(min_val: float, max_val: float) -> Callable[[float], bool]:
     def validate(value: float) -> bool:
         return min_val <= value <= max_val
     return validate
-
 
 double = make_multiplier(2)
 triple = make_multiplier(3)
@@ -213,7 +219,6 @@ import time
 from collections.abc import Callable
 from typing import Any
 from functools import wraps
-
 
 def timer(func: Callable) -> Callable:
     """A decorator that measures execution time."""
@@ -242,7 +247,6 @@ def retry(max_attempts: int) -> Callable:
         return wrapper
     return decorator
 
-
 @timer
 def slow_sum(n: int) -> int:
     return sum(range(n))
@@ -253,7 +257,6 @@ def unstable_operation() -> str:
     if random.random() < 0.7:
         raise ValueError("transient error")
     return "success"
-
 
 result = slow_sum(1_000_000)
 print(f"Result: {result}")
@@ -269,7 +272,6 @@ from typing import TypeVar
 
 T = TypeVar("T")
 
-
 def compose(*funcs: Callable) -> Callable:
     """Composes functions from right to left."""
     def composed(value):
@@ -278,7 +280,6 @@ def compose(*funcs: Callable) -> Callable:
             result = func(result)
         return result
     return composed
-
 
 def strip_whitespace(text: str) -> str:
     return text.strip()
@@ -291,7 +292,6 @@ def replace_spaces(text: str) -> str:
 
 def truncate_20(text: str) -> str:
     return text[:20]
-
 
 slugify = compose(truncate_20, replace_spaces, to_lower, strip_whitespace)
 
@@ -348,17 +348,29 @@ However, excessive abstraction actually harms readability. Always ask "does this
 
 Higher-order functions abstract behavior by accepting or returning functions. Factory patterns and decorators are their most common applications. The next article covers the most widely used higher-order functions: **map, filter, and reduce**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Higher-Order Functions?**
+  - The article treats Higher-Order Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Higher-Order Functions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Higher-Order Functions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
 - **Higher-Order Functions (current)**
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- map, filter, reduce (upcoming)
+- Closures and Partial Application (upcoming)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

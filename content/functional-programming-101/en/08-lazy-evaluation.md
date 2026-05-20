@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 8
-title: Lazy Evaluation and Generators
+title: "Functional Programming 101 (8/10): Lazy Evaluation and Generators"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Build memory-efficient data processing pipelines using generato
 last_reviewed: '2026-05-04'
 ---
 
-# Lazy Evaluation and Generators
+# Functional Programming 101 (8/10): Lazy Evaluation and Generators
 
 The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.
 
 This is post 8 in the Functional Programming 101 series.
 
 Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Lazy Evaluation and Generators?
+- Which signal should the example or diagram make visible for Lazy Evaluation and Generators?
+- What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
+
+*Functional Programming 101 chapter 8 flow overview*
+
+This picture places Lazy Evaluation and Generators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Lazy Evaluation and Generators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,10 +62,6 @@ Python's `range()`, `map()`, `filter()`, and file objects all use lazy evaluatio
 ## Concept Overview
 
 > Eager vs Lazy Evaluation
-
-![Pull-based lazy pipeline](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
-
-*In a lazy pipeline, the consumer pulls one record at a time through every stage. That pull model is why a large input stream does not require every intermediate result to live in memory at once.*
 
 ## Key Concepts
 
@@ -93,7 +105,6 @@ def countdown(n: int):
         yield n
         n -= 1
 
-
 # create a generator object
 gen = countdown(5)
 print(type(gen))  # <class 'generator'>
@@ -122,7 +133,6 @@ print(type(squares_list))  # <class 'list'>
 squares_gen = (x ** 2 for x in range(10))
 print(type(squares_gen))  # <class 'generator'>
 
-
 # memory comparison
 import sys
 
@@ -142,7 +152,6 @@ print(f"Total: {total:,}")
 ```python
 from itertools import count, islice
 
-
 # infinite generator
 def fibonacci():
     a, b = 0, 1
@@ -150,11 +159,9 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
-
 # take only what you need with islice
 fib_10 = list(islice(fibonacci(), 10))
 print(fib_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-
 
 # infinite counter
 def natural_numbers():
@@ -175,7 +182,6 @@ print(squares)  # [1, 4, 9, 16, 25]
 
 ```python
 from itertools import chain, takewhile, dropwhile, accumulate, groupby
-
 
 # chain: concatenate multiple iterables
 combined = list(chain([1, 2], [3, 4], [5, 6]))
@@ -208,7 +214,6 @@ from itertools import chain
 from pathlib import Path
 from typing import Iterator
 
-
 def read_lines(path: Path) -> Iterator[str]:
     """Yields lines from a CSV file one at a time."""
     with path.open("r", encoding="utf-8") as handle:
@@ -232,7 +237,6 @@ def format_output(records: Iterator[dict]) -> Iterator[str]:
     """Formats records for display."""
     for r in records:
         yield f"{r['name']}: {r['score']} points"
-
 
 # create a tiny sample file so the pipeline behaves like a real stream
 sample_path = Path("scores.csv")
@@ -342,17 +346,29 @@ In production, the effective pattern is to compose each pipeline stage as a gene
 
 Lazy evaluation defers computation to the moment values are needed, keeping memory usage constant. Python's generators and `itertools` are the core tools for building lazy pipelines. The next article covers combining small functions into complex transformations: **function composition and pipelines**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Lazy Evaluation and Generators?**
+  - The article treats Lazy Evaluation and Generators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Lazy Evaluation and Generators?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): Closures and Partial Application](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): Recursion and Tail Calls](./07-recursion.md)
 - **Lazy Evaluation and Generators (current)**
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

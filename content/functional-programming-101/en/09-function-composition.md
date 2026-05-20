@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 9
-title: Function Composition and Pipelines
+title: "Functional Programming 101 (9/10): Function Composition and Pipelines"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Combine small functions into complex data transformation pipeli
 last_reviewed: '2026-05-04'
 ---
 
-# Function Composition and Pipelines
+# Functional Programming 101 (9/10): Function Composition and Pipelines
 
 Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.
 
 This is post 9 in the Functional Programming 101 series.
 
 Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Function Composition and Pipelines?
+- Which signal should the example or diagram make visible for Function Composition and Pipelines?
+- What failure should be prevented first when Function Composition and Pipelines reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
+
+*Functional Programming 101 chapter 9 flow overview*
+
+This picture places Function Composition and Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Function Composition and Pipelines is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -56,10 +72,6 @@ Pipeline visualization:
 ```
 
 ## How a readable pipeline flows
-
-![Step-by-step function pipeline](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
-
-*A good pipeline makes each transformation stage explicit, so reviewers and operators can spot where data changes shape.*
 
 ## Key Concepts
 
@@ -108,7 +120,6 @@ from collections.abc import Callable
 from typing import Any
 from functools import reduce
 
-
 def compose(*funcs: Callable) -> Callable:
     """Composes functions from right to left."""
     def composed(x: Any) -> Any:
@@ -127,7 +138,6 @@ def pipe(*funcs: Callable) -> Callable:
         return result
     return piped
 
-
 # compose: f(g(h(x)))
 add_one = lambda x: x + 1
 double = lambda x: x * 2
@@ -145,7 +155,6 @@ print(transform_p(5))  # Result: 12
 
 ```python
 import re
-
 
 def strip_whitespace(text: str) -> str:
     return text.strip()
@@ -166,7 +175,6 @@ def truncate(max_len: int):
     def _truncate(text: str) -> str:
         return text[:max_len]
     return _truncate
-
 
 # slug generation pipeline
 slugify = pipe(
@@ -190,7 +198,6 @@ print(slugify("  Functional Programming — A Composition Guide  "))
 ```python
 from collections.abc import Callable
 
-
 def pipe_data(*funcs: Callable) -> Callable:
     """Data processing pipeline."""
     def process(data):
@@ -199,7 +206,6 @@ def pipe_data(*funcs: Callable) -> Callable:
             result = func(result)
         return result
     return process
-
 
 # define each stage as an independent function
 def parse_records(raw: list[str]) -> list[dict]:
@@ -229,7 +235,6 @@ def format_table(records: list[dict]) -> str:
     for r in records:
         lines.append(f"{r['name']:<10} {r['score']:>5} {r['grade']:>5}")
     return "\n".join(lines)
-
 
 # assemble the pipeline
 process_students = pipe_data(
@@ -264,7 +269,6 @@ print(process_students(raw_data))
 from collections.abc import Callable
 from typing import Iterator
 
-
 def gen_pipe(*funcs: Callable) -> Callable:
     """Generator-based lazy pipeline."""
     def process(data):
@@ -273,7 +277,6 @@ def gen_pipe(*funcs: Callable) -> Callable:
             result = func(result)
         return result
     return process
-
 
 def lines(text: str) -> Iterator[str]:
     for line in text.strip().split("\n"):
@@ -296,7 +299,6 @@ def skip_comments(it: Iterator[str]) -> Iterator[str]:
 def to_upper(it: Iterator[str]) -> Iterator[str]:
     for line in it:
         yield line.upper()
-
 
 # assemble the lazy pipeline
 clean_text = gen_pipe(
@@ -329,7 +331,6 @@ for line in clean_text(lines(text)):
 from collections.abc import Callable
 from typing import Any
 
-
 def conditional(
     predicate: Callable[[Any], bool],
     if_true: Callable,
@@ -345,7 +346,6 @@ def conditional(
 def when(predicate: Callable[[Any], bool], func: Callable) -> Callable:
     """Applies a function only when the condition is true."""
     return conditional(predicate, func)
-
 
 # pipeline with conditional steps
 process = pipe(
@@ -366,7 +366,6 @@ print(process("  Short URL  "))
 ```python
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class OrderEvent:
     order_id: str
@@ -377,23 +376,18 @@ class OrderEvent:
     source: str
     margin: int = 0
 
-
 def normalize_currency(events: list[OrderEvent]) -> list[OrderEvent]:
     rates = {"KRW": 1, "USD": 1380}
     return [replace(e, amount=e.amount * rates[e.currency], currency="KRW") for e in events]
 
-
 def drop_cancelled(events: list[OrderEvent]) -> list[OrderEvent]:
     return [e for e in events if e.status != "cancelled"]
-
 
 def enrich_margin(events: list[OrderEvent]) -> list[OrderEvent]:
     return [replace(e, margin=int(e.amount * 0.18)) for e in events]
 
-
 def keep_marketplace(events: list[OrderEvent]) -> list[OrderEvent]:
     return [e for e in events if e.source == "marketplace"]
-
 
 def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
     report: dict[str, dict[str, int]] = {}
@@ -403,7 +397,6 @@ def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
         store["margin"] += event.margin
         store["orders"] += 1
     return report
-
 
 settle_orders = pipe(
     normalize_currency,
@@ -526,17 +519,29 @@ Python does not have a built-in composition operator like Haskell's `.`, but a s
 
 Function composition combines small functions into complex transformations. `pipe` aligns code order with execution order for better readability. The next article wraps up the series with **balancing OOP and functional programming**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Function Composition and Pipelines?**
+  - The article treats Function Composition and Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Function Composition and Pipelines?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Function Composition and Pipelines reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
-- [map, filter, reduce](./05-map-filter-reduce.md)
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
+- [Functional Programming 101 (5/10): map, filter, reduce](./05-map-filter-reduce.md)
+- [Functional Programming 101 (6/10): Closures and Partial Application](./06-closure-and-partial.md)
+- [Functional Programming 101 (7/10): Recursion and Tail Calls](./07-recursion.md)
+- [Functional Programming 101 (8/10): Lazy Evaluation and Generators](./08-lazy-evaluation.md)
 - **Function Composition and Pipelines (current)**
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References

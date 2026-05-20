@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Closures and Partial Application</title>
+<title>Functional Programming 101 (6/10): Closures and Partial Application</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Closures and Partial Application</h1>
+<h1>Functional Programming 101 (6/10): Closures and Partial Application</h1>
 <p>Closures start to feel practical the moment you need a callback, decorator, or handler to carry a little bit of context. The function itself may be small, but once it has to remember which tenant it belongs to, how many retries are left, or which logger prefix to use, a plain parameter list stops being the whole story.</p>
 <p><code>functools.partial</code> solves a nearby problem from a different angle. Instead of remembering mutable context, it pre-fills stable arguments of an existing function. That distinction matters in production code because it tells you whether you are carrying state or simply specializing configuration.</p>
 <p>This is post 6 in the Functional Programming 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Closures and Partial Application?</li>
+<li>Which signal should the example or diagram make visible for Closures and Partial Application?</li>
+<li>What failure should be prevented first when Closures and Partial Application reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Functional Programming 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png"></p>
+<p><em>Functional Programming 101 chapter 6 flow overview</em></p>
+<p>This picture places Closures and Partial Application inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Closures and Partial Application is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and mechanics of closures</li>
@@ -84,8 +97,6 @@
             (closure)
 </code></pre>
 <h2>Closure vs partial decision flow</h2>
-<p><img alt="Closure vs partial decision flow" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png"></p>
-<p><em>Use closures when the function must remember context. Use <code>partial</code> when an existing function only needs a few fixed arguments.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Closure</strong><br>
 - Description: An inner function that remembers variables from its enclosing scope</p>
@@ -338,17 +349,27 @@ if should_retry(event[&quot;status&quot;]):
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Closures let functions remember the environment where they were defined, and <code>partial</code> fixes arguments of existing functions. Use closures when state is needed; use partial when only fixing arguments. The next article covers a core functional programming technique: <strong>recursion and tail calls</strong>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">What Is Functional Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Pure Functions and Side Effects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Immutable Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Higher-Order Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">map, filter, reduce</a></li>
+<li><strong>What boundary should you inspect first when applying Closures and Partial Application?</strong></li>
+<li>The article treats Closures and Partial Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Closures and Partial Application?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Closures and Partial Application reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/01-what-is-fp.md">Functional Programming 101 (1/10): What Is Functional Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/02-pure-functions.md">Functional Programming 101 (2/10): Pure Functions and Side Effects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/03-immutable-data.md">Functional Programming 101 (3/10): Immutable Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/04-higher-order-functions.md">Functional Programming 101 (4/10): Higher-Order Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/05-map-filter-reduce.md">Functional Programming 101 (5/10): map, filter, reduce</a></li>
 <li><strong>Closures and Partial Application (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/07-recursion.md">Recursion and Tail Calls</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/08-lazy-evaluation.md">Lazy Evaluation and Generators</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/09-function-composition.md">Function Composition and Pipelines</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/functional-programming-101/en/10-oop-and-fp-balance.md">Balancing OOP and Functional Programming</a></li>
+<li>Recursion and Tail Calls (upcoming)</li>
+<li>Lazy Evaluation and Generators (upcoming)</li>
+<li>Function Composition and Pipelines (upcoming)</li>
+<li>Balancing OOP and Functional Programming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

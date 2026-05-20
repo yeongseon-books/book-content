@@ -1,7 +1,7 @@
 ---
 series: functional-programming-101
 episode: 5
-title: map, filter, reduce
+title: "Functional Programming 101 (5/10): map, filter, reduce"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn the principles of map, filter, and reduce, and how they c
 last_reviewed: '2026-05-04'
 ---
 
-# map, filter, reduce
+# Functional Programming 101 (5/10): map, filter, reduce
 
 This is post 5 in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (5/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you transform, filter, and aggregate collections without writing explicit loops?
 
 > `map`, `filter`, and `reduce` are the three core operations of functional programming. They hide loop details and enable declarative data processing that focuses on "what" rather than "how." This article covers each function's mechanics, Python usage, and comparison with list comprehensions.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying map, filter, reduce?
+- Which signal should the example or diagram make visible for map, filter, reduce?
+- What failure should be prevented first when map, filter, reduce reaches a real system?
+
+## Big Picture
+
+![Functional Programming 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.en.png)
+
+*Functional Programming 101 chapter 5 flow overview*
+
+This picture places map, filter, reduce inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of map, filter, reduce is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -155,7 +167,6 @@ print(evens_comp)  # [2, 4, 6, 8, 10]
 ```python
 from functools import reduce
 
-
 # sum
 numbers = [1, 2, 3, 4, 5]
 total = reduce(lambda acc, x: acc + x, numbers)
@@ -199,7 +210,6 @@ result2 = [x ** 2 for x in numbers if x % 2 == 0]
 print(result1)  # [4, 16]
 print(result2)  # [4, 16]
 
-
 # when map is better: applying an existing function
 names = ["alice", "bob", "charlie"]
 
@@ -218,7 +228,6 @@ print(upper2)  # ['ALICE', 'BOB', 'CHARLIE']
 
 ```python
 from functools import reduce
-
 
 # order data processing
 orders = [
@@ -301,17 +310,29 @@ In Python, list comprehensions are more idiomatic than map/filter. But knowing t
 
 map, filter, and reduce are the fundamental tools of functional data processing. In Python, list comprehensions replace many cases, but understanding the principles enables broader tool selection. The next article covers **closures and partial application** — functions that remember external variables.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying map, filter, reduce?**
+  - The article treats map, filter, reduce as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for map, filter, reduce?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when map, filter, reduce reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Functional Programming?](./01-what-is-fp.md)
-- [Pure Functions and Side Effects](./02-pure-functions.md)
-- [Immutable Data](./03-immutable-data.md)
-- [Higher-Order Functions](./04-higher-order-functions.md)
+## In this series
+
+- [Functional Programming 101 (1/10): What Is Functional Programming?](./01-what-is-fp.md)
+- [Functional Programming 101 (2/10): Pure Functions and Side Effects](./02-pure-functions.md)
+- [Functional Programming 101 (3/10): Immutable Data](./03-immutable-data.md)
+- [Functional Programming 101 (4/10): Higher-Order Functions](./04-higher-order-functions.md)
 - **map, filter, reduce (current)**
-- [Closures and Partial Application](./06-closure-and-partial.md)
-- [Recursion and Tail Calls](./07-recursion.md)
-- [Lazy Evaluation and Generators](./08-lazy-evaluation.md)
-- [Function Composition and Pipelines](./09-function-composition.md)
-- [Balancing OOP and Functional Programming](./10-oop-and-fp-balance.md)
+- Closures and Partial Application (upcoming)
+- Recursion and Tail Calls (upcoming)
+- Lazy Evaluation and Generators (upcoming)
+- Function Composition and Pipelines (upcoming)
+- Balancing OOP and Functional Programming (upcoming)
+
 <!-- toc:end -->
 
 ## References
