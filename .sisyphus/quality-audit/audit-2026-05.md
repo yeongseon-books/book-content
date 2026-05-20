@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:41:31+00:00
+Generated: 2026-05-20T11:41:52+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **48**
-- Series at or above 5 issues: **36**
-- Total issues: **395**
-  - BadImg: **395**
+- Series with any issue: **47**
+- Series at or above 5 issues: **35**
+- Total issues: **381**
+  - BadImg: **381**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -44,51 +44,50 @@ Warnings:
 | 1 | `azure-app-service-deep-dive` | 18 | 18 | 0 | 0 | 0 | 0 |
 | 2 | `developer-career-101` | 18 | 18 | 0 | 0 | 0 | 0 |
 | 3 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
-| 4 | `ai-web-dev-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 5 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 6 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 7 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 8 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 9 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 10 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 11 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 14 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 16 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 17 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 18 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 19 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 20 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 21 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 23 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 24 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 25 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 26 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 27 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 32 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 33 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 34 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 35 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 36 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 37 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 38 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 39 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 42 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 43 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 44 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 45 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 46 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 47 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 48 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 4 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 5 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 6 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 7 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 8 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 9 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 10 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 13 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 14 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 15 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 16 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 18 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 19 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 20 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 22 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 23 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 24 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 25 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 31 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 32 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 33 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 34 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 35 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 36 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 37 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 38 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 39 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 40 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 41 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 42 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 43 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 44 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 45 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 46 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 47 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## azure-app-service-deep-dive — Total 18
 
@@ -125,18 +124,6 @@ Warnings:
 - `assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png:1` — PNG height 67px <= 100px (size=666x67)
 - `assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png:1` — PNG height 67px <= 100px (size=885x67)
 - ... 11 more
-
-## ai-web-dev-101 — Total 14
-
-- BadImg=14 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/ai-web-dev-101/01/api-call-overview.en.png:1` — PNG height 84px <= 100px (size=847x84)
-- `assets/ai-web-dev-101/01/api-call-overview.ko.png:1` — PNG height 84px <= 100px (size=699x84)
-- `assets/ai-web-dev-101/03/api-route-handler-flow.en.png:1` — PNG height 94px <= 100px (size=887x94)
-- `assets/ai-web-dev-101/03/api-route-handler-flow.ko.png:1` — PNG height 94px <= 100px (size=789x94)
-- `assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png:1` — PNG height 84px <= 100px (size=1184x84)
-- ... 9 more
 
 ## software-engineering-101 — Total 14
 
