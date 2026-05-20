@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 9
-title: Replication and Backup
+title: "Database Systems 101 (9/10): Replication and Backup"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Primary-replica replication, sync vs async, and PITR backups fo
 last_reviewed: '2026-05-04'
 ---
 
-# Replication and Backup
+# Database Systems 101 (9/10): Replication and Backup
 
 This is post 9 in the Database Systems 101 series.
 
 > Database Systems 101 series (9/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: When a single database dies or a disk vanishes entirely, what does it take to keep the service alive?
 
 > Replication keeps live nodes in lock step on the same data; backups are insurance you can rewind to. Both solve availability and durability, but on different time axes. Neither is enough on its own.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Replication and Backup?
+- Which signal should the example or diagram make visible for Replication and Backup?
+- What failure should be prevented first when Replication and Backup reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.en.png)
+
+*database systems 101 chapter 9 flow overview*
+
+This picture places Replication and Backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Replication and Backup is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -179,17 +191,29 @@ Incident response is rehearsed, not invented in the moment. Failover drills and 
 
 Replication owns availability across space, backup owns durability across time. Together they make a system that survives failures. The next post compares the same data under two very different workloads — OLTP and OLAP — and explains why analytics gets its own system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Replication and Backup?**
+  - The article treats Replication and Backup as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Replication and Backup?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Replication and Backup reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
-- [Transactions and ACID](./05-transactions-and-acid.md)
-- [Isolation Levels](./06-isolation-levels.md)
-- [Normalization and Modeling](./07-normalization-and-modeling.md)
-- [Query Optimization](./08-query-optimization.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
+- [Database Systems 101 (5/10): Transactions and ACID](./05-transactions-and-acid.md)
+- [Database Systems 101 (6/10): Isolation Levels](./06-isolation-levels.md)
+- [Database Systems 101 (7/10): Normalization and Modeling](./07-normalization-and-modeling.md)
+- [Database Systems 101 (8/10): Query Optimization](./08-query-optimization.md)
 - **Replication and Backup (current)**
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

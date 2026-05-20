@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 6
-title: Isolation Levels
+title: "Database Systems 101 (6/10): Isolation Levels"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: From READ COMMITTED to SERIALIZABLE, which anomalies each level
 last_reviewed: '2026-05-04'
 ---
 
-# Isolation Levels
+# Database Systems 101 (6/10): Isolation Levels
 
 This is post 6 in the Database Systems 101 series.
 
 > Database Systems 101 series (6/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: When two transactions touch the same data at the same time, how far does the database go to make each one feel like it is alone?
 
 > Isolation (the I in ACID) is not on/off, it is a dial. Too loose and you get anomalies like dirty reads or phantom reads; too strict and throughput collapses. Isolation levels are the dial that decides where you stop and where you give in.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Isolation Levels?
+- Which signal should the example or diagram make visible for Isolation Levels?
+- What failure should be prevented first when Isolation Levels reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.en.png)
+
+*database systems 101 chapter 6 flow overview*
+
+This picture places Isolation Levels inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Isolation Levels is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -214,17 +226,29 @@ Domains where correctness is absolute — finance, reservations — default to S
 
 Isolation level is the dial between concurrency safety and throughput. Knowing the anomalies and what each level promises lets you design failure modes ahead of time. The next post climbs one layer up to the quality of the data model itself — normalization and functional dependencies. A good model removes update anomalies and concurrency hazards before they ever happen.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Isolation Levels?**
+  - The article treats Isolation Levels as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Isolation Levels?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Isolation Levels reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
-- [Transactions and ACID](./05-transactions-and-acid.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
+- [Database Systems 101 (5/10): Transactions and ACID](./05-transactions-and-acid.md)
 - **Isolation Levels (current)**
 - Normalization and Modeling (upcoming)
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

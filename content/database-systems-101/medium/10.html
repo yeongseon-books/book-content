@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>OLTP and OLAP</title>
+<title>Database Systems 101 (10/10): OLTP and OLAP</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>OLTP and OLAP</h1>
+<h1>Database Systems 101 (10/10): OLTP and OLAP</h1>
 <p>This is the final post in the Database Systems 101 series.</p>
 <blockquote>
 <p>Database Systems 101 series (10/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: It is the same data — so why do operational and analytical databases look so different?</p>
 <blockquote>
 <p>Short, narrow transactions are OLTP; long, wide aggregations are OLAP. The two workloads differ in data model, storage format, and indexing strategy. Once that distinction lands, "why is analytics a separate system" becomes obvious.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying OLTP and OLAP?</li>
+<li>Which signal should the example or diagram make visible for OLTP and OLAP?</li>
+<li>What failure should be prevented first when OLTP and OLAP reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="database systems 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.en.png"></p>
+<p><em>database systems 101 chapter 10 flow overview</em></p>
+<p>This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The fundamental difference between OLTP and OLAP workloads</li>
@@ -226,16 +235,26 @@ GROUP BY d.country;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>OLTP and OLAP are two worlds handling the same data on different time scales and in different shapes. Row storage wins single-row lookups; columnar wins large aggregations. Splitting them and connecting them with ETL/ELT is the standard architecture. With this post we wrap up the Database Systems 101 series. The big map hidden behind the word "database" — model, transactions, indexes, replication, analytics — should now feel like familiar terrain.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Indexes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/05-transactions-and-acid.md">Transactions and ACID</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/06-isolation-levels.md">Isolation Levels</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/07-normalization-and-modeling.md">Normalization and Modeling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/08-query-optimization.md">Query Optimization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/09-replication-and-backup.md">Replication and Backup</a></li>
+<li><strong>What boundary should you inspect first when applying OLTP and OLAP?</strong></li>
+<li>The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for OLTP and OLAP?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when OLTP and OLAP reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">Database Systems 101 (1/10): What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">Database Systems 101 (2/10): The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">Database Systems 101 (3/10): SQL and Query Processing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Database Systems 101 (4/10): Indexes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/05-transactions-and-acid.md">Database Systems 101 (5/10): Transactions and ACID</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/06-isolation-levels.md">Database Systems 101 (6/10): Isolation Levels</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/07-normalization-and-modeling.md">Database Systems 101 (7/10): Normalization and Modeling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/08-query-optimization.md">Database Systems 101 (8/10): Query Optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/09-replication-and-backup.md">Database Systems 101 (9/10): Replication and Backup</a></li>
 <li><strong>OLTP and OLAP (current)</strong></li>
 </ul>
 <h2>References</h2>

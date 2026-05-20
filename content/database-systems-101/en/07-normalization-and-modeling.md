@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 7
-title: Normalization and Modeling
+title: "Database Systems 101 (7/10): Normalization and Modeling"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: From 1NF to 3NF, the intuition behind normalization and how fun
 last_reviewed: '2026-05-04'
 ---
 
-# Normalization and Modeling
+# Database Systems 101 (7/10): Normalization and Modeling
 
 This is post 7 in the Database Systems 101 series.
 
 > Database Systems 101 series (7/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does cramming everything into one table fall apart so quickly, and how do you split it cleanly?
 
 > Normalization is the principle "record each fact in exactly one place." Done well, it removes update anomalies and gives everyone a single, agreed-on home for each piece of truth. 1NF, 2NF, and 3NF are the step-by-step checklist that codifies the principle.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Normalization and Modeling?
+- Which signal should the example or diagram make visible for Normalization and Modeling?
+- What failure should be prevented first when Normalization and Modeling reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/07/07-01-big-picture.en.png)
+
+*database systems 101 chapter 7 flow overview*
+
+This picture places Normalization and Modeling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Normalization and Modeling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -227,17 +239,29 @@ Analytics is different. Reporting builds its own OLAP model (star schema, etc.) 
 
 Normalization splits the model along functional dependencies so that "each fact lives in one place." 1NF, 2NF, and 3NF make that principle a step-by-step checklist, and foreign keys enforce it. The next post takes the model and indexes you have built and looks at how the optimizer turns them into a fast execution plan — query optimization.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Normalization and Modeling?**
+  - The article treats Normalization and Modeling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Normalization and Modeling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Normalization and Modeling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
-- [Transactions and ACID](./05-transactions-and-acid.md)
-- [Isolation Levels](./06-isolation-levels.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
+- [Database Systems 101 (5/10): Transactions and ACID](./05-transactions-and-acid.md)
+- [Database Systems 101 (6/10): Isolation Levels](./06-isolation-levels.md)
 - **Normalization and Modeling (current)**
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 10
-title: OLTP and OLAP
+title: "Database Systems 101 (10/10): OLTP and OLAP"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: OLTP vs OLAP workloads, row vs columnar storage, and why analyt
 last_reviewed: '2026-05-04'
 ---
 
-# OLTP and OLAP
+# Database Systems 101 (10/10): OLTP and OLAP
 
 This is the final post in the Database Systems 101 series.
 
 > Database Systems 101 series (10/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: It is the same data — so why do operational and analytical databases look so different?
 
 > Short, narrow transactions are OLTP; long, wide aggregations are OLAP. The two workloads differ in data model, storage format, and indexing strategy. Once that distinction lands, "why is analytics a separate system" becomes obvious.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying OLTP and OLAP?
+- Which signal should the example or diagram make visible for OLTP and OLAP?
+- What failure should be prevented first when OLTP and OLAP reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.en.png)
+
+*database systems 101 chapter 10 flow overview*
+
+This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -234,17 +246,29 @@ A more recent direction is the "data lakehouse." Columnar files like Parquet sit
 
 OLTP and OLAP are two worlds handling the same data on different time scales and in different shapes. Row storage wins single-row lookups; columnar wins large aggregations. Splitting them and connecting them with ETL/ELT is the standard architecture. With this post we wrap up the Database Systems 101 series. The big map hidden behind the word "database" — model, transactions, indexes, replication, analytics — should now feel like familiar terrain.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying OLTP and OLAP?**
+  - The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for OLTP and OLAP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when OLTP and OLAP reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
-- [Transactions and ACID](./05-transactions-and-acid.md)
-- [Isolation Levels](./06-isolation-levels.md)
-- [Normalization and Modeling](./07-normalization-and-modeling.md)
-- [Query Optimization](./08-query-optimization.md)
-- [Replication and Backup](./09-replication-and-backup.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
+- [Database Systems 101 (5/10): Transactions and ACID](./05-transactions-and-acid.md)
+- [Database Systems 101 (6/10): Isolation Levels](./06-isolation-levels.md)
+- [Database Systems 101 (7/10): Normalization and Modeling](./07-normalization-and-modeling.md)
+- [Database Systems 101 (8/10): Query Optimization](./08-query-optimization.md)
+- [Database Systems 101 (9/10): Replication and Backup](./09-replication-and-backup.md)
 - **OLTP and OLAP (current)**
+
 <!-- toc:end -->
 
 ## References

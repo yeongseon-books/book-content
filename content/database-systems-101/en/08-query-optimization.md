@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 8
-title: Query Optimization
+title: "Database Systems 101 (8/10): Query Optimization"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How the optimizer uses statistics and a cost model to pick a pl
 last_reviewed: '2026-05-04'
 ---
 
-# Query Optimization
+# Database Systems 101 (8/10): Query Optimization
 
 This is post 8 in the Database Systems 101 series.
 
 > Database Systems 101 series (8/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why is the same SQL 1 ms one day and 10 seconds the next, and what should you actually look at?
 
 > The optimizer is code that estimates costs from statistics and picks the cheapest-looking execution plan. When statistics are stale or the data distribution shifts, the optimizer takes the wrong road. The skill of reading EXPLAIN is the skill of auditing that decision after the fact.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Query Optimization?
+- Which signal should the example or diagram make visible for Query Optimization?
+- What failure should be prevented first when Query Optimization reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.en.png)
+
+*database systems 101 chapter 8 flow overview*
+
+This picture places Query Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Query Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -209,17 +221,29 @@ For operational systems, "regression detection" matters as much as tuning. A que
 
 The optimizer picks among possible plans using a statistics-based cost model, and EXPLAIN ANALYZE is the most reliable way to audit that choice. The next post moves beyond a single database — replication and backup. We pull together the two pillars of a system that is both fast and safe.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Query Optimization?**
+  - The article treats Query Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Query Optimization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Query Optimization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
-- [Transactions and ACID](./05-transactions-and-acid.md)
-- [Isolation Levels](./06-isolation-levels.md)
-- [Normalization and Modeling](./07-normalization-and-modeling.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
+- [Database Systems 101 (5/10): Transactions and ACID](./05-transactions-and-acid.md)
+- [Database Systems 101 (6/10): Isolation Levels](./06-isolation-levels.md)
+- [Database Systems 101 (7/10): Normalization and Modeling](./07-normalization-and-modeling.md)
 - **Query Optimization (current)**
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Database System?</title>
+<title>Database Systems 101 (1/10): What Is a Database System?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Is a Database System?</h1>
+<h1>Database Systems 101 (1/10): What Is a Database System?</h1>
 <p>This is the first post in the Database Systems 101 series.</p>
 <blockquote>
 <p>Database Systems 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: We could just put data in a file. Why do we run a whole separate piece of software called a database?</p>
 <blockquote>
 <p>A database management system (DBMS) is not just storage. It is software that solves four hard problems together — <strong>concurrent access, crash recovery, consistency, and querying</strong>. A flat file works until two users, a power failure, or a non-trivial question shows up. After that, it does not. This first episode draws that boundary.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is a Database System??</li>
+<li>Which signal should the example or diagram make visible for What Is a Database System??</li>
+<li>What failure should be prevented first when What Is a Database System? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="database systems 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.en.png"></p>
+<p><em>database systems 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Database System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Database System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The decisive difference between a file and a DBMS</li>
@@ -224,6 +233,16 @@ print(&quot;done&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A DBMS is not a place to put data — it is <strong>software that solves concurrency, durability, consistency, and querying together</strong>. That is what lets your application stay focused on intent. Next we look at the model SQL is built on: the relational model.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is a Database System??</strong></li>
+<li>The article treats What Is a Database System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is a Database System??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is a Database System? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Database System? (current)</strong></li>
 <li>The Relational Model (upcoming)</li>

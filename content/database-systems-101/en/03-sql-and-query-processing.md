@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 3
-title: SQL and Query Processing
+title: "Database Systems 101 (3/10): SQL and Query Processing"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How a single SQL line is parsed, planned, and executed inside a
 last_reviewed: '2026-05-04'
 ---
 
-# SQL and Query Processing
+# Database Systems 101 (3/10): SQL and Query Processing
 
 This is post 3 in the Database Systems 101 series.
 
 > Database Systems 101 series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: When you type `SELECT * FROM orders WHERE user_id = 7`, what actually happens inside the DBMS before rows come back?
 
 > SQL only states **what** you want. The DBMS turns it into rows in four stages — **parse → analyze → plan → execute** — and the optimizer is allowed to find a cheaper way to compute the same answer. This episode walks those stages and the user-facing window into them: `EXPLAIN`.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying SQL and Query Processing?
+- Which signal should the example or diagram make visible for SQL and Query Processing?
+- What failure should be prevented first when SQL and Query Processing reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/03/03-01-big-picture.en.png)
+
+*database systems 101 chapter 3 flow overview*
+
+This picture places SQL and Query Processing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQL and Query Processing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -228,9 +240,20 @@ Even one engineer on the team who reads plans confidently raises everyone's aver
 
 You write **what**; the DBMS decides **how**. Between text and rows live a parser, an optimizer, and an executor — and `EXPLAIN` is your window. Next we cover the single most powerful lever the optimizer has: indexes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying SQL and Query Processing?**
+  - The article treats SQL and Query Processing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for SQL and Query Processing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when SQL and Query Processing reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
 - **SQL and Query Processing (current)**
 - Indexes (upcoming)
 - Transactions and ACID (upcoming)
@@ -239,6 +262,7 @@ You write **what**; the DBMS decides **how**. Between text and rows live a parse
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

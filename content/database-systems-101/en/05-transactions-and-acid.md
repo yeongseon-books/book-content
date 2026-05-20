@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 5
-title: Transactions and ACID
+title: "Database Systems 101 (5/10): Transactions and ACID"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Why a single bank transfer needs a transaction, and what the fo
 last_reviewed: '2026-05-04'
 ---
 
-# Transactions and ACID
+# Database Systems 101 (5/10): Transactions and ACID
 
 This is post 5 in the Database Systems 101 series.
 
 > Database Systems 101 series (5/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does a power outage in the middle of a bank transfer not end up "subtracting one hundred dollars twice"?
 
 > A transaction bundles several SQL statements into one unit and promises "all or nothing." The way the database keeps that promise is called ACID. Once you have this vocabulary, concurrency, recovery, and failure scenarios all start sounding like the same conversation.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Transactions and ACID?
+- Which signal should the example or diagram make visible for Transactions and ACID?
+- What failure should be prevented first when Transactions and ACID reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/05/05-01-big-picture.en.png)
+
+*database systems 101 chapter 5 flow overview*
+
+This picture places Transactions and ACID inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Transactions and ACID is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -224,17 +236,29 @@ Transactions are also the starting point for incident analysis. Asking "how far 
 
 A transaction is the "all or nothing" promise; ACID refines that promise across four properties (atomicity, consistency, isolation, durability). WAL and constraints are the actual mechanisms that keep the promise. The next post zooms into the I — isolation — and walks through what READ COMMITTED, REPEATABLE READ, and SERIALIZABLE prevent and what they still allow.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Transactions and ACID?**
+  - The article treats Transactions and ACID as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Transactions and ACID?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Transactions and ACID reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
-- [Indexes](./04-indexes.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): Indexes](./04-indexes.md)
 - **Transactions and ACID (current)**
 - Isolation Levels (upcoming)
 - Normalization and Modeling (upcoming)
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

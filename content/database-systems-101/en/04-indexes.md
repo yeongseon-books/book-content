@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 4
-title: Indexes
+title: "Database Systems 101 (4/10): Indexes"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How a B-tree index actually works, when it pays off, and when s
 last_reviewed: '2026-05-04'
 ---
 
-# Indexes
+# Database Systems 101 (4/10): Indexes
 
 This is post 4 in the Database Systems 101 series.
 
 > Database Systems 101 series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why is the index at the back of a book so fast, and why does the same intuition carry directly into database indexes?
 
 > An index is a separate data structure that pre-sorts "value to row location." That is why a full scan is O(N) while an index lookup is O(log N). But indexes are not free. They cost writes and disk space. Good index design is less about "where to add one" and more about "where not to add one."
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Indexes?
+- Which signal should the example or diagram make visible for Indexes?
+- What failure should be prevented first when Indexes reaches a real system?
+
+## Big Picture
+
+![database systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/04/04-01-big-picture.en.png)
+
+*database systems 101 chapter 4 flow overview*
+
+This picture places Indexes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Indexes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -216,10 +228,21 @@ For write-heavy workloads, teams consciously cut indexes back. For read-heavy an
 
 An index is a sorted "value to row" structure that lets you answer a query in a couple of tree jumps. The biggest wins come from **selectivity** and **leading columns**. Good index design is less "where do I add one" and more "where do I refuse to add one." In the next post we look at the tool that lets multiple writers touch the same data safely: transactions and ACID.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Indexes?**
+  - The article treats Indexes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Indexes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Indexes reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Database System?](./01-what-is-a-database.md)
-- [The Relational Model](./02-relational-model.md)
-- [SQL and Query Processing](./03-sql-and-query-processing.md)
+## In this series
+
+- [Database Systems 101 (1/10): What Is a Database System?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): The Relational Model](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL and Query Processing](./03-sql-and-query-processing.md)
 - **Indexes (current)**
 - Transactions and ACID (upcoming)
 - Isolation Levels (upcoming)
@@ -227,6 +250,7 @@ An index is a sorted "value to row" structure that lets you answer a query in a 
 - Query Optimization (upcoming)
 - Replication and Backup (upcoming)
 - OLTP and OLAP (upcoming)
+
 <!-- toc:end -->
 
 ## References

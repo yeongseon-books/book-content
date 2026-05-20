@@ -1,7 +1,7 @@
 ---
 series: database-systems-101
 episode: 9
-title: 복제와 백업
+title: "Database Systems 101 (9/10): 복제와 백업"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 복제, 백업, PITR이 가용성과 복구 목표를 어떻게
 last_reviewed: '2026-05-12'
 ---
 
-# 복제와 백업
+# Database Systems 101 (9/10): 복제와 백업
 
 이 글은 Database Systems 101 시리즈의 아홉 번째 글입니다.
 
@@ -29,14 +29,21 @@ last_reviewed: '2026-05-12'
 
 복제와 백업은 모두 데이터를 지키는 수단이지만, 보호하는 축이 다릅니다. 복제는 같은 시점의 데이터를 여러 노드에 퍼뜨려 가용성을 높이고, 백업은 시간을 거슬러 복원할 수 있게 해 줍니다. 둘 중 하나만으로는 충분하지 않습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Primary-Replica 복제는 어떻게 동작하고 각 노드는 무슨 역할을 할까요?
 - 동기 복제와 비동기 복제는 무엇을 주고받을까요?
 - 전체 백업, 증분 백업, WAL 기반 PITR은 어떻게 다를까요?
-- RPO와 RTO는 어떻게 정의해야 할까요?
 
-> **멘탈 모델**: 복제는 공간 축에서 데이터를 복제해 서비스 연속성을 지키고, 백업은 시간 축에서 데이터를 되감아 복구 가능성을 지킵니다. 즉 복제는 “옆으로”, 백업은 “뒤로” 움직이는 보호 장치입니다.
+## 큰 그림
+
+![Database Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.ko.png)
+
+*Database Systems 101 9장 흐름 개요*
+
+이 그림에서는 복제와 백업를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 복제와 백업의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 내용
 
@@ -182,17 +189,29 @@ recovery_target_time = '2026-05-04 03:00:00'
 
 복제는 공간 축에서 가용성을 맡고, 백업은 시간 축에서 복구 가능성을 맡습니다. 둘이 함께 있어야 시스템이 장애를 견딜 수 있습니다. 다음 글에서는 같은 데이터를 두고도 완전히 다른 요구를 갖는 두 세계, OLTP와 OLAP를 비교하며 시리즈를 마무리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **Primary-Replica 복제는 어떻게 동작하고 각 노드는 무슨 역할을 할까요?**
+  - 본문의 기준은 복제와 백업를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **동기 복제와 비동기 복제는 무엇을 주고받을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **전체 백업, 증분 백업, WAL 기반 PITR은 어떻게 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [데이터베이스 시스템이란 무엇인가?](./01-what-is-a-database.md)
-- [관계형 모델](./02-relational-model.md)
-- [SQL과 쿼리 처리](./03-sql-and-query-processing.md)
-- [인덱스](./04-indexes.md)
-- [트랜잭션과 ACID](./05-transactions-and-acid.md)
-- [isolation level](./06-isolation-levels.md)
-- [정규화와 모델링](./07-normalization-and-modeling.md)
-- [쿼리 최적화](./08-query-optimization.md)
+## 시리즈 목차
+
+- [Database Systems 101 (1/10): 데이터베이스 시스템이란 무엇인가?](./01-what-is-a-database.md)
+- [Database Systems 101 (2/10): 관계형 모델](./02-relational-model.md)
+- [Database Systems 101 (3/10): SQL과 쿼리 처리](./03-sql-and-query-processing.md)
+- [Database Systems 101 (4/10): 인덱스](./04-indexes.md)
+- [Database Systems 101 (5/10): 트랜잭션과 ACID](./05-transactions-and-acid.md)
+- [Database Systems 101 (6/10): 격리 수준](./06-isolation-levels.md)
+- [Database Systems 101 (7/10): 정규화와 모델링](./07-normalization-and-modeling.md)
+- [Database Systems 101 (8/10): 쿼리 최적화](./08-query-optimization.md)
 - **복제와 백업 (현재 글)**
 - OLTP와 OLAP (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
