@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 8
-title: Databases
+title: "Computer Science 101 (8/10): Databases"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How databases store, query, and protect data — focused on ind
 last_reviewed: '2026-05-15'
 ---
 
-# Databases
+# Computer Science 101 (8/10): Databases
 
 Finding one row out of millions in milliseconds is rarely about the SQL sentence alone. It is about the data structures, execution plan, and locking behavior hidden underneath that sentence. That is why so many production incidents end up tracing back to the database layer.
 
 This is post 8 in the Computer Science 101 series.
 
 In this article, we'll connect SQL, indexes, execution plans, and ACID transactions so that database behavior stops feeling like a black box.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Databases?
+- Which signal should the example or diagram make visible for Databases?
+- What failure should be prevented first when Databases reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 8 flow overview*
+
+This picture places Databases inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Databases is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -55,9 +71,6 @@ Queries are short, but deep algorithms sit behind them.
 ## Concept at a Glance
 
 > An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
-*An index swaps a row-by-row scan for a structured lookup path*
 
 ## Key Terms
 
@@ -204,7 +217,6 @@ cur.executemany(
 )
 conn.commit()
 
-
 def transfer(src: int, dst: int, amount: int) -> None:
     """Atomic transfer between two accounts — both succeed or both fail."""
     try:
@@ -215,7 +227,6 @@ def transfer(src: int, dst: int, amount: int) -> None:
     except Exception:
         conn.rollback()
         raise
-
 
 transfer(1, 2, 300)
 print(cur.execute("SELECT * FROM accounts").fetchall())
@@ -274,17 +285,29 @@ A database stores data permanently and keeps it consistent under concurrent acce
 
 The next article looks at how we keep all of these systems reliable and maintainable over time — software engineering.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Databases?**
+  - The article treats Databases as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Databases?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Databases reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
+- [Computer Science 101 (7/10): Networks](./07-networks.md)
 - **Databases (current)**
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

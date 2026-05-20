@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Operating Systems</title>
+<title>Computer Science 101 (6/10): Operating Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Operating Systems</h1>
+<h1>Computer Science 101 (6/10): Operating Systems</h1>
 <p>The moment one machine seems to run many programs at once, you are already living inside an operating-system abstraction. The same perspective explains why a web server stalls, why a memory leak becomes visible, and why threads do not always make Python faster.</p>
 <p>This is post 6 in the Computer Science 101 series.</p>
 <p>In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Operating Systems?</li>
+<li>Which signal should the example or diagram make visible for Operating Systems?</li>
+<li>What failure should be prevented first when Operating Systems reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Computer Science 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Computer Science 101 chapter 6 flow overview</em></p>
+<p>This picture places Operating Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Operating Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>Why does one machine appear to run many programs at once?</li>
@@ -82,8 +95,6 @@
 <blockquote>
 <p>A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.</p>
 </blockquote>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>Processes stay isolated from one another while the OS multiplexes hardware resources</em></p>
 <h2>Key Terms</h2>
 <p><strong>Process</strong><br>
 - Description: An execution unit with its own memory space</p>
@@ -266,17 +277,27 @@ asyncio.run(main())
 <h2>Wrap-Up and Next Steps</h2>
 <p>The OS abstracts hardware so that many programs can coexist safely. Processes, threads, virtual memory, and system calls are the stage on which all of our code runs. The right concurrency model depends on whether the work is CPU- or I/O-bound.</p>
 <p>The next article moves beyond a single machine to how computers exchange data — networks.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><strong>What boundary should you inspect first when applying Operating Systems?</strong></li>
+<li>The article treats Operating Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Operating Systems?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Operating Systems reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">Computer Science 101 (1/10): What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computer Science 101 (2/10): Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Computer Science 101 (3/10): Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Computer Science 101 (4/10): Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Science 101 (5/10): Computer Architecture</a></li>
 <li><strong>Operating Systems (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+<li>Networks (upcoming)</li>
+<li>Databases (upcoming)</li>
+<li>Software Engineering (upcoming)</li>
+<li>From CS to AI and Data Science (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

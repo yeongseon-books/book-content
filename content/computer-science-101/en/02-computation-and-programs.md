@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 2
-title: Computation and Programs
+title: "Computer Science 101 (2/10): Computation and Programs"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: The definition of computation, the Turing machine, the evolutio
 last_reviewed: '2026-05-15'
 ---
 
-# Computation and Programs
+# Computer Science 101 (2/10): Computation and Programs
 
 “Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.
 
 This is post 2 in the Computer Science 101 series.
 
 In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Computation and Programs?
+- Which signal should the example or diagram make visible for Computation and Programs?
+- What failure should be prevented first when Computation and Programs reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 2 flow overview*
+
+This picture places Computation and Programs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Computation and Programs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -53,9 +69,6 @@ The answer to "Can every problem be solved by a program?" is no. Computation the
 ## Concept at a Glance
 
 > Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
-*A ladder from the theory of computation to the paradigms we use to express code*
 
 ## Key Terms
 
@@ -89,7 +102,6 @@ def process_orders(orders):
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Order:
     price: int
@@ -100,7 +112,6 @@ class Order:
     def total_price(self) -> int:
         base = self.price * self.quantity
         return int(base * 0.9) if self.discount else base
-
 
 def process_orders(orders: list[Order]) -> int:
     return sum(o.total_price() for o in orders if o.status == "paid")
@@ -120,7 +131,6 @@ def simple_state_machine(tape: list[str]) -> list[str]:
             result.append("1" if symbol == "0" else "0")
     return result
 
-
 tape = ["1", "0", "1", "1", "0"]
 print(simple_state_machine(tape))  # ['0', '1', '0', '0', '1']
 ```
@@ -136,10 +146,8 @@ def halts(program, input_data):
     # Proof sketch: assuming this function exists leads to a contradiction.
     raise NotImplementedError("The halting problem is undecidable")
 
-
 # A practical workaround: use a timeout
 import signal
-
 
 def run_with_timeout(func, timeout_sec: int = 5):
     """Abort if the function does not finish within the time limit."""
@@ -162,7 +170,6 @@ def sum_of_squares_imperative(n: int) -> int:
         total += i * i
     return total
 
-
 print(sum_of_squares_imperative(5))  # 55
 ```
 
@@ -177,7 +184,6 @@ from functools import reduce
 def sum_of_squares_functional(n: int) -> int:
     return reduce(lambda acc, x: acc + x * x, range(1, n + 1), 0)
 
-
 print(sum_of_squares_functional(5))  # 55
 ```
 
@@ -191,10 +197,8 @@ The functional paradigm expresses computation by composing functions instead of 
 
 import dis
 
-
 def add(a: int, b: int) -> int:
     return a + b
-
 
 # Inspect the Python bytecode
 dis.dis(add)
@@ -261,17 +265,29 @@ Computation is the process of transforming input by rules, and the Turing machin
 
 The next article looks at how computers represent data — binary, character encodings, and types.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Computation and Programs?**
+  - The article treats Computation and Programs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Computation and Programs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Computation and Programs reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
 - **Computation and Programs (current)**
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Data Representation (upcoming)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

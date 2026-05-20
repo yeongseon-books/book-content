@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Computation and Programs</title>
+<title>Computer Science 101 (2/10): Computation and Programs</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Computation and Programs</h1>
+<h1>Computer Science 101 (2/10): Computation and Programs</h1>
 <p>“Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.</p>
 <p>This is post 2 in the Computer Science 101 series.</p>
 <p>In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Computation and Programs?</li>
+<li>Which signal should the example or diagram make visible for Computation and Programs?</li>
+<li>What failure should be prevented first when Computation and Programs reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Computer Science 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Computer Science 101 chapter 2 flow overview</em></p>
+<p>This picture places Computation and Programs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Computation and Programs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>What does it actually mean to call a problem computable?</li>
@@ -81,8 +94,6 @@
 <blockquote>
 <p>Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.</p>
 </blockquote>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>A ladder from the theory of computation to the paradigms we use to express code</em></p>
 <h2>Key Terms</h2>
 <p><strong>Turing machine</strong><br>
 - Description: A theoretical model that defines computability</p>
@@ -254,17 +265,27 @@ dis.dis(add)
 <h2>Wrap-Up and Next Steps</h2>
 <p>Computation is the process of transforming input by rules, and the Turing machine is its theoretical model. Not every problem can be solved by computation (the halting problem). A programming language is how humans express computation, and a paradigm is the philosophy of organizing that code.</p>
 <p>The next article looks at how computers represent data — binary, character encodings, and types.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><strong>What boundary should you inspect first when applying Computation and Programs?</strong></li>
+<li>The article treats Computation and Programs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Computation and Programs?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Computation and Programs reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">Computer Science 101 (1/10): What Is Computer Science?</a></li>
 <li><strong>Computation and Programs (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+<li>Data Representation (upcoming)</li>
+<li>Algorithms and Complexity (upcoming)</li>
+<li>Computer Architecture (upcoming)</li>
+<li>Operating Systems (upcoming)</li>
+<li>Networks (upcoming)</li>
+<li>Databases (upcoming)</li>
+<li>Software Engineering (upcoming)</li>
+<li>From CS to AI and Data Science (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

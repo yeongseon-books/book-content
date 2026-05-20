@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 10
-title: AI와 데이터사이언스까지의 연결
+title: "Computer Science 101 (10/10): AI와 데이터사이언스까지의 연결"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: CS 기초가 AI와 데이터사이언스에 어떻게 이어지
 last_reviewed: '2026-05-12'
 ---
 
-# AI와 데이터사이언스까지의 연결
+# Computer Science 101 (10/10): AI와 데이터사이언스까지의 연결
 
 AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가 아닙니다. 데이터 표현, 알고리즘 비용, 메모리 계층, 데이터베이스, 엔지니어링 습관 위에 통계와 도메인 지식을 더한 결과에 가깝습니다.
 
@@ -29,15 +29,21 @@ AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가
 
 여기서는 머신러닝의 기본 구조를 훑고, 앞선 아홉 편이 AI/DS 실무와 어떻게 이어지는지 연결한 뒤, 다음에 무엇을 공부하면 좋을지 로드맵을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?
 - 규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?
 - 학습, 추론, 데이터 품질 검증은 왜 결국 계산과 시스템 문제일까요?
-- AI 시스템에도 테스트, 모니터링, 비용 관리가 왜 똑같이 중요할까요?
-- 이 시리즈 다음에는 어떤 순서로 공부를 이어 가면 좋을까요?
 
-> AI/DS는 CS 위에 통계와 도메인 지식을 쌓은 층입니다. 모델이 달라져도 데이터 표현, 복잡도, 시스템 설계라는 바닥은 그대로 남습니다.
+## 큰 그림
+
+![Computer Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Computer Science 101 10장 흐름 개요*
+
+이 그림에서는 AI와 데이터사이언스까지의 연결를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> AI와 데이터사이언스까지의 연결의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -57,9 +63,6 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 ## 한눈에 보는 개념
 
 > 규칙 기반은 사람이 규칙을 적고, 머신러닝은 데이터로부터 규칙을 추론합니다.
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
-*규칙 기반 시스템은 사람이 규칙을 쓰고, 머신러닝은 데이터로 규칙을 추정합니다*
 
 ## 핵심 용어
 
@@ -266,17 +269,29 @@ for i, step in enumerate(steps, 1):
 
 도구는 변하지만 기초는 남습니다. 시리즈를 읽어 주셔서 감사합니다.
 
+## 처음 질문으로 돌아가기
+
+- **지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?**
+  - 본문의 기준은 AI와 데이터사이언스까지의 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **학습, 추론, 데이터 품질 검증은 왜 결국 계산과 시스템 문제일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Computer Science란 무엇인가?](./01-what-is-computer-science.md)
-- [계산과 프로그램](./02-computation-and-programs.md)
-- [데이터 표현](./03-data-representation.md)
-- [알고리즘과 복잡도](./04-algorithms-and-complexity.md)
-- [컴퓨터 구조](./05-computer-architecture.md)
-- [운영체제](./06-operating-systems.md)
-- [네트워크](./07-networks.md)
-- [데이터베이스](./08-databases.md)
-- [소프트웨어 엔지니어링](./09-software-engineering.md)
+## 시리즈 목차
+
+- [Computer Science 101 (1/10): Computer Science란 무엇인가?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): 계산과 프로그램](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): 데이터 표현](./03-data-representation.md)
+- [Computer Science 101 (4/10): 알고리즘과 복잡도](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): 컴퓨터 구조](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): 운영체제](./06-operating-systems.md)
+- [Computer Science 101 (7/10): 네트워크](./07-networks.md)
+- [Computer Science 101 (8/10): 데이터베이스](./08-databases.md)
+- [Computer Science 101 (9/10): 소프트웨어 엔지니어링](./09-software-engineering.md)
 - **AI와 데이터사이언스까지의 연결 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

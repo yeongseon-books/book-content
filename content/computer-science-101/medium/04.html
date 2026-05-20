@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Algorithms and Complexity</title>
+<title>Computer Science 101 (4/10): Algorithms and Complexity</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Algorithms and Complexity</h1>
+<h1>Computer Science 101 (4/10): Algorithms and Complexity</h1>
 <p>Code that feels fine on 100 records can collapse in production once the data grows by three orders of magnitude. At that point, the first explanation is rarely “the machine is slow.” It is usually that the algorithmic cost was hidden while the input stayed small.</p>
 <p>This is post 4 in the Computer Science 101 series.</p>
 <p>In this article, we'll define algorithms, read time and space complexity, and show how data-structure choice changes performance long before micro-optimization matters.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Algorithms and Complexity?</li>
+<li>Which signal should the example or diagram make visible for Algorithms and Complexity?</li>
+<li>What failure should be prevented first when Algorithms and Complexity reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Computer Science 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Computer Science 101 chapter 4 flow overview</em></p>
+<p>This picture places Algorithms and Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Algorithms and Complexity is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>How can you compare two solutions before you benchmark them?</li>
@@ -82,8 +95,6 @@
 <blockquote>
 <p>Two algorithms that produce the same result can diverge by thousands of times once the input grows.</p>
 </blockquote>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>The same task can stay manageable or become impossible depending on algorithmic choice</em></p>
 <h2>Key Terms</h2>
 <p><strong>Algorithm</strong><br>
 - Description: A finite, well-defined procedure that maps input to output</p>
@@ -261,17 +272,27 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 <h2>Wrap-Up and Next Steps</h2>
 <p>An algorithm is a procedure for solving a problem. Complexity is its cost. Big-O describes the upper bound on growth as input grows. Data-structure choice drives complexity, so you must know the operation costs of <code>list</code>, <code>set</code>, and <code>dict</code>. Senior engineers do not optimize without measuring.</p>
 <p>The next article opens up the machine that actually runs these algorithms — CPU, memory, and the cache hierarchy.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><strong>What boundary should you inspect first when applying Algorithms and Complexity?</strong></li>
+<li>The article treats Algorithms and Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Algorithms and Complexity?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Algorithms and Complexity reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">Computer Science 101 (1/10): What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computer Science 101 (2/10): Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Computer Science 101 (3/10): Data Representation</a></li>
 <li><strong>Algorithms and Complexity (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+<li>Computer Architecture (upcoming)</li>
+<li>Operating Systems (upcoming)</li>
+<li>Networks (upcoming)</li>
+<li>Databases (upcoming)</li>
+<li>Software Engineering (upcoming)</li>
+<li>From CS to AI and Data Science (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

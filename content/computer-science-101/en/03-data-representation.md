@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 3
-title: Data Representation
+title: "Computer Science 101 (3/10): Data Representation"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How computers represent data — binary, character encoding (AS
 last_reviewed: '2026-05-15'
 ---
 
-# Data Representation
+# Computer Science 101 (3/10): Data Representation
 
 People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.
 
 This is post 3 in the Computer Science 101 series.
 
 In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Representation?
+- Which signal should the example or diagram make visible for Data Representation?
+- What failure should be prevented first when Data Representation reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 3 flow overview*
+
+This picture places Data Representation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Representation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -55,9 +71,6 @@ Bit-level understanding is the foundation of debugging and performance work.
 ## Concept at a Glance
 
 > Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
-*The same bit sequence changes meaning depending on the decoding rule*
 
 ## Key Terms
 
@@ -106,7 +119,6 @@ print(bin(255))     # 0b11111111
 print(int("101010", 2))   # 42
 print(int("11111111", 2)) # 255
 
-
 # Verify the conversion principle in code
 def to_binary(n: int) -> str:
     """Convert a decimal integer to a binary string."""
@@ -117,7 +129,6 @@ def to_binary(n: int) -> str:
         bits.append(str(n % 2))
         n //= 2
     return "".join(reversed(bits))
-
 
 print(to_binary(42))  # 101010
 ```
@@ -160,7 +171,6 @@ def twos_complement(n: int, bits: int = 8) -> str:
     if n >= 0:
         return format(n, f"0{bits}b")
     return format((1 << bits) + n, f"0{bits}b")
-
 
 print(twos_complement(5))    # 00000101
 print(twos_complement(-5))   # 11111011
@@ -262,17 +272,29 @@ Every piece of data in a computer is a bit sequence. Encoding rules give bits th
 
 The next article covers algorithms — how to process data efficiently — and complexity, the way we measure their performance.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Representation?**
+  - The article treats Data Representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Representation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Representation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
 - **Data Representation (current)**
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

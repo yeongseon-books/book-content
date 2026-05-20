@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Computer Architecture</title>
+<title>Computer Science 101 (5/10): Computer Architecture</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Computer Architecture</h1>
+<h1>Computer Science 101 (5/10): Computer Architecture</h1>
 <p>Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.</p>
 <p>This is post 5 in the Computer Science 101 series.</p>
 <p>In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Computer Architecture?</li>
+<li>Which signal should the example or diagram make visible for Computer Architecture?</li>
+<li>What failure should be prevented first when Computer Architecture reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Computer Science 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Computer Science 101 chapter 5 flow overview</em></p>
+<p>This picture places Computer Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Computer Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>Why can two algorithms with the same order run at very different speeds?</li>
@@ -82,8 +95,6 @@
 <blockquote>
 <p>Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.</p>
 </blockquote>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>Higher layers are faster and smaller; lower layers are slower but larger</em></p>
 <h2>Key Terms</h2>
 <p><strong>CPU</strong><br>
 - Description: The unit that decodes instructions and performs operations</p>
@@ -258,17 +269,27 @@ print(f&quot;flat array  : {time.perf_counter() - start:.3f}s&quot;)
 <h2>Wrap-Up and Next Steps</h2>
 <p>The CPU is fast and memory is slow. The cache fills the gap, and code that uses it well is tens of times faster on the same algorithm. Good engineers lower the algorithmic order first, then verify the memory access pattern.</p>
 <p>The next article covers how multiple programs coexist and share resources on this hardware — the operating system.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><strong>What boundary should you inspect first when applying Computer Architecture?</strong></li>
+<li>The article treats Computer Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Computer Architecture?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Computer Architecture reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">Computer Science 101 (1/10): What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computer Science 101 (2/10): Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Computer Science 101 (3/10): Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Computer Science 101 (4/10): Algorithms and Complexity</a></li>
 <li><strong>Computer Architecture (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+<li>Operating Systems (upcoming)</li>
+<li>Networks (upcoming)</li>
+<li>Databases (upcoming)</li>
+<li>Software Engineering (upcoming)</li>
+<li>From CS to AI and Data Science (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 9
-title: 소프트웨어 엔지니어링
+title: "Computer Science 101 (9/10): 소프트웨어 엔지니어링"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 테스트, 버전 관리, 리뷰, 리팩터링으로 코딩과 
 last_reviewed: '2026-05-12'
 ---
 
-# 소프트웨어 엔지니어링
+# Computer Science 101 (9/10): 소프트웨어 엔지니어링
 
 혼자 짠 스크립트가 한 번 잘 도는 것과, 여러 사람이 몇 년 동안 계속 바꿔도 버티는 시스템을 만드는 일은 다릅니다. 시간이 흐르고 사람이 바뀌는 동안에도 "여전히 잘 동작한다"를 보장하는 습관이 소프트웨어 엔지니어링입니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-12'
 
 여기서는 테스트, 버전 관리, 코드 리뷰, 리팩터링이라는 네 기둥을 통해 코딩이 엔지니어링으로 확장되는 지점을 살펴보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 코딩과 소프트웨어 엔지니어링의 차이는 어디에서 생길까요?
 - 테스트는 왜 변경을 안전하게 만드는 최소 장치일까요?
 - Git 기반 협업 흐름은 어떤 단위와 습관으로 유지될까요?
-- 리팩터링은 왜 기능 추가와 별개로 관리해야 할까요?
-- 기술 부채를 방치하면 팀 속도와 품질은 어떻게 무너질까요?
 
-> 엔지니어링은 오늘 동작하는 코드를 내일도 바꿀 수 있게 만드는 일입니다. 테스트와 리뷰는 변경의 안전망이고, 리팩터링은 그 안전망 위에서 구조를 되돌리는 도구입니다.
+## 큰 그림
+
+![Computer Science 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Computer Science 101 9장 흐름 개요*
+
+이 그림에서는 소프트웨어 엔지니어링를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 소프트웨어 엔지니어링의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -57,9 +63,6 @@ last_reviewed: '2026-05-12'
 ## 한눈에 보는 개념
 
 > 엔지니어링은 "지금 동작" 위에 "내일도 동작"을 보장하는 활동입니다.
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
-*엔지니어링은 단순 실행 성공 위에 변경 안전성과 운영 지속성을 추가합니다*
 
 ## 핵심 용어
 
@@ -248,17 +251,29 @@ jobs:
 
 다음 글에서는 이 모든 CS 기초가 어떻게 AI와 데이터사이언스로 이어지는지, 그리고 다음에 무엇을 공부해야 하는지를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **코딩과 소프트웨어 엔지니어링의 차이는 어디에서 생길까요?**
+  - 본문의 기준은 소프트웨어 엔지니어링를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **테스트는 왜 변경을 안전하게 만드는 최소 장치일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Git 기반 협업 흐름은 어떤 단위와 습관으로 유지될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Computer Science란 무엇인가?](./01-what-is-computer-science.md)
-- [계산과 프로그램](./02-computation-and-programs.md)
-- [데이터 표현](./03-data-representation.md)
-- [알고리즘과 복잡도](./04-algorithms-and-complexity.md)
-- [컴퓨터 구조](./05-computer-architecture.md)
-- [운영체제](./06-operating-systems.md)
-- [네트워크](./07-networks.md)
-- [데이터베이스](./08-databases.md)
+## 시리즈 목차
+
+- [Computer Science 101 (1/10): Computer Science란 무엇인가?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): 계산과 프로그램](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): 데이터 표현](./03-data-representation.md)
+- [Computer Science 101 (4/10): 알고리즘과 복잡도](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): 컴퓨터 구조](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): 운영체제](./06-operating-systems.md)
+- [Computer Science 101 (7/10): 네트워크](./07-networks.md)
+- [Computer Science 101 (8/10): 데이터베이스](./08-databases.md)
 - **소프트웨어 엔지니어링 (현재 글)**
-- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
+- AI와 데이터사이언스까지의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

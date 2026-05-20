@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 1
-title: What Is Computer Science?
+title: "Computer Science 101 (1/10): What Is Computer Science?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A map of what computer science actually studies, why abstractio
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Computer Science?
+# Computer Science 101 (1/10): What Is Computer Science?
 
 When people first encounter computer science, it is easy to mistake it for “being good at programming languages.” In practice, the engineers who keep growing are usually the ones who can model computation, reason about abstraction, and explain where a system's limits come from.
 
 This is the first post in the Computer Science 101 series.
 
 In this article, we'll define what computer science actually studies, why abstraction is the field's shared tool, and how the rest of the series connects into one map.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Computer Science??
+- Which signal should the example or diagram make visible for What Is Computer Science??
+- What failure should be prevented first when What Is Computer Science? reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 1 flow overview*
+
+This picture places What Is Computer Science? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Computer Science? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -55,9 +71,6 @@ This series walks through the major subjects of a CS curriculum, one at a time, 
 ## Concept at a Glance
 
 > Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
-*The main CS layers, moving from theory into systems and applications*
 
 ## Key Terms
 
@@ -108,7 +121,6 @@ def is_even(n: int) -> bool:
     """Return True if n is even."""
     return n % 2 == 0
 
-
 print(is_even(4))   # True
 print(is_even(7))   # False
 ```
@@ -134,7 +146,6 @@ class Stack:
     def is_empty(self) -> bool:
         return len(self._items) == 0
 
-
 # Users do not need to know there is a list inside
 stack = Stack()
 stack.push(1)
@@ -149,14 +160,12 @@ Abstraction is the field's most important tool. Operating systems abstract hardw
 ```python
 import time
 
-
 def linear_search(items: list[int], target: int) -> int:
     """Sequential search — O(n)."""
     for i, item in enumerate(items):
         if item == target:
             return i
     return -1
-
 
 def binary_search(items: list[int], target: int) -> int:
     """Binary search — O(log n), requires sorted input."""
@@ -170,7 +179,6 @@ def binary_search(items: list[int], target: int) -> int:
         else:
             high = mid - 1
     return -1
-
 
 data = list(range(1_000_000))
 
@@ -278,17 +286,29 @@ Computer science is the study of the principles, limits, and applications of com
 
 The next article digs into the most basic CS question — "What is computation?" — and traces the evolution of programming paradigms.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Computer Science??**
+  - The article treats What Is Computer Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Computer Science??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Computer Science? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Computer Science? (current)**
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Computation and Programs (upcoming)
+- Data Representation (upcoming)
+- Algorithms and Complexity (upcoming)
+- Computer Architecture (upcoming)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

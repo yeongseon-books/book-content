@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 5
-title: Computer Architecture
+title: "Computer Science 101 (5/10): Computer Architecture"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How CPUs, memory, and the cache hierarchy work, and how they sh
 last_reviewed: '2026-05-15'
 ---
 
-# Computer Architecture
+# Computer Science 101 (5/10): Computer Architecture
 
 Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.
 
 This is post 5 in the Computer Science 101 series.
 
 In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Computer Architecture?
+- Which signal should the example or diagram make visible for Computer Architecture?
+- What failure should be prevented first when Computer Architecture reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 5 flow overview*
+
+This picture places Computer Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Computer Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -55,9 +71,6 @@ An algorithm written without hardware awareness is fast only on paper.
 ## Concept at a Glance
 
 > Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
-*Higher layers are faster and smaller; lower layers are slower but larger*
 
 ## Key Terms
 
@@ -170,7 +183,6 @@ def cpu_cycle(instruction: str) -> None:
     write_back = "storing result"
     print(fetch, decode, execute, write_back, sep=" -> ")
 
-
 cpu_cycle("ADD R1, R2, R3")
 ```
 
@@ -187,7 +199,6 @@ class Point:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
-
 
 points = [Point(i, i) for i in range(N)]
 xs = array.array("d", [float(i) for i in range(N)])
@@ -254,17 +265,29 @@ The CPU is fast and memory is slow. The cache fills the gap, and code that uses 
 
 The next article covers how multiple programs coexist and share resources on this hardware — the operating system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Computer Architecture?**
+  - The article treats Computer Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Computer Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Computer Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
 - **Computer Architecture (current)**
-- [Operating Systems](./06-operating-systems.md)
-- [Networks](./07-networks.md)
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Operating Systems (upcoming)
+- Networks (upcoming)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

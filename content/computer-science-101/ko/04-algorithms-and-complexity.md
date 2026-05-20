@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 4
-title: 알고리즘과 복잡도
+title: "Computer Science 101 (4/10): 알고리즘과 복잡도"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 알고리즘, Big-O, 자료구조 선택이 성능을 어떻게
 last_reviewed: '2026-05-12'
 ---
 
-# 알고리즘과 복잡도
+# Computer Science 101 (4/10): 알고리즘과 복잡도
 
 작은 입력에서는 멀쩡하던 코드가 운영에서 갑자기 느려지는 이유는 대개 하드웨어보다 알고리즘 차수에서 먼저 설명됩니다. 같은 문제를 풀어도 어떤 코드는 선형으로 늘고, 어떤 코드는 제곱으로 무너집니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-12'
 
 여기서는 알고리즘의 정의, 시간·공간 복잡도, Big-O 표기법, 그리고 자료구조 선택이 왜 성능을 바꾸는지 입문자 관점에서 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 같은 문제를 푸는 두 코드 중 무엇이 더 빠를지 어떻게 판단할까요?
 - 시간 복잡도와 공간 복잡도는 무엇을 각각 뜻할까요?
 - Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?
-- `list`, `set`, `dict` 선택이 왜 전체 차수를 바꿀 수 있을까요?
-- 작은 입력에서 괜찮아 보이는 코드가 큰 입력에서 무너지는 이유는 무엇일까요?
 
-> 알고리즘은 절차이고, 복잡도는 그 절차의 비용입니다. 시니어 엔지니어는 코드를 읽으면서 이미 입력 크기 변화에 따른 비용 곡선을 함께 봅니다.
+## 큰 그림
+
+![Computer Science 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
+
+*Computer Science 101 4장 흐름 개요*
+
+이 그림에서는 알고리즘과 복잡도를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 알고리즘과 복잡도의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -57,9 +63,6 @@ last_reviewed: '2026-05-12'
 ## 한눈에 보는 개념
 
 > 같은 결과를 내는 두 알고리즘도 입력이 커지면 차이가 수천 배로 벌어집니다.
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
-*같은 문제도 알고리즘과 자료구조 선택에 따라 비용 곡선이 완전히 달라집니다*
 
 ## 핵심 용어
 
@@ -255,17 +258,29 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 
 다음 글에서는 이 알고리즘이 실제로 돌아가는 컴퓨터의 내부 구조 — CPU, 메모리, 캐시 — 를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **같은 문제를 푸는 두 코드 중 무엇이 더 빠를지 어떻게 판단할까요?**
+  - 본문의 기준은 알고리즘과 복잡도를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **시간 복잡도와 공간 복잡도는 무엇을 각각 뜻할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Computer Science란 무엇인가?](./01-what-is-computer-science.md)
-- [계산과 프로그램](./02-computation-and-programs.md)
-- [데이터 표현](./03-data-representation.md)
+## 시리즈 목차
+
+- [Computer Science 101 (1/10): Computer Science란 무엇인가?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): 계산과 프로그램](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): 데이터 표현](./03-data-representation.md)
 - **알고리즘과 복잡도 (현재 글)**
-- [컴퓨터 구조](./05-computer-architecture.md)
-- [운영체제](./06-operating-systems.md)
-- [네트워크](./07-networks.md)
-- [데이터베이스](./08-databases.md)
-- [소프트웨어 엔지니어링](./09-software-engineering.md)
-- [AI와 데이터사이언스까지의 연결](./10-ai-and-data-science.md)
+- 컴퓨터 구조 (예정)
+- 운영체제 (예정)
+- 네트워크 (예정)
+- 데이터베이스 (예정)
+- 소프트웨어 엔지니어링 (예정)
+- AI와 데이터사이언스까지의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

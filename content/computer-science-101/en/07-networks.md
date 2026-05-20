@@ -1,7 +1,7 @@
 ---
 series: computer-science-101
 episode: 7
-title: Networks
+title: "Computer Science 101 (7/10): Networks"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How TCP/IP, HTTP, and DNS actually work — explained with hand
 last_reviewed: '2026-05-15'
 ---
 
-# Networks
+# Computer Science 101 (7/10): Networks
 
 Typing a domain into a browser does not trigger one magical request. It kicks off a layered exchange where DNS, TCP, TLS, and HTTP each do a different job. Engineers who can draw those layers mentally usually find latency and failure faster.
 
 This is post 7 in the Computer Science 101 series.
 
 In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Networks?
+- Which signal should the example or diagram make visible for Networks?
+- What failure should be prevented first when Networks reaches a real system?
+
+## Big Picture
+
+![Computer Science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
+
+*Computer Science 101 chapter 7 flow overview*
+
+This picture places Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Networks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -55,9 +71,6 @@ Each layer trusts the one below it and focuses on its own job.
 ## Concept at a Glance
 
 > Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
-*A request starts at the application layer and picks up lower-layer headers on the way down*
 
 ## Key Terms
 
@@ -261,17 +274,29 @@ A network is a stack of agreements, where each layer trusts the layer below and 
 
 The next article moves beyond the network to how we store data permanently and query it efficiently — databases.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Networks?**
+  - The article treats Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Networks?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Networks reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Science?](./01-what-is-computer-science.md)
-- [Computation and Programs](./02-computation-and-programs.md)
-- [Data Representation](./03-data-representation.md)
-- [Algorithms and Complexity](./04-algorithms-and-complexity.md)
-- [Computer Architecture](./05-computer-architecture.md)
-- [Operating Systems](./06-operating-systems.md)
+## In this series
+
+- [Computer Science 101 (1/10): What Is Computer Science?](./01-what-is-computer-science.md)
+- [Computer Science 101 (2/10): Computation and Programs](./02-computation-and-programs.md)
+- [Computer Science 101 (3/10): Data Representation](./03-data-representation.md)
+- [Computer Science 101 (4/10): Algorithms and Complexity](./04-algorithms-and-complexity.md)
+- [Computer Science 101 (5/10): Computer Architecture](./05-computer-architecture.md)
+- [Computer Science 101 (6/10): Operating Systems](./06-operating-systems.md)
 - **Networks (current)**
-- [Databases](./08-databases.md)
-- [Software Engineering](./09-software-engineering.md)
-- [From CS to AI and Data Science](./10-ai-and-data-science.md)
+- Databases (upcoming)
+- Software Engineering (upcoming)
+- From CS to AI and Data Science (upcoming)
+
 <!-- toc:end -->
 
 ## References

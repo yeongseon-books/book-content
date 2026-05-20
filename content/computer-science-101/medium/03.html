@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Representation</title>
+<title>Computer Science 101 (3/10): Data Representation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Data Representation</h1>
+<h1>Computer Science 101 (3/10): Data Representation</h1>
 <p>People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.</p>
 <p>This is post 3 in the Computer Science 101 series.</p>
 <p>In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Representation?</li>
+<li>Which signal should the example or diagram make visible for Data Representation?</li>
+<li>What failure should be prevented first when Data Representation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Computer Science 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Computer Science 101 chapter 3 flow overview</em></p>
+<p>This picture places Data Representation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Representation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>How does a computer store numbers, text, and images using only 0 and 1?</li>
@@ -82,8 +95,6 @@
 <blockquote>
 <p>Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.</p>
 </blockquote>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>The same bit sequence changes meaning depending on the decoding rule</em></p>
 <h2>Key Terms</h2>
 <p><strong>Bit</strong><br>
 - Description: The smallest unit, storing 0 or 1</p>
@@ -265,17 +276,27 @@ for name, bits in data_sizes.items():
 <h2>Wrap-Up and Next Steps</h2>
 <p>Every piece of data in a computer is a bit sequence. Encoding rules give bits their meaning. Integers use two's complement, characters use UTF-8, and decimals use IEEE 754 floating point. Knowing each representation's limits is the basis of correct design.</p>
 <p>The next article covers algorithms — how to process data efficiently — and complexity, the way we measure their performance.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><strong>What boundary should you inspect first when applying Data Representation?</strong></li>
+<li>The article treats Data Representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Representation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Representation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">Computer Science 101 (1/10): What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computer Science 101 (2/10): Computation and Programs</a></li>
 <li><strong>Data Representation (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+<li>Algorithms and Complexity (upcoming)</li>
+<li>Computer Architecture (upcoming)</li>
+<li>Operating Systems (upcoming)</li>
+<li>Networks (upcoming)</li>
+<li>Databases (upcoming)</li>
+<li>Software Engineering (upcoming)</li>
+<li>From CS to AI and Data Science (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
