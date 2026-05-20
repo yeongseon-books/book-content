@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:00:38+00:00
+Generated: 2026-05-20T12:00:59+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **12**
+- Series with any issue: **11**
 - Series at or above 5 issues: **9**
-- Total issues: **94**
-  - BadImg: **94**
+- Total issues: **92**
+  - BadImg: **92**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -51,8 +51,7 @@ Warnings:
 | 8 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 9 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 10 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 11 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 12 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 11 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -171,14 +170,6 @@ Warnings:
 - `assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png:1` — PNG height 67px <= 100px (size=1097x67)
 - `assets/azure-aca-101/05/05-01-the-scaling-path.en.png:1` — PNG height 67px <= 100px (size=945x67)
 - `assets/azure-aca-101/05/05-01-the-scaling-path.ko.png:1` — PNG height 67px <= 100px (size=945x67)
-
-## azure-functions-101 — Total 2
-
-- BadImg=2 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.en.png:1` — PNG height 86px <= 100px (size=1384x86)
-- `assets/azure-functions-101/06/06-03-what-a-cold-start-actually-includes.ko.png:1` — PNG height 67px <= 100px (size=1277x67)
 
 ## operating-systems-101 — Total 2
 
