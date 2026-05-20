@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:56:23+00:00",
+  "generated_at": "2026-05-20T11:57:57+00:00",
   "series_count": 92,
-  "problem_series_count": 21,
-  "series_with_5_plus": 17,
+  "problem_series_count": 20,
+  "series_with_5_plus": 16,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 180,
+    "BadImg": 166,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 180
+    "all": 166
   },
   "results": [
     {
@@ -368,338 +368,6 @@
             "code": null,
             "image": "10-01-the-smallest-path-to-publication.ko.png",
             "width": 680,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
-      "series": "testing-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 14
-      },
-      "total": 14,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 816,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/01/01-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram.ko.png",
-            "width": 816,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 642,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/03/03-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-diagram.ko.png",
-            "width": 642,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 69px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 572,
-            "height": 69,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 69px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 572,
-            "height": 69,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 90px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 612,
-            "height": 90,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/05/05-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 90px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-diagram.ko.png",
-            "width": 612,
-            "height": 90,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/07/07-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-concept-at-a-glance.en.png",
-            "width": 841,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/07/07-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-diagram.ko.png",
-            "width": 841,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 816,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/01/01-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram.ko.png",
-            "width": 816,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 642,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/03/03-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-diagram.ko.png",
-            "width": 642,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 69px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 572,
-            "height": 69,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 69px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 572,
-            "height": 69,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 90px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 612,
-            "height": 90,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/05/05-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 90px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-diagram.ko.png",
-            "width": 612,
-            "height": 90,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/07/07-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-concept-at-a-glance.en.png",
-            "width": 841,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/07/07-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-diagram.ko.png",
-            "width": 841,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/08/08-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-concept-at-a-glance.en.png",
-            "width": 927,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/08/08-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-diagram.ko.png",
-            "width": 927,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 1123,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/testing-101/09/09-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-diagram.ko.png",
-            "width": 1123,
             "height": 67,
             "repo": null
           }
@@ -5848,6 +5516,20 @@
     },
     {
       "series": "technical-writing-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "testing-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
