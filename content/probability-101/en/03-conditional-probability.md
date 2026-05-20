@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 3
-title: Conditional Probability
+title: "Probability 101 (3/10): Conditional Probability"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn conditional probability, the multiplication rule, and bas
 last_reviewed: '2026-05-15'
 ---
 
-# Conditional Probability
+# Probability 101 (3/10): Conditional Probability
 
 Real probability questions almost always come with conditions. Traffic given rain, disease given a positive test, spam given a suspicious phrase in the subject line — most useful probabilities are probabilities inside a context, not in the abstract.
 
@@ -28,13 +28,21 @@ That is why conditional probability sits near the center of probability theory r
 
 This is post 3 in the Probability 101 series. Here we define conditional probability, connect it to the multiplication rule, separate independence from dependence, and show why base rates can completely change the meaning of the same test result.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why conditional probability is fundamentally about changing the denominator
-- Why P(A|B) and P(B|A) can be completely different
-- How the multiplication rule follows from the definition
-- How to tell independence from dependence
-- Why base-rate neglect breaks real-world interpretation
+- Why conditional probability is fundamentally about changing the denominator?
+- Why P(A|B) and P(B|A) can be completely different?
+- How the multiplication rule follows from the definition?
+
+## Big Picture
+
+![probability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 3 flow overview*
+
+This picture places Conditional Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Conditional Probability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ The risk gets worse when the base rate is small. A rare disease with a sensitive
 > Conditional probability is not the probability of an event in the original world. It is the probability of that event after the world has been narrowed by new information.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -149,9 +153,20 @@ Spam filters, medical screening, fraud detection, autocomplete — conditional p
 
 Conditional probability is the tool for handling context. The next episode reaches its peak: Bayes' Theorem.
 
+## Answering the Opening Questions
+
+- **Why conditional probability is fundamentally about changing the denominator?**
+  - The article treats Conditional Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why P(A|B) and P(B|A) can be completely different?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the multiplication rule follows from the definition?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
 - **Conditional Probability (current)**
 - Bayes' Theorem (upcoming)
 - Random Variables (upcoming)
@@ -160,6 +175,7 @@ Conditional probability is the tool for handling context. The next episode reach
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

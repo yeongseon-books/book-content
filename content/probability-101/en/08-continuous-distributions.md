@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 8
-title: Continuous Distributions
+title: "Probability 101 (8/10): Continuous Distributions"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how continuous distributions model measurements, waiting 
 last_reviewed: '2026-05-15'
 ---
 
-# Continuous Distributions
+# Probability 101 (8/10): Continuous Distributions
 
 In discrete distributions, you can count the possible values one by one. Many real variables do not behave that way. Height, response time, measurement error, weight, and price move along a continuous scale, so they need a different language. That language is the continuous distribution.
 
@@ -28,13 +28,21 @@ Once continuous distributions click, several things become easier at once: why a
 
 This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What it means to model a continuous quantity probabilistically
-- Why a density is not the same thing as a probability
-- When Uniform, Normal, Exponential, and Gamma distributions make sense
-- What the memoryless property of the Exponential distribution tells you
-- Why standardization is useful when comparing different scales
+- What it means to model a continuous quantity probabilistically?
+- Why a density is not the same thing as a probability?
+- When Uniform, Normal, Exponential, and Gamma distributions make sense?
+
+## Big Picture
+
+![probability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 8 flow overview*
+
+This picture places Continuous Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Continuous Distributions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ The practical payoff is that a good continuous model turns loose numbers into de
 > In continuous probability, the key habit is to think in intervals. Probability lives in area, not in a single point.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -151,17 +155,29 @@ The normal model for measurement error, exponential waiting times, log-normal pr
 
 Continuous distributions are the priors of measurement. The next episode shows why the normal appears everywhere via the LLN and CLT.
 
+## Answering the Opening Questions
+
+- **What it means to model a continuous quantity probabilistically?**
+  - The article treats Continuous Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why a density is not the same thing as a probability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When Uniform, Normal, Exponential, and Gamma distributions make sense?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
-- [Discrete Distributions](./07-discrete-distributions.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): Discrete Distributions](./07-discrete-distributions.md)
 - **Continuous Distributions (current)**
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

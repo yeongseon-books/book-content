@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Probability in Machine Learning</title>
+<title>Probability 101 (10/10): Probability in Machine Learning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Probability in Machine Learning</h1>
+<h1>Probability 101 (10/10): Probability in Machine Learning</h1>
 <p>If you make it through a probability series, one question naturally remains: where do all of these ideas actually live inside machine learning? If that question stays unanswered, probability remains background theory. Once it is answered, probability becomes an operational tool for reading model behavior.</p>
 <p>Much of modern machine learning is probability wearing different names. Cross-entropy, negative log-likelihood, classifier probabilities, calibration, and Bayesian updates are not separate islands. They are different views of uncertainty, prediction, and decision cost.</p>
 <p>This is the final post in the Probability 101 series. Here we connect probability to loss functions, conditional model outputs, calibration metrics, and Bayesian thinking so the earlier ideas show up in a recognizable ML workflow.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Where probability is hiding inside common machine learning workflows</li>
-<li>Why cross-entropy and negative log-likelihood point to the same idea</li>
-<li>What a classifier score like 0.8 should mean before you trust it</li>
-<li>Why accuracy and calibration measure different things</li>
-<li>When Bayesian thinking is especially helpful in ML practice</li>
+<li>Where probability is hiding inside common machine learning workflows?</li>
+<li>Why cross-entropy and negative log-likelihood point to the same idea?</li>
+<li>What a classifier score like 0.8 should mean before you trust it?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="probability 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>probability 101 chapter 10 flow overview</em></p>
+<p>This picture places Probability in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Probability in Machine Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If you read model outputs as generic scores rather than as probabilistic statements, decision-making gets fuzzy quickly. You need to know whether 0.8 should be interpreted as “about 80% likely,” whether it is just a ranking score, where the threshold should sit, and how distribution shift may have changed that meaning.</p>
 <p>Training itself is tied to probability as well. Cross-entropy in classification is another face of negative log-likelihood. Regression losses often reveal an implicit distributional assumption about the error. In that sense, the loss function is not just a computational device. It is a window into what kind of probabilistic world the model is assuming.</p>
@@ -72,8 +77,6 @@
 <p>Machine learning is not only about guessing the right label. It is also about organizing uncertainty and tying that uncertainty to decision cost.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Likelihood</strong>: L(θ) = ∏ p(yᵢ | xᵢ; θ).</li>
@@ -161,16 +164,26 @@ print(&quot;Brier:&quot;, brier)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Probability is the native language of ML. The next steps are Linear Algebra 101 and Machine Learning 101, which add the other axes of modeling.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Conditional Probability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/04-bayes-theorem.md">Bayes' Theorem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/05-random-variables.md">Random Variables</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/06-expectation-and-variance.md">Expectation and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/07-discrete-distributions.md">Discrete Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/08-continuous-distributions.md">Continuous Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/09-lln-and-clt.md">Law of Large Numbers and CLT</a></li>
+<li><strong>Where probability is hiding inside common machine learning workflows?</strong></li>
+<li>The article treats Probability in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why cross-entropy and negative log-likelihood point to the same idea?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What a classifier score like 0.8 should mean before you trust it?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">Probability 101 (1/10): What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Probability 101 (2/10): Events and Sample Space</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Probability 101 (3/10): Conditional Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/04-bayes-theorem.md">Probability 101 (4/10): Bayes' Theorem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/05-random-variables.md">Probability 101 (5/10): Random Variables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/06-expectation-and-variance.md">Probability 101 (6/10): Expectation and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/07-discrete-distributions.md">Probability 101 (7/10): Discrete Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/08-continuous-distributions.md">Probability 101 (8/10): Continuous Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/09-lln-and-clt.md">Probability 101 (9/10): Law of Large Numbers and CLT</a></li>
 <li><strong>Probability in Machine Learning (current)</strong></li>
 </ul>
 <h2>References</h2>

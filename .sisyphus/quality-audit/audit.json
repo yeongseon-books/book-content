@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:24:43+00:00",
+  "generated_at": "2026-05-20T11:25:03+00:00",
   "series_count": 92,
   "problem_series_count": 56,
   "series_with_5_plus": 42,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 12,
+    "Shrt": 9,
     "NoEn": 0,
-    "all": 544
+    "all": 541
   },
   "results": [
     {
@@ -6414,316 +6414,6 @@
       }
     },
     {
-      "series": "probability-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 3,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 11,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/01-what-is-probability.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "01-what-is-probability.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/02-events-and-sample-space.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "02-events-and-sample-space.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/07-discrete-distributions.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "07-discrete-distributions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 942,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/03/03-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-diagram.ko.png",
-            "width": 883,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 811,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 811,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 800,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/06/06-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-diagram.ko.png",
-            "width": 830,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1150,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/10/10-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-diagram.ko.png",
-            "width": 1072,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/01-what-is-probability.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "01-what-is-probability.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/02-events-and-sample-space.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "02-events-and-sample-space.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/probability-101/en/07-discrete-distributions.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "07-discrete-distributions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 942,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/03/03-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-diagram.ko.png",
-            "width": 883,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 811,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 811,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 800,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/06/06-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-diagram.ko.png",
-            "width": 830,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1150,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/probability-101/10/10-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-diagram.ko.png",
-            "width": 1072,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "api-design-101",
       "counts": {
         "Synt": 0,
@@ -10356,6 +10046,234 @@
             "image": "07-01-autoregressive-generation-one-token-at-a.ko.png",
             "width": 1384,
             "height": 53,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "probability-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 8
+      },
+      "total": 8,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/03/03-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.en.png",
+            "width": 942,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/03/03-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-diagram.ko.png",
+            "width": 883,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 811,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/04/04-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-diagram.ko.png",
+            "width": 811,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 800,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/06/06-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-diagram.ko.png",
+            "width": 830,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/10/10-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.en.png",
+            "width": 1150,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/10/10-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-diagram.ko.png",
+            "width": 1072,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/03/03-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.en.png",
+            "width": 942,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/03/03-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-diagram.ko.png",
+            "width": 883,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 811,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/04/04-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-diagram.ko.png",
+            "width": 811,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 800,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/06/06-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-diagram.ko.png",
+            "width": 830,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/10/10-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.en.png",
+            "width": 1150,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/probability-101/10/10-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-diagram.ko.png",
+            "width": 1072,
+            "height": 67,
             "repo": null
           }
         ]

@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 4
-title: Bayes' Theorem
+title: "Probability 101 (4/10): Bayes' Theorem"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: See how Bayes' theorem updates belief with new evidence by comb
 last_reviewed: '2026-05-15'
 ---
 
-# Bayes' Theorem
+# Probability 101 (4/10): Bayes' Theorem
 
 At some point in probability, simple calculation stops being the whole story. The harder question becomes how to revise a belief once you see new data. Bayes' theorem is the rule that makes that update explicit.
 
@@ -28,13 +28,21 @@ It matters not just because the equation is elegant, but because the same struct
 
 This is post 4 in the Probability 101 series. Here we break Bayes' theorem into prior, likelihood, evidence, and posterior, then walk through a screening example, sequential updates, and the odds form that often makes the mechanics easier to see.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What question Bayes' theorem actually answers
-- How priors, likelihoods, and posteriors play different roles
-- Why low base rates change the meaning of a positive result
-- How repeated evidence becomes sequential updates
-- Why the odds form is often easier to reason with
+- What question Bayes' theorem actually answers?
+- How priors, likelihoods, and posteriors play different roles?
+- Why low base rates change the meaning of a positive result?
+
+## Big Picture
+
+![probability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 4 flow overview*
+
+This picture places Bayes' Theorem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Bayes' Theorem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ Bayes' theorem is the compact rule that ties those pieces together. It is both a
 > Bayes' theorem does not throw away what you believed before. It combines prior belief and new evidence in a consistent way.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -149,10 +153,21 @@ Spam filters (Naive Bayes), Bayesian A/B testing, medical diagnosis, RL belief s
 
 Bayes' theorem is the math of learning. The next episode introduces random variables — handling numeric outcomes.
 
+## Answering the Opening Questions
+
+- **What question Bayes' theorem actually answers?**
+  - The article treats Bayes' Theorem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How priors, likelihoods, and posteriors play different roles?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why low base rates change the meaning of a positive result?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
 - **Bayes' Theorem (current)**
 - Random Variables (upcoming)
 - Expectation and Variance (upcoming)
@@ -160,6 +175,7 @@ Bayes' theorem is the math of learning. The next episode introduces random varia
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

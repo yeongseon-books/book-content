@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 1
-title: What Is Probability?
+title: "Probability 101 (1/10): What Is Probability?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Understand what probability measures, how frequentist and Bayes
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Probability?
+# Probability 101 (1/10): What Is Probability?
 
 The first definition most people hear is that probability is “how likely something is to happen.” That is not wrong, but it runs out of room quickly. It does not tell you why a coin gets probability 0.5, what “70% chance of rain” actually means, or how much trust to place in a model score of 0.8.
 
@@ -28,13 +28,21 @@ To understand probability well, you need to look past the number itself and ask 
 
 This is the first post in the Probability 101 series. It sets up the core idea of probability, contrasts the frequentist and Bayesian views, and gives you a small code experiment you can use as a mental anchor for the rest of the series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What probability is actually measuring
-- Why sample space and events come before any calculation
-- How the frequentist and Bayesian views answer different questions
-- Why probability keeps showing up in data work and machine learning
-- How a small simulation sharpens your intuition faster than definitions alone
+- What probability is actually measuring?
+- Why sample space and events come before any calculation?
+- How the frequentist and Bayesian views answer different questions?
+
+## Big Picture
+
+![probability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 1 flow overview*
+
+This picture places What Is Probability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Probability? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ Weak probability intuition leads to predictable mistakes. People mix up likeliho
 > Probability is not a way to predict the future with certainty. It is a language for quantifying uncertainty given a set of possible outcomes and the information you have right now.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -147,7 +151,18 @@ Spam filters, recommender systems, fraud detection, medical diagnosis — probab
 
 Probability is the language of uncertainty. The next episode defines events and the sample space more precisely.
 
+## Answering the Opening Questions
+
+- **What probability is actually measuring?**
+  - The article treats What Is Probability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why sample space and events come before any calculation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the frequentist and Bayesian views answer different questions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Probability? (current)**
 - Events and Sample Space (upcoming)
 - Conditional Probability (upcoming)
@@ -158,6 +173,7 @@ Probability is the language of uncertainty. The next episode defines events and 
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

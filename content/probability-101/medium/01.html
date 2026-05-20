@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Probability?</title>
+<title>Probability 101 (1/10): What Is Probability?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is Probability?</h1>
+<h1>Probability 101 (1/10): What Is Probability?</h1>
 <p>The first definition most people hear is that probability is “how likely something is to happen.” That is not wrong, but it runs out of room quickly. It does not tell you why a coin gets probability 0.5, what “70% chance of rain” actually means, or how much trust to place in a model score of 0.8.</p>
 <p>To understand probability well, you need to look past the number itself and ask what kind of uncertainty that number is describing. Once that clicks, the same language starts to work across statistics, data analysis, and machine learning.</p>
 <p>This is the first post in the Probability 101 series. It sets up the core idea of probability, contrasts the frequentist and Bayesian views, and gives you a small code experiment you can use as a mental anchor for the rest of the series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What probability is actually measuring</li>
-<li>Why sample space and events come before any calculation</li>
-<li>How the frequentist and Bayesian views answer different questions</li>
-<li>Why probability keeps showing up in data work and machine learning</li>
-<li>How a small simulation sharpens your intuition faster than definitions alone</li>
+<li>What probability is actually measuring?</li>
+<li>Why sample space and events come before any calculation?</li>
+<li>How the frequentist and Bayesian views answer different questions?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="probability 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>probability 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Probability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Probability? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>In production systems, probability does not stay inside a textbook. Spam filters estimate whether a message is junk, recommendation systems estimate whether a user will click, and medical models estimate the risk of a diagnosis. The numbers look different, but the real question is the same every time: what does this score mean, and how far should I trust it?</p>
 <p>Weak probability intuition leads to predictable mistakes. People mix up likelihood and probability, generalize from tiny samples, and read 0.99 as if it were certainty. Strong probability intuition does the opposite: it makes you ask about assumptions, interpretation, and limits before you act on the number.</p>
@@ -72,8 +77,6 @@
 <p>Probability is not a way to predict the future with certainty. It is a language for quantifying uncertainty given a set of possible outcomes and the information you have right now.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Sample space Ω</strong>: the set of all possible outcomes.</li>
@@ -148,6 +151,16 @@ print(&quot;bayesian: updated belief&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Probability is the language of uncertainty. The next episode defines events and the sample space more precisely.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What probability is actually measuring?</strong></li>
+<li>The article treats What Is Probability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why sample space and events come before any calculation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How the frequentist and Bayesian views answer different questions?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Probability? (current)</strong></li>
 <li>Events and Sample Space (upcoming)</li>

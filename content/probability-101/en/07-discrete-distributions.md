@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 7
-title: Discrete Distributions
+title: "Probability 101 (7/10): Discrete Distributions"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Understand Bernoulli, Binomial, Geometric, and Poisson distribu
 last_reviewed: '2026-05-15'
 ---
 
-# Discrete Distributions
+# Probability 101 (7/10): Discrete Distributions
 
 A surprising amount of real-world data is really about counts. Did something succeed or fail? How many successes happened? How many tries did it take before the first success? How many requests arrived in an hour? Once you start seeing these patterns, the same small set of distributions keeps coming back.
 
@@ -28,13 +28,21 @@ The important thing to memorize is not the names but the situations. What kind o
 
 This is post 7 in the Probability 101 series. Here we use Bernoulli, Binomial, Geometric, and Poisson distributions to build a reusable vocabulary for count data, then connect each distribution to the kind of engineering question it models well.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why a single 0/1 trial starts with Bernoulli
-- When repeated successes turn into Binomial
-- Why waiting for the first success leads to Geometric
-- Why arrival counts often point to Poisson
-- How the model choice changes your interpretation of the same count data
+- Why a single 0/1 trial starts with Bernoulli?
+- When repeated successes turn into Binomial?
+- Why waiting for the first success leads to Geometric?
+
+## Big Picture
+
+![probability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 7 flow overview*
+
+This picture places Discrete Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Discrete Distributions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ Choosing a distribution gives you more than one probability. It gives you a whol
 > Discrete distributions are reusable models for counted outcomes. Much of the work is deciding which process your data actually came from.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -146,17 +150,29 @@ A/B conversions (Binomial), call-center arrivals (Poisson), retry counts (Geomet
 
 Discrete distributions are the priors of count modeling. The next episode covers continuous distributions.
 
+## Answering the Opening Questions
+
+- **Why a single 0/1 trial starts with Bernoulli?**
+  - The article treats Discrete Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When repeated successes turn into Binomial?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why waiting for the first success leads to Geometric?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
 - **Discrete Distributions (current)**
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

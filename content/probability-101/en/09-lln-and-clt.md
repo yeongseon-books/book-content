@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 9
-title: Law of Large Numbers and CLT
+title: "Probability 101 (9/10): Law of Large Numbers and CLT"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn why sample means stabilize and why they often become appr
 last_reviewed: '2026-05-15'
 ---
 
-# Law of Large Numbers and CLT
+# Probability 101 (9/10): Law of Large Numbers and CLT
 
 Statistics and machine learning lean on averages constantly: average response time, average loss, average conversion, average error. But those averages only become trustworthy once you understand why sample means stabilize, and why the distribution of those means often starts to look normal even when the original data is not.
 
@@ -28,13 +28,21 @@ The Law of Large Numbers and the Central Limit Theorem are the two main answers.
 
 This is post 9 in the Probability 101 series. Here we build intuition for the LLN and the CLT, connect them to standard error, and show with simulations why non-normal populations can still produce nearly normal sample means.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why sample means stabilize as the sample grows
-- How the LLN and CLT answer different questions
-- Why standard error is not the same thing as standard deviation
-- Why non-normal populations can still yield nearly normal sample means
-- When a CLT-based approximation becomes risky
+- Why sample means stabilize as the sample grows?
+- How the LLN and CLT answer different questions?
+- Why standard error is not the same thing as standard deviation?
+
+## Big Picture
+
+![probability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 9 flow overview*
+
+This picture places Law of Large Numbers and CLT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Law of Large Numbers and CLT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ Without this distinction, people either trust means too quickly or fail to expla
 > The Law of Large Numbers tells you the mean heads in the right direction. The Central Limit Theorem tells you how the remaining error is shaped.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -161,17 +165,29 @@ CIs for A/B conversion deltas, average response times in monitoring, training-lo
 
 The LLN gives convergence; the CLT gives shape. The final episode wraps everything into probability for machine learning.
 
+## Answering the Opening Questions
+
+- **Why sample means stabilize as the sample grows?**
+  - The article treats Law of Large Numbers and CLT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How the LLN and CLT answer different questions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why standard error is not the same thing as standard deviation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
-- [Discrete Distributions](./07-discrete-distributions.md)
-- [Continuous Distributions](./08-continuous-distributions.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): Discrete Distributions](./07-discrete-distributions.md)
+- [Probability 101 (8/10): Continuous Distributions](./08-continuous-distributions.md)
 - **Law of Large Numbers and CLT (current)**
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

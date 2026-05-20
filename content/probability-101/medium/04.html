@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Bayes' Theorem</title>
+<title>Probability 101 (4/10): Bayes' Theorem</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Bayes' Theorem</h1>
+<h1>Probability 101 (4/10): Bayes' Theorem</h1>
 <p>At some point in probability, simple calculation stops being the whole story. The harder question becomes how to revise a belief once you see new data. Bayes' theorem is the rule that makes that update explicit.</p>
 <p>It matters not just because the equation is elegant, but because the same structure appears in medical diagnosis, spam filtering, recommender systems, A/B testing, and reinforcement learning. Any time evidence arrives and a belief needs to move, Bayes is somewhere in the background.</p>
 <p>This is post 4 in the Probability 101 series. Here we break Bayes' theorem into prior, likelihood, evidence, and posterior, then walk through a screening example, sequential updates, and the odds form that often makes the mechanics easier to see.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What question Bayes' theorem actually answers</li>
-<li>How priors, likelihoods, and posteriors play different roles</li>
-<li>Why low base rates change the meaning of a positive result</li>
-<li>How repeated evidence becomes sequential updates</li>
-<li>Why the odds form is often easier to reason with</li>
+<li>What question Bayes' theorem actually answers?</li>
+<li>How priors, likelihoods, and posteriors play different roles?</li>
+<li>Why low base rates change the meaning of a positive result?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="probability 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>probability 101 chapter 4 flow overview</em></p>
+<p>This picture places Bayes' Theorem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Bayes' Theorem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Statements like “a positive result means the disease is present” fail because they compress too much into one line. What really matters is how the probability of the disease changes after a positive result, given the prior prevalence and the behavior of the test itself.</p>
 <p>Bayes' theorem is the compact rule that ties those pieces together. It is both a formula for probability and a grammar for inference, which is why it keeps reappearing far outside classroom examples.</p>
@@ -72,8 +77,6 @@
 <p>Bayes' theorem does not throw away what you believed before. It combines prior belief and new evidence in a consistent way.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Prior P(H)</strong>: belief before seeing data.</li>
@@ -150,10 +153,20 @@ print(&quot;posterior odds:&quot;, post_odds, &quot;P:&quot;, post_odds / (1 + p
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Bayes' theorem is the math of learning. The next episode introduces random variables — handling numeric outcomes.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Conditional Probability</a></li>
+<li><strong>What question Bayes' theorem actually answers?</strong></li>
+<li>The article treats Bayes' Theorem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How priors, likelihoods, and posteriors play different roles?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why low base rates change the meaning of a positive result?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">Probability 101 (1/10): What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Probability 101 (2/10): Events and Sample Space</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Probability 101 (3/10): Conditional Probability</a></li>
 <li><strong>Bayes' Theorem (current)</strong></li>
 <li>Random Variables (upcoming)</li>
 <li>Expectation and Variance (upcoming)</li>

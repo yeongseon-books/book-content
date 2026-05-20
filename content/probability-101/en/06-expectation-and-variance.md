@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 6
-title: Expectation and Variance
+title: "Probability 101 (6/10): Expectation and Variance"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how expectation and variance summarize the center and spr
 last_reviewed: '2026-05-15'
 ---
 
-# Expectation and Variance
+# Probability 101 (6/10): Expectation and Variance
 
 Learning a distribution is not the same as being able to summarize it. In practice, you often need to answer two faster questions: where is the center, and how much does the value spread around that center? Expectation and variance are the basic answers.
 
@@ -28,13 +28,21 @@ Even a die shows why the pair matters. Knowing that the average face value is 3.
 
 This is post 6 in the Probability 101 series. Here we define expectation and variance, compute them in code, use linearity to simplify reasoning, and connect the formulas to the way engineers read noisy metrics and model behavior.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why expectation is called the center of a distribution
-- What variance measures and why standard deviation is often easier to interpret
-- How linearity of expectation simplifies many problems
-- Why a mean alone often hides instability
-- How simulation helps check the formulas against intuition
+- Why expectation is called the center of a distribution?
+- What variance measures and why standard deviation is often easier to interpret?
+- How linearity of expectation simplifies many problems?
+
+## Big Picture
+
+![probability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 6 flow overview*
+
+This picture places Expectation and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Expectation and Variance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ The key habit is to read center and spread together. A system with the same aver
 > Expectation tells you where a distribution is centered. Variance tells you how much it tends to move around that center.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -150,17 +154,29 @@ The MSE = E[(y - ŷ)²] loss, expected lift in A/B tests, expected return / risk
 
 Expectation and variance are the two axes of a distribution. The next episode covers the main discrete distributions.
 
+## Answering the Opening Questions
+
+- **Why expectation is called the center of a distribution?**
+  - The article treats Expectation and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What variance measures and why standard deviation is often easier to interpret?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How linearity of expectation simplifies many problems?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
 - **Expectation and Variance (current)**
 - Discrete Distributions (upcoming)
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

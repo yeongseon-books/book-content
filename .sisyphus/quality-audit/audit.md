@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:24:43+00:00
+Generated: 2026-05-20T11:25:03+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **56**
 - Series at or above 5 issues: **42**
-- Total issues: **544**
+- Total issues: **541**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **12**
+  - Shrt: **9**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -58,21 +58,21 @@ Warnings:
 | 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 16 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
 | 17 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
-| 18 | `probability-101` | 11 | 8 | 0 | 0 | 3 | 0 |
-| 19 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 20 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 21 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 22 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 23 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 24 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 25 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 26 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 27 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 28 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 18 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 19 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 20 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 21 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 22 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 23 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 24 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 25 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 26 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
+| 27 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 32 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 33 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 34 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 35 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
@@ -312,23 +312,6 @@ Warnings:
 ### Shrt
 - `content/linear-algebra-101/en/04-inner-product-and-distance.md:22` — markdown body has 148 lines (< 150)
 
-## probability-101 — Total 11
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=3 NoEn=0
-
-### BadImg
-- `assets/probability-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=942x67)
-- `assets/probability-101/03/03-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=883x67)
-- `assets/probability-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=811x67)
-- `assets/probability-101/04/04-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=811x67)
-- `assets/probability-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=800x67)
-- ... 3 more
-
-### Shrt
-- `content/probability-101/en/01-what-is-probability.md:22` — markdown body has 149 lines (< 150)
-- `content/probability-101/en/02-events-and-sample-space.md:22` — markdown body has 149 lines (< 150)
-- `content/probability-101/en/07-discrete-distributions.md:22` — markdown body has 148 lines (< 150)
-
 ## api-design-101 — Total 10
 
 - BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
@@ -498,6 +481,18 @@ Warnings:
 - `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png:1` — PNG height 95px <= 100px (size=1384x95)
 - `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png:1` — PNG height 95px <= 100px (size=1384x95)
 - `assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png:1` — PNG height 67px <= 100px (size=877x67)
+- ... 3 more
+
+## probability-101 — Total 8
+
+- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/probability-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=942x67)
+- `assets/probability-101/03/03-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=883x67)
+- `assets/probability-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=811x67)
+- `assets/probability-101/04/04-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=811x67)
+- `assets/probability-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=800x67)
 - ... 3 more
 
 ## rag-benchmark-101 — Total 8

@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 10
-title: Probability in Machine Learning
+title: "Probability 101 (10/10): Probability in Machine Learning"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: See how probability shapes machine learning through loss functi
 last_reviewed: '2026-05-15'
 ---
 
-# Probability in Machine Learning
+# Probability 101 (10/10): Probability in Machine Learning
 
 If you make it through a probability series, one question naturally remains: where do all of these ideas actually live inside machine learning? If that question stays unanswered, probability remains background theory. Once it is answered, probability becomes an operational tool for reading model behavior.
 
@@ -28,13 +28,21 @@ Much of modern machine learning is probability wearing different names. Cross-en
 
 This is the final post in the Probability 101 series. Here we connect probability to loss functions, conditional model outputs, calibration metrics, and Bayesian thinking so the earlier ideas show up in a recognizable ML workflow.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Where probability is hiding inside common machine learning workflows
-- Why cross-entropy and negative log-likelihood point to the same idea
-- What a classifier score like 0.8 should mean before you trust it
-- Why accuracy and calibration measure different things
-- When Bayesian thinking is especially helpful in ML practice
+- Where probability is hiding inside common machine learning workflows?
+- Why cross-entropy and negative log-likelihood point to the same idea?
+- What a classifier score like 0.8 should mean before you trust it?
+
+## Big Picture
+
+![probability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 10 flow overview*
+
+This picture places Probability in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Probability in Machine Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ Training itself is tied to probability as well. Cross-entropy in classification 
 > Machine learning is not only about guessing the right label. It is also about organizing uncertainty and tying that uncertainty to decision cost.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -160,17 +164,29 @@ Spam classification, medical diagnosis, recommendation scores, anomaly detection
 
 Probability is the native language of ML. The next steps are Linear Algebra 101 and Machine Learning 101, which add the other axes of modeling.
 
+## Answering the Opening Questions
+
+- **Where probability is hiding inside common machine learning workflows?**
+  - The article treats Probability in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why cross-entropy and negative log-likelihood point to the same idea?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What a classifier score like 0.8 should mean before you trust it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
-- [Random Variables](./05-random-variables.md)
-- [Expectation and Variance](./06-expectation-and-variance.md)
-- [Discrete Distributions](./07-discrete-distributions.md)
-- [Continuous Distributions](./08-continuous-distributions.md)
-- [Law of Large Numbers and CLT](./09-lln-and-clt.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
+- [Probability 101 (5/10): Random Variables](./05-random-variables.md)
+- [Probability 101 (6/10): Expectation and Variance](./06-expectation-and-variance.md)
+- [Probability 101 (7/10): Discrete Distributions](./07-discrete-distributions.md)
+- [Probability 101 (8/10): Continuous Distributions](./08-continuous-distributions.md)
+- [Probability 101 (9/10): Law of Large Numbers and CLT](./09-lln-and-clt.md)
 - **Probability in Machine Learning (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: probability-101
 episode: 5
-title: Random Variables
+title: "Probability 101 (5/10): Random Variables"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how random variables map outcomes to numbers, and how PMF
 last_reviewed: '2026-05-15'
 ---
 
-# Random Variables
+# Probability 101 (5/10): Random Variables
 
 Events and probabilities can already describe many problems, but once you need to work with measurements, scores, or waiting times, you need a stronger tool. You need a way to move from outcomes to numbers so that averages, variances, and full distributions become possible. That tool is the random variable.
 
@@ -28,13 +28,21 @@ Once you understand random variables, expectation, variance, distributions, and 
 
 This is post 5 in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why random variables are more expressive than raw events
-- How discrete and continuous variables differ
-- What PMF, PDF, and CDF each answer
-- Why P(X = x) = 0 for continuous variables
-- How sampling makes a distribution feel less abstract
+- Why random variables are more expressive than raw events?
+- How discrete and continuous variables differ?
+- What PMF, PDF, and CDF each answer?
+
+## Big Picture
+
+![probability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)
+
+*probability 101 chapter 5 flow overview*
+
+This picture places Random Variables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Random Variables is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,10 +53,6 @@ The same move happens in production systems. Sensor readings, response times, us
 > A random variable is a function that maps possible outcomes into numbers, and a distribution is the rule that places probability mass or density on those numbers.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -150,17 +154,29 @@ Softmax probabilities from ML models, Gaussian noise assumptions, survival-time 
 
 Random variables are the bridge from probability to numeric analysis. The next episode covers expectation and variance.
 
+## Answering the Opening Questions
+
+- **Why random variables are more expressive than raw events?**
+  - The article treats Random Variables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How discrete and continuous variables differ?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What PMF, PDF, and CDF each answer?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Probability?](./01-what-is-probability.md)
-- [Events and Sample Space](./02-events-and-sample-space.md)
-- [Conditional Probability](./03-conditional-probability.md)
-- [Bayes' Theorem](./04-bayes-theorem.md)
+## In this series
+
+- [Probability 101 (1/10): What Is Probability?](./01-what-is-probability.md)
+- [Probability 101 (2/10): Events and Sample Space](./02-events-and-sample-space.md)
+- [Probability 101 (3/10): Conditional Probability](./03-conditional-probability.md)
+- [Probability 101 (4/10): Bayes' Theorem](./04-bayes-theorem.md)
 - **Random Variables (current)**
 - Expectation and Variance (upcoming)
 - Discrete Distributions (upcoming)
 - Continuous Distributions (upcoming)
 - Law of Large Numbers and CLT (upcoming)
 - Probability in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Conditional Probability</title>
+<title>Probability 101 (3/10): Conditional Probability</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Conditional Probability</h1>
+<h1>Probability 101 (3/10): Conditional Probability</h1>
 <p>Real probability questions almost always come with conditions. Traffic given rain, disease given a positive test, spam given a suspicious phrase in the subject line — most useful probabilities are probabilities inside a context, not in the abstract.</p>
 <p>That is why conditional probability sits near the center of probability theory rather than at the edge. Once new information arrives, the denominator changes. If you do not feel that denominator shift clearly, model scores, diagnostic tests, and inference results all become easy to misread.</p>
 <p>This is post 3 in the Probability 101 series. Here we define conditional probability, connect it to the multiplication rule, separate independence from dependence, and show why base rates can completely change the meaning of the same test result.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why conditional probability is fundamentally about changing the denominator</li>
-<li>Why P(A|B) and P(B|A) can be completely different</li>
-<li>How the multiplication rule follows from the definition</li>
-<li>How to tell independence from dependence</li>
-<li>Why base-rate neglect breaks real-world interpretation</li>
+<li>Why conditional probability is fundamentally about changing the denominator?</li>
+<li>Why P(A|B) and P(B|A) can be completely different?</li>
+<li>How the multiplication rule follows from the definition?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="probability 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>probability 101 chapter 3 flow overview</em></p>
+<p>This picture places Conditional Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Conditional Probability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>One of the most common mistakes in applied probability is reversing the direction of the condition. P(disease | positive test) and P(positive test | disease) look similar, but they answer different questions. Lose that directional sense, and you misread diagnostics, alerts, and model outputs.</p>
 <p>The risk gets worse when the base rate is small. A rare disease with a sensitive test can still produce a positive result that does not mean what people assume it means. Conditional probability is the tool that forces context back into the interpretation.</p>
@@ -72,8 +77,6 @@
 <p>Conditional probability is not the probability of an event in the original world. It is the probability of that event after the world has been narrowed by new information.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>P(A | B)</strong>: probability of A given B = P(A∩B) / P(B).</li>
@@ -150,9 +153,19 @@ print(&quot;indep?&quot;, round(TP/N - P_sick * P_pos, 6))  # nonzero implies de
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Conditional probability is the tool for handling context. The next episode reaches its peak: Bayes' Theorem.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
+<li><strong>Why conditional probability is fundamentally about changing the denominator?</strong></li>
+<li>The article treats Conditional Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why P(A|B) and P(B|A) can be completely different?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How the multiplication rule follows from the definition?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">Probability 101 (1/10): What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Probability 101 (2/10): Events and Sample Space</a></li>
 <li><strong>Conditional Probability (current)</strong></li>
 <li>Bayes' Theorem (upcoming)</li>
 <li>Random Variables (upcoming)</li>
