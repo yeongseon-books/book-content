@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Functions and arguments: def, args, kwargs, default, lambda</title>
+<title>Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Functions and arguments: def, args, kwargs, default, lambda</h1>
+<h1>Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</h1>
 <p>A function signature is a contract: what the caller must supply and what the function returns. Argument forms, plus <code>/</code> and <code>*</code>, let you make that contract clearer and harder to misuse.</p>
 <p>This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you will be able to explain and code the following:</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to define a function with <code>def</code> and control what <code>return</code> hands back</li>
-<li>The five argument forms — positional, keyword, default, <code>*args</code>, <code>**kwargs</code> — and how they bind at call time</li>
-<li>How positional-only (<code>/</code>) and keyword-only (<code>*</code>) markers shape an API</li>
-<li>The mutable default argument trap and a safe replacement pattern</li>
-<li>Where <code>lambda</code> fits and where it does not</li>
-<li>How to add light type hints to a function signature to document intent</li>
+<li>How to define a function with <code>def</code> and control what <code>return</code> hands back?</li>
+<li>The five argument forms — positional, keyword, default, <code>*args</code>, <code>**kwargs</code> — and how they bind at call time?</li>
+<li>How positional-only (<code>/</code>) and keyword-only (<code>*</code>) markers shape an API?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 6 flow overview</em></p>
+<p>This picture places Functions and arguments: def, args, kwargs, default, lambda inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Functions and arguments: def, args, kwargs, default, lambda is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Functions are the smallest unit you bundle code into. Once you carve branches and loops into functions, you stop repeating yourself, and the function becomes the unit of testing and change. Python's argument handling is rich, however, so beginners often struggle to choose between forms. Positional only ties calls to order; bad defaults leak state between calls; overusing <code>*args</code> and <code>**kwargs</code> makes signatures opaque.</p>
 <p>This chapter consolidates the five argument forms onto a single page so you can design signatures deliberately. In the next chapter on modules and packages, function signatures become the public interface across module boundaries — better to settle this first.</p>
@@ -75,9 +78,7 @@
 <p>A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the <code>/</code> and <code>*</code> markers tune how strict that contract is.<br>
 Lay the function signature out on a page, and the call-time rules line up in your head.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three rules carry most of the weight.</p>
+<p>Three rules carry most of the weight.</p>
 <ol>
 <li><strong>Arguments bind at call time and the body runs on top of that binding.</strong> The signature is an interface that promises "this is the name and shape I will accept".</li>
 <li><strong>The order inside the signature is fixed:</strong> positional-only → positional/keyword → <code>*args</code> or <code>*</code> → keyword-only → <code>**kwargs</code>. Break the order and you get a <code>SyntaxError</code>.</li>
@@ -320,6 +321,28 @@ TypeError: make_url() got some positional-only arguments passed as keyword argum
 <li>Light type hints are not enforced at runtime, but they reduce misunderstandings at the call site.</li>
 </ul>
 <p>The next chapter covers modules and packages — <code>import</code>, <code>__init__.py</code>, and <code>__name__</code> — and shows how functions are exposed and hidden across module boundaries.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How to define a function with <code>def</code> and control what <code>return</code> hands back?</strong></li>
+<li>The article treats Functions and arguments: def, args, kwargs, default, lambda as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The five argument forms — positional, keyword, default, <code>*args</code>, <code>**kwargs</code> — and how they bind at call time?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How positional-only (<code>/</code>) and keyword-only (<code>*</code>) markers shape an API?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/05-control-flow.md">Python 101 (5/10): Control flow: if, for, while, comprehension</a></li>
+<li><strong>Functions and arguments: def, args, kwargs, default, lambda (current)</strong></li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/controlflow.html">Python tutorial — More on Defining Functions</a> — Practical overview of defaults, keyword arguments, <code>*args</code>, <code>**kwargs</code>, and <code>lambda</code>.</li>

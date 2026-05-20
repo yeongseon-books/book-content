@@ -1,5 +1,5 @@
 ---
-title: 'Modules and packages: import, __init__, __name__'
+title: "Python 101 (7/10): Modules and packages: import, __init__, __name__"
 series: python-101
 episode: 7
 language: en
@@ -22,22 +22,27 @@ seo_description: A module in Python is "a namespace that is loaded once and cach
   a package is "a directory grouped by __init__.py that holds modules".
 ---
 
-# Modules and packages: import, __init__, __name__
+# Python 101 (7/10): Modules and packages: import, __init__, __name__
 
 In Python, a module is a namespace that is loaded once and cached, and a package is the directory-level unit that groups related modules. Once you see what `import` really loads and names, project structure becomes less mysterious.
 
 This post is the 7th article in the Python 101 series. This is the part of the series where single files turn into a real project layout.
 
-## What you will learn
+## Questions to Keep in Mind
 
-After reading this chapter you will be able to:
+- Treat any `.py` file as a module and pull it into another file with `import`?
+- Turn a directory into a package by adding `__init__.py`, and group modules inside it?
+- Explain the difference between `import x`, `from x import y`, and `import x as alias`?
 
-- Treat any `.py` file as a module and pull it into another file with `import`.
-- Turn a directory into a package by adding `__init__.py`, and group modules inside it.
-- Explain the difference between `import x`, `from x import y`, and `import x as alias`.
-- Trace what `if __name__ == "__main__":` does at the moment a file runs.
-- Use `from .sibling import ...` to call sibling modules inside the same package.
-- Describe in one sentence how `sys.path` and `PYTHONPATH` participate in import lookup.
+## Big Picture
+
+![Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png)
+
+*Python 101 chapter 7 flow overview*
+
+This picture places Modules and packages: import, __init__, __name__ inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Modules and packages: import, __init__, __name__ is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -54,9 +59,6 @@ Modules and packages are among Python's main tools for solving this. You break c
 > A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by `__init__.py` that holds modules". Hold those two definitions and most import behavior collapses into one diagram.
 A module is "a `.py` file that runs once and produces a namespace." A package is "a directory that holds such modules." `import` is the act of attaching that namespace to your current code.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png)
-
-*Mental model*
 Two ideas matter most. First, **module top-level code runs once, top to bottom, the first time it is imported**. Second, **the resulting namespace object is cached and reused**. A second import does not re-read the file; it pulls the same object from cache.
 
 ## Core concepts
@@ -371,7 +373,29 @@ This shape often stays similar as a project grows. You can start with a single `
 
 The next chapter covers file I/O and exception handling, where the modules you just organized start touching outside resources.
 
+## Answering the Opening Questions
+
+- **Treat any `.py` file as a module and pull it into another file with `import`?**
+  - The article treats Modules and packages: import, __init__, __name__ as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Turn a directory into a package by adding `__init__.py`, and group modules inside it?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Explain the difference between `import x`, `from x import y`, and `import x as alias`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- **Modules and packages: import, __init__, __name__ (current)**
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,5 +1,5 @@
 ---
-title: '클래스와 객체: 데이터와 동작을 함께 묶기'
+title: "Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기"
 series: python-101
 episode: 9
 language: ko
@@ -22,30 +22,33 @@ seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 
   개별 객체입니다.
 ---
 
-# 클래스와 객체: 데이터와 동작을 함께 묶기
+# Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기
 
 클래스는 데이터를 찍어 내는 형틀이 아니라 같은 종류의 객체가 공유하는 행동의 정의입니다. 인스턴스는 그 정의를 바탕으로 각자의 상태를 가진 개별 객체입니다.
 
 이 글은 Python 101 시리즈의 아홉 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-지금까지 다룬 함수와 모듈은 동작과 데이터를 따로 다뤘습니다. 함수는 입력을 받고 출력을 돌려주고, 모듈은 함수를 묶는 단위였습니다. 그런데 데이터와 그 데이터에 적용되는 동작이 짝을 이루는 경우, 이 둘을 따로 두면 코드가 흩어집니다.
+- 클래스와 객체: 데이터와 동작을 함께 묶기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
+- 클래스와 객체: 데이터와 동작을 함께 묶기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
+- 클래스와 객체: 데이터와 동작을 함께 묶기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
 
-예를 들어 사용자 정보를 다룬다면, `format_user(name, email)`, `validate_user(name, email)`, `serialize_user(name, email)`처럼 같은 데이터를 받는 함수가 여기저기 생깁니다. 호출자는 호출할 때마다 같은 인자를 다시 챙겨야 하고, 필드가 늘어나면 관련 함수들의 시그니처를 두루 손봐야 합니다.
+## 큰 그림
 
-클래스는 데이터(속성)와 동작(메서드)을 한 단위로 묶어 이 문제를 해결합니다. `User(name, email)` 인스턴스 하나가 `format`, `validate`, `serialize`를 모두 들고 다닙니다. 호출자 입장에서는 객체 하나만 넘기면 됩니다.
+![Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.ko.png)
 
-이 글에서는 그 묶음을 만드는 가장 단순한 도구인 `class` 문과 dunder 메서드를 살펴봅니다.
+*Python 101 9장 흐름 개요*
+
+이 그림에서는 클래스와 객체: 데이터와 동작을 함께 묶기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 클래스와 객체: 데이터와 동작을 함께 묶기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 
 > 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는 개별 객체입니다. 이 한 줄이 잡혀 있으면 `self`, 클래스 속성, dunder 메서드의 자리가 자연스럽게 정해집니다.
 다음 그림은 클래스 정의에서 인스턴스 호출까지의 흐름을 보여줍니다.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.ko.png)
-
-*Mental Model*
 세 가지 핵심 아이디어가 있습니다.
 
 - **클래스는 객체를 찍어내는 틀입니다.** `class User:` 문 자체가 `User`라는 클래스 객체를 만들고, `User(...)` 호출이 그 틀로부터 인스턴스를 만들어 냅니다.
@@ -356,17 +359,29 @@ True
 
 다음 글에서는 표준 라이브러리 투어를 다룹니다. 지금까지 배운 함수, 모듈, 클래스 위에서 Python이 기본으로 제공하는 도구들을 빠르게 훑어봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **클래스와 객체: 데이터와 동작을 함께 묶기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
+  - 본문의 기준은 클래스와 객체: 데이터와 동작을 함께 묶기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **클래스와 객체: 데이터와 동작을 함께 묶기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **클래스와 객체: 데이터와 동작을 함께 묶기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
-- [변수, 타입, 연산자](./02-variables-types-operators.md)
-- [문자열과 포매팅](./03-strings-and-formatting.md)
-- [list, tuple, set, dict](./04-list-tuple-set-dict.md)
-- [제어 흐름: if, for, while, comprehension](./05-control-flow.md)
-- [함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
-- [모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
-- [파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
-- **클래스와 객체 (현재 글)**
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- **클래스와 객체: 데이터와 동작을 함께 묶기 (현재 글)**
 - 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

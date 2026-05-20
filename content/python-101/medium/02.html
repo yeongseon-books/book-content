@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Variables, types, and operators</title>
+<title>Python 101 (2/10): Variables, types, and operators</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Variables, types, and operators</h1>
+<h1>Python 101 (2/10): Variables, types, and operators</h1>
 <p>In Python, a variable is not a box that holds a value but a name attached to an object. That one model clears up most beginner confusion around assignment, comparison, and copying.</p>
 <p>This post is the 2nd article in the Python 101 series. This is the point in the series where Python's name-and-object model starts to matter.</p>
 <h2>What you'll learn</h2>
@@ -66,14 +66,19 @@
 <li>The classic traps every beginner hits at least once: <code>is</code> versus <code>==</code>, floating-point comparison, and mutable defaults</li>
 </ul>
 <p>This chapter targets Python 3.12. Blocks shown as REPL sessions (with the <code>&gt;&gt;&gt;</code> prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is a Python variable a name tag attached to an object rather than a box that holds a value?</li>
 <li>What does each of the five primitive types — <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code> — actually guarantee?</li>
 <li>Where does dynamic typing meet type hints, and how do hints make that freedom safer?</li>
-<li>When do <code>is</code> and <code>==</code> agree, and when do they disagree?</li>
-<li>Which floating-point comparisons surprise beginners, and how do you avoid them?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 2 flow overview</em></p>
+<p>This picture places Variables, types, and operators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Variables, types, and operators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Variables and types are the skeleton of every program you'll ever write. It's tempting to dismiss <code>x = 1</code> as trivial, but here are the bugs you keep hitting if the model is fuzzy.</p>
 <ul>
@@ -88,9 +93,7 @@
 <p>In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.<br>
 In Python, a variable is not a box that holds a value. It's a <strong>name tag attached to an object</strong>. One object can have many name tags, and a name tag can be moved to a different object at any time.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-In the diagram above, after <code>a = 42; b = a</code> both <code>a</code> and <code>b</code> point at the same integer object <code>42</code>. After <code>a = "hi"</code>, only <code>a</code> moves to a fresh string object; <code>b</code> still points at <code>42</code>.</p>
+<p>In the diagram above, after <code>a = 42; b = a</code> both <code>a</code> and <code>b</code> point at the same integer object <code>42</code>. After <code>a = "hi"</code>, only <code>a</code> moves to a fresh string object; <code>b</code> still points at <code>42</code>.</p>
 <p>Holding this picture in your head makes two behaviors feel natural.</p>
 <ul>
 <li><code>id(a) == id(b)</code> tells you whether two name tags refer to the same object.</li>
@@ -269,6 +272,28 @@ class Order:
 <li>Use <code>Decimal</code> for money, <code>math.isclose</code> for floating-point checks, and explicit casts for user input.</li>
 </ul>
 <p>The next chapter dives into strings: f-strings and format specs, the difference between <code>str</code> and <code>bytes</code>, and a first look at regular expressions.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is a Python variable a name tag attached to an object rather than a box that holds a value?</strong></li>
+<li>The article treats Variables, types, and operators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does each of the five primitive types — <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code> — actually guarantee?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where does dynamic typing meet type hints, and how do hints make that freedom safer?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><strong>Variables, types, and operators (current)</strong></li>
+<li>Strings and formatting (upcoming)</li>
+<li>list, tuple, set, dict (upcoming)</li>
+<li>Control flow: if, for, while, comprehension (upcoming)</li>
+<li>Functions and arguments: def, args, kwargs, default, lambda (upcoming)</li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Primary reference for <code>int</code>, <code>float</code>, <code>bool</code>, <code>None</code>, truth-value testing, and sequence behavior.</li>

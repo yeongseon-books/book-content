@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Modules and packages: import, __init__, __name__</title>
+<title>Python 101 (7/10): Modules and packages: import, __init__, __name__</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Modules and packages: import, <strong>init</strong>, <strong>name</strong></h1>
+<h1>Python 101 (7/10): Modules and packages: import, <strong>init</strong>, <strong>name</strong></h1>
 <p>In Python, a module is a namespace that is loaded once and cached, and a package is the directory-level unit that groups related modules. Once you see what <code>import</code> really loads and names, project structure becomes less mysterious.</p>
 <p>This post is the 7th article in the Python 101 series. This is the part of the series where single files turn into a real project layout.</p>
-<h2>What you will learn</h2>
-<p>After reading this chapter you will be able to:</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Treat any <code>.py</code> file as a module and pull it into another file with <code>import</code>.</li>
-<li>Turn a directory into a package by adding <code>__init__.py</code>, and group modules inside it.</li>
-<li>Explain the difference between <code>import x</code>, <code>from x import y</code>, and <code>import x as alias</code>.</li>
-<li>Trace what <code>if __name__ == "__main__":</code> does at the moment a file runs.</li>
-<li>Use <code>from .sibling import ...</code> to call sibling modules inside the same package.</li>
-<li>Describe in one sentence how <code>sys.path</code> and <code>PYTHONPATH</code> participate in import lookup.</li>
+<li>Treat any <code>.py</code> file as a module and pull it into another file with <code>import</code>?</li>
+<li>Turn a directory into a package by adding <code>__init__.py</code>, and group modules inside it?</li>
+<li>Explain the difference between <code>import x</code>, <code>from x import y</code>, and <code>import x as alias</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 7 flow overview</em></p>
+<p>This picture places Modules and packages: import, <strong>init</strong>, <strong>name</strong> inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Modules and packages: import, <strong>init</strong>, <strong>name</strong> is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Once you are comfortable writing functions, code starts piling up. A single file with hundreds of lines usually runs into familiar problems:</p>
 <ul>
@@ -79,9 +82,7 @@
 <p>A module in Python is "a namespace that is loaded once and cached"; a package is "a directory grouped by <code>__init__.py</code> that holds modules". Hold those two definitions and most import behavior collapses into one diagram.<br>
 A module is "a <code>.py</code> file that runs once and produces a namespace." A package is "a directory that holds such modules." <code>import</code> is the act of attaching that namespace to your current code.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Two ideas matter most. First, <strong>module top-level code runs once, top to bottom, the first time it is imported</strong>. Second, <strong>the resulting namespace object is cached and reused</strong>. A second import does not re-read the file; it pulls the same object from cache.</p>
+<p>Two ideas matter most. First, <strong>module top-level code runs once, top to bottom, the first time it is imported</strong>. Second, <strong>the resulting namespace object is cached and reused</strong>. A second import does not re-read the file; it pulls the same object from cache.</p>
 <h2>Core concepts</h2>
 <p><strong>1. Module</strong></p>
 <p>One <code>.py</code> file is a module. The module name is the file name with <code>.py</code> removed. A file called <code>math.py</code> is imported as <code>import math</code>.</p>
@@ -322,6 +323,28 @@ def total(items):
 <li><code>sys.path</code> and <code>PYTHONPATH</code> are the source of truth for import lookup, so installing the package or setting an environment variable is safer than mutating the list at runtime.</li>
 </ul>
 <p>The next chapter covers file I/O and exception handling, where the modules you just organized start touching outside resources.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Treat any <code>.py</code> file as a module and pull it into another file with <code>import</code>?</strong></li>
+<li>The article treats Modules and packages: import, <strong>init</strong>, <strong>name</strong> as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Turn a directory into a package by adding <code>__init__.py</code>, and group modules inside it?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Explain the difference between <code>import x</code>, <code>from x import y</code>, and <code>import x as alias</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/05-control-flow.md">Python 101 (5/10): Control flow: if, for, while, comprehension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/06-functions-and-arguments.md">Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</a></li>
+<li><strong>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (current)</strong></li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/modules.html">Python tutorial — Modules</a> — Practical introduction to module execution, import caching, and <code>sys.path</code> lookup order.</li>

@@ -1,5 +1,5 @@
 ---
-title: '모듈과 패키지: import, __init__, __name__'
+title: "Python 101 (7/10): 모듈과 패키지: import, __init__, __name__"
 series: python-101
 episode: 7
 language: ko
@@ -22,30 +22,33 @@ seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 names
   묶인 모듈의…
 ---
 
-# 모듈과 패키지: import, __init__, __name__
+# Python 101 (7/10): 모듈과 패키지: import, __init__, __name__
 
 Python에서 모듈은 한 번 실행되면 캐시되는 namespace이고, 패키지는 관련 모듈을 디렉터리로 묶는 단위입니다. import가 실제로 무엇을 읽고 어디에 이름을 올리는지 이해하면 구조가 한결 단순해집니다.
 
 이 글은 Python 101 시리즈의 일곱 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-함수를 익히고 나면 코드가 길어집니다. 한 파일에 수백 줄이 쌓이면 다음 문제가 생깁니다.
+- 같은 이름의 함수와 변수가 충돌합니다?
+- 어떤 함수가 어디서 정의됐는지 찾기 어렵습니다?
+- 다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다?
 
-- 같은 이름의 함수와 변수가 충돌합니다.
-- 어떤 함수가 어디서 정의됐는지 찾기 어렵습니다.
-- 다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다.
+## 큰 그림
 
-모듈과 패키지는 이런 문제를 다룰 때 가장 먼저 익히게 되는 Python 도구입니다. 파일 단위로 코드를 쪼개고, 디렉터리 단위로 묶고, 필요한 부분만 골라서 가져오는 구조를 만듭니다. CLI 스크립트, 웹 서버, 데이터 파이프라인처럼 구조가 커지는 코드에서 특히 자주 만나게 됩니다. 작은 프로젝트에서 미리 익혀두면, 큰 프로젝트로 옮겨갈 때도 익숙한 방식으로 구조를 따라가기 쉬워집니다.
+![Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.ko.png)
+
+*Python 101 7장 흐름 개요*
+
+이 그림에서는 모듈과 패키지: import, __init__, __name__를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 모듈과 패키지: import, __init__, __name__의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 
 > Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "`__init__.py`가 있는 디렉터리로 묶인 모듈의 묶음"이라는 두 정의만 잡아 두면 import 동작 대부분이 같은 그림으로 설명됩니다.
 모듈은 "한 번 실행되어 namespace를 만드는 `.py` 파일"입니다. 패키지는 "그런 모듈들을 담는 디렉터리"입니다. `import`는 그 namespace를 현재 코드에 연결하는 동작입니다.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.ko.png)
-
-*Mental Model*
 여기서 먼저 잡아둘 점은 두 가지입니다. 첫째, **모듈 코드는 처음 import될 때 위에서 아래로 한 번 실행됩니다**. 둘째, **그 결과 만들어진 namespace 객체가 캐시되어 재사용됩니다**. 두 번째 import는 파일을 다시 읽지 않고 캐시된 객체만 가져옵니다.
 
 *분할 결정 트리: 파일 크기와 책임 분리 기준으로 모듈/패키지 구조가 결정됩니다.*
@@ -363,17 +366,29 @@ def total(items):
 
 다음 글에서는 파일 I/O와 예외 처리를 다룹니다. 모듈 단위로 정리한 코드가 외부 자원을 안전하게 다루는 방법을 살펴봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **같은 이름의 함수와 변수가 충돌합니다?**
+  - 본문의 기준은 모듈과 패키지: import, __init__, __name__를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **어떤 함수가 어디서 정의됐는지 찾기 어렵습니다?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
-- [변수, 타입, 연산자](./02-variables-types-operators.md)
-- [문자열과 포매팅](./03-strings-and-formatting.md)
-- [list, tuple, set, dict](./04-list-tuple-set-dict.md)
-- [제어 흐름: if, for, while, comprehension](./05-control-flow.md)
-- [함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
 - **모듈과 패키지: import, __init__, __name__ (현재 글)**
 - 파일 I/O와 예외 처리 (예정)
-- 클래스와 객체 (예정)
+- 클래스와 객체: 데이터와 동작을 함께 묶기 (예정)
 - 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

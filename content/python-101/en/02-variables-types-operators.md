@@ -1,5 +1,5 @@
 ---
-title: Variables, types, and operators
+title: "Python 101 (2/10): Variables, types, and operators"
 series: python-101
 episode: 2
 language: en
@@ -22,7 +22,7 @@ seo_description: In Python, a variable is not a box that holds a value but a nam
   tag attached to an object.
 ---
 
-# Variables, types, and operators
+# Python 101 (2/10): Variables, types, and operators
 
 In Python, a variable is not a box that holds a value but a name attached to an object. That one model clears up most beginner confusion around assignment, comparison, and copying.
 
@@ -40,14 +40,21 @@ By the end of this chapter you will be able to explain and code the following yo
 
 This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is a Python variable a name tag attached to an object rather than a box that holds a value?
 - What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?
 - Where does dynamic typing meet type hints, and how do hints make that freedom safer?
-- When do `is` and `==` agree, and when do they disagree?
-- Which floating-point comparisons surprise beginners, and how do you avoid them?
 
+## Big Picture
+
+![Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png)
+
+*Python 101 chapter 2 flow overview*
+
+This picture places Variables, types, and operators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Variables, types, and operators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -65,9 +72,6 @@ The common root is one of two confusions: not knowing exactly what a variable po
 > In Python, a variable is not a box that holds a value but a name tag attached to an object. Holding only that picture in your head explains almost every assignment, comparison, and copying trap with the same diagram.
 In Python, a variable is not a box that holds a value. It's a **name tag attached to an object**. One object can have many name tags, and a name tag can be moved to a different object at any time.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png)
-
-*Mental model*
 In the diagram above, after `a = 42; b = a` both `a` and `b` point at the same integer object `42`. After `a = "hi"`, only `a` moves to a fresh string object; `b` still points at `42`.
 
 Holding this picture in your head makes two behaviors feel natural.
@@ -305,7 +309,29 @@ Before moving to the next chapter, walk through these by hand at least once.
 
 The next chapter dives into strings: f-strings and format specs, the difference between `str` and `bytes`, and a first look at regular expressions.
 
+## Answering the Opening Questions
+
+- **Why is a Python variable a name tag attached to an object rather than a box that holds a value?**
+  - The article treats Variables, types, and operators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does dynamic typing meet type hints, and how do hints make that freedom safer?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- **Variables, types, and operators (current)**
+- Strings and formatting (upcoming)
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References

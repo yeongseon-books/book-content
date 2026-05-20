@@ -1,5 +1,5 @@
 ---
-title: '표준 라이브러리 투어: datetime, pathlib, json, collections, itertools'
+title: "Python 101 (10/10): 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools"
 series: python-101
 episode: 10
 language: ko
@@ -22,30 +22,33 @@ seo_description: 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 
   한정해…
 ---
 
-# 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools
+# Python 101 (10/10): 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools
 
 표준 라이브러리는 자주 쓰는 일을 두 번 짜지 않게 해 주는 도구함입니다. 각 모듈은 시간, 경로, 직렬화, 집계, 반복처럼 한 가지 도메인에 집중합니다.
 
 이 글은 Python 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-Python을 두고 흔히 "batteries included"라고 부릅니다. 표준 라이브러리에 자주 쓰는 도구들이 처음부터 들어 있다는 뜻입니다. 표준 라이브러리에 익숙해지면 다음과 같은 점이 달라집니다.
+- 외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?
+- 코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다?
+- 버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다?
 
-- **외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다.
-- **코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다.
-- **버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다.
+## 큰 그림
 
-이 글은 표준 라이브러리 전부를 다루지 않습니다. 작은 스크립트와 데이터 처리에서 자주 등장하는 다섯 개 모듈을 골라 입문 수준에서 훑어봅니다.
+![Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.ko.png)
+
+*Python 101 10장 흐름 개요*
+
+이 그림에서는 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 
 > 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 않게 하는 도구함"이며, 각 모듈은 한 가지 도메인(시간·경로·직렬화·집계·반복)에 한정해 작은 어휘 세트를 제공합니다.
 표준 라이브러리는 용도별로 나뉘어 있습니다. 시간과 날짜는 `datetime`, 파일 경로는 `pathlib`, 데이터 직렬화는 `json`, 더 풍부한 자료 구조는 `collections`, 반복 패턴은 `itertools`가 담당합니다.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.ko.png)
-
-*Mental Model*
 각 모듈은 "특정 종류의 문제 한 가지"를 잘 풀도록 설계돼 있습니다. 모듈 이름만 봐도 어떤 문제를 다룰지 짐작할 수 있도록 명명돼 있는 점이 표준 라이브러리의 일관된 특징입니다.
 
 ## 핵심 개념
@@ -232,17 +235,29 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 
 이번 글로 Python 101 시리즈가 마무리됩니다. 여기서 다룬 함수, 모듈, 클래스, 표준 라이브러리는 이후 다른 시리즈(예: `python-dbapi-101`, `sqlalchemy-101`)에서 그대로 다시 쓰입니다. 다음 시리즈에서는 표준 라이브러리에서 시작해, 외부 패키지로 자연스럽게 영역을 넓혀 갑니다.
 
+## 처음 질문으로 돌아가기
+
+- **외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?**
+  - 본문의 기준은 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
-- [변수, 타입, 연산자](./02-variables-types-operators.md)
-- [문자열과 포매팅](./03-strings-and-formatting.md)
-- [list, tuple, set, dict](./04-list-tuple-set-dict.md)
-- [제어 흐름: if, for, while, comprehension](./05-control-flow.md)
-- [함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
-- [모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
-- [파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
-- [클래스와 객체](./09-classes-and-objects.md)
+## 시리즈 목차
+
+- [Python 101 (1/10): 왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): 변수, 타입, 연산자](./02-variables-types-operators.md)
+- [Python 101 (3/10): 문자열과 포매팅](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): 제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [Python 101 (6/10): 함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [Python 101 (7/10): 모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- [Python 101 (8/10): 파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- [Python 101 (9/10): 클래스와 객체: 데이터와 동작을 함께 묶기](./09-classes-and-objects.md)
 - **표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

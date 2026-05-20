@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>File I/O and exception handling</title>
+<title>Python 101 (8/10): File I/O and exception handling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>File I/O and exception handling</h1>
+<h1>Python 101 (8/10): File I/O and exception handling</h1>
 <p>A file is a three-step resource: open it, read or write it, then close it. Exceptions are the labels that tell you which step failed and what kind of failure you hit.</p>
 <p>This post is the 8th article in the Python 101 series. This is the point in the series where resource handling and failure paths become part of normal coding.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you can do the following.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Open and close files safely using <code>open()</code> together with the <code>with</code> statement.</li>
-<li>Tell text mode (<code>"r"</code>, <code>"w"</code>, <code>"a"</code>) apart from binary mode (<code>"rb"</code>, <code>"wb"</code>) and pick the right one.</li>
-<li>Describe the difference between <code>read</code>, <code>readline</code>, <code>readlines</code>, and iterating the file object in one sentence each.</li>
-<li>Use the four blocks of <code>try</code>/<code>except</code>/<code>else</code>/<code>finally</code> for their distinct roles.</li>
-<li>Catch narrow exceptions like <code>FileNotFoundError</code> and <code>PermissionError</code> instead of using a bare <code>except:</code> clause.</li>
-<li>Use <code>pathlib.Path</code> for path manipulation and <code>read_text</code> / <code>write_text</code> for short file operations.</li>
+<li>Open and close files safely using <code>open()</code> together with the <code>with</code> statement?</li>
+<li>Tell text mode (<code>"r"</code>, <code>"w"</code>, <code>"a"</code>) apart from binary mode (<code>"rb"</code>, <code>"wb"</code>) and pick the right one?</li>
+<li>Describe the difference between <code>read</code>, <code>readline</code>, <code>readlines</code>, and iterating the file object in one sentence each?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 8 flow overview</em></p>
+<p>This picture places File I/O and exception handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of File I/O and exception handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>File code touches outside resources. Unlike in-memory variables, a file handle is a limited operating system resource, and many failure modes come along with it. The disk may be full, permissions may be missing, or another process may hold the file open.</p>
 <p>Code that ignores these conditions tends to work fine in development and break in production. Forgetting to close a handle leaks file descriptors in long-running servers; swallowing exceptions can leave half-written data behind. Catching unexpected exceptions with a bare <code>except:</code> hides real bugs in plain sight.</p>
@@ -75,9 +78,7 @@
 <p>A file is a three-step resource: open, read or write, close. Exceptions are labels that classify which step failed and how. Separating those two models makes the shape of <code>with</code> and <code>try</code> blocks fall out naturally.<br>
 The diagram below shows the flow that runs whenever you open a file and do work with it.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Two ideas hold this together.</p>
+<p>Two ideas hold this together.</p>
 <ul>
 <li><strong><code>with</code> calls <code>__exit__</code> on both normal exit and exception exit, so the handle is closed in both cases.</strong> That removes most of the need to write <code>try</code>/<code>finally</code> and call <code>close()</code> by hand.</li>
 <li><strong>Uncaught exceptions propagate up the call stack.</strong> When <code>except</code> does not match, the function exits at that point and the caller sees the same exception. This is what lets one place own the error policy for many callers.</li>
@@ -284,6 +285,28 @@ done
 <li><code>pathlib.Path</code> is the standard tool that collapses path manipulation and short file work into one line.</li>
 </ul>
 <p>The next chapter covers classes and objects. The functions and modules from earlier chapters get one more layer of abstraction, where data and behavior live together.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Open and close files safely using <code>open()</code> together with the <code>with</code> statement?</strong></li>
+<li>The article treats File I/O and exception handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Tell text mode (<code>"r"</code>, <code>"w"</code>, <code>"a"</code>) apart from binary mode (<code>"rb"</code>, <code>"wb"</code>) and pick the right one?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Describe the difference between <code>read</code>, <code>readline</code>, <code>readlines</code>, and iterating the file object in one sentence each?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/05-control-flow.md">Python 101 (5/10): Control flow: if, for, while, comprehension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/06-functions-and-arguments.md">Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/07-modules-and-packages.md">Python 101 (7/10): Modules and packages: import, <strong>init</strong>, <strong>name</strong></a></li>
+<li><strong>File I/O and exception handling (current)</strong></li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/inputoutput.html">Python tutorial — Input and Output</a> — Covers <code>open()</code>, core read/write methods, and text-versus-binary file handling.</li>

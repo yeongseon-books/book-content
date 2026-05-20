@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Standard library tour: datetime, pathlib, json, collections, itertools</title>
+<title>Python 101 (10/10): Standard library tour: datetime, pathlib, json, collections, itertools</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Standard library tour: datetime, pathlib, json, collections, itertools</h1>
+<h1>Python 101 (10/10): Standard library tour: datetime, pathlib, json, collections, itertools</h1>
 <p>The standard library is the toolbox that keeps you from rewriting common routines. Each module stays focused on one domain, which is why <code>datetime</code>, <code>pathlib</code>, <code>json</code>, <code>collections</code>, and <code>itertools</code> fit so naturally into day-to-day code.</p>
 <p>This post is the final article in the Python 101 series. This is the final stop in the series, where you tie the core language to the tools Python already ships with.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to handle dates and times with <code>datetime</code></li>
-<li>How to treat file paths as objects with <code>pathlib.Path</code></li>
-<li>How to convert between dicts and JSON strings using <code>json</code></li>
-<li>What <code>collections.Counter</code>, <code>defaultdict</code>, and <code>deque</code> are for</li>
-<li>How <code>itertools.chain</code>, <code>groupby</code>, and <code>combinations</code> compress repetitive iteration</li>
+<li>How to handle dates and times with <code>datetime</code>?</li>
+<li>How to treat file paths as objects with <code>pathlib.Path</code>?</li>
+<li>How to convert between dicts and JSON strings using <code>json</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 10 flow overview</em></p>
+<p>This picture places Standard library tour: datetime, pathlib, json, collections, itertools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Standard library tour: datetime, pathlib, json, collections, itertools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Python is often described as "batteries included" — many of the tools you reach for daily are part of the standard library. Getting comfortable with it changes a few things.</p>
 <ul>
@@ -77,9 +82,7 @@
 <p>The standard library is a toolbox of routines so you do not write the same thing twice. Each module sticks to one domain — time, paths, serialization, aggregation, iteration — and exposes a small focused vocabulary.<br>
 The standard library is organized by purpose. <code>datetime</code> covers time, <code>pathlib</code> covers file paths, <code>json</code> covers serialization, <code>collections</code> adds richer data structures, and <code>itertools</code> covers iteration patterns.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Each module is designed to solve "one kind of problem" well. The naming is consistent enough that you can usually guess what a module covers from its name alone.</p>
+<p>Each module is designed to solve "one kind of problem" well. The naming is consistent enough that you can usually guess what a module covers from its name alone.</p>
 <h2>Core concepts</h2>
 <ul>
 <li><strong><code>datetime</code> types</strong>: <code>date</code>, <code>time</code>, the combined <code>datetime</code>, and <code>timedelta</code> for spans. A <code>datetime</code> instance can carry a <code>tzinfo</code> for time zones.</li>
@@ -227,6 +230,28 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 <li><code>itertools</code> shortens iteration patterns; remember that the result is a lazy iterator.</li>
 </ul>
 <p>This wraps up the Python 101 series. The functions, modules, classes, and standard-library tools introduced here come up again in later series such as <code>python-dbapi-101</code> and <code>sqlalchemy-101</code>. The next series picks up from the standard library and gradually moves into external packages.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How to handle dates and times with <code>datetime</code>?</strong></li>
+<li>The article treats Standard library tour: datetime, pathlib, json, collections, itertools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to treat file paths as objects with <code>pathlib.Path</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to convert between dicts and JSON strings using <code>json</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/05-control-flow.md">Python 101 (5/10): Control flow: if, for, while, comprehension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/06-functions-and-arguments.md">Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/07-modules-and-packages.md">Python 101 (7/10): Modules and packages: import, <strong>init</strong>, <strong>name</strong></a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/08-file-io-and-exceptions.md">Python 101 (8/10): File I/O and exception handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/09-classes-and-objects.md">Python 101 (9/10): Classes and objects: bundling data with behavior</a></li>
+<li><strong>Standard library tour: datetime, pathlib, json, collections, itertools (current)</strong></li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/stdlib.html">Python tutorial — Brief Tour of the Standard Library</a> — Frames the standard library as Python’s default toolbox and motivates when to reach for it first.</li>

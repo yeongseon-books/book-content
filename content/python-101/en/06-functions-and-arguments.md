@@ -1,5 +1,5 @@
 ---
-title: 'Functions and arguments: def, args, kwargs, default, lambda'
+title: "Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda"
 series: python-101
 episode: 6
 language: en
@@ -22,22 +22,27 @@ seo_description: 'A function signature is a contract: what the caller must suppl
   and what the function returns.'
 ---
 
-# Functions and arguments: def, args, kwargs, default, lambda
+# Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda
 
 A function signature is a contract: what the caller must supply and what the function returns. Argument forms, plus `/` and `*`, let you make that contract clearer and harder to misuse.
 
 This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.
 
-## What you will learn
+## Questions to Keep in Mind
 
-By the end of this chapter you will be able to explain and code the following:
+- How to define a function with `def` and control what `return` hands back?
+- The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?
+- How positional-only (`/`) and keyword-only (`*`) markers shape an API?
 
-- How to define a function with `def` and control what `return` hands back
-- The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time
-- How positional-only (`/`) and keyword-only (`*`) markers shape an API
-- The mutable default argument trap and a safe replacement pattern
-- Where `lambda` fits and where it does not
-- How to add light type hints to a function signature to document intent
+## Big Picture
+
+![Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png)
+
+*Python 101 chapter 6 flow overview*
+
+This picture places Functions and arguments: def, args, kwargs, default, lambda inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Functions and arguments: def, args, kwargs, default, lambda is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -52,9 +57,6 @@ There is one more reason: the mutable default argument trap is one of the most c
 > A function signature is a contract: what the caller must supply and what the function returns. The five argument forms and the `/` and `*` markers tune how strict that contract is.
 Lay the function signature out on a page, and the call-time rules line up in your head.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png)
-
-*Mental model*
 Three rules carry most of the weight.
 
 1. **Arguments bind at call time and the body runs on top of that binding.** The signature is an interface that promises "this is the name and shape I will accept".
@@ -363,7 +365,29 @@ Both patterns reappear in the next chapter, where modules and packages introduce
 
 The next chapter covers modules and packages — `import`, `__init__.py`, and `__name__` — and shows how functions are exposed and hidden across module boundaries.
 
+## Answering the Opening Questions
+
+- **How to define a function with `def` and control what `return` hands back?**
+  - The article treats Functions and arguments: def, args, kwargs, default, lambda as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How positional-only (`/`) and keyword-only (`*`) markers shape an API?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [Python 101 (5/10): Control flow: if, for, while, comprehension](./05-control-flow.md)
+- **Functions and arguments: def, args, kwargs, default, lambda (current)**
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References

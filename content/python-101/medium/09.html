@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Classes and objects: bundling data with behavior</title>
+<title>Python 101 (9/10): Classes and objects: bundling data with behavior</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Classes and objects: bundling data with behavior</h1>
+<h1>Python 101 (9/10): Classes and objects: bundling data with behavior</h1>
 <p>A class is not just a mold for data; it is a shared definition of behavior for objects of the same kind. An instance is one concrete object carrying that behavior with its own state.</p>
 <p>This post is the 9th article in the Python 101 series. This is the stage in the series where behavior, state, and object design come together.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you can do the following.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Define a class with the <code>class</code> statement and create instances from it.</li>
-<li>Explain the role of <code>__init__</code> in instance initialization.</li>
-<li>Explain what <code>self</code> refers to and why it is the first parameter of a method.</li>
-<li>Tell instance attributes apart from class attributes and pick the right one.</li>
-<li>Describe the basic role of dunder methods like <code>__repr__</code>, <code>__str__</code>, and <code>__eq__</code>.</li>
-<li>Describe single inheritance and method overriding.</li>
-<li>Use <code>@dataclass</code> for simple data containers.</li>
+<li>Define a class with the <code>class</code> statement and create instances from it?</li>
+<li>Explain the role of <code>__init__</code> in instance initialization?</li>
+<li>Explain what <code>self</code> refers to and why it is the first parameter of a method?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 9 flow overview</em></p>
+<p>This picture places Classes and objects: bundling data with behavior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Classes and objects: bundling data with behavior is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Functions and modules from earlier chapters kept behavior and data apart. A function takes input and returns output; a module groups related functions. When data and the behavior that operates on it are tightly paired, however, keeping them separate scatters the code.</p>
 <p>Imagine modeling user information. You end up with <code>format_user(name, email)</code>, <code>validate_user(name, email)</code>, <code>serialize_user(name, email)</code> — many functions taking the same arguments. Callers have to gather the same fields on each call, and adding a new field forces a change across the related signatures.</p>
@@ -77,9 +79,7 @@
 <p>A class is not a mold for data; it is the definition of behavior shared by objects of the same kind. An instance is an individual object that follows that definition. With that one line in mind, <code>self</code>, class attributes, and dunder methods all find their place.<br>
 The diagram below shows the path from a class definition to a method call on an instance.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three ideas hold this together.</p>
+<p>Three ideas hold this together.</p>
 <ul>
 <li><strong>A class is a template for objects.</strong> The <code>class User:</code> statement creates a class object named <code>User</code>, and calling <code>User(...)</code> produces an instance from that template.</li>
 <li><strong><code>__init__</code> initializes the instance.</strong> Python calls it right after the instance is created, and it is the place where you set attributes with <code>self.attr = value</code>.</li>
@@ -325,6 +325,28 @@ True
 <li><code>@dataclass</code> removes the <code>__init__</code>/<code>__repr__</code>/<code>__eq__</code> boilerplate for simple data containers.</li>
 </ul>
 <p>The next chapter is a tour of the standard library. Now that functions, modules, and classes are in place, you will see what Python ships with by default.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Define a class with the <code>class</code> statement and create instances from it?</strong></li>
+<li>The article treats Classes and objects: bundling data with behavior as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Explain the role of <code>__init__</code> in instance initialization?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Explain what <code>self</code> refers to and why it is the first parameter of a method?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/05-control-flow.md">Python 101 (5/10): Control flow: if, for, while, comprehension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/06-functions-and-arguments.md">Python 101 (6/10): Functions and arguments: def, args, kwargs, default, lambda</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/07-modules-and-packages.md">Python 101 (7/10): Modules and packages: import, <strong>init</strong>, <strong>name</strong></a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/08-file-io-and-exceptions.md">Python 101 (8/10): File I/O and exception handling</a></li>
+<li><strong>Classes and objects: bundling data with behavior (current)</strong></li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/classes.html">Python tutorial — Classes</a> — Core guide to <code>class</code>, instances, methods, inheritance, and class-versus-instance variables.</li>

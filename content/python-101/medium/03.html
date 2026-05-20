@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Strings and formatting</title>
+<title>Python 101 (3/10): Strings and formatting</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Strings and formatting</h1>
+<h1>Python 101 (3/10): Strings and formatting</h1>
 <p>In Python 3, <code>str</code> is an immutable sequence of Unicode code points, while <code>bytes</code> is an immutable sequence of raw bytes. Keeping those two layers separate makes encoding and formatting issues much easier to reason about.</p>
 <p>This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you will be able to explain and code the following:</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why Python 3's <code>str</code> is a Unicode string and how it differs from <code>bytes</code></li>
-<li>When to reach for single, double, triple, raw, or byte literals</li>
-<li>The core methods <code>split</code>, <code>join</code>, <code>strip</code>, <code>replace</code>, <code>find</code>, <code>startswith</code></li>
-<li>How slicing reads parts of a string and what it means that <code>str</code> is immutable</li>
-<li>f-strings and format specs (<code>:&gt;10</code>, <code>:.2f</code>, <code>:%Y-%m-%d</code>, <code>!r</code>) end to end</li>
-<li>Where <code>str.format</code> and <code>%</code> formatting still fit, and why we prefer f-strings</li>
-<li>Common encoding pitfalls (<code>UnicodeDecodeError</code>) and whitespace traps</li>
-<li>Your first encounter with regular expressions through the <code>re</code> module</li>
+<li>Why Python 3's <code>str</code> is a Unicode string and how it differs from <code>bytes</code>?</li>
+<li>When to reach for single, double, triple, raw, or byte literals?</li>
+<li>The core methods <code>split</code>, <code>join</code>, <code>strip</code>, <code>replace</code>, <code>find</code>, <code>startswith</code>?</li>
 </ul>
-<p>Most examples are REPL blocks marked by <code>&gt;&gt;&gt;</code> — paste them in and you will see the same output. Code blocks without <code>&gt;&gt;&gt;</code> are illustrative excerpts that assume the surrounding variables already exist.</p>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 3 flow overview</em></p>
+<p>This picture places Strings and formatting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Strings and formatting is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Strings are the input and output of almost every program. User input, a line read from a file, an HTTP response, a log line, a JSON field — all of them are <code>str</code>. Mishandle strings and you walk into recurring accidents:</p>
 <ul>
@@ -83,9 +83,7 @@
 <p>In Python 3, <code>str</code> is an immutable sequence of Unicode code points and <code>bytes</code> is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.<br>
 Python's <code>str</code> is a sequence of code points. It is abstracted at the level humans read; it only becomes <code>bytes</code> when it leaves memory for disk or the network.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three rules make most of the confusion disappear.</p>
+<p>Three rules make most of the confusion disappear.</p>
 <ol>
 <li><strong><code>str</code> is a sequence of Unicode code points.</strong> It carries no encoding information.</li>
 <li><strong><code>bytes</code> is a sequence of integers in <code>0..255</code>.</strong> Which encoding produced them is something the programmer must remember.</li>
@@ -361,6 +359,28 @@ print(&quot;, &quot;.join(parts))
 <li>For big strings, collect into a list and <code>join</code> once. Never splice user input into SQL via an f-string.</li>
 </ul>
 <p>The next chapter compares the four core collections — list, tuple, set, dict — and explains when to reach for each one. Mutability, order, duplicates, and hashability fit on a single page.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why Python 3's <code>str</code> is a Unicode string and how it differs from <code>bytes</code>?</strong></li>
+<li>The article treats Strings and formatting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When to reach for single, double, triple, raw, or byte literals?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The core methods <code>split</code>, <code>join</code>, <code>strip</code>, <code>replace</code>, <code>find</code>, <code>startswith</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><strong>Strings and formatting (current)</strong></li>
+<li>list, tuple, set, dict (upcoming)</li>
+<li>Control flow: if, for, while, comprehension (upcoming)</li>
+<li>Functions and arguments: def, args, kwargs, default, lambda (upcoming)</li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Canonical reference for <code>str</code>, <code>bytes</code>, immutability, and core text methods.</li>

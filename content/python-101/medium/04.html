@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>list, tuple, set, dict</title>
+<title>Python 101 (4/10): list, tuple, set, dict</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>list, tuple, set, dict</h1>
+<h1>Python 101 (4/10): list, tuple, set, dict</h1>
 <p>These four collections diverge along four axes: mutability, order, duplicates, and hashability. Picking the right one is really about choosing which trade-offs matter for the job.</p>
 <p>This post is the 4th article in the Python 101 series. This is the stage in the series where collection trade-offs become concrete.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you will be able to explain and code the following:</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability</li>
-<li>A first-cut decision rule for which collection to reach for</li>
-<li>Core methods like slicing, <code>append</code>/<code>extend</code>, <code>pop</code>, <code>update</code></li>
-<li>One-line data transformations through list, set, and dict comprehensions</li>
-<li>What "hashable" means and why dict keys and set members must be hashable</li>
-<li>The aliasing accidents that come from confusing assignment with copying</li>
-<li>The mutable-default-argument trap and how to avoid it</li>
-<li>How <code>dict.get</code>, <code>setdefault</code>, and <code>collections.defaultdict</code> keep missing keys safe</li>
+<li>How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?</li>
+<li>A first-cut decision rule for which collection to reach for?</li>
+<li>Core methods like slicing, <code>append</code>/<code>extend</code>, <code>pop</code>, <code>update</code>?</li>
 </ul>
-<p>Code blocks marked with <code>&gt;&gt;&gt;</code> are REPL transcripts you can paste directly. Blocks without <code>&gt;&gt;&gt;</code> are illustrative excerpts that assume the surrounding variables already exist.</p>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 4 flow overview</em></p>
+<p>This picture places list, tuple, set, dict inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of list, tuple, set, dict is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Choosing a collection determines both the performance and the meaning of the code. Reach for <code>dict</code> where a <code>list</code> would do, and the code grows heavy. Reach for a <code>list</code> where a <code>set</code> belongs, and a single membership check becomes O(n) — slowing down with every new element. Conversely, expressing an immutable bundle as a <code>list</code> invites someone to mutate what was supposed to be fixed; the type system gives no warning.</p>
 <p>Recurring accidents in production code:</p>
@@ -84,9 +84,7 @@
 <p>The four collections differ along four axes: mutability, order, duplicates allowed, and hashability. Choosing a collection is choosing which guarantees on those four axes you accept and which you give up.<br>
 Group the four collections along three axes — mutability, order, and hashability — and they sit cleanly in memory.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three rules carry most of the weight.</p>
+<p>Three rules carry most of the weight.</p>
 <ol>
 <li><strong>Mutable (list, dict, set)</strong> can be changed in place after creation; <strong>immutable (tuple, str, int)</strong> cannot.</li>
 <li><strong>Dict keys and set elements must be hashable.</strong> A tuple is hashable when every element inside it is hashable.</li>
@@ -358,6 +356,28 @@ counts = Counter(words)
 <li>Handle missing keys with <code>dict.get</code>, <code>setdefault</code>, <code>defaultdict</code>, or <code>Counter</code>.</li>
 </ul>
 <p>The next chapter covers control flow — <code>if</code>, <code>for</code>, <code>while</code> — and shows how <code>enumerate</code>, <code>zip</code>, <code>range</code>, and comprehensions combine into loops that read well.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?</strong></li>
+<li>The article treats list, tuple, set, dict as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>A first-cut decision rule for which collection to reach for?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Core methods like slicing, <code>append</code>/<code>extend</code>, <code>pop</code>, <code>update</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><strong>list, tuple, set, dict (current)</strong></li>
+<li>Control flow: if, for, while, comprehension (upcoming)</li>
+<li>Functions and arguments: def, args, kwargs, default, lambda (upcoming)</li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/library/stdtypes.html">Python docs — Built-in Types</a> — Official behavior reference for list, tuple, set, dict, and hashability constraints.</li>

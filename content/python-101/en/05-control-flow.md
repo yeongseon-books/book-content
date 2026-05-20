@@ -1,5 +1,5 @@
 ---
-title: 'Control flow: if, for, while, comprehension'
+title: "Python 101 (5/10): Control flow: if, for, while, comprehension"
 series: python-101
 episode: 5
 language: en
@@ -22,22 +22,27 @@ seo_description: 'When wiring up control flow, split each branch and loop into t
   questions: "what truthy/falsy decision does this make" and "what is the termination…'
 ---
 
-# Control flow: if, for, while, comprehension
+# Python 101 (5/10): Control flow: if, for, while, comprehension
 
 Control flow gets easier when you break every branch and loop into two questions: what decision is being made, and what ends the loop. That framing keeps `if`, `for`, `while`, and comprehensions from turning into guesswork.
 
 This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.
 
-## What you will learn
+## Questions to Keep in Mind
 
-By the end of this chapter you will be able to explain and code the following:
+- How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?
+- A first-cut decision rule for choosing between `for` and `while`?
+- How to combine `range`, `enumerate`, and `zip` for loops that read well?
 
-- How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`
-- A first-cut decision rule for choosing between `for` and `while`
-- How to combine `range`, `enumerate`, and `zip` for loops that read well
-- When to reach for list/dict/set comprehensions, and when to fall back to a regular loop
-- The subtle behavior of `break`, `continue`, and the `for ... else` clause
-- How to avoid common traps — mutating a sequence while iterating, deeply nested comprehensions, off-by-one errors
+## Big Picture
+
+![Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
+
+*Python 101 chapter 5 flow overview*
+
+This picture places Control flow: if, for, while, comprehension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Control flow: if, for, while, comprehension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -52,9 +57,6 @@ This chapter is also a setup for the next one on functions and argument design. 
 > When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
-
-*Mental model*
 Three rules carry most of the weight.
 
 1. **A single decision is `if`; the same work repeated is a loop.** `for` and `while` are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.
@@ -386,7 +388,29 @@ These two patterns reappear in the next chapter on function arguments and the ch
 
 The next chapter covers functions and arguments. We will pin down `def`, `*args`/`**kwargs`, defaults, and `lambda`, and look at how to package branching and looping bodies into named functions.
 
+## Answering the Opening Questions
+
+- **How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?**
+  - The article treats Control flow: if, for, while, comprehension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **A first-cut decision rule for choosing between `for` and `while`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to combine `range`, `enumerate`, and `zip` for loops that read well?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- [Python 101 (3/10): Strings and formatting](./03-strings-and-formatting.md)
+- [Python 101 (4/10): list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- **Control flow: if, for, while, comprehension (current)**
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References

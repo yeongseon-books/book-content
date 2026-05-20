@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Control flow: if, for, while, comprehension</title>
+<title>Python 101 (5/10): Control flow: if, for, while, comprehension</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Control flow: if, for, while, comprehension</h1>
+<h1>Python 101 (5/10): Control flow: if, for, while, comprehension</h1>
 <p>Control flow gets easier when you break every branch and loop into two questions: what decision is being made, and what ends the loop. That framing keeps <code>if</code>, <code>for</code>, <code>while</code>, and comprehensions from turning into guesswork.</p>
 <p>This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.</p>
-<h2>What you will learn</h2>
-<p>By the end of this chapter you will be able to explain and code the following:</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to handle truthy and falsy values deliberately when writing <code>if</code>/<code>elif</code>/<code>else</code></li>
-<li>A first-cut decision rule for choosing between <code>for</code> and <code>while</code></li>
-<li>How to combine <code>range</code>, <code>enumerate</code>, and <code>zip</code> for loops that read well</li>
-<li>When to reach for list/dict/set comprehensions, and when to fall back to a regular loop</li>
-<li>The subtle behavior of <code>break</code>, <code>continue</code>, and the <code>for ... else</code> clause</li>
-<li>How to avoid common traps — mutating a sequence while iterating, deeply nested comprehensions, off-by-one errors</li>
+<li>How to handle truthy and falsy values deliberately when writing <code>if</code>/<code>elif</code>/<code>else</code>?</li>
+<li>A first-cut decision rule for choosing between <code>for</code> and <code>while</code>?</li>
+<li>How to combine <code>range</code>, <code>enumerate</code>, and <code>zip</code> for loops that read well?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 5 flow overview</em></p>
+<p>This picture places Control flow: if, for, while, comprehension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Control flow: if, for, while, comprehension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Branching and looping make up a large share of application code, so when this part is messy the rest is harder to read. Python's branching and loop syntax is leaner than most languages, but it adds a few unfamiliar tools — <code>for</code>-<code>else</code> and comprehensions — that pay off once you know them. With them in your toolbox you stop writing tall <code>if</code> ladders, and you can switch between regular loops and comprehensions on purpose.</p>
 <p>There is a second reason: in Python an <code>if</code> does not test "is the value true" but "is the value truthy". <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, and <code>None</code> are all falsy. The rule lets you write short, clear conditions, but if you forget it you end up with code that "checks whether a list is empty" yet behaves unexpectedly when the list contains a single zero. This chapter pins down truthy and falsy once.</p>
@@ -75,9 +78,7 @@
 <p>When wiring up control flow, split each branch and loop into two questions: "what truthy/falsy decision does this make" and "what is the termination condition". The same lens decides between a comprehension and a plain loop.<br>
 Lay out the choices on a single page so that, while reading code, you can guess the next step in your head.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three rules carry most of the weight.</p>
+<p>Three rules carry most of the weight.</p>
 <ol>
 <li><strong>A single decision is <code>if</code>; the same work repeated is a loop.</strong> <code>for</code> and <code>while</code> are two tools for the same job — repetition — and the choice depends on whether you already have something to iterate over.</li>
 <li><strong>If you have an iterable to walk, <code>for</code> reads naturally.</strong> Use <code>while</code> when there is no length and you must keep going until a condition holds. Blur this line and infinite loops and off-by-one errors creep in.</li>
@@ -348,6 +349,28 @@ print(total)
 <li>Small tools like <code>for</code>-<code>else</code>, <code>zip(..., strict=True)</code>, and <code>items[:]</code> clear up the common traps.</li>
 </ul>
 <p>The next chapter covers functions and arguments. We will pin down <code>def</code>, <code>*args</code>/<code>**kwargs</code>, defaults, and <code>lambda</code>, and look at how to package branching and looping bodies into named functions.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How to handle truthy and falsy values deliberately when writing <code>if</code>/<code>elif</code>/<code>else</code>?</strong></li>
+<li>The article treats Control flow: if, for, while, comprehension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>A first-cut decision rule for choosing between <code>for</code> and <code>while</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to combine <code>range</code>, <code>enumerate</code>, and <code>zip</code> for loops that read well?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/01-why-python-and-install.md">Python 101 (1/10): Why Python, and how to install and use venv</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/02-variables-types-operators.md">Python 101 (2/10): Variables, types, and operators</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/03-strings-and-formatting.md">Python 101 (3/10): Strings and formatting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-101/en/04-list-tuple-set-dict.md">Python 101 (4/10): list, tuple, set, dict</a></li>
+<li><strong>Control flow: if, for, while, comprehension (current)</strong></li>
+<li>Functions and arguments: def, args, kwargs, default, lambda (upcoming)</li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/tutorial/controlflow.html">Python tutorial — More Control Flow Tools</a> — Covers <code>if</code>, <code>for</code>, <code>while</code>, <code>break</code>, <code>continue</code>, loop <code>else</code>, and function-level examples in one place.</li>

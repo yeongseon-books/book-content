@@ -1,5 +1,5 @@
 ---
-title: Strings and formatting
+title: "Python 101 (3/10): Strings and formatting"
 series: python-101
 episode: 3
 language: en
@@ -22,26 +22,27 @@ seo_description: In Python 3, str is an immutable sequence of Unicode code point
   and bytes is an immutable sequence of bytes.
 ---
 
-# Strings and formatting
+# Python 101 (3/10): Strings and formatting
 
 In Python 3, `str` is an immutable sequence of Unicode code points, while `bytes` is an immutable sequence of raw bytes. Keeping those two layers separate makes encoding and formatting issues much easier to reason about.
 
 This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.
 
-## What you will learn
+## Questions to Keep in Mind
 
-By the end of this chapter you will be able to explain and code the following:
+- Why Python 3's `str` is a Unicode string and how it differs from `bytes`?
+- When to reach for single, double, triple, raw, or byte literals?
+- The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?
 
-- Why Python 3's `str` is a Unicode string and how it differs from `bytes`
-- When to reach for single, double, triple, raw, or byte literals
-- The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`
-- How slicing reads parts of a string and what it means that `str` is immutable
-- f-strings and format specs (`:>10`, `:.2f`, `:%Y-%m-%d`, `!r`) end to end
-- Where `str.format` and `%` formatting still fit, and why we prefer f-strings
-- Common encoding pitfalls (`UnicodeDecodeError`) and whitespace traps
-- Your first encounter with regular expressions through the `re` module
+## Big Picture
 
-Most examples are REPL blocks marked by `>>>` — paste them in and you will see the same output. Code blocks without `>>>` are illustrative excerpts that assume the surrounding variables already exist.
+![Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
+
+*Python 101 chapter 3 flow overview*
+
+This picture places Strings and formatting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Strings and formatting is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -59,9 +60,6 @@ Handling strings precisely prevents these mistakes upfront, and the code becomes
 > In Python 3, `str` is an immutable sequence of Unicode code points and `bytes` is an immutable sequence of bytes. Keep those two layers separate and encoding, formatting, and regex questions all collapse into the same model.
 Python's `str` is a sequence of code points. It is abstracted at the level humans read; it only becomes `bytes` when it leaves memory for disk or the network.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
-
-*Mental model*
 Three rules make most of the confusion disappear.
 
 1. **`str` is a sequence of Unicode code points.** It carries no encoding information.
@@ -394,7 +392,29 @@ Build a function that takes a CSV-like line and prints a tidy aligned row. We wi
 
 The next chapter compares the four core collections — list, tuple, set, dict — and explains when to reach for each one. Mutability, order, duplicates, and hashability fit on a single page.
 
+## Answering the Opening Questions
+
+- **Why Python 3's `str` is a Unicode string and how it differs from `bytes`?**
+  - The article treats Strings and formatting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When to reach for single, double, triple, raw, or byte literals?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- [Python 101 (1/10): Why Python, and how to install and use venv](./01-why-python-and-install.md)
+- [Python 101 (2/10): Variables, types, and operators](./02-variables-types-operators.md)
+- **Strings and formatting (current)**
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why Python, and how to install and use venv</title>
+<title>Python 101 (1/10): Why Python, and how to install and use venv</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Why Python, and how to install and use venv</h1>
+<h1>Python 101 (1/10): Why Python, and how to install and use venv</h1>
 <p>One computer can host many Pythons at once, and every project gets its own. If you miss that model early, environment problems pile up faster than syntax problems.</p>
 <p>This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why "just installing Python" is risky, and why you must separate system Python from project Python</li>
-<li>How to install Python 3.12 safely on macOS, Windows, and Linux</li>
-<li>What a venv (virtual environment) actually solves</li>
-<li>The difference between <code>python</code> and <code>python3</code>, and which one to use when</li>
-<li>How to create, activate, and <strong>verify</strong> that you are inside a project venv</li>
-<li>How to install packages with pip and reproduce environments with <code>requirements.txt</code></li>
+<li>Why "just installing Python" is risky, and why you must separate system Python from project Python?</li>
+<li>How to install Python 3.12 safely on macOS, Windows, and Linux?</li>
+<li>What a venv (virtual environment) actually solves?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png"></p>
+<p><em>Python 101 chapter 1 flow overview</em></p>
+<p>This picture places Why Python, and how to install and use venv inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Why Python, and how to install and use venv is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>The single biggest source of pain when you start with Python is not syntax. It is <strong>environment</strong>.</p>
 <p>Code that ran fine yesterday breaks today. A script that works on your laptop throws import errors on your colleague's machine. <code>pip install</code> fails with a permission error. The cause behind almost all of these is the same: <strong>you are installing packages into the system Python.</strong></p>
@@ -80,9 +84,7 @@
 <li>project Python (venv): a copy living inside the project folder. You install packages only here.</li>
 <li>Ten projects? Ten venvs. They cannot affect each other.</li>
 </ul>
-<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png"></p>
-<p><em>Mental Model</em><br>
-System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.</p>
+<p>System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.</p>
 <h2>Core Concepts</h2>
 <p><strong>1. Flavors of Python</strong></p>
 <ul>
@@ -288,6 +290,28 @@ If you have multiple Python versions installed (3.10 and 3.12, say), <code>pytho
 </ul>
 <h2>Next</h2>
 <p>The next article covers variables, types, and operators: what dynamic typing really means, why type hints exist, and how int, float, str, bool, and None behave differently in practice.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why "just installing Python" is risky, and why you must separate system Python from project Python?</strong></li>
+<li>The article treats Why Python, and how to install and use venv as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to install Python 3.12 safely on macOS, Windows, and Linux?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What a venv (virtual environment) actually solves?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><strong>Why Python, and how to install and use venv (current)</strong></li>
+<li>Variables, types, and operators (upcoming)</li>
+<li>Strings and formatting (upcoming)</li>
+<li>list, tuple, set, dict (upcoming)</li>
+<li>Control flow: if, for, while, comprehension (upcoming)</li>
+<li>Functions and arguments: def, args, kwargs, default, lambda (upcoming)</li>
+<li>Modules and packages: import, <strong>init</strong>, <strong>name</strong> (upcoming)</li>
+<li>File I/O and exception handling (upcoming)</li>
+<li>Classes and objects: bundling data with behavior (upcoming)</li>
+<li>Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/library/venv.html">Python docs — venv</a> — Authoritative reference for <code>python -m venv</code>, activation scripts, and environment isolation.</li>

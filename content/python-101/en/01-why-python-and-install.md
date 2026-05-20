@@ -1,5 +1,5 @@
 ---
-title: Why Python, and how to install and use venv
+title: "Python 101 (1/10): Why Python, and how to install and use venv"
 series: python-101
 episode: 1
 language: en
@@ -22,20 +22,27 @@ seo_description: One computer can host many Pythons at once, and every project g
   its own.
 ---
 
-# Why Python, and how to install and use venv
+# Python 101 (1/10): Why Python, and how to install and use venv
 
 One computer can host many Pythons at once, and every project gets its own. If you miss that model early, environment problems pile up faster than syntax problems.
 
 This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why "just installing Python" is risky, and why you must separate system Python from project Python
-- How to install Python 3.12 safely on macOS, Windows, and Linux
-- What a venv (virtual environment) actually solves
-- The difference between `python` and `python3`, and which one to use when
-- How to create, activate, and **verify** that you are inside a project venv
-- How to install packages with pip and reproduce environments with `requirements.txt`
+- Why "just installing Python" is risky, and why you must separate system Python from project Python?
+- How to install Python 3.12 safely on macOS, Windows, and Linux?
+- What a venv (virtual environment) actually solves?
+
+## Big Picture
+
+![Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png)
+
+*Python 101 chapter 1 flow overview*
+
+This picture places Why Python, and how to install and use venv inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Python, and how to install and use venv is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -57,9 +64,6 @@ That single sentence is the heart of this article.
 - project Python (venv): a copy living inside the project folder. You install packages only here.
 - Ten projects? Ten venvs. They cannot affect each other.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png)
-
-*Mental Model*
 System Python is the OS's territory. Each venv is the project's territory. As a developer you only ever activate a venv and work inside it.
 
 ## Core Concepts
@@ -356,7 +360,29 @@ Newer tools like `uv` and `poetry` are faster and more powerful, but they are bu
 
 The next article covers variables, types, and operators: what dynamic typing really means, why type hints exist, and how int, float, str, bool, and None behave differently in practice.
 
+## Answering the Opening Questions
+
+- **Why "just installing Python" is risky, and why you must separate system Python from project Python?**
+  - The article treats Why Python, and how to install and use venv as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to install Python 3.12 safely on macOS, Windows, and Linux?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What a venv (virtual environment) actually solves?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
+- **Why Python, and how to install and use venv (current)**
+- Variables, types, and operators (upcoming)
+- Strings and formatting (upcoming)
+- list, tuple, set, dict (upcoming)
+- Control flow: if, for, while, comprehension (upcoming)
+- Functions and arguments: def, args, kwargs, default, lambda (upcoming)
+- Modules and packages: import, __init__, __name__ (upcoming)
+- File I/O and exception handling (upcoming)
+- Classes and objects: bundling data with behavior (upcoming)
+- Standard library tour: datetime, pathlib, json, collections, itertools (upcoming)
+
 <!-- toc:end -->
 
 ## References
