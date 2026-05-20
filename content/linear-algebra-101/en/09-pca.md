@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 9
-title: PCA
+title: "Linear Algebra 101 (9/10): PCA"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to PCA — its definition, SVD-based 
 last_reviewed: '2026-05-15'
 ---
 
-# PCA
+# Linear Algebra 101 (9/10): PCA
 
 When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.
 
 This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying PCA?
+- Which signal should the example or diagram make visible for PCA?
+- What failure should be prevented first when PCA reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 9 flow overview*
+
+This picture places PCA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of PCA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Dimensionality reduction, visualization, denoising, and feature compression show
 It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
-
-*This diagram captures the PCA flow from centering to principal components and projection onto the top axes.*
 
 ## Key Terms
 
@@ -152,17 +164,29 @@ Image compression, denoising, *EDA visualization*, *feature compression*, *genom
 
 PCA is the *standard for dimensionality reduction*. The next post brings everything together for *linear algebra in ML*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying PCA?**
+  - The article treats PCA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for PCA?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when PCA reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
-- [Basis and Dimension](./06-basis-and-dimension.md)
-- [Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
-- [Matrix Decomposition](./08-matrix-decomposition.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): Basis and Dimension](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
+- [Linear Algebra 101 (8/10): Matrix Decomposition](./08-matrix-decomposition.md)
 - **PCA (current)**
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

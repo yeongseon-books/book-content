@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Basis and Dimension</title>
+<title>Linear Algebra 101 (6/10): Basis and Dimension</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Basis and Dimension</h1>
+<h1>Linear Algebra 101 (6/10): Basis and Dimension</h1>
 <p>As soon as you go one step deeper into linear algebra, a natural question appears: why can one space be described by multiple sets of axes, and how many axes do you really need? Basis and dimension answer that question. Rank, PCA, and rank-deficient models all come back here.</p>
 <p>This is post 6 in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Basis and Dimension?</li>
+<li>Which signal should the example or diagram make visible for Basis and Dimension?</li>
+<li>What failure should be prevented first when Basis and Dimension reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 6 flow overview</em></p>
+<p>This picture places Basis and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Basis and Dimension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>What does it mean for a set of vectors to describe a space completely?</li>
@@ -70,8 +83,6 @@
 <p>Multicollinearity, dimensionality reduction, principal components, and singular matrices all depend on these concepts. This is not an isolated definitions chapter. It feeds directly into model stability and data representation quality.</p>
 <p>In practice, some features add almost no new information because they are nearly explained by others. Good basis choices can make the same data easier to compress, inspect, and reason about. Basis and dimension are tools for reading the real complexity of a space.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram condenses the flow from linear independence to basis, dimension, and matrix rank.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Linear combination</strong>: <code>c1 v1 + c2 v2 + ...</code></li>
@@ -155,12 +166,22 @@ print(&quot;coords in {b1,b2}:&quot;, coords)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A basis is a <em>choice of axes</em>; dimension is <em>their count</em>. The next post covers <em>eigenvalues and eigenvectors</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
+<li><strong>What boundary should you inspect first when applying Basis and Dimension?</strong></li>
+<li>The article treats Basis and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Basis and Dimension?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Basis and Dimension reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">Linear Algebra 101 (1/10): What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Linear Algebra 101 (2/10): Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Linear Algebra 101 (3/10): Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Linear Algebra 101 (4/10): Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Algebra 101 (5/10): Linear Transformations</a></li>
 <li><strong>Basis and Dimension (current)</strong></li>
 <li>Eigenvalues and Eigenvectors (upcoming)</li>
 <li>Matrix Decomposition (upcoming)</li>

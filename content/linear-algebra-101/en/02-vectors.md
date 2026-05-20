@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 2
-title: Vectors
+title: "Linear Algebra 101 (2/10): Vectors"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to vectors — definition, addition, 
 last_reviewed: '2026-05-15'
 ---
 
-# Vectors
+# Linear Algebra 101 (2/10): Vectors
 
 In machine learning, one row of data is a vector, an embedding is a vector, and a gradient is a vector too. But if you treat vectors as plain number bundles, the calculations may still work while the meaning slips away. A vector is both algebraic notation and a geometric object.
 
 This is post 2 in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Vectors?
+- Which signal should the example or diagram make visible for Vectors?
+- What failure should be prevented first when Vectors reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 2 flow overview*
+
+This picture places Vectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Vectors is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Feature rows, user embeddings, token embeddings, and gradients are all represent
 This matters quickly in practice. Similarity search, normalization, and metric choice all become fragile when you cannot tell whether direction matters, magnitude matters, or both matter. Vectors are the first chapter of linear algebra, but they remain the basic unit all the way to production systems.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
-
-*This diagram frames vectors as geometry, coordinates, and one row of data at the same time.*
 
 ## Key Terms
 
@@ -149,8 +161,19 @@ ML feature inputs, *embedding vectors*, *user/item vectors* in recommenders, and
 
 A vector is a *point/arrow in space* and *one row of your data*. The next post covers *matrices*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Vectors?**
+  - The article treats Vectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Vectors?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Vectors reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
 - **Vectors (current)**
 - Matrices (upcoming)
 - Inner Product and Distance (upcoming)
@@ -160,6 +183,7 @@ A vector is a *point/arrow in space* and *one row of your data*. The next post c
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

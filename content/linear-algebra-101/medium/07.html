@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Eigenvalues and Eigenvectors</title>
+<title>Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Eigenvalues and Eigenvectors</h1>
+<h1>Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors</h1>
 <p>If you apply the same linear transformation again and again, some directions behave differently from the rest. Most directions get mixed or bent, but a few keep their direction and only change length. Eigenvalues and eigenvectors are the tools that describe those privileged axes.</p>
 <p>This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Eigenvalues and Eigenvectors?</li>
+<li>Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?</li>
+<li>What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 7 flow overview</em></p>
+<p>This picture places Eigenvalues and Eigenvectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Eigenvalues and Eigenvectors is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Why do some directions survive repeated matrix application?</li>
@@ -70,8 +83,6 @@
 <p>Eigendecomposition lets you read a complicated transformation in a simpler coordinate system. If you can find the right axes, a messy matrix may reduce to mostly independent scaling behavior along those axes.</p>
 <p>That is why the topic keeps returning in PCA, stability analysis, and ranking algorithms. Eigenvalues and eigenvectors are powerful not because they are formal, but because they tell you which modes dominate and which directions stay structurally meaningful.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram shows how the eigenvalue equation leads to invariant directions and downstream applications.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Eigenvector v</strong>: a <em>non-zero vector</em> satisfying <code>A v = lambda v</code>.</li>
@@ -157,13 +168,23 @@ print(&quot;steady state:&quot;, v / np.linalg.norm(v, 1))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Eigendecomposition reveals a transformation's <em>natural axes</em>. The next post covers <em>matrix decomposition</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Basis and Dimension</a></li>
+<li><strong>What boundary should you inspect first when applying Eigenvalues and Eigenvectors?</strong></li>
+<li>The article treats Eigenvalues and Eigenvectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">Linear Algebra 101 (1/10): What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Linear Algebra 101 (2/10): Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Linear Algebra 101 (3/10): Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Linear Algebra 101 (4/10): Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Algebra 101 (5/10): Linear Transformations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Linear Algebra 101 (6/10): Basis and Dimension</a></li>
 <li><strong>Eigenvalues and Eigenvectors (current)</strong></li>
 <li>Matrix Decomposition (upcoming)</li>
 <li>PCA (upcoming)</li>

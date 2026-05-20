@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 5
-title: Linear Transformations
+title: "Linear Algebra 101 (5/10): Linear Transformations"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to linear transformations — rotatio
 last_reviewed: '2026-05-15'
 ---
 
-# Linear Transformations
+# Linear Algebra 101 (5/10): Linear Transformations
 
 After learning matrices, the natural follow-up is simple: what do those matrices actually do to a space? Linear transformation is the idea that answers that question. A matrix is the coordinate form of a transformation rule.
 
 This is post 5 in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Linear Transformations?
+- Which signal should the example or diagram make visible for Linear Transformations?
+- What failure should be prevented first when Linear Transformations reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 5 flow overview*
+
+This picture places Linear Transformations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Linear Transformations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Every neural-network layer is a linear transformation plus a nonlinearity. Graph
 Once this intuition clicks, a matrix stops being a static object. Some matrices rotate space, some stretch it, some flip orientation, and some slant an entire grid. At that point, linear algebra becomes a language for movement and structure rather than a page of arithmetic rules.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
-
-*This diagram shows how one matrix can rotate, scale, reflect, or shear an entire space.*
 
 ## Key Terms
 
@@ -151,17 +163,29 @@ Graphics *model matrices*, *homographies* in computer vision, *data augmentation
 
 Linear transformations *reshape space*. The next post covers *basis and dimension*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linear Transformations?**
+  - The article treats Linear Transformations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linear Transformations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linear Transformations reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
 - **Linear Transformations (current)**
 - Basis and Dimension (upcoming)
 - Eigenvalues and Eigenvectors (upcoming)
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

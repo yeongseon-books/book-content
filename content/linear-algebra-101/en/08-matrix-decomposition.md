@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 8
-title: Matrix Decomposition
+title: "Linear Algebra 101 (8/10): Matrix Decomposition"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to matrix decomposition — LU, QR, e
 last_reviewed: '2026-05-15'
 ---
 
-# Matrix Decomposition
+# Linear Algebra 101 (8/10): Matrix Decomposition
 
 Once you work with matrices long enough, direct manipulation starts to hit limits. Computing an inverse can be slow or unstable, and different problems prefer different computational paths. Matrix decomposition enters at that point: break one complicated matrix into pieces that are easier to solve with, interpret, or approximate.
 
 This is post 8 in the Linear Algebra 101 series. Here we will place LU, QR, eigendecomposition, and SVD on the same map.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Matrix Decomposition?
+- Which signal should the example or diagram make visible for Matrix Decomposition?
+- What failure should be prevented first when Matrix Decomposition reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 8 flow overview*
+
+This picture places Matrix Decomposition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Matrix Decomposition is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Solving linear systems, fitting least-squares models, compressing data, and buil
 This is one of the most useful mindset shifts in the series. Stable linear algebra is usually about selecting the right factorization for the question in front of you, not about reaching for the inverse because the formula looks short.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
-
-*This diagram compares LU, QR, eigendecomposition, and SVD as different ways to break a matrix into useful parts.*
 
 ## Key Terms
 
@@ -154,17 +166,29 @@ Linear systems (*LU*), least squares (*QR*), PCA (*SVD*), *recommender matrix fa
 
 Matrix decompositions are the *core of numerical linear algebra*. The next post covers *PCA*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Matrix Decomposition?**
+  - The article treats Matrix Decomposition as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Matrix Decomposition?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Matrix Decomposition reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
-- [Basis and Dimension](./06-basis-and-dimension.md)
-- [Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): Basis and Dimension](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors](./07-eigenvalues-and-eigenvectors.md)
 - **Matrix Decomposition (current)**
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

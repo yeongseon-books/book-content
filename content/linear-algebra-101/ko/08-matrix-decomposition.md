@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 8
-title: 행렬 분해
+title: "Linear Algebra 101 (8/10): 행렬 분해"
 status: publish-ready
 targets:
   tistory: true
@@ -20,20 +20,27 @@ seo_description: LU, QR, 고유분해, SVD를 언제 왜 쓰는지 한 흐름으
 last_reviewed: '2026-05-15'
 ---
 
-# 행렬 분해
+# Linear Algebra 101 (8/10): 행렬 분해
 
 행렬을 직접 다루다 보면 곧 한계를 만납니다. 역행렬을 바로 구하는 방식은 느리거나 불안정할 수 있고, 문제에 따라 더 적합한 계산 경로가 따로 있습니다. 이때 등장하는 것이 행렬 분해입니다. 복잡한 행렬을 해석 가능한 조각으로 나누어 계산을 더 안정적으로 만드는 방법입니다.
 
 이 글은 Linear Algebra 101 시리즈의 8번째 글입니다. 여기서는 LU, QR, 고유분해, SVD를 같은 지도 위에서 정리해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 역행렬보다 분해를 먼저 떠올려야 할까요?
 - LU, QR, 고유분해, SVD는 각각 어디에 잘 맞을까요?
 - 모든 분해가 모든 행렬에 적용되는 것은 아닐까요?
-- 분해 결과는 어떻게 검증할 수 있을까요?
 
-> 행렬 분해는 복잡한 변환을 더 단순한 조각으로 나누는 일입니다. 선형대수의 계산이 실제로 돌아가는 방식은 대개 역행렬보다 분해에 더 가깝습니다.
+## 큰 그림
+
+![Linear Algebra 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Linear Algebra 101 8장 흐름 개요*
+
+이 그림에서는 행렬 분해를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 행렬 분해의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -42,10 +49,6 @@ last_reviewed: '2026-05-15'
 실무에서 특히 중요한 이유는 안정성입니다. `inv`를 바로 쓰는 코드는 짧아 보여도 수치적으로 약할 수 있습니다. 반대로 적절한 분해를 쓰면 더 안정적이고 해석도 쉬워집니다. 행렬 분해는 계산 트릭이 아니라 설계 선택입니다.
 
 ## 핵심 개념 한눈에 보기
-
-![핵심 개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)
-
-*LU, QR, 고유분해, SVD가 같은 행렬을 서로 다른 목적에 맞게 나누는 방식을 비교한 개념도입니다.*
 
 이 네 분해는 서로 경쟁 관계라기보다 역할 분담에 가깝습니다. 어떤 문제는 LU가 맞고, 어떤 문제는 QR이나 SVD가 훨씬 자연스럽습니다.
 
@@ -163,17 +166,29 @@ print("close to A:", np.allclose(A_reconstructed, A))
 
 다음 글에서는 PCA를 다룹니다. 행렬 분해, 특히 SVD가 실제 데이터 차원 축소로 어떻게 이어지는지 가장 대표적인 예를 통해 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 역행렬보다 분해를 먼저 떠올려야 할까요?**
+  - 본문의 기준은 행렬 분해를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **LU, QR, 고유분해, SVD는 각각 어디에 잘 맞을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **모든 분해가 모든 행렬에 적용되는 것은 아닐까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [선형대수란 무엇인가?](./01-what-is-linear-algebra.md)
-- [벡터](./02-vectors.md)
-- [행렬](./03-matrices.md)
-- [내적과 거리](./04-inner-product-and-distance.md)
-- [선형변환](./05-linear-transformation.md)
-- [기저와 차원](./06-basis-and-dimension.md)
-- [고유값과 고유벡터](./07-eigenvalues-and-eigenvectors.md)
+## 시리즈 목차
+
+- [Linear Algebra 101 (1/10): 선형대수란 무엇인가?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): 벡터](./02-vectors.md)
+- [Linear Algebra 101 (3/10): 행렬](./03-matrices.md)
+- [Linear Algebra 101 (4/10): 내적과 거리](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): 선형변환](./05-linear-transformation.md)
+- [Linear Algebra 101 (6/10): 기저와 차원](./06-basis-and-dimension.md)
+- [Linear Algebra 101 (7/10): 고유값과 고유벡터](./07-eigenvalues-and-eigenvectors.md)
 - **행렬 분해 (현재 글)**
 - PCA (예정)
 - 머신러닝에서의 선형대수 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

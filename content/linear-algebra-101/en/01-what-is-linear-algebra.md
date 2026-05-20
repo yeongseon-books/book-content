@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 1
-title: What Is Linear Algebra?
+title: "Linear Algebra 101 (1/10): What Is Linear Algebra?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to linear algebra — vectors, matric
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Linear Algebra?
+# Linear Algebra 101 (1/10): What Is Linear Algebra?
 
 If you learn machine learning through formulas, there is usually a moment when the notation suddenly gets dense. Data becomes vectors, parameters become matrices, and one model layer starts to look like a transformation. If linear algebra still feels like a table of numbers, the formulas remain memorized procedures instead of connected ideas.
 
 This is the first post in the Linear Algebra 101 series. Here we will treat linear algebra as the language that ties vectors, matrices, and linear transformations into one picture.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Linear Algebra??
+- Which signal should the example or diagram make visible for What Is Linear Algebra??
+- What failure should be prevented first when What Is Linear Algebra? reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 1 flow overview*
+
+This picture places What Is Linear Algebra? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Linear Algebra? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ In machine learning, input data arrives as vectors, parameters live in matrices,
 If your linear algebra intuition is weak, the inside of a model stays opaque. Once you can read what a vector stores, what a matrix compresses, and why multiplication depends on order, the notation stops feeling like decoration and starts revealing structure.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
-
-*This diagram shows how vectors, matrices, and linear transformations connect into one learning path.*
 
 ## Key Terms
 
@@ -151,7 +163,18 @@ Recommender systems, image processing, graphics, and every layer of deep learnin
 
 Linear algebra is the *language of space*. The next post explores *vector operations* and their *geometric meaning* in depth.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Linear Algebra??**
+  - The article treats What Is Linear Algebra? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Linear Algebra??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Linear Algebra? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Linear Algebra? (current)**
 - Vectors (upcoming)
 - Matrices (upcoming)
@@ -162,6 +185,7 @@ Linear algebra is the *language of space*. The next post explores *vector operat
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

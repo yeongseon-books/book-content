@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:25:03+00:00",
+  "generated_at": "2026-05-20T11:25:23+00:00",
   "series_count": 92,
   "problem_series_count": 56,
   "series_with_5_plus": 42,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 9,
+    "Shrt": 8,
     "NoEn": 0,
-    "all": 541
+    "all": 540
   },
   "results": [
     {
@@ -6104,316 +6104,6 @@
       }
     },
     {
-      "series": "linear-algebra-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 1,
-        "NoEn": 0,
-        "BadImg": 10
-      },
-      "total": 11,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/linear-algebra-101/en/04-inner-product-and-distance.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "04-inner-product-and-distance.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/linear-algebra-101/en/04-inner-product-and-distance.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "04-inner-product-and-distance.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "api-design-101",
       "counts": {
         "Synt": 0,
@@ -7527,6 +7217,286 @@
             "code": null,
             "image": "09-01-secret.ko.png",
             "width": 1040,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "linear-algebra-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 10
+      },
+      "total": 10,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.ko.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 731,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.ko.png",
+            "width": 731,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 944,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.ko.png",
+            "width": 944,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.en.png",
+            "width": 1061,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.ko.png",
+            "width": 1061,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.en.png",
+            "width": 1030,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.ko.png",
+            "width": 1030,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.ko.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 731,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.ko.png",
+            "width": 731,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 944,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.ko.png",
+            "width": 944,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.en.png",
+            "width": 1061,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.ko.png",
+            "width": 1061,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.en.png",
+            "width": 1030,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-concept-at-a-glance.ko.png",
+            "width": 1030,
             "height": 67,
             "repo": null
           }

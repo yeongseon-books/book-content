@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Linear Algebra?</title>
+<title>Linear Algebra 101 (1/10): What Is Linear Algebra?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What Is Linear Algebra?</h1>
+<h1>Linear Algebra 101 (1/10): What Is Linear Algebra?</h1>
 <p>If you learn machine learning through formulas, there is usually a moment when the notation suddenly gets dense. Data becomes vectors, parameters become matrices, and one model layer starts to look like a transformation. If linear algebra still feels like a table of numbers, the formulas remain memorized procedures instead of connected ideas.</p>
 <p>This is the first post in the Linear Algebra 101 series. Here we will treat linear algebra as the language that ties vectors, matrices, and linear transformations into one picture.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Linear Algebra??</li>
+<li>Which signal should the example or diagram make visible for What Is Linear Algebra??</li>
+<li>What failure should be prevented first when What Is Linear Algebra? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Linear Algebra? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Linear Algebra? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>What does linear algebra actually study beyond symbol manipulation?</li>
@@ -70,8 +83,6 @@
 <p>In machine learning, input data arrives as vectors, parameters live in matrices, and an entire layer is usually a linear transformation followed by a nonlinearity. Recommender systems, graphics, and signal processing are not all the same field, but they keep returning to the same vector-and-matrix grammar.</p>
 <p>If your linear algebra intuition is weak, the inside of a model stays opaque. Once you can read what a vector stores, what a matrix compresses, and why multiplication depends on order, the notation stops feeling like decoration and starts revealing structure.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram shows how vectors, matrices, and linear transformations connect into one learning path.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Vector</strong>: a <em>bundle of numbers</em> with <em>direction and magnitude</em>.</li>
@@ -153,6 +164,16 @@ print(&quot;(R A) v:&quot;, (R @ A) @ v)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Linear algebra is the <em>language of space</em>. The next post explores <em>vector operations</em> and their <em>geometric meaning</em> in depth.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Linear Algebra??</strong></li>
+<li>The article treats What Is Linear Algebra? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Linear Algebra??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Linear Algebra? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Linear Algebra? (current)</strong></li>
 <li>Vectors (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 6
-title: Basis and Dimension
+title: "Linear Algebra 101 (6/10): Basis and Dimension"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to basis and dimension — linear ind
 last_reviewed: '2026-05-15'
 ---
 
-# Basis and Dimension
+# Linear Algebra 101 (6/10): Basis and Dimension
 
 As soon as you go one step deeper into linear algebra, a natural question appears: why can one space be described by multiple sets of axes, and how many axes do you really need? Basis and dimension answer that question. Rank, PCA, and rank-deficient models all come back here.
 
 This is post 6 in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Basis and Dimension?
+- Which signal should the example or diagram make visible for Basis and Dimension?
+- What failure should be prevented first when Basis and Dimension reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 6 flow overview*
+
+This picture places Basis and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Basis and Dimension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Multicollinearity, dimensionality reduction, principal components, and singular 
 In practice, some features add almost no new information because they are nearly explained by others. Good basis choices can make the same data easier to compress, inspect, and reason about. Basis and dimension are tools for reading the real complexity of a space.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
-
-*This diagram condenses the flow from linear independence to basis, dimension, and matrix rank.*
 
 ## Key Terms
 
@@ -153,17 +165,29 @@ PCA's *principal components* form a *new basis*. *Feature selection / dimensiona
 
 A basis is a *choice of axes*; dimension is *their count*. The next post covers *eigenvalues and eigenvectors*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Basis and Dimension?**
+  - The article treats Basis and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Basis and Dimension?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Basis and Dimension reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
-- [Inner Product and Distance](./04-inner-product-and-distance.md)
-- [Linear Transformations](./05-linear-transformation.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
+- [Linear Algebra 101 (4/10): Inner Product and Distance](./04-inner-product-and-distance.md)
+- [Linear Algebra 101 (5/10): Linear Transformations](./05-linear-transformation.md)
 - **Basis and Dimension (current)**
 - Eigenvalues and Eigenvectors (upcoming)
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

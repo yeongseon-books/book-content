@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 3
-title: Matrices
+title: "Linear Algebra 101 (3/10): Matrices"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to matrices — definition, multiplic
 last_reviewed: '2026-05-15'
 ---
 
-# Matrices
+# Linear Algebra 101 (3/10): Matrices
 
 Matrices are the notation you see most often in linear algebra. Sometimes they look like tables that hold data. Sometimes they act like rules that move one vector into another. If you only remember the table view, you can still run the arithmetic without understanding why multiplication deserves so much attention.
 
 This is post 3 in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Matrices?
+- Which signal should the example or diagram make visible for Matrices?
+- What failure should be prevented first when Matrices reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 3 flow overview*
+
+This picture places Matrices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Matrices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Design matrices in regression, weight matrices in neural networks, user-item str
 Many production mistakes start as shape mistakes. If you cannot read how many dimensions go in, how many come out, and what kind of transformation is implied, code may run while the meaning is already wrong. Matrices reward the habit of reading structure before values.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
-
-*This diagram summarizes how multiplication, transpose, and inversion make matrices readable as transformation rules.*
 
 ## Key Terms
 
@@ -150,9 +162,20 @@ The *normal equations* in linear regression, *weight matrices* in neural network
 
 A matrix is a *compressed transformation*. The next post covers *inner product and distance*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Matrices?**
+  - The article treats Matrices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Matrices?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Matrices reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
 - **Matrices (current)**
 - Inner Product and Distance (upcoming)
 - Linear Transformations (upcoming)
@@ -161,6 +184,7 @@ A matrix is a *compressed transformation*. The next post covers *inner product a
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

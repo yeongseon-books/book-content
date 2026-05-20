@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:25:03+00:00
+Generated: 2026-05-20T11:25:23+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **56**
 - Series at or above 5 issues: **42**
-- Total issues: **541**
+- Total issues: **540**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **9**
+  - Shrt: **8**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -57,11 +57,11 @@ Warnings:
 | 14 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 16 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 17 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
-| 18 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 19 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 20 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 21 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 18 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 19 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 20 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 21 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 22 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 23 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 24 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
@@ -297,21 +297,6 @@ Warnings:
 - `content/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md:20` — markdown body has 145 lines (< 150)
 - `content/azure-aks-deep-dive/en/06-keda-internals.md:20` — markdown body has 148 lines (< 150)
 
-## linear-algebra-101 — Total 11
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=1 NoEn=0
-
-### BadImg
-- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 88px <= 100px (size=731x88)
-- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 88px <= 100px (size=731x88)
-- `assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=944x67)
-- ... 5 more
-
-### Shrt
-- `content/linear-algebra-101/en/04-inner-product-and-distance.md:22` — markdown body has 148 lines (< 150)
-
 ## api-design-101 — Total 10
 
 - BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
@@ -358,6 +343,18 @@ Warnings:
 - `assets/github-actions-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=817x67)
 - `assets/github-actions-101/04/04-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=817x67)
 - `assets/github-actions-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=949x67)
+- ... 5 more
+
+## linear-algebra-101 — Total 10
+
+- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=794x67)
+- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
+- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 88px <= 100px (size=731x88)
+- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 88px <= 100px (size=731x88)
+- `assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=944x67)
 - ... 5 more
 
 ## llm-api-production-101 — Total 10

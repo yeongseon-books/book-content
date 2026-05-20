@@ -1,7 +1,7 @@
 ---
 series: linear-algebra-101
 episode: 4
-title: Inner Product and Distance
+title: "Linear Algebra 101 (4/10): Inner Product and Distance"
 status: publish-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: A beginner-friendly intro to inner products and distance — do
 last_reviewed: '2026-05-15'
 ---
 
-# Inner Product and Distance
+# Linear Algebra 101 (4/10): Inner Product and Distance
 
 Once vectors are in play, the next question comes immediately: how similar are two vectors, and how far apart are they? Recommenders, embedding search, and nearest-neighbor lookups are all versions of that question turned into numbers.
 
 This is post 4 in the Linear Algebra 101 series. Here we will connect the inner product, cosine similarity, Euclidean distance, and Manhattan distance into one comparison toolkit.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Inner Product and Distance?
+- Which signal should the example or diagram make visible for Inner Product and Distance?
+- What failure should be prevented first when Inner Product and Distance reaches a real system?
+
+## Big Picture
+
+![linear algebra 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
+
+*linear algebra 101 chapter 4 flow overview*
+
+This picture places Inner Product and Distance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Inner Product and Distance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -42,10 +58,6 @@ Document embeddings often care about direction, which is why cosine similarity s
 Without that distinction, metric choice becomes habit instead of judgment. You start using cosine everywhere or L2 everywhere, even though search rankings, clusters, and neighbor sets can shift dramatically when the metric changes. This chapter is about choosing the comparison question, not memorizing one more formula.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
-
-*This diagram links the inner product to cosine similarity and distance metrics as separate comparison questions.*
 
 ## Key Terms
 
@@ -146,10 +158,21 @@ Recommenders (*item similarity*), vector databases (*ANN search*), NLP (*embeddi
 
 Inner product is *similarity*; distance is *dissimilarity*. The next post covers *linear transformations*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Inner Product and Distance?**
+  - The article treats Inner Product and Distance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Inner Product and Distance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Inner Product and Distance reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Linear Algebra?](./01-what-is-linear-algebra.md)
-- [Vectors](./02-vectors.md)
-- [Matrices](./03-matrices.md)
+## In this series
+
+- [Linear Algebra 101 (1/10): What Is Linear Algebra?](./01-what-is-linear-algebra.md)
+- [Linear Algebra 101 (2/10): Vectors](./02-vectors.md)
+- [Linear Algebra 101 (3/10): Matrices](./03-matrices.md)
 - **Inner Product and Distance (current)**
 - Linear Transformations (upcoming)
 - Basis and Dimension (upcoming)
@@ -157,6 +180,7 @@ Inner product is *similarity*; distance is *dissimilarity*. The next post covers
 - Matrix Decomposition (upcoming)
 - PCA (upcoming)
 - Linear Algebra in Machine Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

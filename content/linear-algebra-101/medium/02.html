@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Vectors</title>
+<title>Linear Algebra 101 (2/10): Vectors</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Vectors</h1>
+<h1>Linear Algebra 101 (2/10): Vectors</h1>
 <p>In machine learning, one row of data is a vector, an embedding is a vector, and a gradient is a vector too. But if you treat vectors as plain number bundles, the calculations may still work while the meaning slips away. A vector is both algebraic notation and a geometric object.</p>
 <p>This is post 2 in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Vectors?</li>
+<li>Which signal should the example or diagram make visible for Vectors?</li>
+<li>What failure should be prevented first when Vectors reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 2 flow overview</em></p>
+<p>This picture places Vectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Vectors is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>What makes a vector different from an ordinary list?</li>
@@ -70,8 +83,6 @@
 <p>Feature rows, user embeddings, token embeddings, and gradients are all represented as vectors. Once you can read vectors cleanly, you can move from preprocessing to model internals without switching mental languages.</p>
 <p>This matters quickly in practice. Similarity search, normalization, and metric choice all become fragile when you cannot tell whether direction matters, magnitude matters, or both matter. Vectors are the first chapter of linear algebra, but they remain the basic unit all the way to production systems.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram frames vectors as geometry, coordinates, and one row of data at the same time.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Vector</strong>: an <em>ordered bundle of numbers</em> — <code>[x1, x2, ..., xn]</code>.</li>
@@ -151,8 +162,18 @@ print(&quot;unit v:&quot;, unit_v, &quot;norm:&quot;, np.linalg.norm(unit_v))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A vector is a <em>point/arrow in space</em> and <em>one row of your data</em>. The next post covers <em>matrices</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><strong>What boundary should you inspect first when applying Vectors?</strong></li>
+<li>The article treats Vectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Vectors?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Vectors reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">Linear Algebra 101 (1/10): What Is Linear Algebra?</a></li>
 <li><strong>Vectors (current)</strong></li>
 <li>Matrices (upcoming)</li>
 <li>Inner Product and Distance (upcoming)</li>

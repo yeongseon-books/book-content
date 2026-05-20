@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Linear Transformations</title>
+<title>Linear Algebra 101 (5/10): Linear Transformations</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Linear Transformations</h1>
+<h1>Linear Algebra 101 (5/10): Linear Transformations</h1>
 <p>After learning matrices, the natural follow-up is simple: what do those matrices actually do to a space? Linear transformation is the idea that answers that question. A matrix is the coordinate form of a transformation rule.</p>
 <p>This is post 5 in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Linear Transformations?</li>
+<li>Which signal should the example or diagram make visible for Linear Transformations?</li>
+<li>What failure should be prevented first when Linear Transformations reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 5 flow overview</em></p>
+<p>This picture places Linear Transformations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Linear Transformations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>What does it really mean to multiply a vector by a matrix?</li>
@@ -70,8 +83,6 @@
 <p>Every neural-network layer is a linear transformation plus a nonlinearity. Graphics pipelines, coordinate transforms, and many augmentation steps in vision use the same language.</p>
 <p>Once this intuition clicks, a matrix stops being a static object. Some matrices rotate space, some stretch it, some flip orientation, and some slant an entire grid. At that point, linear algebra becomes a language for movement and structure rather than a page of arithmetic rules.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram shows how one matrix can rotate, scale, reflect, or shear an entire space.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Linear transformation</strong>: <code>T(av + bw) = a T(v) + b T(w)</code> — preserves <em>addition and scalar multiplication</em>.</li>
@@ -153,11 +164,21 @@ print(&quot;compose RS:&quot;, M @ np.array([1.0, 0.0]))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Linear transformations <em>reshape space</em>. The next post covers <em>basis and dimension</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
+<li><strong>What boundary should you inspect first when applying Linear Transformations?</strong></li>
+<li>The article treats Linear Transformations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Linear Transformations?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Linear Transformations reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">Linear Algebra 101 (1/10): What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Linear Algebra 101 (2/10): Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Linear Algebra 101 (3/10): Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Linear Algebra 101 (4/10): Inner Product and Distance</a></li>
 <li><strong>Linear Transformations (current)</strong></li>
 <li>Basis and Dimension (upcoming)</li>
 <li>Eigenvalues and Eigenvectors (upcoming)</li>

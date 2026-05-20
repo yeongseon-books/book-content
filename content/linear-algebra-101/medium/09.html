@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>PCA</title>
+<title>Linear Algebra 101 (9/10): PCA</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>PCA</h1>
+<h1>Linear Algebra 101 (9/10): PCA</h1>
 <p>When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.</p>
 <p>This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying PCA?</li>
+<li>Which signal should the example or diagram make visible for PCA?</li>
+<li>What failure should be prevented first when PCA reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="linear algebra 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>linear algebra 101 chapter 9 flow overview</em></p>
+<p>This picture places PCA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of PCA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Why is PCA allowed to call some directions more important than others?</li>
@@ -70,8 +83,6 @@
 <p>Dimensionality reduction, visualization, denoising, and feature compression show up constantly in practice. PCA is often the first reliable linear-algebra tool for that job.</p>
 <p>It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>This diagram captures the PCA flow from centering to principal components and projection onto the top axes.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PC (principal component)</strong>: <em>orthogonal axes</em> sorted by <em>variance</em>.</li>
@@ -154,15 +165,25 @@ print(&quot;relative reconstruction error:&quot;, err)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>PCA is the <em>standard for dimensionality reduction</em>. The next post brings everything together for <em>linear algebra in ML</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Basis and Dimension</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/07-eigenvalues-and-eigenvectors.md">Eigenvalues and Eigenvectors</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/08-matrix-decomposition.md">Matrix Decomposition</a></li>
+<li><strong>What boundary should you inspect first when applying PCA?</strong></li>
+<li>The article treats PCA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for PCA?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when PCA reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">Linear Algebra 101 (1/10): What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Linear Algebra 101 (2/10): Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Linear Algebra 101 (3/10): Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Linear Algebra 101 (4/10): Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Algebra 101 (5/10): Linear Transformations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/06-basis-and-dimension.md">Linear Algebra 101 (6/10): Basis and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/07-eigenvalues-and-eigenvectors.md">Linear Algebra 101 (7/10): Eigenvalues and Eigenvectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/08-matrix-decomposition.md">Linear Algebra 101 (8/10): Matrix Decomposition</a></li>
 <li><strong>PCA (current)</strong></li>
 <li>Linear Algebra in Machine Learning (upcoming)</li>
 </ul>
