@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 7
-title: 첫 직장 적응
+title: "Developer Career 101 (7/10): 첫 직장 적응"
 status: publish-ready
 targets:
   tistory: true
@@ -20,18 +20,27 @@ seo_description: 주니어 개발자의 성공적인 온보딩을 위한 실무 
 last_reviewed: '2026-05-14'
 ---
 
-# 첫 직장 적응
+# Developer Career 101 (7/10): 첫 직장 적응
 
 첫 직장에 들어가면 빨리 실력을 증명해야 한다는 압박부터 느끼기 쉽습니다. 하지만 대부분의 팀이 초반 90일에 보고 싶은 것은 완성된 실력보다 배우는 방식, 질문하는 태도, 작은 기여를 쌓아 가는 속도입니다.
 
 이 글은 Developer Career 101 시리즈의 7번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 첫 개발자 직장에서 처음 90일은 무엇에 집중해야 할까요?
 - 많이 아는 척하기보다 질문하고 기록하는 태도가 왜 더 중요할까요?
 - 첫 PR과 1:1은 어떻게 신뢰를 만드는 장치가 될까요?
-- 온보딩 초기에 자주 하는 실수는 무엇이고, 어떻게 줄일 수 있을까요?
+
+## 큰 그림
+
+![Developer Career 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Developer Career 101 7장 흐름 개요*
+
+이 그림에서는 첫 직장 적응를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 첫 직장 적응의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -48,10 +57,6 @@ last_reviewed: '2026-05-14'
 > 첫 직장의 초반 90일은 실력을 증명하는 시기라기보다, 배우는 방식과 협업 태도를 보여 주는 시기입니다.
 
 ## 핵심 개념 한눈에 보기
-
-![학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.ko.png)
-
-*학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프*
 
 좋은 온보딩은 혼자 버티는 과정이 아닙니다. 먼저 배우고, 질문하고, 작은 기여를 내고, 피드백으로 보정하는 루프가 돌아야 자리를 빨리 잡을 수 있습니다.
 
@@ -188,17 +193,29 @@ weekly with manager, biweekly with mentor
 
 첫 직장에서의 좋은 출발은 혼자 버티는 데서 나오지 않습니다. 배우고, 질문하고, 작은 기여를 내고, 피드백으로 조정하는 루프를 빠르게 만드는 것이 핵심입니다. 다음 글에서는 본업과 병행해도 무너지지 않는 사이드 프로젝트 운영 원칙을 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **첫 개발자 직장에서 처음 90일은 무엇에 집중해야 할까요?**
+  - 본문의 기준은 첫 직장 적응를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **많이 아는 척하기보다 질문하고 기록하는 태도가 왜 더 중요할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **첫 PR과 1:1은 어떻게 신뢰를 만드는 장치가 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [개발자 커리어란 무엇인가](./01-what-is-developer-career.md)
-- [직무 이해하기](./02-understanding-roles.md)
-- [학습 계획 세우기](./03-learning-plan.md)
-- [이력서와 포트폴리오](./04-resume-and-portfolio.md)
-- [코딩 인터뷰 준비](./05-coding-interview.md)
-- [시스템 디자인 인터뷰](./06-system-design-interview.md)
+## 시리즈 목차
+
+- [Developer Career 101 (1/10): 개발자 커리어란 무엇인가](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): 직무 이해하기](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): 학습 계획 세우기](./03-learning-plan.md)
+- [Developer Career 101 (4/10): 이력서와 포트폴리오](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): 코딩 인터뷰 준비](./05-coding-interview.md)
+- [Developer Career 101 (6/10): 시스템 디자인 인터뷰](./06-system-design-interview.md)
 - **첫 직장 적응 (현재 글)**
 - 사이드 프로젝트와 학습 (예정)
 - 멘토링과 네트워킹 (예정)
 - 시니어로 가는 길 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

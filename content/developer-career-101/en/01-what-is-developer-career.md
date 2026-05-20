@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 1
-title: What Is a Developer Career
+title: "Developer Career 101 (1/10): What Is a Developer Career"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of the stages and growth axes of a dev
 last_reviewed: '2026-05-14'
 ---
 
-# What Is a Developer Career
+# Developer Career 101 (1/10): What Is a Developer Career
 
 People often start by mapping a developer career to company names, years of experience, or the next title. In practice, two engineers with the same title can be operating at very different levels because the real difference shows up in problem scope, judgment, and how much leverage they create for other people.
 
 This is the first post in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?
 - What actually changes between junior, mid-level, senior, and staff-like expectations?
 - Why do skill, influence, and written evidence matter together instead of separately?
-- What should you track over the next six months if you want your growth to stay visible?
 
-> A developer career is not a chronological list of titles. It is the compound growth of role, skill, and impact.
+## Big Picture
+
+![developer career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 1 flow overview*
+
+This picture places What Is a Developer Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Developer Career is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is the first post in the Developer Career 101 series.
 Without direction, five years later you are still at square one.
 
 ## Concept at a Glance
-
-![Career stages and expanding impact radius](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
-
-*Career stages and expanding impact radius*
 
 ## Key Terms
 
@@ -162,7 +165,18 @@ Career ladders at companies make role, impact, and responsibility explicit on mu
 
 Next post covers *Understanding Roles*.
 
+## Answering the Opening Questions
+
+- **Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?**
+  - The article treats What Is a Developer Career as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What actually changes between junior, mid-level, senior, and staff-like expectations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do skill, influence, and written evidence matter together instead of separately?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Developer Career (current)**
 - Understanding Roles (upcoming)
 - Building a Learning Plan (upcoming)
@@ -173,6 +187,7 @@ Next post covers *Understanding Roles*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

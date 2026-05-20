@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 3
-title: Building a Learning Plan
+title: "Developer Career 101 (3/10): Building a Learning Plan"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of running a sustainable learning plan
 last_reviewed: '2026-05-14'
 ---
 
-# Building a Learning Plan
+# Developer Career 101 (3/10): Building a Learning Plan
 
 Most developers do not struggle because learning resources are unavailable. They struggle because books, courses, and repos pile up faster than calendar time, so learning turns into a backlog of intentions instead of a repeatable system.
 
 This is post 3 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What structure keeps learning sustainable during a busy quarter?
 - How should quarterly goals and weekly time blocks connect to each other?
 - How do you choose books, courses, and codebases without drowning in input?
-- Why do outputs and retrospectives matter as much as study time?
 
-> Sustainable learning is not a burst of motivation. It is a system of reserved time, bounded inputs, and visible outputs.
+## Big Picture
+
+![developer career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 3 flow overview*
+
+This picture places Building a Learning Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Learning Plan is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 3 in the Developer Career 101 series.
 Learning without a plan disperses.
 
 ## Concept at a Glance
-
-![Learning loop from quarterly goal to retrospective](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
-
-*Learning loop from quarterly goal to retrospective*
 
 ## Key Terms
 
@@ -180,9 +183,20 @@ Even PIPs and promotions are evaluated against quarterly goals plus outputs.
 
 Next post covers *Resume and Portfolio*.
 
+## Answering the Opening Questions
+
+- **What structure keeps learning sustainable during a busy quarter?**
+  - The article treats Building a Learning Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should quarterly goals and weekly time blocks connect to each other?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose books, courses, and codebases without drowning in input?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
 - **Building a Learning Plan (current)**
 - Resume and Portfolio (upcoming)
 - Preparing for Coding Interviews (upcoming)
@@ -191,6 +205,7 @@ Next post covers *Resume and Portfolio*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

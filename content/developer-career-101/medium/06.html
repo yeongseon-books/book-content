@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>System Design Interviews</title>
+<title>Developer Career 101 (6/10): System Design Interviews</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,21 @@
 </style>
 </head>
 <body>
-<h1>System Design Interviews</h1>
+<h1>Developer Career 101 (6/10): System Design Interviews</h1>
 <p>System design interviews can look like a whiteboard drawing exercise from the outside. What interviewers actually value is whether you can frame requirements, make rough estimates, propose a plausible architecture, and explain trade-offs in a way that shows judgment under constraints.</p>
 <p>This is post 6 in the Developer Career 101 series.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What are interviewers truly evaluating in a system design round?</li>
 <li>In what order should you move through requirements, estimates, high-level design, and deep dives?</li>
 <li>Why do trade-offs and bottlenecks separate shallow answers from senior ones?</li>
-<li>How can you use a classic problem such as a URL shortener to keep your answer stable?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="developer career 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>developer career 101 chapter 6 flow overview</em></p>
+<p>This picture places System Design Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A system design interview is not a test of pretty diagrams. It is a test of judgment explained under real constraints.</p>
+<p>The core of System Design Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -77,8 +80,6 @@
 <h2>Why It Matters</h2>
 <p>Design is the senior-level filter.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Four-stage flow for system design interview answers" src="https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Four-stage flow for system design interview answers</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>functional</strong>: Feature requirements.</li>
@@ -189,12 +190,22 @@ analytics → Kafka → DW
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post covers <em>Settling into the First Job</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/01-what-is-developer-career.md">What Is a Developer Career</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/02-understanding-roles.md">Understanding Roles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/03-learning-plan.md">Building a Learning Plan</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/04-resume-and-portfolio.md">Resume and Portfolio</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/05-coding-interview.md">Preparing for Coding Interviews</a></li>
+<li><strong>What are interviewers truly evaluating in a system design round?</strong></li>
+<li>The article treats System Design Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>In what order should you move through requirements, estimates, high-level design, and deep dives?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why do trade-offs and bottlenecks separate shallow answers from senior ones?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/01-what-is-developer-career.md">Developer Career 101 (1/10): What Is a Developer Career</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/02-understanding-roles.md">Developer Career 101 (2/10): Understanding Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/03-learning-plan.md">Developer Career 101 (3/10): Building a Learning Plan</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/04-resume-and-portfolio.md">Developer Career 101 (4/10): Resume and Portfolio</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/05-coding-interview.md">Developer Career 101 (5/10): Preparing for Coding Interviews</a></li>
 <li><strong>System Design Interviews (current)</strong></li>
 <li>Settling into the First Job (upcoming)</li>
 <li>Side Projects and Learning (upcoming)</li>

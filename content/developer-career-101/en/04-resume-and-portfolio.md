@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 4
-title: Resume and Portfolio
+title: "Developer Career 101 (4/10): Resume and Portfolio"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of writing a resume and portfolio that
 last_reviewed: '2026-05-14'
 ---
 
-# Resume and Portfolio
+# Developer Career 101 (4/10): Resume and Portfolio
 
 Strong experience still gets ignored if it is hard to scan. Hiring teams usually decide within the first minute whether to keep reading, so the first job of a resume is not to tell your whole story. It is to make your role, your best evidence, and your likely interview topics obvious at a glance.
 
 This is post 4 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What structure lets a recruiter understand you quickly without guessing?
 - How do you rewrite responsibilities into outcome-oriented bullets with evidence?
 - Why are numbers and a compact STAR structure such strong hiring signals?
-- How should a portfolio support a resume instead of duplicating it?
 
-> A good resume is not a biography. It is a short, credible argument for why you deserve the next conversation.
+## Big Picture
+
+![developer career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 4 flow overview*
+
+This picture places Resume and Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Resume and Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 4 in the Developer Career 101 series.
 A resume is the ticket into the interview.
 
 ## Concept at a Glance
-
-![Resume flow from summary to supporting portfolio evidence](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
-
-*Resume flow from summary to supporting portfolio evidence*
 
 ## Key Terms
 
@@ -152,10 +155,21 @@ Big companies require a short internal resume even for internal transfers.
 
 Next post covers *Preparing for Coding Interviews*.
 
+## Answering the Opening Questions
+
+- **What structure lets a recruiter understand you quickly without guessing?**
+  - The article treats Resume and Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you rewrite responsibilities into outcome-oriented bullets with evidence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why are numbers and a compact STAR structure such strong hiring signals?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
 - **Resume and Portfolio (current)**
 - Preparing for Coding Interviews (upcoming)
 - System Design Interviews (upcoming)
@@ -163,6 +177,7 @@ Next post covers *Preparing for Coding Interviews*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

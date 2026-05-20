@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 9
-title: Mentoring and Networking
+title: "Developer Career 101 (9/10): Mentoring and Networking"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of finding mentors and building a deve
 last_reviewed: '2026-05-14'
 ---
 
-# Mentoring and Networking
+# Developer Career 101 (9/10): Mentoring and Networking
 
 Solo learning gets you started, but it rarely gives you fast feedback on judgment. Mentors, peers, and communities compress the time between a mistake and a better mental model, provided that you approach them with clear questions, useful follow-up, and a habit of contributing back.
 
 This is post 9 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How do you find a good mentor without turning the first contact into a burden?
 - What makes a question easy for another engineer to answer well?
 - How do communities, conferences, and public writing expand your network?
-- Why does moving from receiving help to giving help matter for career growth?
 
-> A network is not a list of famous people you know. It is a web of trust built through repeated, useful contact.
+## Big Picture
+
+![developer career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 9 flow overview*
+
+This picture places Mentoring and Networking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Mentoring and Networking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 9 in the Developer Career 101 series.
 Solo learning has a ceiling. Connection is a shortcut.
 
 ## Concept at a Glance
-
-![Networking loop from learning to contribution](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
-
-*Networking loop from learning to contribution*
 
 ## Key Terms
 
@@ -176,17 +179,29 @@ Companies run mentorship programs and internal guilds.
 
 Next post covers *The Path to Senior*.
 
+## Answering the Opening Questions
+
+- **How do you find a good mentor without turning the first contact into a burden?**
+  - The article treats Mentoring and Networking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What makes a question easy for another engineer to answer well?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do communities, conferences, and public writing expand your network?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
-- [System Design Interviews](./06-system-design-interview.md)
-- [Settling into the First Job](./07-first-job.md)
-- [Side Projects and Learning](./08-side-projects.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
+- [Developer Career 101 (6/10): System Design Interviews](./06-system-design-interview.md)
+- [Developer Career 101 (7/10): Settling into the First Job](./07-first-job.md)
+- [Developer Career 101 (8/10): Side Projects and Learning](./08-side-projects.md)
 - **Mentoring and Networking (current)**
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

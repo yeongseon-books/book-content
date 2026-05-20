@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 6
-title: System Design Interviews
+title: "Developer Career 101 (6/10): System Design Interviews"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of the four-step system design intervi
 last_reviewed: '2026-05-14'
 ---
 
-# System Design Interviews
+# Developer Career 101 (6/10): System Design Interviews
 
 System design interviews can look like a whiteboard drawing exercise from the outside. What interviewers actually value is whether you can frame requirements, make rough estimates, propose a plausible architecture, and explain trade-offs in a way that shows judgment under constraints.
 
 This is post 6 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What are interviewers truly evaluating in a system design round?
 - In what order should you move through requirements, estimates, high-level design, and deep dives?
 - Why do trade-offs and bottlenecks separate shallow answers from senior ones?
-- How can you use a classic problem such as a URL shortener to keep your answer stable?
 
-> A system design interview is not a test of pretty diagrams. It is a test of judgment explained under real constraints.
+## Big Picture
+
+![developer career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 6 flow overview*
+
+This picture places System Design Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of System Design Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 6 in the Developer Career 101 series.
 Design is the senior-level filter.
 
 ## Concept at a Glance
-
-![Four-stage flow for system design interview answers](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
-
-*Four-stage flow for system design interview answers*
 
 ## Key Terms
 
@@ -175,17 +178,29 @@ Companies use the same frame when writing internal RFCs.
 
 Next post covers *Settling into the First Job*.
 
+## Answering the Opening Questions
+
+- **What are interviewers truly evaluating in a system design round?**
+  - The article treats System Design Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **In what order should you move through requirements, estimates, high-level design, and deep dives?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do trade-offs and bottlenecks separate shallow answers from senior ones?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
 - **System Design Interviews (current)**
 - Settling into the First Job (upcoming)
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

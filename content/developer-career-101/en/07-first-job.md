@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 7
-title: Settling into the First Job
+title: "Developer Career 101 (7/10): Settling into the First Job"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour of the first ninety days at your first
 last_reviewed: '2026-05-14'
 ---
 
-# Settling into the First Job
+# Developer Career 101 (7/10): Settling into the First Job
 
 The first developer job often creates pressure to prove yourself immediately. Most teams are not looking for instant mastery in the first ninety days. They are looking for how fast you learn the context, how clearly you ask for help, and whether you can turn that help into small reliable contributions.
 
 This is post 7 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What should a new developer focus on during the first ninety days?
 - Why do questions, notes, and feedback loops matter more than pretending to know everything?
 - How can your first PR and your 1:1s build trust quickly?
-- What onboarding mistakes show up most often, and how can you avoid them?
 
-> The first ninety days are less about proving finished skill and more about proving a reliable learning loop.
+## Big Picture
+
+![developer career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 7 flow overview*
+
+This picture places Settling into the First Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Settling into the First Job is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 7 in the Developer Career 101 series.
 The first impression frames the next eighteen months.
 
 ## Concept at a Glance
-
-![Onboarding loop from learning to feedback](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
-
-*Onboarding loop from learning to feedback*
 
 ## Key Terms
 
@@ -177,17 +180,29 @@ Many companies use ninety-day goals and a first PR as official onboarding metric
 
 Next post covers *Side Projects and Learning*.
 
+## Answering the Opening Questions
+
+- **What should a new developer focus on during the first ninety days?**
+  - The article treats Settling into the First Job as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do questions, notes, and feedback loops matter more than pretending to know everything?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How can your first PR and your 1:1s build trust quickly?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
-- [System Design Interviews](./06-system-design-interview.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
+- [Developer Career 101 (6/10): System Design Interviews](./06-system-design-interview.md)
 - **Settling into the First Job (current)**
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

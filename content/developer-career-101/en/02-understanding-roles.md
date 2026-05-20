@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 2
-title: Understanding Roles
+title: "Developer Career 101 (2/10): Understanding Roles"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: A beginner-friendly tour comparing frontend, backend, data, SRE
 last_reviewed: '2026-05-14'
 ---
 
-# Understanding Roles
+# Developer Career 101 (2/10): Understanding Roles
 
 Saying "I want to be a developer" is still too broad to guide real decisions. Frontend, backend, data, SRE, ML, and mobile roles all ship software, but they optimize for different outcomes, carry different failure modes, and measure success with different signals.
 
 This is post 2 in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What actually differs across frontend, backend, data, SRE, ML, and mobile roles?
 - Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?
 - How can you tell whether your current role fits you or whether a transition is worth exploring?
-- What should you inspect first before moving toward a different role?
 
-> Good role choices start with the responsibility you are willing to own, not with the tool you want to learn next.
+## Big Picture
+
+![developer career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 2 flow overview*
+
+This picture places Understanding Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Roles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is post 2 in the Developer Career 101 series.
 A bad role fit shortens the path to burnout.
 
 ## Concept at a Glance
-
-![Comparison flow across common developer roles](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
-
-*Comparison flow across common developer roles*
 
 ## Key Terms
 
@@ -161,8 +164,19 @@ Companies recommend roughly six months of onboarding when switching roles.
 
 Next post covers *Building a Learning Plan*.
 
+## Answering the Opening Questions
+
+- **What actually differs across frontend, backend, data, SRE, ML, and mobile roles?**
+  - The article treats Understanding Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How can you tell whether your current role fits you or whether a transition is worth exploring?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
 - **Understanding Roles (current)**
 - Building a Learning Plan (upcoming)
 - Resume and Portfolio (upcoming)
@@ -172,6 +186,7 @@ Next post covers *Building a Learning Plan*.
 - Side Projects and Learning (upcoming)
 - Mentoring and Networking (upcoming)
 - The Path to Senior (upcoming)
+
 <!-- toc:end -->
 
 ## References

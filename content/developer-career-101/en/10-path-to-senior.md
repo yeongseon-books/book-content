@@ -1,7 +1,7 @@
 ---
 series: developer-career-101
 episode: 10
-title: The Path to Senior
+title: "Developer Career 101 (10/10): The Path to Senior"
 status: publish-ready
 targets:
   tistory: false
@@ -21,20 +21,27 @@ seo_description: Master the transition from junior to senior engineer by develop
 last_reviewed: '2026-05-14'
 ---
 
-# The Path to Senior
+# Developer Career 101 (10/10): The Path to Senior
 
 Senior is one of the most overloaded words in engineering careers. It sounds like a reward for surviving long enough, but teams usually recognize seniority through a different pattern: better problem framing, better trade-off calls, and more leverage created for other people.
 
 This is the final post in the Developer Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What actually separates a senior engineer from a mid-level engineer?
 - How do problem framing, judgment, influence, and mentoring show up in day-to-day work?
 - Which behaviors matter beyond technical depth as your scope expands?
-- What can you start practicing now, before the title changes?
 
-> Seniority is less about doing more tickets yourself and more about improving the quality of decisions around you.
+## Big Picture
+
+![developer career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
+
+*developer career 101 chapter 10 flow overview*
+
+This picture places The Path to Senior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Path to Senior is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,10 +56,6 @@ This is the final post in the Developer Career 101 series.
 Senior is a behavior, not a title.
 
 ## Concept at a Glance
-
-![Growth path from junior through lead-level scope](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
-
-*Growth path from junior through lead-level scope*
 
 ## Key Terms
 
@@ -180,17 +183,29 @@ This series ends here. A career is not a sprint, it is a marathon.
 
 The next series is *Data Science Career 101*.
 
+## Answering the Opening Questions
+
+- **What actually separates a senior engineer from a mid-level engineer?**
+  - The article treats The Path to Senior as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do problem framing, judgment, influence, and mentoring show up in day-to-day work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which behaviors matter beyond technical depth as your scope expands?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Developer Career](./01-what-is-developer-career.md)
-- [Understanding Roles](./02-understanding-roles.md)
-- [Building a Learning Plan](./03-learning-plan.md)
-- [Resume and Portfolio](./04-resume-and-portfolio.md)
-- [Preparing for Coding Interviews](./05-coding-interview.md)
-- [System Design Interviews](./06-system-design-interview.md)
-- [Settling into the First Job](./07-first-job.md)
-- [Side Projects and Learning](./08-side-projects.md)
-- [Mentoring and Networking](./09-mentoring-networking.md)
+## In this series
+
+- [Developer Career 101 (1/10): What Is a Developer Career](./01-what-is-developer-career.md)
+- [Developer Career 101 (2/10): Understanding Roles](./02-understanding-roles.md)
+- [Developer Career 101 (3/10): Building a Learning Plan](./03-learning-plan.md)
+- [Developer Career 101 (4/10): Resume and Portfolio](./04-resume-and-portfolio.md)
+- [Developer Career 101 (5/10): Preparing for Coding Interviews](./05-coding-interview.md)
+- [Developer Career 101 (6/10): System Design Interviews](./06-system-design-interview.md)
+- [Developer Career 101 (7/10): Settling into the First Job](./07-first-job.md)
+- [Developer Career 101 (8/10): Side Projects and Learning](./08-side-projects.md)
+- [Developer Career 101 (9/10): Mentoring and Networking](./09-mentoring-networking.md)
 - **The Path to Senior (current)**
+
 <!-- toc:end -->
 
 ## References
