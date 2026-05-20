@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 2
-title: Severity Classification
+title: "Incident Response 101 (2/10): Severity Classification"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to map incident impact to SEV levels, paging scope, a
 last_reviewed: '2026-05-15'
 ---
 
-# Severity Classification
+# Incident Response 101 (2/10): Severity Classification
 
 Once a team agrees on what counts as an incident, the next question is how serious that incident is. Not every incident deserves the same paging fan-out, the same update cadence, or the same leadership attention.
 
@@ -28,17 +28,21 @@ That is why severity is more than a label. It is the shorthand that turns impact
 
 This is post 2 in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.
 
-## Questions this chapter answers
-
-Even after a team agrees that a problem is an incident, people still need a shared way to describe how bad it is. “Serious” means one thing to a payment team and something else to an internal tooling team unless the impact model is explicit.
-
-> Severity is a translation layer between impact and behavior. A SEV label is only useful when it changes who gets paged, how often updates go out, and how fast decisions move.
+## Questions to Keep in Mind
 
 - What separates SEV1, SEV2, and SEV3 in practice?
 - Which axes matter most: users, scope, revenue, legal exposure, or duration?
 - How should severity affect paging and update cadence?
-- Why do boundary examples matter as much as definitions?
-- How much classification should be automated?
+
+## Big Picture
+
+![incident response 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 2 flow overview*
+
+This picture places Severity Classification inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Severity Classification is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A strong severity system removes those debates from the live path. When someone 
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The point of the flow is the mapping step. Severity is not the impact itself; it is the operating language that turns impact into a response pattern.
 
 ## Key Terms
@@ -164,8 +165,19 @@ If someone says “This is SEV2,” the room should already know which people to
 
 Next, we cover initial response.
 
+## Answering the Opening Questions
+
+- **What separates SEV1, SEV2, and SEV3 in practice?**
+  - The article treats Severity Classification as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which axes matter most: users, scope, revenue, legal exposure, or duration?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should severity affect paging and update cadence?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
 - **Severity Classification (current)**
 - Initial Response (upcoming)
 - Communication (upcoming)
@@ -175,6 +187,7 @@ Next, we cover initial response.
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

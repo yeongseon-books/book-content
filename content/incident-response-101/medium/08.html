@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Postmortem</title>
+<title>Incident Response 101 (8/10): Postmortem</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Postmortem</h1>
+<h1>Incident Response 101 (8/10): Postmortem</h1>
 <p>Once an incident is over, the emotional temptation is to move on quickly. The channel quiets down, customer impact is gone, and everyone wants to get back to roadmap work.</p>
 <p>That is exactly when the most valuable learning can be lost. A good postmortem converts a stressful event into an organizational asset instead of a fading memory or a blame ritual.</p>
 <p>This is post 8 in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.</p>
-<h2>Questions this chapter answers</h2>
-<p>Postmortems swing toward two unhealthy extremes: blame documents that make people defensive, or polished narratives that never create meaningful follow-up work.</p>
-<blockquote>
-<p>A useful postmortem records facts, impact, causes, and concrete next actions without collapsing into either personal blame or empty documentation.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is a postmortem still necessary after the incident is already over?</li>
 <li>What does blameless analysis mean in practical terms?</li>
 <li>Why should the template stay stable across incidents?</li>
-<li>What fields make an action item traceable?</li>
-<li>How do you keep the review loop alive after publication?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 8 flow overview</em></p>
+<p>This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Postmortem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>If the team cannot convert the incident into reusable learning, the same outage pattern comes back under a new name. Recovery restores service, but postmortem work is what restores organizational memory.</p>
 <p>A strong postmortem also protects accuracy. It captures facts before memory fades and links them to work that can be prioritized, assigned, and revisited later.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-Publishing the document is only the midpoint. The real payoff comes when the review leads to tracked action items that are still checked later.</p>
+<p>Publishing the document is only the midpoint. The real payoff comes when the review leads to tracked action items that are still checked later.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>blameless</strong>: no personal blame.</li>
@@ -156,14 +155,24 @@ def new_doc():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover prevention.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Mitigation and Resolution</a></li>
+<li><strong>Why is a postmortem still necessary after the incident is already over?</strong></li>
+<li>The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does blameless analysis mean in practical terms?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why should the template stay stable across incidents?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Incident Response 101 (4/10): Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Incident Response 101 (5/10): Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Incident Response 101 (6/10): Root Cause Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Incident Response 101 (7/10): Mitigation and Resolution</a></li>
 <li><strong>Postmortem (current)</strong></li>
 <li>Prevention (upcoming)</li>
 <li>Building an Incident Runbook (upcoming)</li>

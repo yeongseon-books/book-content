@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building an Incident Runbook</title>
+<title>Incident Response 101 (10/10): Building an Incident Runbook</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Building an Incident Runbook</h1>
+<h1>Incident Response 101 (10/10): Building an Incident Runbook</h1>
 <p>During a real incident, scattered documentation is almost as dangerous as missing documentation. If the SEV matrix lives in one wiki, the on-call schedule in another tool, and the customer-update template in a personal note, the team loses time before it even starts acting.</p>
 <p>A runbook is valuable because it turns those fragments into one executable operating surface. It tells the responder where to begin, what to check next, and how the incident should flow into postmortem and prevention work.</p>
 <p>This is the final post in the Incident Response 101 series. This capstone post shows how to assemble a runbook as code so response logic, templates, ownership, and drill practice evolve together.</p>
-<h2>Questions this chapter answers</h2>
-<p>A runbook fails when it is only a reading document. During a live incident, responders need one place that links severity policy, current ownership, communication templates, next-step logic, and postmortem follow-through.</p>
-<blockquote>
-<p>A good runbook is an operating interface, not a pile of notes. It should let a responder move from page acknowledgement to postmortem creation without hunting through five systems.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why does runbook quality show up most clearly at 3 a.m.?</li>
 <li>How should severity policy connect to on-call ownership and templates?</li>
 <li>Why is runbooks-as-code better than keeping everything in a wiki?</li>
-<li>What should be exercised in drills before the runbook is trusted?</li>
-<li>How do you keep the runbook current after real incidents?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 10 flow overview</em></p>
+<p>This picture places Building an Incident Runbook inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building an Incident Runbook is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>The first cost of scattered operations knowledge is search time. The second cost is inconsistency: people start from different assumptions and follow different links even though they are handling the same outage.</p>
 <p>A runbook repository reduces both costs. It makes the response path reviewable, versioned, and easy to improve after drills or real incidents.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.</p>
+<p>Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>runbook</strong>: a collection of response procedures.</li>
@@ -183,16 +182,26 @@ def next_step(current):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>This series wraps up here. Next, read the SRE 101 and Information Security 101 series to grow reliability and security together.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Mitigation and Resolution</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/08-postmortem.md">Postmortem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/09-prevention.md">Prevention</a></li>
+<li><strong>Why does runbook quality show up most clearly at 3 a.m.?</strong></li>
+<li>The article treats Building an Incident Runbook as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How should severity policy connect to on-call ownership and templates?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is runbooks-as-code better than keeping everything in a wiki?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Incident Response 101 (4/10): Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Incident Response 101 (5/10): Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Incident Response 101 (6/10): Root Cause Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Incident Response 101 (7/10): Mitigation and Resolution</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/08-postmortem.md">Incident Response 101 (8/10): Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/09-prevention.md">Incident Response 101 (9/10): Prevention</a></li>
 <li><strong>Building an Incident Runbook (current)</strong></li>
 </ul>
 <h2>References</h2>

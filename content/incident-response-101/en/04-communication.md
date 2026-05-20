@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 4
-title: Communication
+title: "Incident Response 101 (4/10): Communication"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to send incident updates to responders, customers, an
 last_reviewed: '2026-05-15'
 ---
 
-# Communication
+# Incident Response 101 (4/10): Communication
 
 Many teams assume incident communication is secondary work that can wait until the technical situation is clearer. In practice, trust often erodes faster from silence than from a slightly slower recovery.
 
@@ -28,17 +28,21 @@ Customers, executives, and responders do not need the same message. They need th
 
 This is post 4 in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.
 
-## Questions this chapter answers
-
-Communication breaks when teams try to reuse the same sentence for customers, responders, and executives. Those audiences care about different things even when the underlying facts are identical.
-
-> Incident communication is not about saying more. It is about sending the right level of detail to the right audience on a predictable rhythm.
+## Questions to Keep in Mind
 
 - Who needs updates during an incident, and what should each audience hear?
 - Why is a fast imperfect first update usually better than a delayed perfect one?
 - How should severity shape the update cadence?
-- What belongs on a status page versus an internal chat channel?
-- What needs to happen after technical recovery is complete?
+
+## Big Picture
+
+![incident response 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 4 flow overview*
+
+This picture places Communication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Communication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ When those streams are mixed together, everyone gets either too little or too mu
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The important idea is audience branching. One incident can require three communication streams, each with its own channel, level of detail, and timing expectation.
 
 ## Key Terms
@@ -163,10 +164,21 @@ The goal of the first update is not total completeness. It is to establish that 
 
 Next, we cover writing the timeline.
 
+## Answering the Opening Questions
+
+- **Who needs updates during an incident, and what should each audience hear?**
+  - The article treats Communication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a fast imperfect first update usually better than a delayed perfect one?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should severity shape the update cadence?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
 - **Communication (current)**
 - Writing the Timeline (upcoming)
 - Root Cause Analysis (upcoming)
@@ -174,6 +186,7 @@ Next, we cover writing the timeline.
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

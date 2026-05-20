@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prevention</title>
+<title>Incident Response 101 (9/10): Prevention</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Prevention</h1>
+<h1>Incident Response 101 (9/10): Prevention</h1>
 <p>An incident is not truly closed when the postmortem is published. It is closed when the learning is pushed back into code, tests, automation, and operating constraints that make the same failure harder to repeat.</p>
 <p>Teams that stop at documentation keep relearning the same lesson. Teams that attach regression tests, guardrails, and review loops turn each incident into a measurable reliability improvement.</p>
 <p>This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.</p>
-<h2>Questions this chapter answers</h2>
-<p>Many organizations stop prevention work at the moment they can say the postmortem is done. But prevention does not live in a document; it lives in tests, controls, and operating constraints that keep the same failure from re-entering production easily.</p>
-<blockquote>
-<p>Prevention means turning lessons into code, tests, and guardrails that still work months later when the people and context have changed.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do incidents repeat even after strong postmortems?</li>
 <li>Which follow-up items deserve regression tests first?</li>
 <li>How do guardrails differ from warnings or documentation?</li>
-<li>What role do chaos experiments play in prevention work?</li>
-<li>How do you keep the learning loop alive across quarters?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 9 flow overview</em></p>
+<p>This picture places Prevention inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Prevention is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Teams get weaker over time when they depend on memory. They get stronger over time when each incident leaves behind a test, a blocking control, or a better operating default.</p>
 <p>That is why prevention is best treated as an engineering output. Good intentions do not survive turnover or fatigue; tests and safeguards do.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.</p>
+<p>The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>action item</strong>: a postmortem follow-up.</li>
@@ -188,15 +187,25 @@ The loop matters as much as the individual controls. Action items become tests, 
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next is the capstone: Building an Incident Runbook.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Mitigation and Resolution</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/08-postmortem.md">Postmortem</a></li>
+<li><strong>Why do incidents repeat even after strong postmortems?</strong></li>
+<li>The article treats Prevention as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which follow-up items deserve regression tests first?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do guardrails differ from warnings or documentation?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Incident Response 101 (4/10): Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Incident Response 101 (5/10): Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Incident Response 101 (6/10): Root Cause Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Incident Response 101 (7/10): Mitigation and Resolution</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/08-postmortem.md">Incident Response 101 (8/10): Postmortem</a></li>
 <li><strong>Prevention (current)</strong></li>
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>

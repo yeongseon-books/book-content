@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 1
-title: What is an Incident?
+title: "Incident Response 101 (1/10): What is an Incident?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to distinguish a real incident from a routine bug by 
 last_reviewed: '2026-05-15'
 ---
 
-# What is an Incident?
+# Incident Response 101 (1/10): What is an Incident?
 
 The first hard question in on-call work is rarely technical. When an alert fires, you have to decide whether you are looking at a real incident, a routine bug, or a noisy warning that only needs follow-up during business hours.
 
@@ -28,17 +28,21 @@ Without a shared threshold, teams drift in opposite directions. Some page everyo
 
 This is the first post in the Incident Response 101 series. This post explains how to define an incident around customer impact, duration, and response thresholds so the rest of the incident process has a stable starting point.
 
-## Questions this chapter answers
-
-The hard part is not noticing that something looks wrong. The hard part is deciding whether the symptoms have crossed the line from routine engineering work into incident response. If that line is vague, paging and escalation stay vague too.
-
-> An incident is not “anything unusual.” It is an abnormal condition whose customer impact has crossed an agreed threshold.
+## Questions to Keep in Mind
 
 - Which problems should count as an incident instead of a regular bug?
 - How is an alert different from an incident?
 - What metrics make customer impact concrete enough to page people?
-- Where should a new on-call engineer look first before escalating?
-- How do you keep the threshold strict without becoming slow?
+
+## Big Picture
+
+![incident response 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 1 flow overview*
+
+This picture places What is an Incident? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is an Incident? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A usable incident definition reduces argument during the first minutes of respon
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The diagram below shows the first decision cut. Events arrive all day, but only the subset with meaningful customer impact should cross into the incident path.
 
 ## Key Terms
@@ -167,7 +168,18 @@ You are not trying to prove the full root cause yet. You are gathering enough ev
 
 Next, we cover severity classification.
 
+## Answering the Opening Questions
+
+- **Which problems should count as an incident instead of a regular bug?**
+  - The article treats What is an Incident? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How is an alert different from an incident?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What metrics make customer impact concrete enough to page people?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is an Incident? (current)**
 - Severity Classification (upcoming)
 - Initial Response (upcoming)
@@ -178,6 +190,7 @@ Next, we cover severity classification.
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

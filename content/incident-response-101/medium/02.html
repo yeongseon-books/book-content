@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Severity Classification</title>
+<title>Incident Response 101 (2/10): Severity Classification</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Severity Classification</h1>
+<h1>Incident Response 101 (2/10): Severity Classification</h1>
 <p>Once a team agrees on what counts as an incident, the next question is how serious that incident is. Not every incident deserves the same paging fan-out, the same update cadence, or the same leadership attention.</p>
 <p>That is why severity is more than a label. It is the shorthand that turns impact into response behavior, escalation paths, and communication timing.</p>
 <p>This is post 2 in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.</p>
-<h2>Questions this chapter answers</h2>
-<p>Even after a team agrees that a problem is an incident, people still need a shared way to describe how bad it is. “Serious” means one thing to a payment team and something else to an internal tooling team unless the impact model is explicit.</p>
-<blockquote>
-<p>Severity is a translation layer between impact and behavior. A SEV label is only useful when it changes who gets paged, how often updates go out, and how fast decisions move.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What separates SEV1, SEV2, and SEV3 in practice?</li>
 <li>Which axes matter most: users, scope, revenue, legal exposure, or duration?</li>
 <li>How should severity affect paging and update cadence?</li>
-<li>Why do boundary examples matter as much as definitions?</li>
-<li>How much classification should be automated?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 2 flow overview</em></p>
+<p>This picture places Severity Classification inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Severity Classification is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Without severity, every incident starts with improvised negotiation. People debate the label, the audience, and the pacing at the exact moment when they should already be acting.</p>
 <p>A strong severity system removes those debates from the live path. When someone says “SEV2,” the room should already know the expected fan-out, communication cadence, and decision urgency.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The point of the flow is the mapping step. Severity is not the impact itself; it is the operating language that turns impact into a response pattern.</p>
+<p>The point of the flow is the mapping step. Severity is not the impact itself; it is the operating language that turns impact into a response pattern.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SEV1</strong>: company-wide impact.</li>
@@ -190,8 +189,18 @@ The point of the flow is the mapping step. Severity is not the impact itself; it
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover initial response.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><strong>What separates SEV1, SEV2, and SEV3 in practice?</strong></li>
+<li>The article treats Severity Classification as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which axes matter most: users, scope, revenue, legal exposure, or duration?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should severity affect paging and update cadence?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
 <li><strong>Severity Classification (current)</strong></li>
 <li>Initial Response (upcoming)</li>
 <li>Communication (upcoming)</li>

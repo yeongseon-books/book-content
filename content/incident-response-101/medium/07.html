@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Mitigation and Resolution</title>
+<title>Incident Response 101 (7/10): Mitigation and Resolution</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Mitigation and Resolution</h1>
+<h1>Incident Response 101 (7/10): Mitigation and Resolution</h1>
 <p>Stopping customer pain is not the same as fixing the system. That distinction sounds obvious in calm conversation, but during a live incident teams often announce “resolved” when they have only bought a temporary reduction in impact.</p>
 <p>Mitigation and resolution have different goals, different owners, and sometimes different timelines. Confusing them creates both technical and communication risk.</p>
 <p>This is post 7 in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.</p>
-<h2>Questions this chapter answers</h2>
-<p>Teams under pressure often collapse mitigation and resolution into a single recovery concept. That makes it easy to communicate too aggressively, or to close the incident before the real risk is gone.</p>
-<blockquote>
-<p>Mitigation reduces impact now. Resolution removes the condition that caused the impact. Both matter, but they should not be announced or verified in the same way.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What makes rollback such a powerful mitigation tool?</li>
 <li>When should you scale out, throttle, or use a kill switch instead?</li>
 <li>Why is “impact reduced” not enough to declare resolution?</li>
-<li>How do you verify recovery with numbers instead of intuition?</li>
-<li>Which post-mitigation events still need to be recorded?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 7 flow overview</em></p>
+<p>This picture places Mitigation and Resolution inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Mitigation and Resolution is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>A service can look calmer while the underlying cause is still present. That is why incidents often reopen at night or after traffic shifts if the team stops at temporary containment.</p>
 <p>Separating mitigation from resolution keeps the response honest. It improves communication, clarifies ownership, and prevents teams from skipping the verification step.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The response path moves from impact containment to stability and then to root removal. If those states are not separated, both operations and communication get fuzzy.</p>
+<p>The response path moves from impact containment to stability and then to root removal. If those states are not separated, both operations and communication get fuzzy.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>mitigation</strong>: stop the damage.</li>
@@ -160,13 +159,23 @@ def kill(feature):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover the postmortem.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
+<li><strong>What makes rollback such a powerful mitigation tool?</strong></li>
+<li>The article treats Mitigation and Resolution as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you scale out, throttle, or use a kill switch instead?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is “impact reduced” not enough to declare resolution?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Incident Response 101 (4/10): Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Incident Response 101 (5/10): Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Incident Response 101 (6/10): Root Cause Analysis</a></li>
 <li><strong>Mitigation and Resolution (current)</strong></li>
 <li>Postmortem (upcoming)</li>
 <li>Prevention (upcoming)</li>

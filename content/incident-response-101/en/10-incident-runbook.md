@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 10
-title: Building an Incident Runbook
+title: "Incident Response 101 (10/10): Building an Incident Runbook"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to assemble SEV policy, on-call ownership, templates,
 last_reviewed: '2026-05-15'
 ---
 
-# Building an Incident Runbook
+# Incident Response 101 (10/10): Building an Incident Runbook
 
 During a real incident, scattered documentation is almost as dangerous as missing documentation. If the SEV matrix lives in one wiki, the on-call schedule in another tool, and the customer-update template in a personal note, the team loses time before it even starts acting.
 
@@ -28,17 +28,21 @@ A runbook is valuable because it turns those fragments into one executable opera
 
 This is the final post in the Incident Response 101 series. This capstone post shows how to assemble a runbook as code so response logic, templates, ownership, and drill practice evolve together.
 
-## Questions this chapter answers
-
-A runbook fails when it is only a reading document. During a live incident, responders need one place that links severity policy, current ownership, communication templates, next-step logic, and postmortem follow-through.
-
-> A good runbook is an operating interface, not a pile of notes. It should let a responder move from page acknowledgement to postmortem creation without hunting through five systems.
+## Questions to Keep in Mind
 
 - Why does runbook quality show up most clearly at 3 a.m.?
 - How should severity policy connect to on-call ownership and templates?
 - Why is runbooks-as-code better than keeping everything in a wiki?
-- What should be exercised in drills before the runbook is trusted?
-- How do you keep the runbook current after real incidents?
+
+## Big Picture
+
+![incident response 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 10 flow overview*
+
+This picture places Building an Incident Runbook inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building an Incident Runbook is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A runbook repository reduces both costs. It makes the response path reviewable, 
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.
 
 ## Key Terms
@@ -191,17 +192,29 @@ The goal is not to flatten every document into one giant file. The goal is to ma
 
 This series wraps up here. Next, read the SRE 101 and Information Security 101 series to grow reliability and security together.
 
+## Answering the Opening Questions
+
+- **Why does runbook quality show up most clearly at 3 a.m.?**
+  - The article treats Building an Incident Runbook as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should severity policy connect to on-call ownership and templates?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is runbooks-as-code better than keeping everything in a wiki?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
-- [Root Cause Analysis](./06-root-cause-analysis.md)
-- [Mitigation and Resolution](./07-mitigation-and-resolution.md)
-- [Postmortem](./08-postmortem.md)
-- [Prevention](./09-prevention.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
+- [Incident Response 101 (7/10): Mitigation and Resolution](./07-mitigation-and-resolution.md)
+- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
+- [Incident Response 101 (9/10): Prevention](./09-prevention.md)
 - **Building an Incident Runbook (current)**
+
 <!-- toc:end -->
 
 ## References

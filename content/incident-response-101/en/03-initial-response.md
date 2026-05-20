@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 3
-title: Initial Response
+title: "Incident Response 101 (3/10): Initial Response"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn what a response team should do in the first minutes of an
 last_reviewed: '2026-05-15'
 ---
 
-# Initial Response
+# Incident Response 101 (3/10): Initial Response
 
 The first few minutes after an alert feel both compressed and chaotic. Data is incomplete, pressure is high, and different people start pulling toward diagnosis, rollback, communication, and ownership at the same time.
 
@@ -28,17 +28,21 @@ Teams that survive this window well do not start with perfect answers. They star
 
 This is post 3 in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.
 
-## Questions this chapter answers
-
-In the first five minutes, teams often chase diagnosis because it feels productive. But when the blast radius is still growing, response structure matters more than a complete explanation.
-
-> Initial response is about stopping the bleeding, creating one command channel, and assigning ownership before the incident fragments into parallel guesses.
+## Questions to Keep in Mind
 
 - What should happen first after a page is acknowledged?
 - Why is stabilization usually more urgent than diagnosis?
 - How much impact estimation is enough for the first update?
-- Which roles should be assigned immediately?
-- What should trigger the first external communication?
+
+## Big Picture
+
+![incident response 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 3 flow overview*
+
+This picture places Initial Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Initial Response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A strong first-response routine creates enough order to keep the incident legibl
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The response path is intentionally simple. Acknowledge ownership, triage the rough severity, open one channel, and assign roles before the room grows noisy.
 
 ## Key Terms
@@ -162,9 +163,20 @@ This kind of log is short, but it preserves the difference between “we were in
 
 Next, we cover communication.
 
+## Answering the Opening Questions
+
+- **What should happen first after a page is acknowledged?**
+  - The article treats Initial Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is stabilization usually more urgent than diagnosis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How much impact estimation is enough for the first update?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
 - **Initial Response (current)**
 - Communication (upcoming)
 - Writing the Timeline (upcoming)
@@ -173,6 +185,7 @@ Next, we cover communication.
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

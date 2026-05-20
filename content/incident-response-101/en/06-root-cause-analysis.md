@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 6
-title: Root Cause Analysis
+title: "Incident Response 101 (6/10): Root Cause Analysis"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to separate triggers from root causes and turn RCA fi
 last_reviewed: '2026-05-15'
 ---
 
-# Root Cause Analysis
+# Incident Response 101 (6/10): Root Cause Analysis
 
 When an incident hurts production, the first visible event often gets blamed as the cause. A deployment happened before the outage, so the deployment gets blamed. A human ran a command, so the human gets blamed.
 
@@ -28,17 +28,21 @@ That reaction is understandable, but it is usually shallow. The trigger explains
 
 This is post 6 in the Incident Response 101 series. This post shows how to separate triggers from structural causes, collect contributing factors, and turn an RCA into follow-up work that can actually be verified.
 
-## Questions this chapter answers
-
-RCA fails most often when the team stops at the first plausible answer. The trigger is visible and emotionally satisfying, so it gets written down as the cause even though the system conditions remain untouched.
-
-> The goal of RCA is not to name the final spark. It is to uncover the conditions that allowed the spark to turn into customer-facing impact.
+## Questions to Keep in Mind
 
 - How do you distinguish a trigger from a root cause?
 - Why does the Five Whys method still help even in modern systems?
 - Which contributing-factor axes are worth tracking explicitly?
-- Why is “human error” usually an incomplete answer?
-- What makes an action item strong enough to verify later?
+
+## Big Picture
+
+![incident response 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 6 flow overview*
+
+This picture places Root Cause Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Root Cause Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ RCA is valuable when it changes the system. That means tracing beyond the obviou
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 Each “why” step is a reminder not to stop at the first explanation. The useful endpoint is the structural condition that can be changed, not the easiest object to blame.
 
 ## Key Terms
@@ -161,17 +162,29 @@ That framing changes the follow-up work. Instead of blaming the deployment itsel
 
 Next, we cover mitigation and resolution.
 
+## Answering the Opening Questions
+
+- **How do you distinguish a trigger from a root cause?**
+  - The article treats Root Cause Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does the Five Whys method still help even in modern systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which contributing-factor axes are worth tracking explicitly?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
 - **Root Cause Analysis (current)**
 - Mitigation and Resolution (upcoming)
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

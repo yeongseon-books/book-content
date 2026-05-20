@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 7
-title: Mitigation and Resolution
+title: "Incident Response 101 (7/10): Mitigation and Resolution"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to choose mitigation tactics, distinguish them from f
 last_reviewed: '2026-05-15'
 ---
 
-# Mitigation and Resolution
+# Incident Response 101 (7/10): Mitigation and Resolution
 
 Stopping customer pain is not the same as fixing the system. That distinction sounds obvious in calm conversation, but during a live incident teams often announce “resolved” when they have only bought a temporary reduction in impact.
 
@@ -28,17 +28,21 @@ Mitigation and resolution have different goals, different owners, and sometimes 
 
 This is post 7 in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.
 
-## Questions this chapter answers
-
-Teams under pressure often collapse mitigation and resolution into a single recovery concept. That makes it easy to communicate too aggressively, or to close the incident before the real risk is gone.
-
-> Mitigation reduces impact now. Resolution removes the condition that caused the impact. Both matter, but they should not be announced or verified in the same way.
+## Questions to Keep in Mind
 
 - What makes rollback such a powerful mitigation tool?
 - When should you scale out, throttle, or use a kill switch instead?
 - Why is “impact reduced” not enough to declare resolution?
-- How do you verify recovery with numbers instead of intuition?
-- Which post-mitigation events still need to be recorded?
+
+## Big Picture
+
+![incident response 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 7 flow overview*
+
+This picture places Mitigation and Resolution inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Mitigation and Resolution is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ Separating mitigation from resolution keeps the response honest. It improves com
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The response path moves from impact containment to stability and then to root removal. If those states are not separated, both operations and communication get fuzzy.
 
 ## Key Terms
@@ -162,17 +163,29 @@ That order keeps the team focused on the fastest credible reduction in customer 
 
 Next, we cover the postmortem.
 
+## Answering the Opening Questions
+
+- **What makes rollback such a powerful mitigation tool?**
+  - The article treats Mitigation and Resolution as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you scale out, throttle, or use a kill switch instead?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is “impact reduced” not enough to declare resolution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
-- [Root Cause Analysis](./06-root-cause-analysis.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
 - **Mitigation and Resolution (current)**
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

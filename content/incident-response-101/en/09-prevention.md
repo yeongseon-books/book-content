@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 9
-title: Prevention
+title: "Incident Response 101 (9/10): Prevention"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to convert postmortem learning into regression tests,
 last_reviewed: '2026-05-15'
 ---
 
-# Prevention
+# Incident Response 101 (9/10): Prevention
 
 An incident is not truly closed when the postmortem is published. It is closed when the learning is pushed back into code, tests, automation, and operating constraints that make the same failure harder to repeat.
 
@@ -28,17 +28,21 @@ Teams that stop at documentation keep relearning the same lesson. Teams that att
 
 This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.
 
-## Questions this chapter answers
-
-Many organizations stop prevention work at the moment they can say the postmortem is done. But prevention does not live in a document; it lives in tests, controls, and operating constraints that keep the same failure from re-entering production easily.
-
-> Prevention means turning lessons into code, tests, and guardrails that still work months later when the people and context have changed.
+## Questions to Keep in Mind
 
 - Why do incidents repeat even after strong postmortems?
 - Which follow-up items deserve regression tests first?
 - How do guardrails differ from warnings or documentation?
-- What role do chaos experiments play in prevention work?
-- How do you keep the learning loop alive across quarters?
+
+## Big Picture
+
+![incident response 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 9 flow overview*
+
+This picture places Prevention inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Prevention is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ That is why prevention is best treated as an engineering output. Good intentions
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.
 
 ## Key Terms
@@ -161,17 +162,29 @@ Documentation still matters, but tests and guardrails usually deserve priority b
 
 Next is the capstone: Building an Incident Runbook.
 
+## Answering the Opening Questions
+
+- **Why do incidents repeat even after strong postmortems?**
+  - The article treats Prevention as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which follow-up items deserve regression tests first?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do guardrails differ from warnings or documentation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
-- [Root Cause Analysis](./06-root-cause-analysis.md)
-- [Mitigation and Resolution](./07-mitigation-and-resolution.md)
-- [Postmortem](./08-postmortem.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
+- [Incident Response 101 (7/10): Mitigation and Resolution](./07-mitigation-and-resolution.md)
+- [Incident Response 101 (8/10): Postmortem](./08-postmortem.md)
 - **Prevention (current)**
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

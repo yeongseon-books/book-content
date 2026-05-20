@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 5
-title: Writing the Timeline
+title: "Incident Response 101 (5/10): Writing the Timeline"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to build an incident timeline from live notes, channe
 last_reviewed: '2026-05-15'
 ---
 
-# Writing the Timeline
+# Incident Response 101 (5/10): Writing the Timeline
 
 One of the most expensive mistakes after an incident is trusting memory more than recorded evidence. Everyone thinks they saw the same thing, but a few days later the sequence of events, the basis for decisions, and even the time of mitigation start to blur.
 
@@ -28,17 +28,21 @@ A useful timeline is not a polished story reconstructed after the fact. It is a 
 
 This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.
 
-## Questions this chapter answers
-
-A timeline becomes unreliable the moment it mixes memory, hindsight, and interpretation. By the time a team writes a postmortem days later, everyone already knows more than they knew while the incident was live.
-
-> A trustworthy timeline records what the team observed and when it observed it. Interpretation can be useful, but it must stay visibly separate from the facts.
+## Questions to Keep in Mind
 
 - Why should timeline work begin during the incident instead of after it?
 - Which channels need to be collected besides the main response chat?
 - How do you separate recorded facts from later theories?
-- Why do anchor moments like detected and mitigated matter so much?
-- How should time zones be handled in shared documentation?
+
+## Big Picture
+
+![incident response 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 5 flow overview*
+
+This picture places Writing the Timeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing the Timeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A clear timeline protects the team from that distortion. It creates a fact base 
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.
 
 ## Key Terms
@@ -165,17 +166,29 @@ The `fact` lines preserve what the team knew at the time. The `note` line preser
 
 Next, we cover root cause analysis.
 
+## Answering the Opening Questions
+
+- **Why should timeline work begin during the incident instead of after it?**
+  - The article treats Writing the Timeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which channels need to be collected besides the main response chat?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you separate recorded facts from later theories?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
 - **Writing the Timeline (current)**
 - Root Cause Analysis (upcoming)
 - Mitigation and Resolution (upcoming)
 - Postmortem (upcoming)
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Initial Response</title>
+<title>Incident Response 101 (3/10): Initial Response</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Initial Response</h1>
+<h1>Incident Response 101 (3/10): Initial Response</h1>
 <p>The first few minutes after an alert feel both compressed and chaotic. Data is incomplete, pressure is high, and different people start pulling toward diagnosis, rollback, communication, and ownership at the same time.</p>
 <p>Teams that survive this window well do not start with perfect answers. They start with structure: acknowledge the page, estimate impact, open one channel, assign roles, and buy time with stabilization.</p>
 <p>This is post 3 in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.</p>
-<h2>Questions this chapter answers</h2>
-<p>In the first five minutes, teams often chase diagnosis because it feels productive. But when the blast radius is still growing, response structure matters more than a complete explanation.</p>
-<blockquote>
-<p>Initial response is about stopping the bleeding, creating one command channel, and assigning ownership before the incident fragments into parallel guesses.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What should happen first after a page is acknowledged?</li>
 <li>Why is stabilization usually more urgent than diagnosis?</li>
 <li>How much impact estimation is enough for the first update?</li>
-<li>Which roles should be assigned immediately?</li>
-<li>What should trigger the first external communication?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 3 flow overview</em></p>
+<p>This picture places Initial Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Initial Response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>The most expensive minutes in an incident are often the earliest ones. If everyone starts investigating independently, the team loses both speed and a shared picture of the problem.</p>
 <p>A strong first-response routine creates enough order to keep the incident legible. Once ownership, communication, and stabilization are in place, deeper diagnosis becomes much more effective.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The response path is intentionally simple. Acknowledge ownership, triage the rough severity, open one channel, and assign roles before the room grows noisy.</p>
+<p>The response path is intentionally simple. Acknowledge ownership, triage the rough severity, open one channel, and assign roles before the room grows noisy.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ack</strong>: acknowledging a page.</li>
@@ -157,9 +156,19 @@ The response path is intentionally simple. Acknowledge ownership, triage the rou
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover communication.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><strong>What should happen first after a page is acknowledged?</strong></li>
+<li>The article treats Initial Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is stabilization usually more urgent than diagnosis?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How much impact estimation is enough for the first update?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
 <li><strong>Initial Response (current)</strong></li>
 <li>Communication (upcoming)</li>
 <li>Writing the Timeline (upcoming)</li>

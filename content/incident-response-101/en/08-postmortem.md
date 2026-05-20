@@ -1,7 +1,7 @@
 ---
 series: incident-response-101
 episode: 8
-title: Postmortem
+title: "Incident Response 101 (8/10): Postmortem"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to write a blameless postmortem with quantified impac
 last_reviewed: '2026-05-15'
 ---
 
-# Postmortem
+# Incident Response 101 (8/10): Postmortem
 
 Once an incident is over, the emotional temptation is to move on quickly. The channel quiets down, customer impact is gone, and everyone wants to get back to roadmap work.
 
@@ -28,17 +28,21 @@ That is exactly when the most valuable learning can be lost. A good postmortem c
 
 This is post 8 in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.
 
-## Questions this chapter answers
-
-Postmortems swing toward two unhealthy extremes: blame documents that make people defensive, or polished narratives that never create meaningful follow-up work.
-
-> A useful postmortem records facts, impact, causes, and concrete next actions without collapsing into either personal blame or empty documentation.
+## Questions to Keep in Mind
 
 - Why is a postmortem still necessary after the incident is already over?
 - What does blameless analysis mean in practical terms?
 - Why should the template stay stable across incidents?
-- What fields make an action item traceable?
-- How do you keep the review loop alive after publication?
+
+## Big Picture
+
+![incident response 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
+
+*incident response 101 chapter 8 flow overview*
+
+This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Postmortem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -48,9 +52,6 @@ A strong postmortem also protects accuracy. It captures facts before memory fade
 
 ## Diagram at a glance
 
-![Diagram at a glance](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
-
-*Diagram at a glance*
 Publishing the document is only the midpoint. The real payoff comes when the review leads to tracked action items that are still checked later.
 
 ## Key Terms
@@ -158,17 +159,29 @@ A strong action item starts with a verb, names an owner, includes a due date, an
 
 Next, we cover prevention.
 
+## Answering the Opening Questions
+
+- **Why is a postmortem still necessary after the incident is already over?**
+  - The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does blameless analysis mean in practical terms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should the template stay stable across incidents?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Incident?](./01-what-is-incident.md)
-- [Severity Classification](./02-severity.md)
-- [Initial Response](./03-initial-response.md)
-- [Communication](./04-communication.md)
-- [Writing the Timeline](./05-timeline.md)
-- [Root Cause Analysis](./06-root-cause-analysis.md)
-- [Mitigation and Resolution](./07-mitigation-and-resolution.md)
+## In this series
+
+- [Incident Response 101 (1/10): What is an Incident?](./01-what-is-incident.md)
+- [Incident Response 101 (2/10): Severity Classification](./02-severity.md)
+- [Incident Response 101 (3/10): Initial Response](./03-initial-response.md)
+- [Incident Response 101 (4/10): Communication](./04-communication.md)
+- [Incident Response 101 (5/10): Writing the Timeline](./05-timeline.md)
+- [Incident Response 101 (6/10): Root Cause Analysis](./06-root-cause-analysis.md)
+- [Incident Response 101 (7/10): Mitigation and Resolution](./07-mitigation-and-resolution.md)
 - **Postmortem (current)**
 - Prevention (upcoming)
 - Building an Incident Runbook (upcoming)
+
 <!-- toc:end -->
 
 ## References

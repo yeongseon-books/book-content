@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Communication</title>
+<title>Incident Response 101 (4/10): Communication</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Communication</h1>
+<h1>Incident Response 101 (4/10): Communication</h1>
 <p>Many teams assume incident communication is secondary work that can wait until the technical situation is clearer. In practice, trust often erodes faster from silence than from a slightly slower recovery.</p>
 <p>Customers, executives, and responders do not need the same message. They need the same facts translated into different levels of detail and delivered on a predictable cadence.</p>
 <p>This is post 4 in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.</p>
-<h2>Questions this chapter answers</h2>
-<p>Communication breaks when teams try to reuse the same sentence for customers, responders, and executives. Those audiences care about different things even when the underlying facts are identical.</p>
-<blockquote>
-<p>Incident communication is not about saying more. It is about sending the right level of detail to the right audience on a predictable rhythm.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Who needs updates during an incident, and what should each audience hear?</li>
 <li>Why is a fast imperfect first update usually better than a delayed perfect one?</li>
 <li>How should severity shape the update cadence?</li>
-<li>What belongs on a status page versus an internal chat channel?</li>
-<li>What needs to happen after technical recovery is complete?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 4 flow overview</em></p>
+<p>This picture places Communication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Communication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Customers do not need raw logs. They need impact, scope, and the next promised update. Executives need business context, decision risk, and timing. Responders need technical detail and precise ownership.</p>
 <p>When those streams are mixed together, everyone gets either too little or too much. Separating them early keeps trust higher and lets the technical team keep moving.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The important idea is audience branching. One incident can require three communication streams, each with its own channel, level of detail, and timing expectation.</p>
+<p>The important idea is audience branching. One incident can require three communication streams, each with its own channel, level of detail, and timing expectation.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>internal</strong>: shared inside the response team.</li>
@@ -158,10 +157,20 @@ Checkout incident, currently SEV2. Payment conversion is affected. Rollback is i
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover writing the timeline.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
+<li><strong>Who needs updates during an incident, and what should each audience hear?</strong></li>
+<li>The article treats Communication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is a fast imperfect first update usually better than a delayed perfect one?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should severity shape the update cadence?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
 <li><strong>Communication (current)</strong></li>
 <li>Writing the Timeline (upcoming)</li>
 <li>Root Cause Analysis (upcoming)</li>

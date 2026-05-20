@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Writing the Timeline</title>
+<title>Incident Response 101 (5/10): Writing the Timeline</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Writing the Timeline</h1>
+<h1>Incident Response 101 (5/10): Writing the Timeline</h1>
 <p>One of the most expensive mistakes after an incident is trusting memory more than recorded evidence. Everyone thinks they saw the same thing, but a few days later the sequence of events, the basis for decisions, and even the time of mitigation start to blur.</p>
 <p>A useful timeline is not a polished story reconstructed after the fact. It is a fact log captured during the response and cleaned up later without mixing observation and interpretation.</p>
 <p>This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.</p>
-<h2>Questions this chapter answers</h2>
-<p>A timeline becomes unreliable the moment it mixes memory, hindsight, and interpretation. By the time a team writes a postmortem days later, everyone already knows more than they knew while the incident was live.</p>
-<blockquote>
-<p>A trustworthy timeline records what the team observed and when it observed it. Interpretation can be useful, but it must stay visibly separate from the facts.</p>
-</blockquote>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why should timeline work begin during the incident instead of after it?</li>
 <li>Which channels need to be collected besides the main response chat?</li>
 <li>How do you separate recorded facts from later theories?</li>
-<li>Why do anchor moments like detected and mitigated matter so much?</li>
-<li>How should time zones be handled in shared documentation?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="incident response 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png"></p>
+<p><em>incident response 101 chapter 5 flow overview</em></p>
+<p>This picture places Writing the Timeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Writing the Timeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Memory drifts fast, especially after a stressful outage. People remember the final explanation and unconsciously pull it backward into earlier moments where it did not yet exist.</p>
 <p>A clear timeline protects the team from that distortion. It creates a fact base that later RCA and postmortem work can trust without rewriting history.</p>
 <h2>Diagram at a glance</h2>
-<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png"></p>
-<p><em>Diagram at a glance</em><br>
-The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.</p>
+<p>The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>timestamp</strong>: a UTC time stamp.</li>
@@ -160,11 +159,21 @@ def mark(event):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover root cause analysis.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
+<li><strong>Why should timeline work begin during the incident instead of after it?</strong></li>
+<li>The article treats Writing the Timeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which channels need to be collected besides the main response chat?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do you separate recorded facts from later theories?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">Incident Response 101 (1/10): What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Incident Response 101 (2/10): Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Incident Response 101 (3/10): Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Incident Response 101 (4/10): Communication</a></li>
 <li><strong>Writing the Timeline (current)</strong></li>
 <li>Root Cause Analysis (upcoming)</li>
 <li>Mitigation and Resolution (upcoming)</li>
