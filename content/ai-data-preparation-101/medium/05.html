@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Tokenization and Chunking Strategies</title>
+<title>AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Tokenization and Chunking Strategies</h1>
+<h1>AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</h1>
 <p>In LLM systems, the tokenizer is not a minor preprocessing detail. It defines the units the model sees, and poor chunking decisions waste context window budget while hurting retrieval and answer quality.</p>
 <p>This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do Korean, English, and code consume the context window so differently?</li>
 <li>When should you stay with a general-purpose tokenizer and when should you train your own?</li>
 <li>What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?</li>
-<li>How much overlap is enough to protect meaning at boundaries without bloating retrieval?</li>
-<li>Which measurements should drive chunk-size decisions instead of guesswork?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/05/05-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 5 flow overview</em></p>
+<p>This picture places Tokenization and Chunking Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Tokenization decides the cost of reading a document, and chunking decides how much meaning survives when that document is split to fit the model. Treat both as one input-design problem.</p>
+<p>The core of Tokenization and Chunking Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
 <h2>"The tokenizer decides model quality?"</h2>
 <p>In LLMs, tokenization is not just preprocessing. The moment the tokenizer is fixed, the units the model can see and the efficiency of its context window are decided. The reason GPT-4 uses far fewer tokens than GPT-3 for the same Korean text is that its tokenizer was retrained.</p>
 <p>This episode covers two topics.</p>
@@ -273,16 +274,25 @@ def semantic_chunk(text: str, threshold: float = 0.3) -&gt; list[str]:
 <li>[ ] Tune chunk size and overlap against retrieval or answer-quality evaluations</li>
 <li>[ ] Include embedding-memory cost when considering larger vocabularies</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
+<li><strong>Why do Korean, English, and code consume the context window so differently?</strong></li>
+<li>The article treats Tokenization and Chunking Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you stay with a general-purpose tokenizer and when should you train your own?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</a></li>
 <li><strong>Tokenization and Chunking Strategies (current)</strong></li>
-<li>Quality Filtering (upcoming)</li>
-<li>Synthetic Data Generation (upcoming)</li>
-<li>Data Augmentation Techniques (upcoming)</li>
+<li>Quality Filtering - Heuristics and Classifiers (upcoming)</li>
+<li>Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)</li>
+<li>Data Augmentation - From EDA to Back-Translation (upcoming)</li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>

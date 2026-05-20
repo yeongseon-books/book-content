@@ -1,5 +1,5 @@
 ---
-title: PII Detection and Anonymization for Training Data
+title: "AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data"
 series: ai-data-preparation-101
 episode: 4
 language: en
@@ -19,23 +19,28 @@ seo_description: LLMs leaking email addresses or phone numbers that came from tr
   data is no longer hypothetical. Carlini et al.
 ---
 
-# PII Detection and Anonymization for Training Data
+# AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data
 
 Training-data leaks are no longer theoretical once email addresses, phone numbers, or names make it into the corpus. The later you try to handle PII, the more expensive cleanup becomes across the rest of the pipeline.
 
 This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why should PII handling be split into detection, classification, anonymization, and audit?
 - What does regex catch quickly, and where do you need NER or review queues?
 - When should you redact, mask, pseudonymize, or synthesize instead?
-- What belongs in an audit log, and what would recreate the privacy risk?
-- Which extra patterns matter for Korean datasets beyond English defaults?
 
-> Good PII handling is layered risk control: catch the obvious patterns cheaply, catch the ambiguous ones carefully, transform them for the real use case, and make the whole process auditable without leaking the original identifiers.
+## Big Picture
 
----
+![AI data preparation chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png)
+
+*AI data preparation chapter 4 flow overview*
+
+This picture places PII Detection and Anonymization for Training Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of PII Detection and Anonymization for Training Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "We Can't Have PII in Training Data, Right?"
 
 LLMs leaking email addresses or phone numbers that came from training data is no longer hypothetical. Carlini et al. (2021), "Extracting Training Data from Large Language Models," demonstrated real names and contact info being extracted from GPT-2. Whatever PII you put in at training time can leak at inference time.
@@ -292,19 +297,29 @@ Korean data has traps that English code misses.
 - [ ] Store only counts, types, and reduction metrics in audit logs
 - [ ] Review a sampled subset of anonymized rows before promoting the dataset
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- **Why should PII handling be split into detection, classification, anonymization, and audit?**
+  - The article treats PII Detection and Anonymization for Training Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does regex catch quickly, and where do you need NER or review queues?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should you redact, mask, pseudonymize, or synthesize instead?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
 - **PII Detection and Anonymization for Training Data (current)**
 - Tokenization and Chunking Strategies (upcoming)
-- Quality Filtering for Training Data (upcoming)
-- Synthetic Data Generation (upcoming)
-- Data Augmentation Techniques (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

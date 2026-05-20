@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>PII Detection and Anonymization for Training Data</title>
+<title>AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>PII Detection and Anonymization for Training Data</h1>
+<h1>AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</h1>
 <p>Training-data leaks are no longer theoretical once email addresses, phone numbers, or names make it into the corpus. The later you try to handle PII, the more expensive cleanup becomes across the rest of the pipeline.</p>
 <p>This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why should PII handling be split into detection, classification, anonymization, and audit?</li>
 <li>What does regex catch quickly, and where do you need NER or review queues?</li>
 <li>When should you redact, mask, pseudonymize, or synthesize instead?</li>
-<li>What belongs in an audit log, and what would recreate the privacy risk?</li>
-<li>Which extra patterns matter for Korean datasets beyond English defaults?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 4 flow overview</em></p>
+<p>This picture places PII Detection and Anonymization for Training Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Good PII handling is layered risk control: catch the obvious patterns cheaply, catch the ambiguous ones carefully, transform them for the real use case, and make the whole process auditable without leaking the original identifiers.</p>
+<p>The core of PII Detection and Anonymization for Training Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
 <h2>"We Can't Have PII in Training Data, Right?"</h2>
 <p>LLMs leaking email addresses or phone numbers that came from training data is no longer hypothetical. Carlini et al. (2021), "Extracting Training Data from Large Language Models," demonstrated real names and contact info being extracted from GPT-2. Whatever PII you put in at training time can leak at inference time.</p>
 <p>PII anonymization is more than regex matching. It is a four-stage pipeline.</p>
@@ -289,16 +290,25 @@ def anonymize_with_audit(rows: list[dict], audit_path: str,
 <li>[ ] Store only counts, types, and reduction metrics in audit logs</li>
 <li>[ ] Review a sampled subset of anonymized rows before promoting the dataset</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
+<li><strong>Why should PII handling be split into detection, classification, anonymization, and audit?</strong></li>
+<li>The article treats PII Detection and Anonymization for Training Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does regex catch quickly, and where do you need NER or review queues?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When should you redact, mask, pseudonymize, or synthesize instead?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
 <li><strong>PII Detection and Anonymization for Training Data (current)</strong></li>
 <li>Tokenization and Chunking Strategies (upcoming)</li>
-<li>Quality Filtering for Training Data (upcoming)</li>
-<li>Synthetic Data Generation (upcoming)</li>
-<li>Data Augmentation Techniques (upcoming)</li>
+<li>Quality Filtering - Heuristics and Classifiers (upcoming)</li>
+<li>Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)</li>
+<li>Data Augmentation - From EDA to Back-Translation (upcoming)</li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>

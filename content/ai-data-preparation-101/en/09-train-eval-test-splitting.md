@@ -1,5 +1,5 @@
 ---
-title: Train/Eval/Test Splitting and Contamination Control
+title: "AI Data Preparation 101 (9/10): Train/Eval/Test Splitting and Contamination Control"
 series: ai-data-preparation-101
 episode: 9
 language: en
@@ -21,23 +21,28 @@ seo_description: 'The pattern of train_test_split(data, test_size=0.2) failing i
   production repeats every year. Two reasons:'
 ---
 
-# Train/Eval/Test Splitting and Contamination Control
+# AI Data Preparation 101 (9/10): Train/Eval/Test Splitting and Contamination Control
 
 Many experiments look healthy right up until they meet production traffic because a simple random split hid the real failure mode. If your split ignores time, users, or benchmark contamination, validation scores can tell the wrong story.
 
 This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - When does a random split stop representing the production problem you actually care about?
 - How do stratified, group, and temporal splits protect against different leakage patterns?
 - Why is contamination now a first-class evaluation problem for LLMs?
-- What can a simple 13-gram overlap check tell you before you trust a benchmark score?
-- How should teams keep the test set separate from tuning in everyday workflow?
 
-> A split strategy is an evaluation simulator. If it does not mirror the real deployment constraints, even beautiful validation numbers can still be answers to the wrong question.
+## Big Picture
 
----
+![AI data preparation chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png)
+
+*AI data preparation chapter 9 flow overview*
+
+This picture places Train/Eval/Test Splitting and Contamination Control inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Train/Eval/Test Splitting and Contamination Control is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "Doesn't random_split cover it?"
 
 The pattern of `train_test_split(data, test_size=0.2)` failing in production repeats every year. Two reasons:
@@ -232,19 +237,29 @@ This function covers nearly all production cases.
 - [ ] Keep the test set out of hyperparameter tuning and define who may access it
 - [ ] Record the time cutoff and backtest strategy whenever temporal split is in use
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
-- [PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
-- [Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
-- [Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
-- [Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
-- [Data Augmentation - From EDA to Back-Translation](./08-data-augmentation.md)
+- **When does a random split stop representing the production problem you actually care about?**
+  - The article treats Train/Eval/Test Splitting and Contamination Control as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do stratified, group, and temporal splits protect against different leakage patterns?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is contamination now a first-class evaluation problem for LLMs?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
+- [AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
+- [AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation](./08-data-augmentation.md)
 - **Train/Eval/Test Splitting and Contamination Control (current)**
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

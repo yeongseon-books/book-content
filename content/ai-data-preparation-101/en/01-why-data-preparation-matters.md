@@ -1,5 +1,5 @@
 ---
-title: Why Data Preparation Determines Model Quality
+title: "AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality"
 series: ai-data-preparation-101
 episode: 1
 language: en
@@ -19,23 +19,28 @@ seo_description: This is the question every ML beginner asks. You download a Kag
   dataset, run pandas.read_csv(), and shove it into a model. Done, right?
 ---
 
-# Why Data Preparation Determines Model Quality
+# AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality
 
 It is easy to think the job ends once you download a dataset, run `pandas.read_csv()`, and feed it into a model. In production, though, model failures usually trace back to data preparation decisions long before they trace back to architecture choices.
 
 This is the first post in the AI Data Preparation 101 series. Here we cover why data preparation has outsized impact on model quality and which early mistakes tend to compound later.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - When does data preparation create more lift than another round of model tuning?
 - Which data failures make offline metrics look healthy while production quality degrades?
 - Why is data preparation better treated as one pipeline than as a few disconnected preprocessing scripts?
-- What minimum dataset report should exist before training starts?
-- Which signals tell you the problem is still in the data layer, not in the model layer?
 
-> Treat data preparation as the quality contract that decides what the model is allowed to learn, what the evaluation numbers actually mean, and which failures you can still debug later.
+## Big Picture
 
----
+![AI data preparation chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/01/01-01-big-picture.en.png)
+
+*AI data preparation chapter 1 flow overview*
+
+This picture places Why Data Preparation Determines Model Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Data Preparation Determines Model Quality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "Can't I Just Grab Some Data and Train?"
 
 This is the question every ML beginner asks. You download a Kaggle dataset, run `pandas.read_csv()`, and shove it into a model. Done, right? But trace any production model quality issue and 70-80% of the time the root cause sits in the data, not the model.
@@ -231,19 +236,29 @@ Generate this report for every dataset version, diff against the previous versio
 - [ ] Make tokenization and split design explicit instead of leaving them as hidden defaults
 - [ ] Write down which quality signals would tell you to revisit the data before the model
 
+## Answering the Opening Questions
+
+- **When does data preparation create more lift than another round of model tuning?**
+  - The article treats Why Data Preparation Determines Model Quality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which data failures make offline metrics look healthy while production quality degrades?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is data preparation better treated as one pipeline than as a few disconnected preprocessing scripts?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-## AI Data Preparation 101 series
+## In this series
 
 - **Why Data Preparation Determines Model Quality (current)**
 - Source Data Collection and Cataloging (upcoming)
 - Cleaning and Deduplication (upcoming)
 - PII Detection and Anonymization for Training Data (upcoming)
 - Tokenization and Chunking Strategies (upcoming)
-- Quality Filtering for Training Data (upcoming)
-- Synthetic Data Generation (upcoming)
-- Data Augmentation Techniques (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

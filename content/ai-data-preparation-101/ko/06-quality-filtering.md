@@ -18,10 +18,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 데이터 품질 필터링 — Heuristic과 Classifier
+title: "AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic과 Classifier"
 ---
 
-# 데이터 품질 필터링 — Heuristic과 Classifier
+# AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic과 Classifier
 
 수집과 정제를 거친 데이터라도 그대로 학습에 넣을 수 있는 경우는 드뭅니다. 광고 문구, 자동 생성 스팸, 깨진 인코딩, 의미 없는 boilerplate가 절반 이상 섞여 있는 코퍼스는 생각보다 흔합니다.
 
@@ -35,13 +35,21 @@ title: 데이터 품질 필터링 — Heuristic과 Classifier
 
 여기서는 heuristic과 classifier를 조합해 품질 필터를 설계하는 방법과, 언어 감지·perplexity·quality score를 어떤 순서로 배치해야 효율적인지 설명하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?
 - 길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?
 - 언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요?
-- fastText 기반 quality classifier는 heuristic만으로 못 잡는 어떤 경계 샘플을 걸러낼까요?
-- 품질 필터의 threshold를 코드에 고정해 두면 왜 시간이 갈수록 위험해질까요?
+
+## 큰 그림
+
+![AI 데이터 준비 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.ko.png)
+
+*AI 데이터 준비 6장 흐름 개요*
+
+이 그림에서는 데이터 품질 필터링 — Heuristic과 Classifier를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터 품질 필터링 — Heuristic과 Classifier의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -51,7 +59,7 @@ title: 데이터 품질 필터링 — Heuristic과 Classifier
 
 이 글은 품질 필터를 “데이터를 많이 버리는 단계”가 아니라 “학습 가치와 운영 비용을 동시에 최적화하는 단계”로 이해하게 만드는 데 초점을 둡니다.
 
-## 품질 필터링을 이해하는 가장 좋은 방법: 싼 규칙부터 비싼 모델까지 계층적으로 배치하는 것입니다
+## 핵심 관점
 
 품질 필터는 한 번의 점수로 좋은 문서와 나쁜 문서를 완전히 나누는 문제가 아닙니다. 길이, 기호 비율, 반복률처럼 거의 공짜인 signal이 있고, 언어 감지와 perplexity처럼 조금 더 비싼 signal이 있고, classifier처럼 학습된 판정기가 있습니다.
 
@@ -261,19 +269,29 @@ def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -> list[
 
 다음 글에서는 사람이 직접 레이블링하기 어려울 때 감독 신호를 확장하는 합성 데이터 생성 기법을 다룹니다. 품질 필터를 통과한 코퍼스 위에서 synthetic generation이 어떻게 붙는지 자연스럽게 이어집니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?**
+  - 본문의 기준은 데이터 품질 필터링 — Heuristic과 Classifier를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)
-- [원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
-- [데이터 정제와 중복 제거](./03-cleaning-deduplication.md)
-- [학습 데이터 PII 탐지와 익명화](./04-pii-detection-anonymization.md)
-- [Tokenization과 Chunking 전략](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (1/10): 데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): 원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): 데이터 정제와 중복 제거](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): 학습 데이터 PII 탐지와 익명화](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization과 Chunking 전략](./05-tokenization-chunking.md)
 - **데이터 품질 필터링 — Heuristic과 Classifier (현재 글)**
-- [합성 데이터 생성 — Self-Instruct부터 Distillation까지](./07-synthetic-data-generation.md)
-- [데이터 증강 기법 — EDA부터 Back-Translation까지](./08-data-augmentation.md)
-- [학습/평가/테스트 분할과 Contamination 통제](./09-train-eval-test-splitting.md)
-- [프로덕션 데이터 파이프라인 구축](./10-production-data-pipeline.md)
+- 합성 데이터 생성 — Self-Instruct부터 Distillation까지 (예정)
+- 데이터 증강 기법 — EDA부터 Back-Translation까지 (예정)
+- 학습/평가/테스트 분할과 Contamination 통제 (예정)
+- 프로덕션 데이터 파이프라인 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

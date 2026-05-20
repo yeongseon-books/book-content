@@ -16,11 +16,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Synthetic Data Generation - From Self-Instruct to Distillation
+title: "AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation"
 seo_description: When labeled data runs short, synthetic-data quality depends on validating, rejecting, and approving each batch before it reaches training.
 ---
 
-# Synthetic Data Generation - From Self-Instruct to Distillation
+# AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation
 
 This is post 7 in the AI Data Preparation 101 series.
 
@@ -28,13 +28,21 @@ Synthetic data generation is not a trick for inflating dataset size. In practice
 
 To address the weakness called out in issue #779, this chapter is no longer a loose catalog of patterns. It is rebuilt around one reproducible synthetic-data batch workflow. Self-Instruct, Evol-Instruct, RAG eval pair generation, and distillation now appear as decision branches inside the same pipeline.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What should a real synthetic-data batch start with and end with?
 - When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?
 - Which validation gates must a generated JSON artifact pass before it becomes training data?
-- Which rejection cases should fail a batch immediately?
-- Why does distillation need an output-usage policy gate in addition to quality checks?
+
+## Big Picture
+
+![AI data preparation chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/07/07-01-big-picture.en.png)
+
+*AI data preparation chapter 7 flow overview*
+
+This picture places Synthetic Data Generation - From Self-Instruct to Distillation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Synthetic Data Generation - From Self-Instruct to Distillation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this chapter matters
 
@@ -139,7 +147,6 @@ BRANCH_GUIDE = {
     "distillation": "Only use if a policy reviewer has approved output reuse for this teacher.",
 }
 
-
 def build_prompt(batch_goal: str, branch: str) -> str:
     return f"""
 You are generating training data for a SaaS support assistant.
@@ -169,7 +176,6 @@ FAQ chunks:
 {json.dumps(FAQ_CHUNKS, ensure_ascii=False, indent=2)}
 """
 
-
 def generate_batch(batch_goal: str, branch: str, model: str = "gpt-4o-mini") -> list[dict]:
     rsp = client.chat.completions.create(
         model=model,
@@ -179,7 +185,6 @@ def generate_batch(batch_goal: str, branch: str, model: str = "gpt-4o-mini") -> 
     )
     payload = json.loads(rsp.choices[0].message.content)
     return payload["items"]
-
 
 def validate_item(item: dict) -> list[str]:
     reasons = []
@@ -199,7 +204,6 @@ def validate_item(item: dict) -> list[str]:
     if len(item.get("output", "")) < 30:
         reasons.append("too_short")
     return reasons
-
 
 def validate_batch(items: list[dict]) -> tuple[list[dict], list[dict], dict]:
     accepted, rejected = [], []
@@ -228,7 +232,6 @@ def validate_batch(items: list[dict]) -> tuple[list[dict], list[dict], dict]:
     }
     return accepted, rejected, metrics
 
-
 def write_dataset(accepted: list[dict], run_id: str) -> Path:
     out_dir = Path("datasets/ai-data-preparation-101/07-synthetic-data-generation") / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -237,7 +240,6 @@ def write_dataset(accepted: list[dict], run_id: str) -> Path:
         for row in accepted:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
     return out_path
-
 
 run_id = f"support-batch-{uuid.uuid4().hex[:8]}"
 items = generate_batch(batch_goal="Expand refund and outage support tasks", branch="self_instruct")
@@ -322,7 +324,6 @@ def require_policy_review(branch: str, teacher_name: str, review_ticket: str | N
             f"Stop: review output-usage rights for {teacher_name} before creating a distillation dataset."
         )
 
-
 require_policy_review(
     branch="distillation",
     teacher_name="OpenAI API model",
@@ -368,19 +369,29 @@ Self-Instruct expands coverage, Evol-Instruct raises difficulty, RAG eval builds
 
 Next, we will stay in the same late-series workflow arc and look at augmentation: how to widen the training distribution by transforming existing samples without breaking their labels.
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
-- [PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
-- [Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
-- [Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
+- **What should a real synthetic-data batch start with and end with?**
+  - The article treats Synthetic Data Generation - From Self-Instruct to Distillation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which validation gates must a generated JSON artifact pass before it becomes training data?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
 - **Synthetic Data Generation - From Self-Instruct to Distillation (current)**
 - Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

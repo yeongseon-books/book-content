@@ -1,5 +1,5 @@
 ---
-title: Building a Production Data Pipeline
+title: "AI Data Preparation 101 (10/10): Building a Production Data Pipeline"
 series: ai-data-preparation-101
 episode: 10
 language: en
@@ -21,23 +21,28 @@ seo_description: Episodes 1-9 covered cleaning, dedup, PII redaction, tokenizati
   chunking, quality filtering, synthesis, augmentation, and splitting.
 ---
 
-# Building a Production Data Pipeline
+# AI Data Preparation 101 (10/10): Building a Production Data Pipeline
 
 Cleaning, deduplication, PII handling, tokenization, filtering, and splitting all matter on their own, but production requires them to run as one repeatable system. The hard part is not knowing each step in isolation, but wiring them into a pipeline you can rerun and trust.
 
 This is the final post in the AI Data Preparation 101 series. Here we cover how to turn the earlier stages into a production data pipeline with reproducibility and observability built in.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Which system properties turn a set of preprocessing scripts into a production pipeline?
 - How do versioning, fingerprints, and cache keys work together to preserve reproducibility?
 - What operational value do orchestrators such as Airflow add beyond a cron job?
-- Which per-stage statistics reveal drift or stage failures early enough to act?
-- Why should schema validation and early PII handling be pipeline defaults rather than afterthoughts?
 
-> A production data pipeline is a chain of rerunnable contracts. Each stage should describe its inputs, outputs, parameters, and evidence well enough that rerunning it is boring rather than scary.
+## Big Picture
 
----
+![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
+
+*Architecture - a 6-stage pipeline*
+
+This picture places Building a Production Data Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Production Data Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "How do I tie everything we learned into one pipeline?"
 
 Episodes 1-9 covered cleaning, dedup, PII redaction, tokenization, chunking, quality filtering, synthesis, augmentation, and splitting. In production these stages must run automatically every week or every day. The final episode is a pipeline design that integrates all of them.
@@ -51,9 +56,6 @@ Four requirements for a production data pipeline:
 
 ## Architecture - a 6-stage pipeline
 
-![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
-
-*Architecture - a 6-stage pipeline*
 Each stage owns input/output parquet files plus a manifest. The manifest records input fingerprints, code versions, and parameters.
 
 ## Dataset versioning with DVC
@@ -273,19 +275,29 @@ This concludes the series. We started from GIGO in Ep1 and ended at a production
 - [ ] Place PII handling close to ingest so raw identifiers do not spread downstream
 - [ ] Fail loudly on schema drift and support stage-level reruns from the orchestrator
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
-- [PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
-- [Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
-- [Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
-- [Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
-- [Data Augmentation - From EDA to Back-Translation](./08-data-augmentation.md)
-- [Train/Eval/Test Splitting and Contamination Control](./09-train-eval-test-splitting.md)
+- **Which system properties turn a set of preprocessing scripts into a production pipeline?**
+  - The article treats Building a Production Data Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do versioning, fingerprints, and cache keys work together to preserve reproducibility?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What operational value do orchestrators such as Airflow add beyond a cron job?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
+- [AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
+- [AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation](./08-data-augmentation.md)
+- [AI Data Preparation 101 (9/10): Train/Eval/Test Splitting and Contamination Control](./09-train-eval-test-splitting.md)
 - **Building a Production Data Pipeline (current)**
+
 <!-- toc:end -->
 
 ## References

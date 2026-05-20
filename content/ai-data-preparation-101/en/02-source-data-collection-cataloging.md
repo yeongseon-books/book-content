@@ -1,5 +1,5 @@
 ---
-title: Source Data Collection and Cataloging
+title: "AI Data Preparation 101 (2/10): Source Data Collection and Cataloging"
 series: ai-data-preparation-101
 episode: 2
 language: en
@@ -19,23 +19,28 @@ seo_description: 'A request lands: re-train the model from three months ago. You
   the directory and find files like dataset_v2_final_real.csv with no record of…'
 ---
 
-# Source Data Collection and Cataloging
+# AI Data Preparation 101 (2/10): Source Data Collection and Cataloging
 
 The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.
 
 This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What metadata must exist the moment a dataset lands on disk?
 - How do public datasets, web scraping, and vendor feeds differ in operational risk?
 - Why should collection and dataset-card creation happen in one transaction?
-- When is a filesystem catalog enough, and when do you need SQLite or a metadata platform?
-- Which provenance fields make later audits and retraining requests cheap instead of painful?
 
-> Collection is not just pulling bytes from a source. It is the first reproducibility contract: if you cannot prove where the data came from and under what permission, the rest of the pipeline already stands on sand.
+## Big Picture
 
----
+![AI data preparation chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png)
+
+*AI data preparation chapter 2 flow overview*
+
+This picture places Source Data Collection and Cataloging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Source Data Collection and Cataloging is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "I Don't Remember Where This Data Came From"
 
 A request lands: re-train the model from three months ago. You open the directory and find files like `dataset_v2_final_real.csv` with no record of where they originated. This common scene breaks reproducibility and seeds future license disputes.
@@ -279,19 +284,29 @@ Start with SQLite under 50 datasets and migrate when your search needs grow. Pre
 - [ ] Record transform lineage with input/output hashes and code commit for every stage
 - [ ] Decide in advance when the catalog should move from flat files to SQLite or a metadata platform
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- **What metadata must exist the moment a dataset lands on disk?**
+  - The article treats Source Data Collection and Cataloging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do public datasets, web scraping, and vendor feeds differ in operational risk?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should collection and dataset-card creation happen in one transaction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
 - **Source Data Collection and Cataloging (current)**
 - Cleaning and Deduplication (upcoming)
 - PII Detection and Anonymization for Training Data (upcoming)
 - Tokenization and Chunking Strategies (upcoming)
-- Quality Filtering for Training Data (upcoming)
-- Synthetic Data Generation (upcoming)
-- Data Augmentation Techniques (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

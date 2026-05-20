@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Train/Eval/Test Splitting and Contamination Control</title>
+<title>AI Data Preparation 101 (9/10): Train/Eval/Test Splitting and Contamination Control</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Train/Eval/Test Splitting and Contamination Control</h1>
+<h1>AI Data Preparation 101 (9/10): Train/Eval/Test Splitting and Contamination Control</h1>
 <p>Many experiments look healthy right up until they meet production traffic because a simple random split hid the real failure mode. If your split ignores time, users, or benchmark contamination, validation scores can tell the wrong story.</p>
 <p>This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When does a random split stop representing the production problem you actually care about?</li>
 <li>How do stratified, group, and temporal splits protect against different leakage patterns?</li>
 <li>Why is contamination now a first-class evaluation problem for LLMs?</li>
-<li>What can a simple 13-gram overlap check tell you before you trust a benchmark score?</li>
-<li>How should teams keep the test set separate from tuning in everyday workflow?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 9 flow overview</em></p>
+<p>This picture places Train/Eval/Test Splitting and Contamination Control inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A split strategy is an evaluation simulator. If it does not mirror the real deployment constraints, even beautiful validation numbers can still be answers to the wrong question.</p>
+<p>The core of Train/Eval/Test Splitting and Contamination Control is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
 <h2>"Doesn't random_split cover it?"</h2>
 <p>The pattern of <code>train_test_split(data, test_size=0.2)</code> failing in production repeats every year. Two reasons:</p>
 <ol>
@@ -227,16 +228,25 @@ def canary_check(model_call, canary: str = &quot;Th3_C@nary_X9z!&quot;) -&gt; bo
 <li>[ ] Keep the test set out of hyperparameter tuning and define who may access it</li>
 <li>[ ] Record the time cutoff and backtest strategy whenever temporal split is in use</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">Quality Filtering - Heuristics and Classifiers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/08-data-augmentation.md">Data Augmentation - From EDA to Back-Translation</a></li>
+<li><strong>When does a random split stop representing the production problem you actually care about?</strong></li>
+<li>The article treats Train/Eval/Test Splitting and Contamination Control as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do stratified, group, and temporal splits protect against different leakage patterns?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is contamination now a first-class evaluation problem for LLMs?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/08-data-augmentation.md">AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation</a></li>
 <li><strong>Train/Eval/Test Splitting and Contamination Control (current)</strong></li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>

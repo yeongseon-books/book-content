@@ -1,5 +1,5 @@
 ---
-title: Tokenization and Chunking Strategies
+title: "AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies"
 series: ai-data-preparation-101
 episode: 5
 language: en
@@ -21,23 +21,28 @@ seo_description: Entities and references cut at chunk boundaries lose informatio
   Overlap shares some tokens with adjacent chunks.
 ---
 
-# Tokenization and Chunking Strategies
+# AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies
 
 In LLM systems, the tokenizer is not a minor preprocessing detail. It defines the units the model sees, and poor chunking decisions waste context window budget while hurting retrieval and answer quality.
 
 This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do Korean, English, and code consume the context window so differently?
 - When should you stay with a general-purpose tokenizer and when should you train your own?
 - What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?
-- How much overlap is enough to protect meaning at boundaries without bloating retrieval?
-- Which measurements should drive chunk-size decisions instead of guesswork?
 
-> Tokenization decides the cost of reading a document, and chunking decides how much meaning survives when that document is split to fit the model. Treat both as one input-design problem.
+## Big Picture
 
----
+![AI data preparation chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/05/05-01-big-picture.en.png)
+
+*AI data preparation chapter 5 flow overview*
+
+This picture places Tokenization and Chunking Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Tokenization and Chunking Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "The tokenizer decides model quality?"
 
 In LLMs, tokenization is not just preprocessing. The moment the tokenizer is fixed, the units the model can see and the efficiency of its context window are decided. The reason GPT-4 uses far fewer tokens than GPT-3 for the same Korean text is that its tokenizer was retrained.
@@ -272,19 +277,29 @@ If overlap exceeds 50%, duplicate information actually degrades retrieval qualit
 - [ ] Tune chunk size and overlap against retrieval or answer-quality evaluations
 - [ ] Include embedding-memory cost when considering larger vocabularies
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
-- [PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- **Why do Korean, English, and code consume the context window so differently?**
+  - The article treats Tokenization and Chunking Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you stay with a general-purpose tokenizer and when should you train your own?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
 - **Tokenization and Chunking Strategies (current)**
-- Quality Filtering (upcoming)
-- Synthetic Data Generation (upcoming)
-- Data Augmentation Techniques (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,5 +1,5 @@
 ---
-title: Cleaning and Deduplication
+title: "AI Data Preparation 101 (3/10): Cleaning and Deduplication"
 series: ai-data-preparation-101
 episode: 3
 language: en
@@ -19,23 +19,28 @@ seo_description: 'Anyone who has worked on The Pile, C4, or RedPajama will tell 
   the same thing: the dedup stage delivers the biggest single quality improvement.'
 ---
 
-# Cleaning and Deduplication
+# AI Data Preparation 101 (3/10): Cleaning and Deduplication
 
 Teams that have processed large corpora tend to agree on one point: deduplication is one of the highest-leverage quality steps in the pipeline. You can change nothing about the model and still see better results by cleaning and removing repeated data correctly.
 
 This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cleaning transforms for raw text and the deduplication methods that keep training quality honest.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Which text-cleaning transforms are worth keeping because they solve measurable problems?
 - Why is exact dedup not enough for web-scale corpora?
 - How should you tune MinHash thresholds without creating too many false positives?
-- Why does train/eval cross-dedup matter more than raw corpus size?
-- In what order should cleaning, dedup, and splitting happen to avoid leakage?
 
-> Cleaning removes noise the model should never spend capacity on, while dedup removes repeated information the model would otherwise memorize. Both are quality controls, not cosmetic cleanup.
+## Big Picture
 
----
+![AI data preparation chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.en.png)
+
+*AI data preparation chapter 3 flow overview*
+
+This picture places Cleaning and Deduplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cleaning and Deduplication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 ## "Is Deduplication Really That Important?"
 
 Anyone who has worked on The Pile, C4, or RedPajama will tell you the same thing: **the dedup stage delivers the biggest single quality improvement**. Lee et al. (2021) showed in "Deduplicating Training Data Makes Language Models Better" that removing as little as 1% of duplicates lowers perplexity meaningfully.
@@ -255,19 +260,29 @@ Dedup before cleaning lets whitespace-different copies survive as distinct. Cros
 - [ ] Run MinHash near-dedup before splitting the corpus
 - [ ] Cross-dedup train against every evaluation set and delete only from train
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- **Which text-cleaning transforms are worth keeping because they solve measurable problems?**
+  - The article treats Cleaning and Deduplication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is exact dedup not enough for web-scale corpora?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should you tune MinHash thresholds without creating too many false positives?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
 - **Cleaning and Deduplication (current)**
 - PII Detection and Anonymization for Training Data (upcoming)
 - Tokenization and Chunking Strategies (upcoming)
-- Quality Filtering for Training Data (upcoming)
-- Synthetic Data Generation (upcoming)
-- Data Augmentation Techniques (upcoming)
+- Quality Filtering - Heuristics and Classifiers (upcoming)
+- Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)
+- Data Augmentation - From EDA to Back-Translation (upcoming)
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Augmentation - From EDA to Back-Translation</title>
+<title>AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,190 +53,308 @@
 </style>
 </head>
 <body>
-<h1>Data Augmentation - From EDA to Back-Translation</h1>
-<p>Generating brand-new samples and transforming existing ones solve different problems. When you need broader coverage without paying the full cost of new annotation, augmentation is often the more controlled lever.</p>
-<p>This is post 8 in the AI Data Preparation 101 series. Here we cover when to use augmentation techniques such as EDA, back-translation, and paraphrasing.</p>
-<h2>Questions this chapter answers</h2>
+<h1>AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation</h1>
+<p>This is post 8 in the AI Data Preparation 101 series.</p>
+<p>Data augmentation is not about inventing brand-new samples. It is about widening the training distribution while preserving the original label semantics. In practice, that means the important question is not “Which techniques exist?” but “Which technique fits this dataset problem, and does it survive held-out evaluation?”</p>
+<p>To fix the weaknesses called out in issue #779, this chapter is rebuilt around one concrete augmentation decision path instead of a loose survey. It also repairs the untrustworthy AST rename example and makes the Korean-language warning operational by tying it to actual morphology-aware tooling and references.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How is augmentation different from synthetic generation in the problem it solves?</li>
-<li>Which token-level transforms are safe enough for label-preserving text augmentation?</li>
-<li>Why is back-translation helpful for diversity but risky for fact-critical domains?</li>
-<li>What makes AST-level transforms safer than token edits for code corpora?</li>
-<li>How do you verify that augmentation improved robustness rather than just adding noise?</li>
+<li>How is augmentation different from synthetic generation?</li>
+<li>What decision path should you follow for minority-class support and typo robustness?</li>
+<li>When should you choose EDA, back-translation, paraphrasing, or AST transforms?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/08/08-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 8 flow overview</em></p>
+<p>This picture places Data Augmentation - From EDA to Back-Translation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Augmentation should widen the training distribution without breaking the original label semantics. If meaning does not survive, the new sample is just noise with extra compute attached.</p>
+<p>The core of Data Augmentation - From EDA to Back-Translation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
-<h2>"How is augmentation different from synthetic generation?"</h2>
-<p>The previous episode generated samples "from scratch" by calling an LLM. Augmentation instead "transforms" existing samples to broaden the training distribution. It is far cheaper and allows controlled transformations.</p>
-<p>Augmentation is mainly used for two purposes.</p>
+<h2>Why this chapter matters</h2>
+<p>Augmentation is especially useful when labeling budget is tight. It can improve minority-class recall and make a model more robust to typos, paraphrases, and other realistic variations. But if you also modify validation data, or if your transforms stop preserving meaning, the offline score may look cleaner while real generalization gets worse.</p>
+<p>That is why augmentation should be treated as an operating procedure: <strong>train-only transformation + held-out evaluation + stop/go decision</strong>.</p>
+<blockquote>
+<p>Good augmentation does not maximize row count. It maximizes the number of transformed samples that still preserve the label strongly enough to survive evaluation.</p>
+</blockquote>
+<h2>Start from one concrete dataset problem</h2>
+<p>Assume the following scenario.</p>
+<ul>
+<li>Task: Korean customer-support intent classification</li>
+<li>Labels: <code>refund_delay</code>, <code>cancel_plan</code>, <code>outage_question</code>, <code>feature_request</code></li>
+<li>Current problem 1: <code>refund_delay</code> has only 280 examples and is the weakest class</li>
+<li>Current problem 2: real user messages contain typos and colloquial wording, so robustness is weak on a held-out slice</li>
+<li>Fixed rule: validation and test sets must remain untouched</li>
+</ul>
+<p>Given that setup, the decision path should look like this.</p>
 <ol>
-<li><strong>Classification models (NLU)</strong>: grow minority classes to ease class imbalance</li>
-<li><strong>Robustness</strong>: train models robust to typos, paraphrases, and code-switching</li>
+<li>Freeze the held-out validation slice first.</li>
+<li>Measure whether minority-class recall or typo robustness is the bigger failure.</li>
+<li>Try the most label-preserving augmentation family first.</li>
+<li>Keep only rows that pass semantic dedup and train-only guardrails.</li>
+<li>Stop if the held-out metrics do not improve.</li>
 </ol>
-<p>This episode covers 4 techniques.</p>
-<h2>Technique 1 - EDA (Easy Data Augmentation)</h2>
-<p>The simplest 4 token-level transforms: synonym replacement, random insertion, random swap, random deletion. Reported 1-2 point accuracy gains on English NLU baselines.</p>
-<pre><code class="language-python"># pip install nlpaug
-import nlpaug.augmenter.word as naw
+<h2>Freeze the baseline and held-out slices first</h2>
+<p>You cannot judge augmentation without a baseline. Capture the decision metrics before you create a single new row.</p>
+<pre><code class="language-python">BASELINE = {
+    &quot;macro_f1&quot;: 0.812,
+    &quot;refund_delay_recall&quot;: 0.611,
+    &quot;typo_slice_f1&quot;: 0.584,
+}
 
-# 1) Synonym replacement (WordNet)
-syn_aug = naw.SynonymAug(aug_src=&quot;wordnet&quot;, aug_p=0.1)
-
-# 2) Random insertion (BERT contextual)
-ins_aug = naw.ContextualWordEmbsAug(model_path=&quot;bert-base-uncased&quot;, action=&quot;insert&quot;, aug_p=0.1)
-
-# 3) Random swap
-swap_aug = naw.RandomWordAug(action=&quot;swap&quot;, aug_p=0.1)
-
-# 4) Random deletion
-del_aug = naw.RandomWordAug(action=&quot;delete&quot;, aug_p=0.1)
-
-text = &quot;The quick brown fox jumps over the lazy dog.&quot;
-print(syn_aug.augment(text))   # &quot;The fast brown fox jumps over the lazy dog.&quot;
-print(swap_aug.augment(text))  # &quot;The brown quick fox jumps over the lazy dog.&quot;
+TARGET = {
+    &quot;macro_f1_min_delta&quot;: 0.010,
+    &quot;refund_delay_recall_min_delta&quot;: 0.030,
+    &quot;typo_slice_f1_min_delta&quot;: 0.020,
+}
 </code></pre>
-<p><code>aug_p</code> (transform rate) is safe at 0.1-0.2. Past 0.3 the meaning shifts.</p>
-<h2>Technique 2 - Back-translation</h2>
-<p>Translate text -&gt; another language -&gt; back to the original. Meaning is preserved while wording changes - a paraphrase is born.</p>
-<pre><code class="language-python"># pip install transformers torch
-from transformers import MarianMTModel, MarianTokenizer
+<p>The key here is not to rely on macro F1 alone. The decision should be anchored to the exact slices you want to improve. In this scenario, <code>refund_delay_recall</code> and <code>typo_slice_f1</code> are the operator metrics that matter.</p>
+<h2>Which augmentation family should go first?</h2>
+<p>Do not mix everything at once.</p>
+<p><strong>EDA</strong><br>
+- First choice?: Only in a limited role<br>
+- Why: It is fast, but it can easily break Korean particles and word order.</p>
+<p><strong>Back-translation</strong><br>
+- First choice?: Conditional<br>
+- Why: It produces natural rewrites, but entity or number drift is risky.</p>
+<p><strong>Paraphrase model</strong><br>
+- First choice?: First choice here<br>
+- Why: It is the clearest way to expand minority-class wording variation.</p>
+<p><strong>AST transform</strong><br>
+- First choice?: Only for code data<br>
+- Why: It preserves semantics well for code corpora, not for this text classifier.</p>
+<p>For this scenario, the first goal is to widen expression coverage for <code>refund_delay</code>, so the first experiment is <strong>paraphrasing plus Korean-specific guardrails</strong>. If typo robustness still lags after that, we add a small amount of character-level noise as a separate slice experiment. English-centric EDA applied blindly to full Korean sentences is not the default.</p>
+<h2>Korean guardrails are safer at the morpheme level</h2>
+<p>Korean particles and endings can shift meaning quickly. So instead of random swap/delete on raw whitespace tokens, it is safer to inspect morphological tags and protect function-like tokens from replacement.</p>
+<pre><code class="language-python">from konlpy.tag import Okt
 
-class BackTranslator:
-    def __init__(self, src: str = &quot;en&quot;, pivot: str = &quot;de&quot;):
-        self.fwd = self._load(src, pivot)
-        self.bwd = self._load(pivot, src)
+okt = Okt()
+PROTECTED_POS = {&quot;Josa&quot;, &quot;Eomi&quot;, &quot;Punctuation&quot;}
 
-    def _load(self, a: str, b: str):
-        name = f&quot;Helsinki-NLP/opus-mt-{a}-{b}&quot;
-        tok = MarianTokenizer.from_pretrained(name)
-        model = MarianMTModel.from_pretrained(name)
-        return tok, model
+def extract_replaceable_tokens(text: str) -&gt; list[str]:
+    tokens = []
+    for surface, pos in okt.pos(text, norm=True, stem=True):
+        if pos not in PROTECTED_POS and len(surface) &gt; 1:
+            tokens.append(surface)
+    return tokens
 
-    def _translate(self, text: str, pair):
-        tok, model = pair
-        enc = tok(text, return_tensors=&quot;pt&quot;, truncation=True)
-        out = model.generate(**enc, num_beams=4, max_length=256)
-        return tok.decode(out[0], skip_special_tokens=True)
-
-    def __call__(self, text: str) -&gt; str:
-        pivot = self._translate(text, self.fwd)
-        return self._translate(pivot, self.bwd)
-
-bt = BackTranslator(src=&quot;en&quot;, pivot=&quot;de&quot;)
-print(bt(&quot;The model achieves state-of-the-art results.&quot;))
-# -&gt; &quot;The model achieves the best results to date.&quot;
+text = &quot;환불이 아직 안 됐는데 언제 처리되나요?&quot;
+print(extract_replaceable_tokens(text))
+# ['환불', '아직', '처리']
 </code></pre>
-<p>Cycling through multiple pivots (de, fr, ja) further increases diversity. But it depends on MT quality, so it is risky in fact-critical (e.g. medical) domains.</p>
-<h2>Technique 3 - Paraphrase model</h2>
-<p>Call a T5- or PEGASUS-based dedicated paraphraser. Faster and more natural than back-translation.</p>
-<pre><code class="language-python">from transformers import pipeline
+<p>Even a small rule like this prevents many failures where particles or sentence endings are deleted and the label meaning drifts. This is the operational form of the Korean-language warning from issue #779, and KoNLPy is the concrete tool that supports it.</p>
+<h2>Concrete workflow: paraphrase the minority class first</h2>
+<p>The example below selects only the minority class, generates paraphrases, and keeps only rows that pass semantic dedup and banned-pattern rules.</p>
+<pre><code class="language-python">from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+from transformers import pipeline
 
+embedder = SentenceTransformer(&quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;)
 paraphraser = pipeline(
     &quot;text2text-generation&quot;,
     model=&quot;humarin/chatgpt_paraphraser_on_T5_base&quot;,
-    device=0,  # GPU
 )
 
-def paraphrase(text: str, n: int = 3) -&gt; list[str]:
-    outs = paraphraser(
+BANNED_SUBSTRINGS = [&quot;환불 불가&quot;, &quot;법적 조치&quot;, &quot;계정 정지&quot;]
+
+def paraphrase_ko(text: str, n: int = 3) -&gt; list[str]:
+    outputs = paraphraser(
         text,
         num_return_sequences=n,
         num_beams=n + 2,
         do_sample=True,
         temperature=0.8,
-        max_length=128,
+        max_length=96,
     )
-    return [o[&quot;generated_text&quot;] for o in outs]
+    return [o[&quot;generated_text&quot;].strip() for o in outputs]
 
-src = &quot;The customer was unhappy with the delivery time.&quot;
-for p in paraphrase(src):
-    print(&quot;-&quot;, p)
+def semantic_similarity(a: str, b: str) -&gt; float:
+    va = embedder.encode([a])
+    vb = embedder.encode([b])
+    return float(cosine_similarity(va, vb)[0][0])
+
+def build_augmented_rows(rows: list[dict]) -&gt; list[dict]:
+    augmented = []
+    for row in rows:
+        if row[&quot;label&quot;] != &quot;refund_delay&quot;:
+            continue
+
+        for candidate in paraphrase_ko(row[&quot;text&quot;]):
+            if any(bad in candidate for bad in BANNED_SUBSTRINGS):
+                continue
+            sim = semantic_similarity(row[&quot;text&quot;], candidate)
+            if sim &lt; 0.78 or sim &gt; 0.97:
+                continue
+            augmented.append({
+                &quot;text&quot;: candidate,
+                &quot;label&quot;: row[&quot;label&quot;],
+                &quot;source_id&quot;: row[&quot;id&quot;],
+                &quot;aug_method&quot;: &quot;paraphrase&quot;,
+                &quot;similarity&quot;: round(sim, 4),
+            })
+    return augmented
 </code></pre>
-<p>Common production pattern: add 2-3 paraphrases per train sample -&gt; dataset grows 3-4x. Never put augmented samples into validation.</p>
-<h2>Technique 4 - Code augmentation</h2>
-<p>For code corpora, AST-level transforms preserve semantics better than token-level edits.</p>
-<pre><code class="language-python">import ast, astor, random
+<p>This workflow rejects both kinds of bad candidates: rows that changed meaning too much and rows that are so similar they add almost no information. Augmentation is not a contest to keep more rows. It is a filter for keeping only the rows that still deserve to be in train.</p>
+<h2>Handle typo robustness as a separate slice</h2>
+<p>If typo robustness still matters after the minority-class pass, treat it as a separate experiment rather than mixing it into every transformed row.</p>
+<pre><code class="language-python">import random
+
+def inject_typo(text: str, p: float = 0.08) -&gt; str:
+    chars = list(text)
+    for i in range(len(chars) - 1):
+        if random.random() &lt; p and chars[i].isalnum() and chars[i + 1].isalnum():
+            chars[i], chars[i + 1] = chars[i + 1], chars[i]
+            break
+    return &quot;&quot;.join(chars)
+
+print(inject_typo(&quot;환불이 아직 안 됐는데 언제 처리되나요?&quot;))
+</code></pre>
+<p>Keep this slice small and train-only. If you push it too broadly, the model may start learning broken text distribution rather than realistic robustness.</p>
+<h2>Use held-out evaluation to make the stop/go call</h2>
+<p>Augmentation should end in evaluation, not intuition.</p>
+<pre><code class="language-python">def evaluate_augmentation(train_base, train_aug, val_loader, train_fn, eval_fn):
+    base_model = train_fn(train_base)
+    aug_model = train_fn(train_base + train_aug)
+    base_metrics = eval_fn(base_model, val_loader)
+    aug_metrics = eval_fn(aug_model, val_loader)
+    return {
+        &quot;base&quot;: base_metrics,
+        &quot;aug&quot;: aug_metrics,
+        &quot;delta&quot;: {
+            key: round(aug_metrics[key] - base_metrics[key], 4)
+            for key in base_metrics
+        },
+    }
+</code></pre>
+<p>One plausible result table for this scenario would look like this.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Experiment</th>
+<th>macro_f1</th>
+<th>refund_delay_recall</th>
+<th>typo_slice_f1</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baseline</td>
+<td>0.812</td>
+<td>0.611</td>
+<td>0.584</td>
+<td>baseline</td>
+</tr>
+<tr>
+<td>paraphrase + Korean guardrail</td>
+<td>0.826</td>
+<td>0.691</td>
+<td>0.603</td>
+<td>Go</td>
+</tr>
+<tr>
+<td>+ aggressive EDA (<code>aug_p=0.3</code>)</td>
+<td>0.804</td>
+<td>0.676</td>
+<td>0.597</td>
+<td>Stop</td>
+</tr>
+</tbody>
+</table>
+<p>The message is simple. Paraphrasing helped. Aggressive EDA hurt the held-out metrics and should be discarded. In augmentation work, the stop/go decision matters more than the fact that multiple techniques are available.</p>
+<h2>AST transforms belong to code data, and the rename example must be trustworthy</h2>
+<p>Issue #779 correctly pointed out that the earlier AST rename snippet was not trustworthy because the output comment did not match what the code actually changed. The fixed version below renames both <code>ast.arg</code> and <code>ast.Name</code>, so the example output is accurate.</p>
+<pre><code class="language-python">import ast
 
 class VarRenamer(ast.NodeTransformer):
     def __init__(self, mapping: dict[str, str]):
         self.mapping = mapping
-    def visit_Name(self, node):
+
+    def visit_arg(self, node: ast.arg) -&gt; ast.arg:
+        if node.arg in self.mapping:
+            node.arg = self.mapping[node.arg]
+        return node
+
+    def visit_Name(self, node: ast.Name) -&gt; ast.Name:
         if node.id in self.mapping:
             node.id = self.mapping[node.id]
         return node
 
 def rename_vars(src: str) -&gt; str:
     tree = ast.parse(src)
-    names = sorted({n.id for n in ast.walk(tree) if isinstance(n, ast.Name)})
-    mapping = {n: f&quot;v{i}&quot; for i, n in enumerate(names) if not n.startswith(&quot;__&quot;)}
+    names = sorted(
+        {n.arg for n in ast.walk(tree) if isinstance(n, ast.arg)}
+        | {n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and not n.id.startswith(&quot;__&quot;)}
+    )
+    mapping = {name: f&quot;v{i}&quot; for i, name in enumerate(names)}
     new_tree = VarRenamer(mapping).visit(tree)
-    return astor.to_source(new_tree)
+    ast.fix_missing_locations(new_tree)
+    return ast.unparse(new_tree)
 
-print(rename_vars(&quot;def add(a, b): return a + b&quot;))
-# def add(v0, v1): return v0 + v1
+src = &quot;&quot;&quot;
+def add(left, right):
+    total = left + right
+    return total
+&quot;&quot;&quot;
+
+print(rename_vars(src))
+# def add(v0, v1):
+#     v2 = v0 + v1
+#     return v2
 </code></pre>
-<p>Variable renaming, dead-code insertion, and equivalent operator substitution (<code>a + 1</code> -&gt; <code>a - (-1)</code>) are all valid. The model learns code semantics rather than surface tokens.</p>
-<h2>Evaluation - did augmentation actually help?</h2>
-<p>Compare metrics with and without augmentation. Never augment validation.</p>
-<pre><code class="language-python">def evaluate_augmentation(model_class, train_orig, train_aug, val):
-    m_base = model_class().fit(train_orig)
-    m_aug = model_class().fit(train_orig + train_aug)
-    return {
-        &quot;base_f1&quot;: m_base.score(val),
-        &quot;aug_f1&quot;: m_aug.score(val),
-        &quot;delta&quot;: m_aug.score(val) - m_base.score(val),
-    }
-</code></pre>
-<p>If delta is negative or below 0.005, augmentation is likely just noise. Try a different aug_p or paraphraser.</p>
-<h2>5 common mistakes</h2>
-<ol>
-<li><strong>Augmenting the validation set</strong>: this is data leakage. Augmentation is train-only.</li>
-<li><strong>Setting aug_p above 0.3</strong>: meaning shifts, and labels may no longer hold.</li>
-<li><strong>Back-translation in fact-critical domains</strong>: medical or legal text can have numbers or entities altered.</li>
-<li><strong>Applying English EDA to Korean as-is</strong>: random word swap ignores Korean word order and particles. Use morphological augmentation.</li>
-<li><strong>Skipping post-paraphrase deduplication</strong>: paraphrases nearly identical to the source can balloon the dataset. Drop samples with &gt;0.95 semantic similarity.</li>
-</ol>
-<h2>Key Takeaways</h2>
+<p>This branch is still important because it shows that for code corpora, AST-level changes preserve semantics far better than token edits. But it is a separate branch because the current scenario is about Korean text classification, not code generation.</p>
+<h2>Common points of confusion</h2>
 <ul>
-<li>EDA is the baseline of 4 token-level transforms: synonym, insert, swap, delete.</li>
-<li>Back-translation creates natural paraphrases via a pivot language.</li>
-<li>Paraphrase models (T5/PEGASUS) are faster and cleaner.</li>
-<li>For code, AST-level transforms (var rename, dead-code insertion) preserve semantics.</li>
-<li>aug_p of 0.1-0.2 is the safe zone.</li>
-<li>Never augment validation data.</li>
-<li>Episode 9 covers train/eval/test splitting and contamination control.</li>
+<li><strong>Augmenting validation makes evaluation more realistic</strong>: no. That is leakage.</li>
+<li><strong>English-style EDA can be applied to Korean as-is</strong>: no. Without particle and ending protection, meaning breaks fast.</li>
+<li><strong>Higher semantic similarity always means a better row</strong>: no. Too high usually means near-duplicate.</li>
+<li><strong>Mixing more techniques always improves performance</strong>: no. Every technique still needs its own held-out stop/go decision.</li>
 </ul>
-<hr>
 <h2>Operational checklist</h2>
 <ul>
-<li>[ ] Define whether augmentation targets minority-class support or robustness before choosing a technique</li>
-<li>[ ] Keep augmentation train-only and protect validation and test sets from leakage</li>
-<li>[ ] Tune augmentation rate and paraphrase count against held-out metrics</li>
-<li>[ ] Deduplicate augmented samples that are too close to their source examples</li>
-<li>[ ] Maintain a short list of domain-specific transformations that change meaning and must stay banned</li>
+<li>[ ] Freeze baseline and held-out slice metrics before augmentation starts</li>
+<li>[ ] Keep augmentation train-only and leave validation/test untouched</li>
+<li>[ ] Separate minority-class support experiments from typo-robustness experiments</li>
+<li>[ ] Remove meaning-breaking rows and near-duplicates with semantic-similarity and banned-pattern rules</li>
+<li>[ ] For Korean data, protect morphology-sensitive tokens and limit candidates with a tool such as KoNLPy</li>
+<li>[ ] Discard the augmentation batch if held-out metrics do not improve</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Summary</h2>
+<p>The core of augmentation is not the list of technique names. It is the decision flow: define the dataset problem, add train-only guardrails, and keep only the transformations that improve held-out metrics.</p>
+<p>In this scenario, paraphrasing with Korean guardrails improved both <code>refund_delay</code> recall and typo robustness, while aggressive EDA made the model worse. AST transforms remain useful, but only in their proper branch: code data where syntax-aware edits preserve meaning.</p>
+<p>Next, we will look at the split discipline that must follow generation and augmentation alike: train/eval/test separation and contamination control.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">Quality Filtering - Heuristics and Classifiers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
+<li><strong>How is augmentation different from synthetic generation?</strong></li>
+<li>The article treats Data Augmentation - From EDA to Back-Translation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What decision path should you follow for minority-class support and typo robustness?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When should you choose EDA, back-translation, paraphrasing, or AST transforms?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/07-synthetic-data-generation.md">AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation</a></li>
 <li><strong>Data Augmentation - From EDA to Back-Translation (current)</strong></li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://arxiv.org/abs/1901.11196">EDA: Easy Data Augmentation Techniques (Wei &amp; Zou, 2019)</a></li>
-<li><a href="https://arxiv.org/abs/1511.06709">Improving Neural Machine Translation with Back-Translation (Sennrich et al., 2016)</a></li>
-<li><a href="https://github.com/makcedward/nlpaug">nlpaug - Data Augmentation for NLP</a></li>
-<li><a href="https://huggingface.co/Helsinki-NLP">Helsinki-NLP OPUS-MT Models</a></li>
-</ul>
-<p class="tags-line">Tags: Data Augmentation, EDA, Back-Translation, Paraphrase, nlpaug, AST Transform</p>
+<p><strong>Official documentation and tools</strong><br>
+- <a href="https://konlpy.org/en/latest/">KoNLPy documentation</a><br>
+- <a href="http://dmlab.snu.ac.kr/~lucypark/docs/2014-10-10-hclt.pdf">KoNLPy: Korean natural language processing in Python (Park &amp; Cho, 2014)</a><br>
+- <a href="https://github.com/makcedward/nlpaug">nlpaug - Data Augmentation for NLP</a><br>
+- <a href="https://huggingface.co/Helsinki-NLP">Helsinki-NLP OPUS-MT Models</a></p>
+<p><strong>Papers and implementation references</strong><br>
+- <a href="https://arxiv.org/abs/1901.11196">EDA: Easy Data Augmentation Techniques (Wei &amp; Zou, 2019)</a><br>
+- <a href="https://arxiv.org/abs/1511.06709">Improving Neural Machine Translation with Back-Translation (Sennrich et al., 2016)</a><br>
+- <a href="https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2">Sentence-Transformers: Multilingual MiniLM</a></p>
+<p class="tags-line">Tags: Data Augmentation, EDA, Back-Translation, Paraphrase, nlpaug, KoNLPy</p>
 </body>
 </html>

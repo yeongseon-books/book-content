@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Quality Filtering - Heuristics and Classifiers</title>
+<title>AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Quality Filtering - Heuristics and Classifiers</h1>
+<h1>AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers</h1>
 <p>Collected data is rarely clean enough to become training data as-is. The real question is how quickly you can separate usable samples from ads, spam, encoding breakage, and boilerplate before they distort learning.</p>
 <p>This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Which low-cost heuristics catch obvious junk before you spend model calls on it?</li>
 <li>What does language detection remove that simple length or symbol checks cannot?</li>
 <li>How should perplexity and classifier scores sit behind the heuristic layer?</li>
-<li>Why do hard-coded thresholds decay as source distributions change?</li>
-<li>Which stage-level statistics tell you a filter is over-pruning or drifting?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 6 flow overview</em></p>
+<p>This picture places Quality Filtering - Heuristics and Classifiers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Quality filtering is a cost-ordered funnel: cheap rules remove obvious garbage, while heavier models spend time only on the ambiguous cases that are worth scoring more carefully.</p>
+<p>The core of Quality Filtering - Heuristics and Classifiers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
 <h2>"Collected does not mean trainable."</h2>
 <p>A raw corpus is almost always more than half garbage. Ads, auto-generated spam, broken encodings, and meaningless boilerplate are mixed in. Training on it directly wrecks model perplexity and inflates hallucination rates.</p>
 <p>The goal of quality filtering is to decide whether a sample helps training. Two approaches:</p>
@@ -243,16 +244,25 @@ keep = quality_score(doc) &gt;= threshold
 <li>[ ] Document the positive and negative corpora used to train the quality classifier</li>
 <li>[ ] Track drop reasons by stage so threshold changes stay explainable</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
+<li><strong>Which low-cost heuristics catch obvious junk before you spend model calls on it?</strong></li>
+<li>The article treats Quality Filtering - Heuristics and Classifiers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does language detection remove that simple length or symbol checks cannot?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should perplexity and classifier scores sit behind the heuristic layer?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</a></li>
 <li><strong>Quality Filtering - Heuristics and Classifiers (current)</strong></li>
-<li>Synthetic Data Generation (upcoming)</li>
-<li>Data Augmentation Techniques (upcoming)</li>
+<li>Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)</li>
+<li>Data Augmentation - From EDA to Back-Translation (upcoming)</li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>

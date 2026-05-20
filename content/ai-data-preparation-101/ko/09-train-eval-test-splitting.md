@@ -18,10 +18,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 학습/평가/테스트 분할과 Contamination 통제
+title: "AI Data Preparation 101 (9/10): 학습/평가/테스트 분할과 Contamination 통제"
 ---
 
-# 학습/평가/테스트 분할과 Contamination 통제
+# AI Data Preparation 101 (9/10): 학습/평가/테스트 분할과 Contamination 통제
 
 오프라인 실험이 늘 잘 보이는데 운영에 들어가면 성능이 무너지는 팀에는 공통 패턴이 있습니다. 데이터를 나누는 기준이 실제 배포 환경과 맞지 않거나, 평가셋이 이미 학습 코퍼스에 오염돼 있다는 점입니다.
 
@@ -35,13 +35,21 @@ title: 학습/평가/테스트 분할과 Contamination 통제
 
 여기서는 random, stratified, group, temporal split의 적용 기준과, LLM 평가에서 contamination을 어떻게 감지하고 방어할지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 단순 `train_test_split`이 실제 운영 조건을 놓치는 대표적인 경우는 무엇일까요?
 - 클래스 불균형, 사용자 누수, 시계열 데이터는 왜 서로 다른 split 전략을 요구할까요?
 - LLM benchmark contamination은 기존 데이터 누수와 무엇이 다르고 왜 더 위험할까요?
-- 13-gram overlap은 contamination 감지에서 어떤 practical baseline 역할을 할까요?
-- test set을 한 번만 써야 한다는 원칙을 실제 팀 프로세스로 어떻게 지킬 수 있을까요?
+
+## 큰 그림
+
+![AI 데이터 준비 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.ko.png)
+
+*AI 데이터 준비 9장 흐름 개요*
+
+이 그림에서는 학습/평가/테스트 분할과 Contamination 통제를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 학습/평가/테스트 분할과 Contamination 통제의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -51,7 +59,7 @@ title: 학습/평가/테스트 분할과 Contamination 통제
 
 이 글의 목적은 split을 데이터셋 마무리 작업이 아니라 평가 무결성을 정의하는 핵심 설계 단계로 명확히 자리 잡게 만드는 것입니다.
 
-## 분할 전략을 이해하는 가장 좋은 방법: 데이터 특징에 맞는 평가 시뮬레이터를 고르는 것입니다
+## 핵심 관점
 
 분할은 단순히 80/10/10 비율을 만드는 문제가 아닙니다. 어떤 미래를 예측하는 모델인지, 같은 사용자가 여러 샘플을 갖는지, 소수 클래스가 얼마나 작은지에 따라 적합한 split이 달라집니다.
 
@@ -236,19 +244,29 @@ LLM 시대에는 contamination 통제가 여기에 추가됩니다. benchmark가
 
 다음 글에서는 이 모든 단계를 하나의 반복 가능하고 관측 가능한 프로덕션 데이터 파이프라인으로 묶는 방법을 다룹니다. 결국 split과 contamination 통제도 자동화된 파이프라인 안에 들어가야 운영이 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **단순 `train_test_split`이 실제 운영 조건을 놓치는 대표적인 경우는 무엇일까요?**
+  - 본문의 기준은 학습/평가/테스트 분할과 Contamination 통제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **클래스 불균형, 사용자 누수, 시계열 데이터는 왜 서로 다른 split 전략을 요구할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **LLM benchmark contamination은 기존 데이터 누수와 무엇이 다르고 왜 더 위험할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)
-- [원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
-- [데이터 정제와 중복 제거](./03-cleaning-deduplication.md)
-- [학습 데이터 PII 탐지와 익명화](./04-pii-detection-anonymization.md)
-- [Tokenization과 Chunking 전략](./05-tokenization-chunking.md)
-- [데이터 품질 필터링 — Heuristic과 Classifier](./06-quality-filtering.md)
-- [합성 데이터 생성 — Self-Instruct부터 Distillation까지](./07-synthetic-data-generation.md)
-- [데이터 증강 기법 — EDA부터 Back-Translation까지](./08-data-augmentation.md)
+- [AI Data Preparation 101 (1/10): 데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): 원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): 데이터 정제와 중복 제거](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): 학습 데이터 PII 탐지와 익명화](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization과 Chunking 전략](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic과 Classifier](./06-quality-filtering.md)
+- [AI Data Preparation 101 (7/10): 합성 데이터 생성 — Self-Instruct부터 Distillation까지](./07-synthetic-data-generation.md)
+- [AI Data Preparation 101 (8/10): 데이터 증강 기법 — EDA부터 Back-Translation까지](./08-data-augmentation.md)
 - **학습/평가/테스트 분할과 Contamination 통제 (현재 글)**
-- [프로덕션 데이터 파이프라인 구축](./10-production-data-pipeline.md)
+- 프로덕션 데이터 파이프라인 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

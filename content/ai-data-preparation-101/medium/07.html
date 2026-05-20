@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Synthetic Data Generation - From Self-Instruct to Distillation</title>
+<title>AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,200 +53,350 @@
 </style>
 </head>
 <body>
-<h1>Synthetic Data Generation - From Self-Instruct to Distillation</h1>
-<p>In production LLM fine-tuning, the bottleneck is often labeled data rather than model capacity. When annotation is too slow or too expensive, synthetic generation becomes the practical way to expand supervision.</p>
-<p>This is post 7 in the AI Data Preparation 101 series. Here we cover common synthetic data generation patterns, from Self-Instruct to distillation.</p>
-<h2>Questions this chapter answers</h2>
+<h1>AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation</h1>
+<p>This is post 7 in the AI Data Preparation 101 series.</p>
+<p>Synthetic data generation is not a trick for inflating dataset size. In practice, it is an operating procedure for expanding narrow-domain supervision in a controlled way. The critical question is usually not “What should we generate?” but “Which batches do we reject, and which ones are good enough to enter the training set?”</p>
+<p>To address the weakness called out in issue #779, this chapter is no longer a loose catalog of patterns. It is rebuilt around one reproducible synthetic-data batch workflow. Self-Instruct, Evol-Instruct, RAG eval pair generation, and distillation now appear as decision branches inside the same pipeline.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Which synthetic-data pattern fits instruction tuning, RAG evaluation, or distillation best?</li>
-<li>How do Self-Instruct and Evol-Instruct expand supervision in different ways?</li>
-<li>Why must synthetic QA pairs be verified against the source evidence?</li>
-<li>What license checks belong in a distillation workflow before data generation even starts?</li>
-<li>Which quality metrics reveal that your synthetic set is large but not actually useful?</li>
+<li>What should a real synthetic-data batch start with and end with?</li>
+<li>When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?</li>
+<li>Which validation gates must a generated JSON artifact pass before it becomes training data?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/07/07-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 7 flow overview</em></p>
+<p>This picture places Synthetic Data Generation - From Self-Instruct to Distillation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Synthetic data is not free accuracy. It is a controlled way to expand supervision, and its value depends more on verification and mixing strategy than on raw sample count.</p>
+<p>The core of Synthetic Data Generation - From Self-Instruct to Distillation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
-<h2>"If we run out of data, can't we just generate more?"</h2>
-<p>The most common bottleneck in production LLM fine-tuning is a shortage of labeled data. Human annotation costs $1-5 per sample and takes days. Synthetic data generation auto-generates supervised data using a stronger LLM (the teacher).</p>
-<p>Typical use cases:</p>
+<h2>Why this chapter matters</h2>
+<p>Synthetic data can sharply reduce labeling bottlenecks for instruction tuning and evaluation-set creation. But if you keep generating without verification, you accumulate repeated patterns, unsupported answers, teacher bias, and policy risk at the same time.</p>
+<p>That is why the operator view matters more than the pattern list. It is safer to think in terms of seed inputs, generation contract, sample review, rejection reasons, and final write path than to memorize four techniques in isolation.</p>
+<blockquote>
+<p>The success of synthetic data depends less on how many samples the model produced and more on whether the operator designed the batch so that bad samples can be rejected on purpose.</p>
+</blockquote>
+<h2>One concrete operating scenario</h2>
+<p>Assume the following setup.</p>
 <ul>
-<li><strong>Instruction tuning</strong>: Self-Instruct, Alpaca, Evol-Instruct generating instruction-response pairs with GPT-4 etc.</li>
-<li><strong>RAG eval</strong>: auto-generating question-answer pairs from documents</li>
-<li><strong>Data distillation</strong>: using a large model's answers to train a smaller model</li>
+<li>Domain: fine-tuning a SaaS customer-support assistant</li>
+<li>Current problem: not enough instruction data for refunds, plan changes, and outage notices</li>
+<li>Existing assets: 40 human-reviewed seed tasks and 120 FAQ documents</li>
+<li>Goal: generate one synthetic batch this week and write only approved samples to JSONL</li>
 </ul>
-<p>This episode walks through 4 patterns with code.</p>
-<h2>Pattern 1 - Self-Instruct</h2>
-<p>Start with a few seed tasks and let the LLM confabulate new instructions. The Alpaca dataset was built this way.</p>
-<pre><code class="language-python"># pip install openai
+<p>In that setting, the operator flow is straightforward.</p>
+<ol>
+<li>Collect seed tasks and FAQ chunks.</li>
+<li>Define the purpose of this batch.</li>
+<li>Pick the generation branch that matches the purpose.</li>
+<li>Generate samples under an explicit JSON contract.</li>
+<li>Run schema, evidence, diversity, refusal, and policy gates.</li>
+<li>Log rejection reasons and write only approved rows to the dataset path.</li>
+</ol>
+<h2>Choose the branch first</h2>
+<p>The right branch depends on which supervision signal you want to expand.</p>
+<p><strong>Not enough topical coverage from a tiny seed set</strong><br>
+- Branch: Self-Instruct<br>
+- Why this branch fits: It grows instruction-input-output triples across more customer situations.</p>
+<p><strong>Existing tasks are present but too easy</strong><br>
+- Branch: Evol-Instruct<br>
+- Why this branch fits: It keeps the label space while increasing reasoning depth and constraints.</p>
+<p><strong>Retrieval evaluation set is missing</strong><br>
+- Branch: RAG eval pair generation<br>
+- Why this branch fits: It builds question-answer pairs that can be checked against source evidence.</p>
+<p><strong>A strong teacher's response style should transfer to a student</strong><br>
+- Branch: Distillation<br>
+- Why this branch fits: It can produce high-quality supervision, but only after policy review.</p>
+<p>In this chapter's scenario, we first want broader support-task coverage and a smaller set of evidence-grounded FAQ questions. So the default branch is Self-Instruct, hard cases are upgraded with Evol-Instruct, FAQ-grounded samples come from the RAG eval branch, and distillation stays disabled until policy review approves it.</p>
+<h2>A reproducible synthetic-data batch workflow</h2>
+<p>The example below ties together seed inputs, generation contract, validation, rejection, and dataset write path into one minimal operator workflow.</p>
+<pre><code class="language-python">from __future__ import annotations
+
+from collections import Counter
+from pathlib import Path
+import json
+import uuid
+
 from openai import OpenAI
-import json, random
 
 client = OpenAI()
 
 SEED_TASKS = [
-    {&quot;instruction&quot;: &quot;Translate the English sentence into Korean.&quot;, &quot;input&quot;: &quot;The cat sat on the mat.&quot;, &quot;output&quot;: &quot;고양이가 매트 위에 앉았다.&quot;},
-    {&quot;instruction&quot;: &quot;State the time complexity of the code.&quot;, &quot;input&quot;: &quot;for i in range(n): print(i)&quot;, &quot;output&quot;: &quot;O(n)&quot;},
+    {
+        &quot;task_id&quot;: &quot;seed-001&quot;,
+        &quot;instruction&quot;: &quot;Summarize the refund policy for a customer.&quot;,
+        &quot;input&quot;: &quot;A customer on an annual plan asks whether a refund is still possible 10 days after payment.&quot;,
+        &quot;output&quot;: &quot;Annual-plan payments are still within the 14-day refund review window.&quot;,
+        &quot;source_type&quot;: &quot;self_instruct&quot;,
+        &quot;difficulty&quot;: &quot;baseline&quot;,
+        &quot;evidence&quot;: None,
+    },
+    {
+        &quot;task_id&quot;: &quot;seed-002&quot;,
+        &quot;instruction&quot;: &quot;Answer a customer question using only the outage notice.&quot;,
+        &quot;input&quot;: &quot;Explain the cause of the API slowdown described in the 2026-05-01 outage notice.&quot;,
+        &quot;output&quot;: &quot;The outage notice says the direct cause was database connection-pool saturation.&quot;,
+        &quot;source_type&quot;: &quot;rag_eval&quot;,
+        &quot;difficulty&quot;: &quot;baseline&quot;,
+        &quot;evidence&quot;: &quot;Cause: database connection-pool saturation&quot;,
+    },
 ]
 
-PROMPT = &quot;&quot;&quot;The following are example NLP tasks.
-{examples}
-
-Generate 3 new instruction-input-output triples in a JSON array.
-Cover different domains.
-&quot;&quot;&quot;
-
-def generate_synthetic(n_rounds: int = 5, samples_per_round: int = 3) -&gt; list[dict]:
-    pool = list(SEED_TASKS)
-    for _ in range(n_rounds):
-        examples = &quot;\n&quot;.join(json.dumps(t, ensure_ascii=False) for t in random.sample(pool, k=2))
-        rsp = client.chat.completions.create(
-            model=&quot;gpt-4o-mini&quot;,
-            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: PROMPT.format(examples=examples)}],
-            response_format={&quot;type&quot;: &quot;json_object&quot;},
-            temperature=0.9,
-        )
-        try:
-            data = json.loads(rsp.choices[0].message.content)
-            new_tasks = data.get(&quot;tasks&quot;, data) if isinstance(data, dict) else data
-            pool.extend(new_tasks[:samples_per_round])
-        except (json.JSONDecodeError, KeyError):
-            continue
-    return pool[len(SEED_TASKS):]
-</code></pre>
-<p>The key is high temperature (0.8-1.0) to ensure diversity. The same seeds yield new instructions each round.</p>
-<h2>Pattern 2 - Evol-Instruct (difficulty evolution)</h2>
-<p>Proposed in the WizardLM paper. Rewrite an existing instruction to be harder or deeper.</p>
-<pre><code class="language-python">EVOLUTION_PROMPTS = {
-    &quot;deepening&quot;: &quot;Rewrite the instruction to require deeper reasoning:\n{instruction}&quot;,
-    &quot;concretizing&quot;: &quot;Recast the instruction into a more concrete, practical scenario:\n{instruction}&quot;,
-    &quot;reasoning&quot;: &quot;Add a constraint that forces multi-step reasoning:\n{instruction}&quot;,
-    &quot;complicating&quot;: &quot;Add one more input condition to the instruction:\n{instruction}&quot;,
+FAQ_CHUNKS = {
+    &quot;faq-014&quot;: &quot;Refund policy: annual plans remain eligible for refund review within 14 days of payment; after that, partial-refund review depends on usage.&quot;,
+    &quot;faq-021&quot;: &quot;Outage notice: from 2026-05-01 10:42 UTC, API latency increased because the database connection pool was saturated.&quot;,
 }
 
-def evolve(instruction: str, kind: str = &quot;deepening&quot;) -&gt; str:
-    rsp = client.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
-        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: EVOLUTION_PROMPTS[kind].format(instruction=instruction)}],
-        temperature=0.7,
-    )
-    return rsp.choices[0].message.content.strip()
+GENERATION_CONTRACT = {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;required&quot;: [&quot;items&quot;],
+    &quot;item_required&quot;: [
+        &quot;task_id&quot;,
+        &quot;instruction&quot;,
+        &quot;input&quot;,
+        &quot;output&quot;,
+        &quot;source_type&quot;,
+        &quot;difficulty&quot;,
+        &quot;reasons&quot;,
+    ],
+    &quot;allowed_source_type&quot;: [&quot;self_instruct&quot;, &quot;evol_instruct&quot;, &quot;rag_eval&quot;, &quot;distillation&quot;],
+}
 
-simple = &quot;Write a function that sums a list.&quot;
-hard = evolve(simple, kind=&quot;complicating&quot;)
-# -&gt; &quot;Write a function that sums a list, excluding negatives and including only even numbers.&quot;
-</code></pre>
-<p>Round-robin across multiple evolution kinds boosts both difficulty and domain diversity.</p>
-<h2>Pattern 3 - Auto-generating RAG eval pairs</h2>
-<p>For each document chunk, generate 1-3 questions answerable from that chunk alone. Use directly for RAG retrieval evaluation.</p>
-<pre><code class="language-python">QA_PROMPT = &quot;&quot;&quot;Generate 2 questions and answers that can be answered using only the document below.
-Questions should sound natural; answers should be directly quotable from the document.
+BRANCH_GUIDE = {
+    &quot;self_instruct&quot;: &quot;Make a new task in the same domain but with a different customer situation.&quot;,
+    &quot;evol_instruct&quot;: &quot;Take a baseline task and add one realistic constraint that forces deeper reasoning.&quot;,
+    &quot;rag_eval&quot;: &quot;Generate only when the answer can be quoted from the supplied FAQ chunk.&quot;,
+    &quot;distillation&quot;: &quot;Only use if a policy reviewer has approved output reuse for this teacher.&quot;,
+}
 
-Document:
-{chunk}
+def build_prompt(batch_goal: str, branch: str) -&gt; str:
+    return f&quot;&quot;&quot;
+You are generating training data for a SaaS support assistant.
+Batch goal: {batch_goal}
+Branch guide: {BRANCH_GUIDE[branch]}
 
-JSON: {{&quot;pairs&quot;: [{{&quot;q&quot;: &quot;...&quot;, &quot;a&quot;: &quot;...&quot;, &quot;evidence&quot;: &quot;...sentence supporting the answer...&quot;}}, ...]}}
+Return JSON with the shape:
+{{
+  &quot;items&quot;: [
+    {{
+      &quot;task_id&quot;: &quot;syn-...&quot;,
+      &quot;instruction&quot;: &quot;...&quot;,
+      &quot;input&quot;: &quot;...&quot;,
+      &quot;output&quot;: &quot;...&quot;,
+      &quot;source_type&quot;: &quot;{branch}&quot;,
+      &quot;difficulty&quot;: &quot;baseline|hard&quot;,
+      &quot;evidence&quot;: &quot;required when source_type is rag_eval, otherwise null&quot;,
+      &quot;reasons&quot;: [&quot;why this sample adds coverage&quot;]
+    }}
+  ]
+}}
+
+Seed tasks:
+{json.dumps(SEED_TASKS, ensure_ascii=False, indent=2)}
+
+FAQ chunks:
+{json.dumps(FAQ_CHUNKS, ensure_ascii=False, indent=2)}
 &quot;&quot;&quot;
 
-def generate_qa(chunk: str) -&gt; list[dict]:
+def generate_batch(batch_goal: str, branch: str, model: str = &quot;gpt-4o-mini&quot;) -&gt; list[dict]:
     rsp = client.chat.completions.create(
-        model=&quot;gpt-4o-mini&quot;,
-        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: QA_PROMPT.format(chunk=chunk)}],
+        model=model,
+        temperature=0.7 if branch != &quot;rag_eval&quot; else 0.2,
         response_format={&quot;type&quot;: &quot;json_object&quot;},
-        temperature=0.3,  # low because it's fact-based
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: build_prompt(batch_goal, branch)}],
     )
-    return json.loads(rsp.choices[0].message.content)[&quot;pairs&quot;]
+    payload = json.loads(rsp.choices[0].message.content)
+    return payload[&quot;items&quot;]
 
-# Verify: ensure generated evidence actually appears in the chunk
-def verify_pairs(chunk: str, pairs: list[dict]) -&gt; list[dict]:
-    return [p for p in pairs if p.get(&quot;evidence&quot;, &quot;&quot;) in chunk]
-</code></pre>
-<p>The verify step matters. LLMs sometimes fabricate evidence; substring match within the chunk filters those out.</p>
-<h2>Pattern 4 - Distillation (strong model -&gt; weak model)</h2>
-<p>Use GPT-4 answers as a dataset to fine-tune a smaller model.</p>
-<pre><code class="language-python">def distill_one(prompt: str) -&gt; dict:
-    rsp = client.chat.completions.create(
-        model=&quot;gpt-4o&quot;,
-        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
-        temperature=0.0,  # deterministic
-    )
-    return {&quot;prompt&quot;: prompt, &quot;completion&quot;: rsp.choices[0].message.content}
+def validate_item(item: dict) -&gt; list[str]:
+    reasons = []
+    for key in GENERATION_CONTRACT[&quot;item_required&quot;]:
+        if key not in item:
+            reasons.append(f&quot;missing:{key}&quot;)
+    if item.get(&quot;source_type&quot;) not in GENERATION_CONTRACT[&quot;allowed_source_type&quot;]:
+        reasons.append(&quot;invalid_source_type&quot;)
+    if item.get(&quot;source_type&quot;) == &quot;rag_eval&quot;:
+        evidence = item.get(&quot;evidence&quot;)
+        if not evidence:
+            reasons.append(&quot;missing_evidence&quot;)
+        elif not any(evidence in chunk for chunk in FAQ_CHUNKS.values()):
+            reasons.append(&quot;evidence_not_found&quot;)
+    if any(token in item.get(&quot;output&quot;, &quot;&quot;).lower() for token in [&quot;i cannot&quot;, &quot;i'm sorry&quot;, &quot;unable to help&quot;]):
+        reasons.append(&quot;refusal_like_output&quot;)
+    if len(item.get(&quot;output&quot;, &quot;&quot;)) &lt; 30:
+        reasons.append(&quot;too_short&quot;)
+    return reasons
 
-prompts = [...]  # tens of thousands of domain prompts
-dataset = [distill_one(p) for p in prompts]
-# Then LoRA fine-tune a 7B model on this dataset
-</code></pre>
-<p>Caveat: always check the teacher model license. OpenAI prohibits "training a competing model on OpenAI outputs". Open-source teachers (LLaMA, Qwen) have more permissive licenses.</p>
-<h2>Quality verification - keep synthetic data from hurting training</h2>
-<p>Always verify synthetic data on 4 axes.</p>
-<pre><code class="language-python">def synthetic_quality_check(samples: list[dict]) -&gt; dict:
-    n = len(samples)
-    # 1) deduplication: identical instructions should not repeat
-    unique_instructions = len({s[&quot;instruction&quot;] for s in samples})
-    # 2) length distribution
-    lens = [len(s[&quot;output&quot;]) for s in samples]
-    # 3) format compliance: JSON parsing success rate
-    valid = sum(1 for s in samples if isinstance(s.get(&quot;output&quot;), str))
-    # 4) toxicity / refusal rate (simple heuristic)
-    refusals = sum(1 for s in samples
-                   if any(w in s[&quot;output&quot;].lower() for w in [&quot;i cannot&quot;, &quot;i'm sorry&quot;, &quot;as an ai&quot;]))
-    return {
-        &quot;n&quot;: n,
-        &quot;unique_ratio&quot;: unique_instructions / n,
-        &quot;avg_len&quot;: sum(lens) / n,
-        &quot;valid_ratio&quot;: valid / n,
-        &quot;refusal_ratio&quot;: refusals / n,
+def validate_batch(items: list[dict]) -&gt; tuple[list[dict], list[dict], dict]:
+    accepted, rejected = [], []
+    seen = Counter()
+
+    for item in items:
+        item_reasons = validate_item(item)
+        dedup_key = (item.get(&quot;instruction&quot;), item.get(&quot;input&quot;))
+        seen[dedup_key] += 1
+        if seen[dedup_key] &gt; 1:
+            item_reasons.append(&quot;duplicate_instruction_input&quot;)
+
+        if item_reasons:
+            rejected.append({&quot;item&quot;: item, &quot;reasons&quot;: item_reasons})
+        else:
+            accepted.append(item)
+
+    total = len(items) or 1
+    metrics = {
+        &quot;n_total&quot;: len(items),
+        &quot;n_accepted&quot;: len(accepted),
+        &quot;n_rejected&quot;: len(rejected),
+        &quot;accept_ratio&quot;: len(accepted) / total,
+        &quot;unique_ratio&quot;: len(seen) / total,
+        &quot;refusal_ratio&quot;: sum(&quot;refusal_like_output&quot; in r[&quot;reasons&quot;] for r in rejected) / total,
     }
+    return accepted, rejected, metrics
+
+def write_dataset(accepted: list[dict], run_id: str) -&gt; Path:
+    out_dir = Path(&quot;datasets/ai-data-preparation-101/07-synthetic-data-generation&quot;) / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / &quot;accepted.jsonl&quot;
+    with out_path.open(&quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+        for row in accepted:
+            f.write(json.dumps(row, ensure_ascii=False) + &quot;\n&quot;)
+    return out_path
+
+run_id = f&quot;support-batch-{uuid.uuid4().hex[:8]}&quot;
+items = generate_batch(batch_goal=&quot;Expand refund and outage support tasks&quot;, branch=&quot;self_instruct&quot;)
+accepted, rejected, metrics = validate_batch(items)
+
+if metrics[&quot;accept_ratio&quot;] &lt; 0.8 or metrics[&quot;unique_ratio&quot;] &lt; 0.85 or metrics[&quot;refusal_ratio&quot;] &gt; 0.05:
+    raise RuntimeError({&quot;run_id&quot;: run_id, &quot;status&quot;: &quot;reject_batch&quot;, &quot;metrics&quot;: metrics, &quot;rejected&quot;: rejected[:3]})
+
+dataset_path = write_dataset(accepted, run_id)
+print({&quot;run_id&quot;: run_id, &quot;status&quot;: &quot;accepted&quot;, &quot;dataset_path&quot;: str(dataset_path), &quot;metrics&quot;: metrics})
 </code></pre>
-<p>A unique_ratio below 0.7 signals a diversity problem. A high refusal_ratio means prompts are too vague or touch overly sensitive topics.</p>
-<h2>5 common mistakes</h2>
-<ol>
-<li><strong>Using a teacher without checking the license</strong>: training a competitor on OpenAI outputs violates ToS. Use an open-source teacher or hold a commercial license.</li>
-<li><strong>Skipping verification</strong>: synthetic QA evidence often does not exist in the source document. Verify with substring or NLI models.</li>
-<li><strong>Temperature too low</strong>: 0.0-0.3 kills diversity and produces repeated patterns. Self-Instruct works best at 0.8-1.0.</li>
-<li><strong>Fine-tuning on synthetic only</strong>: causes model collapse. Mix with real human data at 1:3 to 1:5 ratios.</li>
-<li><strong>Ignoring bias transfer</strong>: teacher bias is copied to student. Always measure demographic distribution.</li>
-</ol>
-<h2>Key Takeaways</h2>
+<p><strong>The generated artifact should look like this</strong></p>
+<p>The output must be a reviewable JSON artifact, not just a stream of convenient text. A minimum example looks like this.</p>
+<pre><code class="language-json">{
+  &quot;items&quot;: [
+    {
+      &quot;task_id&quot;: &quot;syn-101&quot;,
+      &quot;instruction&quot;: &quot;Explain the refund and rebilling sequence when a customer upgrades from a monthly plan to an annual plan.&quot;,
+      &quot;input&quot;: &quot;The customer paid for a monthly plan 3 days ago and now wants the annual discount as well.&quot;,
+      &quot;output&quot;: &quot;First confirm whether the monthly charge is still within the refund-review window, then explain the annual-plan rebilling sequence separately.&quot;,
+      &quot;source_type&quot;: &quot;self_instruct&quot;,
+      &quot;difficulty&quot;: &quot;baseline&quot;,
+      &quot;evidence&quot;: null,
+      &quot;reasons&quot;: [&quot;Adds a rare case where refund logic and upgrade flow appear together.&quot;]
+    },
+    {
+      &quot;task_id&quot;: &quot;syn-102&quot;,
+      &quot;instruction&quot;: &quot;Answer the API-latency question using only the outage notice.&quot;,
+      &quot;input&quot;: &quot;Summarize the cause of the 2026-05-01 slowdown for a support reply.&quot;,
+      &quot;output&quot;: &quot;According to the public outage notice, the direct cause was database connection-pool saturation.&quot;,
+      &quot;source_type&quot;: &quot;rag_eval&quot;,
+      &quot;difficulty&quot;: &quot;hard&quot;,
+      &quot;evidence&quot;: &quot;database connection-pool saturation&quot;,
+      &quot;reasons&quot;: [&quot;Creates a retrieval-evaluation sample that requires direct evidence.&quot; ]
+    }
+  ]
+}
+</code></pre>
+<p>The important detail is not that the JSON is pretty. It is that every row contains fields the operator can use to reject it later. Without <code>source_type</code>, <code>difficulty</code>, <code>evidence</code>, and <code>reasons</code>, batch failure becomes hard to diagnose.</p>
+<h2>Design rejection logic before you chase scale</h2>
+<p>In production, the most valuable property of a synthetic sample is often not that it looks good, but that you can explain why it was discarded. The workflow above rejects common failure modes such as:</p>
 <ul>
-<li>Self-Instruct is the baseline pattern: LLM generates new instructions from seeds.</li>
-<li>Evol-Instruct evolves existing instructions to be deeper, more concrete, or multi-step.</li>
-<li>RAG eval pairs are generated per chunk and filtered with substring evidence verification.</li>
-<li>Distillation uses a strong teacher's answers as training data for a smaller student.</li>
-<li>Verification axes: unique_ratio, length distribution, format compliance, refusal rate.</li>
-<li>Mix synthetic with real to prevent model collapse.</li>
-<li>Episode 8 covers data augmentation.</li>
+<li><strong>Schema omissions</strong>: required keys such as <code>instruction</code>, <code>output</code>, or <code>source_type</code> are missing.</li>
+<li><strong>Evidence failure</strong>: a <code>rag_eval</code> sample cites an evidence string that does not appear in any FAQ chunk.</li>
+<li><strong>Refusal-heavy output</strong>: the batch contains too many safety refusals to help downstream supervision.</li>
+<li><strong>Duplicate growth</strong>: the same instruction-input pair keeps recurring with cosmetic wording changes.</li>
+<li><strong>Under-informative output</strong>: the answer is too short to be useful training signal.</li>
 </ul>
-<hr>
+<p>Those rejection reasons should be logged, not hidden. Otherwise the operator cannot explain whether the next fix belongs in the prompt, the seed set, or the branch choice.</p>
+<h2>The four patterns are decision branches inside one workflow</h2>
+<p><strong>Self-Instruct: the default coverage branch</strong></p>
+<p>If the dataset lacks breadth, Self-Instruct is the natural default. But high temperature alone is not enough. With a tiny seed set, near-duplicates arrive quickly, so diversity thresholds and dedup gates matter as much as the prompt itself.</p>
+<p><strong>Evol-Instruct: the difficulty branch</strong></p>
+<p>If baseline tasks exist but reasoning depth is shallow, evolve them instead of generating from scratch. Turning “answer the refund question” into “answer the refund question when a partial-refund exception already exists” raises supervision quality without changing the problem family.</p>
+<p><strong>RAG eval pair generation: the evidence branch</strong></p>
+<p>If your goal is retrieval evaluation rather than instruction tuning, the branch should be separated and labeled as <code>source_type="rag_eval"</code>. In this branch, evidence fidelity matters more than stylistic diversity, so lower temperature and mandatory evidence checks are appropriate.</p>
+<p><strong>Distillation: the branch with an extra policy gate</strong></p>
+<p>Distillation is powerful when you want a strong teacher's behavior to transfer into a student dataset. But quality checks are not enough. You also need a hard stop before dataset creation unless output-usage review has already approved the chosen teacher.</p>
+<pre><code class="language-python">def require_policy_review(branch: str, teacher_name: str, review_ticket: str | None) -&gt; None:
+    if branch != &quot;distillation&quot;:
+        return
+    if not review_ticket:
+        raise RuntimeError(
+            f&quot;Stop: review output-usage rights for {teacher_name} before creating a distillation dataset.&quot;
+        )
+
+require_policy_review(
+    branch=&quot;distillation&quot;,
+    teacher_name=&quot;OpenAI API model&quot;,
+    review_ticket=None,  # must be populated by legal/policy review
+)
+</code></pre>
+<p>The main operational point is not to rely on memory about a provider's rules. For OpenAI, output ownership language and usage-policy restrictions are documented separately, so the safe workflow is to review the current provider terms and policy docs before generating a distillation dataset. The right guidance here is not “always allowed” or “always prohibited,” but “document the latest output-use decision before the run starts.”</p>
+<h2>Batch approval should end in explicit thresholds</h2>
+<p>For this workflow, reasonable minimum thresholds could be:</p>
+<ul>
+<li><code>accept_ratio &gt;= 0.80</code></li>
+<li><code>unique_ratio &gt;= 0.85</code></li>
+<li><code>refusal_ratio &lt;= 0.05</code></li>
+<li>every <code>rag_eval</code> row has <code>evidence_not_found == 0</code></li>
+<li>any distillation run without a <code>policy_review_ticket</code> stops immediately</li>
+</ul>
+<p>These numbers are not universal truths. They are practical gates for catching batches that look large but are operationally weak. For example, a <code>unique_ratio</code> of 0.62 is usually not a signal to generate more. It is a signal to redesign the prompt and seed set.</p>
+<h2>Common points of confusion</h2>
+<ul>
+<li><strong>Synthetic data gets better if we simply generate more</strong>: no. Without rejection logic, scale just multiplies noise.</li>
+<li><strong>A stronger teacher automatically makes distillation safe</strong>: no. Quality and policy are separate gates.</li>
+<li><strong>RAG eval data should be judged the same way as instruction-tuning data</strong>: no. Evidence fidelity comes first.</li>
+<li><strong>If the output is JSON, it is ready for training</strong>: no. Schema success is only the first gate.</li>
+</ul>
 <h2>Operational checklist</h2>
 <ul>
-<li>[ ] Pick the synthetic-data pattern that matches the downstream objective instead of defaulting to one prompt style</li>
-<li>[ ] Measure diversity, schema validity, and refusal rate for every generation batch</li>
-<li>[ ] Verify evidence strings for RAG evaluation pairs against the original chunk</li>
-<li>[ ] Review teacher-model license and output-usage constraints before distillation</li>
-<li>[ ] Mix synthetic and human data deliberately rather than fine-tuning on synthetic only</li>
+<li>[ ] Define the batch goal first, then choose Self-Instruct, Evol-Instruct, RAG eval, or distillation</li>
+<li>[ ] Include <code>source_type</code>, <code>difficulty</code>, <code>evidence</code>, and <code>reasons</code> in the generation contract</li>
+<li>[ ] Document accept ratio, unique ratio, and refusal ratio before the run starts</li>
+<li>[ ] Verify that every <code>rag_eval</code> evidence string exists in the source chunk</li>
+<li>[ ] Do not start distillation without an output-usage review ticket</li>
+<li>[ ] Write only approved rows to <code>datasets/ai-data-preparation-101/07-synthetic-data-generation/&lt;run_id&gt;/accepted.jsonl</code></li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Summary</h2>
+<p>Synthetic data generation is not about memorizing four named patterns. It is about operating one reliable batch workflow with seed inputs, a JSON contract, rejection logic, validation gates, and a dataset write path.</p>
+<p>Self-Instruct expands coverage, Evol-Instruct raises difficulty, RAG eval builds evidence-bound evaluation data, and distillation transfers teacher behavior. But regardless of branch, validation and policy review should come before scale.</p>
+<p>Next, we will stay in the same late-series workflow arc and look at augmentation: how to widen the training distribution by transforming existing samples without breaking their labels.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">Source Data Collection and Cataloging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">Cleaning and Deduplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">PII Detection and Anonymization for Training Data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">Tokenization and Chunking Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">Quality Filtering - Heuristics and Classifiers</a></li>
+<li><strong>What should a real synthetic-data batch start with and end with?</strong></li>
+<li>The article treats Synthetic Data Generation - From Self-Instruct to Distillation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which validation gates must a generated JSON artifact pass before it becomes training data?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/02-source-data-collection-cataloging.md">AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/03-cleaning-deduplication.md">AI Data Preparation 101 (3/10): Cleaning and Deduplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/04-pii-detection-anonymization.md">AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/05-tokenization-chunking.md">AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/06-quality-filtering.md">AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers</a></li>
 <li><strong>Synthetic Data Generation - From Self-Instruct to Distillation (current)</strong></li>
-<li>Data Augmentation Techniques (upcoming)</li>
+<li>Data Augmentation - From EDA to Back-Translation (upcoming)</li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://arxiv.org/abs/2212.10560">Self-Instruct: Aligning Language Model with Self Generated Instructions (Wang et al., 2022)</a></li>
-<li><a href="https://arxiv.org/abs/2304.12244">WizardLM: Empowering Large Language Models to Follow Complex Instructions (Xu et al., 2023)</a></li>
-<li><a href="https://github.com/tatsu-lab/stanford_alpaca">Stanford Alpaca - Instruction-tuned LLaMA</a></li>
-<li><a href="https://arxiv.org/abs/2406.15126">Synthetic Data Generation with Large Language Models (Long et al., 2024 survey)</a></li>
-</ul>
+<p><strong>Official documentation</strong><br>
+- <a href="https://openai.com/policies/terms-of-use/">OpenAI Terms of Use</a><br>
+- <a href="https://openai.com/policies/usage-policies/">OpenAI Usage Policies</a><br>
+- <a href="https://platform.openai.com/docs/overview">OpenAI API Developer Docs</a></p>
+<p><strong>Papers and implementation references</strong><br>
+- <a href="https://arxiv.org/abs/2212.10560">Self-Instruct: Aligning Language Model with Self Generated Instructions (Wang et al., 2022)</a><br>
+- <a href="https://arxiv.org/abs/2304.12244">WizardLM: Empowering Large Language Models to Follow Complex Instructions (Xu et al., 2023)</a><br>
+- <a href="https://github.com/tatsu-lab/stanford_alpaca">Stanford Alpaca - Instruction-tuned LLaMA</a><br>
+- <a href="https://arxiv.org/abs/2406.15126">Synthetic Data Generation with Large Language Models (Long et al., 2024 survey)</a></p>
 <p class="tags-line">Tags: Synthetic Data, Self-Instruct, Evol-Instruct, Distillation, GPT-4, Alpaca</p>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Source Data Collection and Cataloging</title>
+<title>AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Source Data Collection and Cataloging</h1>
+<h1>AI Data Preparation 101 (2/10): Source Data Collection and Cataloging</h1>
 <p>The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.</p>
 <p>This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What metadata must exist the moment a dataset lands on disk?</li>
 <li>How do public datasets, web scraping, and vendor feeds differ in operational risk?</li>
 <li>Why should collection and dataset-card creation happen in one transaction?</li>
-<li>When is a filesystem catalog enough, and when do you need SQLite or a metadata platform?</li>
-<li>Which provenance fields make later audits and retraining requests cheap instead of painful?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI data preparation chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png"></p>
+<p><em>AI data preparation chapter 2 flow overview</em></p>
+<p>This picture places Source Data Collection and Cataloging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Collection is not just pulling bytes from a source. It is the first reproducibility contract: if you cannot prove where the data came from and under what permission, the rest of the pipeline already stands on sand.</p>
+<p>The core of Source Data Collection and Cataloging is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<hr>
 <h2>"I Don't Remember Where This Data Came From"</h2>
 <p>A request lands: re-train the model from three months ago. You open the directory and find files like <code>dataset_v2_final_real.csv</code> with no record of where they originated. This common scene breaks reproducibility and seeds future license disputes.</p>
 <p>The goal of the collection stage is not just "get useful data." It is "get useful data <strong>and</strong> record permanently when, where, and under what permission you got it." This episode spends more time on cataloging and provenance than on the act of collection itself.</p>
@@ -285,16 +286,25 @@ def register(conn, card: DatasetCard):
 <li>[ ] Record transform lineage with input/output hashes and code commit for every stage</li>
 <li>[ ] Decide in advance when the catalog should move from flat files to SQLite or a metadata platform</li>
 </ul>
-<h2>AI Data Preparation 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
+<li><strong>What metadata must exist the moment a dataset lands on disk?</strong></li>
+<li>The article treats Source Data Collection and Cataloging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do public datasets, web scraping, and vendor feeds differ in operational risk?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why should collection and dataset-card creation happen in one transaction?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality</a></li>
 <li><strong>Source Data Collection and Cataloging (current)</strong></li>
 <li>Cleaning and Deduplication (upcoming)</li>
 <li>PII Detection and Anonymization for Training Data (upcoming)</li>
 <li>Tokenization and Chunking Strategies (upcoming)</li>
-<li>Quality Filtering for Training Data (upcoming)</li>
-<li>Synthetic Data Generation (upcoming)</li>
-<li>Data Augmentation Techniques (upcoming)</li>
+<li>Quality Filtering - Heuristics and Classifiers (upcoming)</li>
+<li>Synthetic Data Generation - From Self-Instruct to Distillation (upcoming)</li>
+<li>Data Augmentation - From EDA to Back-Translation (upcoming)</li>
 <li>Train/Eval/Test Splitting and Contamination Control (upcoming)</li>
 <li>Building a Production Data Pipeline (upcoming)</li>
 </ul>

@@ -16,11 +16,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Data Augmentation - From EDA to Back-Translation
+title: "AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation"
 seo_description: Augmentation is not about creating more rows. It is about choosing label-preserving train-only transforms that survive held-out evaluation.
 ---
 
-# Data Augmentation - From EDA to Back-Translation
+# AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation
 
 This is post 8 in the AI Data Preparation 101 series.
 
@@ -28,13 +28,21 @@ Data augmentation is not about inventing brand-new samples. It is about widening
 
 To fix the weaknesses called out in issue #779, this chapter is rebuilt around one concrete augmentation decision path instead of a loose survey. It also repairs the untrustworthy AST rename example and makes the Korean-language warning operational by tying it to actual morphology-aware tooling and references.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How is augmentation different from synthetic generation?
 - What decision path should you follow for minority-class support and typo robustness?
 - When should you choose EDA, back-translation, paraphrasing, or AST transforms?
-- Why do train-only guardrails and held-out evaluation belong together?
-- Why does Korean augmentation need morphology-aware protection rules, and where does KoNLPy fit?
+
+## Big Picture
+
+![AI data preparation chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/08/08-01-big-picture.en.png)
+
+*AI data preparation chapter 8 flow overview*
+
+This picture places Data Augmentation - From EDA to Back-Translation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Augmentation - From EDA to Back-Translation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this chapter matters
 
@@ -105,14 +113,12 @@ from konlpy.tag import Okt
 okt = Okt()
 PROTECTED_POS = {"Josa", "Eomi", "Punctuation"}
 
-
 def extract_replaceable_tokens(text: str) -> list[str]:
     tokens = []
     for surface, pos in okt.pos(text, norm=True, stem=True):
         if pos not in PROTECTED_POS and len(surface) > 1:
             tokens.append(surface)
     return tokens
-
 
 text = "환불이 아직 안 됐는데 언제 처리되나요?"
 print(extract_replaceable_tokens(text))
@@ -138,7 +144,6 @@ paraphraser = pipeline(
 
 BANNED_SUBSTRINGS = ["환불 불가", "법적 조치", "계정 정지"]
 
-
 def paraphrase_ko(text: str, n: int = 3) -> list[str]:
     outputs = paraphraser(
         text,
@@ -150,12 +155,10 @@ def paraphrase_ko(text: str, n: int = 3) -> list[str]:
     )
     return [o["generated_text"].strip() for o in outputs]
 
-
 def semantic_similarity(a: str, b: str) -> float:
     va = embedder.encode([a])
     vb = embedder.encode([b])
     return float(cosine_similarity(va, vb)[0][0])
-
 
 def build_augmented_rows(rows: list[dict]) -> list[dict]:
     augmented = []
@@ -188,7 +191,6 @@ If typo robustness still matters after the minority-class pass, treat it as a se
 ```python
 import random
 
-
 def inject_typo(text: str, p: float = 0.08) -> str:
     chars = list(text)
     for i in range(len(chars) - 1):
@@ -196,7 +198,6 @@ def inject_typo(text: str, p: float = 0.08) -> str:
             chars[i], chars[i + 1] = chars[i + 1], chars[i]
             break
     return "".join(chars)
-
 
 print(inject_typo("환불이 아직 안 됐는데 언제 처리되나요?"))
 ```
@@ -240,7 +241,6 @@ Issue #779 correctly pointed out that the earlier AST rename snippet was not tru
 ```python
 import ast
 
-
 class VarRenamer(ast.NodeTransformer):
     def __init__(self, mapping: dict[str, str]):
         self.mapping = mapping
@@ -255,7 +255,6 @@ class VarRenamer(ast.NodeTransformer):
             node.id = self.mapping[node.id]
         return node
 
-
 def rename_vars(src: str) -> str:
     tree = ast.parse(src)
     names = sorted(
@@ -266,7 +265,6 @@ def rename_vars(src: str) -> str:
     new_tree = VarRenamer(mapping).visit(tree)
     ast.fix_missing_locations(new_tree)
     return ast.unparse(new_tree)
-
 
 src = """
 def add(left, right):
@@ -306,19 +304,29 @@ In this scenario, paraphrasing with Korean guardrails improved both `refund_dela
 
 Next, we will look at the split discipline that must follow generation and augmentation alike: train/eval/test separation and contamination control.
 
-<!-- toc:begin -->
-## AI Data Preparation 101 series
+## Answering the Opening Questions
 
-- [Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
-- [Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
-- [Cleaning and Deduplication](./03-cleaning-deduplication.md)
-- [PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
-- [Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
-- [Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
-- [Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
+- **How is augmentation different from synthetic generation?**
+  - The article treats Data Augmentation - From EDA to Back-Translation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What decision path should you follow for minority-class support and typo robustness?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should you choose EDA, back-translation, paraphrasing, or AST transforms?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Data Preparation 101 (1/10): Why Data Preparation Determines Model Quality](./01-why-data-preparation-matters.md)
+- [AI Data Preparation 101 (2/10): Source Data Collection and Cataloging](./02-source-data-collection-cataloging.md)
+- [AI Data Preparation 101 (3/10): Cleaning and Deduplication](./03-cleaning-deduplication.md)
+- [AI Data Preparation 101 (4/10): PII Detection and Anonymization for Training Data](./04-pii-detection-anonymization.md)
+- [AI Data Preparation 101 (5/10): Tokenization and Chunking Strategies](./05-tokenization-chunking.md)
+- [AI Data Preparation 101 (6/10): Quality Filtering - Heuristics and Classifiers](./06-quality-filtering.md)
+- [AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation](./07-synthetic-data-generation.md)
 - **Data Augmentation - From EDA to Back-Translation (current)**
 - Train/Eval/Test Splitting and Contamination Control (upcoming)
 - Building a Production Data Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References
