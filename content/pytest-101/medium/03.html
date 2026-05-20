@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Assert and Exception Testing</title>
+<title>pytest 101 (3/10): Assert and Exception Testing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Assert and Exception Testing</h1>
+<h1>pytest 101 (3/10): Assert and Exception Testing</h1>
 <p>This is post 3 in the pytest 101 series.</p>
 <blockquote>
 <p>pytest 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: How is pytest's <code>assert</code> different from Python's built-in <code>assert</code>?</p>
 <blockquote>
 <p>pytest rewrites <code>assert</code> statements internally, showing the left-hand and right-hand values in detail when a test fails. This article covers various assert patterns and exception testing with <code>pytest.raises</code>.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Assert and Exception Testing?</li>
+<li>Which signal should the example or diagram make visible for Assert and Exception Testing?</li>
+<li>What failure should be prevented first when Assert and Exception Testing reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.en.png"></p>
+<p><em>pytest 101 chapter 3 flow overview</em></p>
+<p>This picture places Assert and Exception Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Assert and Exception Testing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How pytest's assertion introspection mechanism works</li>
@@ -274,9 +283,19 @@ def test_complex_assertion():
 </ol>
 <h2>Summary and Next</h2>
 <p>pytest's assert is readable and provides detailed failure information. <code>pytest.raises</code> and <code>pytest.approx</code> are essential tools for exception and floating-point testing. Next, we'll learn about fixtures for managing test data.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
+<li><strong>What boundary should you inspect first when applying Assert and Exception Testing?</strong></li>
+<li>The article treats Assert and Exception Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Assert and Exception Testing?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Assert and Exception Testing reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">pytest 101 (1/10): Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">pytest 101 (2/10): Writing Your First pytest Test</a></li>
 <li><strong>Assert and Exception Testing (current)</strong></li>
 <li>Understanding Fixtures (upcoming)</li>
 <li>Parametrization (upcoming)</li>

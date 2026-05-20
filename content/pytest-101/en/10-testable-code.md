@@ -17,14 +17,30 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Writing Testable Code
+title: "pytest 101 (10/10): Writing Testable Code"
 ---
 
-# Writing Testable Code
+# pytest 101 (10/10): Writing Testable Code
 
 This is the final post in the pytest 101 series.
 
 When testing feels painful, the problem is often not pytest. It is that one function is trying to calculate totals, call a payment API, write to storage, stamp the current time, and notify a user all at once. In this article, we'll make that pain concrete and then show how to redraw the boundary so the important rules become easy to verify.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Writing Testable Code?
+- Which signal should the example or diagram make visible for Writing Testable Code?
+- What failure should be prevented first when Writing Testable Code reaches a real system?
+
+## Big Picture
+
+![pytest 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.en.png)
+
+*pytest 101 chapter 10 flow overview*
+
+This picture places Writing Testable Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing Testable Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Covers
 
@@ -57,9 +73,6 @@ Testable structure is not only about making tests pleasant. It also narrows fail
   notification sender
   clock / id factory
 ```
-
-![Diagram of a pure-logic core surrounded by injected adapters such as payment gateway, repository, notifier, and clock](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.en.png)
-*The center is where business rules should live. Payment gateways, repositories, notifiers, and time or ID providers stay outside that core and are injected at the boundary. This keeps most tests focused on input and output instead of environment setup.*
 
 ## Core Concepts
 
@@ -591,17 +604,29 @@ Good refactoring does more than reduce mock counts. It leaves business rules at 
 
 Using pytest well and writing testable code are not separate skills. Once you move pure rules inward and push external dependencies to the boundary, tests become shorter and design becomes clearer at the same time. That is the closing idea of this series: good tests do not just verify good code — they also keep pushing the code toward better structure.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Writing Testable Code?**
+  - The article treats Writing Testable Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Writing Testable Code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Writing Testable Code reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
-- [Parametrization](./05-parametrization.md)
-- [Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
-- [Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
-- [Coverage and Test Quality](./08-coverage.md)
-- [Test Automation with GitHub Actions](./09-ci-with-github-actions.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
+- [pytest 101 (5/10): Parametrization](./05-parametrization.md)
+- [pytest 101 (6/10): Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
+- [pytest 101 (8/10): Coverage and Test Quality](./08-coverage.md)
+- [pytest 101 (9/10): Test Automation with GitHub Actions](./09-ci-with-github-actions.md)
 - **Writing Testable Code (current)**
+
 <!-- toc:end -->
 
 ## References

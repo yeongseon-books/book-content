@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Testing Files, Environment Variables, and Time</title>
+<title>pytest 101 (7/10): Testing Files, Environment Variables, and Time</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Testing Files, Environment Variables, and Time</h1>
+<h1>pytest 101 (7/10): Testing Files, Environment Variables, and Time</h1>
 <p>This is post 7 in the pytest 101 series.</p>
 <blockquote>
 <p>pytest 101 series (7/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: How do you reliably test code that reads files or depends on the current time?</p>
 <blockquote>
 <p>pytest's <code>tmp_path</code> fixture manages temporary files, <code>monkeypatch</code> isolates environment variables, and <code>freezegun</code> freezes the clock. This article covers patterns for testing code that depends on system resources.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?</li>
+<li>Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?</li>
+<li>What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.en.png"></p>
+<p><em>pytest 101 chapter 7 flow overview</em></p>
+<p>This picture places Testing Files, Environment Variables, and Time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Testing Files, Environment Variables, and Time is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Managing temporary files with <code>tmp_path</code> and <code>tmp_path_factory</code></li>
@@ -344,13 +353,23 @@ def test_not_billing_day():
 </ol>
 <h2>Summary and Next</h2>
 <p>With tmp_path, monkeypatch, and freezegun, you can isolate system resources for stable, reproducible tests. Next, we'll learn how to measure coverage and evaluate test quality.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
+<li><strong>What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?</strong></li>
+<li>The article treats Testing Files, Environment Variables, and Time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">pytest 101 (1/10): Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">pytest 101 (2/10): Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">pytest 101 (3/10): Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">pytest 101 (4/10): Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">pytest 101 (5/10): Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">pytest 101 (6/10): Mock and Monkeypatch</a></li>
 <li><strong>Testing Files, Environment Variables, and Time (current)</strong></li>
 <li>Coverage and Test Quality (upcoming)</li>
 <li>Test Automation with GitHub Actions (upcoming)</li>

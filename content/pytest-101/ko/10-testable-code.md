@@ -1,7 +1,7 @@
 ---
 series: pytest-101
 episode: 10
-title: 테스트하기 쉬운 코드 구조 만들기
+title: "pytest 101 (10/10): 테스트하기 쉬운 코드 구조 만들기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,18 +20,27 @@ seo_description: mock 벽을 줄이기 위해 순수 로직과 외부 의존성 
 last_reviewed: '2026-05-17'
 ---
 
-# 테스트하기 쉬운 코드 구조 만들기
+# pytest 101 (10/10): 테스트하기 쉬운 코드 구조 만들기
 
 이 글은 pytest 101 시리즈의 마지막 글입니다.
 
 테스트가 힘든 이유는 pytest 기능이 부족해서가 아니라 코드가 결제, 저장, 알림, 시간 조회 같은 바깥세상 의존성을 한 함수 안에 뒤섞어 놓았기 때문인 경우가 많습니다. 이 글에서는 mock이 많아지는 구조를 어떻게 읽어야 하는지, 그리고 어떤 경계에서 순수 로직과 부작용을 분리해야 테스트가 짧아지는지 구체적인 예제로 살펴봅니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 어떤 함수는 테스트 하나에 patch와 mock이 여러 개씩 필요할까요?
 - 의존성 주입은 어떤 지점에 적용해야 실제로 테스트가 단순해질까요?
 - 순수 함수, Protocol, Fake 객체는 각각 어떤 역할을 맡으면 좋을까요?
-- 레거시 함수를 리팩터링할 때 “mock을 덜 쓰는 구조”를 어떻게 목표로 잡을 수 있을까요?
+
+## 큰 그림
+
+![pytest 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
+
+*pytest 101 10장 흐름 개요*
+
+이 그림에서는 테스트하기 쉬운 코드 구조 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 테스트하기 쉬운 코드 구조 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -57,9 +66,6 @@ last_reviewed: '2026-05-17'
   notification sender
   clock / id factory
 ```
-
-![순수 로직 코어와 결제, 저장, 알림 같은 외부 어댑터 경계를 나눈 테스트하기 쉬운 코드 구조](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
-*가운데의 순수 로직 코어는 입력과 출력만으로 검증할 수 있어야 하고, 결제 게이트웨이·저장소·알림 발송기 같은 바깥 의존성은 경계 밖에서 주입받아야 합니다. 이렇게 나누면 비즈니스 규칙 테스트는 mock 벽 없이 빠르게 돌고, 바깥 통합부만 별도 검증 대상으로 남길 수 있습니다.*
 
 ## 핵심 개념
 
@@ -591,17 +597,29 @@ def test_checkout_after_refactoring():
 
 pytest를 잘 쓰는 것과 테스트하기 쉬운 코드를 만드는 일은 따로 떨어져 있지 않습니다. 순수 로직을 안쪽에 모으고, 외부 의존성을 경계 밖으로 밀어내면 테스트는 자연스럽게 짧아지고 설계는 더 분명해집니다. 이 시리즈의 마지막 메시지는 단순합니다. 좋은 테스트는 좋은 코드를 확인할 뿐 아니라, 좋은 코드 구조를 향해 계속 밀어 주는 설계 피드백이기도 합니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 어떤 함수는 테스트 하나에 patch와 mock이 여러 개씩 필요할까요?**
+  - 본문의 기준은 테스트하기 쉬운 코드 구조 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **의존성 주입은 어떤 지점에 적용해야 실제로 테스트가 단순해질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **순수 함수, Protocol, Fake 객체는 각각 어떤 역할을 맡으면 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
-- [첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
-- [assert와 예외 테스트](./03-assert-and-exceptions.md)
-- [fixture 이해하기](./04-fixtures.md)
-- [parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
-- [mock과 monkeypatch](./06-mock-and-monkeypatch.md)
-- [파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
-- [coverage와 테스트 품질 보기](./08-coverage.md)
-- [GitHub Actions에서 테스트 자동화하기](./09-ci-with-github-actions.md)
+## 시리즈 목차
+
+- [pytest 101 (1/10): 왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
+- [pytest 101 (2/10): 첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
+- [pytest 101 (3/10): assert와 예외 테스트](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): fixture 이해하기](./04-fixtures.md)
+- [pytest 101 (5/10): parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
+- [pytest 101 (6/10): mock과 monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
+- [pytest 101 (8/10): coverage와 테스트 품질 보기](./08-coverage.md)
+- [pytest 101 (9/10): GitHub Actions에서 테스트 자동화하기](./09-ci-with-github-actions.md)
 - **테스트하기 쉬운 코드 구조 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

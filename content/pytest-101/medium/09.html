@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Test Automation with GitHub Actions</title>
+<title>pytest 101 (9/10): Test Automation with GitHub Actions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,178 +53,190 @@
 </style>
 </head>
 <body>
-<h1>Test Automation with GitHub Actions</h1>
+<h1>pytest 101 (9/10): Test Automation with GitHub Actions</h1>
 <p>This is post 9 in the pytest 101 series.</p>
-<blockquote>
-<p>pytest 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Do you have to run tests manually every time you open a PR?</p>
-<blockquote>
-<p>GitHub Actions triggers test runs automatically on push and PR events. This article covers setting up pytest with coverage in GitHub Actions, matrix builds across Python versions, and caching for faster runs.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Local green tests are not enough when pull requests can still ship unverified combinations of Python versions, dependencies, and coverage regressions. In this article, we'll turn pytest into an operational gate by wiring one coherent GitHub Actions workflow to every push and pull request.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The structure and syntax of a GitHub Actions workflow file</li>
-<li>Running pytest with coverage in CI</li>
-<li>Matrix builds to test across multiple Python versions</li>
-<li>Caching dependencies to speed up CI runs</li>
+<li>What boundary should you inspect first when applying Test Automation with GitHub Actions?</li>
+<li>Which signal should the example or diagram make visible for Test Automation with GitHub Actions?</li>
+<li>What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png"></p>
+<p><em>pytest 101 chapter 9 flow overview</em></p>
+<p>This picture places Test Automation with GitHub Actions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Test Automation with GitHub Actions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>What This Article Covers</h2>
+<ul>
+<li>How to stop relying on developers to remember manual test runs before opening a PR</li>
+<li>How to assemble one final GitHub Actions workflow instead of mentally merging partial YAML snippets</li>
+<li>How to verify Python 3.10, 3.11, and 3.12 in parallel without slowing feedback too much</li>
+<li>How to keep an HTML coverage artifact available for reviewers after each CI run</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Tests pass locally but may fail in a different environment. CI runs all tests in a consistent environment automatically, catching problems before code is merged.</p>
+<p>Without CI, testing remains a habit. Habits fail under pressure. A team only gets consistent quality when test execution is enforced by repository rules instead of personal memory.</p>
 <blockquote>
-<p>"Works on my machine" is solved by CI. If it passes in CI, it works for everyone on the team.</p>
+<p>The real value of CI is not "it can run tests". It is "you cannot forget to run them anymore."</p>
 </blockquote>
-<p>No matter how well-written your tests are, they're useless if nobody runs them. CI automates execution so "forgot to run tests" never happens.</p>
+<p>Python projects are especially prone to environment drift. A change that passes on one laptop can still fail on another version of Python or with a slightly different dependency cache. That is why the PR signal, not the local shell, should be the team's source of truth.</p>
 <h2>Mental Model</h2>
 <blockquote>
-<p>CI = push/PR event → automatic test run → results displayed on PR</p>
+<p>Think of GitHub Actions as a router: one push or pull request event fans out into multiple Python-version jobs, and one designated job also keeps the coverage artifact for review.</p>
 </blockquote>
-<pre><code class="language-text">Developer pushes → GitHub Actions triggered
-  → Install Python
-  → Install dependencies
-  → Run pytest
-  → Coverage report
-  → Result: Pass / Fail
+<pre><code class="language-text">push or pull_request
+  -&gt; workflow starts
+  -&gt; matrix jobs for Python 3.10 / 3.11 / 3.12
+  -&gt; each job installs package + test dependencies
+  -&gt; each job runs pytest with coverage threshold
+  -&gt; Python 3.12 job uploads HTML coverage artifact
+  -&gt; PR shows pass/fail signal for merge decision
 </code></pre>
 <h2>Core Concepts</h2>
 <p><strong>workflow</strong><br>
-- Description: An automation pipeline defined in <code>.github/workflows/</code></p>
+- Description: The automation definition stored in <code>.github/workflows/</code></p>
+<p><strong>trigger</strong><br>
+- Description: The event condition that starts a workflow</p>
 <p><strong>job</strong><br>
-- Description: An execution unit within a workflow</p>
-<p><strong>step</strong><br>
-- Description: An individual command within a job</p>
+- Description: An independently executed task on a GitHub Actions runner</p>
 <p><strong>matrix</strong><br>
-- Description: Tests multiple environment combinations simultaneously</p>
+- Description: A strategy that expands one job definition across multiple environments</p>
 <p><strong>artifact</strong><br>
-- Description: Files generated during CI that can be stored and downloaded</p>
+- Description: A stored file bundle generated during workflow execution</p>
 <h2>Before / After</h2>
-<p>Compare manual testing with CI automation.</p>
-<pre><code class="language-bash"># before: manual — developer runs tests themselves
-git push origin feature-branch
-# PR created... forgot to run tests
-# reviewer: &quot;Did you run the tests?&quot; → &quot;Uh... no&quot;
+<p><strong>Before — test execution depends on human memory:</strong></p>
+<pre><code class="language-bash">git push origin feature/cart-discount
+# Open PR
+# Reviewer: &quot;Did you check 3.10 too?&quot;
+# Author: &quot;I only ran it on 3.12...&quot;
 </code></pre>
-<pre><code class="language-yaml"># after: automatic — runs on every push
-# .github/workflows/test.yml
-name: Test
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: &quot;3.12&quot;
-      - run: pip install -e &quot;.[test]&quot;
-      - run: pytest --cov
-</code></pre>
-<h2>Step-by-Step Practice</h2>
-<p><strong>Step 1: Write the Basic Workflow</strong></p>
+<p><strong>After — push and PR events enforce the same rule:</strong></p>
 <pre><code class="language-yaml"># .github/workflows/test.yml
-name: Tests
+name: test
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
-  test:
+  pytest:
+    strategy:
+      matrix:
+        python-version: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - run: pip install -e &quot;.[test]&quot;
+      - run: pytest --cov=src --cov-fail-under=80
+</code></pre>
+<p>Even this short version already communicates the operational rule: when it runs, which versions it checks, and what failure threshold blocks the change.</p>
+<h2>Step-by-Step Practice</h2>
+<p><strong>Step 1: Start with the final workflow, not fragments</strong></p>
+<p>Instead of scattering the explanation across partial YAML blocks, anchor the article on one runnable file and explain each decision from there.</p>
+<pre><code class="language-yaml"># .github/workflows/test.yml
+name: test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  pytest:
+    name: pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+
     steps:
-      - name: Checkout code
+      - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: &quot;3.12&quot;
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e &quot;.[test]&quot;
-
-      - name: Run tests
-        run: pytest -v --tb=short
-
-      - name: Run tests with coverage
-        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=80
-</code></pre>
-<p><strong>Step 2: Matrix Build</strong></p>
-<pre><code class="language-yaml"># .github/workflows/test.yml
-name: Tests
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
-      - name: Install dependencies
+      - name: Install package and test dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e &quot;.[test]&quot;
 
-      - name: Run tests
-        run: pytest -v --cov=src --cov-report=term-missing
-</code></pre>
-<p><strong>Step 3: Dependency Caching</strong></p>
-<pre><code class="language-yaml">      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-</code></pre>
-<p><strong>Step 4: Upload Coverage Artifact</strong></p>
-<pre><code class="language-yaml">      - name: Generate HTML coverage report
-        run: pytest --cov=src --cov-report=html
-        if: matrix.python-version == '3.12'
+      - name: Run pytest with coverage gate
+        id: pytest
+        run: |
+          set +e
+          pytest -q --maxfail=1 \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=80
+          status=$?
+          echo &quot;exit_code=$status&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;
+          exit 0
 
-      - name: Upload coverage report
+      - name: Build HTML coverage report
+        if: ${{ always() &amp;&amp; matrix.python-version == '3.12' }}
+        run: coverage html
+
+      - name: Upload HTML coverage artifact
+        if: ${{ always() &amp;&amp; matrix.python-version == '3.12' }}
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-html
           path: htmlcov/
-        if: matrix.python-version == '3.12'
+          if-no-files-found: error
+
+      - name: Fail job when pytest failed
+        if: ${{ steps.pytest.outputs.exit_code != '0' }}
+        run: exit 1
 </code></pre>
-<p><strong>Step 5: Configure Test Dependencies in pyproject.toml</strong></p>
-<pre><code class="language-toml"># pyproject.toml
-[project.optional-dependencies]
+<p>This one file is the reference point for everything else in the article. Readers never have to reconstruct the workflow in their heads.</p>
+<p><strong>Step 2: Trigger on both push and pull request</strong></p>
+<pre><code class="language-yaml">on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+</code></pre>
+<p>If you only listen to <code>push</code>, you lose the clarity of seeing the rule enforced directly on the PR. If you only listen to <code>pull_request</code>, branch pushes become a slower feedback loop. In practice, teams usually want both.</p>
+<p>This also matches how branch protection is commonly configured: the workflow becomes a required status check, which means "no green CI, no merge."</p>
+<p><strong>Step 3: Use a matrix to surface compatibility problems earlier</strong></p>
+<pre><code class="language-yaml">strategy:
+  fail-fast: false
+  matrix:
+    python-version: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
+</code></pre>
+<p>The matrix expands one job definition across multiple Python versions. <code>fail-fast: false</code> is useful because one failure should not hide the rest of the compatibility picture. If 3.10 fails but 3.11 and 3.12 pass, that already tells you something precise about the bug.</p>
+<p>Quote version strings. YAML should treat them as strings, not numbers such as <code>3.1</code>.</p>
+<p><strong>Step 4: Install the project the way the project actually runs</strong></p>
+<pre><code class="language-yaml">- name: Install package and test dependencies
+  run: |
+    python -m pip install --upgrade pip
+    pip install -e &quot;.[test]&quot;
+</code></pre>
+<p><code>pip install -r requirements.txt</code> is often not enough, especially for projects using a <code>src/</code> layout. CI should install the package itself plus its test extras so imports behave the same way they do in real development.</p>
+<p>That workflow stays cleaner when <code>pyproject.toml</code> already describes the test environment.</p>
+<pre><code class="language-toml">[project.optional-dependencies]
 test = [
     &quot;pytest&gt;=8.0&quot;,
     &quot;pytest-cov&gt;=5.0&quot;,
-    &quot;freezegun&gt;=1.2&quot;,
 ]
 
 [tool.pytest.ini_options]
 testpaths = [&quot;tests&quot;]
 pythonpath = [&quot;src&quot;]
-addopts = &quot;-v --tb=short&quot;
+addopts = &quot;-ra --tb=short&quot;
 
 [tool.coverage.run]
 source = [&quot;src&quot;]
@@ -233,80 +245,155 @@ branch = true
 [tool.coverage.report]
 show_missing = true
 fail_under = 80
-exclude_lines = [
-    &quot;pragma: no cover&quot;,
-    &quot;if TYPE_CHECKING:&quot;,
-    &quot;if __name__ == .__main__.&quot;,
-]
 </code></pre>
+<p><strong>Step 5: Prefer setup-python caching before hand-rolled cache steps</strong></p>
+<pre><code class="language-yaml">- name: Set up Python
+  uses: actions/setup-python@v5
+  with:
+    python-version: ${{ matrix.python-version }}
+    cache: pip
+    cache-dependency-path: pyproject.toml
+</code></pre>
+<p>Older examples often build dependency caching with <code>actions/cache</code> directly. That still works, but <code>actions/setup-python</code> already supports a pip cache and is simpler to maintain. The dependency file drives cache invalidation, and the workflow stays readable.</p>
+<p>The goal of CI optimization is not to create the cleverest cache key. It is to keep feedback fast without making the workflow mysterious.</p>
+<p><strong>Step 6: Standardize on one canonical pytest command</strong></p>
+<pre><code class="language-yaml">- name: Run pytest with coverage gate
+  run: |
+    pytest -q --maxfail=1 \
+      --cov=src \
+      --cov-report=term-missing \
+      --cov-report=xml \
+      --cov-fail-under=80
+</code></pre>
+<p>Teams get confused when the README says <code>pytest</code>, CI says <code>pytest --cov</code>, and local developer docs say something else again. Try to make the CI command the repository's canonical verification command.</p>
+<p>This one step does four jobs:</p>
+<ul>
+<li>verifies test pass/fail status</li>
+<li>shows missing coverage lines in the log</li>
+<li>emits an XML report for later tooling</li>
+<li>fails the run when coverage drops below the agreed floor</li>
+</ul>
+<p><strong>Step 7: Keep the artifact even when tests fail, while still failing the job</strong></p>
+<pre><code class="language-yaml">- name: Run pytest with coverage gate
+  id: pytest
+  run: |
+    set +e
+    pytest -q --maxfail=1 \
+      --cov=src \
+      --cov-report=term-missing \
+      --cov-report=xml \
+      --cov-fail-under=80
+    status=$?
+    echo &quot;exit_code=$status&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;
+    exit 0
+
+- name: Build HTML coverage report
+  if: ${{ always() &amp;&amp; matrix.python-version == '3.12' }}
+  run: coverage html
+
+- name: Upload HTML coverage artifact
+  if: ${{ always() &amp;&amp; matrix.python-version == '3.12' }}
+  uses: actions/upload-artifact@v4
+  with:
+    name: coverage-html
+    path: htmlcov/
+    if-no-files-found: error
+
+- name: Fail job when pytest failed
+  if: ${{ steps.pytest.outputs.exit_code != '0' }}
+  run: exit 1
+</code></pre>
+<p>GitHub Actions skips later steps after a failed step unless you explicitly use a status function. That means a plain failing <code>pytest</code> step usually prevents HTML coverage generation and artifact upload, which breaks the common review workflow of downloading artifacts from a red PR. The pattern above captures the pytest exit code, runs report generation and upload with <code>always()</code>, and then fails the job at the end so you get both diagnostics and a red status.</p>
+<p>Uploading HTML coverage from every matrix job usually creates more noise than value. One representative Python version is enough for most teams, and here Python 3.12 plays that role.</p>
+<p>For reviewers, this matters because they can download <code>htmlcov/index.html</code> straight from the workflow run and inspect missed branches without rerunning the project locally.</p>
+<h2>How to Verify the Workflow After You Push</h2>
+<p>Do not stop at "the YAML is written." CI becomes operational only after you verify the run path.</p>
+<ol>
+<li>In the <strong>Actions</strong> tab, confirm the workflow run is attached to the correct branch push or pull request event.</li>
+<li>Check that the <strong>three matrix jobs</strong> appear separately as Python 3.10, 3.11, and 3.12 runs.</li>
+<li>Open a job log and confirm the expected order: checkout -&gt; install -&gt; pytest -&gt; coverage.</li>
+<li>In the Python 3.12 run, confirm the <strong>Artifacts</strong> section contains <code>coverage-html</code>.</li>
+<li>If this repository uses branch protection, wire this workflow into the <strong>required status checks</strong> list.</li>
+</ol>
+<p>Knowing what success looks like is part of the implementation. Otherwise the workflow exists, but the operational guarantee is still vague.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li><code>on: [push, pull_request]</code> triggers on both event types</li>
-<li>Matrix builds test 3 Python versions simultaneously</li>
-<li>Caching saves <code>pip install</code> time on subsequent runs</li>
-<li>Coverage reports stored as artifacts for later download</li>
+<li>A single final <code>test.yml</code> is easier to reason about than four disconnected snippets.</li>
+<li><code>fail-fast: false</code> preserves the full compatibility picture across Python versions.</li>
+<li><code>actions/setup-python</code> caching is often enough without a separate cache action.</li>
+<li>A single artifact-producing job gives reviewers useful coverage context without tripling artifact noise.</li>
 </ul>
 <h2>Common Mistakes</h2>
-<p><strong>Only <code>pip install -r requirements.txt</code></strong><br>
-- Why It's a Problem: Package itself isn't installed, causing import errors<br>
+<p><strong>Configuring only <code>push</code> or only <code>pull_request</code></strong><br>
+- Why It's a Problem: The feedback path stays incomplete<br>
+- Fix: Use both and connect the workflow to branch protection</p>
+<p><strong>Leaving Python versions unquoted</strong><br>
+- Why It's a Problem: YAML may interpret <code>3.10</code> as <code>3.1</code><br>
+- Fix: Write <code>"3.10"</code></p>
+<p><strong>Installing requirements without the project package</strong><br>
+- Why It's a Problem: <code>src</code>-layout imports may fail in CI<br>
 - Fix: Use <code>pip install -e ".[test]"</code></p>
-<p><strong>Python version without quotes</strong><br>
-- Why It's a Problem: <code>3.10</code> is parsed as <code>3.1</code> in YAML<br>
-- Fix: Quote it: <code>"3.10"</code></p>
-<p><strong>Cache key without lock file</strong><br>
-- Why It's a Problem: Cache isn't invalidated when dependencies change<br>
-- Fix: Use <code>hashFiles('pyproject.toml')</code></p>
-<p><strong>No coverage threshold</strong><br>
-- Why It's a Problem: CI passes even when coverage drops<br>
-- Fix: Add <code>--cov-fail-under=80</code></p>
-<p><strong>Only testing on main branch</strong><br>
-- Why It's a Problem: PR changes aren't tested before merge<br>
-- Fix: Include <code>pull_request</code> event</p>
+<p><strong>Uploading HTML coverage from every matrix job</strong><br>
+- Why It's a Problem: Logs and artifacts get noisy fast<br>
+- Fix: Upload from one representative version</p>
+<p><strong>Letting CI and local docs use different pytest commands</strong><br>
+- Why It's a Problem: Reproduction becomes inconsistent<br>
+- Fix: Make the CI command the canonical one</p>
 <h2>Practical Applications</h2>
 <ul>
-<li>Enforce branch protection so PRs can't merge until CI passes</li>
-<li>Test across Python 3.10, 3.11, and 3.12 with matrix builds</li>
-<li>Auto-post coverage reports as PR comments</li>
-<li>Split slow tests into a separate job for faster feedback</li>
-<li>Add a workflow status badge to README</li>
+<li>Add <code>ruff</code> or <code>mypy</code> jobs alongside the test job for a broader quality gate.</li>
+<li>Split slow integration tests from fast unit tests when feedback time starts growing.</li>
+<li>Enforce green CI in repository settings instead of relying on PR template reminders.</li>
+<li>Keep nightly or scheduled workflows separate from the fast PR workflow.</li>
 </ul>
 <h2>How Practitioners Think About This</h2>
-<p>CI compensates for the human limitation of "forgetting to run tests." Once configured, every push runs tests automatically — you never have to consciously remember.</p>
-<p>In practice, teams enforce a rule that PRs cannot merge without passing CI. This single rule dramatically improves code quality.</p>
+<p>Good CI is less about having many features and more about having one rule the team trusts. Once logs become noisy or the workflow feels inconsistent, people stop treating red builds as urgent signals.</p>
+<p>So the first win is not sophistication. It is a stable baseline: every push and PR runs the same pytest command, the result is visible on the PR, and failing CI blocks merge.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Created <code>.github/workflows/test.yml</code></li>
-<li>[ ] Configured triggers for both push and pull_request events</li>
-<li>[ ] Set up a matrix build for multiple Python versions</li>
-<li>[ ] Added dependency caching</li>
-<li>[ ] Set a coverage threshold and uploaded artifacts</li>
+<li>[ ] Added both push and pull request triggers to <code>.github/workflows/test.yml</code></li>
+<li>[ ] Configured a matrix for Python 3.10, 3.11, and 3.12</li>
+<li>[ ] Installed the package and test dependencies with <code>pip install -e ".[test]"</code></li>
+<li>[ ] Chosen one canonical <code>pytest --cov</code> command as the CI verification rule</li>
+<li>[ ] Uploaded an HTML coverage artifact from one representative Python version</li>
 </ul>
 <h2>Exercises</h2>
 <ol>
-<li>Add a lint job (flake8 or ruff) to the workflow and run it in parallel with the test job.</li>
-<li>Set <code>fail-fast: false</code> so the remaining Python versions continue even if one fails.</li>
-<li>Add a workflow status badge to your README.md.</li>
+<li>Add a <code>ruff check .</code> job and run it in parallel with the test job.</li>
+<li>Raise the coverage floor from 80 to 85 and inspect which files cause the failure.</li>
+<li>Add this workflow to your repository's required status checks.</li>
 </ol>
 <h2>Summary and Next</h2>
-<p>GitHub Actions automates test execution so every code change is verified. Matrix builds, caching, and coverage reports make CI effective. Next, we'll learn design principles for writing testable code.</p>
+<p>GitHub Actions is not just a way to run tests automatically. It is how a repository turns testing into an enforced merge rule. Once you anchor the workflow around one final file with clear triggers, matrix coverage, caching, and an artifact path, CI stops being a side feature and becomes the repository's default safety gate. Next, we'll look at how to write code that needs fewer mocks in the first place.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">Testing Files, Environment Variables, and Time</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/08-coverage.md">Coverage and Test Quality</a></li>
+<li><strong>What boundary should you inspect first when applying Test Automation with GitHub Actions?</strong></li>
+<li>The article treats Test Automation with GitHub Actions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Test Automation with GitHub Actions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">pytest 101 (1/10): Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">pytest 101 (2/10): Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">pytest 101 (3/10): Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">pytest 101 (4/10): Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">pytest 101 (5/10): Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">pytest 101 (6/10): Mock and Monkeypatch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">pytest 101 (7/10): Testing Files, Environment Variables, and Time</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/08-coverage.md">pytest 101 (8/10): Coverage and Test Quality</a></li>
 <li><strong>Test Automation with GitHub Actions (current)</strong></li>
 <li>Writing Testable Code (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://docs.github.com/en/actions">GitHub Actions — Documentation</a></li>
+<li><a href="https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions">GitHub Actions workflow syntax</a></li>
+<li><a href="https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs">Running variations of jobs in a workflow with a matrix</a></li>
+<li><a href="https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows">Caching dependencies to speed up workflows</a></li>
 <li><a href="https://github.com/actions/setup-python">actions/setup-python</a></li>
-<li><a href="https://pytest-cov.readthedocs.io/en/latest/config.html">pytest-cov — CI Configuration</a></li>
-<li><a href="https://realpython.com/python-continuous-integration/">Real Python — CI/CD with GitHub Actions</a></li>
+<li><a href="https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts">Store and share data with workflow artifacts</a></li>
 </ul>
 <p class="tags-line">Tags: Python, pytest, GitHub Actions, CI/CD, Test Automation</p>
 </body>

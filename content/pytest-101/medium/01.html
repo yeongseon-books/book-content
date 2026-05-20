@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why Write Tests?</title>
+<title>pytest 101 (1/10): Why Write Tests?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Why Write Tests?</h1>
+<h1>pytest 101 (1/10): Why Write Tests?</h1>
 <p>This is the first post in the pytest 101 series.</p>
 <blockquote>
 <p>pytest 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: Does writing tests slow down development?</p>
 <blockquote>
 <p>Tests don't slow you down — they remove the fear of change and ultimately speed you up. This article explains why tests matter, what kinds exist, and why pytest is the go-to tool for Python testing.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Why Write Tests??</li>
+<li>Which signal should the example or diagram make visible for Why Write Tests??</li>
+<li>What failure should be prevented first when Why Write Tests? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.en.png"></p>
+<p><em>pytest 101 chapter 1 flow overview</em></p>
+<p>This picture places Why Write Tests? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Why Write Tests? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The concrete impact of tests on development productivity</li>
@@ -162,7 +171,7 @@ def test_divide_by_zero():
 <pre><code class="language-bash">pytest test_calculator.py -v
 </code></pre>
 <p>Output:</p>
-<pre><code>test_calculator.py::test_add PASSED
+<pre><code class="language-text">test_calculator.py::test_add PASSED
 test_calculator.py::test_add_negative PASSED
 test_calculator.py::test_divide PASSED
 test_calculator.py::test_divide_by_zero PASSED
@@ -218,6 +227,16 @@ test_calculator.py::test_divide_by_zero PASSED
 </ol>
 <h2>Summary and Next</h2>
 <p>Tests are a safety net for code changes. pytest lets you write tests with a single <code>assert</code> statement. In the next article, we'll walk through writing your first pytest test from scratch.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying Why Write Tests??</strong></li>
+<li>The article treats Why Write Tests? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Why Write Tests??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Why Write Tests? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>Why Write Tests? (current)</strong></li>
 <li>Writing Your First pytest Test (upcoming)</li>

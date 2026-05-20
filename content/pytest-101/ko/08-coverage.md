@@ -1,7 +1,7 @@
 ---
 series: pytest-101
 episode: 8
-title: coverage와 테스트 품질 보기
+title: "pytest 101 (8/10): coverage와 테스트 품질 보기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,20 +20,27 @@ seo_description: pytest-cov로 테스트가 실제로 어느 코드까지 실행
 last_reviewed: '2026-05-12'
 ---
 
-# coverage와 테스트 품질 보기
+# pytest 101 (8/10): coverage와 테스트 품질 보기
 
 이 글은 pytest 101 시리즈의 여덟 번째 글입니다. 테스트가 있다는 사실과 테스트가 충분하다는 사실은 전혀 다릅니다. 이 글에서는 `pytest-cov`를 이용해 테스트가 실제로 어느 코드 라인을 실행했는지 측정하고, 누락된 분기를 찾아 보완하는 방법을 설명합니다.
 
 커버리지는 버그가 없음을 증명하지는 않지만, 적어도 어떤 코드가 전혀 실행되지 않았는지는 객관적으로 보여 줍니다. 그래서 테스트 품질을 이야기할 때 커버리지는 출발점으로 매우 유용합니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 코드 커버리지는 정확히 무엇을 측정할까요?
 - 라인 커버리지와 브랜치 커버리지는 어떻게 다를까요?
 - `pytest-cov`로 누락 라인을 어떻게 확인할 수 있을까요?
-- CI에서 최소 커버리지를 강제하려면 어떻게 해야 할까요?
+
+## 큰 그림
+
+![pytest 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.ko.png)
+
+*pytest 101 8장 흐름 개요*
+
+이 그림에서는 coverage와 테스트 품질 보기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> coverage와 테스트 품질 보기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -236,17 +243,29 @@ pytest --cov=src/myapp --cov-report=term-missing
 
 커버리지는 테스트 범위를 객관적으로 보여 주는 도구입니다. pytest-cov로 누락 구간을 찾고, 그 빈 곳을 메우는 테스트를 추가하며, CI에서 기준을 강제하면 테스트 품질을 훨씬 안정적으로 유지할 수 있습니다. 다음 글에서는 GitHub Actions로 이 검증을 자동화해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **코드 커버리지는 정확히 무엇을 측정할까요?**
+  - 본문의 기준은 coverage와 테스트 품질 보기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **라인 커버리지와 브랜치 커버리지는 어떻게 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`pytest-cov`로 누락 라인을 어떻게 확인할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
-- [첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
-- [assert와 예외 테스트](./03-assert-and-exceptions.md)
-- [fixture 이해하기](./04-fixtures.md)
-- [parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
-- [mock과 monkeypatch](./06-mock-and-monkeypatch.md)
-- [파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
+## 시리즈 목차
+
+- [pytest 101 (1/10): 왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
+- [pytest 101 (2/10): 첫 번째 pytest 테스트 작성하기](./02-first-pytest-test.md)
+- [pytest 101 (3/10): assert와 예외 테스트](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): fixture 이해하기](./04-fixtures.md)
+- [pytest 101 (5/10): parametrization으로 테스트 케이스 늘리기](./05-parametrization.md)
+- [pytest 101 (6/10): mock과 monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): 파일, 환경변수, 시간 테스트하기](./07-testing-files-env-time.md)
 - **coverage와 테스트 품질 보기 (현재 글)**
 - GitHub Actions에서 테스트 자동화하기 (예정)
 - 테스트하기 쉬운 코드 구조 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

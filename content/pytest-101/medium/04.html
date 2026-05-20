@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding Fixtures</title>
+<title>pytest 101 (4/10): Understanding Fixtures</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Understanding Fixtures</h1>
+<h1>pytest 101 (4/10): Understanding Fixtures</h1>
 <p>This is post 4 in the pytest 101 series.</p>
 <blockquote>
 <p>pytest 101 series (4/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: How do you avoid duplicating setup code across multiple tests?</p>
 <blockquote>
 <p>pytest fixtures define test data and state as functions, injecting them automatically by parameter name. This article covers fixture creation, scope management, and yield-based teardown.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Understanding Fixtures?</li>
+<li>Which signal should the example or diagram make visible for Understanding Fixtures?</li>
+<li>What failure should be prevented first when Understanding Fixtures reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.en.png"></p>
+<p><em>pytest 101 chapter 4 flow overview</em></p>
+<p>This picture places Understanding Fixtures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Understanding Fixtures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Defining fixtures and injecting them into tests</li>
@@ -283,10 +292,20 @@ def test_api_client_url(api_client):
 </ol>
 <h2>Summary and Next</h2>
 <p>Fixtures are pytest's core mechanism for managing test data. Understanding scope and yield lets you manage resources safely and efficiently. Next, we'll learn how parametrization lets a single test function verify multiple inputs.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
+<li><strong>What boundary should you inspect first when applying Understanding Fixtures?</strong></li>
+<li>The article treats Understanding Fixtures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Understanding Fixtures?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Understanding Fixtures reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">pytest 101 (1/10): Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">pytest 101 (2/10): Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">pytest 101 (3/10): Assert and Exception Testing</a></li>
 <li><strong>Understanding Fixtures (current)</strong></li>
 <li>Parametrization (upcoming)</li>
 <li>Mock and Monkeypatch (upcoming)</li>

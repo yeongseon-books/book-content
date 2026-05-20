@@ -1,7 +1,7 @@
 ---
 series: pytest-101
 episode: 9
-title: Test Automation with GitHub Actions
+title: "pytest 101 (9/10): Test Automation with GitHub Actions"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Build a GitHub Actions workflow that verifies pytest, coverage,
 last_reviewed: '2026-05-17'
 ---
 
-# Test Automation with GitHub Actions
+# pytest 101 (9/10): Test Automation with GitHub Actions
 
 This is post 9 in the pytest 101 series.
 
 Local green tests are not enough when pull requests can still ship unverified combinations of Python versions, dependencies, and coverage regressions. In this article, we'll turn pytest into an operational gate by wiring one coherent GitHub Actions workflow to every push and pull request.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Test Automation with GitHub Actions?
+- Which signal should the example or diagram make visible for Test Automation with GitHub Actions?
+- What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?
+
+## Big Picture
+
+![pytest 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
+
+*pytest 101 chapter 9 flow overview*
+
+This picture places Test Automation with GitHub Actions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Test Automation with GitHub Actions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Covers
 
@@ -54,9 +70,6 @@ push or pull_request
   -> Python 3.12 job uploads HTML coverage artifact
   -> PR shows pass/fail signal for merge decision
 ```
-
-![GitHub Actions CI flow from push or pull request to Python matrix jobs and coverage artifact upload](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
-*A push or pull request starts the same workflow definition. GitHub Actions expands it into Python 3.10, 3.11, and 3.12 jobs, and one designated run also uploads an HTML coverage artifact so reviewers can inspect failures without recreating the environment locally.*
 
 ## Core Concepts
 
@@ -375,17 +388,29 @@ So the first win is not sophistication. It is a stable baseline: every push and 
 
 GitHub Actions is not just a way to run tests automatically. It is how a repository turns testing into an enforced merge rule. Once you anchor the workflow around one final file with clear triggers, matrix coverage, caching, and an artifact path, CI stops being a side feature and becomes the repository's default safety gate. Next, we'll look at how to write code that needs fewer mocks in the first place.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Test Automation with GitHub Actions?**
+  - The article treats Test Automation with GitHub Actions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Test Automation with GitHub Actions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
-- [Parametrization](./05-parametrization.md)
-- [Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
-- [Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
-- [Coverage and Test Quality](./08-coverage.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
+- [pytest 101 (5/10): Parametrization](./05-parametrization.md)
+- [pytest 101 (6/10): Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
+- [pytest 101 (8/10): Coverage and Test Quality](./08-coverage.md)
 - **Test Automation with GitHub Actions (current)**
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

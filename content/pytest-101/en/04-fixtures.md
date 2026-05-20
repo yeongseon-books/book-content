@@ -1,7 +1,7 @@
 ---
 series: pytest-101
 episode: 4
-title: Understanding Fixtures
+title: "pytest 101 (4/10): Understanding Fixtures"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Master pytest fixtures to manage test data efficiently. Learn a
 last_reviewed: '2026-05-04'
 ---
 
-# Understanding Fixtures
+# pytest 101 (4/10): Understanding Fixtures
 
 This is post 4 in the pytest 101 series.
 
 > pytest 101 series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you avoid duplicating setup code across multiple tests?
 
 > pytest fixtures define test data and state as functions, injecting them automatically by parameter name. This article covers fixture creation, scope management, and yield-based teardown.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Fixtures?
+- Which signal should the example or diagram make visible for Understanding Fixtures?
+- What failure should be prevented first when Understanding Fixtures reaches a real system?
+
+## Big Picture
+
+![pytest 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.en.png)
+
+*pytest 101 chapter 4 flow overview*
+
+This picture places Understanding Fixtures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Fixtures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -275,10 +287,21 @@ Scope selection follows the rule: "Is it safe for tests to share this data?" Imm
 
 Fixtures are pytest's core mechanism for managing test data. Understanding scope and yield lets you manage resources safely and efficiently. Next, we'll learn how parametrization lets a single test function verify multiple inputs.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Fixtures?**
+  - The article treats Understanding Fixtures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Fixtures?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Fixtures reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
 - **Understanding Fixtures (current)**
 - Parametrization (upcoming)
 - Mock and Monkeypatch (upcoming)
@@ -286,6 +309,7 @@ Fixtures are pytest's core mechanism for managing test data. Understanding scope
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

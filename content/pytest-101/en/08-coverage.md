@@ -18,22 +18,34 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Coverage and Test Quality
+title: "pytest 101 (8/10): Coverage and Test Quality"
 ---
 
-# Coverage and Test Quality
+# pytest 101 (8/10): Coverage and Test Quality
 
 This is post 8 in the pytest 101 series.
 
 > pytest 101 series (8/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: What percentage of your code do your tests actually execute?
 
 > Code coverage measures the proportion of lines your tests run. With pytest-cov, you can measure coverage, find untested lines, and fill the gaps. This article covers setup, interpretation, and CI enforcement.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Coverage and Test Quality?
+- Which signal should the example or diagram make visible for Coverage and Test Quality?
+- What failure should be prevented first when Coverage and Test Quality reaches a real system?
+
+## Big Picture
+
+![pytest 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.en.png)
+
+*pytest 101 chapter 8 flow overview*
+
+This picture places Coverage and Test Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Coverage and Test Quality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -243,17 +255,29 @@ In practice, keeping new code coverage higher than existing code is an effective
 
 Coverage objectively measures the scope of your tests. Measure with pytest-cov, fill missing lines, and enforce thresholds in CI to maintain test quality. Next, we'll automate test execution with GitHub Actions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Coverage and Test Quality?**
+  - The article treats Coverage and Test Quality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Coverage and Test Quality?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Coverage and Test Quality reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
-- [Assert and Exception Testing](./03-assert-and-exceptions.md)
-- [Understanding Fixtures](./04-fixtures.md)
-- [Parametrization](./05-parametrization.md)
-- [Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
-- [Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
+- [pytest 101 (3/10): Assert and Exception Testing](./03-assert-and-exceptions.md)
+- [pytest 101 (4/10): Understanding Fixtures](./04-fixtures.md)
+- [pytest 101 (5/10): Parametrization](./05-parametrization.md)
+- [pytest 101 (6/10): Mock and Monkeypatch](./06-mock-and-monkeypatch.md)
+- [pytest 101 (7/10): Testing Files, Environment Variables, and Time](./07-testing-files-env-time.md)
 - **Coverage and Test Quality (current)**
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References

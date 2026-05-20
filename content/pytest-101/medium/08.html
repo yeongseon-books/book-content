@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Coverage and Test Quality</title>
+<title>pytest 101 (8/10): Coverage and Test Quality</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Coverage and Test Quality</h1>
+<h1>pytest 101 (8/10): Coverage and Test Quality</h1>
 <p>This is post 8 in the pytest 101 series.</p>
 <blockquote>
 <p>pytest 101 series (8/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: What percentage of your code do your tests actually execute?</p>
 <blockquote>
 <p>Code coverage measures the proportion of lines your tests run. With pytest-cov, you can measure coverage, find untested lines, and fill the gaps. This article covers setup, interpretation, and CI enforcement.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Coverage and Test Quality?</li>
+<li>Which signal should the example or diagram make visible for Coverage and Test Quality?</li>
+<li>What failure should be prevented first when Coverage and Test Quality reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="pytest 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.en.png"></p>
+<p><em>pytest 101 chapter 8 flow overview</em></p>
+<p>This picture places Coverage and Test Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Coverage and Test Quality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Installing pytest-cov and measuring coverage</li>
@@ -248,14 +257,24 @@ def test_age_type_error():
 </ol>
 <h2>Summary and Next</h2>
 <p>Coverage objectively measures the scope of your tests. Measure with pytest-cov, fill missing lines, and enforce thresholds in CI to maintain test quality. Next, we'll automate test execution with GitHub Actions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">Why Write Tests?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">Writing Your First pytest Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">Assert and Exception Testing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">Understanding Fixtures</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">Parametrization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">Mock and Monkeypatch</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">Testing Files, Environment Variables, and Time</a></li>
+<li><strong>What boundary should you inspect first when applying Coverage and Test Quality?</strong></li>
+<li>The article treats Coverage and Test Quality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Coverage and Test Quality?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Coverage and Test Quality reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/01-why-write-tests.md">pytest 101 (1/10): Why Write Tests?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/02-first-pytest-test.md">pytest 101 (2/10): Writing Your First pytest Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/03-assert-and-exceptions.md">pytest 101 (3/10): Assert and Exception Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/04-fixtures.md">pytest 101 (4/10): Understanding Fixtures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/05-parametrization.md">pytest 101 (5/10): Parametrization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/06-mock-and-monkeypatch.md">pytest 101 (6/10): Mock and Monkeypatch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pytest-101/en/07-testing-files-env-time.md">pytest 101 (7/10): Testing Files, Environment Variables, and Time</a></li>
 <li><strong>Coverage and Test Quality (current)</strong></li>
 <li>Test Automation with GitHub Actions (upcoming)</li>
 <li>Writing Testable Code (upcoming)</li>

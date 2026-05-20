@@ -1,7 +1,7 @@
 ---
 series: pytest-101
 episode: 3
-title: Assert and Exception Testing
+title: "pytest 101 (3/10): Assert and Exception Testing"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Master pytest assertion introspection, floating-point compariso
 last_reviewed: '2026-05-04'
 ---
 
-# Assert and Exception Testing
+# pytest 101 (3/10): Assert and Exception Testing
 
 This is post 3 in the pytest 101 series.
 
 > pytest 101 series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How is pytest's `assert` different from Python's built-in `assert`?
 
 > pytest rewrites `assert` statements internally, showing the left-hand and right-hand values in detail when a test fails. This article covers various assert patterns and exception testing with `pytest.raises`.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Assert and Exception Testing?
+- Which signal should the example or diagram make visible for Assert and Exception Testing?
+- What failure should be prevented first when Assert and Exception Testing reaches a real system?
+
+## Big Picture
+
+![pytest 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.en.png)
+
+*pytest 101 chapter 3 flow overview*
+
+This picture places Assert and Exception Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Assert and Exception Testing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -266,9 +278,20 @@ When writing exception tests, think from the perspective: "This function *must* 
 
 pytest's assert is readable and provides detailed failure information. `pytest.raises` and `pytest.approx` are essential tools for exception and floating-point testing. Next, we'll learn about fixtures for managing test data.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Assert and Exception Testing?**
+  - The article treats Assert and Exception Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Assert and Exception Testing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Assert and Exception Testing reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Write Tests?](./01-why-write-tests.md)
-- [Writing Your First pytest Test](./02-first-pytest-test.md)
+## In this series
+
+- [pytest 101 (1/10): Why Write Tests?](./01-why-write-tests.md)
+- [pytest 101 (2/10): Writing Your First pytest Test](./02-first-pytest-test.md)
 - **Assert and Exception Testing (current)**
 - Understanding Fixtures (upcoming)
 - Parametrization (upcoming)
@@ -277,6 +300,7 @@ pytest's assert is readable and provides detailed failure information. `pytest.r
 - Coverage and Test Quality (upcoming)
 - Test Automation with GitHub Actions (upcoming)
 - Writing Testable Code (upcoming)
+
 <!-- toc:end -->
 
 ## References
