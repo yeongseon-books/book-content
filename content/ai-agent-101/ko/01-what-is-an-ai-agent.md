@@ -1,5 +1,5 @@
 ---
-title: AI Agent란 무엇인가?
+title: "AI Agent 101 (1/10): AI Agent란 무엇인가?"
 series: ai-agent-101
 episode: 1
 language: ko
@@ -21,7 +21,7 @@ last_reviewed: '2026-05-12'
 seo_description: chatbot과 agent를 가르는 기준과 기본 실행 루프를 정리합니다.
 ---
 
-# AI Agent란 무엇인가?
+# AI Agent 101 (1/10): AI Agent란 무엇인가?
 
 많은 팀이 LLM을 처음 도입할 때 가장 먼저 보는 장면은 채팅창입니다. 질문을 넣으면 대답이 나오고, 말투도 그럴듯하며, 요약과 설명도 빠르게 해냅니다. 여기까지만 보면 LLM은 결국 "똑똑한 답변 엔진"처럼 보입니다.
 
@@ -33,13 +33,21 @@ seo_description: chatbot과 agent를 가르는 기준과 기본 실행 루프를
 
 이 글에서는 AI Agent를 "말을 잘하는 모델"이 아니라 "목표를 받고 작업 루프를 실행하는 시스템"으로 이해해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- chatbot과 agent를 가르는 가장 실용적인 기준은 무엇일까요?
-- tool use가 없는 시스템도 agent라고 부를 수 있을까요?
-- Observe → Think → Act → Check 루프는 왜 거의 모든 agent 설계의 출발점일까요?
-- 어떤 업무는 agent가 필요하고, 어떤 업무는 chatbot이나 RAG로 충분할까요?
-- agent를 처음 설계할 때 가장 먼저 그려야 할 위험은 무엇일까요?
+- 챗봇과 agent를 가르는 기준을 기능 이름이 아니라 실행 책임으로 보면 무엇이 달라질까요?
+- Observe → Think → Act → Check 루프는 agent 실패를 어디서 나눠 보게 해 줄까요?
+- 처음 agent를 설계할 때 tool보다 먼저 정해야 할 경계는 무엇일까요?
+
+## 큰 그림
+
+![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
+
+*agent 루프 한눈에 보기*
+
+이 그림에서는 목표를 받은 agent가 관찰하고, 판단하고, 행동하고, 결과를 확인하는 반복 흐름을 봅니다. 챗봇과 agent의 차이는 답변 품질보다 이 루프를 누가 책임지고 끝내는지에서 갈립니다.
+
+> Agent의 출발점은 더 똑똑한 말투가 아니라, 목표를 향해 반복 실행되는 제어 루프입니다.
 
 ## 왜 이 글이 중요한가
 
@@ -49,7 +57,7 @@ AI Agent라는 표현은 이미 너무 넓게 쓰이고 있습니다. 어떤 문
 
 무엇보다 이후 시리즈 전체를 읽기 위한 공통 멘탈 모델이 여기서 정해집니다. context engineering, tool use, workflow, memory, evaluation, operations 모두 결국 "goal을 받고 루프를 어떻게 안전하게 돌릴 것인가"라는 한 문장 위에 쌓입니다.
 
-## AI Agent를 이해하는 가장 좋은 방법: 목표를 받은 작업 루프로 보는 것입니다
+## 핵심 관점
 
 AI Agent를 가장 안정적으로 이해하는 방법은 agent를 하나의 앱 기능이 아니라 **작업 루프를 가진 실행 시스템**으로 보는 것입니다. 입력이 단순 메시지인지, 목표인지부터 구분해 보면 차이가 선명해집니다. chatbot은 대체로 한 턴 응답에서 끝나지만, agent는 목표를 달성할 때까지 관찰하고 결정하고 실행하고 점검합니다.
 
@@ -59,9 +67,6 @@ AI Agent를 가장 안정적으로 이해하는 방법은 agent를 하나의 앱
 
 > Agent의 핵심은 "LLM이 똑똑한가"보다 "목표를 향해 관찰·판단·행동·검증을 반복하는 제어 루프를 안전하게 만들었는가"에 있습니다.
 
-### agent 루프 한눈에 보기
-
-![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
 ## 핵심 개념
 
 ### Chatbot과 Agent를 먼저 분리해야 합니다
@@ -169,19 +174,28 @@ AI Agent는 단순히 말을 잘하는 모델이 아닙니다. 목표를 받고,
 
 이 글의 목적은 화려한 예제를 보여 주는 데 있지 않습니다. 시리즈 전체를 읽는 동안 계속 재사용할 기준선을 만드는 데 있습니다. 다음 글부터는 이 기준선 위에서 context engineering, tool use, workflow, memory를 하나씩 더 구체적으로 쌓아 올리겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **챗봇과 agent를 가르는 기준을 기능 이름이 아니라 실행 책임으로 보면 무엇이 달라질까요?**
+  - 챗봇은 대체로 사람이 읽을 답변을 만들고 끝나지만, agent는 시스템이 다음 행동을 실행할 수 있도록 목표 달성 과정을 책임집니다. 그래서 설계 기준도 응답 문장이 아니라 실행 루프가 됩니다.
+- **Observe → Think → Act → Check 루프는 agent 실패를 어디서 나눠 보게 해 줄까요?**
+  - 이 루프를 쓰면 관찰이 부족했는지, 판단이 틀렸는지, 행동이 실패했는지, 결과 확인이 빠졌는지 단계별로 나눠 볼 수 있습니다.
+- **처음 agent를 설계할 때 tool보다 먼저 정해야 할 경계는 무엇일까요?**
+  - 먼저 목표, 허용 행동, 중단 조건, 사람이 개입해야 할 지점을 정해야 합니다. tool은 그 경계 안에서만 붙이는 실행 수단입니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **AI Agent란 무엇인가? (현재 글)**
-- 컨텍스트 엔지니어링 (예정)
-- Tool Use 기초 (예정)
-- Agent Workflow 설계 (예정)
-- Memory와 State (예정)
-- Multi-Agent 시스템 (예정)
-- Agent 평가 (예정)
-- 에러 처리와 안정성 (예정)
-- 운영 (예정)
-- 첫 Agent 만들기 (예정)
+- **AI Agent 101 (1/10): AI Agent란 무엇인가? (현재 글)**
+- AI Agent 101 (2/10): 컨텍스트 엔지니어링 (예정)
+- AI Agent 101 (3/10): Tool Use 기초 (예정)
+- AI Agent 101 (4/10): Agent Workflow 설계 (예정)
+- AI Agent 101 (5/10): Memory와 State (예정)
+- AI Agent 101 (6/10): Multi-Agent 시스템 (예정)
+- AI Agent 101 (7/10): Agent 평가 (예정)
+- AI Agent 101 (8/10): 에러 처리와 안정성 (예정)
+- AI Agent 101 (9/10): 운영 (예정)
+- AI Agent 101 (10/10): 첫 Agent 만들기 (예정)
 
 <!-- toc:end -->
 

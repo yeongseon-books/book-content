@@ -1,5 +1,5 @@
 ---
-title: Context Engineering
+title: "AI Agent 101 (2/10): Context Engineering"
 series: ai-agent-101
 episode: 2
 language: en
@@ -20,9 +20,7 @@ seo_description: Agent behavior is determined by context. System prompts, conver
   history, tool descriptions, and current state information all constitute…
 ---
 
-# Context Engineering
-
-> AI Agent 101 Series (2/10)
+# AI Agent 101 (2/10): Context Engineering
 
 Agent behavior is determined by context. System prompts, conversation history, tool descriptions, and current state information all constitute context, and agents make decisions based on this context. Clear context leads to clear agent decisions, while ambiguous context leads to erratic behavior.
 
@@ -30,22 +28,22 @@ Context engineering is the process of clearly telling the agent "who you are, wh
 
 This is post 2 in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
 
----
+## Questions to Keep in Mind
 
-<!-- a-grade-intro:begin -->
+- When an agent behaves strangely, which context boundary should you inspect before rewriting prompt wording?
+- What responsibilities are split across the system prompt, conversation history, tool descriptions, and current state?
+- As context grows, how do you decide what to keep and what to drop?
 
-## Key Questions
+## Big Picture
 
-- What pieces make up an agent's context?
-- What is the single most important rule for writing a system prompt?
-- How do you separate role, rules, and knowledge boundaries in one prompt?
-- Which context-injection pattern fits which situation?
+![Context map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png)
 
-<!-- a-grade-intro:end -->
+*Context map*
 
-## Context map
+This picture splits the context that drives an agent into the system prompt, history, tool descriptions, and current state. Context engineering is not prompt decoration; it is designing the behavior contract the agent reads.
 
-![diagram](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png)
+> Context is not just input text for the model; it is the execution contract that tells the agent what role it plays, what it may do, and what it must not do.
+
 ## Context Components
 
 An agent's context refers to all information the LLM considers when making decisions. Context consists of four main components.
@@ -692,19 +690,28 @@ for case in test_cases:
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **When an agent behaves strangely, which context boundary should you inspect before rewriting prompt wording?**
+  - Inspect whether role, rules, knowledge boundaries, and current task state are mixed together. If those boundaries are blurred, better wording will not stabilize behavior for long.
+- **What responsibilities are split across the system prompt, conversation history, tool descriptions, and current state?**
+  - The system prompt owns role and rules, history owns prior interaction, tool descriptions own available actions, and state owns the current workflow position and intermediate results.
+- **As context grows, how do you decide what to keep and what to drop?**
+  - Keep information needed for the current decision, reproducibility, and safety boundaries. Summarize or remove repetitive and stale detail.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- **Context Engineering (current)**
-- Tool Use Fundamentals (upcoming)
-- Agent Workflow Design (upcoming)
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- **AI Agent 101 (2/10): Context Engineering (current)**
+- AI Agent 101 (3/10): Tool Use Fundamentals (upcoming)
+- AI Agent 101 (4/10): Agent Workflow Design (upcoming)
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

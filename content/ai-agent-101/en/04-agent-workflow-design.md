@@ -1,5 +1,5 @@
 ---
-title: Agent Workflow Design
+title: "AI Agent 101 (4/10): Agent Workflow Design"
 series: ai-agent-101
 episode: 4
 language: en
@@ -20,9 +20,7 @@ seo_description: To perform complex tasks, agents must break work into steps, ex
   each step in order, and verify results. This process is called a workflow.
 ---
 
-# Agent Workflow Design
-
-> AI Agent 101 Series (4/10)
+# AI Agent 101 (4/10): Agent Workflow Design
 
 To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."
 
@@ -30,27 +28,27 @@ Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Ex
 
 This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
----
+## Questions to Keep in Mind
 
-<!-- a-grade-intro:begin -->
+- What flow should be drawn before prompt tuning when you choose an agent workflow?
+- Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?
+- Where should state and validation live inside a workflow if you want it to be operable?
 
-## Key Questions
+## Big Picture
 
-- When does each of ReAct, Plan-and-Execute, and Reflexion shine?
-- How do you decide the right granularity of decomposed steps?
-- Where should state live inside a workflow?
-- What validation must happen before pushing a workflow to production?
+![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
 
-<!-- a-grade-intro:end -->
+*Draw the control flow before you tune the prompt*
+
+This picture fixes an agent workflow first as control flow: plan, execute, validate, and replan. The core of workflow design is not a longer prompt; it is making explicit which stage is allowed to choose the next action.
+
+> A workflow is not just a name for a reasoning style; it is the control structure that decides action order and stopping conditions.
 
 ## Key Workflow Patterns
 
 Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
 
 ### Draw the control flow before you tune the prompt
-
-![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
-*A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.*
 
 ### ReAct (Reasoning + Acting)
 
@@ -1325,19 +1323,28 @@ else:
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What flow should be drawn before prompt tuning when you choose an agent workflow?**
+  - Draw how planning, execution, observation, validation, and replanning connect after the goal arrives. Without that flow, prompt changes are temporary patches.
+- **Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?**
+  - ReAct fits iterative tool exploration, Plan-and-Execute fits long multi-step work, and Reflexion fits tasks where failures must be inspected before retrying.
+- **Where should state and validation live inside a workflow if you want it to be operable?**
+  - State should be the minimal execution record passed between stages, and validation should sit at the boundary that allows the next action or stops the run.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- **Agent Workflow Design (current)**
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- **AI Agent 101 (4/10): Agent Workflow Design (current)**
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

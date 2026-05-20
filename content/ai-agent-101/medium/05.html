@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Memory and State</title>
+<title>AI Agent 101 (5/10): Memory and State</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Memory and State</h1>
-<blockquote>
-<p>AI Agent 101 Series (5/10)</p>
-</blockquote>
+<h1>AI Agent 101 (5/10): Memory and State</h1>
 <p>For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions.</p>
 <p>However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).</p>
 <p>This is post 5 in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do short-term and long-term memory differ, and when do you need each?</li>
-<li>What is the safest strategy for truncating conversation history?</li>
-<li>How do you cope when the context window is too small?</li>
-<li>On what basis do you pick an external memory backend (Vector DB vs KV)?</li>
+<li>What design problem appears when agent memory and state are treated as the same store?</li>
+<li>When do short-term memory, long-term memory, and execution state each matter?</li>
+<li>When the context window is tight, what should be summarized and what must remain exact?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
-<h2>Short-term Memory vs Long-term Memory</h2>
-<p><strong>Memory and state split</strong></p>
+<h2>Big Picture</h2>
 <p><img alt="Memory and state split" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-memory-and-state-split.en.png"></p>
+<p><em>Memory and state split</em></p>
+<p>This picture separates the current-turn working set, execution state for workflow position, and long-term memory for later retrieval. Memory design is not storing more; it is placing the right information in the right layer for the next decision.</p>
+<blockquote>
+<p>Memory preserves useful past information; state tells the workflow where the current execution stands.</p>
+</blockquote>
+<h2>Short-term Memory vs Long-term Memory</h2>
 <h2>Short-term Memory vs Long-term Memory</h2>
 <p>Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.</p>
 <p><img alt="Short-term Memory vs Long-term Memory" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-short-term-memory-vs-long-term-memory.en.png"><br>
@@ -284,7 +280,6 @@ memory.end_session()
 - Short-term memory: Maintains current conversation flow.<br>
 - Long-term memory: Stores important information beyond sessions.<br>
 - Agent searches long-term memory for relevant information on session start and injects it into short-term memory.</p>
-<h2>Conversation History Management</h2>
 <h2>Conversation History Management</h2>
 <p>As conversations grow longer, they exceed the context window. Since you can't keep all messages indefinitely, you must remove old messages or summarize them.</p>
 <p><strong>Strategy 1: Sliding Window</strong></p>
@@ -535,7 +530,6 @@ print(f&quot;Retained messages: {len(context) - 1}&quot;)  # excluding system
 - Keep recent N messages as-is (sliding window).<br>
 - Remove low-importance messages when exceeding N (importance-based).<br>
 - Periodically summarize old messages (summarization).</p>
-<h2>Context Window Management</h2>
 <h2>Context Window Management</h2>
 <p>The context window is the limit on the number of tokens a model can process at once. For GPT-4, this varies by model: 8K, 32K, 128K, etc.</p>
 <p>Agents performing long conversations or many tool calls can exceed the context window. Let's examine strategies to manage this.</p>
@@ -1218,6 +1212,15 @@ def save_conversation(user_id, messages):
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What design problem appears when agent memory and state are treated as the same store?</strong></li>
+<li>Mixing them blurs what should be retained, summarized, deleted, or used to resume execution. Long-lived knowledge and current workflow position need different rules.</li>
+<li><strong>When do short-term memory, long-term memory, and execution state each matter?</strong></li>
+<li>Short-term memory holds the current conversation, long-term memory stores information worth retrieving across sessions, and execution state tracks workflow position and intermediate results.</li>
+<li><strong>When the context window is tight, what should be summarized and what must remain exact?</strong></li>
+<li>Keep evidence and tool results exactly when they are needed for reproducibility. Summarize repetitive conversation or old explanation to save context.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

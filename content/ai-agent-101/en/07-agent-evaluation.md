@@ -1,5 +1,5 @@
 ---
-title: Agent Evaluation
+title: "AI Agent 101 (7/10): Agent Evaluation"
 series: ai-agent-101
 episode: 7
 language: en
@@ -20,9 +20,7 @@ seo_description: What's harder than building an agent is evaluating "whether thi
   agent works properly." Simple LLMs only need response quality evaluation, but…
 ---
 
-# Agent Evaluation
-
-> AI Agent 101 Series (7/10)
+# AI Agent 101 (7/10): Agent Evaluation
 
 What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.
 
@@ -30,17 +28,21 @@ Agent evaluation is divided into three levels. Individual tool call accuracy (To
 
 This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
----
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
+- Why is final-answer grading not enough for agent evaluation?
+- What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?
+- What real requests and failure cases belong in an eval set before production?
 
-- What makes agent evaluation fundamentally different from ML model evaluation?
-- What do you look at to call a trajectory success or failure?
-- How do you measure tool-call accuracy?
-- Where do end-to-end tests and benchmarks pull in different directions?
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
+
+*Evaluation signal path*
+
+This picture follows evaluation signals from the user request through tool calls, intermediate trajectory, and final result. Agent evaluation must judge not only whether the answer is correct, but whether the path to it is safe and reproducible.
+
+> Agent evaluation is not answer grading; it is diagnosis across trajectory, tool use, and final outcome.
 
 ## Agent Evaluation Metrics
 
@@ -48,7 +50,6 @@ Agent evaluation must look beyond "did it answer well" to multiple dimensions. T
 
 ### Evaluation signal path
 
-![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
 ### Task Success Rate
 
 The percentage of user requests the agent completes successfully.
@@ -627,19 +628,28 @@ Pre-deploy regression testing is mandatory.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Why is final-answer grading not enough for agent evaluation?**
+  - An agent can call the wrong tool and still produce plausible text. Final-answer grading misses cost, risk, and accidental success.
+- **What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?**
+  - Trajectory evaluation catches wasted or wrong paths, tool-call accuracy catches tool choice and argument errors, and end-to-end success checks user-visible completion.
+- **What real requests and failure cases belong in an eval set before production?**
+  - Include frequent real requests, boundary cases, tool failures, ambiguous inputs, and cases that trigger expensive loops.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- **Agent Evaluation (current)**
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- **AI Agent 101 (7/10): Agent Evaluation (current)**
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

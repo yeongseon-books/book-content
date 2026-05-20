@@ -1,5 +1,5 @@
 ---
-title: Error Handling and Reliability
+title: "AI Agent 101 (8/10): Error Handling and Reliability"
 series: ai-agent-101
 episode: 8
 language: en
@@ -20,9 +20,7 @@ seo_description: Agents can fail because they call external tools, go through ne
   and depend on uncertain model judgments.
 ---
 
-# Error Handling and Reliability
-
-> AI Agent 101 Series (8/10)
+# AI Agent 101 (8/10): Error Handling and Reliability
 
 Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc.
 
@@ -30,17 +28,21 @@ To build reliable agents, you must anticipate and respond to these failures. Ret
 
 This is post 8 in the AI Agent 101 series. Here we cover common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.
 
----
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
+- When designing agent reliability, what should be controlled instead of pretending failures disappear?
+- Which failures fit Retry, Fallback, or Circuit Breaker patterns?
+- What guards are needed before and after safe tool execution?
 
-- How do you classify the errors an agent throws?
-- When do you reach for Retry vs Fallback vs Circuit Breaker?
-- What guards do you need to run tools safely?
-- What does good graceful degradation look like to the user?
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![Reliability control loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
+
+*Reliability control loop*
+
+This picture shows a reliability loop that detects failures, retries, degrades through fallback, or stops execution with a circuit breaker. Reliability comes from containing failure before it spreads, not from assuming failure will not happen.
+
+> A reliable agent is not an agent that never fails; it is one that detects, limits, and stops failures in explainable ways.
 
 ## Error Types in Agents
 
@@ -48,7 +50,6 @@ Agents tangle together LLMs, tools, external APIs, and user input, so error sour
 
 ### Reliability control loop
 
-![Reliability control loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
 ### LLM Response Errors
 
 The LLM's own non-determinism, format errors, and hallucinations are the most common error source.
@@ -462,19 +463,28 @@ Show users a friendly message; manage internal trace IDs separately.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **When designing agent reliability, what should be controlled instead of pretending failures disappear?**
+  - Control detection, blast radius, retry count, and user-visible state across network, tool, model-judgment, and output-format failures.
+- **Which failures fit Retry, Fallback, or Circuit Breaker patterns?**
+  - Retry fits transient failures, fallback fits cases where degraded service is acceptable, and circuit breakers fit repeated or risky external failures.
+- **What guards are needed before and after safe tool execution?**
+  - Before execution, validate allowed tools, arguments, permissions, and timeouts. After execution, normalize errors, partial results, retry decisions, and user messaging.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- [Agent Evaluation](./07-agent-evaluation.md)
-- **Error Handling and Reliability (current)**
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- [AI Agent 101 (7/10): Agent Evaluation](./07-agent-evaluation.md)
+- **AI Agent 101 (8/10): Error Handling and Reliability (current)**
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

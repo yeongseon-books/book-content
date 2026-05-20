@@ -1,5 +1,5 @@
 ---
-title: Memory and State
+title: "AI Agent 101 (5/10): Memory and State"
 series: ai-agent-101
 episode: 5
 language: en
@@ -20,9 +20,7 @@ seo_description: For agents to perform multi-step tasks, they must remember what
   did in previous steps. This is memory.
 ---
 
-# Memory and State
-
-> AI Agent 101 Series (5/10)
+# AI Agent 101 (5/10): Memory and State
 
 For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions.
 
@@ -30,24 +28,24 @@ However, model context windows are limited. You can't keep including all convers
 
 This is post 5 in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
 
----
+## Questions to Keep in Mind
 
-<!-- a-grade-intro:begin -->
+- What design problem appears when agent memory and state are treated as the same store?
+- When do short-term memory, long-term memory, and execution state each matter?
+- When the context window is tight, what should be summarized and what must remain exact?
 
-## Key Questions
+## Big Picture
 
-- How do short-term and long-term memory differ, and when do you need each?
-- What is the safest strategy for truncating conversation history?
-- How do you cope when the context window is too small?
-- On what basis do you pick an external memory backend (Vector DB vs KV)?
+![Memory and state split](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
 
-<!-- a-grade-intro:end -->
+*Memory and state split*
+
+This picture separates the current-turn working set, execution state for workflow position, and long-term memory for later retrieval. Memory design is not storing more; it is placing the right information in the right layer for the next decision.
+
+> Memory preserves useful past information; state tells the workflow where the current execution stands.
 
 ## Short-term Memory vs Long-term Memory
 
-### Memory and state split
-
-![Memory and state split](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
 ## Short-term Memory vs Long-term Memory
 
 Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.
@@ -281,7 +279,6 @@ memory.end_session()
 - Long-term memory: Stores important information beyond sessions.
 - Agent searches long-term memory for relevant information on session start and injects it into short-term memory.
 
-## Conversation History Management
 ## Conversation History Management
 
 As conversations grow longer, they exceed the context window. Since you can't keep all messages indefinitely, you must remove old messages or summarize them.
@@ -528,7 +525,6 @@ In practice, these strategies are combined:
 - Remove low-importance messages when exceeding N (importance-based).
 - Periodically summarize old messages (summarization).
 
-## Context Window Management
 ## Context Window Management
 
 The context window is the limit on the number of tokens a model can process at once. For GPT-4, this varies by model: 8K, 32K, 128K, etc.
@@ -1306,19 +1302,28 @@ def save_conversation(user_id, messages):
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What design problem appears when agent memory and state are treated as the same store?**
+  - Mixing them blurs what should be retained, summarized, deleted, or used to resume execution. Long-lived knowledge and current workflow position need different rules.
+- **When do short-term memory, long-term memory, and execution state each matter?**
+  - Short-term memory holds the current conversation, long-term memory stores information worth retrieving across sessions, and execution state tracks workflow position and intermediate results.
+- **When the context window is tight, what should be summarized and what must remain exact?**
+  - Keep evidence and tool results exactly when they are needed for reproducibility. Summarize repetitive conversation or old explanation to save context.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- **Memory and State (current)**
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- **AI Agent 101 (5/10): Memory and State (current)**
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

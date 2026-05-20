@@ -1,5 +1,5 @@
 ---
-title: Building Your First Agent
+title: "AI Agent 101 (10/10): Building Your First Agent"
 series: ai-agent-101
 episode: 10
 language: en
@@ -20,9 +20,7 @@ seo_description: Now let's synthesize what we've learned and build a real agent.
   article implements a simple yet practical agent from start to finish.
 ---
 
-# Building Your First Agent
-
-> AI Agent 101 Series (10/10)
+# AI Agent 101 (10/10): Building Your First Agent
 
 Now let's synthesize what we've learned and build a real agent. This article implements a simple yet practical agent from start to finish. We'll cover the entire process: context setup, tool definition, workflow composition, error handling, and testing.
 
@@ -30,17 +28,21 @@ Recommended frameworks are LangGraph and Crew AI. Both simplify agent constructi
 
 This is the final post in the AI Agent 101 series. Here we cover end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.
 
----
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
+- Where should you draw the ownership boundary for the first research-assistant agent?
+- In what order should tools, memory, the agent loop, and eval be assembled so failures stay small?
+- How should you choose among raw code, LangGraph, and CrewAI for a first agent?
 
-- Where do you draw the line on what the Research Assistant agent owns?
-- In what order should you build tools, memory, and the loop?
-- On what basis do you pick raw code vs LangGraph vs CrewAI?
-- How do you wire your first agent into automated eval?
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![End-to-end build map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
+
+*End-to-end build map*
+
+This picture shows a research-assistant agent analyzing a question, searching, calculating, synthesizing, and storing conversation history as one end-to-end flow. The goal of a first agent is not feature count; it is turning the earlier design principles into a small, verifiable loop.
+
+> A first agent should be more than a demo; it should be a small operating skeleton that validates boundaries, tools, memory, and eval together.
 
 ## What We Are Building: A Research Assistant
 
@@ -56,7 +58,6 @@ This example is small but it pulls together every concept covered in episodes 1 
 
 ## End-to-end build map
 
-![diagram](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
 ---
 
 ## Prerequisites
@@ -530,19 +531,28 @@ This series is the starting point of agent development. Begin with small agents 
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Where should you draw the ownership boundary for the first research-assistant agent?**
+  - Let it analyze questions and perform bounded search, calculation, and synthesis. Exclude high-permission external changes and unvalidated autonomous execution.
+- **In what order should tools, memory, the agent loop, and eval be assembled so failures stay small?**
+  - Define tool contracts first, add memory/state, connect the loop, and then use evals to verify each boundary. That order keeps failures small.
+- **How should you choose among raw code, LangGraph, and CrewAI for a first agent?**
+  - Raw code fits learning and small control loops, LangGraph fits explicit state, branching, and checkpointing, and CrewAI fits role-separated multi-agent collaboration.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- [Agent Evaluation](./07-agent-evaluation.md)
-- [Error Handling and Reliability](./08-error-handling-reliability.md)
-- [Production Operations](./09-production-operations.md)
-- **Building Your First Agent (current)**
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- [AI Agent 101 (7/10): Agent Evaluation](./07-agent-evaluation.md)
+- [AI Agent 101 (8/10): Error Handling and Reliability](./08-error-handling-reliability.md)
+- [AI Agent 101 (9/10): Production Operations](./09-production-operations.md)
+- **AI Agent 101 (10/10): Building Your First Agent (current)**
 
 <!-- toc:end -->
 

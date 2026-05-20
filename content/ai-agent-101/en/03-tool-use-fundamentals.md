@@ -1,5 +1,5 @@
 ---
-title: Tool Use Fundamentals
+title: "AI Agent 101 (3/10): Tool Use Fundamentals"
 series: ai-agent-101
 episode: 3
 language: en
@@ -20,9 +20,7 @@ seo_description: Agents differ from simple conversational models because they ca
   use tools. They can call weather APIs, query databases, read and write files.
 ---
 
-# Tool Use Fundamentals
-
-> AI Agent 101 Series (3/10)
+# AI Agent 101 (3/10): Tool Use Fundamentals
 
 Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools.
 
@@ -30,18 +28,21 @@ The core of tool use is function calling. When the model determines "I need to c
 
 This is post 3 in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
 
----
+## Questions to Keep in Mind
 
-<!-- a-grade-intro:begin -->
+- Where does the model decision end and application execution begin in function calling?
+- How does an ambiguous tool schema make an agent fail?
+- What should be validated before tool output is fed back to the model?
 
-## Key Questions
+## Big Picture
 
-- What does function calling actually look like from the model's side?
-- What failures show up when a tool schema is poorly written?
-- How does the model pick a tool when several are available?
-- What do you need to watch when feeding tool output back into the model?
+![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
 
-<!-- a-grade-intro:end -->
+*Tool-calling loop*
+
+This picture shows the model producing a tool-call request, the application executing the real tool through a schema, and the result returning to the model. Tool use is less about letting the model run code and more about fixing the execution boundary as a contract.
+
+> Tool use separates model reasoning from code execution and connects them with schemas and validation.
 
 ## Function Calling Basic Flow
 
@@ -49,7 +50,6 @@ The core mechanism that enables AI agents to interact with external systems is F
 
 ### Tool-calling loop
 
-![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
 ### The Four-Step Flow
 
 **Step 1: Provide Tool Definitions to LLM**
@@ -1110,19 +1110,28 @@ if result["success"]:
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Where does the model decision end and application execution begin in function calling?**
+  - The model requests which tool to call and with which arguments; application code validates that request and executes the real API or function.
+- **How does an ambiguous tool schema make an agent fail?**
+  - A vague name or argument contract makes the model choose similar tools or fill invalid values, which hides whether the failure came from the model or the schema.
+- **What should be validated before tool output is fed back to the model?**
+  - Validate argument types, allowed ranges, error shape, sensitive data exposure, and whether only the minimal useful result returns to the model.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- **Tool Use Fundamentals (current)**
-- Agent Workflow Design (upcoming)
-- Memory and State (upcoming)
-- Multi-Agent Systems (upcoming)
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- **AI Agent 101 (3/10): Tool Use Fundamentals (current)**
+- AI Agent 101 (4/10): Agent Workflow Design (upcoming)
+- AI Agent 101 (5/10): Memory and State (upcoming)
+- AI Agent 101 (6/10): Multi-Agent Systems (upcoming)
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

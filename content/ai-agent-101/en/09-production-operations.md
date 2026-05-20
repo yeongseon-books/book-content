@@ -1,5 +1,5 @@
 ---
-title: Production Operations
+title: "AI Agent 101 (9/10): Production Operations"
 series: ai-agent-101
 episode: 9
 language: en
@@ -20,9 +20,7 @@ seo_description: When you deploy agents to production, new problems arise. You n
   to monitor how much it costs, how long responses take, where it fails, and which…
 ---
 
-# Production Operations
-
-> AI Agent 101 Series (9/10)
+# AI Agent 101 (9/10): Production Operations
 
 When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.
 
@@ -30,24 +28,25 @@ The core of agent operations is observability. You must track all agent steps, m
 
 This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
 
----
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
+- What trace do you need first if production users ask why an agent answered that way?
+- At what unit should cost and latency be measured to reveal the real bottleneck?
+- Which observability signals should gate deployment and rollback for an agent?
 
-- What is the first observability signal you put in place for an agent?
-- What is the simplest way to track cost and enforce a ceiling?
-- When you scale an agent, where does the bottleneck appear: LLM or tools?
-- How do you design a safe deploy and rollback?
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
+
+*Observability*
+
+This picture follows one request across planning, tool execution, observability, and safety controls until it feeds back into operations. Agent operations are not subjective quality review; they are system design for tracing cost, latency, and failure causes at each step.
+
+> An operable agent does not log only the final answer. It lets you follow the path, cost, and tool calls that produced it.
 
 ## Observability
 
 Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.
-
-![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
-*Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.*
 
 ### Structured Logging
 
@@ -585,19 +584,28 @@ A leading cause of GDPR/CCPA violations and security incidents.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What trace do you need first if production users ask why an agent answered that way?**
+  - You need one trace that ties together request id, user input, chosen workflow, each step, tool calls, model responses, cost, latency, and errors.
+- **At what unit should cost and latency be measured to reveal the real bottleneck?**
+  - Do not look only at totals. Break cost and latency down by step, tool call, model call, and user request to reveal the bottleneck boundary.
+- **Which observability signals should gate deployment and rollback for an agent?**
+  - Deployment gates should include success rate, error rate, cost ceilings, P95 latency, tool failure rate, and recovery after rollback.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- [Multi-Agent Systems](./06-multi-agent-systems.md)
-- [Agent Evaluation](./07-agent-evaluation.md)
-- [Error Handling and Reliability](./08-error-handling-reliability.md)
-- **Production Operations (current)**
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- [AI Agent 101 (6/10): Multi-Agent Systems](./06-multi-agent-systems.md)
+- [AI Agent 101 (7/10): Agent Evaluation](./07-agent-evaluation.md)
+- [AI Agent 101 (8/10): Error Handling and Reliability](./08-error-handling-reliability.md)
+- **AI Agent 101 (9/10): Production Operations (current)**
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

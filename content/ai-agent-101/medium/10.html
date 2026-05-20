@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building Your First Agent</title>
+<title>AI Agent 101 (10/10): Building Your First Agent</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Building Your First Agent</h1>
-<blockquote>
-<p>AI Agent 101 Series (10/10)</p>
-</blockquote>
+<h1>AI Agent 101 (10/10): Building Your First Agent</h1>
 <p>Now let's synthesize what we've learned and build a real agent. This article implements a simple yet practical agent from start to finish. We'll cover the entire process: context setup, tool definition, workflow composition, error handling, and testing.</p>
 <p>Recommended frameworks are LangGraph and Crew AI. Both simplify agent construction but have different approaches. LangGraph is strong in graph-based workflows, while Crew AI is strong in multi-agent collaboration.</p>
 <p>This is the final post in the AI Agent 101 series. Here we cover end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Where do you draw the line on what the Research Assistant agent owns?</li>
-<li>In what order should you build tools, memory, and the loop?</li>
-<li>On what basis do you pick raw code vs LangGraph vs CrewAI?</li>
-<li>How do you wire your first agent into automated eval?</li>
+<li>Where should you draw the ownership boundary for the first research-assistant agent?</li>
+<li>In what order should tools, memory, the agent loop, and eval be assembled so failures stay small?</li>
+<li>How should you choose among raw code, LangGraph, and CrewAI for a first agent?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="End-to-end build map" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png"></p>
+<p><em>End-to-end build map</em></p>
+<p>This picture shows a research-assistant agent analyzing a question, searching, calculating, synthesizing, and storing conversation history as one end-to-end flow. The goal of a first agent is not feature count; it is turning the earlier design principles into a small, verifiable loop.</p>
+<blockquote>
+<p>A first agent should be more than a demo; it should be a small operating skeleton that validates boundaries, tools, memory, and eval together.</p>
+</blockquote>
 <h2>What We Are Building: A Research Assistant</h2>
 <p>In this episode, you build a small research assistant agent end to end. The user asks a question and the agent goes through these steps.</p>
 <ol>
@@ -83,7 +81,7 @@
 </ol>
 <p>This example is small but it pulls together every concept covered in episodes 1 through 9: context setup, tool definition, workflow design, memory, error handling, evaluation, and operations.</p>
 <h2>End-to-end build map</h2>
-<h2><img alt="diagram" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png"></h2>
+<hr>
 <h2>Prerequisites</h2>
 <p>Install the required packages.</p>
 <pre><code class="language-bash">pip install openai pydantic python-dotenv
@@ -520,6 +518,15 @@ LangGraph and CrewAI are powerful but carry learning costs. Build from scratch f
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Where should you draw the ownership boundary for the first research-assistant agent?</strong></li>
+<li>Let it analyze questions and perform bounded search, calculation, and synthesis. Exclude high-permission external changes and unvalidated autonomous execution.</li>
+<li><strong>In what order should tools, memory, the agent loop, and eval be assembled so failures stay small?</strong></li>
+<li>Define tool contracts first, add memory/state, connect the loop, and then use evals to verify each boundary. That order keeps failures small.</li>
+<li><strong>How should you choose among raw code, LangGraph, and CrewAI for a first agent?</strong></li>
+<li>Raw code fits learning and small control loops, LangGraph fits explicit state, branching, and checkpointing, and CrewAI fits role-separated multi-agent collaboration.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

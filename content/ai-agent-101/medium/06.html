@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Multi-Agent Systems</title>
+<title>AI Agent 101 (6/10): Multi-Agent Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Multi-Agent Systems</h1>
-<blockquote>
-<p>AI Agent 101 Series (6/10)</p>
-</blockquote>
+<h1>AI Agent 101 (6/10): Multi-Agent Systems</h1>
 <p>Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.</p>
 <p>The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.</p>
 <p>This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you tell a single-agent task from a real multi-agent task?</li>
-<li>What do Supervisor, Hierarchical, and Swarm patterns actually look like?</li>
-<li>What is the most common failure mode in agent-to-agent protocols?</li>
-<li>Which delegation mistakes blow up cost the fastest?</li>
+<li>Where is the line between a task that fits one agent and a task that needs multiple agents?</li>
+<li>What responsibilities should the supervisor, workers, and handoff contract each own?</li>
+<li>How do cost and failure points grow as you split work across more agents?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="Multi-Agent Patterns" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png"></p>
+<p><em>Multi-Agent Patterns</em></p>
+<p>This picture shows a supervisor splitting work and role-specific agents exchanging results through a handoff contract. Multi-agent design is not making collaboration look impressive; it is separating responsibility and cost boundaries.</p>
+<blockquote>
+<p>You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.</p>
+</blockquote>
 <h2>Multi-Agent Patterns</h2>
 <p>There are several patterns for handling complex tasks through cooperation among multiple agents.</p>
-<p><img alt="Multi-Agent Patterns" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png"><br>
-<em>Multi-agent systems are easier to reason about when you draw them as delegation graphs: who routes work, who writes to shared state, and who is allowed to return the final answer.</em></p>
 <p><strong>Orchestrator Pattern (Centralized Coordination)</strong></p>
 <p>A single Orchestrator agent coordinates everything and delegates work to specialized Worker agents.</p>
 <pre><code class="language-python">from typing import List, Dict
@@ -948,6 +944,15 @@ def run_pipeline():
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Where is the line between a task that fits one agent and a task that needs multiple agents?</strong></li>
+<li>Consider multiple agents when domains, tools, success criteria, or task ownership are distinct enough that one prompt and state contract become overloaded.</li>
+<li><strong>What responsibilities should the supervisor, workers, and handoff contract each own?</strong></li>
+<li>The supervisor owns routing and stopping decisions, workers own assigned execution, and the handoff contract owns the input and output shape passed between them.</li>
+<li><strong>How do cost and failure points grow as you split work across more agents?</strong></li>
+<li>More agents add LLM calls, handoff gaps, state mismatches, and supervisor bottlenecks. Split only when role separation pays for that overhead.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

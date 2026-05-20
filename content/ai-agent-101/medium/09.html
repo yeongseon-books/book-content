@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Production Operations</title>
+<title>AI Agent 101 (9/10): Production Operations</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Production Operations</h1>
-<blockquote>
-<p>AI Agent 101 Series (9/10)</p>
-</blockquote>
+<h1>AI Agent 101 (9/10): Production Operations</h1>
 <p>When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.</p>
 <p>The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.</p>
 <p>This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What is the first observability signal you put in place for an agent?</li>
-<li>What is the simplest way to track cost and enforce a ceiling?</li>
-<li>When you scale an agent, where does the bottleneck appear: LLM or tools?</li>
-<li>How do you design a safe deploy and rollback?</li>
+<li>What trace do you need first if production users ask why an agent answered that way?</li>
+<li>At what unit should cost and latency be measured to reveal the real bottleneck?</li>
+<li>Which observability signals should gate deployment and rollback for an agent?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="Observability" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png"></p>
+<p><em>Observability</em></p>
+<p>This picture follows one request across planning, tool execution, observability, and safety controls until it feeds back into operations. Agent operations are not subjective quality review; they are system design for tracing cost, latency, and failure causes at each step.</p>
+<blockquote>
+<p>An operable agent does not log only the final answer. It lets you follow the path, cost, and tool calls that produced it.</p>
+</blockquote>
 <h2>Observability</h2>
 <p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
-<p><img alt="Observability" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png"><br>
-<em>Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.</em></p>
 <p><strong>Structured Logging</strong></p>
 <p>Plaintext logs are hard to parse and query. JSON-structured logs are the standard.</p>
 <pre><code class="language-python">import logging
@@ -546,6 +542,15 @@ logger.info(&quot;request&quot;,
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What trace do you need first if production users ask why an agent answered that way?</strong></li>
+<li>You need one trace that ties together request id, user input, chosen workflow, each step, tool calls, model responses, cost, latency, and errors.</li>
+<li><strong>At what unit should cost and latency be measured to reveal the real bottleneck?</strong></li>
+<li>Do not look only at totals. Break cost and latency down by step, tool call, model call, and user request to reveal the bottleneck boundary.</li>
+<li><strong>Which observability signals should gate deployment and rollback for an agent?</strong></li>
+<li>Deployment gates should include success rate, error rate, cost ceilings, P95 latency, tool failure rate, and recovery after rollback.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

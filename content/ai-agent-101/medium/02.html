@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Context Engineering</title>
+<title>AI Agent 101 (2/10): Context Engineering</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Context Engineering</h1>
-<blockquote>
-<p>AI Agent 101 Series (2/10)</p>
-</blockquote>
+<h1>AI Agent 101 (2/10): Context Engineering</h1>
 <p>Agent behavior is determined by context. System prompts, conversation history, tool descriptions, and current state information all constitute context, and agents make decisions based on this context. Clear context leads to clear agent decisions, while ambiguous context leads to erratic behavior.</p>
 <p>Context engineering is the process of clearly telling the agent "who you are, what you should do, how you should behave, and what you shouldn't do." It's not just about writing good prompts—it's about designing the entire environment in which the agent operates.</p>
 <p>This is post 2 in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What pieces make up an agent's context?</li>
-<li>What is the single most important rule for writing a system prompt?</li>
-<li>How do you separate role, rules, and knowledge boundaries in one prompt?</li>
-<li>Which context-injection pattern fits which situation?</li>
+<li>When an agent behaves strangely, which context boundary should you inspect before rewriting prompt wording?</li>
+<li>What responsibilities are split across the system prompt, conversation history, tool descriptions, and current state?</li>
+<li>As context grows, how do you decide what to keep and what to drop?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
-<h2>Context map</h2>
-<p><img alt="diagram" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png"></p>
+<h2>Big Picture</h2>
+<p><img alt="Context map" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png"></p>
+<p><em>Context map</em></p>
+<p>This picture splits the context that drives an agent into the system prompt, history, tool descriptions, and current state. Context engineering is not prompt decoration; it is designing the behavior contract the agent reads.</p>
+<blockquote>
+<p>Context is not just input text for the model; it is the execution contract that tells the agent what role it plays, what it may do, and what it must not do.</p>
+</blockquote>
 <h2>Context Components</h2>
 <p>An agent's context refers to all information the LLM considers when making decisions. Context consists of four main components.</p>
 <p><strong>System Prompt</strong></p>
@@ -591,6 +587,15 @@ for case in test_cases:
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>When an agent behaves strangely, which context boundary should you inspect before rewriting prompt wording?</strong></li>
+<li>Inspect whether role, rules, knowledge boundaries, and current task state are mixed together. If those boundaries are blurred, better wording will not stabilize behavior for long.</li>
+<li><strong>What responsibilities are split across the system prompt, conversation history, tool descriptions, and current state?</strong></li>
+<li>The system prompt owns role and rules, history owns prior interaction, tool descriptions own available actions, and state owns the current workflow position and intermediate results.</li>
+<li><strong>As context grows, how do you decide what to keep and what to drop?</strong></li>
+<li>Keep information needed for the current decision, reproducibility, and safety boundaries. Summarize or remove repetitive and stale detail.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

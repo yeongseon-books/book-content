@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Agent Evaluation</title>
+<title>AI Agent 101 (7/10): Agent Evaluation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,30 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Agent Evaluation</h1>
-<blockquote>
-<p>AI Agent 101 Series (7/10)</p>
-</blockquote>
+<h1>AI Agent 101 (7/10): Agent Evaluation</h1>
 <p>What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.</p>
 <p>Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).</p>
 <p>This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What makes agent evaluation fundamentally different from ML model evaluation?</li>
-<li>What do you look at to call a trajectory success or failure?</li>
-<li>How do you measure tool-call accuracy?</li>
-<li>Where do end-to-end tests and benchmarks pull in different directions?</li>
+<li>Why is final-answer grading not enough for agent evaluation?</li>
+<li>What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?</li>
+<li>What real requests and failure cases belong in an eval set before production?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="Evaluation signal path" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png"></p>
+<p><em>Evaluation signal path</em></p>
+<p>This picture follows evaluation signals from the user request through tool calls, intermediate trajectory, and final result. Agent evaluation must judge not only whether the answer is correct, but whether the path to it is safe and reproducible.</p>
+<blockquote>
+<p>Agent evaluation is not answer grading; it is diagnosis across trajectory, tool use, and final outcome.</p>
+</blockquote>
 <h2>Agent Evaluation Metrics</h2>
 <p>Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.</p>
 <p><strong>Evaluation signal path</strong></p>
-<p><img alt="Evaluation signal path" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png"><br>
-<strong>Task Success Rate</strong></p>
+<p><strong>Task Success Rate</strong></p>
 <p>The percentage of user requests the agent completes successfully.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 from collections.abc import Callable
@@ -584,6 +581,15 @@ else:
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is final-answer grading not enough for agent evaluation?</strong></li>
+<li>An agent can call the wrong tool and still produce plausible text. Final-answer grading misses cost, risk, and accidental success.</li>
+<li><strong>What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?</strong></li>
+<li>Trajectory evaluation catches wasted or wrong paths, tool-call accuracy catches tool choice and argument errors, and end-to-end success checks user-visible completion.</li>
+<li><strong>What real requests and failure cases belong in an eval set before production?</strong></li>
+<li>Include frequent real requests, boundary cases, tool failures, ambiguous inputs, and cases that trigger expensive loops.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

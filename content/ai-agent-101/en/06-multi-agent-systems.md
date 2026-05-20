@@ -1,5 +1,5 @@
 ---
-title: Multi-Agent Systems
+title: "AI Agent 101 (6/10): Multi-Agent Systems"
 series: ai-agent-101
 episode: 6
 language: en
@@ -20,9 +20,7 @@ seo_description: Sometimes it's difficult to handle all tasks with a single agen
   This happens when tasks span multiple domains, require different expertise at each…
 ---
 
-# Multi-Agent Systems
-
-> AI Agent 101 Series (6/10)
+# AI Agent 101 (6/10): Multi-Agent Systems
 
 Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.
 
@@ -30,24 +28,25 @@ The core of multi-agent systems is coordination and delegation. Patterns include
 
 This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
 
----
-<!-- a-grade-intro:begin -->
+## Questions to Keep in Mind
 
-## Key Questions
+- Where is the line between a task that fits one agent and a task that needs multiple agents?
+- What responsibilities should the supervisor, workers, and handoff contract each own?
+- How do cost and failure points grow as you split work across more agents?
 
-- How do you tell a single-agent task from a real multi-agent task?
-- What do Supervisor, Hierarchical, and Swarm patterns actually look like?
-- What is the most common failure mode in agent-to-agent protocols?
-- Which delegation mistakes blow up cost the fastest?
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+
+*Multi-Agent Patterns*
+
+This picture shows a supervisor splitting work and role-specific agents exchanging results through a handoff contract. Multi-agent design is not making collaboration look impressive; it is separating responsibility and cost boundaries.
+
+> You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.
 
 ## Multi-Agent Patterns
 
 There are several patterns for handling complex tasks through cooperation among multiple agents.
-
-![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
-*Multi-agent systems are easier to reason about when you draw them as delegation graphs: who routes work, who writes to shared state, and who is allowed to return the final answer.*
 
 ### Orchestrator Pattern (Centralized Coordination)
 
@@ -1020,19 +1019,28 @@ Handling individual agent failures explicitly increases system reliability.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **Where is the line between a task that fits one agent and a task that needs multiple agents?**
+  - Consider multiple agents when domains, tools, success criteria, or task ownership are distinct enough that one prompt and state contract become overloaded.
+- **What responsibilities should the supervisor, workers, and handoff contract each own?**
+  - The supervisor owns routing and stopping decisions, workers own assigned execution, and the handoff contract owns the input and output shape passed between them.
+- **How do cost and failure points grow as you split work across more agents?**
+  - More agents add LLM calls, handoff gaps, state mismatches, and supervisor bottlenecks. Split only when role separation pays for that overhead.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is an AI Agent?](./01-what-is-an-ai-agent.md)
-- [Context Engineering](./02-context-engineering.md)
-- [Tool Use Fundamentals](./03-tool-use-fundamentals.md)
-- [Agent Workflow Design](./04-agent-workflow-design.md)
-- [Memory and State](./05-memory-and-state.md)
-- **Multi-Agent Systems (current)**
-- Agent Evaluation (upcoming)
-- Error Handling and Reliability (upcoming)
-- Production Operations (upcoming)
-- Building Your First Agent (upcoming)
+- [AI Agent 101 (1/10): What Is an AI Agent?](./01-what-is-an-ai-agent.md)
+- [AI Agent 101 (2/10): Context Engineering](./02-context-engineering.md)
+- [AI Agent 101 (3/10): Tool Use Fundamentals](./03-tool-use-fundamentals.md)
+- [AI Agent 101 (4/10): Agent Workflow Design](./04-agent-workflow-design.md)
+- [AI Agent 101 (5/10): Memory and State](./05-memory-and-state.md)
+- **AI Agent 101 (6/10): Multi-Agent Systems (current)**
+- AI Agent 101 (7/10): Agent Evaluation (upcoming)
+- AI Agent 101 (8/10): Error Handling and Reliability (upcoming)
+- AI Agent 101 (9/10): Production Operations (upcoming)
+- AI Agent 101 (10/10): Building Your First Agent (upcoming)
 
 <!-- toc:end -->
 

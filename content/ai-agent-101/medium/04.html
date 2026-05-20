@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Agent Workflow Design</title>
+<title>AI Agent 101 (4/10): Agent Workflow Design</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,30 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Agent Workflow Design</h1>
-<blockquote>
-<p>AI Agent 101 Series (4/10)</p>
-</blockquote>
+<h1>AI Agent 101 (4/10): Agent Workflow Design</h1>
 <p>To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."</p>
 <p>Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.</p>
 <p>This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>When does each of ReAct, Plan-and-Execute, and Reflexion shine?</li>
-<li>How do you decide the right granularity of decomposed steps?</li>
-<li>Where should state live inside a workflow?</li>
-<li>What validation must happen before pushing a workflow to production?</li>
+<li>What flow should be drawn before prompt tuning when you choose an agent workflow?</li>
+<li>Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?</li>
+<li>Where should state and validation live inside a workflow if you want it to be operable?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="Draw the control flow before you tune the prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png"></p>
+<p><em>Draw the control flow before you tune the prompt</em></p>
+<p>This picture fixes an agent workflow first as control flow: plan, execute, validate, and replan. The core of workflow design is not a longer prompt; it is making explicit which stage is allowed to choose the next action.</p>
+<blockquote>
+<p>A workflow is not just a name for a reasoning style; it is the control structure that decides action order and stopping conditions.</p>
+</blockquote>
 <h2>Key Workflow Patterns</h2>
 <p>Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.</p>
 <p><strong>Draw the control flow before you tune the prompt</strong></p>
-<p><img alt="Draw the control flow before you tune the prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png"><br>
-<em>A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.</em></p>
 <p><strong>ReAct (Reasoning + Acting)</strong></p>
 <p><strong>ReAct</strong> alternates between Reasoning and Acting. The agent thinks, uses tools, and observes results iteratively.</p>
 <pre><code class="language-python">from typing import Dict, Any, List
@@ -1220,6 +1216,15 @@ else:
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What flow should be drawn before prompt tuning when you choose an agent workflow?</strong></li>
+<li>Draw how planning, execution, observation, validation, and replanning connect after the goal arrives. Without that flow, prompt changes are temporary patches.</li>
+<li><strong>Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?</strong></li>
+<li>ReAct fits iterative tool exploration, Plan-and-Execute fits long multi-step work, and Reflexion fits tasks where failures must be inspected before retrying.</li>
+<li><strong>Where should state and validation live inside a workflow if you want it to be operable?</strong></li>
+<li>State should be the minimal execution record passed between stages, and validation should sit at the boundary that allows the next action or stops the run.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>

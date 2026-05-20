@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Error Handling and Reliability</title>
+<title>AI Agent 101 (8/10): Error Handling and Reliability</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,30 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Error Handling and Reliability</h1>
-<blockquote>
-<p>AI Agent 101 Series (8/10)</p>
-</blockquote>
+<h1>AI Agent 101 (8/10): Error Handling and Reliability</h1>
 <p>Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc.</p>
 <p>To build reliable agents, you must anticipate and respond to these failures. Retry strategies, fallback patterns, timeout handling, and graceful degradation are key.</p>
 <p>This is post 8 in the AI Agent 101 series. Here we cover common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.</p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you classify the errors an agent throws?</li>
-<li>When do you reach for Retry vs Fallback vs Circuit Breaker?</li>
-<li>What guards do you need to run tools safely?</li>
-<li>What does good graceful degradation look like to the user?</li>
+<li>When designing agent reliability, what should be controlled instead of pretending failures disappear?</li>
+<li>Which failures fit Retry, Fallback, or Circuit Breaker patterns?</li>
+<li>What guards are needed before and after safe tool execution?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="Reliability control loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png"></p>
+<p><em>Reliability control loop</em></p>
+<p>This picture shows a reliability loop that detects failures, retries, degrades through fallback, or stops execution with a circuit breaker. Reliability comes from containing failure before it spreads, not from assuming failure will not happen.</p>
+<blockquote>
+<p>A reliable agent is not an agent that never fails; it is one that detects, limits, and stops failures in explainable ways.</p>
+</blockquote>
 <h2>Error Types in Agents</h2>
 <p>Agents tangle together LLMs, tools, external APIs, and user input, so error sources are diverse.</p>
 <p><strong>Reliability control loop</strong></p>
-<p><img alt="Reliability control loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png"><br>
-<strong>LLM Response Errors</strong></p>
+<p><strong>LLM Response Errors</strong></p>
 <p>The LLM's own non-determinism, format errors, and hallucinations are the most common error source.</p>
 <pre><code class="language-python">import json
 from typing import Optional
@@ -433,6 +430,15 @@ return {
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>When designing agent reliability, what should be controlled instead of pretending failures disappear?</strong></li>
+<li>Control detection, blast radius, retry count, and user-visible state across network, tool, model-judgment, and output-format failures.</li>
+<li><strong>Which failures fit Retry, Fallback, or Circuit Breaker patterns?</strong></li>
+<li>Retry fits transient failures, fallback fits cases where degraded service is acceptable, and circuit breakers fit repeated or risky external failures.</li>
+<li><strong>What guards are needed before and after safe tool execution?</strong></li>
+<li>Before execution, validate allowed tools, arguments, permissions, and timeouts. After execution, normalize errors, partial results, retry decisions, and user messaging.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/01-what-is-an-ai-agent.md">What Is an AI Agent?</a></li>
