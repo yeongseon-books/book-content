@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>optimization basics</title>
+<title>Compilers 101 (7/10): optimization basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>optimization basics</h1>
+<h1>Compilers 101 (7/10): optimization basics</h1>
 <blockquote>
 <p>Compilers 101 series (7/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: When the compiler sees <code>2 + 3 * 4</code>, does it compute it every time at runtime, or does it replace it with 14 ahead of time?</p>
 <blockquote>
 <p>An optimizer is a transformation from IR to IR. It produces faster, smaller code while preserving meaning. The starting points are constant folding and dead code elimination.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 7 in the Compilers 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying optimization basics?</li>
+<li>Which signal should the example or diagram make visible for optimization basics?</li>
+<li>What failure should be prevented first when optimization basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="compilers 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/07/07-01-big-picture.en.png"></p>
+<p><em>compilers 101 chapter 7 flow overview</em></p>
+<p>This picture places optimization basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of optimization basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>That "meaning preserving" is the absolute rule of optimization</li>
@@ -214,202 +223,34 @@ for inst in optimize(code): print(inst)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Optimization is a series of meaning-preserving transformations on IR. The next post finally turns this IR into real machine code — code generation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">intermediate representation</a></li>
+<li><strong>What boundary should you inspect first when applying optimization basics?</strong></li>
+<li>The article treats optimization basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for optimization basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when optimization basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">Compilers 101 (1/10): What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">Compilers 101 (2/10): lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">Compilers 101 (3/10): parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">Compilers 101 (4/10): semantic analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">Compilers 101 (5/10): symbol table and scope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">Compilers 101 (6/10): intermediate representation</a></li>
 <li><strong>optimization basics (current)</strong></li>
 <li>code generation (upcoming)</li>
 <li>JIT vs AOT (upcoming)</li>
-<li>building a tiny interpreter (upcoming)</li>
+<li>Building a Tiny Interpreter (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Optimizing_compiler">Compiler optimization (Wikipedia)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Constant_folding">Constant folding (Wikipedia)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Dead-code_elimination">Dead code elimination (Wikipedia)</a></li>
-<li><a href="https://llvm.org/docs/Passes.html">LLVM Passes</a></li>
-</ul>
-<blockquote>
-<p>Compilers 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When the compiler sees <code>2 + 3 * 4</code>, does it compute it every time at runtime, or does it replace it with 14 ahead of time?</p>
-<blockquote>
-<p>An optimizer is a transformation from IR to IR. It produces faster, smaller code while preserving meaning. The starting points are constant folding and dead code elimination.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
-<ul>
-<li>That "meaning preserving" is the absolute rule of optimization</li>
-<li>Constant folding: computing at compile time</li>
-<li>Dead code elimination: removing unreachable code</li>
-<li>Intuition for common subexpression elimination (CSE)</li>
-<li>How optimizations are applied as a pipeline of passes</li>
-</ul>
-<h2>Why It Matters</h2>
-<p>For the same algorithm, a compiler that reduces well makes code 10x faster or 1/10 the size. At the same time, a wrong optimization changes program meaning — the scariest kind of bug. Watching the optimizer is how you see where the compiler's trustworthiness comes from.</p>
-<blockquote>
-<p>"Make it faster + keep the meaning." Holding both lines at once is what an optimizer does.</p>
-</blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;IR&quot;] --&gt; B[&quot;constant folding&quot;]
-    B --&gt; C[&quot;dead code elim&quot;]
-    C --&gt; D[&quot;CSE&quot;]
-    D --&gt; E[&quot;optimized IR&quot;]
-</code></pre>
-<p>Each step takes IR in and emits IR out. Every pass must preserve meaning.</p>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>Pass</strong>: one walk over the IR that transforms it.</li>
-<li><strong>Constant folding</strong>: computing operations on constants at compile time.</li>
-<li><strong>Dead code elimination (DCE)</strong>: removing instructions whose result is never used.</li>
-<li><strong>Common subexpression elimination (CSE)</strong>: removing duplicate computation of the same expression.</li>
-<li><strong>Strength reduction</strong>: replacing <code>x * 2</code> with <code>x + x</code> or <code>x &lt;&lt; 1</code> (cheaper instruction).</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before — naive IR</strong></p>
-<pre><code class="language-text">t1 = 2 * 3
-t2 = 1 + t1
-t3 = t2
-return t3
-</code></pre>
-<p><strong>After — optimized</strong></p>
-<pre><code class="language-text">return 7
-</code></pre>
-<p>Same result, but instruction count goes from 4 to 1.</p>
-<h2>Hands-on: a small optimizer</h2>
-<p><strong>Step 1 — Represent IR instructions</strong></p>
-<pre><code class="language-python"># 1_inst.py
-# work on tuples of (op, dst, src1, src2)
-code = [
-    (&quot;LOAD&quot;, &quot;t1&quot;, 2, None),
-    (&quot;LOAD&quot;, &quot;t2&quot;, 3, None),
-    (&quot;*&quot;,    &quot;t3&quot;, &quot;t1&quot;, &quot;t2&quot;),
-    (&quot;LOAD&quot;, &quot;t4&quot;, 1, None),
-    (&quot;+&quot;,    &quot;t5&quot;, &quot;t4&quot;, &quot;t3&quot;),
-    (&quot;RET&quot;,  None, &quot;t5&quot;, None),
-]
-</code></pre>
-<p>Every transformation works on a flat list.</p>
-<p><strong>Step 2 — Constant folding</strong></p>
-<pre><code class="language-python"># 2_fold.py
-def fold(code):
-    consts = {}
-    out = []
-    for op, dst, a, b in code:
-        if op == &quot;LOAD&quot; and isinstance(a, int):
-            consts[dst] = a; out.append((op, dst, a, b)); continue
-        if op in &quot;+-*/&quot; and a in consts and b in consts:
-            v = {&quot;+&quot;:consts[a]+consts[b],&quot;-&quot;:consts[a]-consts[b],
-                 &quot;*&quot;:consts[a]*consts[b],&quot;/&quot;:consts[a]//consts[b]}[op]
-            consts[dst] = v
-            out.append((&quot;LOAD&quot;, dst, v, None))
-        else:
-            out.append((op, dst, a, b))
-    return out
-</code></pre>
-<p>Carry a constants environment and immediately compute arithmetic when both sides are constants.</p>
-<p><strong>Step 3 — Dead code elimination</strong></p>
-<pre><code class="language-python"># 3_dce.py
-def dce(code):
-    used = set()
-    # gather use info from the bottom up
-    for op, dst, a, b in reversed(code):
-        if op == &quot;RET&quot;:
-            used.add(a)
-        else:
-            if dst in used:
-                if isinstance(a, str): used.add(a)
-                if isinstance(b, str): used.add(b)
-    # one more pass keeps only live instructions
-    return [(op, dst, a, b) for op, dst, a, b in code
-            if op == &quot;RET&quot; or dst in used]
-</code></pre>
-<p>Sweep backwards collecting use info, then drop instructions whose dst is never used.</p>
-<p><strong>Step 4 — Bundling passes</strong></p>
-<pre><code class="language-python"># 4_pipeline.py
-def optimize(code):
-    code = fold(code)
-    code = dce(code)
-    return code
-
-for inst in optimize(code): print(inst)
-</code></pre>
-<p>Compose passes as functions. Running the same pass twice may shrink further (fixed point).</p>
-<p><strong>Step 5 — Common subexpression intuition</strong></p>
-<pre><code class="language-python"># 5_cse.py
-# the same right-hand side appearing twice
-# t1 = a + b
-# t2 = a + b   &lt;- same expression
-# replace the second line with t2 = t1
-</code></pre>
-<p>Carry a hash table <code>(op, src1, src2) → dst</code> and it is very simple. Especially clean in SSA.</p>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>Every pass is an IR → IR transformation.</li>
-<li>Each pass is small and simple (a few dozen lines).</li>
-<li>The order of passes affects result quality.</li>
-<li>The fixed-point pattern (run a pass repeatedly) is common.</li>
-</ul>
-<h2>Five Common Mistakes</h2>
-<ol>
-<li><strong>Doing dead code elimination that ignores side effects.</strong> I/O calls must stay even if their result is unused.</li>
-<li><strong>Folding floating point freely.</strong> Associativity may not hold and results change.</li>
-<li><strong>Doing CSE that ignores branches.</strong> The same expression may have different values in different basic blocks.</li>
-<li><strong>Not thinking about pass order.</strong> fold then dce is a common reliable order.</li>
-<li><strong>Stopping after one round.</strong> fold creates more dead code, and dce creates more folding opportunities.</li>
-</ol>
-<h2>How This Shows Up in Production</h2>
-<p>LLVM has dozens of passes; compile flags like <code>-O2</code> and <code>-O3</code> describe which passes run in which order. JIT compilers select hot paths and apply more aggressive optimization. Profile-guided optimization (PGO) bases pass decisions on real execution data.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li>Before adding a new pass, they verify "meaning preservation" first.</li>
-<li>They keep passes small and single-purpose.</li>
-<li>They know the fixed-point pattern is common.</li>
-<li>They trust profile-driven decisions (no guessing).</li>
-<li>They always ask "on which architecture does this transformation pay off?"</li>
-</ul>
-<h2>Checklist</h2>
-<ul>
-<li>[ ] Have you accepted that meaning preservation is the absolute rule?</li>
-<li>[ ] Can you write constant folding on one page?</li>
-<li>[ ] Can you say that DCE comes from use analysis?</li>
-<li>[ ] Can you explain why pass order affects results?</li>
-<li>[ ] Do you have intuition for why CSE is simpler in SSA?</li>
-</ul>
-<h2>Practice Problems</h2>
-<ol>
-<li>Add strength reduction (<code>x * 2 → x + x</code>) to the fold above.</li>
-<li>Write a fixed-point loop that repeats <code>fold + dce</code> until nothing more shrinks.</li>
-<li>Make a side-effecting instruction (<code>PRINT</code>, <code>STORE</code>) and confirm DCE keeps it alive.</li>
-</ol>
-<h2>Wrap-up and Next Steps</h2>
-<p>Optimization is a series of meaning-preserving transformations on IR. The next post finally turns this IR into real machine code — code generation.</p>
-<ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">intermediate representation</a></li>
-<li><strong>optimization basics (current)</strong></li>
-<li>code generation (upcoming)</li>
-<li>JIT vs AOT (upcoming)</li>
-<li>building a tiny interpreter (upcoming)</li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://en.wikipedia.org/wiki/Optimizing_compiler">Compiler optimization (Wikipedia)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Constant_folding">Constant folding (Wikipedia)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Dead-code_elimination">Dead code elimination (Wikipedia)</a></li>
-<li><a href="https://llvm.org/docs/Passes.html">LLVM Passes</a></li>
+<li>Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman, <em>Compilers: Principles, Techniques, and Tools</em> (2nd ed.), optimization chapters.</li>
+<li>Keith D. Cooper, Linda Torczon, <em>Engineering a Compiler</em> (2nd ed.), scalar-optimization and data-flow chapters.</li>
+<li><a href="https://llvm.org/docs/Passes.html">LLVM’s Analysis and Transform Passes</a></li>
+<li><a href="https://llvm.org/docs/NewPassManager.html">LLVM — Using the New Pass Manager</a> — default optimization-pipeline structure.</li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Compilers, Optimization, ConstantFolding, DeadCode</p>
 </body>

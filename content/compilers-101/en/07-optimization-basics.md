@@ -1,7 +1,7 @@
 ---
 series: compilers-101
 episode: 7
-title: optimization basics
+title: "Compilers 101 (7/10): optimization basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: An optimizer makes code faster while preserving meaning. Build 
 last_reviewed: '2026-05-04'
 ---
 
-# optimization basics
+# Compilers 101 (7/10): optimization basics
 
 > Compilers 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When the compiler sees `2 + 3 * 4`, does it compute it every time at runtime, or does it replace it with 14 ahead of time?
 
 > An optimizer is a transformation from IR to IR. It produces faster, smaller code while preserving meaning. The starting points are constant folding and dead code elimination.
 
-<!-- a-grade-intro:end -->
-
 This is post 7 in the Compilers 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying optimization basics?
+- Which signal should the example or diagram make visible for optimization basics?
+- What failure should be prevented first when optimization basics reaches a real system?
+
+## Big Picture
+
+![compilers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/07/07-01-big-picture.en.png)
+
+*compilers 101 chapter 7 flow overview*
+
+This picture places optimization basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of optimization basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -220,17 +232,29 @@ LLVM has dozens of passes; compile flags like `-O2` and `-O3` describe which pas
 
 Optimization is a series of meaning-preserving transformations on IR. The next post finally turns this IR into real machine code — code generation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying optimization basics?**
+  - The article treats optimization basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for optimization basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when optimization basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
 - **optimization basics (current)**
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

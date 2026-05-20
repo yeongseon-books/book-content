@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Compiler?</title>
+<title>Compilers 101 (1/10): What Is a Compiler?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Is a Compiler?</h1>
+<h1>Compilers 101 (1/10): What Is a Compiler?</h1>
 <p>This is the first post in the Compilers 101 series.</p>
 <blockquote>
 <p>Compilers 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: How many stages sit between writing <code>2 + 3 * 4</code> and getting the result <code>14</code>?</p>
 <blockquote>
 <p>A compiler is a program that translates a program written in one language into another (usually less abstract). The translation does not happen in one step — it runs as a <strong>pipeline</strong>: lexer, parser, semantic analyzer, IR, optimizer, code generator. Once you can draw this pipeline in your head, every compiler, interpreter, and transpiler looks like a variation of the same picture.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is a Compiler??</li>
+<li>Which signal should the example or diagram make visible for What Is a Compiler??</li>
+<li>What failure should be prevented first when What Is a Compiler? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="compilers 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/01/01-01-big-picture.en.png"></p>
+<p><em>compilers 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Compiler? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Compiler? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A one-line definition of a compiler</li>
@@ -237,17 +246,27 @@ def emit(node, out=None):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A compiler is a system that only makes sense once you decompose it into stages. Next we look at the very first stage in detail — lexical analysis, where text becomes tokens.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is a Compiler??</strong></li>
+<li>The article treats What Is a Compiler? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is a Compiler??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is a Compiler? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Compiler? (current)</strong></li>
-<li>Lexical Analysis (upcoming)</li>
-<li>Parsing and the AST (upcoming)</li>
-<li>Semantic Analysis (upcoming)</li>
-<li>Symbol Tables and Scope (upcoming)</li>
-<li>Intermediate Representation (upcoming)</li>
-<li>Optimization Basics (upcoming)</li>
-<li>Code Generation (upcoming)</li>
+<li>lexical analysis (upcoming)</li>
+<li>parsing and AST (upcoming)</li>
+<li>semantic analysis (upcoming)</li>
+<li>symbol table and scope (upcoming)</li>
+<li>intermediate representation (upcoming)</li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
 <li>JIT vs AOT (upcoming)</li>
-<li>Build a Tiny Interpreter (upcoming)</li>
+<li>Building a Tiny Interpreter (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

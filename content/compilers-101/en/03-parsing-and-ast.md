@@ -1,7 +1,7 @@
 ---
 series: compilers-101
 episode: 3
-title: parsing and AST
+title: "Compilers 101 (3/10): parsing and AST"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: A parser turns a token stream into a tree. Build a small expres
 last_reviewed: '2026-05-04'
 ---
 
-# parsing and AST
+# Compilers 101 (3/10): parsing and AST
 
 > Compilers 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why does the compiler group `1 + 2 * 3` as `(1 + (2 * 3))` and not as `((1 + 2) * 3)`?
 
 > A parser takes a token stream as input and builds a **tree (AST)** that captures structure. Operator precedence, associativity, and error reporting are all decided in this step.
 
-<!-- a-grade-intro:end -->
-
 This is post 3 in the Compilers 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying parsing and AST?
+- Which signal should the example or diagram make visible for parsing and AST?
+- What failure should be prevented first when parsing and AST reaches a real system?
+
+## Big Picture
+
+![compilers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/03/03-01-big-picture.en.png)
+
+*compilers 101 chapter 3 flow overview*
+
+This picture places parsing and AST inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of parsing and AST is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -245,9 +257,20 @@ Most hand-written compilers (rustc, clang, CPython) use recursive descent parser
 
 A parser turns a flat token stream into a meaningful tree. The next post looks at the step that reads that tree and answers questions like "where was this variable declared? does this type match?" — semantic analysis.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying parsing and AST?**
+  - The article treats parsing and AST as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for parsing and AST?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when parsing and AST reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
 - **parsing and AST (current)**
 - semantic analysis (upcoming)
 - symbol table and scope (upcoming)
@@ -255,7 +278,8 @@ A parser turns a flat token stream into a meaningful tree. The next post looks a
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -269,13 +293,9 @@ Tags: Computer Science, Compilers, Parser, AST, RecursiveDescent, Precedence
 
 > Compilers 101 series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does the compiler group `1 + 2 * 3` as `(1 + (2 * 3))` and not as `((1 + 2) * 3)`?
 
 > A parser takes a token stream as input and builds a **tree (AST)** that captures structure. Operator precedence, associativity, and error reporting are all decided in this step.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -488,8 +508,10 @@ Most hand-written compilers (rustc, clang, CPython) use recursive descent parser
 A parser turns a flat token stream into a meaningful tree. The next post looks at the step that reads that tree and answers questions like "where was this variable declared? does this type match?" — semantic analysis.
 
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
 - **parsing and AST (current)**
 - semantic analysis (upcoming)
 - symbol table and scope (upcoming)
@@ -497,7 +519,8 @@ A parser turns a flat token stream into a meaningful tree. The next post looks a
 - optimization basics (upcoming)
 - code generation (upcoming)
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: compilers-101
 episode: 9
-title: JIT vs AOT
+title: "Compilers 101 (9/10): JIT vs AOT"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: JIT compiles during execution and AOT compiles before it. We co
 last_reviewed: '2026-05-04'
 ---
 
-# JIT vs AOT
+# Compilers 101 (9/10): JIT vs AOT
 
 > Compilers 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why does the same JavaScript code feel slow at first and then suddenly speed up?
 
 > JIT (just-in-time) compiles during execution and AOT (ahead-of-time) compiles before it. That single difference shapes startup time, peak performance, and even how you ship the program.
 
-<!-- a-grade-intro:end -->
-
 This is post 9 in the Compilers 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying JIT vs AOT?
+- Which signal should the example or diagram make visible for JIT vs AOT?
+- What failure should be prevented first when JIT vs AOT reaches a real system?
+
+## Big Picture
+
+![compilers 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/09/09-01-big-picture.en.png)
+
+*compilers 101 chapter 9 flow overview*
+
+This picture places JIT vs AOT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of JIT vs AOT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -216,17 +228,29 @@ JVM, .NET, V8, and JavaScriptCore all use tiered JITs. Go, Rust, and C and C++ a
 
 JIT and AOT are two models born from one question: when do we compile? In the next post we assemble everything we have learned into a tiny interpreter that fits on one screen.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying JIT vs AOT?**
+  - The article treats JIT vs AOT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for JIT vs AOT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when JIT vs AOT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [what is a compiler](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization basics](./07-optimization-basics.md)
-- [code generation](./08-code-generation.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): optimization basics](./07-optimization-basics.md)
+- [Compilers 101 (8/10): code generation](./08-code-generation.md)
 - **JIT vs AOT (current)**
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -240,13 +264,9 @@ Tags: Computer Science, Compilers, JIT, AOT, Tradeoffs, Warmup
 
 > Compilers 101 series (9/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does the same JavaScript code feel slow at first and then suddenly speed up?
 
 > JIT (just-in-time) compiles during execution and AOT (ahead-of-time) compiles before it. That single difference shapes startup time, peak performance, and even how you ship the program.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -430,16 +450,19 @@ JVM, .NET, V8, and JavaScriptCore all use tiered JITs. Go, Rust, and C and C++ a
 JIT and AOT are two models born from one question: when do we compile? In the next post we assemble everything we have learned into a tiny interpreter that fits on one screen.
 
 <!-- toc:begin -->
-- [what is a compiler](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization basics](./07-optimization-basics.md)
-- [code generation](./08-code-generation.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): optimization basics](./07-optimization-basics.md)
+- [Compilers 101 (8/10): code generation](./08-code-generation.md)
 - **JIT vs AOT (current)**
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References

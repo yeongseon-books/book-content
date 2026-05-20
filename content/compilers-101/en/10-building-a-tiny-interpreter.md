@@ -1,7 +1,7 @@
 ---
 series: compilers-101
 episode: 10
-title: Building a Tiny Interpreter
+title: "Compilers 101 (10/10): Building a Tiny Interpreter"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: We combine the lexer, parser, and evaluator from this series in
 last_reviewed: '2026-05-04'
 ---
 
-# Building a Tiny Interpreter
+# Compilers 101 (10/10): Building a Tiny Interpreter
 
 This is the final post in the Compilers 101 series.
 
 > Compilers 101 series (10/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: What does it look like when the lexer, parser, and evaluator we have studied all live in one file?
 
 > In this post we build a small arithmetic interpreter in a single file. We tokenize input, lift it into an AST, evaluate it to a value, and wrap the whole thing in a REPL you can run yourself.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Building a Tiny Interpreter?
+- Which signal should the example or diagram make visible for Building a Tiny Interpreter?
+- What failure should be prevented first when Building a Tiny Interpreter reaches a real system?
+
+## Big Picture
+
+![compilers 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/10/10-01-big-picture.en.png)
+
+*compilers 101 chapter 10 flow overview*
+
+This picture places Building a Tiny Interpreter inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Tiny Interpreter is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -263,17 +275,29 @@ Small DSLs (search queries, filter expressions, configuration expressions) almos
 
 We built a tiny interpreter in one file and used it to verify every stage from this series. The next steps are to grow it into a toy language with variables, functions, and types, or to translate the same AST into backend code for a real compiler. The series ends here.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Building a Tiny Interpreter?**
+  - The article treats Building a Tiny Interpreter as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Building a Tiny Interpreter?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Building a Tiny Interpreter reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [what is a compiler](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization basics](./07-optimization-basics.md)
-- [code generation](./08-code-generation.md)
-- [JIT vs AOT](./09-jit-vs-aot.md)
-- **building a tiny interpreter (current)**
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): optimization basics](./07-optimization-basics.md)
+- [Compilers 101 (8/10): code generation](./08-code-generation.md)
+- [Compilers 101 (9/10): JIT vs AOT](./09-jit-vs-aot.md)
+- **Building a Tiny Interpreter (current)**
+
 <!-- toc:end -->
 
 ## References

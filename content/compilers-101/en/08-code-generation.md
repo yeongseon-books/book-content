@@ -1,7 +1,7 @@
 ---
 series: compilers-101
 episode: 8
-title: code generation
+title: "Compilers 101 (8/10): code generation"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Code generation turns IR into real instructions. Cover the core
 last_reviewed: '2026-05-04'
 ---
 
-# code generation
+# Compilers 101 (8/10): code generation
 
 > Compilers 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: The IR has unlimited temporaries like `t1, t2, t3...`. The real CPU only has 16 registers. How do you fit them?
 
 > Code generation turns IR into real instructions. The two core jobs are instruction selection (which instructions?) and register allocation (where do values live?).
 
-<!-- a-grade-intro:end -->
-
 This is post 8 in the Compilers 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying code generation?
+- Which signal should the example or diagram make visible for code generation?
+- What failure should be prevented first when code generation reaches a real system?
+
+## Big Picture
+
+![compilers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/08/08-01-big-picture.en.png)
+
+*compilers 101 chapter 8 flow overview*
+
+This picture places code generation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of code generation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -236,17 +248,29 @@ LLVM's backend has two paths — SelectionDAG and GlobalISel — with different 
 
 Code generation is the last bridge between the IR and a real CPU. The next post compares when this whole pipeline runs — at compile time or during execution — JIT vs AOT.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying code generation?**
+  - The article treats code generation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for code generation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when code generation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization basics](./07-optimization-basics.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): optimization basics](./07-optimization-basics.md)
 - **code generation (current)**
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -260,13 +284,9 @@ Tags: Computer Science, Compilers, CodeGen, RegisterAllocation, Assembly
 
 > Compilers 101 series (8/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: The IR has unlimited temporaries like `t1, t2, t3...`. The real CPU only has 16 registers. How do you fit them?
 
 > Code generation turns IR into real instructions. The two core jobs are instruction selection (which instructions?) and register allocation (where do values live?).
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -471,16 +491,19 @@ LLVM's backend has two paths — SelectionDAG and GlobalISel — with different 
 Code generation is the last bridge between the IR and a real CPU. The next post compares when this whole pipeline runs — at compile time or during execution — JIT vs AOT.
 
 <!-- toc:begin -->
-- [What Is a Compiler?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing and AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table and scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization basics](./07-optimization-basics.md)
+## In this series
+
+- [Compilers 101 (1/10): What Is a Compiler?](./01-what-is-a-compiler.md)
+- [Compilers 101 (2/10): lexical analysis](./02-lexical-analysis.md)
+- [Compilers 101 (3/10): parsing and AST](./03-parsing-and-ast.md)
+- [Compilers 101 (4/10): semantic analysis](./04-semantic-analysis.md)
+- [Compilers 101 (5/10): symbol table and scope](./05-symbol-table-and-scope.md)
+- [Compilers 101 (6/10): intermediate representation](./06-intermediate-representation.md)
+- [Compilers 101 (7/10): optimization basics](./07-optimization-basics.md)
 - **code generation (current)**
 - JIT vs AOT (upcoming)
-- building a tiny interpreter (upcoming)
+- Building a Tiny Interpreter (upcoming)
+
 <!-- toc:end -->
 
 ## References
