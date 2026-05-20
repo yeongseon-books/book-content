@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:39:49+00:00",
+  "generated_at": "2026-05-20T11:40:08+00:00",
   "series_count": 92,
-  "problem_series_count": 51,
-  "series_with_5_plus": 39,
+  "problem_series_count": 50,
+  "series_with_5_plus": 38,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 447,
+    "BadImg": 437,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 447
+    "all": 437
   },
   "results": [
     {
@@ -5883,286 +5883,6 @@
             "image": "10-01-concept-at-a-glance.ko.png",
             "width": 1030,
             "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
-      "series": "llm-api-production-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 10
-      },
-      "total": 10,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-structured-output-json-mode-and-response.en.png",
-            "width": 1227,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-structured-output-json-mode-and-response.ko.png",
-            "width": 1064,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-tool-calling-connecting-functions-to-the.en.png",
-            "width": 1291,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-tool-calling-connecting-functions-to-the.ko.png",
-            "width": 1181,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png",
-            "line": 1,
-            "message": "PNG height 34px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-04-building-the-full-function-execution-loo.en.png",
-            "width": 1384,
-            "height": 34,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png",
-            "line": 1,
-            "message": "PNG height 40px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-04-building-the-full-function-execution-loo.ko.png",
-            "width": 1384,
-            "height": 40,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png",
-            "line": 1,
-            "message": "PNG height 50px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-why-ttl-matters.en.png",
-            "width": 1384,
-            "height": 50,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/04/04-03-why-ttl-matters.ko.png",
-            "line": 1,
-            "message": "PNG height 54px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-why-ttl-matters.ko.png",
-            "width": 1271,
-            "height": 54,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png",
-            "line": 1,
-            "message": "PNG height 98px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-putting-a-limiter-in-front-of-groq-calls.en.png",
-            "width": 1384,
-            "height": 98,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.ko.png",
-            "line": 1,
-            "message": "PNG height 99px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-putting-a-limiter-in-front-of-groq-calls.ko.png",
-            "width": 1237,
-            "height": 99,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-structured-output-json-mode-and-response.en.png",
-            "width": 1227,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-structured-output-json-mode-and-response.ko.png",
-            "width": 1064,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-tool-calling-connecting-functions-to-the.en.png",
-            "width": 1291,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-tool-calling-connecting-functions-to-the.ko.png",
-            "width": 1181,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png",
-            "line": 1,
-            "message": "PNG height 34px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-04-building-the-full-function-execution-loo.en.png",
-            "width": 1384,
-            "height": 34,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.ko.png",
-            "line": 1,
-            "message": "PNG height 40px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-04-building-the-full-function-execution-loo.ko.png",
-            "width": 1384,
-            "height": 40,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/04/04-03-why-ttl-matters.en.png",
-            "line": 1,
-            "message": "PNG height 50px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-why-ttl-matters.en.png",
-            "width": 1384,
-            "height": 50,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/04/04-03-why-ttl-matters.ko.png",
-            "line": 1,
-            "message": "PNG height 54px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-03-why-ttl-matters.ko.png",
-            "width": 1271,
-            "height": 54,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.en.png",
-            "line": 1,
-            "message": "PNG height 98px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-putting-a-limiter-in-front-of-groq-calls.en.png",
-            "width": 1384,
-            "height": 98,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-api-production-101/06/06-03-putting-a-limiter-in-front-of-groq-calls.ko.png",
-            "line": 1,
-            "message": "PNG height 99px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-putting-a-limiter-in-front-of-groq-calls.ko.png",
-            "width": 1237,
-            "height": 99,
             "repo": null
           }
         ]
@@ -12192,6 +11912,20 @@
     },
     {
       "series": "linux-cli-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "llm-api-production-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
