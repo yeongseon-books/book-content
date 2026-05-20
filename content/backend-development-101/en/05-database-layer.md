@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 5
-title: The Database Layer
+title: "Backend Development 101 (5/10): The Database Layer"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Use the repository pattern to isolate database access — trans
 last_reviewed: '2026-05-15'
 ---
 
-# The Database Layer
+# Backend Development 101 (5/10): The Database Layer
 
 The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.
 
 This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The role of the repository pattern
-- Why we use an ORM and where its *traps* live
-- The flow of transactions, commits, and rollbacks
-- What a migration is and why it matters
-- The N+1 query problem and how to fix it
+- The role of the repository pattern?
+- Why we use an ORM and where its *traps* live?
+- The flow of transactions, commits, and rollbacks?
+
+## Big Picture
+
+![backend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 5 flow overview*
+
+This picture places The Database Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Database Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Databases are *what changes most often* and *what should change least*. Splittin
 
 ## Concept at a Glance
 
-![database layer boundary between service, repository, ORM, cache, and database](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*database layer boundary between service, repository, ORM, cache, and database*
 The service does not know SQL — only the repository does.
 
 ## Key Terms
@@ -209,17 +214,29 @@ Most backends start with *PostgreSQL + ORM + Alembic + Repository*. As traffic g
 
 A repository is a *translator over the database*. Next, we look at *who can see what* — authentication and authorization.
 
+## Answering the Opening Questions
+
+- **The role of the repository pattern?**
+  - The article treats The Database Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why we use an ORM and where its *traps* live?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The flow of transactions, commits, and rollbacks?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
 - **The Database Layer (current)**
 - Authentication and Authorization (upcoming)
 - Logging and Error Handling (upcoming)
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

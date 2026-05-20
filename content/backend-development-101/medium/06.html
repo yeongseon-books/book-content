@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Authentication and Authorization</title>
+<title>Backend Development 101 (6/10): Authentication and Authorization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Authentication and Authorization</h1>
+<h1>Backend Development 101 (6/10): Authentication and Authorization</h1>
 <p>Login looks small from the UI, but the server has to answer two separate questions on every protected request. It must know who the user is, and it must decide what that user is allowed to do right now.</p>
 <p>This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The difference between authentication and authorization</li>
-<li>Minimum safe practices for password storage</li>
-<li>Sessions vs JWT — when to use which</li>
-<li>How to build a protected endpoint in FastAPI</li>
-<li>How to model permissions as roles</li>
+<li>The difference between authentication and authorization?</li>
+<li>Minimum safe practices for password storage?</li>
+<li>Sessions vs JWT — when to use which?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 6 flow overview</em></p>
+<p>This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Auth is the <em>one area</em> where a single mistake can sink a company. A line that stored passwords as plain text or skipped a token check returns <em>years later</em> as a security incident.</p>
 <blockquote>
 <p>Auth code must be small, standard, and boring.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="authentication and authorization flow from login to token verification and role check" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>authentication and authorization flow from login to token verification and role check</em><br>
-Authentication asks <em>who</em>; authorization asks <em>can you</em>.</p>
+<p>Authentication asks <em>who</em>; authorization asks <em>can you</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Authentication</strong>: identity check.</li>
@@ -196,12 +199,22 @@ def delete_user(uid: int, _: dict = Depends(require_role(&quot;admin&quot;))):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Authentication is <em>identity</em>; authorization is <em>permission</em>. Next, we look at the operator's eyes — <em>Logging and Error Handling</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
+<li><strong>The difference between authentication and authorization?</strong></li>
+<li>The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Minimum safe practices for password storage?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Sessions vs JWT — when to use which?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Backend Development 101 (4/10): The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Backend Development 101 (5/10): The Database Layer</a></li>
 <li><strong>Authentication and Authorization (current)</strong></li>
 <li>Logging and Error Handling (upcoming)</li>
 <li>Testing the Backend (upcoming)</li>

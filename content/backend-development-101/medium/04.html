@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Service Layer</title>
+<title>Backend Development 101 (4/10): The Service Layer</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>The Service Layer</h1>
+<h1>Backend Development 101 (4/10): The Service Layer</h1>
 <p>Once controllers start doing too much, the same business rule gets copied into REST handlers, batch jobs, and other entry points. The first thing that breaks is not style — it is the existence of one reliable place where the rule lives.</p>
 <p>This is post 4 in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The role of the service layer</li>
-<li>How to split responsibility across controller, service, and repository</li>
-<li>Where to start a transaction</li>
-<li>How to inject dependencies into a service</li>
-<li>Where domain events fit in</li>
+<li>The role of the service layer?</li>
+<li>How to split responsibility across controller, service, and repository?</li>
+<li>Where to start a transaction?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 4 flow overview</em></p>
+<p>This picture places The Service Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Service Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Putting business logic in controllers spreads the same rule across <em>three places</em> — REST, gRPC, batch jobs. Move it into services and <em>every entry point</em> enforces the same rule. This single principle determines how long your service survives.</p>
 <blockquote>
 <p>Business rules do not change when the door changes.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="service layer coordinating repositories, external APIs, and events" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>service layer coordinating repositories, external APIs, and events</em><br>
-A service is the <em>orchestrator</em> — it coordinates the repo, external APIs, and the event bus.</p>
+<p>A service is the <em>orchestrator</em> — it coordinates the repo, external APIs, and the event bus.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Service</strong>: an object responsible for one business <em>use case</em>.</li>
@@ -210,10 +213,20 @@ class OrderService:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The service layer is the <em>home of business rules</em>. Next, we go a layer deeper to the <em>Database Layer</em>, where data finally lives.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><strong>The role of the service layer?</strong></li>
+<li>The article treats The Service Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to split responsibility across controller, service, and repository?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where to start a transaction?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
 <li><strong>The Service Layer (current)</strong></li>
 <li>The Database Layer (upcoming)</li>
 <li>Authentication and Authorization (upcoming)</li>

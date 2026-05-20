@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 2
-title: Building an HTTP Server
+title: "Backend Development 101 (2/10): Building an HTTP Server"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Build an HTTP server from a raw socket up to FastAPI to truly u
 last_reviewed: '2026-05-15'
 ---
 
-# Building an HTTP Server
+# Backend Development 101 (2/10): Building an HTTP Server
 
 After using frameworks for a while, it is easy to forget what an HTTP server is actually doing. The moment a response gets truncated, a header disappears, or behavior changes behind a proxy, you have to go back down to raw requests and responses.
 
 This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The actual shape of an HTTP request and response
-- How HTTP rides on top of TCP
-- The meaning of status codes and headers
-- How to build a real server with FastAPI
-- How to run a raw-socket server and watch the traffic
+- The actual shape of an HTTP request and response?
+- How HTTP rides on top of TCP?
+- The meaning of status codes and headers?
+
+## Big Picture
+
+![backend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 2 flow overview*
+
+This picture places Building an HTTP Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building an HTTP Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Once you have *seen* what frameworks hide, every future debugging session gets f
 
 ## Concept at a Glance
 
-![raw HTTP request and response flow between client and server](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
-
-*raw HTTP request and response flow between client and server*
 Both request and response are just *blocks of text*.
 
 ## Key Terms
@@ -201,8 +206,19 @@ In production, FastAPI handles the socket plumbing for you. But when an outage h
 
 An HTTP server is a *text-protocol program*. Next, we add the layer that decides *which function handles which path* — the router.
 
+## Answering the Opening Questions
+
+- **The actual shape of an HTTP request and response?**
+  - The article treats Building an HTTP Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How HTTP rides on top of TCP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of status codes and headers?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
 - **Building an HTTP Server (current)**
 - Routing and Controllers (upcoming)
 - The Service Layer (upcoming)
@@ -212,6 +228,7 @@ An HTTP server is a *text-protocol program*. Next, we add the layer that decides
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

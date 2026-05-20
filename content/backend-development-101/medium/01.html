@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Backend Development?</title>
+<title>Backend Development 101 (1/10): What Is Backend Development?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Is Backend Development?</h1>
+<h1>Backend Development 101 (1/10): What Is Backend Development?</h1>
 <p>Users only see the screen, but the part that keeps a service trustworthy is the code behind it. If you cannot explain where a request enters, where rules live, and where data stops being trustworthy, you can add features quickly but you cannot operate the system for long.</p>
 <p>This is the first post in the Backend Development 101 series. Here, we define backend development as a set of responsibilities — receiving requests, applying rules, touching data, and returning responses — instead of treating it as one vague technical label.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The role and the boundaries of a backend</li>
-<li>The five layers that form a backend system</li>
-<li>The path of one request through that system</li>
-<li>A map of this whole series</li>
-<li>Why each next chapter exists</li>
+<li>The role and the boundaries of a backend?</li>
+<li>The five layers that form a backend system?</li>
+<li>The path of one request through that system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Backend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Backend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Building only the frontend lets you ship <em>what the user sees</em>. Building the backend lets you ship <em>systems that survive</em>. Data, authentication, consistency, and operations all live behind the screen, and someone has to design them.</p>
 <blockquote>
 <p>The backend is invisible, but it decides everything.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="client request path across HTTP server, router, service, and database" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>client request path across HTTP server, router, service, and database</em><br>
-Requests flow left to right; responses retrace the same path.</p>
+<p>Requests flow left to right; responses retrace the same path.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>HTTP server</strong>: the front door for requests.</li>
@@ -188,6 +191,16 @@ def create_user(payload: UserIn):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The backend is a <em>set of responsibilities</em>. Next, we open up the lowest layer and build an <em>HTTP server</em> by hand to see how it really works.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The role and the boundaries of a backend?</strong></li>
+<li>The article treats What Is Backend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The five layers that form a backend system?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The path of one request through that system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Backend Development? (current)</strong></li>
 <li>Building an HTTP Server (upcoming)</li>

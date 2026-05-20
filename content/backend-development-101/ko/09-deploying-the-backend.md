@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 9
-title: 백엔드 배포
+title: "Backend Development 101 (9/10): 백엔드 배포"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,27 @@ seo_description: Docker와 healthcheck로 백엔드를 안전하게 배포하는
 last_reviewed: '2026-05-15'
 ---
 
-# 백엔드 배포
+# Backend Development 101 (9/10): 백엔드 배포
 
 로컬에서는 잘 되던 애플리케이션이 운영에서 깨지는 이유는 코드만의 문제가 아니라 환경 차이 때문인 경우가 많습니다. 같은 코드를 어디서나 같은 방식으로 실행할 수 없다면, 배포는 언제나 사람 기억과 현장 판단에 의존하게 됩니다.
 
 이 글은 Backend Development 101 시리즈의 아홉 번째 글입니다. 여기서는 Docker, 환경 변수, healthcheck, rolling update를 중심으로 배포를 재현성의 문제로 이해해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 배포 환경은 어떤 요소들로 이루어질까요?
 - Dockerfile은 왜 재현 가능한 실행 환경을 만드는 핵심일까요?
 - 환경 변수와 secret은 어떻게 분리해야 할까요?
-- healthcheck와 readiness probe는 어떤 운영 판단에 쓰일까요?
-- 무중단에 가까운 배포는 어떤 아이디어로 동작할까요?
+
+## 큰 그림
+
+![Backend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Backend Development 101 9장 흐름 개요*
+
+이 그림에서는 백엔드 배포를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 백엔드 배포의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
-
-*소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름*
 코드는 이미지가 되고, 이미지는 어디에서나 같은 방식으로 실행되어야 합니다. 이 재현성이 있어야 운영 문제를 환경 탓으로만 돌리지 않을 수 있습니다.
 
 ## 핵심 용어
@@ -209,17 +214,29 @@ healthcheck:
 
 배포는 재현성의 문제입니다. 마지막 글에서는 지금까지 배운 아홉 개 레이어를 하나의 운영 가능한 백엔드 구조로 묶어 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **배포 환경은 어떤 요소들로 이루어질까요?**
+  - 본문의 기준은 백엔드 배포를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Dockerfile은 왜 재현 가능한 실행 환경을 만드는 핵심일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **환경 변수와 secret은 어떻게 분리해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
-- [HTTP 서버 만들기](./02-building-an-http-server.md)
-- [Routing과 Controller](./03-routing-and-controllers.md)
-- [Service Layer](./04-service-layer.md)
-- [Database Layer](./05-database-layer.md)
-- [인증과 권한](./06-auth-and-authorization.md)
-- [Logging과 Error Handling](./07-logging-and-error-handling.md)
-- [백엔드 테스트](./08-testing-the-backend.md)
+## 시리즈 목차
+
+- [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing과 Controller](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging과 Error Handling](./07-logging-and-error-handling.md)
+- [Backend Development 101 (8/10): 백엔드 테스트](./08-testing-the-backend.md)
 - **백엔드 배포 (현재 글)**
 - 운영 가능한 백엔드 구조 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deploying the Backend</title>
+<title>Backend Development 101 (9/10): Deploying the Backend</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Deploying the Backend</h1>
+<h1>Backend Development 101 (9/10): Deploying the Backend</h1>
 <p>The reason code works on your laptop and fails in production is usually not the code alone. It is the difference in operating system, dependencies, secrets, networking, and startup assumptions that never got frozen into something reproducible.</p>
 <p>This is post 9 in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The pieces that make up a deployment environment</li>
-<li>How a Dockerfile creates a <em>reproducible environment</em></li>
-<li>How to manage env vars and secrets</li>
-<li>What healthchecks and readiness probes do</li>
-<li>The basic idea behind zero-downtime deployment</li>
+<li>The pieces that make up a deployment environment?</li>
+<li>How a Dockerfile creates a *reproducible environment?</li>
+<li>How to manage env vars and secrets?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 9 flow overview</em></p>
+<p>This picture places Deploying the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Deploying the Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When deploys become <em>scary</em>, release frequency drops, and rare deploys carry <em>more change</em> and <em>more risk</em>. Making deploys boring is one of the most senior things you can do.</p>
 <blockquote>
 <p>A great deploy has <em>no drama</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="deployment flow from source code to container image, runtime, and users" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>deployment flow from source code to container image, runtime, and users</em><br>
-Code becomes an <em>image</em>; the image runs the same way <em>everywhere</em>.</p>
+<p>Code becomes an <em>image</em>; the image runs the same way <em>everywhere</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Container</strong>: a unit that runs <em>with its dependencies inside it</em>.</li>
@@ -184,15 +187,25 @@ def healthz():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Deployment is a <em>reproducibility</em> problem. In the final chapter, we tie all the layers together into a <em>production-ready backend structure</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Logging and Error Handling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Testing the Backend</a></li>
+<li><strong>The pieces that make up a deployment environment?</strong></li>
+<li>The article treats Deploying the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How a Dockerfile creates a *reproducible environment?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to manage env vars and secrets?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Backend Development 101 (4/10): The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Backend Development 101 (5/10): The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Backend Development 101 (6/10): Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Backend Development 101 (7/10): Logging and Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Backend Development 101 (8/10): Testing the Backend</a></li>
 <li><strong>Deploying the Backend (current)</strong></li>
 <li>A Production-Ready Backend Structure (upcoming)</li>
 </ul>

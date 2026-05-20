@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>A Production-Ready Backend Structure</title>
+<title>Backend Development 101 (10/10): A Production-Ready Backend Structure</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>A Production-Ready Backend Structure</h1>
+<h1>Backend Development 101 (10/10): A Production-Ready Backend Structure</h1>
 <p>Once you try to fit HTTP handling, routing, services, databases, auth, logging, testing, and deployment into one project, structure stops being an aesthetic preference. It becomes the thing that determines whether the code is merely working or genuinely operable.</p>
 <p>This is the final post in the Backend Development 101 series. Here, we tie the earlier layers together into one production-ready backend shape and turn those ideas into directory boundaries, configuration rules, and observability defaults.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>A <em>project directory layout</em> that hosts all nine layers</li>
-<li>A strategy for splitting config across dev/staging/prod</li>
-<li>The three pillars of observability on one page</li>
-<li>A baseline for performance and cost</li>
-<li>A roadmap for what to learn next</li>
+<li>A <em>project directory layout</em> that hosts all nine layers?</li>
+<li>A strategy for splitting config across dev/staging/prod?</li>
+<li>The three pillars of observability on one page?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 10 flow overview</em></p>
+<p>This picture places A Production-Ready Backend Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of A Production-Ready Backend Structure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A good structure lets <em>a new teammate find anything in 30 minutes</em>. A bad structure makes <em>future-you</em> unable to find your own code three months later. Structure is the biggest gift you give your future self.</p>
 <blockquote>
 <p>Production-grade code is <em>easy to read</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="production request flow with observability attached to each layer" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>production request flow with observability attached to each layer</em><br>
-Each arrow should align with a <em>directory boundary</em>.</p>
+<p>Each arrow should align with a <em>directory boundary</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Project layout</strong>: rules for the physical location of code.</li>
@@ -221,16 +224,26 @@ def setup_metrics(app):
 <li><em>Observability 101</em> — connect logs, metrics, and traces into one chart.</li>
 </ul>
 <p>Thank you for staying with this series. The ability to <em>take a small backend and make it production-ready</em> is a <em>core skill</em> that travels with you to any company.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Service Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Database Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Logging and Error Handling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Testing the Backend</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/09-deploying-the-backend.md">Deploying the Backend</a></li>
+<li><strong>A <em>project directory layout</em> that hosts all nine layers?</strong></li>
+<li>The article treats A Production-Ready Backend Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>A strategy for splitting config across dev/staging/prod?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The three pillars of observability on one page?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Backend Development 101 (4/10): The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Backend Development 101 (5/10): The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Backend Development 101 (6/10): Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Backend Development 101 (7/10): Logging and Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Backend Development 101 (8/10): Testing the Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/09-deploying-the-backend.md">Backend Development 101 (9/10): Deploying the Backend</a></li>
 <li><strong>A Production-Ready Backend Structure (current)</strong></li>
 </ul>
 <h2>References</h2>

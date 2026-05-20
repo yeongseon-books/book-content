@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building an HTTP Server</title>
+<title>Backend Development 101 (2/10): Building an HTTP Server</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Building an HTTP Server</h1>
+<h1>Backend Development 101 (2/10): Building an HTTP Server</h1>
 <p>After using frameworks for a while, it is easy to forget what an HTTP server is actually doing. The moment a response gets truncated, a header disappears, or behavior changes behind a proxy, you have to go back down to raw requests and responses.</p>
 <p>This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The actual shape of an HTTP request and response</li>
-<li>How HTTP rides on top of TCP</li>
-<li>The meaning of status codes and headers</li>
-<li>How to build a real server with FastAPI</li>
-<li>How to run a raw-socket server and watch the traffic</li>
+<li>The actual shape of an HTTP request and response?</li>
+<li>How HTTP rides on top of TCP?</li>
+<li>The meaning of status codes and headers?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 2 flow overview</em></p>
+<p>This picture places Building an HTTP Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building an HTTP Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Once you have <em>seen</em> what frameworks hide, every future debugging session gets faster. Without it, you guess at why a status code looks wrong or why a header is missing.</p>
 <blockquote>
 <p>Frameworks are convenient, but seniors know what is <em>behind</em> the framework.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="raw HTTP request and response flow between client and server" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>raw HTTP request and response flow between client and server</em><br>
-Both request and response are just <em>blocks of text</em>.</p>
+<p>Both request and response are just <em>blocks of text</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Request line</strong>: <code>GET /path HTTP/1.1</code> — method, path, version.</li>
@@ -191,8 +194,18 @@ def root():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>An HTTP server is a <em>text-protocol program</em>. Next, we add the layer that decides <em>which function handles which path</em> — the router.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><strong>The actual shape of an HTTP request and response?</strong></li>
+<li>The article treats Building an HTTP Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How HTTP rides on top of TCP?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The meaning of status codes and headers?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
 <li><strong>Building an HTTP Server (current)</strong></li>
 <li>Routing and Controllers (upcoming)</li>
 <li>The Service Layer (upcoming)</li>

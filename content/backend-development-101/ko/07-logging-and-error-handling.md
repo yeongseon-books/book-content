@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 7
-title: Logging과 Error Handling
+title: "Backend Development 101 (7/10): Logging과 Error Handling"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,27 @@ seo_description: 구조화 로그와 글로벌 예외 처리를 통해 백엔드
 last_reviewed: '2026-05-15'
 ---
 
-# Logging과 Error Handling
+# Backend Development 101 (7/10): Logging과 Error Handling
 
 새벽에 장애 알림이 왔을 때 코드를 처음부터 다시 읽는 것만으로는 원인을 빨리 찾기 어렵습니다. 운영에서 중요한 것은 실패를 다시 실행하는 능력보다, 이미 일어난 요청을 로그와 오류 응답만으로 설명하는 능력입니다.
 
 이 글은 Backend Development 101 시리즈의 일곱 번째 글입니다. 여기서는 구조화 로그, request_id, 글로벌 예외 처리라는 세 가지 축을 중심으로 운영에서 읽히는 백엔드를 만드는 방법을 정리해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 `print` 대신 logger를 써야 할까요?
 - 구조화 로그는 어떤 모양이어야 운영에서 쓸모가 있을까요?
 - 글로벌 예외 처리는 왜 응답 일관성을 지켜 줄까요?
-- `request_id`는 어떻게 한 요청을 끝까지 추적하게 해 줄까요?
-- 로그 레벨은 어떤 기준으로 나눠야 할까요?
+
+## 큰 그림
+
+![Backend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Backend Development 101 7장 흐름 개요*
+
+이 그림에서는 Logging과 Error Handling를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Logging과 Error Handling의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
-
-*request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름*
 정상 경로든 오류 경로든 결국 모두 로그로 모입니다. 운영 가능한 시스템은 이 흐름이 일관되게 설계되어 있습니다.
 
 ## 핵심 용어
@@ -229,17 +234,29 @@ log.critical("database is down")
 
 좋은 로그와 일관된 예외 처리는 운영의 눈입니다. 다음 글에서는 백엔드를 안전하게 바꿀 수 있게 해 주는 테스트 전략을 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 `print` 대신 logger를 써야 할까요?**
+  - 본문의 기준은 Logging과 Error Handling를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **구조화 로그는 어떤 모양이어야 운영에서 쓸모가 있을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **글로벌 예외 처리는 왜 응답 일관성을 지켜 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
-- [HTTP 서버 만들기](./02-building-an-http-server.md)
-- [Routing과 Controller](./03-routing-and-controllers.md)
-- [Service Layer](./04-service-layer.md)
-- [Database Layer](./05-database-layer.md)
-- [인증과 권한](./06-auth-and-authorization.md)
+## 시리즈 목차
+
+- [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing과 Controller](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
 - **Logging과 Error Handling (현재 글)**
 - 백엔드 테스트 (예정)
 - 백엔드 배포 (예정)
 - 운영 가능한 백엔드 구조 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

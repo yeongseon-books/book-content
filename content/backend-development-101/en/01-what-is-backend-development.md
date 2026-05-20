@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 1
-title: What Is Backend Development?
+title: "Backend Development 101 (1/10): What Is Backend Development?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: A clear map of backend development — HTTP servers, routing, s
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Backend Development?
+# Backend Development 101 (1/10): What Is Backend Development?
 
 Users only see the screen, but the part that keeps a service trustworthy is the code behind it. If you cannot explain where a request enters, where rules live, and where data stops being trustworthy, you can add features quickly but you cannot operate the system for long.
 
 This is the first post in the Backend Development 101 series. Here, we define backend development as a set of responsibilities — receiving requests, applying rules, touching data, and returning responses — instead of treating it as one vague technical label.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The role and the boundaries of a backend
-- The five layers that form a backend system
-- The path of one request through that system
-- A map of this whole series
-- Why each next chapter exists
+- The role and the boundaries of a backend?
+- The five layers that form a backend system?
+- The path of one request through that system?
+
+## Big Picture
+
+![backend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 1 flow overview*
+
+This picture places What Is Backend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Backend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Building only the frontend lets you ship *what the user sees*. Building the back
 
 ## Concept at a Glance
 
-![client request path across HTTP server, router, service, and database](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
-
-*client request path across HTTP server, router, service, and database*
 Requests flow left to right; responses retrace the same path.
 
 ## Key Terms
@@ -194,7 +199,18 @@ The shape of a backend is similar from a startup to a large company — Router, 
 
 The backend is a *set of responsibilities*. Next, we open up the lowest layer and build an *HTTP server* by hand to see how it really works.
 
+## Answering the Opening Questions
+
+- **The role and the boundaries of a backend?**
+  - The article treats What Is Backend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The five layers that form a backend system?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The path of one request through that system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Backend Development? (current)**
 - Building an HTTP Server (upcoming)
 - Routing and Controllers (upcoming)
@@ -205,6 +221,7 @@ The backend is a *set of responsibilities*. Next, we open up the lowest layer an
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

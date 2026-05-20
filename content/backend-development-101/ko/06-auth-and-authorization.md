@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 6
-title: 인증과 권한
+title: "Backend Development 101 (6/10): 인증과 권한"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,27 @@ seo_description: 인증(AuthN)과 권한(AuthZ)의 차이를 이해하고 bcrypt
 last_reviewed: '2026-05-15'
 ---
 
-# 인증과 권한
+# Backend Development 101 (6/10): 인증과 권한
 
 로그인 기능은 단순해 보여도 서버 관점에서는 두 가지 질문이 동시에 따라옵니다. 사용자가 누구인지 증명해야 하고, 이번 요청에서 무엇을 해도 되는지도 따로 판단해야 합니다.
 
 이 글은 Backend Development 101 시리즈의 여섯 번째 글입니다. 여기서는 authentication과 authorization을 분리해서 이해하고, FastAPI에서 안전한 기본 흐름을 어떻게 잡는지 살펴보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - authentication과 authorization은 무엇이 다를까요?
 - 비밀번호 저장에서 최소한으로 지켜야 할 안전 기준은 무엇일까요?
 - session과 JWT는 각각 언제 더 자연스러울까요?
-- FastAPI에서 보호된 endpoint를 만드는 기본 구조는 어떻게 생길까요?
-- permission을 role로 모델링하면 어떤 장점이 있을까요?
+
+## 큰 그림
+
+![Backend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Backend Development 101 6장 흐름 개요*
+
+이 그림에서는 인증과 권한를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 인증과 권한의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![로그인부터 토큰 검증과 역할 검사까지 이어지는 인증·권한 흐름](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
-
-*로그인부터 토큰 검증과 역할 검사까지 이어지는 인증·권한 흐름*
 authentication은 “누구인가”를 묻고, authorization은 “무엇을 할 수 있는가”를 묻습니다. 두 문제를 섞어 생각하면 인증 흐름이 점점 불명확해집니다.
 
 ## 핵심 용어
@@ -216,17 +221,29 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 
 authentication은 identity이고 authorization은 permission입니다. 다음 글에서는 운영자가 시스템을 보는 눈인 Logging과 Error Handling을 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **authentication과 authorization은 무엇이 다를까요?**
+  - 본문의 기준은 인증과 권한를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **비밀번호 저장에서 최소한으로 지켜야 할 안전 기준은 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **session과 JWT는 각각 언제 더 자연스러울까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
-- [HTTP 서버 만들기](./02-building-an-http-server.md)
-- [Routing과 Controller](./03-routing-and-controllers.md)
-- [Service Layer](./04-service-layer.md)
-- [Database Layer](./05-database-layer.md)
+## 시리즈 목차
+
+- [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing과 Controller](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
 - **인증과 권한 (현재 글)**
 - Logging과 Error Handling (예정)
 - 백엔드 테스트 (예정)
 - 백엔드 배포 (예정)
 - 운영 가능한 백엔드 구조 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Logging and Error Handling</title>
+<title>Backend Development 101 (7/10): Logging and Error Handling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Logging and Error Handling</h1>
+<h1>Backend Development 101 (7/10): Logging and Error Handling</h1>
 <p>When the pager goes off at 3 a.m., re-reading the code is rarely the fastest path to an answer. What matters in production is whether the system leaves enough evidence behind to explain a failed request from logs and error responses alone.</p>
 <p>This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why we use a logger instead of <code>print</code></li>
-<li>The shape of a structured log</li>
-<li>How a global exception handler keeps responses consistent</li>
-<li>How a <code>request_id</code> lets you follow one request end to end</li>
-<li>How to choose the <em>right</em> log level</li>
+<li>Why we use a logger instead of <code>print</code>?</li>
+<li>The shape of a structured log?</li>
+<li>How a global exception handler keeps responses consistent?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 7 flow overview</em></p>
+<p>This picture places Logging and Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Logging and Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Code is written once and <em>operated for years</em>. Ninety percent of operations is <em>reading</em>, and the reading tool is the log. Building structured logs from day one cuts incident response time by <em>orders of magnitude</em>.</p>
 <blockquote>
 <p>Good logs are read more often than the code itself.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="request ID middleware and global exception handling flow into logs" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>request ID middleware and global exception handling flow into logs</em><br>
-Every path leads to the <em>log</em>.</p>
+<p>Every path leads to the <em>log</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Logger</strong>: object that emits log records.</li>
@@ -209,13 +212,23 @@ log.critical(&quot;database is down&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Good logs and consistent error handling are the <em>eyes of operations</em>. Next, we make the code safe to change with <em>backend testing</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
+<li><strong>Why we use a logger instead of <code>print</code>?</strong></li>
+<li>The article treats Logging and Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The shape of a structured log?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How a global exception handler keeps responses consistent?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Backend Development 101 (4/10): The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">Backend Development 101 (5/10): The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Backend Development 101 (6/10): Authentication and Authorization</a></li>
 <li><strong>Logging and Error Handling (current)</strong></li>
 <li>Testing the Backend (upcoming)</li>
 <li>Deploying the Backend (upcoming)</li>

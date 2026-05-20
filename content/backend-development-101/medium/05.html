@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Database Layer</title>
+<title>Backend Development 101 (5/10): The Database Layer</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>The Database Layer</h1>
+<h1>Backend Development 101 (5/10): The Database Layer</h1>
 <p>The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.</p>
 <p>This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The role of the repository pattern</li>
-<li>Why we use an ORM and where its <em>traps</em> live</li>
-<li>The flow of transactions, commits, and rollbacks</li>
-<li>What a migration is and why it matters</li>
-<li>The N+1 query problem and how to fix it</li>
+<li>The role of the repository pattern?</li>
+<li>Why we use an ORM and where its <em>traps</em> live?</li>
+<li>The flow of transactions, commits, and rollbacks?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 5 flow overview</em></p>
+<p>This picture places The Database Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Database Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Databases are <em>what changes most often</em> and <em>what should change least</em>. Splitting the layer early means swapping a database, adding a cache, or running tests on an in-memory engine all happen in <em>one file</em>.</p>
 <blockquote>
 <p>A repository is the <em>translator between the database and the service</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="database layer boundary between service, repository, ORM, cache, and database" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>database layer boundary between service, repository, ORM, cache, and database</em><br>
-The service does not know SQL — only the repository does.</p>
+<p>The service does not know SQL — only the repository does.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Repository</strong>: an object that wraps database access in <em>function-like</em> methods.</li>
@@ -203,11 +206,21 @@ orders = session.scalars(stmt).all()
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A repository is a <em>translator over the database</em>. Next, we look at <em>who can see what</em> — authentication and authorization.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><strong>The role of the repository pattern?</strong></li>
+<li>The article treats The Database Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why we use an ORM and where its <em>traps</em> live?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The flow of transactions, commits, and rollbacks?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Backend Development 101 (3/10): Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">Backend Development 101 (4/10): The Service Layer</a></li>
 <li><strong>The Database Layer (current)</strong></li>
 <li>Authentication and Authorization (upcoming)</li>
 <li>Logging and Error Handling (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 8
-title: Testing the Backend
+title: "Backend Development 101 (8/10): Testing the Backend"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Split backend tests into unit, integration, and E2E levels and 
 last_reviewed: '2026-05-15'
 ---
 
-# Testing the Backend
+# Backend Development 101 (8/10): Testing the Backend
 
 Changing backend code without tests is a bet every single time. As a system grows, the real skill is not writing perfect code once, but making sure you can change it later without breaking the parts that already matter.
 
 This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between unit, integration, and E2E tests
-- How to test a service with pytest
-- How to call endpoints with FastAPI's `TestClient`
-- How to test without spinning up a *real* database
-- When to use fixtures and when to mock
+- The difference between unit, integration, and E2E tests?
+- How to test a service with pytest?
+- How to call endpoints with FastAPI's `TestClient`?
+
+## Big Picture
+
+![backend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 8 flow overview*
+
+This picture places Testing the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Testing the Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Code without tests can be *read but not changed safely*. The mark of a good back
 
 ## Concept at a Glance
 
-![test pyramid from unit to integration and end-to-end coverage](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
-
-*test pyramid from unit to integration and end-to-end coverage*
 The test pyramid — *many* at the bottom, *few* at the top.
 
 ## Key Terms
@@ -200,17 +205,29 @@ CI (GitHub Actions and friends) runs `pytest` on every PR. Units take *seconds*,
 
 Tests are the *safety net for change*. Next, we deliver the code to real users — *deploying the backend*.
 
+## Answering the Opening Questions
+
+- **The difference between unit, integration, and E2E tests?**
+  - The article treats Testing the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to test a service with pytest?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to call endpoints with FastAPI's `TestClient`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
-- [Authentication and Authorization](./06-auth-and-authorization.md)
-- [Logging and Error Handling](./07-logging-and-error-handling.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): Authentication and Authorization](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging and Error Handling](./07-logging-and-error-handling.md)
 - **Testing the Backend (current)**
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

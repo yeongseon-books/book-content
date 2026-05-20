@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Routing and Controllers</title>
+<title>Backend Development 101 (3/10): Routing and Controllers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Routing and Controllers</h1>
+<h1>Backend Development 101 (3/10): Routing and Controllers</h1>
 <p>A single file feels fine when your API only has a few endpoints. Once features start stacking up, though, the real problem is not line count but the constant question of where each new path, validation rule, and response shape should live.</p>
 <p>This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The difference between routers and controllers</li>
-<li>The difference between path, query, and body parameters</li>
-<li>How to design REST-style endpoints</li>
-<li>How to split a FastAPI app with <code>APIRouter</code></li>
-<li>What controllers should and should <em>not</em> do</li>
+<li>The difference between routers and controllers?</li>
+<li>The difference between path, query, and body parameters?</li>
+<li>How to design REST-style endpoints?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="backend development 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>backend development 101 chapter 3 flow overview</em></p>
+<p>This picture places Routing and Controllers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Routing and Controllers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>In a tiny project, a single file works. As endpoints grow, that single file <em>becomes hell</em>. Splitting layers from day one makes "where does this code go?" obvious for every new feature.</p>
 <blockquote>
 <p>Good structure removes the question of <em>where to put code</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="request routing flow from router to controller, service, and repository" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>request routing flow from router to controller, service, and repository</em><br>
-Routers are the <em>map</em>, controllers are the <em>front desk</em>, services are the <em>experts</em>.</p>
+<p>Routers are the <em>map</em>, controllers are the <em>front desk</em>, services are the <em>experts</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Router</strong>: maps URL patterns to handlers.</li>
@@ -220,9 +223,19 @@ class UserController:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Routers are the <em>map</em>; controllers are the <em>front desk</em>. Next, we open the door behind the desk — the Service Layer that holds the <em>business rules</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><strong>The difference between routers and controllers?</strong></li>
+<li>The article treats Routing and Controllers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The difference between path, query, and body parameters?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to design REST-style endpoints?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">Backend Development 101 (1/10): What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Backend Development 101 (2/10): Building an HTTP Server</a></li>
 <li><strong>Routing and Controllers (current)</strong></li>
 <li>The Service Layer (upcoming)</li>
 <li>The Database Layer (upcoming)</li>

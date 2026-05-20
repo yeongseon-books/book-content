@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 5
-title: Database Layer
+title: "Backend Development 101 (5/10): Database Layer"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,27 @@ seo_description: Repository 패턴과 트랜잭션, migration, N+1 핵심을 정
 last_reviewed: '2026-05-15'
 ---
 
-# Database Layer
+# Backend Development 101 (5/10): Database Layer
 
 service가 직접 SQL을 쓰기 시작하면 쿼리 중복과 데이터 접근 규칙의 분산이 빠르게 커집니다. 처음에는 편해 보여도 성능 조정, 캐시 추가, 테스트 격리 같은 작업이 모두 어려워집니다.
 
 이 글은 Backend Development 101 시리즈의 다섯 번째 글입니다. 여기서는 repository pattern을 중심으로 database layer를 분리하고, ORM·migration·transaction·N+1까지 함께 정리해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 service가 SQL을 직접 작성하지 않는 편이 좋을까요?
 - repository pattern은 어떤 경계를 만들어 줄까요?
 - ORM은 왜 편리하면서도 함정을 함께 가져올까요?
-- transaction, commit, rollback은 어떤 흐름으로 이해해야 할까요?
-- migration과 N+1 문제는 왜 database layer의 핵심 주제일까요?
+
+## 큰 그림
+
+![Backend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
+
+*Backend Development 101 5장 흐름 개요*
+
+이 그림에서는 Database Layer를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Database Layer의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,9 +52,6 @@ repository는 데이터베이스와 service 사이의 번역기 역할을 합니
 
 ## 한눈에 보는 개념
 
-![서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
-
-*서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계*
 service는 SQL을 몰라도 되고, repository만 데이터 접근 세부 구현을 알면 됩니다. 이 단순한 분리가 데이터 계층을 교체 가능한 형태로 만들어 줍니다.
 
 ## 핵심 용어
@@ -221,17 +226,29 @@ orders = session.scalars(stmt).all()
 
 repository는 데이터베이스 위에 놓인 번역기입니다. 다음 글에서는 누가 무엇을 볼 수 있는지 결정하는 인증과 권한 문제로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 service가 SQL을 직접 작성하지 않는 편이 좋을까요?**
+  - 본문의 기준은 Database Layer를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **repository pattern은 어떤 경계를 만들어 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **ORM은 왜 편리하면서도 함정을 함께 가져올까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
-- [HTTP 서버 만들기](./02-building-an-http-server.md)
-- [Routing과 Controller](./03-routing-and-controllers.md)
-- [Service Layer](./04-service-layer.md)
+## 시리즈 목차
+
+- [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing과 Controller](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
 - **Database Layer (현재 글)**
 - 인증과 권한 (예정)
 - Logging과 Error Handling (예정)
 - 백엔드 테스트 (예정)
 - 백엔드 배포 (예정)
 - 운영 가능한 백엔드 구조 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

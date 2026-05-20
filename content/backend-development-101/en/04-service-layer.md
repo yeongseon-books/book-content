@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 4
-title: The Service Layer
+title: "Backend Development 101 (4/10): The Service Layer"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Use a service layer to keep business rules in one place — han
 last_reviewed: '2026-05-15'
 ---
 
-# The Service Layer
+# Backend Development 101 (4/10): The Service Layer
 
 Once controllers start doing too much, the same business rule gets copied into REST handlers, batch jobs, and other entry points. The first thing that breaks is not style — it is the existence of one reliable place where the rule lives.
 
 This is post 4 in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The role of the service layer
-- How to split responsibility across controller, service, and repository
-- Where to start a transaction
-- How to inject dependencies into a service
-- Where domain events fit in
+- The role of the service layer?
+- How to split responsibility across controller, service, and repository?
+- Where to start a transaction?
+
+## Big Picture
+
+![backend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 4 flow overview*
+
+This picture places The Service Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Service Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Putting business logic in controllers spreads the same rule across *three places
 
 ## Concept at a Glance
 
-![service layer coordinating repositories, external APIs, and events](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
-
-*service layer coordinating repositories, external APIs, and events*
 A service is the *orchestrator* — it coordinates the repo, external APIs, and the event bus.
 
 ## Key Terms
@@ -214,10 +219,21 @@ Large backends keep one service directory per domain (`services/orders/`, `servi
 
 The service layer is the *home of business rules*. Next, we go a layer deeper to the *Database Layer*, where data finally lives.
 
+## Answering the Opening Questions
+
+- **The role of the service layer?**
+  - The article treats The Service Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to split responsibility across controller, service, and repository?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where to start a transaction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
 - **The Service Layer (current)**
 - The Database Layer (upcoming)
 - Authentication and Authorization (upcoming)
@@ -225,6 +241,7 @@ The service layer is the *home of business rules*. Next, we go a layer deeper to
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

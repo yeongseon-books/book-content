@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 10
-title: 운영 가능한 백엔드 구조
+title: "Backend Development 101 (10/10): 운영 가능한 백엔드 구조"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,27 @@ seo_description: 운영 가능한 백엔드 프로젝트의 구조와 설정 전
 last_reviewed: '2026-05-15'
 ---
 
-# 운영 가능한 백엔드 구조
+# Backend Development 101 (10/10): 운영 가능한 백엔드 구조
 
 지금까지 배운 HTTP 서버, 라우팅, 서비스, 데이터베이스, 인증, 로깅, 테스트, 배포를 실제 프로젝트 구조 안에 묶는 순간부터 코드의 성격이 달라집니다. 기능이 동작하는 것과 운영 가능한 구조를 갖추는 것은 서로 다른 문제이기 때문입니다.
 
 이 글은 Backend Development 101 시리즈의 마지막 글입니다. 여기서는 운영 가능한 백엔드가 왜 결국 구조의 문제로 귀결되는지 정리하고, 지금까지 배운 레이어를 하나의 프로젝트에 배치하는 기준을 살펴보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 지금까지 배운 아홉 개 레이어를 하나의 프로젝트 구조로 어떻게 배치할까요?
 - dev, staging, prod 설정은 어떤 방식으로 나눠야 할까요?
 - observability의 세 기둥은 프로젝트 안에서 어디에 놓일까요?
-- 성능과 비용의 최소 기준은 왜 숫자로 적어 두어야 할까요?
-- 다음 단계 학습은 어떤 방향으로 이어지면 좋을까요?
+
+## 큰 그림
+
+![Backend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Backend Development 101 10장 흐름 개요*
+
+이 그림에서는 운영 가능한 백엔드 구조를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 운영 가능한 백엔드 구조의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
-
-*운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조*
 각 화살표는 물리적인 디렉터리 경계와 맞물려야 합니다. 구조가 좋다면 요청 흐름도 파일 구조를 따라 자연스럽게 읽힙니다.
 
 ## 핵심 용어
@@ -240,17 +245,29 @@ def setup_metrics(app):
 
 이 시리즈를 끝까지 따라오셨다면, 이제 작은 백엔드를 운영 가능한 구조로 끌어올리는 기본 감각은 이미 갖춘 셈입니다.
 
+## 처음 질문으로 돌아가기
+
+- **지금까지 배운 아홉 개 레이어를 하나의 프로젝트 구조로 어떻게 배치할까요?**
+  - 본문의 기준은 운영 가능한 백엔드 구조를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **dev, staging, prod 설정은 어떤 방식으로 나눠야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **observability의 세 기둥은 프로젝트 안에서 어디에 놓일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
-- [HTTP 서버 만들기](./02-building-an-http-server.md)
-- [Routing과 Controller](./03-routing-and-controllers.md)
-- [Service Layer](./04-service-layer.md)
-- [Database Layer](./05-database-layer.md)
-- [인증과 권한](./06-auth-and-authorization.md)
-- [Logging과 Error Handling](./07-logging-and-error-handling.md)
-- [백엔드 테스트](./08-testing-the-backend.md)
-- [백엔드 배포](./09-deploying-the-backend.md)
+## 시리즈 목차
+
+- [Backend Development 101 (1/10): 백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing과 Controller](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): 인증과 권한](./06-auth-and-authorization.md)
+- [Backend Development 101 (7/10): Logging과 Error Handling](./07-logging-and-error-handling.md)
+- [Backend Development 101 (8/10): 백엔드 테스트](./08-testing-the-backend.md)
+- [Backend Development 101 (9/10): 백엔드 배포](./09-deploying-the-backend.md)
 - **운영 가능한 백엔드 구조 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

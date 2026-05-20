@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 7
-title: Logging and Error Handling
+title: "Backend Development 101 (7/10): Logging and Error Handling"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Use structured logging and a global exception handler to diagno
 last_reviewed: '2026-05-15'
 ---
 
-# Logging and Error Handling
+# Backend Development 101 (7/10): Logging and Error Handling
 
 When the pager goes off at 3 a.m., re-reading the code is rarely the fastest path to an answer. What matters in production is whether the system leaves enough evidence behind to explain a failed request from logs and error responses alone.
 
 This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why we use a logger instead of `print`
-- The shape of a structured log
-- How a global exception handler keeps responses consistent
-- How a `request_id` lets you follow one request end to end
-- How to choose the *right* log level
+- Why we use a logger instead of `print`?
+- The shape of a structured log?
+- How a global exception handler keeps responses consistent?
+
+## Big Picture
+
+![backend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 7 flow overview*
+
+This picture places Logging and Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Logging and Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Code is written once and *operated for years*. Ninety percent of operations is *
 
 ## Concept at a Glance
 
-![request ID middleware and global exception handling flow into logs](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
-
-*request ID middleware and global exception handling flow into logs*
 Every path leads to the *log*.
 
 ## Key Terms
@@ -213,17 +218,29 @@ In production logs flow into *collectors* (CloudWatch, Loki, Datadog). A field l
 
 Good logs and consistent error handling are the *eyes of operations*. Next, we make the code safe to change with *backend testing*.
 
+## Answering the Opening Questions
+
+- **Why we use a logger instead of `print`?**
+  - The article treats Logging and Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The shape of a structured log?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How a global exception handler keeps responses consistent?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
-- [Authentication and Authorization](./06-auth-and-authorization.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
+- [Backend Development 101 (6/10): Authentication and Authorization](./06-auth-and-authorization.md)
 - **Logging and Error Handling (current)**
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

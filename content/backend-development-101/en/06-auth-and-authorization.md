@@ -1,7 +1,7 @@
 ---
 series: backend-development-101
 episode: 6
-title: Authentication and Authorization
+title: "Backend Development 101 (6/10): Authentication and Authorization"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,27 @@ seo_description: Understand the difference between authentication and authorizat
 last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Authorization
+# Backend Development 101 (6/10): Authentication and Authorization
 
 Login looks small from the UI, but the server has to answer two separate questions on every protected request. It must know who the user is, and it must decide what that user is allowed to do right now.
 
 This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between authentication and authorization
-- Minimum safe practices for password storage
-- Sessions vs JWT — when to use which
-- How to build a protected endpoint in FastAPI
-- How to model permissions as roles
+- The difference between authentication and authorization?
+- Minimum safe practices for password storage?
+- Sessions vs JWT — when to use which?
+
+## Big Picture
+
+![backend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
+
+*backend development 101 chapter 6 flow overview*
+
+This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,9 +50,6 @@ Auth is the *one area* where a single mistake can sink a company. A line that st
 
 ## Concept at a Glance
 
-![authentication and authorization flow from login to token verification and role check](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
-
-*authentication and authorization flow from login to token verification and role check*
 Authentication asks *who*; authorization asks *can you*.
 
 ## Key Terms
@@ -200,17 +205,29 @@ Most SaaS products start with *bcrypt + JWT + role-based access*. As they grow, 
 
 Authentication is *identity*; authorization is *permission*. Next, we look at the operator's eyes — *Logging and Error Handling*.
 
+## Answering the Opening Questions
+
+- **The difference between authentication and authorization?**
+  - The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Minimum safe practices for password storage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Sessions vs JWT — when to use which?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Backend Development?](./01-what-is-backend-development.md)
-- [Building an HTTP Server](./02-building-an-http-server.md)
-- [Routing and Controllers](./03-routing-and-controllers.md)
-- [The Service Layer](./04-service-layer.md)
-- [The Database Layer](./05-database-layer.md)
+## In this series
+
+- [Backend Development 101 (1/10): What Is Backend Development?](./01-what-is-backend-development.md)
+- [Backend Development 101 (2/10): Building an HTTP Server](./02-building-an-http-server.md)
+- [Backend Development 101 (3/10): Routing and Controllers](./03-routing-and-controllers.md)
+- [Backend Development 101 (4/10): The Service Layer](./04-service-layer.md)
+- [Backend Development 101 (5/10): The Database Layer](./05-database-layer.md)
 - **Authentication and Authorization (current)**
 - Logging and Error Handling (upcoming)
 - Testing the Backend (upcoming)
 - Deploying the Backend (upcoming)
 - A Production-Ready Backend Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References
