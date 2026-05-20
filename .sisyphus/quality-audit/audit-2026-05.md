@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:52:11+00:00
+Generated: 2026-05-20T11:52:31+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **33**
-- Series at or above 5 issues: **25**
-- Total issues: **264**
-  - BadImg: **264**
+- Series with any issue: **32**
+- Series at or above 5 issues: **24**
+- Total issues: **258**
+  - BadImg: **258**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -60,20 +60,19 @@ Warnings:
 | 17 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 18 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 19 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 20 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 21 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 22 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 23 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 24 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 25 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 26 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 27 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 28 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 29 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 30 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 31 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 32 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 33 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 20 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 21 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 22 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 23 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 24 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 25 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 26 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 27 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 28 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 29 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 30 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 31 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 32 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -302,18 +301,6 @@ Warnings:
 - `assets/sql-101/05/05-01-aggregation-flow.ko.png:1` — PNG height 67px <= 100px (size=1021x67)
 - `assets/sql-101/07/07-01-window-calculation-flow.en.png:1` — PNG height 88px <= 100px (size=1026x88)
 - ... 3 more
-
-## cloud-computing-101 — Total 6
-
-- BadImg=6 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=666x67)
-- `assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=666x67)
-- `assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=763x67)
-- `assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=763x67)
-- `assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=893x67)
-- ... 1 more
 
 ## machine-learning-101 — Total 6
 
