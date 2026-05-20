@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building an Evaluation Report</title>
+<title>Model Evaluation 101 (10/10): Building an Evaluation Report</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Building an Evaluation Report</h1>
+<h1>Model Evaluation 101 (10/10): Building an Evaluation Report</h1>
 <p>Many teams handle training and metric calculation reasonably well. The weak point usually appears right before deployment, when the result gets compressed into a slide, a dashboard tile, or a single message. A few days later, nobody remembers which data produced the score, which threshold was used, or which slices were already known to be weak.</p>
 <p>A strong evaluation report prevents that amnesia. It is not paperwork for its own sake. It is the operating record that makes reviews, audits, and post-incident analysis point back to the same evidence.</p>
 <p>This is the final post in the Model Evaluation 101 series. In this post, we turn metrics, slices, reproducibility, and known risks into one report that can survive beyond a single model run.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The five sections of an evaluation report</li>
-<li>How it differs from a Model Card</li>
-<li>Reproducibility metadata</li>
-<li>Patterns for automatic generation</li>
-<li>Five common pitfalls</li>
+<li>The five sections of an evaluation report?</li>
+<li>How it differs from a Model Card?</li>
+<li>Reproducibility metadata?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 10 flow overview</em></p>
+<p>This picture places Building an Evaluation Report inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A good evaluation report is the deployment record for one concrete model decision. It keeps metrics, threshold, slices, reproducibility, and known risks in the same place.</p>
+<p>The core of Building an Evaluation Report is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Reviews, audits, and post-incident analyses all read the same report. A consistent format speeds up the team.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="evaluation report structure linking metrics slices reproducibility and risk" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>evaluation report structure linking metrics slices reproducibility and risk</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Model Card</strong>: a document describing a model's intent and limits.</li>
@@ -178,16 +178,26 @@ print(to_md(report))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Across ten episodes you have a vocabulary for evaluation and the realistic traps. From here, MLOps and deeper error analysis are the natural next series.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">ROC and AUC</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/07-calibration.md">Calibration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/08-cross-validation.md">Cross Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/09-error-analysis.md">Error Analysis</a></li>
+<li><strong>The five sections of an evaluation report?</strong></li>
+<li>The article treats Building an Evaluation Report as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How it differs from a Model Card?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Reproducibility metadata?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Model Evaluation 101 (2/10): Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">Model Evaluation 101 (3/10): The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Model Evaluation 101 (4/10): Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">Model Evaluation 101 (5/10): F1 Score</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">Model Evaluation 101 (6/10): ROC and AUC</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/07-calibration.md">Model Evaluation 101 (7/10): Calibration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/08-cross-validation.md">Model Evaluation 101 (8/10): Cross Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/09-error-analysis.md">Model Evaluation 101 (9/10): Error Analysis</a></li>
 <li><strong>Building an Evaluation Report (current)</strong></li>
 </ul>
 <h2>References</h2>

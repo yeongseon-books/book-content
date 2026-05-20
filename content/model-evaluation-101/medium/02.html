@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Train, Validation, and Test</title>
+<title>Model Evaluation 101 (2/10): Train, Validation, and Test</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Train, Validation, and Test</h1>
+<h1>Model Evaluation 101 (2/10): Train, Validation, and Test</h1>
 <p>Model quality is often decided long before you compute the first metric. If the split is wrong, every number that follows can still look polished while being untrustworthy. Leakage from preprocessing, random splits on time-series data, or the same user showing up in multiple splits can all inflate performance fast.</p>
 <p>That is why train, validation, and test are not textbook ceremony. They are a discipline for separating learning, selection, and final verification. Once those roles blur together, evaluation stops being evidence and starts becoming wishful thinking.</p>
 <p>This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The role of each dataset</li>
-<li>Different forms of data leakage</li>
-<li>Principles for splitting time-series data</li>
-<li>Group-aware splitting to prevent group leakage</li>
-<li>Five common pitfalls</li>
+<li>The role of each dataset?</li>
+<li>Different forms of data leakage?</li>
+<li>Principles for splitting time-series data?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 2 flow overview</em></p>
+<p>This picture places Train, Validation, and Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Train fits, validation tunes, and test is touched exactly once. When those roles mix together, evaluation stops being trustworthy.</p>
+<p>The core of Train, Validation, and Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>A wrong split invalidates every measurement that follows. Model comparisons become misleading.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="dataset split into train validation and test roles" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>dataset split into train validation and test roles</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Train</strong>: data used for fitting.</li>
@@ -158,8 +158,18 @@ print(&quot;valid:&quot;, m.score(sc.transform(Xva), yva))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The split strategy is the prerequisite for every measurement. Next, we examine the limits of accuracy.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><strong>The role of each dataset?</strong></li>
+<li>The article treats Train, Validation, and Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Different forms of data leakage?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Principles for splitting time-series data?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</a></li>
 <li><strong>Train, Validation, and Test (current)</strong></li>
 <li>The Limits of Accuracy (upcoming)</li>
 <li>Precision and Recall (upcoming)</li>

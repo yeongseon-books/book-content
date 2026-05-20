@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 10
-title: 평가 리포트 만들기
+title: "Model Evaluation 101 (10/10): 평가 리포트 만들기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 프로덕션 배포 결정의 근거가 되는 종합적인 모
 last_reviewed: '2026-05-15'
 ---
 
-# 평가 리포트 만들기
+# Model Evaluation 101 (10/10): 평가 리포트 만들기
 
 모델 학습과 평가까지는 많은 팀이 잘합니다. 문제는 배포 직전입니다. 이때 결과가 슬라이드 한 장이나 메시지 한 줄로 축약되면, 며칠 뒤에는 가장 중요한 맥락이 사라집니다. 어떤 데이터에서 계산했는지, 임계값은 얼마였는지, 어떤 슬라이스가 약했는지, 재현성 정보가 남아 있는지 다시 묻게 됩니다.
 
@@ -28,17 +28,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Model Evaluation 101 시리즈의 10번째 글입니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?
 - 평가 리포트와 Model Card는 무엇이 다를까요?
 - 임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요?
-- 리포트를 사람이 손으로 쓰지 말고 자동 생성해야 하는 이유는 무엇일까요?
-- 팀 리뷰와 감사 대응에서 일관된 형식이 왜 중요할까요?
 
-> 좋은 평가 리포트는 숫자만 모아 둔 문서가 아닙니다. 데이터, 지표, 임계값, 약한 슬라이스, 재현성 정보를 한 번에 모아 배포 판단의 근거를 남기는 운영 문서입니다.
+## 큰 그림
+
+![Model Evaluation 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Model Evaluation 101 10장 흐름 개요*
+
+이 그림에서는 평가 리포트 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 평가 리포트 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
-
-*지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조*
 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.
 
 ## 핵심 용어
@@ -168,17 +169,29 @@ print(to_md(report))
 
 좋은 평가 리포트는 한 장짜리 요약이면서도, 배포 판단에 필요한 맥락을 빠짐없이 담고 있어야 합니다. 데이터, 지표, 임계값, 슬라이스, 재현성, 리스크가 한곳에 모여야 숫자가 의사결정의 근거가 됩니다. 여기까지가 Model Evaluation 101의 기본 어휘이며, 이후에는 MLOps와 더 깊은 오류 분석으로 자연스럽게 이어질 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?**
+  - 본문의 기준은 평가 리포트 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **평가 리포트와 Model Card는 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
-- [훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
-- [정확도의 한계](./03-limits-of-accuracy.md)
-- [정밀도와 재현율](./04-precision-and-recall.md)
-- [F1 점수](./05-f1-score.md)
-- [ROC와 AUC 이해하기](./06-roc-and-auc.md)
-- [확률 보정 이해하기](./07-calibration.md)
-- [교차 검증 이해하기](./08-cross-validation.md)
-- [오류 분석으로 약점 찾기](./09-error-analysis.md)
+## 시리즈 목차
+
+- [Model Evaluation 101 (1/10): 모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): 훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): 정확도의 한계](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): 정밀도와 재현율](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 점수](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC와 AUC 이해하기](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
+- [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
+- [Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기](./09-error-analysis.md)
 - **평가 리포트 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

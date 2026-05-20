@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 10
-title: Building an Evaluation Report
+title: "Model Evaluation 101 (10/10): Building an Evaluation Report"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A reusable model evaluation report template covering data, metr
 last_reviewed: '2026-05-15'
 ---
 
-# Building an Evaluation Report
+# Model Evaluation 101 (10/10): Building an Evaluation Report
 
 Many teams handle training and metric calculation reasonably well. The weak point usually appears right before deployment, when the result gets compressed into a slide, a dashboard tile, or a single message. A few days later, nobody remembers which data produced the score, which threshold was used, or which slices were already known to be weak.
 
@@ -28,15 +28,21 @@ A strong evaluation report prevents that amnesia. It is not paperwork for its ow
 
 This is the final post in the Model Evaluation 101 series. In this post, we turn metrics, slices, reproducibility, and known risks into one report that can survive beyond a single model run.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- The five sections of an evaluation report
-- How it differs from a Model Card
-- Reproducibility metadata
-- Patterns for automatic generation
-- Five common pitfalls
+- The five sections of an evaluation report?
+- How it differs from a Model Card?
+- Reproducibility metadata?
 
-> A good evaluation report is the deployment record for one concrete model decision. It keeps metrics, threshold, slices, reproducibility, and known risks in the same place.
+## Big Picture
+
+![model evaluation 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 10 flow overview*
+
+This picture places Building an Evaluation Report inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building an Evaluation Report is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +50,6 @@ Reviews, audits, and post-incident analyses all read the same report. A consiste
 
 ## Concept at a Glance
 
-![evaluation report structure linking metrics slices reproducibility and risk](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
-
-*evaluation report structure linking metrics slices reproducibility and risk*
 ## Key Terms
 
 - **Model Card**: a document describing a model's intent and limits.
@@ -176,17 +179,29 @@ ML release gates and monitoring alerts use the evaluation report as the canonica
 
 Across ten episodes you have a vocabulary for evaluation and the realistic traps. From here, MLOps and deeper error analysis are the natural next series.
 
+## Answering the Opening Questions
+
+- **The five sections of an evaluation report?**
+  - The article treats Building an Evaluation Report as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How it differs from a Model Card?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Reproducibility metadata?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
-- [Calibration](./07-calibration.md)
-- [Cross Validation](./08-cross-validation.md)
-- [Error Analysis](./09-error-analysis.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): Calibration](./07-calibration.md)
+- [Model Evaluation 101 (8/10): Cross Validation](./08-cross-validation.md)
+- [Model Evaluation 101 (9/10): Error Analysis](./09-error-analysis.md)
 - **Building an Evaluation Report (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why Model Evaluation Is Hard</title>
+<title>Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Why Model Evaluation Is Hard</h1>
+<h1>Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</h1>
 <p>Model evaluation tends to feel easier in a notebook than it does in production. A single score can look clean, yet the decision behind it is rarely clean. The same 95% accuracy means very different things depending on the data distribution, the cost of mistakes, and the threshold that turns scores into action.</p>
 <p>When evaluation gets shaky, model selection gets shaky with it. The real danger is not one bad number, but a whole team optimizing toward the wrong number. That is why evaluation is less about metric calculation and more about decision design.</p>
 <p>This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Four reasons evaluation is hard</li>
-<li>Why metrics are not business value</li>
-<li>The threat of distribution drift</li>
-<li>How thresholds drive decisions</li>
-<li>Five common pitfalls</li>
+<li>Four reasons evaluation is hard?</li>
+<li>Why metrics are not business value?</li>
+<li>The threat of distribution drift?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 1 flow overview</em></p>
+<p>This picture places Why Model Evaluation Is Hard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Evaluation is not one number. It is the meeting point of data distribution, cost structure, thresholds, and the decision the model is supposed to support.</p>
+<p>The core of Why Model Evaluation Is Hard is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Evaluation is the language of model selection. When the language is wrong, the entire team aims at the wrong target.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="evaluation flow from predictions to metrics and decisions" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>evaluation flow from predictions to metrics and decisions</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a numerical summary of performance.</li>
@@ -151,6 +151,16 @@ print(&quot;cost:&quot;, cost(tp=5, fp=10, fn=2))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Evaluation is the language of model selection. Next, we cover the roles of train, validation, and test sets.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Four reasons evaluation is hard?</strong></li>
+<li>The article treats Why Model Evaluation Is Hard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why metrics are not business value?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The threat of distribution drift?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>Why Model Evaluation Is Hard (current)</strong></li>
 <li>Train, Validation, and Test (upcoming)</li>

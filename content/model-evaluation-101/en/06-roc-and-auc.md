@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 6
-title: ROC and AUC
+title: "Model Evaluation 101 (6/10): ROC and AUC"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: ROC-AUC as a ranking summary, extended all the way to threshold
 last_reviewed: '2026-05-17'
 ---
 
-# ROC and AUC
+# Model Evaluation 101 (6/10): ROC and AUC
 
 This is post 6 in the Model Evaluation 101 series.
 
 ROC curves and AUC are useful when you want to compare candidate models before committing to one production threshold. But issue #772 correctly pointed out that the earlier version stopped at `ko/06-roc-and-auc.md:84-115`: it showed `thr[:3]`, AUC, PR-AUC, and one `FPR<=0.05` lookup, then never landed on an actual operating decision.
 
 This rewrite finishes that story. We will use ROC-AUC as a ranking-quality summary, compare it with PR-AUC on the same imbalanced dataset, then turn an `FPR <= 0.05` policy into a concrete threshold, confusion matrix, precision/recall pair, and simple decision cost.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying ROC and AUC?
+- Which signal should the example or diagram make visible for ROC and AUC?
+- What failure should be prevented first when ROC and AUC reaches a real system?
+
+## Big Picture
+
+![model evaluation 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 6 flow overview*
+
+This picture places ROC and AUC inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ROC and AUC is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## This post answers
 
@@ -43,10 +59,6 @@ The real question is not “what is the AUC?” It is this one.
 Without that question, ROC-AUC stays a nice-looking summary. With it, the whole 03–06 metrics arc lands in an operational judgment.
 
 ## Concept at a glance
-
-![ranking flow from model scores to roc and pr views](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
-
-*ranking flow from model scores to roc and pr views*
 
 ROC and PR both start from score ranking. Deployment does not. Deployment happens at one threshold, so the curve analysis has to come back down to one confusion matrix.
 
@@ -188,17 +200,29 @@ That is the missing last mile from curve summary to deployment decision.
 
 ROC and AUC are useful because they summarize ranking quality before you lock a threshold. But deployment still happens at one threshold, with one confusion matrix, under one set of constraints. That closes the metrics arc from baselines in episode 03, to threshold trade-offs in episode 04, to F1 summary limits in episode 05, and finally to operating-point selection here.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying ROC and AUC?**
+  - The article treats ROC and AUC as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for ROC and AUC?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when ROC and AUC reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
 - **ROC and AUC (current)**
 - Calibration (upcoming)
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

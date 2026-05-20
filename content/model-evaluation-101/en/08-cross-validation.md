@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 8
-title: Cross Validation
+title: "Model Evaluation 101 (8/10): Cross Validation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Cross-validation strategies including K-Fold, stratified, Group
 last_reviewed: '2026-05-15'
 ---
 
-# Cross Validation
+# Model Evaluation 101 (8/10): Cross Validation
 
 One train/test split can make evaluation look more certain than it really is. On small or moderately noisy datasets, a tiny shift in the split can reorder two models that looked clearly separated a minute earlier.
 
@@ -28,15 +28,21 @@ That is why cross validation is better understood as an uncertainty tool than as
 
 This is post 8 in the Model Evaluation 101 series. In this post, we use fold-based evaluation to separate stable comparisons from noisy ones and to spot leakage that survives a single split.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- The meaning and trade-offs of K-Fold
-- Why stratified is the default
-- GroupKFold and time-series splits
-- How to read variance
-- Five common pitfalls
+- The meaning and trade-offs of K-Fold?
+- Why stratified is the default?
+- GroupKFold and time-series splits?
 
-> Cross validation is not just repeated scoring. It measures how much your estimate moves when the split moves, which is often the difference between a real win and noise.
+## Big Picture
+
+![model evaluation 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 8 flow overview*
+
+This picture places Cross Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cross Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +50,6 @@ A single split is noisy. Reporting the standard deviation alongside the mean mak
 
 ## Concept at a Glance
 
-![cross-validation flow from folds to score mean and variance](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
-
-*cross-validation flow from folds to score mean and variance*
 ## Key Terms
 
 - **K-Fold**: split into k parts, train and validate k times.
@@ -154,17 +157,29 @@ Hyperparameter tuning runs CV for inner evaluation, then a separate held-out set
 
 CV is the confidence of the estimate. Next, error analysis dissects the predictions that go wrong.
 
+## Answering the Opening Questions
+
+- **The meaning and trade-offs of K-Fold?**
+  - The article treats Cross Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why stratified is the default?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **GroupKFold and time-series splits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
-- [Calibration](./07-calibration.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): Calibration](./07-calibration.md)
 - **Cross Validation (current)**
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

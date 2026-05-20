@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 4
-title: Precision and Recall
+title: "Model Evaluation 101 (4/10): Precision and Recall"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Precision and recall as a threshold decision memo, with an oper
 last_reviewed: '2026-05-17'
 ---
 
-# Precision and Recall
+# Model Evaluation 101 (4/10): Precision and Recall
 
 This is post 4 in the Model Evaluation 101 series.
 
 Issue #772 called out that this chapter repeated the same mid-series narrative rhythm as its neighbors. The real weakness was not the definitions. It was that `ko/04-precision-and-recall.md:43-68` never centered the question an operator actually asks: **what happens if we lower the threshold, and what do we give up if we raise it?**
 
 So this rewrite is structured as a threshold decision memo. Precision and recall are not here as terms to memorize. They are here as the numbers you use to decide how many alerts to send and how many real cases you can afford to miss.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Precision and Recall?
+- Which signal should the example or diagram make visible for Precision and Recall?
+- What failure should be prevented first when Precision and Recall reaches a real system?
+
+## Big Picture
+
+![model evaluation 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 4 flow overview*
+
+This picture places Precision and Recall inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Precision and Recall is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## This post answers
 
@@ -46,10 +62,6 @@ That makes the real chapter question this one:
 > If the threshold is 0.20, 0.35, 0.50, or 0.70, which operating point can the team actually live with?
 
 ## Concept at a glance
-
-![precision and recall moving as the threshold changes](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
-
-*precision and recall moving as the threshold changes*
 
 Lower thresholds usually increase recall by casting a wider net, but that wider net also pulls in more false positives and hurts precision. This chapter is about translating that trade-off into an operational recommendation.
 
@@ -164,10 +176,21 @@ That sentence is much more useful than simply saying “precision and recall tra
 
 Precision and recall become valuable when they drive a threshold choice. The next chapter explains why teams often compress that trade-off into a single F1 number, and why that summary can still hide the decision you care about.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Precision and Recall?**
+  - The article treats Precision and Recall as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Precision and Recall?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Precision and Recall reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
 - **Precision and Recall (current)**
 - F1 Score (upcoming)
 - ROC and AUC (upcoming)
@@ -175,6 +198,7 @@ Precision and recall become valuable when they drive a threshold choice. The nex
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

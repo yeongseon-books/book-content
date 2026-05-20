@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 7
-title: 확률 보정 이해하기
+title: "Model Evaluation 101 (7/10): 확률 보정 이해하기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 분류 모델의 확률값이 실제 빈도와 일치하도록 
 last_reviewed: '2026-05-15'
 ---
 
-# 확률 보정 이해하기
+# Model Evaluation 101 (7/10): 확률 보정 이해하기
 
 모델이 0.8의 확률을 예측했다고 할 때, 우리는 보통 그 숫자를 직관적으로 받아들입니다. 하지만 그 0.8이 실제로도 10번 중 8번 정도 맞는지를 확인하지 않으면, 그 숫자는 점수처럼 보일 뿐 확률이라고 부르기 어렵습니다. 바로 이 지점을 다루는 개념이 calibration입니다.
 
@@ -28,17 +28,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Model Evaluation 101 시리즈의 7번째 글입니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 모델이 예측한 확률을 왜 그대로 믿으면 안 될까요?
 - 신뢰도 곡선은 무엇을 보여 줄까요?
 - Brier 점수는 어떤 종류의 오류를 요약할까요?
-- Platt 보정과 isotonic 보정은 언제 다르게 쓰일까요?
-- 보정 뒤에 임계값을 다시 조정해야 하는 이유는 무엇일까요?
 
-> 보정은 모델이 양성과 음성을 잘 가르는지 묻는 작업이 아닙니다. 모델이 말한 확률이 실제 빈도와 얼마나 맞는지 묻는 작업입니다. 그래서 AUC와는 다른 축의 평가입니다.
+## 큰 그림
+
+![Model Evaluation 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Model Evaluation 101 7장 흐름 개요*
+
+이 그림에서는 확률 보정 이해하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 확률 보정 이해하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![예측 확률 구간과 실제 빈도를 비교하는 보정 흐름](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
-
-*예측 확률 구간과 실제 빈도를 비교하는 보정 흐름*
 예측 확률 구간별 평균과 실제 양성 빈도를 나란히 놓고 비교해야 합니다. 두 값이 대각선 위에 가깝게 맞아야 확률이 정직하다고 말할 수 있습니다.
 
 ## 핵심 용어
@@ -143,17 +144,29 @@ print("brier (isotonic):", brier_score_loss(yte, iso.predict_proba(Xte)[:, 1]))
 
 보정은 모델이 얼마나 잘 맞히는가보다, 모델이 말한 확률을 얼마나 믿을 수 있는가를 다룹니다. 순위 성능과 확률 성능은 다르며, 운영에서는 둘 다 중요합니다. 다음 글에서는 한 번의 분할에 기대지 않고 평가 추정치의 안정성을 보는 교차 검증으로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **모델이 예측한 확률을 왜 그대로 믿으면 안 될까요?**
+  - 본문의 기준은 확률 보정 이해하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **신뢰도 곡선은 무엇을 보여 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Brier 점수는 어떤 종류의 오류를 요약할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
-- [훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
-- [정확도의 한계](./03-limits-of-accuracy.md)
-- [정밀도와 재현율](./04-precision-and-recall.md)
-- [F1 점수](./05-f1-score.md)
-- [ROC와 AUC 이해하기](./06-roc-and-auc.md)
+## 시리즈 목차
+
+- [Model Evaluation 101 (1/10): 모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): 훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): 정확도의 한계](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): 정밀도와 재현율](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 점수](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC와 AUC 이해하기](./06-roc-and-auc.md)
 - **확률 보정 이해하기 (현재 글)**
 - 교차 검증 이해하기 (예정)
 - 오류 분석으로 약점 찾기 (예정)
 - 평가 리포트 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

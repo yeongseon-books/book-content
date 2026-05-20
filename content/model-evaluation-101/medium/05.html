@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>F1 Score</title>
+<title>Model Evaluation 101 (5/10): F1 Score</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,116 +53,228 @@
 </style>
 </head>
 <body>
-<h1>F1 Score</h1>
-<p>Once you understand why precision and recall both matter, the next temptation is obvious: compress them into a single score. F1 is usually the first answer because it is compact, easy to compare, and common in reports and leaderboards.</p>
-<p>But every summary discards detail. F1 tells you how balanced precision and recall are, yet it does not tell you which class is weak, which averaging mode was used, or whether the business cares more about misses than false alarms. It is a useful headline, not a full diagnosis.</p>
-<p>This is post 5 in the Model Evaluation 101 series. In this post, we unpack standard F1, F-beta, and the averaging choices that make superficially similar scores mean different things.</p>
-<h2>Questions this post answers</h2>
+<h1>Model Evaluation 101 (5/10): F1 Score</h1>
+<p>This is post 5 in the Model Evaluation 101 series.</p>
+<p>Once precision and recall are framed as a threshold memo, teams immediately ask for one compact number. F1 is usually the answer. The problem is that the earlier version of this chapter used <code>ko/05-f1-score.md:109-118</code> to sweep thresholds on the same binary data that was used for training, which teaches exactly the optimistic tuning pattern the series should avoid.</p>
+<p>This rewrite fixes that defect directly. F1 is still useful, but threshold selection now follows the correct <strong>train → validation → test</strong> flow. At the same time, macro, micro, and weighted F1 are connected back to the review question they actually answer.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The formula and intuition behind F1</li>
-<li>F-beta for recall-heavy vs precision-heavy use cases</li>
-<li>Macro, micro, and weighted averaging</li>
-<li>What F1 means under class imbalance</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying F1 Score?</li>
+<li>Which signal should the example or diagram make visible for F1 Score?</li>
+<li>What failure should be prevented first when F1 Score reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 5 flow overview</em></p>
+<p>This picture places F1 Score inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>F1 is a compact summary, not a complete explanation. You still need to name the averaging mode, the class behavior behind it, and the cost trade-off it hides.</p>
+<p>The core of F1 Score is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<h2>Why It Matters</h2>
-<p>Leaderboards usually report a single F1 number. Without specifying which F1, two models cannot be compared.</p>
-<h2>Concept at a Glance</h2>
-<p><img alt="f1 summary branching into averaging modes and f-beta choices" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>f1 summary branching into averaging modes and f-beta choices</em></p>
-<h2>Key Terms</h2>
+<h2>This post answers</h2>
 <ul>
-<li><strong>F1</strong>: <code>2*P*R/(P+R)</code>.</li>
-<li><strong>F-beta</strong>: <code>beta&gt;1</code> favors recall, <code>beta&lt;1</code> favors precision.</li>
-<li><strong>Macro</strong>: simple average of per-class F1.</li>
-<li><strong>Micro</strong>: aggregate TP, FP, FN first, then compute.</li>
-<li><strong>Weighted</strong>: weighted by class frequency.</li>
+<li>What review question do macro, micro, and weighted F1 each answer?</li>
+<li>Why is threshold tuning on the training data itself optimistic?</li>
+<li>Why might the best validation F1 threshold still be the wrong production threshold?</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "F1 is 0.78."</p>
-<p><strong>After</strong>: "macro F1 is 0.78, F2 is 0.82, per-class F1 is ..."</p>
-<h2>Hands-on: 5 Steps Comparing F1 Variants</h2>
-<p><strong>Step 1 — Data and model</strong></p>
+<h2>What F1 can summarize and what it cannot</h2>
+<p>F1 is the harmonic mean of precision and recall, so it drops whenever either side collapses. That is useful. But F1 is still a summary.</p>
+<ul>
+<li>It can hide which averaging mode was used.</li>
+<li>It can hide which class is weak.</li>
+<li>It can hide which threshold produced the number.</li>
+<li>It can hide whether the threshold was tuned on the wrong split.</li>
+</ul>
+<p>So the right question is not “what is the F1?” but “which F1, chosen how, and for what decision?”</p>
+<h2>Concept at a glance</h2>
+<p>This chapter has two branching points: which averaging mode you use in multiclass evaluation, and which threshold you lock in for the binary operating policy.</p>
+<h2>Part 1 — The same predictions produce different F1 summaries</h2>
 <pre><code class="language-python">from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-X, y = make_classification(n_samples=2000, n_classes=3, n_informative=5, weights=[0.6, 0.3, 0.1], random_state=0)
-Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-pred = m.predict(Xte)
+from sklearn.metrics import f1_score, fbeta_score
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=3200,
+    n_features=12,
+    n_informative=6,
+    n_redundant=2,
+    n_classes=3,
+    n_clusters_per_class=1,
+    weights=[0.65, 0.25, 0.10],
+    class_sep=1.1,
+    flip_y=0.02,
+    random_state=11,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    stratify=y,
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print(&quot;micro:&quot;, round(f1_score(y_test, pred, average=&quot;micro&quot;), 3))
+print(&quot;macro:&quot;, round(f1_score(y_test, pred, average=&quot;macro&quot;), 3))
+print(&quot;weighted:&quot;, round(f1_score(y_test, pred, average=&quot;weighted&quot;), 3))
+print(&quot;per class:&quot;, [round(x, 3) for x in f1_score(y_test, pred, average=None)])
+print(&quot;F2 macro:&quot;, round(fbeta_score(y_test, pred, beta=2, average=&quot;macro&quot;), 3))
+print(&quot;F0.5 macro:&quot;, round(fbeta_score(y_test, pred, beta=0.5, average=&quot;macro&quot;), 3))
 </code></pre>
-<p><strong>Step 2 — F1 averaging</strong></p>
-<pre><code class="language-python">from sklearn.metrics import f1_score
-print(&quot;micro:&quot;, f1_score(yte, pred, average=&quot;micro&quot;))
-print(&quot;macro:&quot;, f1_score(yte, pred, average=&quot;macro&quot;))
-print(&quot;weighted:&quot;, f1_score(yte, pred, average=&quot;weighted&quot;))
+<p>Expected output:</p>
+<pre><code class="language-text">micro: 0.927
+macro: 0.881
+weighted: 0.925
+per class: [0.952, 0.923, 0.768]
+F2 macro: 0.866
+F0.5 macro: 0.900
 </code></pre>
-<p><strong>Step 3 — Per-class F1</strong></p>
-<pre><code class="language-python">print(&quot;per class:&quot;, f1_score(yte, pred, average=None))
-</code></pre>
-<p><strong>Step 4 — F-beta</strong></p>
-<pre><code class="language-python">from sklearn.metrics import fbeta_score
-print(&quot;F2 (recall heavy):&quot;, fbeta_score(yte, pred, beta=2, average=&quot;macro&quot;))
-print(&quot;F0.5 (precision heavy):&quot;, fbeta_score(yte, pred, beta=0.5, average=&quot;macro&quot;))
-</code></pre>
-<p><strong>Step 5 — Threshold vs F1 (binary case)</strong></p>
+<p>Those numbers answer different questions.</p>
+<ul>
+<li><strong>Micro F1 = 0.927</strong>: dominated by total volume, so the majority class matters most.</li>
+<li><strong>Macro F1 = 0.881</strong>: every class gets an equal vote.</li>
+<li><strong>Weighted F1 = 0.925</strong>: tracks the original class distribution.</li>
+<li><strong>Per-class F1 = [0.952, 0.923, 0.768]</strong>: the third class is the real weakness.</li>
+</ul>
+<p>That is why <code>F1=0.92</code> is incomplete unless you name the averaging mode.</p>
+<h2>Part 2 — Threshold selection must use train, validation, and test separately</h2>
+<p>Now we fix the exact issue #772 defect. The binary example below does <strong>not</strong> train and tune on the same data.</p>
 <pre><code class="language-python">import numpy as np
 from sklearn.datasets import make_classification
-Xb, yb = make_classification(n_samples=1000, weights=[0.8, 0.2], random_state=1)
-mb = LogisticRegression(max_iter=1000).fit(Xb, yb)
-proba = mb.predict_proba(Xb)[:, 1]
-for t in np.arange(0.2, 0.9, 0.1):
-    p = (proba &gt;= t).astype(int)
-    print(round(t, 1), round(f1_score(yb, p), 3))
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=4000,
+    n_features=10,
+    n_informative=5,
+    n_redundant=2,
+    weights=[0.88, 0.12],
+    class_sep=1.0,
+    flip_y=0.02,
+    random_state=19,
+)
+
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X,
+    y,
+    test_size=0.4,
+    stratify=y,
+    random_state=42,
+)
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp,
+    y_temp,
+    test_size=0.5,
+    stratify=y_temp,
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+val_proba = model.predict_proba(X_val)[:, 1]
+test_proba = model.predict_proba(X_test)[:, 1]
+
+thresholds = np.arange(0.10, 0.91, 0.05)
+rows = []
+for threshold in thresholds:
+    val_pred = (val_proba &gt;= threshold).astype(int)
+    rows.append(
+        (
+            round(float(threshold), 2),
+            f1_score(y_val, val_pred),
+            precision_score(y_val, val_pred, zero_division=0),
+            recall_score(y_val, val_pred, zero_division=0),
+        )
+    )
+
+best_threshold, best_val_f1, _, _ = max(rows, key=lambda row: row[1])
+print(&quot;validation sweep:&quot;)
+for threshold, f1, precision, recall in rows:
+    if threshold in {0.20, 0.30, 0.50, 0.70}:
+        print(threshold, round(f1, 3), round(precision, 3), round(recall, 3))
+
+print(&quot;best validation threshold:&quot;, best_threshold, round(best_val_f1, 3))
+
+locked_test_pred = (test_proba &gt;= best_threshold).astype(int)
+print(
+    &quot;locked test:&quot;,
+    round(f1_score(y_test, locked_test_pred), 3),
+    round(precision_score(y_test, locked_test_pred), 3),
+    round(recall_score(y_test, locked_test_pred), 3),
+)
+
+business_pred = (test_proba &gt;= 0.50).astype(int)
+print(
+    &quot;business threshold 0.50:&quot;,
+    round(f1_score(y_test, business_pred), 3),
+    round(precision_score(y_test, business_pred), 3),
+    round(recall_score(y_test, business_pred), 3),
+)
 </code></pre>
-<p><strong>Expected output:</strong> You should see micro, macro, and weighted F1 disagree on the same predictions, and the binary threshold sweep should make it obvious that F1 itself moves when the operating point moves.</p>
-<h2>What to Notice in This Code</h2>
+<p>Expected output:</p>
+<pre><code class="language-text">validation sweep:
+0.20 0.596 0.485 0.775
+0.30 0.585 0.564 0.608
+0.50 0.503 0.776 0.373
+0.70 0.354 0.821 0.225
+best validation threshold: 0.2 0.596
+locked test: 0.627 0.527 0.775
+business threshold 0.50: 0.490 0.717 0.373
+</code></pre>
+<h2>Why this procedure matters</h2>
+<p>On the validation split, the best F1 threshold is <strong>0.20</strong>. Once that threshold is chosen, it is locked and carried unchanged to the test split, where it produces <code>F1=0.627</code>, <code>precision=0.527</code>, and <code>recall=0.775</code>.</p>
+<p>That is the correct question: does the policy selected on validation survive on held-out data?</p>
+<p>If you train and tune on the same data, you allow threshold choice to absorb chance patterns from the training sample. That is the optimistic workflow issue #772 explicitly asked us to remove.</p>
+<h2>The best F1 threshold may still be the wrong business threshold</h2>
+<p>Not every team should ship the threshold that maximizes validation F1.</p>
+<p>In this example, 0.20 wins on F1, but on the test split it also creates many false alarms. Threshold <strong>0.50</strong> has a lower F1, yet precision climbs to <strong>0.717</strong>. If reviewer fatigue is the dominant cost, 0.50 may still be the better operating choice.</p>
+<p>That leads to the real review question.</p>
 <ul>
-<li>Macro F1 treats minority classes equally.</li>
-<li>Micro F1 is dominated by the majority class.</li>
-<li>Weighted F1 mirrors the class distribution as is.</li>
+<li>Is the goal to miss fewer positives? Then 0.20 is attractive.</li>
+<li>Is the goal to protect a limited false-positive budget? Then 0.50 may be safer.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
-<ol>
-<li>Reporting F1 without naming the averaging mode.</li>
-<li>Misreading macro F1 on imbalanced data.</li>
-<li>Ignoring per-class precision and recall behind F1.</li>
-<li>Choosing F-beta beta arbitrarily instead of from cost.</li>
-<li>Skipping the F1 vs threshold curve.</li>
-</ol>
-<h2>How This Shows Up in Production</h2>
-<p>Competitions love a single F1 for ranking. In production, per-class F1 and the threshold curve matter more.</p>
-<h2>How a Senior Engineer Thinks</h2>
+<p>F1 tells you about balance. It does not, by itself, encode policy.</p>
+<h2>F-beta is how you stop hiding the cost preference</h2>
+<p>In the multiclass example, <code>F2 macro=0.866</code> and <code>F0.5 macro=0.900</code> differ because the metric itself changes what it values.</p>
 <ul>
-<li>A single F1 is a starting line, not a verdict.</li>
-<li>Beta comes from cost, not taste.</li>
-<li>Macro and micro answer different questions.</li>
-<li>Sweep the threshold to find the F1 peak.</li>
-<li>Read per-class F1 to find weaknesses.</li>
+<li><strong>F2</strong> weights recall more heavily.</li>
+<li><strong>F0.5</strong> weights precision more heavily.</li>
 </ul>
+<p>So beta should come from cost structure, not personal taste. If misses are more expensive, a recall-heavy beta makes sense. If false alarms are more expensive, a precision-heavy beta makes sense.</p>
+<h2>What a solid review sentence sounds like</h2>
+<blockquote>
+<p>Macro F1 is 0.881, but the minority class remains weaker at 0.768 per-class F1. For the binary operating policy, threshold 0.20 maximized validation F1 and delivered test F1 0.627 with precision 0.527 and recall 0.775. However, if the review team cannot absorb that false-positive rate, a stricter threshold such as 0.50 should be considered despite its lower F1.</p>
+</blockquote>
+<p>That sentence keeps the convenience of F1 without hiding the averaging mode, threshold procedure, or operating trade-off.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I name the averaging mode.</li>
-<li>[ ] I report per-class F1.</li>
-<li>[ ] I justify the choice of beta.</li>
-<li>[ ] I plot F1 versus threshold.</li>
+<li>[ ] I name the F1 averaging mode.</li>
+<li>[ ] I inspect per-class F1, not just the aggregate.</li>
+<li>[ ] I separate train, validation, and test for threshold choice.</li>
+<li>[ ] I lock the chosen validation threshold before evaluating on test.</li>
+<li>[ ] I state whether the highest-F1 threshold is also the preferred business threshold.</li>
 </ul>
-<h2>Practice Problems</h2>
-<ol>
-<li>Explain how macro, micro, and weighted F1 differ on a 3-class problem.</li>
-<li>Pick an F-beta beta when recall is twice as important as precision.</li>
-<li>Find the threshold that maximizes F1 on the binary example.</li>
-</ol>
-<h2>Wrap-up and Next Steps</h2>
-<p>F1 summarizes; it does not diagnose. Next, ROC and AUC give a threshold-free view.</p>
+<h2>Wrap-up</h2>
+<p>F1 is still a useful summary, but only after you make its hidden choices explicit. The next chapter zooms out to ROC and AUC for threshold-free ranking quality, then brings the conversation back down to the operating threshold you still have to choose in the end.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
+<li><strong>What boundary should you inspect first when applying F1 Score?</strong></li>
+<li>The article treats F1 Score as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for F1 Score?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when F1 Score reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Model Evaluation 101 (2/10): Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">Model Evaluation 101 (3/10): The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Model Evaluation 101 (4/10): Precision and Recall</a></li>
 <li><strong>F1 Score (current)</strong></li>
 <li>ROC and AUC (upcoming)</li>
 <li>Calibration (upcoming)</li>
@@ -174,8 +286,8 @@ for t in np.arange(0.2, 0.9, 0.1):
 <ul>
 <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">scikit-learn — f1_score</a></li>
 <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html">scikit-learn — fbeta_score</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html">scikit-learn — precision_recall_fscore_support</a></li>
 <li><a href="https://en.wikipedia.org/wiki/F-score">Wikipedia — F-score</a></li>
-<li><a href="https://developers.google.com/machine-learning/crash-course/classification/precision-and-recall">Google — Classification metrics</a></li>
 </ul>
 <p class="tags-line">Tags: ModelEvaluation, F1Score, Fbeta, ImbalancedData, scikit-learn</p>
 </body>

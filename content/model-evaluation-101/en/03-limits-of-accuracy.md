@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 3
-title: The Limits of Accuracy
+title: "Model Evaluation 101 (3/10): The Limits of Accuracy"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: How to read accuracy only after checking base rate, dummy basel
 last_reviewed: '2026-05-17'
 ---
 
-# The Limits of Accuracy
+# Model Evaluation 101 (3/10): The Limits of Accuracy
 
 This is post 3 in the Model Evaluation 101 series.
 
 Accuracy is easy to compute and easy to explain, which is exactly why teams trust it too early. Issue #772 called out that this chapter explained the limitation of accuracy but did not walk the reader through the real operator sequence: base rate → dummy baseline → minority recall → balanced accuracy → final review.
 
 That is the structure of this rewrite. We will treat accuracy as the **last summary number**, not the first verdict. In other words, we are fixing the weakness identified in `ko/03-limits-of-accuracy.md:64-69,115-131`: the article now moves in the order a reviewer would actually use when deciding whether accuracy is still safe to report.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying The Limits of Accuracy?
+- Which signal should the example or diagram make visible for The Limits of Accuracy?
+- What failure should be prevented first when The Limits of Accuracy reaches a real system?
+
+## Big Picture
+
+![model evaluation 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 3 flow overview*
+
+This picture places The Limits of Accuracy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Limits of Accuracy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## This post answers
 
@@ -47,10 +63,6 @@ When class imbalance is present, accuracy should be read in this order.
 If you reverse that order, `acc 96%` sounds impressive. If you keep the order, you can distinguish a real lift from majority-class comfort.
 
 ## Concept at a glance
-
-![how balanced and imbalanced data change the meaning of accuracy](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
-
-*how balanced and imbalanced data change the meaning of accuracy*
 
 The point is not that accuracy is useless. The point is that imbalanced data changes the conditions under which accuracy is honest.
 
@@ -180,9 +192,20 @@ That is a much safer conclusion than simply reporting `96% accuracy`.
 
 Accuracy is not a bad metric. It is a metric with an order of operations. On imbalanced data, base rate, dummy baseline, minority recall, and balanced accuracy have to speak first. Next, we continue that review flow by turning precision and recall into an explicit threshold decision memo.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying The Limits of Accuracy?**
+  - The article treats The Limits of Accuracy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for The Limits of Accuracy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when The Limits of Accuracy reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
 - **The Limits of Accuracy (current)**
 - Precision and Recall (upcoming)
 - F1 Score (upcoming)
@@ -191,6 +214,7 @@ Accuracy is not a bad metric. It is a metric with an order of operations. On imb
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

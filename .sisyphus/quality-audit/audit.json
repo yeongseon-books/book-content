@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-20T11:26:40+00:00",
+  "generated_at": "2026-05-20T11:27:16+00:00",
   "series_count": 92,
-  "problem_series_count": 56,
+  "problem_series_count": 55,
   "series_with_5_plus": 42,
   "gate": null,
   "gate_failed_series": [],
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 5,
+    "Shrt": 2,
     "NoEn": 0,
-    "all": 537
+    "all": 534
   },
   "results": [
     {
@@ -13196,104 +13196,6 @@
       }
     },
     {
-      "series": "model-evaluation-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 3,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 3,
-      "max_issue_kind": "Shrt",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/01-why-evaluation-is-hard.md",
-            "line": 22,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "01-why-evaluation-is-hard.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/07-calibration.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "07-calibration.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/08-cross-validation.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "08-cross-validation.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/01-why-evaluation-is-hard.md",
-            "line": 22,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "01-why-evaluation-is-hard.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/07-calibration.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "07-calibration.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/model-evaluation-101/ko/08-cross-validation.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "08-cross-validation.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "ai-agent-101",
       "counts": {
         "Synt": 0,
@@ -13961,6 +13863,20 @@
     },
     {
       "series": "math-for-cs-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "model-evaluation-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

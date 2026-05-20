@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>ROC and AUC</title>
+<title>Model Evaluation 101 (6/10): ROC and AUC</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,112 +53,199 @@
 </style>
 </head>
 <body>
-<h1>ROC and AUC</h1>
-<p>Sometimes you want to compare models before you commit to one production threshold. That is the main job of ROC curves and AUC. They let you inspect how well a model ranks positives ahead of negatives across many possible cutoffs.</p>
-<p>That convenience can also mislead teams. Production never runs on "all thresholds." It runs on one threshold with one false-positive budget and one recall target. ROC and AUC are comparison tools, not deployment decisions.</p>
-<p>This is post 6 in the Model Evaluation 101 series. In this post, we separate ranking quality from operating policy and show why PR-AUC often has to sit next to ROC-AUC.</p>
-<h2>Questions this post answers</h2>
+<h1>Model Evaluation 101 (6/10): ROC and AUC</h1>
+<p>This is post 6 in the Model Evaluation 101 series.</p>
+<p>ROC curves and AUC are useful when you want to compare candidate models before committing to one production threshold. But issue #772 correctly pointed out that the earlier version stopped at <code>ko/06-roc-and-auc.md:84-115</code>: it showed <code>thr[:3]</code>, AUC, PR-AUC, and one <code>FPR&lt;=0.05</code> lookup, then never landed on an actual operating decision.</p>
+<p>This rewrite finishes that story. We will use ROC-AUC as a ranking-quality summary, compare it with PR-AUC on the same imbalanced dataset, then turn an <code>FPR &lt;= 0.05</code> policy into a concrete threshold, confusion matrix, precision/recall pair, and simple decision cost.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The axes and meaning of the ROC curve</li>
-<li>The probabilistic interpretation of AUC</li>
-<li>How PR and ROC curves disagree</li>
-<li>The AUC trap on imbalanced data</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying ROC and AUC?</li>
+<li>Which signal should the example or diagram make visible for ROC and AUC?</li>
+<li>What failure should be prevented first when ROC and AUC reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 6 flow overview</em></p>
+<p>This picture places ROC and AUC inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>ROC and AUC summarize ranking quality across thresholds. Production still has to choose one threshold and live with its actual false-positive and recall trade-offs.</p>
+<p>The core of ROC and AUC is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<h2>Why It Matters</h2>
-<p>AUC is convenient because it avoids picking a threshold, but production decisions live at one specific threshold.</p>
-<h2>Concept at a Glance</h2>
-<p><img alt="ranking flow from model scores to roc and pr views" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>ranking flow from model scores to roc and pr views</em></p>
-<h2>Key Terms</h2>
+<h2>This post answers</h2>
 <ul>
-<li><strong>TPR</strong>: same as recall.</li>
-<li><strong>FPR</strong>: <code>FP/(FP+TN)</code>.</li>
-<li><strong>ROC</strong>: TPR vs FPR as the threshold sweeps.</li>
-<li><strong>AUC-ROC</strong>: probability that a random positive scores higher than a random negative.</li>
-<li><strong>AUC-PR</strong>: area under the precision-recall curve, more sensitive on imbalance.</li>
+<li>Why can ROC-AUC and PR-AUC feel very different on the same dataset?</li>
+<li>How do you turn an <code>FPR &lt;= 0.05</code> policy into a threshold and confusion matrix?</li>
+<li>When does a decent AUC still lead to a “not ready to launch” conclusion?</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "AUC 0.9, ship it."</p>
-<p><strong>After</strong>: "AUC 0.9, plus precision and recall at the operating threshold, plus PR-AUC for imbalance."</p>
-<h2>Hands-on: 5 Steps Through ROC and AUC</h2>
-<p><strong>Step 1 — Data and model</strong></p>
-<pre><code class="language-python">from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-X, y = make_classification(n_samples=2000, weights=[0.9, 0.1], random_state=0)
-Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
-m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
-proba = m.predict_proba(Xte)[:, 1]
-</code></pre>
-<p><strong>Step 2 — ROC curve</strong></p>
-<pre><code class="language-python">from sklearn.metrics import roc_curve
-fpr, tpr, thr = roc_curve(yte, proba)
-print(&quot;first 3 thresholds:&quot;, thr[:3])
-</code></pre>
-<p><strong>Step 3 — AUC</strong></p>
-<pre><code class="language-python">from sklearn.metrics import roc_auc_score
-print(&quot;AUC-ROC:&quot;, roc_auc_score(yte, proba))
-</code></pre>
-<p><strong>Step 4 — Compare with PR-AUC</strong></p>
-<pre><code class="language-python">from sklearn.metrics import average_precision_score
-print(&quot;AUC-PR:&quot;, average_precision_score(yte, proba))
-</code></pre>
-<p><strong>Step 5 — Pick an operating threshold</strong></p>
+<h2>The final question of this chapter</h2>
+<p>The real question is not “what is the AUC?” It is this one.</p>
+<blockquote>
+<p>If AUC looks decent, what do we actually pay at the threshold we are allowed to deploy?</p>
+</blockquote>
+<p>Without that question, ROC-AUC stays a nice-looking summary. With it, the whole 03–06 metrics arc lands in an operational judgment.</p>
+<h2>Concept at a glance</h2>
+<p>ROC and PR both start from score ranking. Deployment does not. Deployment happens at one threshold, so the curve analysis has to come back down to one confusion matrix.</p>
+<h2>Code that goes from curve summary to deployment choice</h2>
 <pre><code class="language-python">import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    average_precision_score,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(
+    n_samples=5000,
+    n_features=12,
+    n_informative=5,
+    n_redundant=3,
+    weights=[0.96, 0.04],
+    class_sep=1.2,
+    flip_y=0.02,
+    random_state=31,
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.3,
+    stratify=y,
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=4000).fit(X_train, y_train)
+proba = model.predict_proba(X_test)[:, 1]
+
+fpr, tpr, thresholds = roc_curve(y_test, proba)
+print(&quot;ROC-AUC:&quot;, round(roc_auc_score(y_test, proba), 3))
+print(&quot;PR-AUC:&quot;, round(average_precision_score(y_test, proba), 3))
+
 target_fpr = 0.05
-idx = np.searchsorted(fpr, target_fpr)
-print(&quot;threshold for FPR&lt;=0.05:&quot;, thr[idx], &quot;TPR:&quot;, tpr[idx])
+idx = max(i for i, value in enumerate(fpr) if value &lt;= target_fpr)
+threshold = thresholds[idx]
+pred = (proba &gt;= threshold).astype(int)
+
+cm = confusion_matrix(y_test, pred)
+tn, fp, fn, tp = cm.ravel()
+precision = precision_score(y_test, pred, zero_division=0)
+recall = recall_score(y_test, pred, zero_division=0)
+decision_cost = fp * 1 + fn * 10
+
+print(&quot;chosen threshold:&quot;, round(float(threshold), 3))
+print(&quot;FPR:&quot;, round(fp / (fp + tn), 3))
+print(&quot;precision:&quot;, round(precision, 3))
+print(&quot;recall:&quot;, round(recall, 3))
+print(&quot;confusion matrix:&quot;, cm.tolist())
+print(&quot;cost (FP=1, FN=10):&quot;, decision_cost)
 </code></pre>
-<p><strong>Expected output:</strong> You should get one threshold-free ranking summary from ROC-AUC, a more imbalance-sensitive summary from PR-AUC, and a concrete threshold you can defend once an FPR budget is fixed.</p>
-<h2>What to Notice in This Code</h2>
+<p>Expected output:</p>
+<pre><code class="language-text">ROC-AUC: 0.819
+PR-AUC: 0.463
+chosen threshold: 0.141
+FPR: 0.049
+precision: 0.352
+recall: 0.507
+confusion matrix: [[1355, 70], [37, 38]]
+cost (FP=1, FN=10): 440
+</code></pre>
+<h2>First conclusion: ROC-AUC and PR-AUC are not telling the same story</h2>
+<p>The ROC-AUC is <strong>0.819</strong>, which sounds fairly solid. The PR-AUC is only <strong>0.463</strong>. On low-base-rate problems, that difference matters. ROC-AUC summarizes ranking separation between positives and negatives. PR-AUC is far more sensitive to whether the model surfaces positive cases with usable precision.</p>
+<p>So “AUC looks good” is still too vague. PR-AUC adds the missing warning that positive-case quality may be weaker than the ROC summary suggests.</p>
+<h2>What happens under an explicit FPR budget?</h2>
+<p>Suppose the operating policy says <code>FPR &lt;= 0.05</code>. Under that constraint, the chosen threshold in this example is <strong>0.141</strong>.</p>
+<p>At that point, the model produces:</p>
 <ul>
-<li>AUC measures ranking quality and is less sensitive to distribution.</li>
-<li>PR-AUC reacts strongly to imbalance, which is often what you want.</li>
-<li>Operating thresholds are usually fixed by an FPR or recall constraint.</li>
+<li>precision <strong>0.352</strong></li>
+<li>recall <strong>0.507</strong></li>
+<li>confusion matrix <code>[[1355, 70], [37, 38]]</code></li>
 </ul>
-<h2>Five Common Mistakes</h2>
-<ol>
-<li>Trusting AUC alone on heavy imbalance.</li>
-<li>Mixing ROC and PR comparisons across models.</li>
-<li>Shipping without nailing down the threshold.</li>
-<li>Tuning the threshold without calibrating probabilities.</li>
-<li>Assuming AUC 0.5 always means "random."</li>
-</ol>
-<h2>How This Shows Up in Production</h2>
-<p>Risk-scoring models choose between candidates by AUC. Alerting systems pin a maximum FPR and read TPR off the curve.</p>
-<h2>How a Senior Engineer Thinks</h2>
+<p>That means the false-positive budget is respected, but only about half of the true positives are caught. This is the step the previous version was missing: the curve point is now translated into operational impact.</p>
+<h2>Compare the threshold candidates side by side</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Threshold</th>
+<th>FPR</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>Operational reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.10</td>
+<td>0.081</td>
+<td>0.275</td>
+<td>0.587</td>
+<td>Better recall, but it violates the 5% FPR policy.</td>
+</tr>
+<tr>
+<td>0.141</td>
+<td>0.049</td>
+<td>0.352</td>
+<td>0.507</td>
+<td>Highest recall that still fits the FPR budget.</td>
+</tr>
+<tr>
+<td>0.20</td>
+<td>0.023</td>
+<td>0.500</td>
+<td>0.440</td>
+<td>Safer on false positives, but misses more real positives.</td>
+</tr>
+</tbody>
+</table>
+<p>This is the table that turns “the curve looks good” into “these are the actual choices.”</p>
+<h2>Add a simple cost frame and the trade-off becomes concrete</h2>
+<p>The code above uses a deliberately simple cost function: <code>FP=1</code>, <code>FN=10</code>. At threshold 0.141, the total cost is <strong>440</strong>.</p>
 <ul>
-<li>AUC is a comparison summary, not a deployment decision.</li>
-<li>Add PR-AUC under imbalance.</li>
-<li>Fix the threshold from an FPR or recall budget.</li>
-<li>Watch AUC drift over time.</li>
-<li>Look at per-class AUC where it applies.</li>
+<li>70 false positives × 1 = 70</li>
+<li>37 false negatives × 10 = 370</li>
+<li>total = 440</li>
 </ul>
+<p>An interesting detail is that threshold 0.10 can look cheaper overall at <strong>426</strong>, but it fails the policy because <code>FPR=0.081</code>. That is the point: <strong>cost minimization and policy compliance are not the same thing</strong>. Production usually needs both.</p>
+<h2>So is the model deployable?</h2>
+<p>Now we can ask the final question.</p>
+<blockquote>
+<p>Under <code>FPR &lt;= 0.05</code>, is recall 0.507 good enough?</p>
+</blockquote>
+<p>If the team requirement is “catch at least 60% of positives,” then the answer is no. The model is not ready under the current policy budget because the best compliant operating point still reaches only about 50.7% recall.</p>
+<p>That leads to a much stronger recommendation than “ROC-AUC is 0.819.”</p>
+<blockquote>
+<p>The model has decent ranking quality, but under the current <code>FPR &lt;= 0.05</code> deployment policy it reaches only 0.507 recall. If the recall target is stricter, the team should improve the model or revisit the operating policy before launch.</p>
+</blockquote>
+<p>That is the missing last mile from curve summary to deployment decision.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I report AUC-ROC.</li>
-<li>[ ] I report AUC-PR for imbalance.</li>
-<li>[ ] I document the operating threshold.</li>
-<li>[ ] I monitor AUC drift in production.</li>
+<li>[ ] I report ROC-AUC and PR-AUC together.</li>
+<li>[ ] I write down the operating constraint first.</li>
+<li>[ ] I show the confusion matrix at the chosen threshold.</li>
+<li>[ ] I report precision and recall in the same paragraph.</li>
+<li>[ ] I use a simple cost frame when it helps explain the policy trade-off.</li>
 </ul>
-<h2>Practice Problems</h2>
-<ol>
-<li>Find the TPR achievable at FPR &lt;= 0.01.</li>
-<li>Show how AUC-ROC and AUC-PR diverge on heavily imbalanced data.</li>
-<li>Construct two models with the same AUC that make different operating decisions.</li>
-</ol>
-<h2>Wrap-up and Next Steps</h2>
-<p>ROC and AUC speak the language of ranking. Next, calibration asks whether the predicted probabilities themselves are trustworthy.</p>
+<h2>Wrap-up</h2>
+<p>ROC and AUC are useful because they summarize ranking quality before you lock a threshold. But deployment still happens at one threshold, with one confusion matrix, under one set of constraints. That closes the metrics arc from baselines in episode 03, to threshold trade-offs in episode 04, to F1 summary limits in episode 05, and finally to operating-point selection here.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
+<li><strong>What boundary should you inspect first when applying ROC and AUC?</strong></li>
+<li>The article treats ROC and AUC as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for ROC and AUC?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when ROC and AUC reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Model Evaluation 101 (2/10): Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">Model Evaluation 101 (3/10): The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Model Evaluation 101 (4/10): Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">Model Evaluation 101 (5/10): F1 Score</a></li>
 <li><strong>ROC and AUC (current)</strong></li>
 <li>Calibration (upcoming)</li>
 <li>Cross Validation (upcoming)</li>
@@ -169,8 +256,8 @@ print(&quot;threshold for FPR&lt;=0.05:&quot;, thr[idx], &quot;TPR:&quot;, tpr[i
 <ul>
 <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html">scikit-learn — roc_curve</a></li>
 <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html">scikit-learn — roc_auc_score</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html">scikit-learn — average_precision_score</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Wikipedia — ROC curve</a></li>
-<li><a href="https://developers.google.com/machine-learning/crash-course/classification/roc-and-auc">Google — ROC and AUC</a></li>
 </ul>
 <p class="tags-line">Tags: ModelEvaluation, ROC, AUC, PRCurve, scikit-learn</p>
 </body>

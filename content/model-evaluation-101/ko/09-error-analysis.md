@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 9
-title: 오류 분석으로 약점 찾기
+title: "Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 평균 점수에 가려진 모델의 취약점을 파악하기 
 last_reviewed: '2026-05-15'
 ---
 
-# 오류 분석으로 약점 찾기
+# Model Evaluation 101 (9/10): 오류 분석으로 약점 찾기
 
 전체 점수는 모델이 얼마나 잘하는지 대략 알려 줍니다. 하지만 모델을 실제로 고치려면 그 숫자만으로는 부족합니다. 정확도 92%라는 결과는 그럴듯하지만, 어디서 틀렸는지, 어떤 사용자 집단에서 약한지, false positive와 false negative 중 무엇이 더 큰지까지는 말해 주지 못합니다.
 
@@ -28,17 +28,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Model Evaluation 101 시리즈의 9번째 글입니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 전체 점수가 비슷한 두 모델은 어디에서 다르게 실패할까요?
 - 슬라이스 분석은 어떤 약점을 드러내 줄까요?
 - false positive와 false negative를 왜 나눠 봐야 할까요?
-- 신뢰도 구간별 오류율은 무엇을 말해 줄까요?
-- 모델 문제와 라벨 문제를 어떻게 구분할 수 있을까요?
 
-> 오류 분석의 핵심은 평균 점수 뒤에 숨은 실패 패턴을 드러내는 데 있습니다. 어떤 세그먼트가 약한지, 어떤 오류 유형이 많은지, 어떤 샘플이 애매한지 분리해야 다음 개선 실험이 정확해집니다.
+## 큰 그림
+
+![Model Evaluation 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Model Evaluation 101 9장 흐름 개요*
+
+이 그림에서는 오류 분석으로 약점 찾기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 오류 분석으로 약점 찾기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 멘탈 모델
 
-![슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
-
-*슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부*
 평균을 쪼개면 패턴이 보입니다. 특성별 슬라이스, 오류 유형, 신뢰도 구간을 나눠 보면 같은 모델도 전혀 다른 얼굴을 드러냅니다.
 
 ## 핵심 용어
@@ -149,17 +150,29 @@ print("ambiguous indices:", order.tolist())
 
 오류 분석은 평균 점수의 뒤편을 보는 작업입니다. 어디서 틀리는지, 어떻게 틀리는지, 왜 틀리는지를 분리해야 개선의 방향이 생깁니다. 다음 글에서는 지금까지의 평가 결과를 한 장의 문서로 정리하는 평가 리포트 작성으로 시리즈를 마무리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **전체 점수가 비슷한 두 모델은 어디에서 다르게 실패할까요?**
+  - 본문의 기준은 오류 분석으로 약점 찾기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **슬라이스 분석은 어떤 약점을 드러내 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **false positive와 false negative를 왜 나눠 봐야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
-- [훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
-- [정확도의 한계](./03-limits-of-accuracy.md)
-- [정밀도와 재현율](./04-precision-and-recall.md)
-- [F1 점수](./05-f1-score.md)
-- [ROC와 AUC 이해하기](./06-roc-and-auc.md)
-- [확률 보정 이해하기](./07-calibration.md)
-- [교차 검증 이해하기](./08-cross-validation.md)
+## 시리즈 목차
+
+- [Model Evaluation 101 (1/10): 모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): 훈련·검증·테스트 데이터 나누기](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): 정확도의 한계](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): 정밀도와 재현율](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 점수](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC와 AUC 이해하기](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): 확률 보정 이해하기](./07-calibration.md)
+- [Model Evaluation 101 (8/10): 교차 검증 이해하기](./08-cross-validation.md)
 - **오류 분석으로 약점 찾기 (현재 글)**
 - 평가 리포트 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

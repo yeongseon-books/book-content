@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:26:40+00:00
+Generated: 2026-05-20T11:27:16+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,13 +27,13 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **56**
+- Series with any issue: **55**
 - Series at or above 5 issues: **42**
-- Total issues: **537**
+- Total issues: **534**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **5**
+  - Shrt: **2**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -92,11 +92,10 @@ Warnings:
 | 49 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 50 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 51 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 52 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
-| 53 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 54 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 55 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 56 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 52 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 53 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 54 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 55 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## python-dbapi-101 — Total 42
 
@@ -692,15 +691,6 @@ Warnings:
 - `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png:1` — PNG height 88px <= 100px (size=1355x88)
 - `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.ko.png:1` — PNG height 88px <= 100px (size=1138x88)
 - `assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png:1` — PNG height 88px <= 100px (size=1325x88)
-
-## model-evaluation-101 — Total 3
-
-- BadImg=0 Synt=0 BrkLink=0 Shrt=3 NoEn=0
-
-### Shrt
-- `content/model-evaluation-101/ko/01-why-evaluation-is-hard.md:22` — markdown body has 143 lines (< 150)
-- `content/model-evaluation-101/ko/07-calibration.md:22` — markdown body has 145 lines (< 150)
-- `content/model-evaluation-101/ko/08-cross-validation.md:22` — markdown body has 148 lines (< 150)
 
 ## ai-agent-101 — Total 2
 

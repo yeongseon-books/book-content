@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 9
-title: Error Analysis
+title: "Model Evaluation 101 (9/10): Error Analysis"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Error analysis breaks accuracy into slices, error types, and co
 last_reviewed: '2026-05-15'
 ---
 
-# Error Analysis
+# Model Evaluation 101 (9/10): Error Analysis
 
 Aggregate scores tell you roughly how good a model is, but they rarely tell you how to fix it. A 92% accuracy number can sound reassuring while still hiding the user segment, feature range, or error type that is doing the real damage.
 
@@ -28,15 +28,21 @@ That is why improvement work often begins not with a better metric, but with a b
 
 This is post 9 in the Model Evaluation 101 series. In this post, we break the score apart by slice, confidence, and error type so the next experiment has a concrete target.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Decomposing performance by slice
-- Classifying error types (FP, FN, class confusion)
-- Analyzing accuracy by confidence
-- Telling data problems from model problems
-- Five common pitfalls
+- Decomposing performance by slice?
+- Classifying error types (FP, FN, class confusion)?
+- Analyzing accuracy by confidence?
 
-> Error analysis matters because average performance hides the exact place where the system is brittle. You improve faster once the failure pattern has a name.
+## Big Picture
+
+![model evaluation 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 9 flow overview*
+
+This picture places Error Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Error Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +50,6 @@ This is post 9 in the Model Evaluation 101 series. In this post, we break the sc
 
 ## Concept at a Glance
 
-![error analysis moving from all errors to slices and confidence buckets](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
-
-*error analysis moving from all errors to slices and confidence buckets*
 ## Key Terms
 
 - **Slice**: a subset of the data defined by some condition.
@@ -157,17 +160,29 @@ Reliability and fairness audits sometimes require per-segment reports by law.
 
 Error analysis answers "why does it fail?" Next, the evaluation report ties everything into one document.
 
+## Answering the Opening Questions
+
+- **Decomposing performance by slice?**
+  - The article treats Error Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Classifying error types (FP, FN, class confusion)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Analyzing accuracy by confidence?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
-- [F1 Score](./05-f1-score.md)
-- [ROC and AUC](./06-roc-and-auc.md)
-- [Calibration](./07-calibration.md)
-- [Cross Validation](./08-cross-validation.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
+- [Model Evaluation 101 (5/10): F1 Score](./05-f1-score.md)
+- [Model Evaluation 101 (6/10): ROC and AUC](./06-roc-and-auc.md)
+- [Model Evaluation 101 (7/10): Calibration](./07-calibration.md)
+- [Model Evaluation 101 (8/10): Cross Validation](./08-cross-validation.md)
 - **Error Analysis (current)**
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

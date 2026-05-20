@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Calibration</title>
+<title>Model Evaluation 101 (7/10): Calibration</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Calibration</h1>
+<h1>Model Evaluation 101 (7/10): Calibration</h1>
 <p>When a model predicts 0.8, most teams instinctively read that as "about an 80% chance." That interpretation only holds if the model is calibrated. Without that check, the score may still be useful for ranking while being misleading as a probability.</p>
 <p>This matters most when probabilities flow directly into pricing, prioritization, or expected-value calculations. A model can have strong AUC and still overstate or understate risk badly enough to damage downstream decisions.</p>
 <p>This is post 7 in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition and purpose of calibration</li>
-<li>How to read a reliability diagram</li>
-<li>The meaning of Brier score</li>
-<li>Platt scaling and isotonic regression</li>
-<li>Five common pitfalls</li>
+<li>The definition and purpose of calibration?</li>
+<li>How to read a reliability diagram?</li>
+<li>The meaning of Brier score?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="model evaluation 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>model evaluation 101 chapter 7 flow overview</em></p>
+<p>This picture places Calibration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Calibration asks whether predicted probabilities deserve to be read as probabilities at all. That is a different question from ranking examples correctly.</p>
+<p>The core of Calibration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Systems that multiply probabilities by costs to make decisions need calibration more than AUC.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="calibration flow comparing predicted probability buckets to observed frequency" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>calibration flow comparing predicted probability buckets to observed frequency</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Calibration</strong>: predicted probability equals observed frequency.</li>
@@ -153,13 +153,23 @@ print(&quot;brier (isotonic):&quot;, brier_score_loss(yte, iso.predict_proba(Xte
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Calibration is the truth of the probability itself. Next, cross validation tackles the variance of evaluation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">ROC and AUC</a></li>
+<li><strong>The definition and purpose of calibration?</strong></li>
+<li>The article treats Calibration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to read a reliability diagram?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The meaning of Brier score?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Model Evaluation 101 (1/10): Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Model Evaluation 101 (2/10): Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">Model Evaluation 101 (3/10): The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Model Evaluation 101 (4/10): Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">Model Evaluation 101 (5/10): F1 Score</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/06-roc-and-auc.md">Model Evaluation 101 (6/10): ROC and AUC</a></li>
 <li><strong>Calibration (current)</strong></li>
 <li>Cross Validation (upcoming)</li>
 <li>Error Analysis (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 2
-title: Train, Validation, and Test
+title: "Model Evaluation 101 (2/10): Train, Validation, and Test"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to separate train, validation, and test sets, prevent leaka
 last_reviewed: '2026-05-15'
 ---
 
-# Train, Validation, and Test
+# Model Evaluation 101 (2/10): Train, Validation, and Test
 
 Model quality is often decided long before you compute the first metric. If the split is wrong, every number that follows can still look polished while being untrustworthy. Leakage from preprocessing, random splits on time-series data, or the same user showing up in multiple splits can all inflate performance fast.
 
@@ -28,15 +28,21 @@ That is why train, validation, and test are not textbook ceremony. They are a di
 
 This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- The role of each dataset
-- Different forms of data leakage
-- Principles for splitting time-series data
-- Group-aware splitting to prevent group leakage
-- Five common pitfalls
+- The role of each dataset?
+- Different forms of data leakage?
+- Principles for splitting time-series data?
 
-> Train fits, validation tunes, and test is touched exactly once. When those roles mix together, evaluation stops being trustworthy.
+## Big Picture
+
+![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 2 flow overview*
+
+This picture places Train, Validation, and Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Train, Validation, and Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +50,6 @@ A wrong split invalidates every measurement that follows. Model comparisons beco
 
 ## Concept at a Glance
 
-![dataset split into train validation and test roles](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
-
-*dataset split into train validation and test roles*
 ## Key Terms
 
 - **Train**: data used for fitting.
@@ -156,8 +159,19 @@ Recommendation, healthcare, and finance all rely on group-aware or time-aware sp
 
 The split strategy is the prerequisite for every measurement. Next, we examine the limits of accuracy.
 
+## Answering the Opening Questions
+
+- **The role of each dataset?**
+  - The article treats Train, Validation, and Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Different forms of data leakage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Principles for splitting time-series data?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
 - **Train, Validation, and Test (current)**
 - The Limits of Accuracy (upcoming)
 - Precision and Recall (upcoming)
@@ -167,6 +181,7 @@ The split strategy is the prerequisite for every measurement. Next, we examine t
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

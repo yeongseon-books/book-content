@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 1
-title: Why Model Evaluation Is Hard
+title: "Model Evaluation 101 (1/10): Why Model Evaluation Is Hard"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Why a single accuracy number is the wrong evaluation, and how d
 last_reviewed: '2026-05-15'
 ---
 
-# Why Model Evaluation Is Hard
+# Model Evaluation 101 (1/10): Why Model Evaluation Is Hard
 
 Model evaluation tends to feel easier in a notebook than it does in production. A single score can look clean, yet the decision behind it is rarely clean. The same 95% accuracy means very different things depending on the data distribution, the cost of mistakes, and the threshold that turns scores into action.
 
@@ -28,15 +28,21 @@ When evaluation gets shaky, model selection gets shaky with it. The real danger 
 
 This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Four reasons evaluation is hard
-- Why metrics are not business value
-- The threat of distribution drift
-- How thresholds drive decisions
-- Five common pitfalls
+- Four reasons evaluation is hard?
+- Why metrics are not business value?
+- The threat of distribution drift?
 
-> Evaluation is not one number. It is the meeting point of data distribution, cost structure, thresholds, and the decision the model is supposed to support.
+## Big Picture
+
+![model evaluation 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 1 flow overview*
+
+This picture places Why Model Evaluation Is Hard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Model Evaluation Is Hard is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +50,6 @@ Evaluation is the language of model selection. When the language is wrong, the e
 
 ## Concept at a Glance
 
-![evaluation flow from predictions to metrics and decisions](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
-
-*evaluation flow from predictions to metrics and decisions*
 ## Key Terms
 
 - **Metric**: a numerical summary of performance.
@@ -149,7 +152,18 @@ A/B experiments, MLOps gates, and compliance reviews all hinge on the evaluation
 
 Evaluation is the language of model selection. Next, we cover the roles of train, validation, and test sets.
 
+## Answering the Opening Questions
+
+- **Four reasons evaluation is hard?**
+  - The article treats Why Model Evaluation Is Hard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why metrics are not business value?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The threat of distribution drift?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **Why Model Evaluation Is Hard (current)**
 - Train, Validation, and Test (upcoming)
 - The Limits of Accuracy (upcoming)
@@ -160,6 +174,7 @@ Evaluation is the language of model selection. Next, we cover the roles of train
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References

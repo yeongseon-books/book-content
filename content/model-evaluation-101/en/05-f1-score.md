@@ -1,7 +1,7 @@
 ---
 series: model-evaluation-101
 episode: 5
-title: F1 Score
+title: "Model Evaluation 101 (5/10): F1 Score"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: "How F1 changes across averaging modes, and how to pick thresho
 last_reviewed: '2026-05-17'
 ---
 
-# F1 Score
+# Model Evaluation 101 (5/10): F1 Score
 
 This is post 5 in the Model Evaluation 101 series.
 
 Once precision and recall are framed as a threshold memo, teams immediately ask for one compact number. F1 is usually the answer. The problem is that the earlier version of this chapter used `ko/05-f1-score.md:109-118` to sweep thresholds on the same binary data that was used for training, which teaches exactly the optimistic tuning pattern the series should avoid.
 
 This rewrite fixes that defect directly. F1 is still useful, but threshold selection now follows the correct **train → validation → test** flow. At the same time, macro, micro, and weighted F1 are connected back to the review question they actually answer.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying F1 Score?
+- Which signal should the example or diagram make visible for F1 Score?
+- What failure should be prevented first when F1 Score reaches a real system?
+
+## Big Picture
+
+![model evaluation 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
+
+*model evaluation 101 chapter 5 flow overview*
+
+This picture places F1 Score inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of F1 Score is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## This post answers
 
@@ -46,10 +62,6 @@ F1 is the harmonic mean of precision and recall, so it drops whenever either sid
 So the right question is not “what is the F1?” but “which F1, chosen how, and for what decision?”
 
 ## Concept at a glance
-
-![f1 summary branching into averaging modes and f-beta choices](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
-
-*f1 summary branching into averaging modes and f-beta choices*
 
 This chapter has two branching points: which averaging mode you use in multiclass evaluation, and which threshold you lock in for the binary operating policy.
 
@@ -253,17 +265,29 @@ That sentence keeps the convenience of F1 without hiding the averaging mode, thr
 
 F1 is still a useful summary, but only after you make its hidden choices explicit. The next chapter zooms out to ROC and AUC for threshold-free ranking quality, then brings the conversation back down to the operating threshold you still have to choose in the end.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying F1 Score?**
+  - The article treats F1 Score as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for F1 Score?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when F1 Score reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
-- [Train, Validation, and Test](./02-train-val-test.md)
-- [The Limits of Accuracy](./03-limits-of-accuracy.md)
-- [Precision and Recall](./04-precision-and-recall.md)
+## In this series
+
+- [Model Evaluation 101 (1/10): Why Model Evaluation Is Hard](./01-why-evaluation-is-hard.md)
+- [Model Evaluation 101 (2/10): Train, Validation, and Test](./02-train-val-test.md)
+- [Model Evaluation 101 (3/10): The Limits of Accuracy](./03-limits-of-accuracy.md)
+- [Model Evaluation 101 (4/10): Precision and Recall](./04-precision-and-recall.md)
 - **F1 Score (current)**
 - ROC and AUC (upcoming)
 - Calibration (upcoming)
 - Cross Validation (upcoming)
 - Error Analysis (upcoming)
 - Building an Evaluation Report (upcoming)
+
 <!-- toc:end -->
 
 ## References
