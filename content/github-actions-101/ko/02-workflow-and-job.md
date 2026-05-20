@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 2
-title: Workflow와 Job
+title: "GitHub Actions 101 (2/10): Workflow와 Job"
 status: content-ready
 targets:
   tistory: true
@@ -20,21 +20,27 @@ seo_description: Workflow, Job, Step의 관계와 의존성 설계를 실무 흐
 last_reviewed: '2026-05-15'
 ---
 
-# Workflow와 Job
+# GitHub Actions 101 (2/10): Workflow와 Job
 
 GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “테스트와 린트를 같이 돌려도 될까?”, “배포는 테스트가 끝난 뒤에만 돌게 하려면 어떻게 써야 하지?”, “한 파일 안에 다 넣으면 되나, 잡을 나눠야 하나?” 이 질문들은 문법보다 구조 설계와 더 가깝습니다.
 
 이 글은 GitHub Actions 101 시리즈의 2번째 글입니다. 여기서는 워크플로, 잡, 스텝이 어떻게 계층을 이루는지부터 시작해, 병렬성과 의존성을 어떤 기준으로 설계해야 하는지 정리해 보겠습니다.
 
-## 이 글에서 다룰 문제
-
-> 워크플로우는 자동화의 껍데기이고, 잡 그래프가 실제 파이프라인입니다. 빠르게 돌릴 일은 병렬로 풀고, 순서가 필요한 일만 `needs`로 묶어야 속도와 안전을 함께 잡을 수 있습니다.
+## 먼저 던지는 질문
 
 - Workflow, Job, Step은 각각 무엇을 담당할까요?
 - `needs`는 왜 단순한 옵션이 아니라 파이프라인 설계 도구일까요?
 - `matrix`는 언제 유용하고 언제 비용 폭탄이 될까요?
-- 잡 사이에 값을 전달할 때 `outputs`는 어디까지 써야 할까요?
-- 잡을 잘못 나누면 어떤 운영 문제가 생길까요?
+
+## 큰 그림
+
+![GitHub Actions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
+
+*GitHub Actions 101 2장 흐름 개요*
+
+이 그림에서는 Workflow와 Job를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Workflow와 Job의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -43,10 +49,6 @@ GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “
 실무에서는 이 설계가 곧 개발자 경험으로 이어집니다. 린트 결과는 30초 안에 받고, 테스트는 2분 안에 받고, 배포는 그 이후에만 시작되게 만들 수 있다면 팀의 리듬이 달라집니다. 저는 Job 그래프를 잘 그리는 능력이 GitHub Actions 실력을 크게 갈라놓는다고 봅니다.
 
 ## 한눈에 보는 잡 그래프
-
-![lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
-
-*lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프*
 
 이 그림은 단순하지만 핵심을 잘 보여 줍니다. lint와 test는 서로 독립이므로 병렬로 돌릴 수 있고, build는 그 둘이 성공한 뒤에만 시작하면 됩니다. deploy는 build가 끝난 뒤에만 허용해야 하므로 마지막에 놓입니다.
 
@@ -196,8 +198,19 @@ jobs:
 
 다음 글에서는 이 그래프가 언제 실행돼야 하는지, 즉 트리거 설계를 다룹니다. 좋은 잡 구조도 적절한 시점에만 실행될 때 비로소 가치가 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **Workflow, Job, Step은 각각 무엇을 담당할까요?**
+  - 본문의 기준은 Workflow와 Job를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`needs`는 왜 단순한 옵션이 아니라 파이프라인 설계 도구일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`matrix`는 언제 유용하고 언제 비용 폭탄이 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [GitHub Actions란 무엇인가?](./01-what-is-github-actions.md)
+## 시리즈 목차
+
+- [GitHub Actions 101 (1/10): GitHub Actions란 무엇인가?](./01-what-is-github-actions.md)
 - **Workflow와 Job (현재 글)**
 - Trigger 이해하기 (예정)
 - Python 테스트 자동화 (예정)
@@ -207,6 +220,7 @@ jobs:
 - 배포 자동화 (예정)
 - Secret 관리 (예정)
 - 실전 CI/CD 파이프라인 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

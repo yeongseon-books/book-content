@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Python Test Automation</title>
+<title>GitHub Actions 101 (4/10): Python Test Automation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Python Test Automation</h1>
+<h1>GitHub Actions 101 (4/10): Python Test Automation</h1>
 <p>Teams that run <code>pytest</code> only on local machines keep hitting the same failures. One developer passes on 3.12, another breaks on 3.10, someone skips the test suite under deadline pressure, and the problem surfaces only after merge when the cost of recovery is already higher.</p>
 <p>The important line is not “tests exist.” It is “the repository runs the same tests in the same environment every time.” That shift is what turns test code into an actual safety mechanism for the team.</p>
 <p>This is post 4 in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around <code>setup-python</code>, caching, reports, coverage, and version matrices.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Python Test Automation?</li>
+<li>Which signal should the example or diagram make visible for Python Test Automation?</li>
+<li>What failure should be prevented first when Python Test Automation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 4 flow overview</em></p>
+<p>This picture places Python Test Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Python Test Automation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Fast setup with <em>setup-python</em> + <em>pip cache</em></li>
@@ -71,8 +84,6 @@
 <p><em>Slow CI</em> becomes <em>skipped CI</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A Python test workflow moving from PR open to setup, install, pytest, and coverage" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>A Python test workflow moving from PR open to setup, install, pytest, and coverage</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>setup-python</strong>: installs <em>Python on the runner</em>.</li>
@@ -86,7 +97,7 @@
 <p><strong>After</strong>: a <em>Tests passed</em> check appears on every PR and <em>3.10/3.11/3.12</em> must all pass before merge.</p>
 <h2>Hands-on: Test Automation in 5 Steps</h2>
 <p><strong>Step 1 — Python + cache</strong></p>
-<pre><code class="language-yaml">- uses: actions/setup-python@v5
+<pre><code class="language-yaml">- uses: actions/setup-python@v6
   with:
     python-version: &quot;3.11&quot;
     cache: &quot;pip&quot;
@@ -94,7 +105,7 @@
 </code></pre>
 <p><strong>Step 2 — Run pytest and report</strong></p>
 <pre><code class="language-yaml">- run: pytest -q --junitxml=report.xml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   if: always()
   with:
     name: pytest-report
@@ -111,7 +122,7 @@
   matrix:
     python: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
 steps:
-  - uses: actions/setup-python@v5
+  - uses: actions/setup-python@v6
     with:
       python-version: ${{ matrix.python }}
 </code></pre>
@@ -160,10 +171,20 @@ steps:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Test automation is the <em>heart of CI</em>. The next post covers <em>Lint and Type Check</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><strong>What boundary should you inspect first when applying Python Test Automation?</strong></li>
+<li>The article treats Python Test Automation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Python Test Automation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Python Test Automation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">GitHub Actions 101 (3/10): Understanding Triggers</a></li>
 <li><strong>Python Test Automation (current)</strong></li>
 <li>Lint and Type Check (upcoming)</li>
 <li>Build Artifacts (upcoming)</li>

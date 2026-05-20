@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Build Artifacts</title>
+<title>GitHub Actions 101 (6/10): Build Artifacts</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Build Artifacts</h1>
+<h1>GitHub Actions 101 (6/10): Build Artifacts</h1>
 <p>If a CI run finishes the build and then throws the output away, the pipeline is only half done. The logs say “success,” but no one can later confirm which wheel, archive, or report actually passed validation, and deploy often ends up rebuilding work it should have reused.</p>
 <p>That is why artifacts matter more than they first appear to. They preserve the exact output a workflow produced and give later jobs, release tooling, and humans a traceable handoff point.</p>
 <p>This is post 6 in the GitHub Actions 101 series. In this post, we will use artifacts to keep build outputs, move them across jobs, and carry them into GitHub Releases when the workflow becomes an external delivery channel.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Build Artifacts?</li>
+<li>Which signal should the example or diagram make visible for Build Artifacts?</li>
+<li>What failure should be prevented first when Build Artifacts reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 6 flow overview</em></p>
+<p>This picture places Build Artifacts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Build Artifacts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Using <em>upload-artifact / download-artifact</em></li>
@@ -71,8 +84,6 @@
 <p><em>Every merge</em> should leave a <em>traceable build</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A build job uploading artifacts to GitHub storage before a deploy job downloads them" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A build job uploading artifacts to GitHub storage before a deploy job downloads them</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Artifact</strong>: a <em>file bundle produced</em> by a workflow.</li>
@@ -87,7 +98,7 @@
 <h2>Hands-on: Artifacts in 5 Steps</h2>
 <p><strong>Step 1 — Upload</strong></p>
 <pre><code class="language-yaml">- run: python -m build
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: dist
     path: dist/*
@@ -98,14 +109,14 @@
   needs: build
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: dist
         path: dist/
     - run: ls dist/
 </code></pre>
 <p><strong>Step 3 — Bundle by patterns</strong></p>
-<pre><code class="language-yaml">- uses: actions/upload-artifact@v4
+<pre><code class="language-yaml">- uses: actions/upload-artifact@v7
   with:
     name: reports
     path: |
@@ -121,7 +132,7 @@
     generate_release_notes: true
 </code></pre>
 <p><strong>Step 5 — Retention policy</strong></p>
-<pre><code class="language-yaml">- uses: actions/upload-artifact@v4
+<pre><code class="language-yaml">- uses: actions/upload-artifact@v7
   with:
     name: nightly-build
     path: dist/
@@ -153,7 +164,7 @@
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Use <em>upload-artifact@v4</em>.</li>
+<li>[ ] Use <em>upload-artifact@v7</em>.</li>
 <li>[ ] <em>retention-days</em> is set.</li>
 <li>[ ] <em>Releases</em> are auto-published on <em>tag push</em>.</li>
 <li>[ ] <em>Checksums</em> or <em>signatures</em> are attached.</li>
@@ -166,12 +177,22 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Artifacts are the <em>receipts of your build</em>. Next: <em>Docker build</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><strong>What boundary should you inspect first when applying Build Artifacts?</strong></li>
+<li>The article treats Build Artifacts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Build Artifacts?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Build Artifacts reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">GitHub Actions 101 (3/10): Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">GitHub Actions 101 (4/10): Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">GitHub Actions 101 (5/10): Lint and Type Check</a></li>
 <li><strong>Build Artifacts (current)</strong></li>
 <li>Docker Build (upcoming)</li>
 <li>Deployment Automation (upcoming)</li>

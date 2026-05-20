@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding Triggers</title>
+<title>GitHub Actions 101 (3/10): Understanding Triggers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Understanding Triggers</h1>
+<h1>GitHub Actions 101 (3/10): Understanding Triggers</h1>
 <p>As automation grows, a new kind of waste appears. Why did a docs-only edit trigger a full build? Why did three quick pushes to the same PR queue three identical runs? Why did the nightly job fire at the wrong local time even though the cron expression looked correct?</p>
 <p>Trigger design is where GitHub Actions stops being just syntax and becomes policy. The practical question is not only when a workflow should run, but when it should stay silent so cost, queue time, and alert noise remain under control.</p>
 <p>This is post 3 in the GitHub Actions 101 series. In this post, we will use <code>push</code>, <code>pull_request</code>, <code>schedule</code>, <code>workflow_dispatch</code>, path filters, and <code>concurrency</code> to make workflows run at the right moment and only at the right moment.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Understanding Triggers?</li>
+<li>Which signal should the example or diagram make visible for Understanding Triggers?</li>
+<li>What failure should be prevented first when Understanding Triggers reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 3 flow overview</em></p>
+<p>This picture places Understanding Triggers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Understanding Triggers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>push</em> and <em>pull_request</em></li>
@@ -71,8 +84,6 @@
 <p>A <em>good workflow</em> runs <em>only at the right moment</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A workflow triggered by push, pull_request, schedule, and workflow_dispatch events" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>A workflow triggered by push, pull_request, schedule, and workflow_dispatch events</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>push</strong>: when <em>commits land</em> on a branch.</li>
@@ -161,9 +172,19 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Triggers control <em>when</em> your workflow runs. Next up: <em>Python test automation</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><strong>What boundary should you inspect first when applying Understanding Triggers?</strong></li>
+<li>The article treats Understanding Triggers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Understanding Triggers?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Understanding Triggers reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
 <li><strong>Understanding Triggers (current)</strong></li>
 <li>Python Test Automation (upcoming)</li>
 <li>Lint and Type Check (upcoming)</li>

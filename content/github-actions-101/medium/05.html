@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Lint and Type Check</title>
+<title>GitHub Actions 101 (5/10): Lint and Type Check</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Lint and Type Check</h1>
+<h1>GitHub Actions 101 (5/10): Lint and Type Check</h1>
 <p>If code review keeps starting with import order, line length, and obvious type errors, the team is spending expensive human attention on work a machine can do faster and more consistently. That is usually a sign that the quality gate is either missing or too soft to be trusted.</p>
 <p>The goal of lint and type checks is not to slow developers down. It is to remove low-value review noise so humans can focus on design, failure modes, and the operational consequences of a change.</p>
 <p>This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff, Mypy, and pre-commit to turn style and type rules into an explicit CI gate instead of an informal team habit.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Lint and Type Check?</li>
+<li>Which signal should the example or diagram make visible for Lint and Type Check?</li>
+<li>What failure should be prevented first when Lint and Type Check reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 5 flow overview</em></p>
+<p>This picture places Lint and Type Check inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Lint and Type Check is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Combined <em>style + lint</em> with <em>Ruff</em></li>
@@ -71,8 +84,6 @@
 <p><em>Format gating</em> cuts <em>review time</em> in half.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Code changes passing through Ruff and Mypy before they reach the CI quality gate" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Code changes passing through Ruff and Mypy before they reach the CI quality gate</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Linter</strong>: catches <em>style/pattern violations</em> (ruff).</li>
@@ -86,8 +97,8 @@
 <p><strong>After</strong>: PRs show <em>Lint passed</em> and <em>Type-check passed</em> automatically; review focuses on <em>logic</em>.</p>
 <h2>Hands-on: Quality Gate in 5 Steps</h2>
 <p><strong>Step 1 — Ruff workflow</strong></p>
-<pre><code class="language-yaml">- uses: actions/checkout@v4
-- uses: actions/setup-python@v5
+<pre><code class="language-yaml">      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
   with:
     python-version: &quot;3.11&quot;
 - run: pip install ruff
@@ -158,11 +169,21 @@ repos:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Quality gates <em>lighten the review load</em>. Next: <em>Build artifacts</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><strong>What boundary should you inspect first when applying Lint and Type Check?</strong></li>
+<li>The article treats Lint and Type Check as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Lint and Type Check?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Lint and Type Check reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">GitHub Actions 101 (3/10): Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">GitHub Actions 101 (4/10): Python Test Automation</a></li>
 <li><strong>Lint and Type Check (current)</strong></li>
 <li>Build Artifacts (upcoming)</li>
 <li>Docker Build (upcoming)</li>

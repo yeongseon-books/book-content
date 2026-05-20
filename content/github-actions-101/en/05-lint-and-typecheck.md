@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 5
-title: Lint and Type Check
+title: "GitHub Actions 101 (5/10): Lint and Type Check"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Automate code-quality gates with ruff, mypy, and pre-commit so 
 last_reviewed: '2026-05-15'
 ---
 
-# Lint and Type Check
+# GitHub Actions 101 (5/10): Lint and Type Check
 
 If code review keeps starting with import order, line length, and obvious type errors, the team is spending expensive human attention on work a machine can do faster and more consistently. That is usually a sign that the quality gate is either missing or too soft to be trusted.
 
 The goal of lint and type checks is not to slow developers down. It is to remove low-value review noise so humans can focus on design, failure modes, and the operational consequences of a change.
 
 This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff, Mypy, and pre-commit to turn style and type rules into an explicit CI gate instead of an informal team habit.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Lint and Type Check?
+- Which signal should the example or diagram make visible for Lint and Type Check?
+- What failure should be prevented first when Lint and Type Check reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 5 flow overview*
+
+This picture places Lint and Type Check inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Lint and Type Check is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff,
 > *Format gating* cuts *review time* in half.
 
 ## Concept at a Glance
-
-![Code changes passing through Ruff and Mypy before they reach the CI quality gate](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
-
-*Code changes passing through Ruff and Mypy before they reach the CI quality gate*
 
 ## Key Terms
 
@@ -156,17 +168,29 @@ Mature teams standardize *ruff + mypy + pre-commit* via a *template repo* and ru
 
 Quality gates *lighten the review load*. Next: *Build artifacts*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Lint and Type Check?**
+  - The article treats Lint and Type Check as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Lint and Type Check?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Lint and Type Check reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
 - **Lint and Type Check (current)**
 - Build Artifacts (upcoming)
 - Docker Build (upcoming)
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

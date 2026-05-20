@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 9
-title: Secret Management
+title: "GitHub Actions 101 (9/10): Secret Management"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Repository, environment, and organization secrets with OIDC, ma
 last_reviewed: '2026-05-15'
 ---
 
-# Secret Management
+# GitHub Actions 101 (9/10): Secret Management
 
 As automation becomes more capable, more sensitive values start flowing through the pipeline: package tokens, cloud credentials, database passwords, certificates, and service keys. The hard part is that once one of them lands in a log or commit history, the recovery cost is far higher than a normal CI failure.
 
 That makes secret handling a design problem rather than a convenience feature. You need to decide where secrets live, which environments can read them, how much power `GITHUB_TOKEN` gets, and how to avoid turning one careless debug command into a permanent leak.
 
 This is post 9 in the GitHub Actions 101 series. In this post, we will use scope, least privilege, OIDC, and runtime masking to treat secrets as operational resources instead of YAML variables.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Secret Management?
+- Which signal should the example or diagram make visible for Secret Management?
+- What failure should be prevented first when Secret Management reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 9 flow overview*
+
+This picture places Secret Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Secret Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ This is post 9 in the GitHub Actions 101 series. In this post, we will use scope
 > *The biggest risk to a secret is not a hacker; it is *us*. One careless echo and it is over.*
 
 ## Concept at a Glance
-
-![A flow from organization, repository, and environment secrets into job runtime and masking](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
-
-*A flow from organization, repository, and environment secrets into job runtime and masking*
 
 ## Key Terms
 
@@ -155,17 +167,29 @@ Mature teams keep a *single source of truth* in *HashiCorp Vault*, *Doppler*, or
 
 Secret management prevents *most* security incidents. Next: a *real-world CI/CD pipeline* that ties everything together.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Secret Management?**
+  - The article treats Secret Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Secret Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Secret Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
-- [Lint and Type Check](./05-lint-and-typecheck.md)
-- [Build Artifacts](./06-build-artifact.md)
-- [Docker Build](./07-docker-build.md)
-- [Deployment Automation](./08-deploy-automation.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
+- [GitHub Actions 101 (5/10): Lint and Type Check](./05-lint-and-typecheck.md)
+- [GitHub Actions 101 (6/10): Build Artifacts](./06-build-artifact.md)
+- [GitHub Actions 101 (7/10): Docker Build](./07-docker-build.md)
+- [GitHub Actions 101 (8/10): Deployment Automation](./08-deploy-automation.md)
 - **Secret Management (current)**
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

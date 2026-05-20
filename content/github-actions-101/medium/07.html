@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Docker Build</title>
+<title>GitHub Actions 101 (7/10): Docker Build</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Docker Build</h1>
+<h1>GitHub Actions 101 (7/10): Docker Build</h1>
 <p>Docker build is usually the slowest and most failure-prone stage in a GitHub Actions pipeline. Without cache, every PR rebuilds layers from scratch. Without a tag policy, you lose traceability. Without the right permissions, the build succeeds only to fail at the final push with a 401.</p>
 <p>That is why container automation is not just “run <code>docker build</code> in CI.” It is a design problem that combines Buildx, cache layout, registry authentication, and branch-specific push policy.</p>
 <p>This is post 7 in the GitHub Actions 101 series. In this post, we will build a practical Docker workflow around Buildx, GitHub Actions cache, GHCR authentication, multi-platform builds, and tagging strategy.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Docker Build?</li>
+<li>Which signal should the example or diagram make visible for Docker Build?</li>
+<li>What failure should be prevented first when Docker Build reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 7 flow overview</em></p>
+<p>This picture places Docker Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Docker Build is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Enabling <em>Buildx</em> via <em>docker/setup-buildx-action</em></li>
@@ -71,8 +84,6 @@
 <p><em>Container standards</em> drive <em>deployment standards</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A Docker build path from Dockerfile through Buildx and cache to GHCR" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>A Docker build path from Dockerfile through Buildx and cache to GHCR</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Buildx</strong>: Docker's <em>advanced builder</em>.</li>
@@ -171,13 +182,23 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Automating Docker builds is the <em>gateway to deployment automation</em>. Next: <em>Deployment automation</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
+<li><strong>What boundary should you inspect first when applying Docker Build?</strong></li>
+<li>The article treats Docker Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Docker Build?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Docker Build reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">GitHub Actions 101 (3/10): Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">GitHub Actions 101 (4/10): Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">GitHub Actions 101 (5/10): Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">GitHub Actions 101 (6/10): Build Artifacts</a></li>
 <li><strong>Docker Build (current)</strong></li>
 <li>Deployment Automation (upcoming)</li>
 <li>Secret Management (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 3
-title: Understanding Triggers
+title: "GitHub Actions 101 (3/10): Understanding Triggers"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: From push and PR to schedule and workflow_dispatch. Take precis
 last_reviewed: '2026-05-15'
 ---
 
-# Understanding Triggers
+# GitHub Actions 101 (3/10): Understanding Triggers
 
 As automation grows, a new kind of waste appears. Why did a docs-only edit trigger a full build? Why did three quick pushes to the same PR queue three identical runs? Why did the nightly job fire at the wrong local time even though the cron expression looked correct?
 
 Trigger design is where GitHub Actions stops being just syntax and becomes policy. The practical question is not only when a workflow should run, but when it should stay silent so cost, queue time, and alert noise remain under control.
 
 This is post 3 in the GitHub Actions 101 series. In this post, we will use `push`, `pull_request`, `schedule`, `workflow_dispatch`, path filters, and `concurrency` to make workflows run at the right moment and only at the right moment.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Triggers?
+- Which signal should the example or diagram make visible for Understanding Triggers?
+- What failure should be prevented first when Understanding Triggers reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 3 flow overview*
+
+This picture places Understanding Triggers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Triggers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ Trigger design dictates your *cost and noise*. Running *every workflow on every 
 > A *good workflow* runs *only at the right moment*.
 
 ## Concept at a Glance
-
-![A workflow triggered by push, pull_request, schedule, and workflow_dispatch events](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)
-
-*A workflow triggered by push, pull_request, schedule, and workflow_dispatch events*
 
 ## Key Terms
 
@@ -159,9 +171,20 @@ Mature teams split triggers by *role*: *PR* = quick checks, *main push* = full t
 
 Triggers control *when* your workflow runs. Next up: *Python test automation*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Triggers?**
+  - The article treats Understanding Triggers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Triggers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Triggers reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
 - **Understanding Triggers (current)**
 - Python Test Automation (upcoming)
 - Lint and Type Check (upcoming)
@@ -170,6 +193,7 @@ Triggers control *when* your workflow runs. Next up: *Python test automation*.
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

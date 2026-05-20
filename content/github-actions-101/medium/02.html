@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Workflows and Jobs</title>
+<title>GitHub Actions 101 (2/10): Workflows and Jobs</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Workflows and Jobs</h1>
+<h1>GitHub Actions 101 (2/10): Workflows and Jobs</h1>
 <p>Once you start using GitHub Actions, the next question is rarely about YAML syntax. It is about structure. Should lint and test live in one job? Should deploy wait for build only, or for every earlier check? When does a single workflow become harder to reason about than several smaller ones?</p>
 <p>Those questions are really about pipeline design. A workflow file is only the container. The actual pipeline is the graph of jobs inside it, and the quality of that graph determines both feedback speed and operational safety.</p>
 <p>This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use <code>needs</code>, <code>matrix</code>, and <code>outputs</code> to design a graph that is fast without becoming fragile.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Workflows and Jobs?</li>
+<li>Which signal should the example or diagram make visible for Workflows and Jobs?</li>
+<li>What failure should be prevented first when Workflows and Jobs reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 2 flow overview</em></p>
+<p>This picture places Workflows and Jobs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Workflows and Jobs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The exact relationship between <em>Workflow / Job / Step</em></li>
@@ -71,8 +84,6 @@
 <p><em>Parallel for speed, dependencies for safety</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A job graph where lint and test run in parallel before build and deploy" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>A job graph where lint and test run in parallel before build and deploy</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Workflow</strong>: one <em>YAML file</em> equals one workflow.</li>
@@ -91,13 +102,13 @@
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: ruff check .
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: pytest -q
 </code></pre>
 <p><strong>Step 2 — Order with needs</strong></p>
@@ -105,7 +116,7 @@
     runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: python -m build
 </code></pre>
 <p><strong>Step 3 — Multiple environments via matrix</strong></p>
@@ -115,8 +126,8 @@
         python: [&quot;3.10&quot;, &quot;3.11&quot;, &quot;3.12&quot;]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
       - run: pytest -q
@@ -182,8 +193,18 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The job graph is the <em>spine of your pipeline</em>. The next post covers <em>when it runs (Trigger)</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><strong>What boundary should you inspect first when applying Workflows and Jobs?</strong></li>
+<li>The article treats Workflows and Jobs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Workflows and Jobs?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Workflows and Jobs reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
 <li><strong>Workflows and Jobs (current)</strong></li>
 <li>Understanding Triggers (upcoming)</li>
 <li>Python Test Automation (upcoming)</li>

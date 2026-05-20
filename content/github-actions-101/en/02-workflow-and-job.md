@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 2
-title: Workflows and Jobs
+title: "GitHub Actions 101 (2/10): Workflows and Jobs"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Workflow, Job, and Step structure with dependencies. Master par
 last_reviewed: '2026-05-15'
 ---
 
-# Workflows and Jobs
+# GitHub Actions 101 (2/10): Workflows and Jobs
 
 Once you start using GitHub Actions, the next question is rarely about YAML syntax. It is about structure. Should lint and test live in one job? Should deploy wait for build only, or for every earlier check? When does a single workflow become harder to reason about than several smaller ones?
 
 Those questions are really about pipeline design. A workflow file is only the container. The actual pipeline is the graph of jobs inside it, and the quality of that graph determines both feedback speed and operational safety.
 
 This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use `needs`, `matrix`, and `outputs` to design a graph that is fast without becoming fragile.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Workflows and Jobs?
+- Which signal should the example or diagram make visible for Workflows and Jobs?
+- What failure should be prevented first when Workflows and Jobs reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 2 flow overview*
+
+This picture places Workflows and Jobs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Workflows and Jobs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ A fully *serial* CI is slow; a fully *parallel* one *breaks ordering*. Drawing t
 > *Parallel for speed, dependencies for safety*.
 
 ## Concept at a Glance
-
-![A job graph where lint and test run in parallel before build and deploy](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
-
-*A job graph where lint and test run in parallel before build and deploy*
 
 ## Key Terms
 
@@ -180,8 +192,19 @@ Mature teams run *fast lint+test only* on *PRs* and a *full matrix + build* on *
 
 The job graph is the *spine of your pipeline*. The next post covers *when it runs (Trigger)*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Workflows and Jobs?**
+  - The article treats Workflows and Jobs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Workflows and Jobs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Workflows and Jobs reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
 - **Workflows and Jobs (current)**
 - Understanding Triggers (upcoming)
 - Python Test Automation (upcoming)
@@ -191,6 +214,7 @@ The job graph is the *spine of your pipeline*. The next post covers *when it run
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

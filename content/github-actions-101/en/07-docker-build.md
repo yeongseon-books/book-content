@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 7
-title: Docker Build
+title: "GitHub Actions 101 (7/10): Docker Build"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Buildx, cache, multi-platform, and GHCR push. Build Docker imag
 last_reviewed: '2026-05-15'
 ---
 
-# Docker Build
+# GitHub Actions 101 (7/10): Docker Build
 
 Docker build is usually the slowest and most failure-prone stage in a GitHub Actions pipeline. Without cache, every PR rebuilds layers from scratch. Without a tag policy, you lose traceability. Without the right permissions, the build succeeds only to fail at the final push with a 401.
 
 That is why container automation is not just “run `docker build` in CI.” It is a design problem that combines Buildx, cache layout, registry authentication, and branch-specific push policy.
 
 This is post 7 in the GitHub Actions 101 series. In this post, we will build a practical Docker workflow around Buildx, GitHub Actions cache, GHCR authentication, multi-platform builds, and tagging strategy.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Docker Build?
+- Which signal should the example or diagram make visible for Docker Build?
+- What failure should be prevented first when Docker Build reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 7 flow overview*
+
+This picture places Docker Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Docker Build is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ The *slowest CI step* is usually the *Docker build*. Done right (cache + multi-s
 > *Container standards* drive *deployment standards*.
 
 ## Concept at a Glance
-
-![A Docker build path from Dockerfile through Buildx and cache to GHCR](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)
-
-*A Docker build path from Dockerfile through Buildx and cache to GHCR*
 
 ## Key Terms
 
@@ -175,17 +187,29 @@ Mature teams build *amd64 + cache only* on *PRs* and produce *signed (cosign) mu
 
 Automating Docker builds is the *gateway to deployment automation*. Next: *Deployment automation*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Docker Build?**
+  - The article treats Docker Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Docker Build?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Docker Build reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
-- [Lint and Type Check](./05-lint-and-typecheck.md)
-- [Build Artifacts](./06-build-artifact.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
+- [GitHub Actions 101 (5/10): Lint and Type Check](./05-lint-and-typecheck.md)
+- [GitHub Actions 101 (6/10): Build Artifacts](./06-build-artifact.md)
 - **Docker Build (current)**
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

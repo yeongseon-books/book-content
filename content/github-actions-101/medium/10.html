@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>A Real-World CI/CD Pipeline</title>
+<title>GitHub Actions 101 (10/10): A Real-World CI/CD Pipeline</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>A Real-World CI/CD Pipeline</h1>
+<h1>GitHub Actions 101 (10/10): A Real-World CI/CD Pipeline</h1>
 <p>The pieces we covered one by one are all useful, but real systems do not run them in isolation. Triggers, tests, lint, artifacts, Docker, deployment, and secret handling eventually meet in one delivery path, and the quality of that composition determines whether the pipeline scales or collapses under its own weight.</p>
 <p>The practical question is not “how many checks can we add?” It is “how clearly can we separate responsibility?” Pull requests need fast feedback. Main needs integration and staging confidence. Tags need traceable release and production promotion. Once those roles are clear, the YAML gets simpler instead of larger.</p>
 <p>This is the final post in the GitHub Actions 101 series. In this post, we will combine the earlier topics into a reusable CI/CD shape that separates PR, <code>main</code>, and tag responsibilities without losing traceability.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying A Real-World CI/CD Pipeline?</li>
+<li>Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?</li>
+<li>What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 10 flow overview</em></p>
+<p>This picture places A Real-World CI/CD Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of A Real-World CI/CD Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Responsibility split</em> across <em>PR, main, and tag</em></li>
@@ -71,8 +84,6 @@
 <p><em>The pieces make you </em>fast<em>. The composition keeps you </em>fast<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A full pipeline split into PR feedback, main integration, and tag-based release promotion" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>A full pipeline split into PR feedback, main integration, and tag-based release promotion</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Reusable workflow</strong>: a <em>shared workflow</em> invoked via <code>workflow_call</code>.</li>
@@ -97,8 +108,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python-version }}
       - run: pip install -e &quot;.[dev]&quot;
@@ -152,7 +163,7 @@ jobs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with: { python-version: &quot;3.12&quot; }
     - run: pip install -e &quot;.[dev]&quot;
       shell: bash
@@ -215,16 +226,26 @@ runs:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>If you followed along, you can handle <em>95% of real-world CI/CD</em>. From here, deepen <em>runtime</em> and <em>operations</em> with <em>Docker 101</em>, <em>Kubernetes 101</em>, and <em>SRE 101</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/07-docker-build.md">Docker Build</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/08-deploy-automation.md">Deployment Automation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/09-secret-management.md">Secret Management</a></li>
+<li><strong>What boundary should you inspect first when applying A Real-World CI/CD Pipeline?</strong></li>
+<li>The article treats A Real-World CI/CD Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">GitHub Actions 101 (1/10): What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">GitHub Actions 101 (2/10): Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">GitHub Actions 101 (3/10): Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">GitHub Actions 101 (4/10): Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">GitHub Actions 101 (5/10): Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">GitHub Actions 101 (6/10): Build Artifacts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/07-docker-build.md">GitHub Actions 101 (7/10): Docker Build</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/08-deploy-automation.md">GitHub Actions 101 (8/10): Deployment Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/09-secret-management.md">GitHub Actions 101 (9/10): Secret Management</a></li>
 <li><strong>A Real-World CI/CD Pipeline (current)</strong></li>
 </ul>
 <h2>References</h2>

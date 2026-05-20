@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is GitHub Actions?</title>
+<title>GitHub Actions 101 (1/10): What Is GitHub Actions?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is GitHub Actions?</h1>
+<h1>GitHub Actions 101 (1/10): What Is GitHub Actions?</h1>
 <p>At first glance, GitHub Actions looks like “CI built into GitHub.” That is a fair starting point, but it does not explain why some teams move faster with better release discipline while others just accumulate more YAML and still rely on manual steps.</p>
 <p>The more useful way to think about GitHub Actions is as an execution platform that lives next to your repository. Once a push, pull request, or tag becomes the trigger for test, lint, build, and deploy, the team stops depending on memory and starts depending on repeatable code.</p>
 <p>This is the first post in the GitHub Actions 101 series. In this post, we will frame GitHub Actions as an execution platform for repository events rather than a convenient automation button.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is GitHub Actions??</li>
+<li>Which signal should the example or diagram make visible for What Is GitHub Actions??</li>
+<li>What failure should be prevented first when What Is GitHub Actions? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="github actions 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>github actions 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is GitHub Actions? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is GitHub Actions? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and place of <em>GitHub Actions</em></li>
@@ -71,8 +84,6 @@
 <p>Real CI starts at the moment a <em>PR is merged</em>, not when a human remembers.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A GitHub Actions run flowing from a push event to a workflow, job, and step" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>A GitHub Actions run flowing from a push event to a workflow, job, and step</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Workflow</strong>: a complete <em>automation unit</em> in <code>.github/workflows/*.yml</code>.</li>
@@ -101,8 +112,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: &quot;3.11&quot;
       - run: pip install -r requirements.txt
@@ -161,6 +172,16 @@ A failed test now blocks merge.
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>GitHub Actions is <em>automation that lives next to your code</em>. The next post explores <em>Workflow and Job</em> structure in depth.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is GitHub Actions??</strong></li>
+<li>The article treats What Is GitHub Actions? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is GitHub Actions??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is GitHub Actions? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is GitHub Actions? (current)</strong></li>
 <li>Workflows and Jobs (upcoming)</li>

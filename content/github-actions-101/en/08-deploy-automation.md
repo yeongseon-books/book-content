@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 8
-title: Deployment Automation
+title: "GitHub Actions 101 (8/10): Deployment Automation"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Environments, approval, and OIDC. From PR merge to staging and 
 last_reviewed: '2026-05-15'
 ---
 
-# Deployment Automation
+# GitHub Actions 101 (8/10): Deployment Automation
 
 Teams that deploy by hand usually end up with the same blind spots. Staging is automatic but production still depends on a message in chat. Someone can run the command, but no one can reconstruct the exact sequence later. Rollback exists in a document somewhere, yet nobody wants to search for it during an incident.
 
 Good deployment automation is not about removing every human decision. It is about automating the safe, repeatable path while making the risky path explicit through approval rules, environment policy, and short-lived credentials.
 
 This is post 8 in the GitHub Actions 101 series. In this post, we will design a deployment flow around GitHub Environments, required reviewers, OIDC, and codified rollback.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Deployment Automation?
+- Which signal should the example or diagram make visible for Deployment Automation?
+- What failure should be prevented first when Deployment Automation reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 8 flow overview*
+
+This picture places Deployment Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deployment Automation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ This is post 8 in the GitHub Actions 101 series. In this post, we will design a 
 > If the *deployment runbook* lives only in someone's head, an *incident is coming*.
 
 ## Concept at a Glance
-
-![A deployment path from main merge to automatic staging and approval-gated production](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)
-
-*A deployment path from main merge to automatic staging and approval-gated production*
 
 ## Key Terms
 
@@ -190,17 +202,29 @@ Mature teams chain *PR merge -> canary -> blue/green -> full rollout* in *one wo
 
 Deployment automation defines your *cost of change*. Next: *Secret management*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Deployment Automation?**
+  - The article treats Deployment Automation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Deployment Automation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Deployment Automation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
-- [Python Test Automation](./04-python-test-automation.md)
-- [Lint and Type Check](./05-lint-and-typecheck.md)
-- [Build Artifacts](./06-build-artifact.md)
-- [Docker Build](./07-docker-build.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
+- [GitHub Actions 101 (4/10): Python Test Automation](./04-python-test-automation.md)
+- [GitHub Actions 101 (5/10): Lint and Type Check](./05-lint-and-typecheck.md)
+- [GitHub Actions 101 (6/10): Build Artifacts](./06-build-artifact.md)
+- [GitHub Actions 101 (7/10): Docker Build](./07-docker-build.md)
 - **Deployment Automation (current)**
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References

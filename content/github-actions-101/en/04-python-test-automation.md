@@ -1,7 +1,7 @@
 ---
 series: github-actions-101
 episode: 4
-title: Python Test Automation
+title: "GitHub Actions 101 (4/10): Python Test Automation"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: pytest, coverage, and matrix in one workflow. Run your Python t
 last_reviewed: '2026-05-15'
 ---
 
-# Python Test Automation
+# GitHub Actions 101 (4/10): Python Test Automation
 
 Teams that run `pytest` only on local machines keep hitting the same failures. One developer passes on 3.12, another breaks on 3.10, someone skips the test suite under deadline pressure, and the problem surfaces only after merge when the cost of recovery is already higher.
 
 The important line is not “tests exist.” It is “the repository runs the same tests in the same environment every time.” That shift is what turns test code into an actual safety mechanism for the team.
 
 This is post 4 in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around `setup-python`, caching, reports, coverage, and version matrices.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Python Test Automation?
+- Which signal should the example or diagram make visible for Python Test Automation?
+- What failure should be prevented first when Python Test Automation reaches a real system?
+
+## Big Picture
+
+![github actions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
+
+*github actions 101 chapter 4 flow overview*
+
+This picture places Python Test Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Python Test Automation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,10 +59,6 @@ Manual tests get *forgotten*. Only automation guarantees *the same trust* on eve
 > *Slow CI* becomes *skipped CI*.
 
 ## Concept at a Glance
-
-![A Python test workflow moving from PR open to setup, install, pytest, and coverage](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
-
-*A Python test workflow moving from PR open to setup, install, pytest, and coverage*
 
 ## Key Terms
 
@@ -158,10 +170,21 @@ Mature teams *parallelize with pytest-xdist*, manage *flaky tests* with *re-run*
 
 Test automation is the *heart of CI*. The next post covers *Lint and Type Check*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Python Test Automation?**
+  - The article treats Python Test Automation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Python Test Automation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Python Test Automation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is GitHub Actions?](./01-what-is-github-actions.md)
-- [Workflows and Jobs](./02-workflow-and-job.md)
-- [Understanding Triggers](./03-triggers.md)
+## In this series
+
+- [GitHub Actions 101 (1/10): What Is GitHub Actions?](./01-what-is-github-actions.md)
+- [GitHub Actions 101 (2/10): Workflows and Jobs](./02-workflow-and-job.md)
+- [GitHub Actions 101 (3/10): Understanding Triggers](./03-triggers.md)
 - **Python Test Automation (current)**
 - Lint and Type Check (upcoming)
 - Build Artifacts (upcoming)
@@ -169,6 +192,7 @@ Test automation is the *heart of CI*. The next post covers *Lint and Type Check*
 - Deployment Automation (upcoming)
 - Secret Management (upcoming)
 - A Real-World CI/CD Pipeline (upcoming)
+
 <!-- toc:end -->
 
 ## References
