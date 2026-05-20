@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:33:02+00:00
+Generated: 2026-05-20T11:33:22+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **55**
 - Series at or above 5 issues: **42**
-- Total issues: **534**
+- Total issues: **532**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **2**
+  - Shrt: **0**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -56,8 +56,8 @@ Warnings:
 | 13 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 14 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 16 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 17 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 16 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 18 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 19 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 20 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
@@ -277,22 +277,6 @@ Warnings:
 - `assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png:1` — PNG height 87px <= 100px (size=1087x87)
 - ... 7 more
 
-## azure-aks-deep-dive — Total 12
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=2 NoEn=0
-
-### BadImg
-- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png:1` — PNG height 67px <= 100px (size=1158x67)
-- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.ko.png:1` — PNG height 67px <= 100px (size=1158x67)
-- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png:1` — PNG height 67px <= 100px (size=1241x67)
-- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png:1` — PNG height 67px <= 100px (size=1241x67)
-- `assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png:1` — PNG height 65px <= 100px (size=1384x65)
-- ... 5 more
-
-### Shrt
-- `content/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md:20` — markdown body has 145 lines (< 150)
-- `content/azure-aks-deep-dive/en/06-keda-internals.md:20` — markdown body has 148 lines (< 150)
-
 ## api-design-101 — Total 10
 
 - BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
@@ -303,6 +287,18 @@ Warnings:
 - `assets/api-design-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=731x67)
+- ... 5 more
+
+## azure-aks-deep-dive — Total 10
+
+- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png:1` — PNG height 67px <= 100px (size=1158x67)
+- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.ko.png:1` — PNG height 67px <= 100px (size=1158x67)
+- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png:1` — PNG height 67px <= 100px (size=1241x67)
+- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png:1` — PNG height 67px <= 100px (size=1241x67)
+- `assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png:1` — PNG height 65px <= 100px (size=1384x65)
 - ... 5 more
 
 ## clean-code-101 — Total 10

@@ -1,5 +1,5 @@
 ---
-title: kubelet and containerd — how a container actually starts on a node
+title: "Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node"
 series: azure-aks-deep-dive
 episode: 2
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Trace how kubelet, CRI, containerd, and runc start a Pod on an AKS node and learn where image pull, sandbox, and runtime failures split apart.
 ---
 
-# kubelet and containerd — how a container actually starts on a node
+# Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node
 
 `kubectl apply` makes container startup look like one continuous action, but the execution path is more layered than that. After scheduling is finished, kubelet, the CRI boundary, containerd, and `runc` each take over a different part of the node-local path.
 
@@ -48,21 +48,24 @@ calls the CRI over a Unix socket,
 containerd creates the sandbox and containers,
 and `runc` finally spawns the real process.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - On exactly what interval does the kubelet poll what, and how do you tune that interval?
 - Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?
 - Are image pulls cached per node, and who authenticates the pull?
-- How do PodSpec.resources.requests and limits meet the kubelet's eviction decision?
-- What are the three most common causes of an unhealthy kubelet, and which metrics expose them?
+
+## Big Picture
+
+![azure kubernetes service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
+
+*azure kubernetes service deep dive chapter 2 flow overview*
+
+This picture places kubelet and containerd — how a container actually starts on a node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of kubelet and containerd — how a container actually starts on a node is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The execution path in one picture
 
-![Execution path from API server to runc](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
-
-*Execution path from API server to runc*
 ---
 
 ## kubelet, CRI, and runtime
@@ -171,15 +174,24 @@ crictl images | grep my-app
 - [ ] Reviewed the impact of changing the containerd snapshotter
 - [ ] Tightened kubectl-debug permissions and ephemeral-container policy
 
+## Answering the Opening Questions
+
+- **On exactly what interval does the kubelet poll what, and how do you tune that interval?**
+  - The article treats kubelet and containerd — how a container actually starts on a node as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Are image pulls cached per node, and who authenticates the pull?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
-- **kubelet and containerd — how a container actually starts on a node (current)**
-- CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)
-- Scheduler and Pod placement — who decides which node (upcoming)
-- HPA and Cluster Autoscaler internals — two control loops (upcoming)
-- KEDA internals — how a ScaledObject builds an HPA (upcoming)
+- [Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you](./01-control-plane-anatomy.md)
+- **Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node (current)**
+- Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)
+- Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node (upcoming)
+- Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (upcoming)
+- Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)
 
 <!-- toc:end -->
 

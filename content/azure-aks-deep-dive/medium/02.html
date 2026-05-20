@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>kubelet and containerd — how a container actually starts on a node</title>
+<title>Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>kubelet and containerd — how a container actually starts on a node</h1>
+<h1>Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node</h1>
 <p><code>kubectl apply</code> makes container startup look like one continuous action, but the execution path is more layered than that. After scheduling is finished, kubelet, the CRI boundary, containerd, and <code>runc</code> each take over a different part of the node-local path.</p>
 <p>This is the second post in the Azure Kubernetes Service Deep Dive series. Here, I follow the node-side startup path and separate kubelet's responsibility from the runtime stack below it.</p>
 <h2>Source Version</h2>
@@ -76,18 +76,21 @@ Kubelet sees a PodSpec through the API server,<br>
 calls the CRI over a Unix socket,<br>
 containerd creates the sandbox and containers,<br>
 and <code>runc</code> finally spawns the real process.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>On exactly what interval does the kubelet poll what, and how do you tune that interval?</li>
 <li>Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?</li>
 <li>Are image pulls cached per node, and who authenticates the pull?</li>
-<li>How do PodSpec.resources.requests and limits meet the kubelet's eviction decision?</li>
-<li>What are the three most common causes of an unhealthy kubelet, and which metrics expose them?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service deep dive chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png"></p>
+<p><em>azure kubernetes service deep dive chapter 2 flow overview</em></p>
+<p>This picture places kubelet and containerd — how a container actually starts on a node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of kubelet and containerd — how a container actually starts on a node is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The execution path in one picture</h2>
-<p><img alt="Execution path from API server to runc" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png"></p>
-<h2><em>Execution path from API server to runc</em></h2>
+<hr>
 <h2>kubelet, CRI, and runtime</h2>
 <p>Kubelet is the node agent.<br>
 It watches the API server for Pods assigned to its node,<br>
@@ -166,14 +169,23 @@ crictl images | grep my-app
 <li>[ ] Reviewed the impact of changing the containerd snapshotter</li>
 <li>[ ] Tightened kubectl-debug permissions and ephemeral-container policy</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>On exactly what interval does the kubelet poll what, and how do you tune that interval?</strong></li>
+<li>The article treats kubelet and containerd — how a container actually starts on a node as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Are image pulls cached per node, and who authenticates the pull?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
-<li><strong>kubelet and containerd — how a container actually starts on a node (current)</strong></li>
-<li>CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)</li>
-<li>Scheduler and Pod placement — who decides which node (upcoming)</li>
-<li>HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
-<li>KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</a></li>
+<li><strong>Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node (current)</strong></li>
+<li>Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

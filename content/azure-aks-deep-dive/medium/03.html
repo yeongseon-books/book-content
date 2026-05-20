@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>CNI and Azure CNI Overlay — where Pod IPs come from</title>
+<title>Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>CNI and Azure CNI Overlay — where Pod IPs come from</h1>
+<h1>Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from</h1>
 <p>AKS networking gets confusing fast if every design is still called simply “Azure CNI.” The real operational questions are more specific: which address space gives the Pod its IP, what consumes scarce VNet space, and what path outbound traffic takes after the Pod comes up.</p>
 <p>This is the third post in the Azure Kubernetes Service Deep Dive series. Here, I separate Azure CNI Pod Subnet, Node Subnet, and Overlay so the source of Pod IPs becomes concrete.</p>
 <p>The goal is not to re-list networking product names. It is to give you a cleaner operator map: where the Pod IP is allocated, what burns scarce VNet space, what an external firewall actually sees, and which symptom usually appears first when the address plan starts to hurt.</p>
@@ -71,22 +71,25 @@ In current AKS you should separate three cases instead of calling everything sim
 Azure CNI Pod Subnet is the current flat-networking path for new clusters,<br>
 Azure CNI Node Subnet is the older flat model,<br>
 and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mostly sees node IPs.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How do kubenet, Azure CNI, and Azure CNI Overlay differ in IP consumption and routing?</li>
 <li>What operational limits emerge when Pod IPs consume real VNet IPs directly?</li>
 <li>In Overlay mode, what is the SNAT path for outbound traffic?</li>
-<li>Where in the data plane does a NetworkPolicy (Azure NPM, Cilium) actually drop packets?</li>
-<li>What is the first signal of subnet IP exhaustion, and what is the recovery playbook?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service deep dive chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png"></p>
+<p><em>azure kubernetes service deep dive chapter 3 flow overview</em></p>
+<p>This picture places CNI and Azure CNI Overlay — where Pod IPs come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of CNI and Azure CNI Overlay — where Pod IPs come from is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters in real AKS operations</h2>
 <p>AKS networking is not a one-time cluster-creation checkbox. The chosen model keeps shaping later decisions about new node pools, peering, firewall rules, NAT, private endpoints, and how many Pods the cluster can add before address pressure becomes a production issue.</p>
 <p>That is why teams often get surprised twice. First, they treat all Azure CNI modes as the same design and underestimate how differently they consume IP space. Second, they debug outbound failures, IP exhaustion, or policy mismatches as if they were generic Kubernetes problems when the root cause is actually the network model chosen on day one.</p>
 <p>The practical payoff of this chapter is simple. Once you can answer “where did this Pod IP come from?” and “what source IP does the outside world see?”, most AKS networking incidents narrow down much faster.</p>
 <h2>Put the three models side by side</h2>
-<p><img alt="Comparison of three AKS network models" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png"></p>
-<h2><em>Comparison of three AKS network models</em></h2>
+<hr>
 <h2>What CNI does</h2>
 <p>CNI is the contract that attaches networking to the Pod sandbox.<br>
 It creates interfaces,<br>
@@ -181,14 +184,23 @@ kubectl get events -A --sort-by=.lastTimestamp | tail -30
 <li>[ ] Monitor SNAT-port exhaustion and decided whether to use NAT Gateway</li>
 <li>[ ] Reviewed DNS traffic path (CoreDNS, upstream) and caching policy</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How do kubenet, Azure CNI, and Azure CNI Overlay differ in IP consumption and routing?</strong></li>
+<li>The article treats CNI and Azure CNI Overlay — where Pod IPs come from as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What operational limits emerge when Pod IPs consume real VNet IPs directly?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>In Overlay mode, what is the SNAT path for outbound traffic?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">kubelet and containerd — how a container actually starts on a node</a></li>
-<li><strong>CNI and Azure CNI Overlay — where Pod IPs come from (current)</strong></li>
-<li>Scheduler and Pod placement — who decides which node (upcoming)</li>
-<li>HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
-<li>KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node</a></li>
+<li><strong>Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from (current)</strong></li>
+<li>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Control plane anatomy — what AKS hides from you</title>
+<title>Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Control plane anatomy — what AKS hides from you</h1>
+<h1>Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</h1>
 <p>The phrase “managed Kubernetes” is useful until you need it for real operational decisions. Once latency, rollout failures, or cluster-wide symptoms appear, you need a sharper boundary: what belongs to the control plane, what belongs to the nodes, and what Microsoft operates on your behalf.</p>
 <p>This is the first post in the Azure Kubernetes Service Deep Dive series. Here, I fix the control-plane versus data-plane map first and define the managed surfaces an AKS operator can actually observe.</p>
 <h2>Source Version</h2>
@@ -76,22 +76,24 @@ Part 1 draws the map.<br>
 It defines what the AKS control plane really is,<br>
 where the data plane starts,<br>
 and why the only control-plane surface most users ever see is the API server endpoint.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What components make up the AKS control plane, and who exactly notices when each one fails?</li>
 <li>How far does the 'managed control plane' promise extend — etcd backup, upgrades, multi-zone availability?</li>
 <li>Which scenarios surface API-server throttling first, and where does your workload create the pressure?</li>
-<li>When the control plane goes down, how long do worker-node workloads keep running?</li>
-<li>Where do audit logs and diagnostic settings land, at what cost, and what does the security team want shipped?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service deep dive chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png"></p>
+<p><em>azure kubernetes service deep dive chapter 1 flow overview</em></p>
+<p>This picture places Control plane anatomy — what AKS hides from you inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Control plane anatomy — what AKS hides from you is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The big picture — AKS control vs data plane</h2>
 <p>This diagram is the map for the whole series.<br>
 Later parts zoom into one box at a time.<br>
 Get the boundaries straight now and kubelet, CNI, scheduler, and autoscaling all line up cleanly.</p>
-<p><img alt="Managed control plane and node data plane" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png"></p>
-<p><em>Managed control plane and node data plane</em><br>
-The <code>kube-apiserver</code>, <code>etcd</code>, <code>kube-controller-manager</code>, and <code>kube-scheduler</code> boxes belong to this episode,<br>
+<p>The <code>kube-apiserver</code>, <code>etcd</code>, <code>kube-controller-manager</code>, and <code>kube-scheduler</code> boxes belong to this episode,<br>
 node-side <code>kubelet + containerd</code> belong to part 2,<br>
 <code>CNI</code> to part 3,<br>
 <code>scheduler</code> internals to part 4,<br>
@@ -194,14 +196,23 @@ az monitor diagnostic-settings list \
 <li>[ ] Agreed audit-log retention and analysis queries with security</li>
 <li>[ ] Decided whether to use API-server private endpoint and what the bypass path is</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What components make up the AKS control plane, and who exactly notices when each one fails?</strong></li>
+<li>The article treats Control plane anatomy — what AKS hides from you as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How far does the 'managed control plane' promise extend — etcd backup, upgrades, multi-zone availability?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which scenarios surface API-server throttling first, and where does your workload create the pressure?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>Control plane anatomy — what AKS hides from you (current)</strong></li>
-<li>kubelet and containerd — how a container actually starts on a node (upcoming)</li>
-<li>CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)</li>
-<li>Scheduler and Pod placement — who decides which node (upcoming)</li>
-<li>HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
-<li>KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
+<li><strong>Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you (current)</strong></li>
+<li>Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scheduler and Pod placement — who decides which node</title>
+<title>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Scheduler and Pod placement — who decides which node</h1>
+<h1>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node</h1>
 <p>When a Pod stays Pending, it is tempting to jump straight to node health or runtime logs. Very often the earlier decision point matters more: scheduler has to evaluate constraints, narrow the candidate set, and commit a Binding before node-side execution can even begin.</p>
 <p>This is the fourth post in the Azure Kubernetes Service Deep Dive series. Here, I walk through how kube-scheduler filters, scores, and finally records placement decisions.</p>
 <p>The useful shift is from “Pending means something is wrong on the node” to “Pending can be a placement story long before kubelet ever sees the Pod.” That single distinction saves a surprising amount of wasted debugging time.</p>
@@ -76,21 +76,24 @@ The upstream scheduler code makes the structure clear.<br>
 It filters impossible nodes,<br>
 scores feasible ones,<br>
 and records a Binding.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Through which stages does kube-scheduler narrow down nodes for a single Pod?</li>
 <li>What intent originally drove nodeSelector, affinity, taints/tolerations, and topologySpreadConstraints?</li>
 <li>PriorityClass and preemption protect the SLO — who pays the side-effect bill?</li>
-<li>When a Pod is unschedulable, what are the first three debugging steps?</li>
-<li>How should placement policies differ between stateful and stateless workloads?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service deep dive chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png"></p>
+<p><em>azure kubernetes service deep dive chapter 4 flow overview</em></p>
+<p>This picture places Scheduler and Pod placement — who decides which node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scheduler and Pod placement — who decides which node is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters in real AKS operations</h2>
 <p>Scheduler behavior is where abstract policy becomes an operational consequence. Zone-spread rules, taints, affinity, PVC topology, spot-node usage, and preemption all meet at the same decision point. If this layer is fuzzy, teams end up paying for it as Pending Pods, uneven failure domains, or high-priority workloads displacing the wrong tenants.</p>
 <p>This is also the chapter that makes autoscaling behavior easier to read. HPA can request more replicas, but if scheduler cannot find feasible nodes, the next thing you see is not more Ready Pods. It is a set of Pending Pods that Cluster Autoscaler may or may not be able to help later.</p>
 <h2>The three steps</h2>
-<p><img alt="Scheduling stages from pending Pod to Binding" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png"></p>
-<h2><em>Scheduling stages from pending Pod to Binding</em></h2>
+<hr>
 <h2>Filter and Score</h2>
 <p><code>ScheduleOne()</code> separates the scheduling cycle from the binding cycle.<br>
 Filter removes nodes where the Pod cannot run.<br>
@@ -180,14 +183,23 @@ kubectl get pvc -n my-ns
 <li>[ ] Prepared alerts and an auto-diagnostic script for Pending Pods</li>
 <li>[ ] Aligned PVC zone-affinity with node zones for stateful workloads</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Through which stages does kube-scheduler narrow down nodes for a single Pod?</strong></li>
+<li>The article treats Scheduler and Pod placement — who decides which node as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What intent originally drove nodeSelector, affinity, taints/tolerations, and topologySpreadConstraints?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>PriorityClass and preemption protect the SLO — who pays the side-effect bill?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">kubelet and containerd — how a container actually starts on a node</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
-<li><strong>Scheduler and Pod placement — who decides which node (current)</strong></li>
-<li>HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
-<li>KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
+<li><strong>Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node (current)</strong></li>
+<li>Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops (upcoming)</li>
+<li>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>KEDA internals — how a ScaledObject builds an HPA</title>
+<title>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>KEDA internals — how a ScaledObject builds an HPA</h1>
+<h1>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA</h1>
 <p>Event-driven autoscaling can make KEDA look like a full replacement for HPA. Internally, the model is more precise than that: KEDA layers on top of HPA, feeds the external-metrics path, and takes special responsibility at the scale-to-zero boundary.</p>
 <p>This is the final post in the Azure Kubernetes Service Deep Dive series. Here, I trace how a ScaledObject becomes a generated HPA, where the adapter fits, and why KEDA directly owns the 0-to-1 edge.</p>
 <h2>Source Version</h2>
@@ -71,18 +71,21 @@ creates HPAs,<br>
 feeds the external metrics path,<br>
 and directly handles the scale-to-zero boundary by writing replica counts itself.<br>
 KEDA installs two main components: the <strong>operator</strong>, which watches <code>ScaledObject</code> and <code>ScaledJob</code> CRDs, creates the HPA, and reconciles activation and deactivation; and the <strong>metrics adapter</strong>, which implements the Kubernetes external-metrics API so HPA can pull scaler values. A <strong>scaler</strong> is the Go interface each event source implements for activity detection and metric production.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How does KEDA synthesize HPA external metrics, and where does the adapter's responsibility end?</li>
 <li>What is the decisive difference between triggers that scale to zero and those that cannot?</li>
 <li>How do ScaledObject and ScaledJob differ in intent, and who picks which?</li>
-<li>When several triggers attach to one ScaledObject, how is max-metric chosen?</li>
-<li>How far is workload impact contained when the KEDA operator itself fails?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service deep dive chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png"></p>
+<p><em>azure kubernetes service deep dive chapter 6 flow overview</em></p>
+<p>This picture places KEDA internals — how a ScaledObject builds an HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of KEDA internals — how a ScaledObject builds an HPA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The KEDA structure</h2>
-<p><img alt="KEDA structure linking event sources to HPA" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png"></p>
-<h2><em>KEDA structure linking event sources to HPA</em></h2>
+<hr>
 <h2>ScaledObjectReconciler and the generated HPA</h2>
 <p><code>scaledobject_controller.go</code> checks that the target exposes <code>/scale</code>,<br>
 ensures the right label exists,<br>
@@ -136,14 +139,23 @@ kubectl get hpa -n my-ns | grep keda
 <li>[ ] Set policy for external-scaler auth (managed identity, secrets)</li>
 <li>[ ] Enabled monitoring on consistency between KEDA metrics and actual replica counts</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How does KEDA synthesize HPA external metrics, and where does the adapter's responsibility end?</strong></li>
+<li>The article treats KEDA internals — how a ScaledObject builds an HPA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the decisive difference between triggers that scale to zero and those that cannot?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do ScaledObject and ScaledJob differ in intent, and who picks which?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Control plane anatomy — what AKS hides from you</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">kubelet and containerd — how a container actually starts on a node</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/04-scheduler-and-pod-placement.md">Scheduler and Pod placement — who decides which node</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md">HPA and Cluster Autoscaler internals — two control loops</a></li>
-<li><strong>KEDA internals — how a ScaledObject builds an HPA (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/01-control-plane-anatomy.md">Azure Kubernetes Service Deep Dive (1/6): Control plane anatomy — what AKS hides from you</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/02-kubelet-and-containerd.md">Azure Kubernetes Service Deep Dive (2/6): kubelet and containerd — how a container actually starts on a node</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/03-cni-and-azure-cni-overlay.md">Azure Kubernetes Service Deep Dive (3/6): CNI and Azure CNI Overlay — where Pod IPs come from</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/04-scheduler-and-pod-placement.md">Azure Kubernetes Service Deep Dive (4/6): Scheduler and Pod placement — who decides which node</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md">Azure Kubernetes Service Deep Dive (5/6): HPA and Cluster Autoscaler internals — two control loops</a></li>
+<li><strong>Azure Kubernetes Service Deep Dive (6/6): KEDA internals — how a ScaledObject builds an HPA (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>
