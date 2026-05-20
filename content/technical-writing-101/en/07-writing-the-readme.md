@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 7
-title: Writing the README
+title: "Technical Writing 101 (7/10): Writing the README"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Write a README that gives first-time visitors a five-minute pat
 last_reviewed: '2026-05-15'
 ---
 
-# Writing the README
+# Technical Writing 101 (7/10): Writing the README
 
 Most readers decide whether to stay in a repository before they inspect a single source file. If the README hides the purpose, the install path, or the first success, the project already feels expensive to approach.
 
@@ -28,13 +28,21 @@ A strong README does not try to explain everything. It lowers entry friction. It
 
 This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- The *five part* structure
-- Writing the *Quick Start*
-- Using *badges*
-- Adding an *FAQ*
-- Stating the *license*
+- The *five part* structure?
+- Writing the *Quick Start?
+- Using *badges?
+
+## Big Picture
+
+![technical writing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 7 flow overview*
+
+This picture places Writing the README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing the README is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ The *README* is the *first impression* of a project.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **What**: What it *is*.
@@ -163,17 +168,29 @@ Most trending GitHub projects follow nearly the same *five part* pattern.
 
 The next post is *Writing Tutorials*.
 
+## Answering the Opening Questions
+
+- **The *five part* structure?**
+  - The article treats Writing the README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Writing the *Quick Start?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Using *badges?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
 - **Writing the README (current)**
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

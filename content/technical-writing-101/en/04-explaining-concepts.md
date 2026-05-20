@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 4
-title: Explaining Concepts
+title: "Technical Writing 101 (4/10): Explaining Concepts"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Explain technical concepts with definition, analogy, counterexa
 last_reviewed: '2026-05-15'
 ---
 
-# Explaining Concepts
+# Technical Writing 101 (4/10): Explaining Concepts
 
 The most common failure in concept writing is accuracy without traction. The definition may be technically correct, yet the reader still cannot predict where the concept applies, where it breaks, or how it should affect code and design decisions.
 
@@ -28,13 +28,21 @@ Useful concept writing needs more than a polished sentence. It needs a boundary.
 
 This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- A *one line* definition
-- Using an *analogy*
-- Using a *counterexample*
-- Using a *diagram*
-- Building a *worked example*
+- A *one line* definition?
+- Using an *analogy?
+- Using a *counterexample?
+
+## Big Picture
+
+![technical writing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 4 flow overview*
+
+This picture places Explaining Concepts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Explaining Concepts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ If the *concept* stays blurry, everything after it is a *sandcastle*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **definition**: A *one line definition*.
@@ -154,10 +159,21 @@ The best internal wiki pages always open with *definition*, *analogy*, *countere
 
 The next post is *Explaining Example Code*.
 
+## Answering the Opening Questions
+
+- **A *one line* definition?**
+  - The article treats Explaining Concepts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Using an *analogy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Using a *counterexample?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
 - **Explaining Concepts (current)**
 - Explaining Example Code (upcoming)
 - Using Figures and Tables (upcoming)
@@ -165,6 +181,7 @@ The next post is *Explaining Example Code*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

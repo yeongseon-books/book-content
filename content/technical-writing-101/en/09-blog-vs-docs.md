@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 9
-title: Blog vs Documentation
+title: "Technical Writing 101 (9/10): Blog vs Documentation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Separate blog posts from documentation by ownership, freshness,
 last_reviewed: '2026-05-15'
 ---
 
-# Blog vs Documentation
+# Technical Writing 101 (9/10): Blog vs Documentation
 
 A postmortem article can be excellent context and still be the wrong place to store today's official rollout steps. A reference page can be correct and still fail to explain why the team made a controversial design choice. Blogs and docs both help engineering teams, but they do different jobs.
 
@@ -28,13 +28,21 @@ Strong teams do not force one format to replace the other. They separate ownersh
 
 This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- The four quadrants of *Diátaxis*
-- The *lifespan* of blog vs docs
-- What *blogs* do well
-- What *docs* do well
-- *Linking* the two
+- The four quadrants of *Diátaxis?
+- The *lifespan* of blog vs docs?
+- What *blogs* do well?
+
+## Big Picture
+
+![technical writing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 9 flow overview*
+
+This picture places Blog vs Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Blog vs Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ When *kinds of writing* mix up, the *reader* gets *lost*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Diátaxis**: A *four quadrant* documentation model.
@@ -149,17 +154,29 @@ Engineering teams *separate* blogs from docs and *version control* the docs alon
 
 The next post is *Pre-publish Checklist*.
 
+## Answering the Opening Questions
+
+- **The four quadrants of *Diátaxis?**
+  - The article treats Blog vs Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *lifespan* of blog vs docs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What *blogs* do well?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
-- [Writing Tutorials](./08-writing-tutorials.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): Writing Tutorials](./08-writing-tutorials.md)
 - **Blog vs Documentation (current)**
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

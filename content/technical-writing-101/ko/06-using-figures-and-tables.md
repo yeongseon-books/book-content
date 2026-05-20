@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 6
-title: 그림과 표 사용하기
+title: "Technical Writing 101 (6/10): 그림과 표 사용하기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 텍스트 위주의 기술 문서에서 그림과 표를 적재
 last_reviewed: '2026-05-15'
 ---
 
-# 그림과 표 사용하기
+# Technical Writing 101 (6/10): 그림과 표 사용하기
 
 문단으로 충분히 설명할 수 있는 내용을 그림으로 바꾸면 오히려 독자를 헷갈리게 만들 수 있습니다. 반대로 흐름이나 비교를 문단으로만 밀어붙이면 독자는 핵심 구조를 파악하기도 전에 스크롤부터 내리게 됩니다. 중요한 것은 시각 자료의 양이 아니라 질문과 형식의 짝을 맞추는 일입니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Technical Writing 101 시리즈의 6번째 글입니다. 여기서는 그림과 표를 언제 고르고, 캡션과 대체 텍스트를 어떻게 써야 하는지 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 언제 그림이 문단보다 더 나을까요?
 - 언제 표가 비교를 더 정확하게 보여 줄까요?
 - 캡션과 대체 텍스트는 왜 장식이 아니라 본문 일부일까요?
-- 해상도와 접근성은 왜 시각 자료의 기본 조건일까요?
+
+## 큰 그림
+
+![Technical Writing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Technical Writing 101 6장 흐름 개요*
+
+이 그림에서는 그림과 표 사용하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 그림과 표 사용하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -51,9 +60,6 @@ last_reviewed: '2026-05-15'
 
 > 멘탈 모델: 흐름을 보여 주고 싶으면 그림을 고르고, 선택지를 나란히 비교하고 싶으면 표를 고릅니다. 이 구분만 지켜도 많은 시각 자료가 더 정확해집니다.
 
-![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.ko.png)
-
-*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **flowchart**: 흐름도입니다.
@@ -155,17 +161,29 @@ last_reviewed: '2026-05-15'
 
 그림과 표는 글을 꾸미는 요소가 아니라 설명을 압축하는 도구입니다. 흐름은 그림으로, 비교는 표로 나누면 독자는 구조를 훨씬 빨리 파악합니다. 다음 글에서는 처음 방문한 사람이 5분 안에 프로젝트를 실행할 수 있게 만드는 README를 어떻게 써야 하는지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **언제 그림이 문단보다 더 나을까요?**
+  - 본문의 기준은 그림과 표 사용하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **언제 표가 비교를 더 정확하게 보여 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **캡션과 대체 텍스트는 왜 장식이 아니라 본문 일부일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
-- [독자 정의하기](./02-defining-the-reader.md)
-- [제목과 구조 잡기](./03-title-and-structure.md)
-- [개념 설명하기](./04-explaining-concepts.md)
-- [예제 코드 설명하기](./05-explaining-example-code.md)
+## 시리즈 목차
+
+- [Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): 독자 정의하기](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): 제목과 구조 잡기](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): 개념 설명하기](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): 예제 코드 설명하기](./05-explaining-example-code.md)
 - **그림과 표 사용하기 (현재 글)**
 - README 작성하기 (예정)
 - 튜토리얼 작성하기 (예정)
 - 블로그와 문서 차이 (예정)
 - 발행 전 체크리스트 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

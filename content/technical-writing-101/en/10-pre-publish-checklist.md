@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 10
-title: Pre-publish Checklist
+title: "Technical Writing 101 (10/10): Pre-publish Checklist"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Use a repeatable pre-publish checklist for titles, links, code,
 last_reviewed: '2026-05-15'
 ---
 
-# Pre-publish Checklist
+# Technical Writing 101 (10/10): Pre-publish Checklist
 
 The riskiest moment in writing is often the moment when the draft feels almost done. That is when broken links, stale commands, missing captions, and title typos get waved through as small details. Readers usually notice those details first.
 
@@ -28,13 +28,21 @@ A pre-publish pass is not perfectionism. It is a cost-control routine. One round
 
 This is the final post in the Technical Writing 101 series. It turns that last-pass review into a repeatable workflow for titles, links, code, visuals, and post-publish follow-up.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- *Title* review
-- *Link* validation
-- *Code* execution
-- *Image* checks
-- *Post-publish* review
+- Title* review?
+- Link* validation?
+- Code* execution?
+
+## Big Picture
+
+![technical writing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 10 flow overview*
+
+This picture places Pre-publish Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pre-publish Checklist is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ A *fix after publish* is far more expensive than a *check before publish*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **link rot**: A *broken link* over time.
@@ -158,17 +163,29 @@ Engineering blog teams run *peer review*, *automated checks*, and *post-mortems*
 
 This is the *final* post in *Technical Writing 101*. The next series covers *Open Source Contribution*.
 
+## Answering the Opening Questions
+
+- **Title* review?**
+  - The article treats Pre-publish Checklist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Link* validation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Code* execution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
-- [Writing Tutorials](./08-writing-tutorials.md)
-- [Blog vs Documentation](./09-blog-vs-docs.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): Writing Tutorials](./08-writing-tutorials.md)
+- [Technical Writing 101 (9/10): Blog vs Documentation](./09-blog-vs-docs.md)
 - **Pre-publish Checklist (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 5
-title: Explaining Example Code
+title: "Technical Writing 101 (5/10): Explaining Example Code"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Walk readers through example code with minimal snippets, callou
 last_reviewed: '2026-05-15'
 ---
 
-# Explaining Example Code
+# Technical Writing 101 (5/10): Explaining Example Code
 
 Long code samples often look generous, but they are one of the fastest ways to lose a reader. If the post does not show where to focus, what to run, and what success looks like, the example becomes a copy-paste gamble instead of a teaching tool.
 
@@ -28,13 +28,21 @@ Good code walkthroughs are intentionally small. They isolate the interesting lin
 
 This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- A *minimal* example
-- Where to place *comments*
-- Writing a *callout line*
-- Showing the *input and output*
-- Linking the *full code*
+- A *minimal* example?
+- Where to place *comments?
+- Writing a *callout line?
+
+## Big Picture
+
+![technical writing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 5 flow overview*
+
+This picture places Explaining Example Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Explaining Example Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ A *runnable* example must reach the reader's *hands* to teach.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **MWE**: A *Minimal Working Example*.
@@ -164,17 +169,29 @@ Open source README *Quick Start* sections nearly always follow the *MWE plus out
 
 The next post is *Using Figures and Tables*.
 
+## Answering the Opening Questions
+
+- **A *minimal* example?**
+  - The article treats Explaining Example Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where to place *comments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Writing a *callout line?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
 - **Explaining Example Code (current)**
 - Using Figures and Tables (upcoming)
 - Writing the README (upcoming)
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

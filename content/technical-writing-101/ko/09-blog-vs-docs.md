@@ -17,10 +17,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 블로그와 문서 차이
+title: "Technical Writing 101 (9/10): 블로그와 문서 차이"
 ---
 
-# 블로그와 문서 차이
+# Technical Writing 101 (9/10): 블로그와 문서 차이
 
 같은 주제를 다뤘다는 이유로 블로그 글과 공식 문서를 같은 선반에 올려두면 운영이 금방 어긋납니다. 장애 원인을 설명한 회고 글은 훌륭한 맥락 자료가 될 수 있지만, 지금 팀이 따라야 할 절차의 정본이 되기에는 최신성 보장이 약합니다. 반대로 공식 문서는 정본으로서 강하지만, 왜 그런 결정을 했는지까지 늘 충분히 설명하지는 못합니다.
 
@@ -28,12 +28,21 @@ title: 블로그와 문서 차이
 
 이 글은 Technical Writing 101 시리즈의 9번째 글입니다. 여기서는 블로그와 문서를 역할, 최신성, 소유권 관점에서 구분하는 기준을 다룹니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 블로그와 공식 문서는 왜 서로 섞이면 안 될까요?
 - 둘의 생명주기와 소유권은 무엇이 다를까요?
 - Diátaxis의 네 구역은 이 차이를 어떻게 설명해 줄까요?
-- 블로그와 문서를 연결하되 책임은 어떻게 나눠야 할까요?
+
+## 큰 그림
+
+![Technical Writing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Technical Writing 101 9장 흐름 개요*
+
+이 그림에서는 블로그와 문서 차이를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 블로그와 문서 차이의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -51,9 +60,6 @@ title: 블로그와 문서 차이
 
 > 멘탈 모델: 블로그는 경험과 해석을 담고, 문서는 지금 따라야 할 기준을 담습니다. 둘은 연결할 수 있지만 서로를 대신하면 안 됩니다.
 
-![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.ko.png)
-
-*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **Diátaxis**: 네 구역 문서 모델입니다.
@@ -156,17 +162,29 @@ docs = "The team's official truth"
 
 블로그와 문서는 같은 기술을 다뤄도 역할이 다릅니다. 블로그는 경험과 배경을 남기고, 문서는 지금 따라야 할 기준을 유지합니다. 둘을 링크로 연결하는 것은 좋지만, 서로를 대신하게 두면 안 됩니다. 다음 글에서는 발행 직전에 무엇을 어떻게 점검해야 하는지 시리즈 마지막 정리로 이어 가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **블로그와 공식 문서는 왜 서로 섞이면 안 될까요?**
+  - 본문의 기준은 블로그와 문서 차이를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **둘의 생명주기와 소유권은 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Diátaxis의 네 구역은 이 차이를 어떻게 설명해 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
-- [독자 정의하기](./02-defining-the-reader.md)
-- [제목과 구조 잡기](./03-title-and-structure.md)
-- [개념 설명하기](./04-explaining-concepts.md)
-- [예제 코드 설명하기](./05-explaining-example-code.md)
-- [그림과 표 사용하기](./06-using-figures-and-tables.md)
-- [README 작성하기](./07-writing-the-readme.md)
-- [튜토리얼 작성하기](./08-writing-tutorials.md)
+## 시리즈 목차
+
+- [Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): 독자 정의하기](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): 제목과 구조 잡기](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): 개념 설명하기](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): 예제 코드 설명하기](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): 그림과 표 사용하기](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): README 작성하기](./07-writing-the-readme.md)
+- [Technical Writing 101 (8/10): 튜토리얼 작성하기](./08-writing-tutorials.md)
 - **블로그와 문서 차이 (현재 글)**
 - 발행 전 체크리스트 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

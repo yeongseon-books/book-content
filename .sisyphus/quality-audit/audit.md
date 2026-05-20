@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:24:04+00:00
+Generated: 2026-05-20T11:24:23+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,13 +27,13 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **58**
+- Series with any issue: **57**
 - Series at or above 5 issues: **43**
-- Total issues: **550**
+- Total issues: **549**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **18**
+  - Shrt: **17**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -98,7 +98,6 @@ Warnings:
 | 55 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 | 56 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 | 57 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 58 | `technical-writing-101` | 1 | 0 | 0 | 0 | 1 | 0 |
 
 ## python-dbapi-101 — Total 42
 
@@ -763,10 +762,3 @@ Warnings:
 ### BadImg
 - `assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png:1` — PNG height 67px <= 100px (size=979x67)
 - `assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png:1` — PNG height 67px <= 100px (size=1019x67)
-
-## technical-writing-101 — Total 1
-
-- BadImg=0 Synt=0 BrkLink=0 Shrt=1 NoEn=0
-
-### Shrt
-- `content/technical-writing-101/en/02-defining-the-reader.md:22` — markdown body has 148 lines (< 150)

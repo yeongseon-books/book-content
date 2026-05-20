@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Explaining Example Code</title>
+<title>Technical Writing 101 (5/10): Explaining Example Code</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Explaining Example Code</h1>
+<h1>Technical Writing 101 (5/10): Explaining Example Code</h1>
 <p>Long code samples often look generous, but they are one of the fastest ways to lose a reader. If the post does not show where to focus, what to run, and what success looks like, the example becomes a copy-paste gamble instead of a teaching tool.</p>
 <p>Good code walkthroughs are intentionally small. They isolate the interesting lines, pair them with a short callout, and close the loop with an actual command and visible output. That is what turns a snippet into a reusable learning step.</p>
 <p>This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>A <em>minimal</em> example</li>
-<li>Where to place <em>comments</em></li>
-<li>Writing a <em>callout line</em></li>
-<li>Showing the <em>input and output</em></li>
-<li>Linking the <em>full code</em></li>
+<li>A <em>minimal</em> example?</li>
+<li>Where to place *comments?</li>
+<li>Writing a *callout line?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="technical writing 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>technical writing 101 chapter 5 flow overview</em></p>
+<p>This picture places Explaining Example Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Explaining Example Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A <em>runnable</em> example must reach the reader's <em>hands</em> to teach.</p>
 <blockquote>
 <p>Mental model: show the smallest runnable snippet, point at the key line, then prove the output.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>MWE</strong>: A <em>Minimal Working Example</em>.</li>
@@ -157,11 +160,21 @@ curl &quot;http://127.0.0.1:8000/add?a=2&amp;b=3&quot;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The next post is <em>Using Figures and Tables</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">What Is Technical Writing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Defining the Reader</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Title and Structure</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Explaining Concepts</a></li>
+<li><strong>A <em>minimal</em> example?</strong></li>
+<li>The article treats Explaining Example Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Where to place *comments?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Writing a *callout line?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">Technical Writing 101 (1/10): What Is Technical Writing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Technical Writing 101 (2/10): Defining the Reader</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Technical Writing 101 (3/10): Title and Structure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Technical Writing 101 (4/10): Explaining Concepts</a></li>
 <li><strong>Explaining Example Code (current)</strong></li>
 <li>Using Figures and Tables (upcoming)</li>
 <li>Writing the README (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 8
-title: 튜토리얼 작성하기
+title: "Technical Writing 101 (8/10): 튜토리얼 작성하기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 독자가 따라 하기만 해도 첫 성공을 경험하도록
 last_reviewed: '2026-05-15'
 ---
 
-# 튜토리얼 작성하기
+# Technical Writing 101 (8/10): 튜토리얼 작성하기
 
 튜토리얼을 쓰다 보면 설명을 더해야 안심이 됩니다. 그런데 독자는 지금 모든 배경을 배우러 온 것이 아니라, 손을 움직여 첫 성공을 확인하러 온 경우가 많습니다. 그래서 튜토리얼은 설명의 완전성보다 성공 경로의 안정성을 먼저 설계해야 합니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Technical Writing 101 시리즈의 8번째 글입니다. 여기서는 첫 성공을 빠르게 만들고 검증 가능한 단계로 나누는 튜토리얼 설계법을 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 따라 하기 글은 설명 글이나 레퍼런스와 무엇이 다를까요?
 - 독자가 따라만 해도 동작하는 튜토리얼은 어떻게 만들까요?
 - 전제 조건, 작은 성공, 복구 안내, 다음 단계는 어떤 순서로 놓여야 할까요?
-- 왜 짧은 튜토리얼이 더 좋은 경우가 많을까요?
+
+## 큰 그림
+
+![Technical Writing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Technical Writing 101 8장 흐름 개요*
+
+이 그림에서는 튜토리얼 작성하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 튜토리얼 작성하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -51,9 +60,6 @@ last_reviewed: '2026-05-15'
 
 > 멘탈 모델: 튜토리얼은 강의문이 아니라 안내선입니다. 전제 조건을 먼저 밝히고, 한 단계씩 따라가게 하고, 작은 성공을 빠르게 보여 준 뒤, 다음 학습으로 넘깁니다.
 
-![한눈에 보는 멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)
-
-*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **tutorial**: 학습 지향 글입니다.
@@ -174,17 +180,29 @@ fastapi dev main.py
 
 튜토리얼은 설명을 많이 하는 글이 아니라, 독자가 따라 하며 첫 성공을 얻는 글입니다. 그래서 전제 조건, 단계 순서, 작은 성공, 복구 안내, 다음 단계가 모두 중요합니다. 다음 글에서는 개인 경험을 담는 블로그와 팀의 공식 기준을 담는 문서를 어떻게 구분할지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **따라 하기 글은 설명 글이나 레퍼런스와 무엇이 다를까요?**
+  - 본문의 기준은 튜토리얼 작성하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **독자가 따라만 해도 동작하는 튜토리얼은 어떻게 만들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **전제 조건, 작은 성공, 복구 안내, 다음 단계는 어떤 순서로 놓여야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
-- [독자 정의하기](./02-defining-the-reader.md)
-- [제목과 구조 잡기](./03-title-and-structure.md)
-- [개념 설명하기](./04-explaining-concepts.md)
-- [예제 코드 설명하기](./05-explaining-example-code.md)
-- [그림과 표 사용하기](./06-using-figures-and-tables.md)
-- [README 작성하기](./07-writing-the-readme.md)
+## 시리즈 목차
+
+- [Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): 독자 정의하기](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): 제목과 구조 잡기](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): 개념 설명하기](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): 예제 코드 설명하기](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): 그림과 표 사용하기](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): README 작성하기](./07-writing-the-readme.md)
 - **튜토리얼 작성하기 (현재 글)**
 - 블로그와 문서 차이 (예정)
 - 발행 전 체크리스트 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

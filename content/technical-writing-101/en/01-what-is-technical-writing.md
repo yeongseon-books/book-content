@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 1
-title: What Is Technical Writing
+title: "Technical Writing 101 (1/10): What Is Technical Writing"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Define technical writing with a reader-task-output model so eng
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Technical Writing
+# Technical Writing 101 (1/10): What Is Technical Writing
 
 When beginners hear *technical writing*, they often picture polish first: clean grammar, nice headings, maybe a few screenshots. In real engineering teams, the harder problem is direction. If the writer does not know who the reader is, what action should follow, and what counts as success, even elegant prose turns into a slow document.
 
@@ -28,13 +28,21 @@ Technical writing matters because it keeps working after the meeting ends. A REA
 
 This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- A definition of *technical writing*
-- The difference from *everyday* prose
-- The *three purposes*
-- The reader's *action*
-- The shape of a *series*
+- A definition of *technical writing?
+- The difference from *everyday* prose?
+- The *three purposes?
+
+## Big Picture
+
+![technical writing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 1 flow overview*
+
+This picture places What Is Technical Writing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Technical Writing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Writing tends to *outlive* the *code* it describes.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **technical writing**: Prose that *delivers technical information*.
@@ -148,7 +153,18 @@ Internal company docs, open source READMEs, and conference talk slides are all *
 
 The next post is *Defining the Reader*.
 
+## Answering the Opening Questions
+
+- **A definition of *technical writing?**
+  - The article treats What Is Technical Writing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference from *everyday* prose?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *three purposes?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Technical Writing (current)**
 - Defining the Reader (upcoming)
 - Title and Structure (upcoming)
@@ -159,6 +175,7 @@ The next post is *Defining the Reader*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 8
-title: Writing Tutorials
+title: "Technical Writing 101 (8/10): Writing Tutorials"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Write tutorials with short verified steps, recovery notes, and 
 last_reviewed: '2026-05-15'
 ---
 
-# Writing Tutorials
+# Technical Writing 101 (8/10): Writing Tutorials
 
 Writers often respond to uncertainty by adding more explanation. Tutorial readers usually need the opposite. They need a short path, clear checkpoints, and quick recovery when one step fails.
 
@@ -28,13 +28,21 @@ A tutorial earns trust by making success predictable. Each step should leave beh
 
 This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Where a tutorial sits in *Diátaxis*
-- Stating *prerequisites*
-- Designing a *small win*
-- *Error recovery* notes
-- The *wrap-up* and *next step*
+- Where a tutorial sits in *Diátaxis?
+- Stating *prerequisites?
+- Designing a *small win?
+
+## Big Picture
+
+![technical writing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 8 flow overview*
+
+This picture places Writing Tutorials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing Tutorials is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ A *first success* creates the will to keep *learning*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **tutorial**: A *learning* oriented post.
@@ -167,17 +172,29 @@ Great libraries finish their *official tutorial* in *under five minutes*.
 
 The next post is *Blog vs Documentation*.
 
+## Answering the Opening Questions
+
+- **Where a tutorial sits in *Diátaxis?**
+  - The article treats Writing Tutorials as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Stating *prerequisites?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Designing a *small win?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
-- [Title and Structure](./03-title-and-structure.md)
-- [Explaining Concepts](./04-explaining-concepts.md)
-- [Explaining Example Code](./05-explaining-example-code.md)
-- [Using Figures and Tables](./06-using-figures-and-tables.md)
-- [Writing the README](./07-writing-the-readme.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
+- [Technical Writing 101 (3/10): Title and Structure](./03-title-and-structure.md)
+- [Technical Writing 101 (4/10): Explaining Concepts](./04-explaining-concepts.md)
+- [Technical Writing 101 (5/10): Explaining Example Code](./05-explaining-example-code.md)
+- [Technical Writing 101 (6/10): Using Figures and Tables](./06-using-figures-and-tables.md)
+- [Technical Writing 101 (7/10): Writing the README](./07-writing-the-readme.md)
 - **Writing Tutorials (current)**
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

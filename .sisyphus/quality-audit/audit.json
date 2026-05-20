@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-20T11:24:04+00:00",
+  "generated_at": "2026-05-20T11:24:23+00:00",
   "series_count": 92,
-  "problem_series_count": 58,
+  "problem_series_count": 57,
   "series_with_5_plus": 43,
   "gate": null,
   "gate_failed_series": [],
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 18,
+    "Shrt": 17,
     "NoEn": 0,
-    "all": 550
+    "all": 549
   },
   "results": [
     {
@@ -13934,52 +13934,6 @@
       }
     },
     {
-      "series": "technical-writing-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 1,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 1,
-      "max_issue_kind": "Shrt",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/technical-writing-101/en/02-defining-the-reader.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "02-defining-the-reader.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/technical-writing-101/en/02-defining-the-reader.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "02-defining-the-reader.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "ai-app-patterns-101",
       "counts": {
         "Synt": 0,
@@ -14415,6 +14369,20 @@
     },
     {
       "series": "python-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "technical-writing-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Using Figures and Tables</title>
+<title>Technical Writing 101 (6/10): Using Figures and Tables</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Using Figures and Tables</h1>
+<h1>Technical Writing 101 (6/10): Using Figures and Tables</h1>
 <p>Not every dense paragraph should become a diagram. Not every list of options deserves a table. The real skill is choosing the visual form that best answers the reader's question. If that choice is wrong, visuals add noise instead of clarity.</p>
 <p>Figures are strongest when the reader needs direction, sequence, or system shape. Tables are strongest when the reader needs side-by-side differences, limits, and trade-offs. Once you see that split, visual choices stop feeling decorative and start feeling editorial.</p>
 <p>This is post 6 in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Flowcharts</em> and <em>sequence diagrams</em></li>
-<li><em>Comparison</em> and <em>decision</em> tables</li>
-<li>Writing <em>captions</em></li>
-<li>Writing <em>alt text</em></li>
-<li><em>Resolution</em> and <em>accessibility</em></li>
+<li>Flowcharts<em> and </em>sequence diagrams?</li>
+<li>Comparison<em> and </em>decision* tables?</li>
+<li>Writing *captions?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="technical writing 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>technical writing 101 chapter 6 flow overview</em></p>
+<p>This picture places Using Figures and Tables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Using Figures and Tables is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>One <em>figure</em> often replaces <em>five</em> paragraphs.</p>
 <blockquote>
 <p>Mental model: use a figure for flow and a table for side-by-side decisions.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>flowchart</strong>: A <em>flow diagram</em>.</li>
@@ -100,11 +103,11 @@
 <p>Captions should answer the same question. <code>Architecture diagram</code> is too broad to help. <code>Request path from client to API server and database</code> tells the reader what to extract before they even inspect the figure.</p>
 <h2>Hands-on: A Figure and a Table</h2>
 <p><strong>Step 1 — Flowchart</strong></p>
-<p><img alt="Step 1 — Flowchart" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-02-step-1-flowchart.en.png"></p>
-<p><em>Step 1 — Flowchart</em><br>
+<p><img alt="request flow from client to server and database" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-02-step-1-flowchart.en.png"></p>
+<p><em>This flowchart shows the basic path from the client to the server and database.</em><br>
 <strong>Step 2 — Sequence</strong></p>
-<p><img alt="Step 2 — Sequence" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-03-step-2-sequence.en.png"></p>
-<p><em>Step 2 — Sequence</em><br>
+<p><img alt="call order between the client server and database" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-03-step-2-sequence.en.png"></p>
+<p><em>This sequence diagram shows the call order between the client, server, and database.</em><br>
 <strong>Step 3 — Comparison table</strong></p>
 <pre><code class="language-markdown">| Option | Speed | Cost |
 | --- | --- | --- |
@@ -156,12 +159,22 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The next post is <em>Writing the README</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">What Is Technical Writing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Defining the Reader</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Title and Structure</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Explaining Concepts</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/05-explaining-example-code.md">Explaining Example Code</a></li>
+<li><strong>Flowcharts<em> and </em>sequence diagrams?</strong></li>
+<li>The article treats Using Figures and Tables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Comparison<em> and </em>decision* tables?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Writing *captions?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">Technical Writing 101 (1/10): What Is Technical Writing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Technical Writing 101 (2/10): Defining the Reader</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Technical Writing 101 (3/10): Title and Structure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Technical Writing 101 (4/10): Explaining Concepts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/05-explaining-example-code.md">Technical Writing 101 (5/10): Explaining Example Code</a></li>
 <li><strong>Using Figures and Tables (current)</strong></li>
 <li>Writing the README (upcoming)</li>
 <li>Writing Tutorials (upcoming)</li>

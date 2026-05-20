@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Technical Writing</title>
+<title>Technical Writing 101 (1/10): What Is Technical Writing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Is Technical Writing</h1>
+<h1>Technical Writing 101 (1/10): What Is Technical Writing</h1>
 <p>When beginners hear <em>technical writing</em>, they often picture polish first: clean grammar, nice headings, maybe a few screenshots. In real engineering teams, the harder problem is direction. If the writer does not know who the reader is, what action should follow, and what counts as success, even elegant prose turns into a slow document.</p>
 <p>Technical writing matters because it keeps working after the meeting ends. A README, runbook, tutorial, or migration note gets read by someone who still has to install, run, compare, debug, or decide something. That operational handoff is what separates it from everyday explanatory prose.</p>
 <p>This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>A definition of <em>technical writing</em></li>
-<li>The difference from <em>everyday</em> prose</li>
-<li>The <em>three purposes</em></li>
-<li>The reader's <em>action</em></li>
-<li>The shape of a <em>series</em></li>
+<li>A definition of *technical writing?</li>
+<li>The difference from <em>everyday</em> prose?</li>
+<li>The *three purposes?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="technical writing 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>technical writing 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Technical Writing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Technical Writing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Writing tends to <em>outlive</em> the <em>code</em> it describes.</p>
 <blockquote>
 <p>Mental model: the post only works when a reader can turn the explanation into an action.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>technical writing</strong>: Prose that <em>delivers technical information</em>.</li>
@@ -154,6 +157,16 @@ source .venv/bin/activate
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The next post is <em>Defining the Reader</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>A definition of *technical writing?</strong></li>
+<li>The article treats What Is Technical Writing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The difference from <em>everyday</em> prose?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The *three purposes?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Technical Writing (current)</strong></li>
 <li>Defining the Reader (upcoming)</li>

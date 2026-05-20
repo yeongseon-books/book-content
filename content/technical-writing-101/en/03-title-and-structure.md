@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 3
-title: Title and Structure
+title: "Technical Writing 101 (3/10): Title and Structure"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Design technical titles and post structure together so the titl
 last_reviewed: '2026-05-15'
 ---
 
-# Title and Structure
+# Technical Writing 101 (3/10): Title and Structure
 
 Some posts earn the click and lose the reader two scrolls later. Others contain useful material but hide it behind a vague title, so the right reader never opens them in the first place. Those failures look different, but they come from the same source: the title promised one thing while the structure delivered another.
 
@@ -28,13 +28,21 @@ A strong title is not just marketing copy. It compresses the reader action and t
 
 This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- *SEO* titles
-- *H heading* hierarchy
-- *Intro, body, summary* shape
-- Building an *outline*
-- Handling *paragraphs*
+- SEO* titles?
+- H heading* hierarchy?
+- Intro, body, summary* shape?
+
+## Big Picture
+
+![technical writing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 3 flow overview*
+
+This picture places Title and Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Title and Structure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ The *title* earns the *click*, and the *structure* earns the *time*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **SEO title**: A *search-friendly title*.
@@ -163,9 +168,20 @@ News articles use the *inverted pyramid*, and technical blogs ask for *conclusio
 
 The next post is *Explaining Concepts*.
 
+## Answering the Opening Questions
+
+- **SEO* titles?**
+  - The article treats Title and Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **H heading* hierarchy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Intro, body, summary* shape?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
-- [Defining the Reader](./02-defining-the-reader.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
+- [Technical Writing 101 (2/10): Defining the Reader](./02-defining-the-reader.md)
 - **Title and Structure (current)**
 - Explaining Concepts (upcoming)
 - Explaining Example Code (upcoming)
@@ -174,6 +190,7 @@ The next post is *Explaining Concepts*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

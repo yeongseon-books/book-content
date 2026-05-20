@@ -1,7 +1,7 @@
 ---
 series: technical-writing-101
 episode: 2
-title: Defining the Reader
+title: "Technical Writing 101 (2/10): Defining the Reader"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Define the reader with persona, prior knowledge, goal, and non-
 last_reviewed: '2026-05-15'
 ---
 
-# Defining the Reader
+# Technical Writing 101 (2/10): Defining the Reader
 
 The same FastAPI example can be a friendly introduction for a junior engineer and a useless wall of text for the on-call engineer trying to restore service. The writing is not necessarily wrong. The target moved.
 
@@ -28,13 +28,21 @@ Once the reader is blurry, everything else drifts with it: how much background t
 
 This is post 2 in the Technical Writing 101 series. Here we turn the reader into a working model with persona, prior knowledge, goal, and non-goal.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Building a *persona*
-- Mapping *prior knowledge*
-- Aligning the *goal*
-- Tightening the *scope*
-- Matching example *difficulty*
+- Building a *persona?
+- Mapping *prior knowledge?
+- Aligning the *goal?
+
+## Big Picture
+
+![technical writing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
+
+*technical writing 101 chapter 2 flow overview*
+
+This picture places Defining the Reader inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Defining the Reader is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ A blurry *reader* leads to blurry *sentences*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **persona**: A *model of the reader*.
@@ -146,8 +151,19 @@ API references, user guides, and tutorials all split by *persona*.
 
 The next post is *Title and Structure*.
 
+## Answering the Opening Questions
+
+- **Building a *persona?**
+  - The article treats Defining the Reader as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Mapping *prior knowledge?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Aligning the *goal?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Technical Writing](./01-what-is-technical-writing.md)
+## In this series
+
+- [Technical Writing 101 (1/10): What Is Technical Writing](./01-what-is-technical-writing.md)
 - **Defining the Reader (current)**
 - Title and Structure (upcoming)
 - Explaining Concepts (upcoming)
@@ -157,6 +173,7 @@ The next post is *Title and Structure*.
 - Writing Tutorials (upcoming)
 - Blog vs Documentation (upcoming)
 - Pre-publish Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References
