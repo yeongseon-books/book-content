@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LLM app security</title>
+<title>LLM Apps Ops 101 (4/6): LLM app security</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,23 +53,23 @@
 </style>
 </head>
 <body>
-<h1>LLM app security</h1>
+<h1>LLM Apps Ops 101 (4/6): LLM app security</h1>
 <p>LLM security gets expensive when unsafe input is allowed to spread through the stack before anyone notices.</p>
 <p>This is the fourth post in the LLM Apps Ops 101 series. Here, we will set up a basic security layer with prompt scanning, masking, and output filtering.</p>
 <p>The practical goal is not perfect prevention. It is to fail earlier, before bad input reaches the model and before bad output reaches the user.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What should you scan first to catch basic prompt injection attempts?</li>
-<li>How do you mask emails or secrets before the model sees them?</li>
-<li>What can an output filter realistically block, and what can it not?</li>
-<li>Which event fields let you operate blocking rules instead of just shipping them?</li>
+<li>Why should LLM app security separate input guards from output filters?</li>
+<li>What responsibilities should prompt-injection detection and PII masking have in code?</li>
+<li>Which logs should you inspect first when rejection rate rises or falls?</li>
 </ul>
-<blockquote>
-<p>LLM security is about moving failure earlier. Block risky input before the model sees it, then block risky output before the user sees it.</p>
-</blockquote>
-<h2>Big picture</h2>
+<h2>Big Picture</h2>
 <p><img alt="LLM app security layer structure" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.en.png"></p>
 <p><em>LLM app security layer structure</em></p>
+<p>This picture shows input guards blocking prompt injection while output filters re-check PII and policy violations on the way out. LLM app security is not telling the model to be safe; it is validating each data boundary.</p>
+<blockquote>
+<p>Input can become instruction and output can become data leakage, so both boundaries need controls.</p>
+</blockquote>
 <h2>Why this layer matters</h2>
 <p><img alt="Input guard and output filter flow" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png"></p>
 <p><em>Input guard and output filter flow</em></p>
@@ -236,14 +236,23 @@ python3 -m scripts.security_report --compare release-2026-05-10 release-2026-05-
 <h2>Summary</h2>
 <p>The core security posture is simple: do not trust the input, and do not trust the raw output either.</p>
 <p>That principle will stay true even after your rules get more sophisticated. In the next post, we will place the same guardrails inside a deployable FastAPI service and verify startup, health, and one real request end to end.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why should LLM app security separate input guards from output filters?</strong></li>
+<li>Attacks enter through input and leaks leave through output, so one filter cannot cover the whole risk.</li>
+<li><strong>What responsibilities should prompt-injection detection and PII masking have in code?</strong></li>
+<li>Injection detection blocks dangerous instruction patterns, while PII masking reduces sensitive data at storage, transport, and response boundaries.</li>
+<li><strong>Which logs should you inspect first when rejection rate rises or falls?</strong></li>
+<li>Inspect block reasons by request_id, raw length, detection rule, masked fields, false-positive samples, and release version first.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM cost tracking and optimization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/03-evaluation.md">Evaluating LLM output quality</a></li>
-<li><strong>LLM app security (current)</strong></li>
-<li>LLM app deployment strategies (upcoming)</li>
-<li>Completing the LLM ops pipeline (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM Apps Ops 101 (2/6): LLM cost tracking and optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/03-evaluation.md">LLM Apps Ops 101 (3/6): Evaluating LLM output quality</a></li>
+<li><strong>LLM Apps Ops 101 (4/6): LLM app security (current)</strong></li>
+<li>LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)</li>
+<li>LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

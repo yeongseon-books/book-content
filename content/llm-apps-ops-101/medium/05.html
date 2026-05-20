@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LLM app deployment strategies</title>
+<title>LLM Apps Ops 101 (5/6): LLM app deployment strategies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,23 +53,23 @@
 </style>
 </head>
 <body>
-<h1>LLM app deployment strategies</h1>
+<h1>LLM Apps Ops 101 (5/6): LLM app deployment strategies</h1>
 <p>Operations-focused deployment advice only matters if the application can prove that it really starts.</p>
 <p>This is the fifth post in the LLM Apps Ops 101 series. Here, we will make a FastAPI-based LLM endpoint deployable and add a self-test that verifies the full startup path.</p>
 <p>A believable example should bring up the server, pass health, and complete one representative request without manual glue.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How much should a health check prove for a FastAPI LLM endpoint?</li>
-<li>How do you call the synchronous Groq client safely from an async endpoint?</li>
-<li>What is the simplest self-test flow that proves the server really starts?</li>
-<li>How should local self-tests connect to container deployment checks?</li>
+<li>Why should a pre-deployment self-test verify both health checks and real chat requests?</li>
+<li>What failure boundary appears between an async endpoint and a synchronous model call?</li>
+<li>What minimum artifacts should exist before container deployment?</li>
 </ul>
-<blockquote>
-<p>A deployable example is not defined by nice-looking server code. It is defined by whether the same script can start the server, hit health, and complete a real chat request.</p>
-</blockquote>
-<h2>Big picture</h2>
+<h2>Big Picture</h2>
 <p><img alt="Self-test flow for health and chat" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-01-big-picture.en.png"></p>
 <p><em>Self-test flow for health and chat</em></p>
+<p>This picture shows the self-test verifying startup, health endpoint, chat request, and provider call in order. Deploying an LLM app is not only about whether the container starts; it is about whether the real model-call boundary works.</p>
+<blockquote>
+<p>Deployment verification for an LLM app starts not with server startup, but with one real request passing end to end.</p>
+</blockquote>
 <h2>Why this layer matters</h2>
 <p><img alt="Startup verification reaches health check" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png"></p>
 <p><em>Startup verification reaches health check</em></p>
@@ -257,14 +257,23 @@ curl --fail -H &quot;Content-Type: application/json&quot; -d '{&quot;message&quo
 <h2>Summary</h2>
 <p>In deployment examples, the self-test is often more valuable than the endpoint code because it proves the instructions are real.</p>
 <p>The next step is to combine deployment, security, quality, cost, and logging into one integrated request path so the service leaves a full operational trail.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why should a pre-deployment self-test verify both health checks and real chat requests?</strong></li>
+<li>A health check can pass while provider auth, payload shape, timeout, or response parsing still fails.</li>
+<li><strong>What failure boundary appears between an async endpoint and a synchronous model call?</strong></li>
+<li>A sync model call inside an async server can block the event loop, propagate timeouts poorly, and exhaust workers.</li>
+<li><strong>What minimum artifacts should exist before container deployment?</strong></li>
+<li>Prepare environment variables, a health endpoint, external chat self-test, timeout settings, log schema, and rollback steps.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM cost tracking and optimization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/03-evaluation.md">Evaluating LLM output quality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/04-security.md">LLM app security</a></li>
-<li><strong>LLM app deployment strategies (current)</strong></li>
-<li>Completing the LLM ops pipeline (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/02-cost-tracking.md">LLM Apps Ops 101 (2/6): LLM cost tracking and optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/03-evaluation.md">LLM Apps Ops 101 (3/6): Evaluating LLM output quality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/04-security.md">LLM Apps Ops 101 (4/6): LLM app security</a></li>
+<li><strong>LLM Apps Ops 101 (5/6): LLM app deployment strategies (current)</strong></li>
+<li>LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

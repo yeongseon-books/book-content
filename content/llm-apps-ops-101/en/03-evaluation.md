@@ -1,5 +1,5 @@
 ---
-title: Evaluating LLM output quality
+title: "LLM Apps Ops 101 (3/6): Evaluating LLM output quality"
 series: llm-apps-ops-101
 episode: 3
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 ---
 
-# Evaluating LLM output quality
+# LLM Apps Ops 101 (3/6): Evaluating LLM output quality
 
 As traffic grows, nobody can read every model response by hand.
 
@@ -26,19 +26,21 @@ This is the third post in the LLM Apps Ops 101 series. Here, we will build a min
 
 Early in an ops pipeline, the pragmatic move is not to build a brilliant judge. It is to fail obvious bad output cheaply, consistently, and with enough detail to act on it.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do you automate max-length checks for model output?
-- When does keyword coverage become a useful quality gate?
-- How far should format validation go before you add schema validation?
-- What should a batch evaluation report include so failures are actionable?
+- Why should LLM output evaluation not stop at rule-based checks?
+- What failures become visible faster when format, length, and keyword checks are separated?
+- What decision standard should a batch evaluation report provide for operations?
 
-> The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
+## Big Picture
 
-## Big picture
 ![LLM output quality evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
 
 *LLM output quality evaluation pipeline*
+
+This picture shows LLM output passing through fast checks such as format, length, and keywords before deeper quality evaluation. Evaluation is not a pre-release event; it is the layer that reads quality change during operations.
+
+> Rule-based checks are the first filter for obvious failures; semantic quality judgment belongs in the next layer.
 
 ## Why this layer matters
 ![Rule checks catch obvious failures first](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)
@@ -264,15 +266,24 @@ Evaluation becomes operationally useful when it fails fast on obvious mistakes b
 
 The next layer is not always a smarter judge. Often it is better reporting, better test cases, and better comparison discipline. In the next post, we will connect this quality layer to the security layer, where even well-formed output can still be operationally unsafe.
 
+## Answering the Opening Questions
+
+- **Why should LLM output evaluation not stop at rule-based checks?**
+  - Passing format checks does not mean the answer is good. Factuality, usefulness, and grounding still need deeper evaluation.
+- **What failures become visible faster when format, length, and keyword checks are separated?**
+  - Broken JSON, overly short answers, and missing required terms become visible as separate failure types.
+- **What decision standard should a batch evaluation report provide for operations?**
+  - It should provide before/after pass rates, failure categories, representative failures, and thresholds that decide whether release is blocked.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
-- [LLM cost tracking and optimization](./02-cost-tracking.md)
-- **Evaluating LLM output quality (current)**
-- LLM app security (upcoming)
-- LLM app deployment strategies (upcoming)
-- Completing the LLM ops pipeline (upcoming)
+- [LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
+- [LLM Apps Ops 101 (2/6): LLM cost tracking and optimization](./02-cost-tracking.md)
+- **LLM Apps Ops 101 (3/6): Evaluating LLM output quality (current)**
+- LLM Apps Ops 101 (4/6): LLM app security (upcoming)
+- LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 

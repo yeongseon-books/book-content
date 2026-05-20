@@ -1,5 +1,5 @@
 ---
-title: LLM cost tracking and optimization
+title: "LLM Apps Ops 101 (2/6): LLM cost tracking and optimization"
 series: llm-apps-ops-101
 episode: 2
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 ---
 
-# LLM cost tracking and optimization
+# LLM Apps Ops 101 (2/6): LLM cost tracking and optimization
 
 LLM costs often look harmless until repeated prompts, traffic growth, or background jobs make them visible all at once. If you do not measure cost per call early, optimization decisions stay qualitative much longer than they should.
 
@@ -26,19 +26,21 @@ This is the second post in the LLM Apps Ops 101 series. Here, we will turn token
 
 Cost optimization does not work as a slogan. You need to know which calls create spend before you can decide what to compress, cache, reroute, or rate-limit.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How should token usage accumulate across repeated calls?
-- How much abstraction is enough for a simple price-per-million model?
-- Which numbers reveal the highest-value cost-saving opportunities first?
-- How do you compare caching, prompt compression, and model routing with the same report?
+- Why should LLM cost be tracked per call instead of waiting for the monthly bill?
+- What operations experiments become easier when the price card is separated in code?
+- How do you decide whether to cut cost first with caching, model changes, or prompt compression?
 
-> Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
+## Big Picture
 
-## Big picture
 ![Cost tracking flow and optimization points](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
 
 *Cost tracking flow and optimization points*
+
+This picture shows per-call token usage passing through a price card into cost records, then pointing to cache, model, and prompt optimization points. Cost tracking is not a savings tip; it is the operating layer that explains unit economics.
+
+> Cost is not a number to discover at month end; it is an operating signal to record on every request.
 
 ## Why this layer matters
 ![Per-call tokens become cumulative cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)
@@ -247,15 +249,24 @@ You cannot reduce spend responsibly until you can point to the exact calls that 
 
 The real goal is not adding one more metric. It is turning cost signals into operating decisions. In the next post, we will look at the evaluation layer that tells you whether those cheaper calls are still good enough.
 
+## Answering the Opening Questions
+
+- **Why should LLM cost be tracked per call instead of waiting for the monthly bill?**
+  - A monthly total cannot tell which endpoint, tenant, prompt, or model created the spend, so it hides the repair target.
+- **What operations experiments become easier when the price card is separated in code?**
+  - You can recompute price changes, model comparisons, cache savings, and prompt-compression effects with one calculator.
+- **How do you decide whether to cut cost first with caching, model changes, or prompt compression?**
+  - Start with caching for repeated inputs, smaller models when quality margin exists, and prompt compression when long system or context text is the cost driver.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
-- **LLM cost tracking and optimization (current)**
-- Evaluating LLM output quality (upcoming)
-- LLM app security (upcoming)
-- LLM app deployment strategies (upcoming)
-- Completing the LLM ops pipeline (upcoming)
+- [LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
+- **LLM Apps Ops 101 (2/6): LLM cost tracking and optimization (current)**
+- LLM Apps Ops 101 (3/6): Evaluating LLM output quality (upcoming)
+- LLM Apps Ops 101 (4/6): LLM app security (upcoming)
+- LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 

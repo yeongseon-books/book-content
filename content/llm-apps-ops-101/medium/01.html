@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Monitoring and logging for LLM apps</title>
+<title>LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Monitoring and logging for LLM apps</h1>
+<h1>LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps</h1>
 <p>Once an LLM app moves beyond a demo, the first real operations problem is not the outage itself. It is the inability to reconstruct what happened for one request across latency, token usage, and debugging context.</p>
 <p>This is the first post in the LLM Apps Ops 101 series. Here, we will define the logging and monitoring baseline that makes each model call traceable after the fact.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Which fields belong in every LLM request log?</li>
 <li>How do you tie latency, token usage, and response preview into one record?</li>
 <li>What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?</li>
 </ul>
-<blockquote>
-<p>Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting across separate systems.</p>
-</blockquote>
-<h2>Big picture</h2>
+<h2>Big Picture</h2>
 <p><img alt="Monitoring and logging component layout" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png"></p>
 <p><em>Monitoring and logging component layout</em></p>
+<p>This picture connects the application, LLM provider, log storage, and operations dashboard into one observability flow. The first operating baseline for an LLM app is not a dashboard; it is a log shape that can explain one request later.</p>
+<blockquote>
+<p>Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting.</p>
+</blockquote>
 <h2>Why this layer matters</h2>
 <p><img alt="Request and response logs per call" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png"></p>
 <p><em>Request and response logs per call</em><br>
@@ -190,14 +191,23 @@ if __name__ == &quot;__main__&quot;:
 </ul>
 <h2>Summary</h2>
 <p>The goal is not pretty logs. The goal is one record shape that can answer later questions about incidents, cost spikes, and model behavior.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Which fields belong in every LLM request log?</strong></li>
+<li>At minimum, keep request_id, model, prompt and completion tokens, latency, status, error, response preview, and user or tenant keys.</li>
+<li><strong>How do you tie latency, token usage, and response preview into one record?</strong></li>
+<li>Use one request_id for start and completion events, then record provider usage and measured latency in the same JSON record or joinable events.</li>
+<li><strong>What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?</strong></li>
+<li>A stable typed JSON schema survives best. If field names and request_id stay consistent, the backend can change without losing analysis.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>Monitoring and logging for LLM apps (current)</strong></li>
-<li>LLM cost tracking and optimization (upcoming)</li>
-<li>Evaluating LLM output quality (upcoming)</li>
-<li>LLM app security (upcoming)</li>
-<li>LLM app deployment strategies (upcoming)</li>
-<li>Completing the LLM ops pipeline (upcoming)</li>
+<li><strong>LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps (current)</strong></li>
+<li>LLM Apps Ops 101 (2/6): LLM cost tracking and optimization (upcoming)</li>
+<li>LLM Apps Ops 101 (3/6): Evaluating LLM output quality (upcoming)</li>
+<li>LLM Apps Ops 101 (4/6): LLM app security (upcoming)</li>
+<li>LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)</li>
+<li>LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

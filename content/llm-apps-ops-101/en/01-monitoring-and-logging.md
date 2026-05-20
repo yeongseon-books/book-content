@@ -1,5 +1,5 @@
 ---
-title: Monitoring and logging for LLM apps
+title: "LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps"
 series: llm-apps-ops-101
 episode: 1
 language: en
@@ -19,23 +19,28 @@ seo_description: Treat one log line as the operating contract for one LLM call, 
   cost, latency, and debugging questions stop fragmenting across separate systems.
 ---
 
-# Monitoring and logging for LLM apps
+# LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps
 
 Once an LLM app moves beyond a demo, the first real operations problem is not the outage itself. It is the inability to reconstruct what happened for one request across latency, token usage, and debugging context.
 
 This is the first post in the LLM Apps Ops 101 series. Here, we will define the logging and monitoring baseline that makes each model call traceable after the fact.
 
-## Questions this post answers
+## Questions to Keep in Mind
+
 - Which fields belong in every LLM request log?
 - How do you tie latency, token usage, and response preview into one record?
 - What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?
 
-> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting across separate systems.
+## Big Picture
 
-## Big picture
 ![Monitoring and logging component layout](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
 
 *Monitoring and logging component layout*
+
+This picture connects the application, LLM provider, log storage, and operations dashboard into one observability flow. The first operating baseline for an LLM app is not a dashboard; it is a log shape that can explain one request later.
+
+> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting.
+
 ## Why this layer matters
 ![Request and response logs per call](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)
 
@@ -168,15 +173,24 @@ if __name__ == "__main__":
 ## Summary
 The goal is not pretty logs. The goal is one record shape that can answer later questions about incidents, cost spikes, and model behavior.
 
+## Answering the Opening Questions
+
+- **Which fields belong in every LLM request log?**
+  - At minimum, keep request_id, model, prompt and completion tokens, latency, status, error, response preview, and user or tenant keys.
+- **How do you tie latency, token usage, and response preview into one record?**
+  - Use one request_id for start and completion events, then record provider usage and measured latency in the same JSON record or joinable events.
+- **What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?**
+  - A stable typed JSON schema survives best. If field names and request_id stay consistent, the backend can change without losing analysis.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Monitoring and logging for LLM apps (current)**
-- LLM cost tracking and optimization (upcoming)
-- Evaluating LLM output quality (upcoming)
-- LLM app security (upcoming)
-- LLM app deployment strategies (upcoming)
-- Completing the LLM ops pipeline (upcoming)
+- **LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps (current)**
+- LLM Apps Ops 101 (2/6): LLM cost tracking and optimization (upcoming)
+- LLM Apps Ops 101 (3/6): Evaluating LLM output quality (upcoming)
+- LLM Apps Ops 101 (4/6): LLM app security (upcoming)
+- LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 

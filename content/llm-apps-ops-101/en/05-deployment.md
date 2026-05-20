@@ -1,5 +1,5 @@
 ---
-title: LLM app deployment strategies
+title: "LLM Apps Ops 101 (5/6): LLM app deployment strategies"
 series: llm-apps-ops-101
 episode: 5
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: A deployable example proves startup, health, and one real chat request with the same script.
 ---
 
-# LLM app deployment strategies
+# LLM Apps Ops 101 (5/6): LLM app deployment strategies
 
 Operations-focused deployment advice only matters if the application can prove that it really starts.
 
@@ -26,19 +26,21 @@ This is the fifth post in the LLM Apps Ops 101 series. Here, we will make a Fast
 
 A believable example should bring up the server, pass health, and complete one representative request without manual glue.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How much should a health check prove for a FastAPI LLM endpoint?
-- How do you call the synchronous Groq client safely from an async endpoint?
-- What is the simplest self-test flow that proves the server really starts?
-- How should local self-tests connect to container deployment checks?
+- Why should a pre-deployment self-test verify both health checks and real chat requests?
+- What failure boundary appears between an async endpoint and a synchronous model call?
+- What minimum artifacts should exist before container deployment?
 
-> A deployable example is not defined by nice-looking server code. It is defined by whether the same script can start the server, hit health, and complete a real chat request.
+## Big Picture
 
-## Big picture
 ![Self-test flow for health and chat](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
 
 *Self-test flow for health and chat*
+
+This picture shows the self-test verifying startup, health endpoint, chat request, and provider call in order. Deploying an LLM app is not only about whether the container starts; it is about whether the real model-call boundary works.
+
+> Deployment verification for an LLM app starts not with server startup, but with one real request passing end to end.
 
 ## Why this layer matters
 ![Startup verification reaches health check](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png)
@@ -262,15 +264,24 @@ In deployment examples, the self-test is often more valuable than the endpoint c
 
 The next step is to combine deployment, security, quality, cost, and logging into one integrated request path so the service leaves a full operational trail.
 
+## Answering the Opening Questions
+
+- **Why should a pre-deployment self-test verify both health checks and real chat requests?**
+  - A health check can pass while provider auth, payload shape, timeout, or response parsing still fails.
+- **What failure boundary appears between an async endpoint and a synchronous model call?**
+  - A sync model call inside an async server can block the event loop, propagate timeouts poorly, and exhaust workers.
+- **What minimum artifacts should exist before container deployment?**
+  - Prepare environment variables, a health endpoint, external chat self-test, timeout settings, log schema, and rollback steps.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
-- [LLM cost tracking and optimization](./02-cost-tracking.md)
-- [Evaluating LLM output quality](./03-evaluation.md)
-- [LLM app security](./04-security.md)
-- **LLM app deployment strategies (current)**
-- Completing the LLM ops pipeline (upcoming)
+- [LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
+- [LLM Apps Ops 101 (2/6): LLM cost tracking and optimization](./02-cost-tracking.md)
+- [LLM Apps Ops 101 (3/6): Evaluating LLM output quality](./03-evaluation.md)
+- [LLM Apps Ops 101 (4/6): LLM app security](./04-security.md)
+- **LLM Apps Ops 101 (5/6): LLM app deployment strategies (current)**
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 

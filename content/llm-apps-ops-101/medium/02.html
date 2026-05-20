@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LLM cost tracking and optimization</title>
+<title>LLM Apps Ops 101 (2/6): LLM cost tracking and optimization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,23 +53,23 @@
 </style>
 </head>
 <body>
-<h1>LLM cost tracking and optimization</h1>
+<h1>LLM Apps Ops 101 (2/6): LLM cost tracking and optimization</h1>
 <p>LLM costs often look harmless until repeated prompts, traffic growth, or background jobs make them visible all at once. If you do not measure cost per call early, optimization decisions stay qualitative much longer than they should.</p>
 <p>This is the second post in the LLM Apps Ops 101 series. Here, we will turn token usage into an explicit cost feedback loop that supports caching, prompt compression, and routing decisions.</p>
 <p>Cost optimization does not work as a slogan. You need to know which calls create spend before you can decide what to compress, cache, reroute, or rate-limit.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How should token usage accumulate across repeated calls?</li>
-<li>How much abstraction is enough for a simple price-per-million model?</li>
-<li>Which numbers reveal the highest-value cost-saving opportunities first?</li>
-<li>How do you compare caching, prompt compression, and model routing with the same report?</li>
+<li>Why should LLM cost be tracked per call instead of waiting for the monthly bill?</li>
+<li>What operations experiments become easier when the price card is separated in code?</li>
+<li>How do you decide whether to cut cost first with caching, model changes, or prompt compression?</li>
 </ul>
-<blockquote>
-<p>Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.</p>
-</blockquote>
-<h2>Big picture</h2>
+<h2>Big Picture</h2>
 <p><img alt="Cost tracking flow and optimization points" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-big-picture.en.png"></p>
 <p><em>Cost tracking flow and optimization points</em></p>
+<p>This picture shows per-call token usage passing through a price card into cost records, then pointing to cache, model, and prompt optimization points. Cost tracking is not a savings tip; it is the operating layer that explains unit economics.</p>
+<blockquote>
+<p>Cost is not a number to discover at month end; it is an operating signal to record on every request.</p>
+</blockquote>
 <h2>Why this layer matters</h2>
 <p><img alt="Per-call tokens become cumulative cost" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png"></p>
 <p><em>Per-call tokens become cumulative cost</em></p>
@@ -84,7 +84,8 @@ from dataclasses import asdict, dataclass
 from groq import Groq
 
 MODEL = &quot;llama-3.1-8b-instant&quot;
-PRICE_PER_MILLION_TOKENS = 0.05
+INPUT_PRICE_PER_MILLION_TOKENS = 0.05
+OUTPUT_PRICE_PER_MILLION_TOKENS = 0.08
 
 @dataclass
 class CostRecord:
@@ -94,8 +95,10 @@ class CostRecord:
     total_tokens: int
     cost_usd: float
 
-def estimate_cost(total_tokens: int) -&gt; float:
-    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
+def estimate_cost(prompt_tokens: int, completion_tokens: int) -&gt; float:
+    prompt_cost = (prompt_tokens / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS
+    completion_cost = (completion_tokens / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS
+    return round(prompt_cost + completion_cost, 8)
 
 def run_prompt(client: Groq, prompt: str) -&gt; CostRecord:
     response = client.chat.completions.create(
@@ -114,7 +117,7 @@ def run_prompt(client: Groq, prompt: str) -&gt; CostRecord:
         prompt_tokens=usage.prompt_tokens,
         completion_tokens=usage.completion_tokens,
         total_tokens=usage.total_tokens,
-        cost_usd=estimate_cost(usage.total_tokens),
+        cost_usd=estimate_cost(usage.prompt_tokens, usage.completion_tokens),
     )
 
 def main() -&gt; None:
@@ -126,7 +129,8 @@ def main() -&gt; None:
     ]
     records = [run_prompt(client, prompt) for prompt in prompts]
     report = {
-        &quot;price_per_million_tokens&quot;: PRICE_PER_MILLION_TOKENS,
+        &quot;input_price_per_million_tokens&quot;: INPUT_PRICE_PER_MILLION_TOKENS,
+        &quot;output_price_per_million_tokens&quot;: OUTPUT_PRICE_PER_MILLION_TOKENS,
         &quot;total_calls&quot;: len(records),
         &quot;total_tokens&quot;: sum(record.total_tokens for record in records),
         &quot;total_cost_usd&quot;: round(sum(record.cost_usd for record in records), 8),
@@ -140,7 +144,7 @@ if __name__ == &quot;__main__&quot;:
 <h2>What to notice in this code</h2>
 <p><img alt="Repeated prompts become cache candidates" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-02-what-to-notice-in-this-code.en.png"></p>
 <p><em>Repeated prompts become cache candidates</em><br>
-- A single <code>PRICE_PER_MILLION_TOKENS</code> constant keeps the math obvious and easy to replace later.<br>
+- Separate input and output pricing constants keep the example aligned with how Groq bills this model.<br>
 - Persisting one <code>CostRecord</code> per call lets you analyze outliers without recomputing reports.<br>
 - Repeating one prompt on purpose gives you a baseline for later cache experiments.</p>
 <h2>Separate the price card before you need it</h2>
@@ -216,7 +220,7 @@ print(json.dumps(asdict(report), indent=2, ensure_ascii=False))
 <h2>Where engineers get confused</h2>
 <p><img alt="Optimization levers need quality checks" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png"></p>
 <p><em>Optimization levers need quality checks</em><br>
-- Many vendors price input and output tokens differently. Even if the example is simple, design for that split mentally.<br>
+- Many vendors price input and output tokens differently. Model your cost records that way from the start.<br>
 - A total-cost number alone hides spikes. You also need call count and token distribution.<br>
 - Cost optimization without quality checks often means quietly making the product worse.<br>
 - High cache hit rate can still be harmful if cache invalidation lets stale answers survive too long.</p>
@@ -242,14 +246,23 @@ python3 -m scripts.cost_report --group-by model
 <h2>Summary</h2>
 <p>You cannot reduce spend responsibly until you can point to the exact calls that create it.</p>
 <p>The real goal is not adding one more metric. It is turning cost signals into operating decisions. In the next post, we will look at the evaluation layer that tells you whether those cheaper calls are still good enough.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why should LLM cost be tracked per call instead of waiting for the monthly bill?</strong></li>
+<li>A monthly total cannot tell which endpoint, tenant, prompt, or model created the spend, so it hides the repair target.</li>
+<li><strong>What operations experiments become easier when the price card is separated in code?</strong></li>
+<li>You can recompute price changes, model comparisons, cache savings, and prompt-compression effects with one calculator.</li>
+<li><strong>How do you decide whether to cut cost first with caching, model changes, or prompt compression?</strong></li>
+<li>Start with caching for repeated inputs, smaller models when quality margin exists, and prompt compression when long system or context text is the cost driver.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
-<li><strong>LLM cost tracking and optimization (current)</strong></li>
-<li>Evaluating LLM output quality (upcoming)</li>
-<li>LLM app security (upcoming)</li>
-<li>LLM app deployment strategies (upcoming)</li>
-<li>Completing the LLM ops pipeline (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps</a></li>
+<li><strong>LLM Apps Ops 101 (2/6): LLM cost tracking and optimization (current)</strong></li>
+<li>LLM Apps Ops 101 (3/6): Evaluating LLM output quality (upcoming)</li>
+<li>LLM Apps Ops 101 (4/6): LLM app security (upcoming)</li>
+<li>LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)</li>
+<li>LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

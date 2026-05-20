@@ -1,5 +1,5 @@
 ---
-title: LLM app security
+title: "LLM Apps Ops 101 (4/6): LLM app security"
 series: llm-apps-ops-101
 episode: 4
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: LLM security is about moving failure earlier. Block risky input before the model sees it, then block risky output before the user sees it.
 ---
 
-# LLM app security
+# LLM Apps Ops 101 (4/6): LLM app security
 
 LLM security gets expensive when unsafe input is allowed to spread through the stack before anyone notices.
 
@@ -26,19 +26,21 @@ This is the fourth post in the LLM Apps Ops 101 series. Here, we will set up a b
 
 The practical goal is not perfect prevention. It is to fail earlier, before bad input reaches the model and before bad output reaches the user.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- What should you scan first to catch basic prompt injection attempts?
-- How do you mask emails or secrets before the model sees them?
-- What can an output filter realistically block, and what can it not?
-- Which event fields let you operate blocking rules instead of just shipping them?
+- Why should LLM app security separate input guards from output filters?
+- What responsibilities should prompt-injection detection and PII masking have in code?
+- Which logs should you inspect first when rejection rate rises or falls?
 
-> LLM security is about moving failure earlier. Block risky input before the model sees it, then block risky output before the user sees it.
+## Big Picture
 
-## Big picture
 ![LLM app security layer structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
 
 *LLM app security layer structure*
+
+This picture shows input guards blocking prompt injection while output filters re-check PII and policy violations on the way out. LLM app security is not telling the model to be safe; it is validating each data boundary.
+
+> Input can become instruction and output can become data leakage, so both boundaries need controls.
 
 ## Why this layer matters
 ![Input guard and output filter flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)
@@ -234,15 +236,24 @@ The core security posture is simple: do not trust the input, and do not trust th
 
 That principle will stay true even after your rules get more sophisticated. In the next post, we will place the same guardrails inside a deployable FastAPI service and verify startup, health, and one real request end to end.
 
+## Answering the Opening Questions
+
+- **Why should LLM app security separate input guards from output filters?**
+  - Attacks enter through input and leaks leave through output, so one filter cannot cover the whole risk.
+- **What responsibilities should prompt-injection detection and PII masking have in code?**
+  - Injection detection blocks dangerous instruction patterns, while PII masking reduces sensitive data at storage, transport, and response boundaries.
+- **Which logs should you inspect first when rejection rate rises or falls?**
+  - Inspect block reasons by request_id, raw length, detection rule, masked fields, false-positive samples, and release version first.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
-- [LLM cost tracking and optimization](./02-cost-tracking.md)
-- [Evaluating LLM output quality](./03-evaluation.md)
-- **LLM app security (current)**
-- LLM app deployment strategies (upcoming)
-- Completing the LLM ops pipeline (upcoming)
+- [LLM Apps Ops 101 (1/6): Monitoring and logging for LLM apps](./01-monitoring-and-logging.md)
+- [LLM Apps Ops 101 (2/6): LLM cost tracking and optimization](./02-cost-tracking.md)
+- [LLM Apps Ops 101 (3/6): Evaluating LLM output quality](./03-evaluation.md)
+- **LLM Apps Ops 101 (4/6): LLM app security (current)**
+- LLM Apps Ops 101 (5/6): LLM app deployment strategies (upcoming)
+- LLM Apps Ops 101 (6/6): Completing the LLM ops pipeline (upcoming)
 
 <!-- toc:end -->
 
