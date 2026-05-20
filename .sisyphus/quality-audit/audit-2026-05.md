@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:57:57+00:00
+Generated: 2026-05-20T11:58:17+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **20**
-- Series at or above 5 issues: **16**
-- Total issues: **166**
-  - BadImg: **166**
+- Series with any issue: **19**
+- Series at or above 5 issues: **15**
+- Total issues: **154**
+  - BadImg: **154**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -43,24 +43,23 @@ Warnings:
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
 | 2 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 3 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 4 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 5 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 6 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 7 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 8 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 9 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 10 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 11 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 12 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 13 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 14 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 15 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 16 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 17 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 18 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 19 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 20 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 3 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 4 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 5 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 6 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 7 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 8 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 9 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 10 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 11 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 12 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 13 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 14 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 15 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 16 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 17 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 18 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 19 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -84,18 +83,6 @@ Warnings:
 - `assets/data-science-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1014x67)
 - `assets/data-science-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=858x67)
 - `assets/data-science-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1118x67)
-- ... 7 more
-
-## docker-101 — Total 12
-
-- BadImg=12 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/docker-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=744x67)
-- `assets/docker-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=744x67)
-- `assets/docker-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=951x67)
-- `assets/docker-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=951x67)
-- `assets/docker-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 88px <= 100px (size=835x88)
 - ... 7 more
 
 ## llm-apps-ops-101 — Total 12
