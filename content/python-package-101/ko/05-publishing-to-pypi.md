@@ -1,5 +1,5 @@
 ---
-title: PyPI에 배포하기 — TestPyPI부터 실제 배포까지
+title: "Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지"
 series: python-package-101
 episode: 5
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드된 패키지를 PyPI에 업로드하는 도구입니다.
 ---
 
-# PyPI에 배포하기 — TestPyPI부터 실제 배포까지
+# Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지
 
 패키지를 빌드했다면 이제 다른 사람이 실제로 설치할 수 있는 저장소에 올려야 합니다. 이 단계부터는 단순한 로컬 연습을 넘어 배포 안정성, 인증 정보 관리, 버전 고정 같은 운영 감각이 중요해집니다.
 
 이 글은 Python Package 101 시리즈의 5번째 글입니다. 여기서는 TestPyPI와 PyPI의 역할 차이, `twine` 업로드 흐름, 그리고 배포 실패를 피하기 위한 기본 원칙을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - PyPI와 TestPyPI는 무엇이 다를까요?
 - `twine`은 정확히 어떤 역할을 할까요?
 - API 토큰은 어떻게 만들고 관리할까요?
-- 한 번 업로드한 버전은 수정할 수 있을까요?
+
+## 큰 그림
+
+![Python Package 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
+
+*Python Package 101 5장 흐름 개요*
+
+이 그림에서는 PyPI에 배포하기 — TestPyPI부터 실제 배포까지를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> PyPI에 배포하기 — TestPyPI부터 실제 배포까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -64,9 +73,6 @@ python -m build → dist/*.whl, dist/*.tar.gz
                      ↓
           twine upload dist/*          (production)
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
-*빌드부터 TestPyPI 검증, 실제 PyPI 배포까지의 운영 흐름*
 
 ## 핵심 개념
 
@@ -232,19 +238,28 @@ twine upload dist/*    # upload only the current version
 
 다음 글에서는 **버전 관리와 릴리스** — SemVer, Git 태그, CHANGELOG를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **PyPI와 TestPyPI는 무엇이 다를까요?**
+  - 본문의 기준은 PyPI에 배포하기 — TestPyPI부터 실제 배포까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`twine`은 정확히 어떤 역할을 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **API 토큰은 어떻게 만들고 관리할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Python Package란 무엇인가?](./01-what-is-a-python-package.md)
-- [프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
-- [의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
-- [패키지 빌드하기 — wheel과 sdist](./04-building-packages.md)
-- **PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (현재 글)**
-- 버전 관리와 릴리스 (예정)
-- CLI 패키지 만들기 (예정)
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist](./04-building-packages.md)
+- **Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (현재 글)**
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

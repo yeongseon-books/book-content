@@ -1,5 +1,5 @@
 ---
-title: 의존성 관리 — venv, pip, uv, requirements
+title: "Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements"
 series: python-package-101
 episode: 3
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간을 만드는 것이고, 의존성 관리는 어떤 패키지의 어떤 버전이 필요한지를 기록하는 것입니다.
 ---
 
-# 의존성 관리 — venv, pip, uv, requirements
+# Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements
 
 패키지를 만들었다면 이제 그 패키지가 어떤 환경에서 어떤 버전의 라이브러리와 함께 동작하는지 관리해야 합니다. 같은 코드라도 설치된 패키지 버전이 다르면 전혀 다른 결과가 나올 수 있기 때문입니다.
 
 이 글은 Python Package 101 시리즈의 3번째 글입니다. 여기서는 가상환경이 왜 필요한지, `requirements.txt`와 `pyproject.toml`의 역할이 어떻게 다른지, 그리고 `uv`가 왜 빠르게 표준 도구가 되고 있는지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 가상환경이 필요하고 어떻게 동작할까요?
 - `pip freeze`와 `requirements.txt`는 어떤 관계일까요?
 - `uv`는 `pip`와 무엇이 다를까요?
-- `pyproject.toml`의 `dependencies`와 `requirements.txt`는 어떻게 다를까요?
+
+## 큰 그림
+
+![Python Package 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.ko.png)
+
+*Python Package 101 3장 흐름 개요*
+
+이 그림에서는 의존성 관리 — venv, pip, uv, requirements를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 의존성 관리 — venv, pip, uv, requirements의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -63,9 +72,6 @@ site-packages/             project-a/.venv/site-packages/
                               requests 2.31
                               django 4.2
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.ko.png)
-*프로젝트별 가상환경과 버전 고정 파일이 분리되는 구조*
 
 ## 핵심 개념
 
@@ -248,19 +254,28 @@ dependencies = ["requests>=2.28"]
 
 다음 글에서는 **패키지 빌드하기** — wheel과 sdist를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 가상환경이 필요하고 어떻게 동작할까요?**
+  - 본문의 기준은 의존성 관리 — venv, pip, uv, requirements를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`pip freeze`와 `requirements.txt`는 어떤 관계일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`uv`는 `pip`와 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Python Package란 무엇인가?](./01-what-is-a-python-package.md)
-- [프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
-- **의존성 관리 — venv, pip, uv, requirements (현재 글)**
-- 패키지 빌드하기 — wheel과 sdist (예정)
-- PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
-- 버전 관리와 릴리스 (예정)
-- CLI 패키지 만들기 (예정)
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
+- **Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements (현재 글)**
+- Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist (예정)
+- Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

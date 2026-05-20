@@ -1,5 +1,5 @@
 ---
-title: Type Hints and Static Analysis
+title: "Python Package 101 (8/10): Type Hints and Static Analysis"
 series: python-package-101
 episode: 8
 language: en
@@ -22,20 +22,27 @@ seo_description: Type hints declare the input and output types of functions, and
   catches type errors without running the code.
 ---
 
-# Type Hints and Static Analysis
+# Python Package 101 (8/10): Type Hints and Static Analysis
 
 The moment other developers import your package, they need more than working code. They need a contract they can read quickly, and type hints are the fastest way to make that contract visible to both humans and tools.
 
 This is post 8 in the Python Package 101 series. Here we use type hints, `mypy`, and `py.typed` to turn Python packaging into something safer to consume and easier to refactor.
 
-## Key Questions
+## Questions to Keep in Mind
 
 - Why are type hints needed and do they affect runtime?
 - What kinds of errors does `mypy` catch?
 - Why is the `py.typed` marker file needed?
-- How do you use generic types and Union types?
 
-> Type hints declare the input and output types of functions, and mypy catches type errors without running the code.
+## Big Picture
+
+![Python Package 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
+
+*Python Package 101 chapter 8 flow overview*
+
+This picture places Type Hints and Static Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Type Hints and Static Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What you will learn
 
@@ -62,9 +69,6 @@ mypy checks:
   greet(42)    # Error: expected str, got int
   x: int = greet("Alice")  # Error: str assigned to int
 ```
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
-*How type hints feed static analysis and improve the package consumer experience*
 
 ## Core Concepts
 
@@ -272,19 +276,28 @@ For new projects, start with `strict = true` from day one. For existing projects
 
 The next post covers **documentation** — README, MkDocs, and API Reference.
 
+## Answering the Opening Questions
+
+- **Why are type hints needed and do they affect runtime?**
+  - The article treats Type Hints and Static Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What kinds of errors does `mypy` catch?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is the `py.typed` marker file needed?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is a Python Package?](./01-what-is-a-python-package.md)
-- [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
-- [Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
-- [Building Packages — wheel and sdist](./04-building-packages.md)
-- [Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
-- [Versioning and Releases](./06-versioning-and-releases.md)
-- [CLI Packages](./07-cli-packages.md)
-- **Type Hints and Static Analysis (current)**
-- Documentation — README, MkDocs, API Reference (upcoming)
-- Production Package Template (upcoming)
+- [Python Package 101 (1/10): What Is a Python Package?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): Project Structure — src layout and pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): Building Packages — wheel and sdist](./04-building-packages.md)
+- [Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
+- [Python Package 101 (6/10): Versioning and Releases](./06-versioning-and-releases.md)
+- [Python Package 101 (7/10): CLI Packages](./07-cli-packages.md)
+- **Python Package 101 (8/10): Type Hints and Static Analysis (current)**
+- Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

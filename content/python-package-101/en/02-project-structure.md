@@ -1,5 +1,5 @@
 ---
-title: Project Structure — src layout and pyproject.toml
+title: "Python Package 101 (2/10): Project Structure — src layout and pyproject.toml"
 series: python-package-101
 episode: 2
 language: en
@@ -22,20 +22,27 @@ seo_description: src layout separates source code from the project root to enfor
   install-before-test, and pyproject.toml defines how to build.
 ---
 
-# Project Structure — src layout and pyproject.toml
+# Python Package 101 (2/10): Project Structure — src layout and pyproject.toml
 
 Project structure is where many packaging bugs begin. If tests read local source by accident, you can ship a package that only works on your machine.
 
 This is post 2 in the Python Package 101 series. Here we compare flat layout and src layout, explain why `pyproject.toml` replaced `setup.py`, and build a minimal package skeleton that behaves like a real install.
 
-## Key Questions
+## Questions to Keep in Mind
 
 - What is the difference between flat layout and src layout?
 - What is `pyproject.toml` and why does it replace `setup.py`?
 - What goes in `[build-system]` and `[project]`?
-- What does a minimal pyproject.toml look like?
 
-> src layout separates source code from the project root to enforce install-before-test, and pyproject.toml defines how to build the package.
+## Big Picture
+
+![Python Package 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
+
+*Python Package 101 chapter 2 flow overview*
+
+This picture places Project Structure — src layout and pyproject.toml inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Project Structure — src layout and pyproject.toml is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What you will learn
 
@@ -66,9 +73,6 @@ tests/                      core.py
 pyproject.toml          tests/
                         pyproject.toml
 ```
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
-*How src layout separates source, metadata, and installation-time verification*
 
 ## Core Concepts
 
@@ -272,19 +276,28 @@ For the build backend, `setuptools` is the most widely used, but `hatchling` and
 
 The next post covers **dependency management** — venv, pip, uv, and requirements.
 
+## Answering the Opening Questions
+
+- **What is the difference between flat layout and src layout?**
+  - The article treats Project Structure — src layout and pyproject.toml as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is `pyproject.toml` and why does it replace `setup.py`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What goes in `[build-system]` and `[project]`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is a Python Package?](./01-what-is-a-python-package.md)
-- **Project Structure — src layout and pyproject.toml (current)**
-- Dependency Management — venv, pip, uv, requirements (upcoming)
-- Building Packages — wheel and sdist (upcoming)
-- Publishing to PyPI — from TestPyPI to production (upcoming)
-- Versioning and Releases (upcoming)
-- CLI Packages (upcoming)
-- Type Hints and Static Analysis (upcoming)
-- Documentation — README, MkDocs, API Reference (upcoming)
-- Production Package Template (upcoming)
+- [Python Package 101 (1/10): What Is a Python Package?](./01-what-is-a-python-package.md)
+- **Python Package 101 (2/10): Project Structure — src layout and pyproject.toml (current)**
+- Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements (upcoming)
+- Python Package 101 (4/10): Building Packages — wheel and sdist (upcoming)
+- Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production (upcoming)
+- Python Package 101 (6/10): Versioning and Releases (upcoming)
+- Python Package 101 (7/10): CLI Packages (upcoming)
+- Python Package 101 (8/10): Type Hints and Static Analysis (upcoming)
+- Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

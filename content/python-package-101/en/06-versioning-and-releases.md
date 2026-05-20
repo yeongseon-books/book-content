@@ -1,5 +1,5 @@
 ---
-title: Versioning and Releases
+title: "Python Package 101 (6/10): Versioning and Releases"
 series: python-package-101
 episode: 6
 language: en
@@ -22,20 +22,27 @@ seo_description: SemVer assigns meaning to version numbers, and Git tags mark sp
   commits as release points.
 ---
 
-# Versioning and Releases
+# Python Package 101 (6/10): Versioning and Releases
 
 After the first public release, users stop asking only “does it work?” and start asking “is this update safe?” Version numbers, tags, and changelogs are the signals they rely on.
 
 This is post 6 in the Python Package 101 series. Here we translate code changes into SemVer decisions, keep package metadata in sync, and turn release history into something users can trust.
 
-## Key Questions
+## Questions to Keep in Mind
 
 - When do you bump each part of MAJOR.MINOR.PATCH in SemVer?
 - Where in the code should the version be recorded?
 - What is the relationship between Git tags and releases?
-- Why is a CHANGELOG needed and how do you write one?
 
-> SemVer assigns meaning to version numbers, and Git tags mark specific commits as release points.
+## Big Picture
+
+![Python Package 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
+
+*Python Package 101 chapter 6 flow overview*
+
+This picture places Versioning and Releases inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Versioning and Releases is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What you will learn
 
@@ -62,9 +69,6 @@ PATCH  (1.2.3 → 1.2.4): Bug fix, no API changes
 MINOR  (1.2.4 → 1.3.0): New feature, existing API preserved
 MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 ```
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
-*How a code change becomes a version bump, a changelog entry, a tag, and a release*
 
 ## Core Concepts
 
@@ -229,19 +233,28 @@ If managing versions in two places is tedious, use `setuptools-scm`. Just tag a 
 
 The next post covers **CLI packages** — entry points and click.
 
+## Answering the Opening Questions
+
+- **When do you bump each part of MAJOR.MINOR.PATCH in SemVer?**
+  - The article treats Versioning and Releases as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where in the code should the version be recorded?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the relationship between Git tags and releases?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is a Python Package?](./01-what-is-a-python-package.md)
-- [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
-- [Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
-- [Building Packages — wheel and sdist](./04-building-packages.md)
-- [Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
-- **Versioning and Releases (current)**
-- CLI Packages (upcoming)
-- Type Hints and Static Analysis (upcoming)
-- Documentation — README, MkDocs, API Reference (upcoming)
-- Production Package Template (upcoming)
+- [Python Package 101 (1/10): What Is a Python Package?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): Project Structure — src layout and pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): Building Packages — wheel and sdist](./04-building-packages.md)
+- [Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production](./05-publishing-to-pypi.md)
+- **Python Package 101 (6/10): Versioning and Releases (current)**
+- Python Package 101 (7/10): CLI Packages (upcoming)
+- Python Package 101 (8/10): Type Hints and Static Analysis (upcoming)
+- Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)
+- Python Package 101 (10/10): Production Package Template (upcoming)
 
 <!-- toc:end -->
 

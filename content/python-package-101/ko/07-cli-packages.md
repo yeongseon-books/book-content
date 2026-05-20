@@ -1,5 +1,5 @@
 ---
-title: CLI 패키지 만들기
+title: "Python Package 101 (7/10): CLI 패키지 만들기"
 series: python-package-101
 episode: 7
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: entry point와 click으로 pip install 후 바로 실행 가능한 CLI를 만드는 방법입니다.
 ---
 
-# CLI 패키지 만들기
+# Python Package 101 (7/10): CLI 패키지 만들기
 
 패키지는 import해서 쓰는 라이브러리로만 끝나지 않습니다. 잘 만든 패키지는 설치 직후 터미널 명령어로도 실행할 수 있습니다.
 
 이 글은 Python Package 101 시리즈의 7번째 글입니다. 여기서는 `[project.scripts]` entry point가 어떻게 동작하는지, `argparse`와 `click`의 차이는 무엇인지, 그리고 실무에서 쓰기 좋은 CLI 구조를 어떻게 잡는지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?
 - `[project.scripts]` entry point는 어떻게 동작할까요?
 - `argparse`와 `click`은 무엇이 다를까요?
-- 서브커맨드 구조는 어떻게 설계할까요?
+
+## 큰 그림
+
+![Python Package 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
+
+*Python Package 101 7장 흐름 개요*
+
+이 그림에서는 CLI 패키지 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> CLI 패키지 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -61,9 +70,6 @@ greet = "mylib.cli:main"    →    Hello, Alice!
          ↓
    runs the main() function in mylib/cli.py
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
-*설치된 패키지가 entry point를 통해 CLI 명령으로 연결되는 구조*
 
 ## 핵심 개념
 
@@ -291,19 +297,28 @@ CLI에서 가장 중요한 것은 기능 수보다 **일관된 인터페이스**
 
 다음 글에서는 **타입 힌트와 정적 검사** — mypy, `py.typed`, 타입 안전한 패키지를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **`pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?**
+  - 본문의 기준은 CLI 패키지 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`[project.scripts]` entry point는 어떻게 동작할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`argparse`와 `click`은 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Python Package란 무엇인가?](./01-what-is-a-python-package.md)
-- [프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
-- [의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
-- [패키지 빌드하기 — wheel과 sdist](./04-building-packages.md)
-- [PyPI에 배포하기 — TestPyPI부터 실제 배포까지](./05-publishing-to-pypi.md)
-- [버전 관리와 릴리스](./06-versioning-and-releases.md)
-- **CLI 패키지 만들기 (현재 글)**
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
+- [Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist](./04-building-packages.md)
+- [Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지](./05-publishing-to-pypi.md)
+- [Python Package 101 (6/10): 버전 관리와 릴리스](./06-versioning-and-releases.md)
+- **Python Package 101 (7/10): CLI 패키지 만들기 (현재 글)**
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

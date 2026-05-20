@@ -1,5 +1,5 @@
 ---
-title: Python Package란 무엇인가?
+title: "Python Package 101 (1/10): Python Package란 무엇인가?"
 series: python-package-101
 episode: 1
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른 사람과 공유하는 단위입니다. import로 불러오는 모든 것이 패키지입니다.
 ---
 
-# Python Package란 무엇인가?
+# Python Package 101 (1/10): Python Package란 무엇인가?
 
 프로젝트가 조금만 커져도 파일을 여러 개로 나누고, 다른 파일의 코드를 `import`해서 쓰게 됩니다. 여기서부터 Python 패키징의 기본 개념이 시작됩니다.
 
 이 글은 Python Package 101 시리즈의 첫 번째 글입니다. 여기서는 모듈, 패키지, 배포판이 각각 무엇이고 `pip install`이 실제로 무엇을 설치하는지, 그리고 왜 여러분의 코드를 패키지로 만들어야 하는지를 먼저 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 모듈과 패키지는 정확히 무엇이 다를까요?
 - `import requests`를 실행하면 내부에서는 어떤 일이 일어날까요?
 - `pip install`은 실제로 무엇을 설치할까요?
-- 내 코드를 언제 패키지로 만들어야 할까요?
+
+## 큰 그림
+
+![Python Package 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
+
+*Python Package 101 1장 흐름 개요*
+
+이 그림에서는 Python Package란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Python Package란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -61,9 +70,6 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
                      utils.py
                      models.py
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
-*모듈이 패키지와 배포판을 거쳐 설치되는 흐름*
 
 ## 핵심 개념
 
@@ -257,19 +263,28 @@ import my_package           # Import name: underscore
 
 다음 글에서는 **프로젝트 구조** — src layout과 `pyproject.toml`을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **모듈과 패키지는 정확히 무엇이 다를까요?**
+  - 본문의 기준은 Python Package란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`import requests`를 실행하면 내부에서는 어떤 일이 일어날까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`pip install`은 실제로 무엇을 설치할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **Python Package란 무엇인가? (현재 글)**
-- 프로젝트 구조 잡기 — src layout과 pyproject.toml (예정)
-- 의존성 관리 — venv, pip, uv, requirements (예정)
-- 패키지 빌드하기 — wheel과 sdist (예정)
-- PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
-- 버전 관리와 릴리스 (예정)
-- CLI 패키지 만들기 (예정)
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- **Python Package 101 (1/10): Python Package란 무엇인가? (현재 글)**
+- Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml (예정)
+- Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements (예정)
+- Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist (예정)
+- Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

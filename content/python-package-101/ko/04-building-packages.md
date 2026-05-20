@@ -1,5 +1,5 @@
 ---
-title: 패키지 빌드하기 — wheel과 sdist
+title: "Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist"
 series: python-package-101
 episode: 4
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: wheel은 이미 빌드된 패키지 파일이고, sdist는 소스 코드를 묶은 원본 아카이브입니다. 둘 다 만들어야 어디서든 설치할 수 있습니다.
 ---
 
-# 패키지 빌드하기 — wheel과 sdist
+# Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist
 
 패키지를 구조화하고 의존성을 정리했다면, 이제 실제로 배포 가능한 파일을 만들어야 합니다. `pip install`은 소스 저장소를 직접 읽는 것이 아니라 배포판 아카이브를 설치하기 때문입니다.
 
 이 글은 Python Package 101 시리즈의 4번째 글입니다. 여기서는 wheel과 sdist의 차이, `python -m build`가 생성하는 결과물, 그리고 빌드 후 반드시 확인해야 할 검증 포인트를 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - wheel과 sdist는 무엇이 다를까요?
 - `python -m build`는 어떤 파일을 만들까요?
 - `.whl` 파일 안에는 무엇이 들어 있을까요?
-- PyPI에는 어떤 파일을 올려야 할까요?
+
+## 큰 그림
+
+![Python Package 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.ko.png)
+
+*Python Package 101 4장 흐름 개요*
+
+이 그림에서는 패키지 빌드하기 — wheel과 sdist를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 패키지 빌드하기 — wheel과 sdist의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -56,9 +65,6 @@ source code → python -m build → dist/
                                 ├── mylib-0.1.0.tar.gz     (sdist)
                                 └── mylib-0.1.0-py3-none-any.whl  (wheel)
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.ko.png)
-*소스 코드가 sdist와 wheel로 빌드된 뒤 설치 검증으로 이어지는 흐름*
 
 ## 핵심 개념
 
@@ -219,19 +225,28 @@ python -m build    # build from a clean state
 
 다음 글에서는 **PyPI에 배포하기** — TestPyPI부터 실제 배포까지를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **wheel과 sdist는 무엇이 다를까요?**
+  - 본문의 기준은 패키지 빌드하기 — wheel과 sdist를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`python -m build`는 어떤 파일을 만들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`.whl` 파일 안에는 무엇이 들어 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Python Package란 무엇인가?](./01-what-is-a-python-package.md)
-- [프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
-- [의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
-- **패키지 빌드하기 — wheel과 sdist (현재 글)**
-- PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
-- 버전 관리와 릴리스 (예정)
-- CLI 패키지 만들기 (예정)
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
+- [Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml](./02-project-structure.md)
+- [Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements](./03-dependency-management.md)
+- **Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist (현재 글)**
+- Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

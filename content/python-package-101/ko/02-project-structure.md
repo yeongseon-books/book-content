@@ -1,5 +1,5 @@
 ---
-title: 프로젝트 구조 잡기 — src layout과 pyproject.toml
+title: "Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml"
 series: python-package-101
 episode: 2
 language: ko
@@ -21,18 +21,27 @@ last_reviewed: '2026-05-15'
 seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 잡는 방법을 설명합니다.
 ---
 
-# 프로젝트 구조 잡기 — src layout과 pyproject.toml
+# Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml
 
 패키징은 파일 몇 개를 묶는 수준에서 끝나지 않습니다. 어디에 소스를 두고, 어떤 파일에 메타데이터를 적고, 테스트가 실제 설치된 패키지를 검증하도록 구조를 어떻게 잡을지까지 함께 결정해야 합니다.
 
 이 글은 Python Package 101 시리즈의 2번째 글입니다. 여기서는 flat layout과 src layout의 차이, `pyproject.toml`이 `setup.py`를 대체한 이유, 그리고 패키지 프로젝트의 최소 표준 구조를 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - flat layout과 src layout은 무엇이 다를까요?
 - `pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?
 - `[build-system]`과 `[project]`에는 무엇이 들어갈까요?
-- 최소한의 `pyproject.toml`은 어떤 모습일까요?
+
+## 큰 그림
+
+![Python Package 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.ko.png)
+
+*Python Package 101 2장 흐름 개요*
+
+이 그림에서는 프로젝트 구조 잡기 — src layout과 pyproject.toml를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 프로젝트 구조 잡기 — src layout과 pyproject.toml의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -63,9 +72,6 @@ tests/                      core.py
 pyproject.toml          tests/
                         pyproject.toml
 ```
-
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.ko.png)
-*src layout이 소스, 메타데이터, 설치 검증을 분리하는 구조*
 
 ## 핵심 개념
 
@@ -269,19 +275,28 @@ where = ["src"]
 
 다음 글에서는 **의존성 관리** — venv, pip, uv, requirements를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **flat layout과 src layout은 무엇이 다를까요?**
+  - 본문의 기준은 프로젝트 구조 잡기 — src layout과 pyproject.toml를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`[build-system]`과 `[project]`에는 무엇이 들어갈까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Python Package란 무엇인가?](./01-what-is-a-python-package.md)
-- **프로젝트 구조 잡기 — src layout과 pyproject.toml (현재 글)**
-- 의존성 관리 — venv, pip, uv, requirements (예정)
-- 패키지 빌드하기 — wheel과 sdist (예정)
-- PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
-- 버전 관리와 릴리스 (예정)
-- CLI 패키지 만들기 (예정)
-- 타입 힌트와 정적 검사 (예정)
-- 문서화 — README, MkDocs, API Reference (예정)
-- 실전 패키지 템플릿 만들기 (예정)
+- [Python Package 101 (1/10): Python Package란 무엇인가?](./01-what-is-a-python-package.md)
+- **Python Package 101 (2/10): 프로젝트 구조 잡기 — src layout과 pyproject.toml (현재 글)**
+- Python Package 101 (3/10): 의존성 관리 — venv, pip, uv, requirements (예정)
+- Python Package 101 (4/10): 패키지 빌드하기 — wheel과 sdist (예정)
+- Python Package 101 (5/10): PyPI에 배포하기 — TestPyPI부터 실제 배포까지 (예정)
+- Python Package 101 (6/10): 버전 관리와 릴리스 (예정)
+- Python Package 101 (7/10): CLI 패키지 만들기 (예정)
+- Python Package 101 (8/10): 타입 힌트와 정적 검사 (예정)
+- Python Package 101 (9/10): 문서화 — README, MkDocs, API Reference (예정)
+- Python Package 101 (10/10): 실전 패키지 템플릿 만들기 (예정)
 
 <!-- toc:end -->
 

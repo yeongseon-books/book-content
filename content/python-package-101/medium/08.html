@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Type Hints and Static Analysis</title>
+<title>Python Package 101 (8/10): Type Hints and Static Analysis</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,21 @@
 </style>
 </head>
 <body>
-<h1>Type Hints and Static Analysis</h1>
+<h1>Python Package 101 (8/10): Type Hints and Static Analysis</h1>
 <p>The moment other developers import your package, they need more than working code. They need a contract they can read quickly, and type hints are the fastest way to make that contract visible to both humans and tools.</p>
 <p>This is post 8 in the Python Package 101 series. Here we use type hints, <code>mypy</code>, and <code>py.typed</code> to turn Python packaging into something safer to consume and easier to refactor.</p>
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why are type hints needed and do they affect runtime?</li>
 <li>What kinds of errors does <code>mypy</code> catch?</li>
 <li>Why is the <code>py.typed</code> marker file needed?</li>
-<li>How do you use generic types and Union types?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Python Package 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png"></p>
+<p><em>Python Package 101 chapter 8 flow overview</em></p>
+<p>This picture places Type Hints and Static Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Type hints declare the input and output types of functions, and mypy catches type errors without running the code.</p>
+<p>The core of Type Hints and Static Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What you will learn</h2>
 <ul>
@@ -89,8 +92,6 @@ mypy checks:
   greet(42)    # Error: expected str, got int
   x: int = greet(&quot;Alice&quot;)  # Error: str assigned to int
 </code></pre>
-<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png"><br>
-<em>How type hints feed static analysis and improve the package consumer experience</em></p>
 <h2>Core Concepts</h2>
 <p><strong>type hint</strong><br>
 - Description: Type annotation on variables/arguments/return values<br>
@@ -252,18 +253,27 @@ mypy src/  # resolves import type errors for requests
 <li>Overusing <code>Any</code> defeats the purpose of type hints.</li>
 </ul>
 <p>The next post covers <strong>documentation</strong> — README, MkDocs, and API Reference.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why are type hints needed and do they affect runtime?</strong></li>
+<li>The article treats Type Hints and Static Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What kinds of errors does <code>mypy</code> catch?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is the <code>py.typed</code> marker file needed?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">What Is a Python Package?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Project Structure — src layout and pyproject.toml</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Dependency Management — venv, pip, uv, requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Building Packages — wheel and sdist</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Publishing to PyPI — from TestPyPI to production</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Versioning and Releases</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/07-cli-packages.md">CLI Packages</a></li>
-<li><strong>Type Hints and Static Analysis (current)</strong></li>
-<li>Documentation — README, MkDocs, API Reference (upcoming)</li>
-<li>Production Package Template (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/01-what-is-a-python-package.md">Python Package 101 (1/10): What Is a Python Package?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/02-project-structure.md">Python Package 101 (2/10): Project Structure — src layout and pyproject.toml</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/03-dependency-management.md">Python Package 101 (3/10): Dependency Management — venv, pip, uv, requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/04-building-packages.md">Python Package 101 (4/10): Building Packages — wheel and sdist</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/05-publishing-to-pypi.md">Python Package 101 (5/10): Publishing to PyPI — from TestPyPI to production</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/06-versioning-and-releases.md">Python Package 101 (6/10): Versioning and Releases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-package-101/en/07-cli-packages.md">Python Package 101 (7/10): CLI Packages</a></li>
+<li><strong>Python Package 101 (8/10): Type Hints and Static Analysis (current)</strong></li>
+<li>Python Package 101 (9/10): Documentation — README, MkDocs, API Reference (upcoming)</li>
+<li>Python Package 101 (10/10): Production Package Template (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
