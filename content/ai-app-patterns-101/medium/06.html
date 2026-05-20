@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Human-in-the-loop — designing for human intervention</title>
+<title>AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,37 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Human-in-the-loop — designing for human intervention</h1>
+<h1>AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention</h1>
 <p>Better automation does not remove the need for human review; it makes the review boundary more important. Once an AI system can draft, classify, or trigger actions at scale, the real engineering work is deciding which outcomes can flow through untouched and which ones must stop for approval.</p>
 <p>This is the final post in the AI App Patterns 101 series. Here we cover how to place human judgment inside an automated pipeline without turning the whole system back into manual work.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What criteria should trigger a human approval step before an AI draft is sent?</li>
-<li>How can you implement a branch that escalates only low-confidence outputs to a human?</li>
-<li>How do you keep a HITL demo script verifiable in automation while still modeling human review?</li>
+<li>Is human-in-the-loop a fallback for weak models, or part of product design?</li>
+<li>When should you use an approval gate versus a confidence-based branch?</li>
+<li>What should be logged so human decisions can be audited later?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Human review by risk level" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png"></p>
+<p><em>Human review by risk level</em></p>
+<p>This picture shows an automated path branching into human approval or review under specific conditions. HITL is not giving up on automation; it keeps risky decisions inside a safer boundary.</p>
 <blockquote>
 <p>Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<blockquote>
-<p>AI App Patterns 101 (6/6)</p>
-</blockquote>
-<p>Full automation is not always appropriate. Handling sensitive customer data, drafting legally binding documents, or making financial decisions all require a human to review and approve the AI's output before it takes effect. Human-in-the-loop (HITL) is the pattern for inserting human judgment into an otherwise automated pipeline.</p>
-<p>Topics:</p>
-<ul>
-<li>when HITL is the right choice</li>
-<li>implementing approval gates</li>
-<li>confidence-based auto/manual branching</li>
-<li>audit logging</li>
-</ul>
-<hr>
 <h2>When HITL is the right choice</h2>
 <p><strong>Human review by risk level</strong></p>
-<p><img alt="Human review by risk level" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png"></p>
-<p><em>Human review by risk level</em><br>
-HITL adds latency and cost. Use it when the cost of an unchecked error is high.</p>
+<p>HITL adds latency and cost. Use it when the cost of an unchecked error is high.</p>
 <p><strong>High-stakes decisions</strong>: money transfers, contract generation, personal data processing — anything where a mistake is expensive or irreversible.</p>
 <p><strong>Low model confidence</strong>: route uncertain outputs to a human rather than sending a guess downstream.</p>
 <p><strong>Regulatory requirements</strong>: some industries prohibit fully autonomous AI decisions.</p>
@@ -313,6 +301,21 @@ print(f&quot;audit log: {LOG_FILE}&quot;)
 <h2>Conclusion</h2>
 <p>HITL does not mean abandoning automation. High-confidence outputs flow through automatically; low-confidence or high-risk outputs pause for human review. The ratio shifts toward automation as the model proves itself on real traffic. Audit logs close the loop: every human correction is evidence for the next round of fine-tuning or threshold adjustment.</p>
 <p>This series covered six core LLM application patterns — chatbot, RAG Q&amp;A, document assistant, agent with tools, workflow automation, and human-in-the-loop. Each pattern stands alone or composes with the others to form more complex systems.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Is human-in-the-loop a fallback for weak models, or part of product design?</strong><br>
+  HITL is a product design choice for decisions with risk and accountability, not just a patch for weak models.</p>
+</li>
+<li>
+<p><strong>When should you use an approval gate versus a confidence-based branch?</strong><br>
+  Use an approval gate for explicit approval decisions such as deploy, refund, or permission changes; use confidence-based branching when only some cases need review.</p>
+</li>
+<li>
+<p><strong>What should be logged so human decisions can be audited later?</strong><br>
+  Log original input, model suggestion, confidence, branch reason, reviewer, timestamp, and final decision.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>

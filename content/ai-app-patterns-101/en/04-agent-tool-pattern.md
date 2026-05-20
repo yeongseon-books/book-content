@@ -1,5 +1,5 @@
 ---
-title: Agent and tool pattern — autonomous tool selection
+title: "AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection"
 series: ai-app-patterns-101
 episode: 4
 language: en
@@ -19,43 +19,32 @@ seo_description: An agent is a controller that lets the model choose tool-call p
   at runtime instead of hardcoding every step ahead of time.
 ---
 
-# Agent and tool pattern — autonomous tool selection
+# AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection
 
 Some problems stop fitting a fixed chain the moment the next step depends on what the model discovers during execution. At that point, the real design question is not whether agents are powerful, but how narrowly you can define the tool choices and the control loop around them.
 
 This is post 4 in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- When does it make sense to use `AgentExecutor` instead of a fixed chain?
-- How should tool descriptions be written so the LLM can choose correctly between a calculator and a search tool?
-- What execution traces matter when debugging a tool-selecting agent?
+- When an agent chooses a tool, how much autonomy does it really have?
+- What risk appears if tool names and arguments are not validated before execution?
+- How can ReAct traces narrow agent failures faster?
+
+## Big Picture
+
+![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
+
+*Fixed chain versus dynamic agent*
+
+This picture shows an agent looping through reasoning, tool choice, execution result, and observation while actual execution stays inside the application boundary. Autonomy means choosing among allowed tools, not unrestricted action.
 
 > An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-> AI App Patterns 101 (4/6)
-
-Every chain built so far has a fixed execution path: input enters, steps run in order, output exits. The agent pattern changes this. The LLM decides which tool to call, inspects the result, and then decides what to do next — including whether to call another tool or produce a final answer.
-
-Topics:
-
-- agent vs chain — what changes and why
-- defining and registering tools
-- building a ReAct agent
-- composing multiple tools
-
----
 
 ## Agent vs chain
 
 ### Fixed chain versus dynamic agent
 
-![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
-
-*Fixed chain versus dynamic agent*
 **Chain**: input → step A → step B → output. The execution path is determined at design time.
 
 **Agent**: input → LLM reasons → selects tool → executes tool → observes result → repeats if needed → final answer. The execution path is determined at runtime.
@@ -356,15 +345,26 @@ The agent pattern extends chain-based LLM apps into systems that can reason acro
 
 The next post covers workflow automation: designing multi-step chains where each stage transforms data and passes it to the next.
 
+## Answering the Opening Questions
+
+- **When an agent chooses a tool, how much autonomy does it really have?**
+  The agent can request a tool only within the list and schema the application exposes. That is bounded autonomy.
+
+- **What risk appears if tool names and arguments are not validated before execution?**
+  Without validation, unknown tool calls, invalid arguments, unauthorized actions, or duplicate execution can reach real functions.
+
+- **How can ReAct traces narrow agent failures faster?**
+  ReAct traces show the thought, selected tool, and arguments, making it easier to separate prompt issues, tool-description issues, and execution errors.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
-- [Document assistant — summarization, extraction, classification](./03-document-assistant.md)
-- **Agent and tool pattern — autonomous tool selection (current)**
-- Workflow automation — designing multi-step chains (upcoming)
-- Human-in-the-loop — designing for human intervention (upcoming)
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification](./03-document-assistant.md)
+- **AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection (current)**
+- AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (upcoming)
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

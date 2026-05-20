@@ -1,5 +1,5 @@
 ---
-title: 워크플로 자동화 — 다단계 체인 설계
+title: "AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계"
 series: ai-app-patterns-101
 episode: 5
 language: ko
@@ -18,45 +18,34 @@ last_reviewed: '2026-05-15'
 seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인입니다.
 ---
 
-# 워크플로 자동화 — 다단계 체인 설계
+# AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계
 
 작업 단계가 예측 가능할 때는 모델에게 자유를 더 주는 편이 오히려 시스템 신뢰도를 떨어뜨립니다. 워크플로의 가치는 handoff 지점, 중간 데이터 형태, 실패를 드러내야 하는 위치를 고정해 두는 데 있습니다.
 
 한 번의 LLM 호출로는 잘 풀리지 않는 업무가 많습니다. 고객 문의를 받아 요약하고, 분류하고, 카테고리별 로직을 적용하고, 답변을 생성하는 식의 흐름이 대표적입니다. 이런 작업은 모델의 즉흥성보다 단계 간 계약이 더 중요합니다.
 
-이 글은 AI App Patterns 101 시리즈의 5번째 글입니다. 여기서는 명시적인 단계와 깔끔한 데이터 계약을 가진 다단계 LLM 워크플로를 어떻게 설계할지 다룹니다.
+이 글은 AI App Patterns 101 시리즈의 다섯 번째 글입니다. 여기서는 명시적인 단계와 깔끔한 데이터 계약을 가진 다단계 LLM 워크플로를 어떻게 설계할지 다룹니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 여러 LLM 단계를 연결할 때 중간 출력은 어떤 구조로 만들어야 할까요?
-- 요약 → 분류 → 태깅 워크플로에서는 어느 지점에서 실패를 감지하고 드러내야 할까요?
-- 어떤 상황에서 에이전트보다 고정 워크플로가 더 나을까요?
+- 다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?
+- 중간 결과의 타입을 고정하지 않으면 다음 단계에서 어떤 문제가 생길까요?
+- 워크플로 자동화에서 실패를 한 번에 숨기지 않으려면 어디에 로그를 남겨야 할까요?
+
+## 큰 그림
+
+![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
+
+*단계 사이의 순차 handoff*
+
+이 그림에서는 입력이 여러 처리 단계를 지나거나 분류 결과에 따라 다른 경로로 라우팅되는 흐름을 봅니다. 워크플로 자동화의 핵심은 단계별 계약과 실패 지점을 분리해서 긴 체인을 추적 가능하게 만드는 것입니다.
 
 > 워크플로 자동화는 모델의 선택권을 줄이고, 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인으로 바꾸는 설계입니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-> AI App Patterns 101 (5/6)
-
-어떤 작업은 단일 LLM 호출로는 버티기 어렵습니다. 고객 문의를 받고, 분류하고, 카테고리별 로직을 적용하고, 마지막 답변을 만드는 흐름이 그렇습니다. 워크플로 자동화는 이런 단계를 LangChain LCEL로 연결해 하나의 일관된 파이프라인으로 만듭니다.
-
-다룰 주제는 다음과 같습니다.
-
-- 순차 체인 만들기
-- 라우팅 — 중간 출력에 따라 분기하기
-- 실용적인 다단계 코드 리뷰 파이프라인
-- 각 단계의 출력을 다음 단계로 깔끔하게 전달하기
-
----
 
 ## 순차 체인
 
 ### 단계 사이의 순차 handoff
 
-![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
-
-*단계 사이의 순차 handoff*
 ### 병렬 작업을 포함한 DAG 스타일 분기
 
 ![병렬 작업을 포함한 DAG 스타일 분기](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-02-dag-style-branching-with-parallel-work.ko.png)
@@ -358,15 +347,26 @@ print(f"\n=== final report ===\n{result['report']}")
 
 마지막 글에서는 Human-in-the-loop 설계를 다룹니다. 자동화 파이프라인 안에 사람 검토와 승인 게이트를 삽입하는 방식입니다.
 
+## 처음 질문으로 돌아가기
+
+- **다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?**
+  모든 입력이 같은 순서로 처리되면 순차 체인이 충분하지만, 입력 유형별로 다른 처리나 담당자가 필요하면 라우팅이 필요합니다.
+
+- **중간 결과의 타입을 고정하지 않으면 다음 단계에서 어떤 문제가 생길까요?**
+  중간 결과 타입이 고정되지 않으면 다음 단계가 기대한 필드를 못 찾거나 문자열과 JSON을 혼동해 조용히 실패할 수 있습니다.
+
+- **워크플로 자동화에서 실패를 한 번에 숨기지 않으려면 어디에 로그를 남겨야 할까요?**
+  각 단계의 입력, 출력, 분기 결정, 예외를 별도로 기록해야 마지막 결과만 보고 원인을 추측하지 않아도 됩니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [챗봇 패턴 — 대화 이력과 상태 관리](./01-chatbot-pattern.md)
-- [RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
-- [문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
-- [에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
-- **워크플로 자동화 — 다단계 체인 설계 (현재 글)**
-- Human-in-the-loop — 사람 개입 설계 (예정)
+- [AI App Patterns 101 (1/6): 챗봇 패턴 — 대화 이력과 상태 관리](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
+- [AI App Patterns 101 (3/6): 문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
+- [AI App Patterns 101 (4/6): 에이전트와 도구 패턴 — 자율적 도구 선택](./04-agent-tool-pattern.md)
+- **AI App Patterns 101 (5/6): 워크플로 자동화 — 다단계 체인 설계 (현재 글)**
+- AI App Patterns 101 (6/6): Human-in-the-loop — 사람 개입 설계 (예정)
 
 <!-- toc:end -->
 

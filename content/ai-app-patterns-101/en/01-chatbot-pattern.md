@@ -1,5 +1,5 @@
 ---
-title: Chatbot pattern — managing conversation history and state
+title: "AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state"
 series: ai-app-patterns-101
 episode: 1
 language: en
@@ -19,45 +19,32 @@ seo_description: A chatbot is not a model with memory; it is an application loop
   keeps replaying the accumulated messages list.
 ---
 
-# Chatbot pattern — managing conversation history and state
+# AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state
 
 The first mistake in chatbot design is assuming the model remembers anything between calls. In practice, the application decides what context to replay, how long to keep it, and when that history becomes too expensive or too noisy.
 
 This is the first post in the AI App Patterns 101 series. Here we cover the smallest reliable chatbot pattern and the state-management decisions that make multi-turn behavior work.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Why does a chatbot application need to carry conversation history itself?
-- What is the smallest working pattern for a multi-turn chatbot with accumulated messages?
+- If the model does not remember previous turns, where should chatbot memory live?
+- When does replaying history make cost and latency a bigger problem than answer quality?
 - When should session history stay in memory, and when should it move to external storage?
 
+## Big Picture
+
+![Stateless call with replayed history](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
+
+*Stateless call with replayed history*
+
+This picture shows multi-turn behavior coming from the application replaying message history, not from model memory. The chatbot pattern is about deciding what to store, trim, summarize, and separate by session.
+
 > A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-> AI App Patterns 101 (1/6)
-
-The LLM API is stateless. Each request is independent, so if you want the model to remember earlier turns, the application must manage history itself. The core questions of the chatbot pattern are: how to store the history, how much to keep, and when to compress it.
-
-This post builds from the simplest possible chatbot to a windowed memory, a summary-based approach, and a session-keyed structure for multi-user apps.
-
-Topics:
-
-- a basic chatbot with manual history management
-- memory window — keeping only the last N messages
-- conversation summary to control context length
-- session-based chatbot structure
-
----
 
 ## Basic chatbot: manual history
 
 ### Stateless call with replayed history
 
-![Stateless call with replayed history](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
-
-*Stateless call with replayed history*
 The simplest approach: accumulate messages in a list and send the full list with every request.
 
 ```python
@@ -342,15 +329,26 @@ The chatbot pattern is fundamentally a question of history management. Simple ac
 
 The next post covers the RAG Q&A pattern: retrieving external documents to improve LLM answer accuracy.
 
+## Answering the Opening Questions
+
+- **If the model does not remember previous turns, where should chatbot memory live?**
+  Chatbot memory lives in application-managed message history and session storage, not inside the model.
+
+- **When does replaying history make cost and latency a bigger problem than answer quality?**
+  Replaying full history increases token cost and latency, so windowing or summarization becomes necessary before the conversation grows too long.
+
+- **When should session history stay in memory, and when should it move to external storage?**
+  An in-memory dictionary is fine for a demo, but multi-user apps, restarts, and horizontal scaling require Redis or a database.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Chatbot pattern — managing conversation history and state (current)**
-- RAG Q&A pattern — document-based question answering (upcoming)
-- Document assistant — summarization, extraction, classification (upcoming)
-- Agent and tool pattern — autonomous tool selection (upcoming)
-- Workflow automation — designing multi-step chains (upcoming)
-- Human-in-the-loop — designing for human intervention (upcoming)
+- **AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state (current)**
+- AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering (upcoming)
+- AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification (upcoming)
+- AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection (upcoming)
+- AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (upcoming)
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

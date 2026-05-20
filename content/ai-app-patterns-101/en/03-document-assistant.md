@@ -1,5 +1,5 @@
 ---
-title: Document assistant — summarization, extraction, classification
+title: "AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification"
 series: ai-app-patterns-101
 episode: 3
 language: en
@@ -19,43 +19,32 @@ seo_description: A document assistant is not a conversational system; it is a tr
   that turns long input into short, task-shaped output.
 ---
 
-# Document assistant — summarization, extraction, classification
+# AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification
 
 Document-processing tasks look different on the surface, but they usually reduce to the same engineering problem: take long input, shape it for the model, and return compact output with a clear contract. That framing makes summarization, extraction, and classification easier to design as one family of patterns.
 
 This is post 3 in the AI App Patterns 101 series. Here we cover the document assistant pattern through summarization, structured extraction, and classification flows.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- What chain structure keeps summarization stable when a document is too long for one prompt?
-- How should chunk-level processing and final synthesis be separated in a summarization pipeline?
-- Why does the document assistant pattern fit batch processing better than a chatbot?
+- Why do summarization, extraction, and classification need different output contracts in a document assistant?
+- When should a long document be split into staged Map-Reduce summarization?
+- What validation is needed before production code trusts extraction or classification output?
+
+## Big Picture
+
+![Short document summarization flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
+
+*Short document summarization flow*
+
+This picture shows one document input branching into summarization, extraction, and classification paths. A reliable document assistant separates output shape and validation rules for each task.
 
 > A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-> AI App Patterns 101 (3/6)
-
-The document assistant pattern takes a document as input and performs a specific processing task on it. Unlike a chatbot or RAG pipeline, there is no ongoing conversation: the document is the input, and a structured or condensed result is the output. LLMs handle summarization, information extraction, and classification well because all three reduce to the same operation — read the document, apply a rule, return structured text.
-
-Topics:
-
-- summarization with style and audience control
-- Map-Reduce for documents that exceed the context window
-- structured information extraction with JSON output
-- multi-class document classification
-
----
 
 ## Document summarization
 
 ### Short document summarization flow
 
-![Short document summarization flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
-
-*Short document summarization flow*
 For short documents, pass the full text directly and request a summary. Parameterizing style, length, and audience lets the same chain serve different consumers.
 
 ```python
@@ -363,15 +352,26 @@ Summarization, extraction, and classification cover the majority of document pro
 
 The next post covers the Agent and Tool pattern, where the LLM autonomously selects and calls tools to answer questions it cannot handle from context alone.
 
+## Answering the Opening Questions
+
+- **Why do summarization, extraction, and classification need different output contracts in a document assistant?**
+  Summarization returns compressed prose, extraction returns structured fields, and classification returns constrained labels, so one parser hides different failure modes.
+
+- **When should a long document be split into staged Map-Reduce summarization?**
+  Use Map-Reduce summarization when a document exceeds context limits or when section-level meaning must be preserved before combining results.
+
+- **What validation is needed before production code trusts extraction or classification output?**
+  Required fields, enum labels, length limits, and missing-value handling should be validated in code before downstream logic uses the result.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- [RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
-- **Document assistant — summarization, extraction, classification (current)**
-- Agent and tool pattern — autonomous tool selection (upcoming)
-- Workflow automation — designing multi-step chains (upcoming)
-- Human-in-the-loop — designing for human intervention (upcoming)
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- [AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering](./02-rag-qa-pattern.md)
+- **AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification (current)**
+- AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection (upcoming)
+- AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (upcoming)
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

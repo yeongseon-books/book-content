@@ -1,5 +1,5 @@
 ---
-title: RAG Q&A pattern — document-based question answering
+title: "AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering"
 series: ai-app-patterns-101
 episode: 2
 language: en
@@ -19,46 +19,32 @@ seo_description: RAG is not a model that memorizes answers; it is a pipeline tha
   injects retrieved documents into the prompt before generation.
 ---
 
-# RAG Q&A pattern — document-based question answering
+# AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering
 
 RAG is easier to reason about when you stop treating it as a smarter model and start treating it as a retrieval pipeline. Answer quality depends less on model mystique and more on whether the right chunks are found and injected at the right moment.
 
 This is post 2 in the AI App Patterns 101 series. Here we build the smallest useful RAG Q&A pipeline and walk through how retrieval and generation fit together.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How should a minimal RAG pipeline connect chunking, embedding, retrieval, and answer generation?
-- Can a small FAISS-based example return answer text together with evidence snippets?
-- Where do you design against hallucination when the answer is not in the documents?
+- Why should retrieval results be inspected before judging answer quality in RAG?
+- What failure appears when the model is allowed to answer with weak evidence?
+- Where should chunks and metadata be preserved so answers can return sources?
+
+## Big Picture
+
+![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
+
+*Offline indexing pipeline*
+
+This picture shows a question turning into retrieved document chunks, which then become evidence for generation. RAG Q&A is safer when the retrieval boundary and evidence quality are inspected before the model call.
 
 > RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-> AI App Patterns 101 (2/6)
-
-RAG (Retrieval-Augmented Generation) addresses two persistent LLM limitations. First, LLMs do not know about events after their training cutoff. Second, they have no access to private or proprietary data. RAG patches both gaps by retrieving relevant documents at query time and injecting them into the prompt.
-
-This post builds a complete RAG Q&A pipeline step by step.
-
-Topics:
-
-- the two phases of RAG: indexing and retrieval
-- a complete RAG Q&A chain
-- prompt design for better answer quality
-- returning answers with source attribution
-- when RAG fails and how to respond
-
----
 
 ## The two phases of RAG
 
 ### Offline indexing pipeline
 
-![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
-
-*Offline indexing pipeline*
 **Indexing** (offline): split documents into chunks, embed them, store in a vector index.
 
 **Retrieval** (online): embed the query, find similar chunks, inject them into the prompt.
@@ -428,15 +414,26 @@ RAG Q&A is the most practical pattern for giving an LLM access to knowledge it w
 
 The next post covers the document assistant pattern: summarization, information extraction, and classification applied to structured document processing tasks.
 
+## Answering the Opening Questions
+
+- **Why should retrieval results be inspected before judging answer quality in RAG?**
+  The model answer is constrained by retrieved context, so empty or wrong context will produce poor answers no matter how strong the model is.
+
+- **What failure appears when the model is allowed to answer with weak evidence?**
+  Weak evidence can produce plausible hallucinations, so low scores or empty results should route to a no-evidence path.
+
+- **Where should chunks and metadata be preserved so answers can return sources?**
+  Preserve document id, title, URL, and position together with chunk text from retrieval onward so the answer can cite its source.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
-- **RAG Q&A pattern — document-based question answering (current)**
-- Document assistant — summarization, extraction, classification (upcoming)
-- Agent and tool pattern — autonomous tool selection (upcoming)
-- Workflow automation — designing multi-step chains (upcoming)
-- Human-in-the-loop — designing for human intervention (upcoming)
+- [AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state](./01-chatbot-pattern.md)
+- **AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering (current)**
+- AI App Patterns 101 (3/6): Document assistant — summarization, extraction, classification (upcoming)
+- AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection (upcoming)
+- AI App Patterns 101 (5/6): Workflow automation — designing multi-step chains (upcoming)
+- AI App Patterns 101 (6/6): Human-in-the-loop — designing for human intervention (upcoming)
 
 <!-- toc:end -->
 

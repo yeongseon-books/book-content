@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Chatbot pattern — managing conversation history and state</title>
+<title>AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,38 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Chatbot pattern — managing conversation history and state</h1>
+<h1>AI App Patterns 101 (1/6): Chatbot pattern — managing conversation history and state</h1>
 <p>The first mistake in chatbot design is assuming the model remembers anything between calls. In practice, the application decides what context to replay, how long to keep it, and when that history becomes too expensive or too noisy.</p>
 <p>This is the first post in the AI App Patterns 101 series. Here we cover the smallest reliable chatbot pattern and the state-management decisions that make multi-turn behavior work.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why does a chatbot application need to carry conversation history itself?</li>
-<li>What is the smallest working pattern for a multi-turn chatbot with accumulated messages?</li>
+<li>If the model does not remember previous turns, where should chatbot memory live?</li>
+<li>When does replaying history make cost and latency a bigger problem than answer quality?</li>
 <li>When should session history stay in memory, and when should it move to external storage?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Stateless call with replayed history" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png"></p>
+<p><em>Stateless call with replayed history</em></p>
+<p>This picture shows multi-turn behavior coming from the application replaying message history, not from model memory. The chatbot pattern is about deciding what to store, trim, summarize, and separate by session.</p>
 <blockquote>
 <p>A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<blockquote>
-<p>AI App Patterns 101 (1/6)</p>
-</blockquote>
-<p>The LLM API is stateless. Each request is independent, so if you want the model to remember earlier turns, the application must manage history itself. The core questions of the chatbot pattern are: how to store the history, how much to keep, and when to compress it.</p>
-<p>This post builds from the simplest possible chatbot to a windowed memory, a summary-based approach, and a session-keyed structure for multi-user apps.</p>
-<p>Topics:</p>
-<ul>
-<li>a basic chatbot with manual history management</li>
-<li>memory window — keeping only the last N messages</li>
-<li>conversation summary to control context length</li>
-<li>session-based chatbot structure</li>
-</ul>
-<hr>
 <h2>Basic chatbot: manual history</h2>
 <p><strong>Stateless call with replayed history</strong></p>
-<p><img alt="Stateless call with replayed history" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png"></p>
-<p><em>Stateless call with replayed history</em><br>
-The simplest approach: accumulate messages in a list and send the full list with every request.</p>
+<p>The simplest approach: accumulate messages in a list and send the full list with every request.</p>
 <pre><code class="language-python">import os
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -331,6 +318,21 @@ print(f&quot;session A history length: {len(sessions[session_a])}&quot;)
 <h2>Conclusion</h2>
 <p>The chatbot pattern is fundamentally a question of history management. Simple accumulation, windowing, and summarization each make sense in different situations depending on conversation length, how much old context matters, and token cost.</p>
 <p>The next post covers the RAG Q&amp;A pattern: retrieving external documents to improve LLM answer accuracy.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>If the model does not remember previous turns, where should chatbot memory live?</strong><br>
+  Chatbot memory lives in application-managed message history and session storage, not inside the model.</p>
+</li>
+<li>
+<p><strong>When does replaying history make cost and latency a bigger problem than answer quality?</strong><br>
+  Replaying full history increases token cost and latency, so windowing or summarization becomes necessary before the conversation grows too long.</p>
+</li>
+<li>
+<p><strong>When should session history stay in memory, and when should it move to external storage?</strong><br>
+  An in-memory dictionary is fine for a demo, but multi-user apps, restarts, and horizontal scaling require Redis or a database.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>Chatbot pattern — managing conversation history and state (current)</strong></li>

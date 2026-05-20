@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Agent and tool pattern — autonomous tool selection</title>
+<title>AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,37 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Agent and tool pattern — autonomous tool selection</h1>
+<h1>AI App Patterns 101 (4/6): Agent and tool pattern — autonomous tool selection</h1>
 <p>Some problems stop fitting a fixed chain the moment the next step depends on what the model discovers during execution. At that point, the real design question is not whether agents are powerful, but how narrowly you can define the tool choices and the control loop around them.</p>
 <p>This is post 4 in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>When does it make sense to use <code>AgentExecutor</code> instead of a fixed chain?</li>
-<li>How should tool descriptions be written so the LLM can choose correctly between a calculator and a search tool?</li>
-<li>What execution traces matter when debugging a tool-selecting agent?</li>
+<li>When an agent chooses a tool, how much autonomy does it really have?</li>
+<li>What risk appears if tool names and arguments are not validated before execution?</li>
+<li>How can ReAct traces narrow agent failures faster?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Fixed chain versus dynamic agent" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png"></p>
+<p><em>Fixed chain versus dynamic agent</em></p>
+<p>This picture shows an agent looping through reasoning, tool choice, execution result, and observation while actual execution stays inside the application boundary. Autonomy means choosing among allowed tools, not unrestricted action.</p>
 <blockquote>
 <p>An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<blockquote>
-<p>AI App Patterns 101 (4/6)</p>
-</blockquote>
-<p>Every chain built so far has a fixed execution path: input enters, steps run in order, output exits. The agent pattern changes this. The LLM decides which tool to call, inspects the result, and then decides what to do next — including whether to call another tool or produce a final answer.</p>
-<p>Topics:</p>
-<ul>
-<li>agent vs chain — what changes and why</li>
-<li>defining and registering tools</li>
-<li>building a ReAct agent</li>
-<li>composing multiple tools</li>
-</ul>
-<hr>
 <h2>Agent vs chain</h2>
 <p><strong>Fixed chain versus dynamic agent</strong></p>
-<p><img alt="Fixed chain versus dynamic agent" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png"></p>
-<p><em>Fixed chain versus dynamic agent</em><br>
-<strong>Chain</strong>: input → step A → step B → output. The execution path is determined at design time.</p>
+<p><strong>Chain</strong>: input → step A → step B → output. The execution path is determined at design time.</p>
 <p><strong>Agent</strong>: input → LLM reasons → selects tool → executes tool → observes result → repeats if needed → final answer. The execution path is determined at runtime.</p>
 <p>Agents use the ReAct (Reason + Act) loop: Thought → Action → Observation, repeated until the LLM determines it has enough information to answer. The LLM writes its reasoning, names a tool, supplies its arguments, reads the tool output, and then reasons again.</p>
 <hr>
@@ -335,6 +323,21 @@ def safe_divide(a: float, b: float) -&gt; str:
 <h2>Conclusion</h2>
 <p>The agent pattern extends chain-based LLM apps into systems that can reason across multiple steps and tools. The docstring is the only signal the LLM has for tool selection — treat it as a contract, not a comment. Keep tools narrow and focused: one clear responsibility each, error messages instead of exceptions, and deterministic behavior for the same input.</p>
 <p>The next post covers workflow automation: designing multi-step chains where each stage transforms data and passes it to the next.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>When an agent chooses a tool, how much autonomy does it really have?</strong><br>
+  The agent can request a tool only within the list and schema the application exposes. That is bounded autonomy.</p>
+</li>
+<li>
+<p><strong>What risk appears if tool names and arguments are not validated before execution?</strong><br>
+  Without validation, unknown tool calls, invalid arguments, unauthorized actions, or duplicate execution can reach real functions.</p>
+</li>
+<li>
+<p><strong>How can ReAct traces narrow agent failures faster?</strong><br>
+  ReAct traces show the thought, selected tool, and arguments, making it easier to separate prompt issues, tool-description issues, and execution errors.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>

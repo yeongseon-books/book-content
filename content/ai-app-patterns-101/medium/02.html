@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>RAG Q&A pattern — document-based question answering</title>
+<title>AI App Patterns 101 (2/6): RAG Q&A pattern — document-based question answering</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,39 +53,25 @@
 </style>
 </head>
 <body>
-<h1>RAG Q&amp;A pattern — document-based question answering</h1>
+<h1>AI App Patterns 101 (2/6): RAG Q&amp;A pattern — document-based question answering</h1>
 <p>RAG is easier to reason about when you stop treating it as a smarter model and start treating it as a retrieval pipeline. Answer quality depends less on model mystique and more on whether the right chunks are found and injected at the right moment.</p>
 <p>This is post 2 in the AI App Patterns 101 series. Here we build the smallest useful RAG Q&amp;A pipeline and walk through how retrieval and generation fit together.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How should a minimal RAG pipeline connect chunking, embedding, retrieval, and answer generation?</li>
-<li>Can a small FAISS-based example return answer text together with evidence snippets?</li>
-<li>Where do you design against hallucination when the answer is not in the documents?</li>
+<li>Why should retrieval results be inspected before judging answer quality in RAG?</li>
+<li>What failure appears when the model is allowed to answer with weak evidence?</li>
+<li>Where should chunks and metadata be preserved so answers can return sources?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Offline indexing pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png"></p>
+<p><em>Offline indexing pipeline</em></p>
+<p>This picture shows a question turning into retrieved document chunks, which then become evidence for generation. RAG Q&amp;A is safer when the retrieval boundary and evidence quality are inspected before the model call.</p>
 <blockquote>
 <p>RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<blockquote>
-<p>AI App Patterns 101 (2/6)</p>
-</blockquote>
-<p>RAG (Retrieval-Augmented Generation) addresses two persistent LLM limitations. First, LLMs do not know about events after their training cutoff. Second, they have no access to private or proprietary data. RAG patches both gaps by retrieving relevant documents at query time and injecting them into the prompt.</p>
-<p>This post builds a complete RAG Q&amp;A pipeline step by step.</p>
-<p>Topics:</p>
-<ul>
-<li>the two phases of RAG: indexing and retrieval</li>
-<li>a complete RAG Q&amp;A chain</li>
-<li>prompt design for better answer quality</li>
-<li>returning answers with source attribution</li>
-<li>when RAG fails and how to respond</li>
-</ul>
-<hr>
 <h2>The two phases of RAG</h2>
 <p><strong>Offline indexing pipeline</strong></p>
-<p><img alt="Offline indexing pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png"></p>
-<p><em>Offline indexing pipeline</em><br>
-<strong>Indexing</strong> (offline): split documents into chunks, embed them, store in a vector index.</p>
+<p><strong>Indexing</strong> (offline): split documents into chunks, embed them, store in a vector index.</p>
 <p><strong>Retrieval</strong> (online): embed the query, find similar chunks, inject them into the prompt.</p>
 <pre><code class="language-text">indexing:  documents → chunking → embedding → FAISS
 retrieval: query → embedding → FAISS search → prompt injection → LLM → answer
@@ -397,6 +383,21 @@ print(answer_with_guard(&quot;What are the main features of Rust?&quot;))
 <h2>Conclusion</h2>
 <p>RAG Q&amp;A is the most practical pattern for giving an LLM access to knowledge it was not trained on. The prompt instruction to say "I don't know" when information is absent is the simplest hallucination guard.</p>
 <p>The next post covers the document assistant pattern: summarization, information extraction, and classification applied to structured document processing tasks.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why should retrieval results be inspected before judging answer quality in RAG?</strong><br>
+  The model answer is constrained by retrieved context, so empty or wrong context will produce poor answers no matter how strong the model is.</p>
+</li>
+<li>
+<p><strong>What failure appears when the model is allowed to answer with weak evidence?</strong><br>
+  Weak evidence can produce plausible hallucinations, so low scores or empty results should route to a no-evidence path.</p>
+</li>
+<li>
+<p><strong>Where should chunks and metadata be preserved so answers can return sources?</strong><br>
+  Preserve document id, title, URL, and position together with chunk text from retrieval onward so the answer can cite its source.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-app-patterns-101/en/01-chatbot-pattern.md">Chatbot pattern — managing conversation history and state</a></li>
