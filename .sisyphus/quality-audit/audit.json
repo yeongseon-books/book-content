@@ -1,249 +1,21 @@
 {
-  "generated_at": "2026-05-20T12:04:16+00:00",
+  "generated_at": "2026-05-20T12:04:36+00:00",
   "series_count": 92,
-  "problem_series_count": 4,
-  "series_with_5_plus": 2,
+  "problem_series_count": 3,
+  "series_with_5_plus": 1,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 22,
+    "BadImg": 14,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 22
+    "all": 14
   },
   "results": [
-    {
-      "series": "llm-from-scratch-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 8,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-causal-mask-no-peeking-at-the-future.en.png",
-            "width": 984,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/03/03-01-causal-mask.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-causal-mask.ko.png",
-            "width": 984,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png",
-            "line": 1,
-            "message": "PNG height 95px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-layernorm-pre-norm-vs-post-norm.en.png",
-            "width": 1384,
-            "height": 95,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png",
-            "line": 1,
-            "message": "PNG height 95px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-layernorm-pre-norm-vs-post-norm.ko.png",
-            "width": 1384,
-            "height": 95,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-5-line-core-of-the-training-loop.en.png",
-            "width": 877,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-5-line-core-of-the-training-loop.ko.png",
-            "width": 877,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png",
-            "line": 1,
-            "message": "PNG height 53px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-autoregressive-generation-one-token-at-a.en.png",
-            "width": 1384,
-            "height": 53,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.ko.png",
-            "line": 1,
-            "message": "PNG height 53px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-autoregressive-generation-one-token-at-a.ko.png",
-            "width": 1384,
-            "height": 53,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-causal-mask-no-peeking-at-the-future.en.png",
-            "width": 984,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/03/03-01-causal-mask.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-causal-mask.ko.png",
-            "width": 984,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png",
-            "line": 1,
-            "message": "PNG height 95px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-layernorm-pre-norm-vs-post-norm.en.png",
-            "width": 1384,
-            "height": 95,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png",
-            "line": 1,
-            "message": "PNG height 95px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-layernorm-pre-norm-vs-post-norm.ko.png",
-            "width": 1384,
-            "height": 95,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-5-line-core-of-the-training-loop.en.png",
-            "width": 877,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-5-line-core-of-the-training-loop.ko.png",
-            "width": 877,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png",
-            "line": 1,
-            "message": "PNG height 53px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-autoregressive-generation-one-token-at-a.en.png",
-            "width": 1384,
-            "height": 53,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.ko.png",
-            "line": 1,
-            "message": "PNG height 53px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-autoregressive-generation-one-token-at-a.ko.png",
-            "width": 1384,
-            "height": 53,
-            "repo": null
-          }
-        ]
-      }
-    },
     {
       "series": "rag-benchmark-101",
       "counts": {
@@ -1468,6 +1240,20 @@
     },
     {
       "series": "llm-finetuning-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "llm-from-scratch-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

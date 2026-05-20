@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:04:16+00:00
+Generated: 2026-05-20T12:04:36+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **4**
-- Series at or above 5 issues: **2**
-- Total issues: **22**
-  - BadImg: **22**
+- Series with any issue: **3**
+- Series at or above 5 issues: **1**
+- Total issues: **14**
+  - BadImg: **14**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,22 +41,9 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 2 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 3 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 4 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## llm-from-scratch-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png:1` — PNG height 88px <= 100px (size=984x88)
-- `assets/llm-from-scratch-101/03/03-01-causal-mask.ko.png:1` — PNG height 88px <= 100px (size=984x88)
-- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png:1` — PNG height 95px <= 100px (size=1384x95)
-- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png:1` — PNG height 95px <= 100px (size=1384x95)
-- `assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png:1` — PNG height 67px <= 100px (size=877x67)
-- ... 3 more
+| 1 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 2 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 3 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## rag-benchmark-101 — Total 8
 
