@@ -14,51 +14,35 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
+title: "Vector Search 101 (2/6): HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기"
 seo_description: HuggingFace 임베딩을 로컬에서 만들고 저장하고 다시 불러오는 실습을 다룹니다.
 ---
 
-# HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
+# Vector Search 101 (2/6): HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
 
 1편에서 개념을 다뤘다면, 이번 글은 실제 코드를 실행하는 단계입니다. 이론에서 실제 임베딩으로 넘어가면 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장하고 효율적으로 다시 불러오려면 어떻게 해야 할지 같은 실무 질문이 바로 등장합니다.
 
 `langchain-huggingface`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스 뒤에 감싼 래퍼입니다. LangChain 파이프라인을 직접 만들지 않더라도 이 래퍼 패턴은 이해할 가치가 있습니다. 실제 애플리케이션에서 임베딩 모델이 더 큰 스택 안에 어떻게 통합되는지를 보여 주기 때문입니다.
 
-이 글은 Vector Search 101 시리즈의 2번째 글입니다.
+이 글은 Vector Search 101 시리즈의 두 번째 글입니다.
 
-여기서는 로컬 임베딩을 만들고, 배치로 처리하고, 저장 후 다시 불러오는 흐름까지 한 번에 묶어 봅니다. 다음 다섯 가지를 다룹니다.
+여기서는 로컬 임베딩을 만들고, 배치로 처리하고, 저장 후 다시 불러오는 흐름까지 한 번에 묶어 봅니다.
 
-- `HuggingFaceEmbeddings` 설치와 초기화
-- 단일 쿼리 임베딩과 배치 임베딩의 차이
-- 벡터를 NumPy 파일로 저장하고 다시 불러오는 방법
-- CPU 환경에서 인코딩 속도를 높이는 실용 팁
-- 래퍼와 원시 `SentenceTransformer` API 비교
+## 먼저 던지는 질문
+
+- sentence-transformers로 만든 벡터가 정말 검색에 쓸 수 있는 형태인지 어디서 확인할까요?
+- 한 문장씩 인코딩하는 코드와 배치 인코딩 코드는 운영에서 어떤 차이를 만들까요?
+- 벡터를 저장했다가 다시 불러올 때 무엇을 함께 기록해야 나중에 재현할 수 있을까요?
+
+## 큰 그림
 
 ![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.ko.png)
 
 *단일 쿼리 임베딩 호출 흐름*
-<!-- ebook-only:start -->
 
-**핵심 아이디어**: HuggingFace 임베딩은 로컬에서 무료로 실행됩니다. `sentence-transformers`가 모델을 내려받고 벡터를 반환합니다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 2편입니다.
-이전 글에서는 **임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기**를 다뤘습니다.
-이 글 다음에는 **코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기**로 이어집니다.
-<!-- ebook-only:end -->
-
----
+이 그림에서는 원문 텍스트가 임베딩 모델을 지나 고정 길이 벡터로 바뀌고, 그 벡터가 저장·재사용되는 경로를 봅니다. 실습의 핵심은 숫자 배열 하나를 만드는 데서 끝나지 않고, 차원과 모델 정보를 함께 다루는 것입니다.
 
 > HuggingFace 임베딩 실습의 핵심은 모델 하나를 잘 호출하는 법보다, 같은 벡터를 반복 가능하게 만들고 재사용하는 흐름을 익히는 데 있습니다.
-
-## 이 글에서 다룰 문제
-
-- Hugging Face `sentence-transformers`와 OpenAI Embeddings API 사이에는 실제로 어떤 트레이드오프가 있을까요?
-- GPU 없이 로컬 임베딩 모델을 실행할 때 어떤 성능 함정이 생길까요?
-- 다국어 모델과 영어 전용 모델은 한국어 검색 품질에서 어떻게 갈릴까요?
-- 배치 임베딩에서는 메모리, 배치 크기, 토큰 한계를 어떻게 균형 있게 맞출까요?
-- 임베딩 모델 버전이 바뀌면 기존 인덱스를 어떻게 마이그레이션해야 할까요?
 
 ## 설치
 
@@ -337,15 +321,26 @@ print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 - [ ] 결과 차원 수와 dtype를 인덱스 스키마와 맞췄다
 - [ ] 장기 보관하는 임베딩과 함께 모델 버전을 저장했다
 
+## 처음 질문으로 돌아가기
+
+- **sentence-transformers로 만든 벡터가 정말 검색에 쓸 수 있는 형태인지 어디서 확인할까요?**
+  벡터의 shape, dtype, 차원 수, 간단한 유사도 결과를 확인해야 검색 입력으로 쓸 수 있는지 판단할 수 있습니다.
+
+- **한 문장씩 인코딩하는 코드와 배치 인코딩 코드는 운영에서 어떤 차이를 만들까요?**
+  배치 인코딩은 모델 호출 오버헤드를 줄여 처리량을 높입니다. 운영에서는 지연 시간, 메모리 사용량, 배치 크기를 함께 조절해야 합니다.
+
+- **벡터를 저장했다가 다시 불러올 때 무엇을 함께 기록해야 나중에 재현할 수 있을까요?**
+  모델 이름, 모델 버전, 차원 수, 정규화 여부, 입력 해시를 함께 기록해야 저장된 벡터를 나중에 같은 조건으로 재현할 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기](./01-what-is-embedding.md)
-- **HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기 (현재 글)**
-- 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기 (예정)
-- FAISS 입문 — 고속 근사 최근접 이웃 검색 (예정)
-- 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (예정)
-- 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
+- [Vector Search 101 (1/6): 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기](./01-what-is-embedding.md)
+- **Vector Search 101 (2/6): HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기 (현재 글)**
+- Vector Search 101 (3/6): 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기 (예정)
+- Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색 (예정)
+- Vector Search 101 (5/6): 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (예정)
+- Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
 
 <!-- toc:end -->
 

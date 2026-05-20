@@ -14,11 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Vector search pipeline — from document ingestion to query
+title: "Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query"
 seo_description: Build an end-to-end vector search pipeline from document ingestion to retrieval, including hybrid search combining keywords and embeddings.
 ---
 
-# Vector search pipeline — from document ingestion to query
+# Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query
 
 The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.
 
@@ -26,38 +26,23 @@ The post closes with the basics of hybrid search, which combines vector retrieva
 
 This is the final post in the Vector Search 101 series.
 
-The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers. Topics:
+The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers.
 
-- loading documents from text
-- the full indexing flow: chunking → embedding → FAISS
-- saving and reloading the index
-- querying and displaying results
-- hybrid search concept and a minimal implementation
+## Questions to Keep in Mind
+
+- What stages make vector search a pipeline rather than one embedding call?
+- When is hybrid search safer than pure vector search?
+- When documents change, what should drive reindexing and operational logs?
+
+## Big Picture
 
 ![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 
 *End to end indexing and retrieval flow*
-<!-- ebook-only:start -->
 
-**The key idea**: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.
-
-## Where this chapter fits
-
-This is chapter 6 of 6 in the series.
-The previous chapter covered **Chunking strategies — how to split long documents**.
-<!-- ebook-only:end -->
-
----
+This picture connects ingestion, chunking, embedding, indexing, querying, and result assembly into one retrieval path. Thinking in pipeline stages makes quality problems traceable across boundaries instead of inside one embedding call.
 
 > A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.
-
-## Questions this chapter answers
-
-- How do you cleanly separate ingest, embedding, indexing, and search stages?
-- What event should trigger an automatic reindex?
-- How do you combine lexical search (like BM25) with vector search when vectors alone fall short?
-- When does it become necessary to add a reranker before passing results to the LLM?
-- How do you compute and track production search quality metrics (recall@k, MRR, nDCG)?
 
 ## Pipeline structure
 
@@ -389,15 +374,26 @@ The natural next step is connecting this pipeline to an LLM to build a RAG syste
 - [ ] Maintained an eval set and an automated quality script in production
 - [ ] Surfaced latency, recall, and cost on the same dashboard
 
+## Answering the Opening Questions
+
+- **What stages make vector search a pipeline rather than one embedding call?**
+  Ingestion, cleaning, chunking, embedding, indexing, query embedding, retrieval, and result assembly all have to work together.
+
+- **When is hybrid search safer than pure vector search?**
+  Hybrid search is safer when exact identifiers, fresh keywords, filters, or symbolic matches matter and pure semantic retrieval may blur them.
+
+- **When documents change, what should drive reindexing and operational logs?**
+  Document version, input hash, model version, and chunking settings should drive reindexing; logs should keep query, result, latency, and index version together.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- [Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
-- [FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
-- [Chunking strategies — how to split long documents](./05-chunking-strategies.md)
-- **Vector search pipeline — from document ingestion to query (current)**
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- [Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
+- [Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
+- [Vector Search 101 (5/6): Chunking strategies — how to split long documents](./05-chunking-strategies.md)
+- **Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (current)**
 
 <!-- toc:end -->
 

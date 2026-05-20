@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is an embedding — converting text into vectors</title>
+<title>Vector Search 101 (1/6): What is an embedding — converting text into vectors</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,40 +53,24 @@
 </style>
 </head>
 <body>
-<h1>What is an embedding — converting text into vectors</h1>
+<h1>Vector Search 101 (1/6): What is an embedding — converting text into vectors</h1>
 <p>Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.</p>
 <p>Embeddings approach the problem differently. They convert text into numeric vectors so that semantically similar sentences end up geometrically close in a high-dimensional space. The distance between those vectors becomes a proxy for meaning. That property makes keyword-free, meaning-based retrieval possible.</p>
 <p>This is the first post in the Vector Search 101 series.</p>
-<p>This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores. We will cover five things:</p>
+<p>This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>what embeddings are and why they emerged</li>
-<li>how meaning is represented as distance in vector space</li>
-<li>how embedding models learn that representation</li>
-<li>a first hands-on example that produces real vectors</li>
-<li>where embeddings fall short and what to watch for</li>
+<li>When keyword search misses documents with the same meaning but different wording, what is missing?</li>
+<li>What does it actually mean for two embedding vectors to be close?</li>
+<li>When choosing a first embedding model, which limits should you check before tuning anything else?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="Keyword search and embedding search contrast" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png"></p>
 <p><em>Keyword search and embedding search contrast</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 1 of 6 in the series.<br>
-After this chapter, the next one moves on to <strong>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture shows the shift from keyword matching to comparison in semantic space. Embeddings turn text into vectors so a search system can find nearby meaning even when the same words do not appear.</p>
 <blockquote>
 <p>An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>What is an embedding mathematically, and why convert text into a numeric vector at all?</li>
-<li>How do word, sentence, and document embeddings actually differ?</li>
-<li>How do accuracy and cost shift as embedding dimensionality grows?</li>
-<li>Why does the same text produce different vectors across models?</li>
-<li>How do you measure whether your embeddings are any good?</li>
-</ul>
 <h2>The ceiling of keyword search</h2>
 <p><img alt="Keyword search and embedding search contrast" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png"></p>
 <p><em>Keyword search and embedding search contrast</em><br>
@@ -273,6 +257,21 @@ Embeddings are not a universal replacement for keyword search. Several situation
 <li>[ ] Sanity-checked quality by computing similarity on a few hand-picked pairs</li>
 <li>[ ] Wrote a reindex procedure for when the embedding model changes</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>When keyword search misses documents with the same meaning but different wording, what is missing?</strong><br>
+  What is missing is a representation of meaning, not another keyword rule. Embeddings provide that representation by mapping text into vectors that can be compared geometrically.</p>
+</li>
+<li>
+<p><strong>What does it actually mean for two embedding vectors to be close?</strong><br>
+  Close means the vectors have a small distance or similar direction under the chosen metric, which the system treats as a proxy for semantic similarity.</p>
+</li>
+<li>
+<p><strong>When choosing a first embedding model, which limits should you check before tuning anything else?</strong><br>
+  Check dimensionality, token limit, language support, and model version first because those values define quality limits and reindexing cost.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>What is an embedding — converting text into vectors (current)</strong></li>
@@ -293,7 +292,7 @@ Embeddings are not a universal replacement for keyword search. Several situation
 </ul>
 <p><strong>Related Series</strong></p>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-deep-dive/en/01-document-loading-and-chunking.md">RAG Deep Dive</a> — shows how the embeddings and ANN indexes from this series get assembled inside a full RAG pipeline. Read it next if you care more about the "documents → chunks → retrieval → answer" flow than the search engine itself.</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/vector-search-101/en/rag-deep-dive/en/01-document-loading-and-chunking.md">RAG Deep Dive</a> — shows how the embeddings and ANN indexes from this series get assembled inside a full RAG pipeline. Read it next if you care more about the "documents → chunks → retrieval → answer" flow than the search engine itself.</li>
 </ul>
 <p class="tags-line">Tags: Vector Search, FAISS, Embeddings, Python</p>
 </body>

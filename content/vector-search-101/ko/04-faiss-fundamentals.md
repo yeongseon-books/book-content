@@ -14,51 +14,35 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: FAISS 입문 — 고속 근사 최근접 이웃 검색
+title: "Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색"
 seo_description: FAISS로 벡터 인덱스를 만들고 저장하고 검색하는 기본 패턴을 설명합니다.
 ---
 
-# FAISS 입문 — 고속 근사 최근접 이웃 검색
+# Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색
 
 문서 수가 수천, 수만 건으로 늘어나면 NumPy 기반 브루트 포스 검색은 금방 느려집니다. 차원이 384인 벡터 10만 개를 쿼리 하나와 비교하려면 쿼리마다 3,840만 번의 곱셈이 필요합니다. 이 정도 규모에서는 검색 지연이 수백 밀리초 이상으로 올라가며, 대화형 애플리케이션에는 너무 느립니다.
 
 FAISS(Facebook AI Similarity Search)는 바로 이 문제를 풀기 위해 만들어졌습니다. 작은 정확도 손실과 큰 속도 향상을 맞바꾸는 근사 최근접 이웃 검색을 지원하고, 수십억 개 규모의 벡터도 처리할 수 있으며, CPU와 GPU 모두에서 빠르게 동작합니다.
 
-이 글은 Vector Search 101 시리즈의 4번째 글입니다.
+이 글은 Vector Search 101 시리즈의 네 번째 글입니다.
 
-여기서는 검색 속도를 올릴 때 가장 먼저 만나는 FAISS의 기본 패턴을 정리합니다. 다음 다섯 가지를 다룹니다.
+여기서는 검색 속도를 올릴 때 가장 먼저 만나는 FAISS의 기본 패턴을 정리합니다.
 
-- FAISS 설치와 인덱스 유형 선택
-- `IndexFlatL2`와 `IndexFlatIP`를 사용한 정확 검색
-- 인덱스를 디스크에 저장하고 다시 불러오기
-- 작은 코퍼스에 실제 쿼리를 날려 보기
-- 인덱스 유형을 선택하는 기준
+## 먼저 던지는 질문
+
+- 벡터가 많아질수록 단순 반복 검색은 어디서 한계가 날까요?
+- IndexFlatIP와 IndexFlatL2는 어떤 전제에서 선택해야 할까요?
+- 인덱스를 저장하고 다시 불러올 때 벡터와 메타데이터를 어떻게 맞춰야 할까요?
+
+## 큰 그림
 
 ![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.ko.png)
 
 *FAISS 인덱스 유형 비교 구조*
-<!-- ebook-only:start -->
 
-**핵심 아이디어**: FAISS는 벡터를 빠르게 찾습니다. 가장 단순한 선택은 IndexFlatL2이며, 데이터가 커지면 IVF나 HNSW로 넘어갑니다.
-
-## 이 장의 위치
-
-이 글은 시리즈 6편 중 4편입니다.
-이전 글에서는 **코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기**를 다뤘습니다.
-이 글 다음에는 **청크 전략 — 긴 문서를 어떻게 나눌 것인가**로 이어집니다.
-<!-- ebook-only:end -->
-
----
+이 그림에서는 쿼리 벡터가 FAISS 인덱스를 거쳐 가장 가까운 벡터 ID를 찾고, 그 ID로 원문 메타데이터를 다시 연결하는 흐름을 봅니다. FAISS는 빠른 검색을 맡지만, 어떤 거리 척도와 메타데이터 정렬을 사용할지는 애플리케이션이 정해야 합니다.
 
 > FAISS를 이해하는 가장 좋은 방법은 더 똑똑한 데이터베이스로 보는 것이 아니라, 벡터 검색 전용 계산 엔진으로 보는 것입니다.
-
-## 이 글에서 다룰 문제
-
-- FAISS의 IndexFlat, IVF, HNSW는 각각 언제 선택하는 것이 맞을까요?
-- 정확 검색과 ANN 사이의 정확도-지연 시간 트레이드오프는 어떻게 이해해야 할까요?
-- 어떤 인덱스 유형은 학습이 필요하고, 그 학습은 어떻게 진행할까요?
-- FAISS 인덱스를 저장하고 다시 불러올 때 어떤 함정을 조심해야 할까요?
-- 어떤 워크로드에서는 GPU FAISS가 CPU FAISS보다 유리하고, 또 어떤 경우에는 반대일까요?
 
 ## 설치
 
@@ -352,15 +336,26 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
 - [ ] 기본값이 아니라 측정값을 바탕으로 nprobe/ef를 조정했다
 - [ ] 벡터 수, 차원 수, 메모리 사용량 메트릭을 추가했다
 
+## 처음 질문으로 돌아가기
+
+- **벡터가 많아질수록 단순 반복 검색은 어디서 한계가 날까요?**
+  문서 수와 벡터 차원이 커지면 모든 벡터를 매번 비교하는 방식은 지연 시간과 CPU 비용이 빠르게 커집니다.
+
+- **IndexFlatIP와 IndexFlatL2는 어떤 전제에서 선택해야 할까요?**
+  정규화된 벡터에서 코사인에 가까운 순위를 원하면 IndexFlatIP가 잘 맞고, 좌표 거리 자체를 비교하려면 IndexFlatL2를 선택합니다.
+
+- **인덱스를 저장하고 다시 불러올 때 벡터와 메타데이터를 어떻게 맞춰야 할까요?**
+  인덱스가 반환하는 row id와 문서 ID, 원문, 메타데이터 배열의 순서를 함께 저장해야 재로딩 후에도 결과가 어긋나지 않습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기](./01-what-is-embedding.md)
-- [HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기](./02-huggingface-embeddings.md)
-- [코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기](./03-cosine-similarity.md)
-- **FAISS 입문 — 고속 근사 최근접 이웃 검색 (현재 글)**
-- 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (예정)
-- 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
+- [Vector Search 101 (1/6): 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기](./02-huggingface-embeddings.md)
+- [Vector Search 101 (3/6): 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기](./03-cosine-similarity.md)
+- **Vector Search 101 (4/6): FAISS 입문 — 고속 근사 최근접 이웃 검색 (현재 글)**
+- Vector Search 101 (5/6): 청크 전략 — 긴 문서를 어떻게 나눌 것인가 (예정)
+- Vector Search 101 (6/6): 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지 (예정)
 
 <!-- toc:end -->
 

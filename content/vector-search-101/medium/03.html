@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cosine similarity and vector search — computing sentence distances</title>
+<title>Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,40 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Cosine similarity and vector search — computing sentence distances</h1>
+<h1>Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances</h1>
 <p>Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.</p>
 <p>This is post 3 in the Vector Search 101 series.</p>
 <p>This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>implementing cosine similarity, dot product, and Euclidean distance</li>
-<li>the relationship between normalization and each metric</li>
-<li>building a brute-force nearest-neighbor search</li>
-<li>running a real query and examining the results</li>
-<li>when to use each metric</li>
+<li>If you already have vectors, why is choosing a distance metric still part of the search design?</li>
+<li>How do cosine similarity, inner product, and L2 distance change ranking behavior?</li>
+<li>Why does normalization affect both ranking results and FAISS index choice?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="Cosine dot and euclidean comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png"></p>
 <p><em>Cosine dot and euclidean comparison structure</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: cosine similarity measures the alignment of two vector directions. It ignores magnitude, so sentence length differences do not matter.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 3 of 6 in the series.<br>
-The previous chapter covered <strong>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</strong>.<br>
-After this chapter, the next one moves on to <strong>FAISS fundamentals — fast approximate nearest-neighbor search</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture shows that the same vectors can produce different ranking decisions depending on the distance metric. Retrieval quality depends not only on the embedding model but also on the rule used to compare vectors.</p>
 <blockquote>
 <p>In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>Do cosine similarity, dot product, and Euclidean distance produce the same ranking or different ones?</li>
-<li>How does pre-normalizing vectors collapse cosine and dot product into the same computation?</li>
-<li>What data should you actually look at when picking a similarity threshold?</li>
-<li>High similarity does not always mean the same meaning - what are the traps?</li>
-<li>How should negative similarity (opposite meaning) be handled in search results?</li>
-</ul>
 <h2>Three distance metrics</h2>
 <p><img alt="Cosine dot and euclidean comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.en.png"></p>
 <p><em>Cosine dot and euclidean comparison structure</em><br>
@@ -301,6 +284,21 @@ for rank, (score, text) in enumerate(results, start=1):
 <li>[ ] Calibrated the threshold against a sample query distribution</li>
 <li>[ ] Decided how many candidates to pass to a reranker after scoring</li>
 <li>[ ] Captured false-positive examples as regression cases</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>If you already have vectors, why is choosing a distance metric still part of the search design?</strong><br>
+  The metric defines what close means. Without that rule, vectors cannot be ranked consistently.</p>
+</li>
+<li>
+<p><strong>How do cosine similarity, inner product, and L2 distance change ranking behavior?</strong><br>
+  Cosine emphasizes direction, inner product includes direction and magnitude, and L2 emphasizes coordinate distance, so rankings can diverge.</p>
+</li>
+<li>
+<p><strong>Why does normalization affect both ranking results and FAISS index choice?</strong><br>
+  Normalization changes the relationship between cosine and inner product, which also changes whether an IP or L2 FAISS index matches the intended metric.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Vector search pipeline — from document ingestion to query</title>
+<title>Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,40 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Vector search pipeline — from document ingestion to query</h1>
+<h1>Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query</h1>
 <p>The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.</p>
 <p>The post closes with the basics of hybrid search, which combines vector retrieval with keyword search.</p>
 <p>This is the final post in the Vector Search 101 series.</p>
-<p>The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers. Topics:</p>
+<p>The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>loading documents from text</li>
-<li>the full indexing flow: chunking → embedding → FAISS</li>
-<li>saving and reloading the index</li>
-<li>querying and displaying results</li>
-<li>hybrid search concept and a minimal implementation</li>
+<li>What stages make vector search a pipeline rather than one embedding call?</li>
+<li>When is hybrid search safer than pure vector search?</li>
+<li>When documents change, what should drive reindexing and operational logs?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="End to end indexing and retrieval flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png"></p>
 <p><em>End to end indexing and retrieval flow</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: a vector search pipeline is four steps — embed, index, query, retrieve. Each step should be independently replaceable.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 6 of 6 in the series.<br>
-The previous chapter covered <strong>Chunking strategies — how to split long documents</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture connects ingestion, chunking, embedding, indexing, querying, and result assembly into one retrieval path. Thinking in pipeline stages makes quality problems traceable across boundaries instead of inside one embedding call.</p>
 <blockquote>
 <p>A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>How do you cleanly separate ingest, embedding, indexing, and search stages?</li>
-<li>What event should trigger an automatic reindex?</li>
-<li>How do you combine lexical search (like BM25) with vector search when vectors alone fall short?</li>
-<li>When does it become necessary to add a reranker before passing results to the LLM?</li>
-<li>How do you compute and track production search quality metrics (recall@k, MRR, nDCG)?</li>
-</ul>
 <h2>Pipeline structure</h2>
 <p><img alt="End to end indexing and retrieval flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-pipeline-structure.en.png"></p>
 <p><em>End to end indexing and retrieval flow</em><br>
@@ -368,6 +352,21 @@ print(manifest)
 <li>[ ] Defined how lexical and vector scores fuse (weighted sum, RRF, etc.)</li>
 <li>[ ] Maintained an eval set and an automated quality script in production</li>
 <li>[ ] Surfaced latency, recall, and cost on the same dashboard</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What stages make vector search a pipeline rather than one embedding call?</strong><br>
+  Ingestion, cleaning, chunking, embedding, indexing, query embedding, retrieval, and result assembly all have to work together.</p>
+</li>
+<li>
+<p><strong>When is hybrid search safer than pure vector search?</strong><br>
+  Hybrid search is safer when exact identifiers, fresh keywords, filters, or symbolic matches matter and pure semantic retrieval may blur them.</p>
+</li>
+<li>
+<p><strong>When documents change, what should drive reindexing and operational logs?</strong><br>
+  Document version, input hash, model version, and chunking settings should drive reindexing; logs should keep query, result, latency, and index version together.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

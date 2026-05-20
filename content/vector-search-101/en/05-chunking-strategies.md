@@ -14,11 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Chunking strategies — how to split long documents
+title: "Vector Search 101 (5/6): Chunking strategies — how to split long documents"
 seo_description: Optimize retrieval quality by choosing effective chunking strategies, adjusting chunk size, and managing overlap to preserve context in vector search.
 ---
 
-# Chunking strategies — how to split long documents
+# Vector Search 101 (5/6): Chunking strategies — how to split long documents
 
 Embedding models have a hard token limit. `all-MiniLM-L6-v2` processes at most 256 subword tokens. A single page of a PDF often exceeds that. Feeding a long document as one input either truncates it — losing content at the boundary — or compresses too much information into one vector, which dilutes retrieval precision.
 
@@ -26,39 +26,23 @@ Chunking is the process of splitting a long document into embedding-sized pieces
 
 This is post 5 in the Vector Search 101 series.
 
-Here chunking is treated as a retrieval design choice, not a preprocessing afterthought. This post covers five things:
+Here chunking is treated as a retrieval design choice, not a preprocessing afterthought.
 
-- the core parameters: chunk size and overlap
-- implementing fixed-size chunking from scratch
-- using LangChain's `RecursiveCharacterTextSplitter`
-- how chunk boundaries affect retrieval quality
-- choosing a chunking strategy for different document types
+## Questions to Keep in Mind
+
+- Why split long documents into chunks instead of embedding them as one piece?
+- How do chunk_size and overlap trade retrieval quality against cost?
+- What breaks in the answer path when chunks do not carry metadata?
+
+## Big Picture
 
 ![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
 
 *Chunk size and overlap structure*
-<!-- ebook-only:start -->
 
-**The key idea**: chunk size and overlap control retrieval quality. Too large adds noise; too small loses context.
-
-## Where this chapter fits
-
-This is chapter 5 of 6 in the series.
-The previous chapter covered **FAISS fundamentals — fast approximate nearest-neighbor search**.
-After this chapter, the next one moves on to **Vector search pipeline — from document ingestion to query**.
-<!-- ebook-only:end -->
-
----
+This picture shows a long document being split into chunks, then embedded as searchable units. Chunking is not just preprocessing; it defines retrieval units, cost, and source traceability.
 
 > Chunking is not just extra preprocessing work. It is a design step where you decide what unit of context your retrieval system will remember.
-
-## Questions this chapter answers
-
-- Why is embedding a long document as a single chunk a bad idea?
-- When does fixed-size, sentence-based, or semantic chunking each shine or fall apart?
-- Why introduce overlap between chunks, and how do you pick the ratio?
-- How do you chunk documents that mix code, tables, and markdown headings without losing recall?
-- What does storing metadata (section title, source) on each chunk actually buy you?
 
 ## Chunk size and overlap
 
@@ -448,15 +432,26 @@ The final post assembles everything — document loading, chunking, embedding, i
 - [ ] Deduplicated near-identical chunks from the same document
 - [ ] Tracked document ID and offset so citations remain reachable
 
+## Answering the Opening Questions
+
+- **Why split long documents into chunks instead of embedding them as one piece?**
+  Embedding a whole long document can exceed token limits or dilute the relevant passage. Chunks create smaller retrieval units that point to useful locations.
+
+- **How do chunk_size and overlap trade retrieval quality against cost?**
+  Larger chunks preserve more context but add cost and noise; smaller chunks localize matches but can cut context. Overlap pays extra tokens to reduce that cut.
+
+- **What breaks in the answer path when chunks do not carry metadata?**
+  Without document id, title, position, or URL metadata, the system cannot explain where a retrieved chunk came from or link back to the source.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- [Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
-- [FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
-- **Chunking strategies — how to split long documents (current)**
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- [Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances](./03-cosine-similarity.md)
+- [Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search](./04-faiss-fundamentals.md)
+- **Vector Search 101 (5/6): Chunking strategies — how to split long documents (current)**
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

@@ -14,11 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Cosine similarity and vector search — computing sentence distances
+title: "Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances"
 seo_description: Compare cosine similarity, dot product, and Euclidean distance for vector search to understand how normalization affects semantic ranking results.
 ---
 
-# Cosine similarity and vector search — computing sentence distances
+# Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances
 
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
 
@@ -26,37 +26,21 @@ This is post 3 in the Vector Search 101 series.
 
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.
 
-- implementing cosine similarity, dot product, and Euclidean distance
-- the relationship between normalization and each metric
-- building a brute-force nearest-neighbor search
-- running a real query and examining the results
-- when to use each metric
+## Questions to Keep in Mind
+
+- If you already have vectors, why is choosing a distance metric still part of the search design?
+- How do cosine similarity, inner product, and L2 distance change ranking behavior?
+- Why does normalization affect both ranking results and FAISS index choice?
+
+## Big Picture
 
 ![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 
 *Cosine dot and euclidean comparison structure*
-<!-- ebook-only:start -->
 
-**The key idea**: cosine similarity measures the alignment of two vector directions. It ignores magnitude, so sentence length differences do not matter.
-
-## Where this chapter fits
-
-This is chapter 3 of 6 in the series.
-The previous chapter covered **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers**.
-After this chapter, the next one moves on to **FAISS fundamentals — fast approximate nearest-neighbor search**.
-<!-- ebook-only:end -->
-
----
+This picture shows that the same vectors can produce different ranking decisions depending on the distance metric. Retrieval quality depends not only on the embedding model but also on the rule used to compare vectors.
 
 > In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.
-
-## Questions this chapter answers
-
-- Do cosine similarity, dot product, and Euclidean distance produce the same ranking or different ones?
-- How does pre-normalizing vectors collapse cosine and dot product into the same computation?
-- What data should you actually look at when picking a similarity threshold?
-- High similarity does not always mean the same meaning - what are the traps?
-- How should negative similarity (opposite meaning) be handled in search results?
 
 ## Three distance metrics
 
@@ -326,15 +310,26 @@ The next post introduces FAISS. We will look at index types, how to build and pe
 - [ ] Decided how many candidates to pass to a reranker after scoring
 - [ ] Captured false-positive examples as regression cases
 
+## Answering the Opening Questions
+
+- **If you already have vectors, why is choosing a distance metric still part of the search design?**
+  The metric defines what close means. Without that rule, vectors cannot be ranked consistently.
+
+- **How do cosine similarity, inner product, and L2 distance change ranking behavior?**
+  Cosine emphasizes direction, inner product includes direction and magnitude, and L2 emphasizes coordinate distance, so rankings can diverge.
+
+- **Why does normalization affect both ranking results and FAISS index choice?**
+  Normalization changes the relationship between cosine and inner product, which also changes whether an IP or L2 FAISS index matches the intended metric.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- [HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
-- **Cosine similarity and vector search — computing sentence distances (current)**
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- [Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers](./02-huggingface-embeddings.md)
+- **Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (current)**
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

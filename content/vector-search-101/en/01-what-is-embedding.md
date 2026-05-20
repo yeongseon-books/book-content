@@ -14,11 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: What is an embedding — converting text into vectors
+title: "Vector Search 101 (1/6): What is an embedding — converting text into vectors"
 seo_description: Learn how text embeddings transform natural language into numeric vectors to enable semantic search, machine-readable meaning, and vector similarity.
 ---
 
-# What is an embedding — converting text into vectors
+# Vector Search 101 (1/6): What is an embedding — converting text into vectors
 
 Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.
 
@@ -26,38 +26,23 @@ Embeddings approach the problem differently. They convert text into numeric vect
 
 This is the first post in the Vector Search 101 series.
 
-This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores. We will cover five things:
+This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores.
 
-- what embeddings are and why they emerged
-- how meaning is represented as distance in vector space
-- how embedding models learn that representation
-- a first hands-on example that produces real vectors
-- where embeddings fall short and what to watch for
+## Questions to Keep in Mind
+
+- When keyword search misses documents with the same meaning but different wording, what is missing?
+- What does it actually mean for two embedding vectors to be close?
+- When choosing a first embedding model, which limits should you check before tuning anything else?
+
+## Big Picture
 
 ![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 
 *Keyword search and embedding search contrast*
-<!-- ebook-only:start -->
 
-**The key idea**: an embedding compresses text into a high-dimensional vector. Sentences with similar meaning land close together in that space.
-
-## Where this chapter fits
-
-This is chapter 1 of 6 in the series.
-After this chapter, the next one moves on to **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers**.
-<!-- ebook-only:end -->
-
----
+This picture shows the shift from keyword matching to comparison in semantic space. Embeddings turn text into vectors so a search system can find nearby meaning even when the same words do not appear.
 
 > An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.
-
-## Questions this chapter answers
-
-- What is an embedding mathematically, and why convert text into a numeric vector at all?
-- How do word, sentence, and document embeddings actually differ?
-- How do accuracy and cost shift as embedding dimensionality grows?
-- Why does the same text produce different vectors across models?
-- How do you measure whether your embeddings are any good?
 
 ## The ceiling of keyword search
 
@@ -310,15 +295,26 @@ The next post moves from concept to practice. We will use `HuggingFaceEmbeddings
 - [ ] Sanity-checked quality by computing similarity on a few hand-picked pairs
 - [ ] Wrote a reindex procedure for when the embedding model changes
 
+## Answering the Opening Questions
+
+- **When keyword search misses documents with the same meaning but different wording, what is missing?**
+  What is missing is a representation of meaning, not another keyword rule. Embeddings provide that representation by mapping text into vectors that can be compared geometrically.
+
+- **What does it actually mean for two embedding vectors to be close?**
+  Close means the vectors have a small distance or similar direction under the chosen metric, which the system treats as a proxy for semantic similarity.
+
+- **When choosing a first embedding model, which limits should you check before tuning anything else?**
+  Check dimensionality, token limit, language support, and model version first because those values define quality limits and reindexing cost.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What is an embedding — converting text into vectors (current)**
-- HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (upcoming)
-- Cosine similarity and vector search — computing sentence distances (upcoming)
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- **Vector Search 101 (1/6): What is an embedding — converting text into vectors (current)**
+- Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (upcoming)
+- Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (upcoming)
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

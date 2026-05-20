@@ -14,11 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
+title: "Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers"
 seo_description: Learn to use HuggingFace sentence-transformers locally to generate text vectors, manage batches, and save embeddings for semantic search applications.
 ---
 
-# HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
+# Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 
@@ -26,39 +26,23 @@ Post 1 covered the concept. This post is about running real code. Moving from th
 
 This is post 2 in the Vector Search 101 series.
 
-Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely. This post covers five things:
+Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely.
 
-- installing and initializing `HuggingFaceEmbeddings`
-- the difference between single-query and batch embedding
-- saving vectors to NumPy files and reloading them
-- practical tips for speeding up encoding on CPU
-- comparing the wrapper to the raw `SentenceTransformer` API
+## Questions to Keep in Mind
+
+- Where do you verify that vectors from sentence-transformers are actually usable for search?
+- What changes in production when you move from one-by-one encoding to batch encoding?
+- What metadata must travel with saved vectors so the result can be reproduced later?
+
+## Big Picture
 
 ![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 
 *Single query embedding call flow*
-<!-- ebook-only:start -->
 
-**The key idea**: HuggingFace embeddings run locally for free. `sentence-transformers` downloads the model and returns vectors.
-
-## Where this chapter fits
-
-This is chapter 2 of 6 in the series.
-The previous chapter covered **What is an embedding — converting text into vectors**.
-After this chapter, the next one moves on to **Cosine similarity and vector search — computing sentence distances**.
-<!-- ebook-only:end -->
-
----
+This picture follows text through an embedding model into fixed-length vectors that can be stored and reused. The practical point is not just producing numbers; it is keeping model and dimension information with those numbers.
 
 > The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.
-
-## Questions this chapter answers
-
-- What are the real tradeoffs between Hugging Face `sentence-transformers` and the OpenAI Embeddings API?
-- What performance traps appear when you run a local embedding model without a GPU?
-- How do multilingual versus English-only models split on Korean search quality?
-- How do you balance memory, batch size, and token limits when embedding in batch?
-- How do you migrate an existing index when the embedding model version moves?
 
 ## Installation
 
@@ -337,15 +321,26 @@ The next post moves to similarity computation. We will look at when cosine simil
 - [ ] Aligned the result dimension and dtype with your index schema
 - [ ] Stored the model version alongside any embedding kept long-term
 
+## Answering the Opening Questions
+
+- **Where do you verify that vectors from sentence-transformers are actually usable for search?**
+  Verify shape, dtype, dimensionality, and a few similarity results before treating the vectors as search-ready.
+
+- **What changes in production when you move from one-by-one encoding to batch encoding?**
+  Batch encoding reduces per-call overhead and improves throughput, but production code must also manage latency, memory, and batch size.
+
+- **What metadata must travel with saved vectors so the result can be reproduced later?**
+  Store model name, model version, dimensionality, normalization choice, and input hashes with the vectors so the index can be reproduced.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is an embedding — converting text into vectors](./01-what-is-embedding.md)
-- **HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (current)**
-- Cosine similarity and vector search — computing sentence distances (upcoming)
-- FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
-- Chunking strategies — how to split long documents (upcoming)
-- Vector search pipeline — from document ingestion to query (upcoming)
+- [Vector Search 101 (1/6): What is an embedding — converting text into vectors](./01-what-is-embedding.md)
+- **Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers (current)**
+- Vector Search 101 (3/6): Cosine similarity and vector search — computing sentence distances (upcoming)
+- Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search (upcoming)
+- Vector Search 101 (5/6): Chunking strategies — how to split long documents (upcoming)
+- Vector Search 101 (6/6): Vector search pipeline — from document ingestion to query (upcoming)
 
 <!-- toc:end -->
 

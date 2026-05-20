@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Chunking strategies — how to split long documents</title>
+<title>Vector Search 101 (5/6): Chunking strategies — how to split long documents</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,41 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Chunking strategies — how to split long documents</h1>
+<h1>Vector Search 101 (5/6): Chunking strategies — how to split long documents</h1>
 <p>Embedding models have a hard token limit. <code>all-MiniLM-L6-v2</code> processes at most 256 subword tokens. A single page of a PDF often exceeds that. Feeding a long document as one input either truncates it — losing content at the boundary — or compresses too much information into one vector, which dilutes retrieval precision.</p>
 <p>Chunking is the process of splitting a long document into embedding-sized pieces. How you split directly affects retrieval quality. Chunks that are too small lose context; chunks that are too large mix unrelated content.</p>
 <p>This is post 5 in the Vector Search 101 series.</p>
-<p>Here chunking is treated as a retrieval design choice, not a preprocessing afterthought. This post covers five things:</p>
+<p>Here chunking is treated as a retrieval design choice, not a preprocessing afterthought.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>the core parameters: chunk size and overlap</li>
-<li>implementing fixed-size chunking from scratch</li>
-<li>using LangChain's <code>RecursiveCharacterTextSplitter</code></li>
-<li>how chunk boundaries affect retrieval quality</li>
-<li>choosing a chunking strategy for different document types</li>
+<li>Why split long documents into chunks instead of embedding them as one piece?</li>
+<li>How do chunk_size and overlap trade retrieval quality against cost?</li>
+<li>What breaks in the answer path when chunks do not carry metadata?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="Chunk size and overlap structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png"></p>
 <p><em>Chunk size and overlap structure</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: chunk size and overlap control retrieval quality. Too large adds noise; too small loses context.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 5 of 6 in the series.<br>
-The previous chapter covered <strong>FAISS fundamentals — fast approximate nearest-neighbor search</strong>.<br>
-After this chapter, the next one moves on to <strong>Vector search pipeline — from document ingestion to query</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture shows a long document being split into chunks, then embedded as searchable units. Chunking is not just preprocessing; it defines retrieval units, cost, and source traceability.</p>
 <blockquote>
 <p>Chunking is not just extra preprocessing work. It is a design step where you decide what unit of context your retrieval system will remember.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>Why is embedding a long document as a single chunk a bad idea?</li>
-<li>When does fixed-size, sentence-based, or semantic chunking each shine or fall apart?</li>
-<li>Why introduce overlap between chunks, and how do you pick the ratio?</li>
-<li>How do you chunk documents that mix code, tables, and markdown headings without losing recall?</li>
-<li>What does storing metadata (section title, source) on each chunk actually buy you?</li>
-</ul>
 <h2>Chunk size and overlap</h2>
 <p><img alt="Chunk size and overlap structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png"></p>
 <p><em>Chunk size and overlap structure</em><br>
@@ -423,6 +406,21 @@ Chunks that are too small lack enough context to match a query accurately. Chunk
 <li>[ ] Applied separate chunking rules to code and tables versus prose</li>
 <li>[ ] Deduplicated near-identical chunks from the same document</li>
 <li>[ ] Tracked document ID and offset so citations remain reachable</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why split long documents into chunks instead of embedding them as one piece?</strong><br>
+  Embedding a whole long document can exceed token limits or dilute the relevant passage. Chunks create smaller retrieval units that point to useful locations.</p>
+</li>
+<li>
+<p><strong>How do chunk_size and overlap trade retrieval quality against cost?</strong><br>
+  Larger chunks preserve more context but add cost and noise; smaller chunks localize matches but can cut context. Overlap pays extra tokens to reduce that cut.</p>
+</li>
+<li>
+<p><strong>What breaks in the answer path when chunks do not carry metadata?</strong><br>
+  Without document id, title, position, or URL metadata, the system cannot explain where a retrieved chunk came from or link back to the source.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

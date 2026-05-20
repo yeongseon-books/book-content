@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>FAISS fundamentals — fast approximate nearest-neighbor search</title>
+<title>Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,41 +53,24 @@
 </style>
 </head>
 <body>
-<h1>FAISS fundamentals — fast approximate nearest-neighbor search</h1>
+<h1>Vector Search 101 (4/6): FAISS fundamentals — fast approximate nearest-neighbor search</h1>
 <p>Once documents number in the thousands or tens of thousands, NumPy brute-force search slows down. Comparing a query against 100,000 vectors of dimension 384 requires 38.4 million multiplications per query. At that scale, search latency climbs into the hundreds of milliseconds or higher, which is too slow for interactive applications.</p>
 <p>FAISS (Facebook AI Similarity Search) was built for this problem. It supports approximate nearest-neighbor (ANN) search that trades a small accuracy cost for a large speed gain. It handles billion-scale vector collections and runs fast on both CPU and GPU.</p>
 <p>This is post 4 in the Vector Search 101 series.</p>
-<p>This post covers the baseline FAISS workflow you need before tuning larger ANN deployments. We will go through five things:</p>
+<p>This post covers the baseline FAISS workflow you need before tuning larger ANN deployments.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>installing FAISS and choosing an index type</li>
-<li>exact search with <code>IndexFlatL2</code> and <code>IndexFlatIP</code></li>
-<li>saving an index to disk and reloading it</li>
-<li>running real queries against a small corpus</li>
-<li>how to choose between index types</li>
+<li>Where does a simple loop over vectors stop being good enough?</li>
+<li>What assumption should decide between IndexFlatIP and IndexFlatL2?</li>
+<li>When saving and reloading an index, how do vectors and metadata stay aligned?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="FAISS index type comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png"></p>
 <p><em>FAISS index type comparison structure</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: FAISS finds vectors fast. IndexFlatL2 is the simplest option; switch to IVF or HNSW when the dataset grows.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 4 of 6 in the series.<br>
-The previous chapter covered <strong>Cosine similarity and vector search — computing sentence distances</strong>.<br>
-After this chapter, the next one moves on to <strong>Chunking strategies — how to split long documents</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture follows a query vector through a FAISS index to retrieve nearest vector ids, then reconnect those ids to source metadata. FAISS handles fast lookup, but the application still owns metric choice and metadata alignment.</p>
 <blockquote>
 <p>The best way to understand FAISS is not as a smarter database, but as a compute engine dedicated to vector search.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>When is each of FAISS IndexFlat, IVF, and HNSW the right pick?</li>
-<li>What is the accuracy/latency tradeoff between exact search and ANN?</li>
-<li>Which index types need training, and how do you train them?</li>
-<li>What gotchas appear when persisting and reloading a FAISS index?</li>
-<li>For which workloads does GPU FAISS beat CPU FAISS, and vice versa?</li>
-</ul>
 <h2>Installation</h2>
 <p>CPU-only version:</p>
 <pre><code class="language-bash">pip install faiss-cpu sentence-transformers numpy
@@ -361,6 +344,21 @@ IndexFlatL2 (lower = more similar):
 <li>[ ] Persisted the index and reproduced it on the same environment</li>
 <li>[ ] Tuned nprobe/ef from measurements, not from defaults</li>
 <li>[ ] Added metrics for vector count, dimension, and memory footprint</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Where does a simple loop over vectors stop being good enough?</strong><br>
+  A brute-force loop becomes expensive as vector count and dimensionality grow because every query compares against every stored vector.</p>
+</li>
+<li>
+<p><strong>What assumption should decide between IndexFlatIP and IndexFlatL2?</strong><br>
+  Use IndexFlatIP when normalized vectors should behave like cosine ranking, and IndexFlatL2 when coordinate distance is the intended metric.</p>
+</li>
+<li>
+<p><strong>When saving and reloading an index, how do vectors and metadata stay aligned?</strong><br>
+  Persist the row-id mapping together with document ids, source text, and metadata so reloaded search results point to the same records.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>

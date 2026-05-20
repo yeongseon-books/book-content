@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</title>
+<title>Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,41 +53,24 @@
 </style>
 </head>
 <body>
-<h1>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</h1>
+<h1>Vector Search 101 (2/6): HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</h1>
 <p>Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.</p>
 <p><code>HuggingFaceEmbeddings</code> from <code>langchain-huggingface</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
 <p>This is post 2 in the Vector Search 101 series.</p>
-<p>Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely. This post covers five things:</p>
+<p>Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely.</p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>installing and initializing <code>HuggingFaceEmbeddings</code></li>
-<li>the difference between single-query and batch embedding</li>
-<li>saving vectors to NumPy files and reloading them</li>
-<li>practical tips for speeding up encoding on CPU</li>
-<li>comparing the wrapper to the raw <code>SentenceTransformer</code> API</li>
+<li>Where do you verify that vectors from sentence-transformers are actually usable for search?</li>
+<li>What changes in production when you move from one-by-one encoding to batch encoding?</li>
+<li>What metadata must travel with saved vectors so the result can be reproduced later?</li>
 </ul>
+<h2>Big Picture</h2>
 <p><img alt="Single query embedding call flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png"></p>
 <p><em>Single query embedding call flow</em></p>
-<!-- ebook-only:start -->
-
-<p><strong>The key idea</strong>: HuggingFace embeddings run locally for free. <code>sentence-transformers</code> downloads the model and returns vectors.</p>
-<h2>Where this chapter fits</h2>
-<p>This is chapter 2 of 6 in the series.<br>
-The previous chapter covered <strong>What is an embedding — converting text into vectors</strong>.<br>
-After this chapter, the next one moves on to <strong>Cosine similarity and vector search — computing sentence distances</strong>.</p>
-<!-- ebook-only:end -->
-
-<hr>
+<p>This picture follows text through an embedding model into fixed-length vectors that can be stored and reused. The practical point is not just producing numbers; it is keeping model and dimension information with those numbers.</p>
 <blockquote>
 <p>The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
-<ul>
-<li>What are the real tradeoffs between Hugging Face <code>sentence-transformers</code> and the OpenAI Embeddings API?</li>
-<li>What performance traps appear when you run a local embedding model without a GPU?</li>
-<li>How do multilingual versus English-only models split on Korean search quality?</li>
-<li>How do you balance memory, batch size, and token limits when embedding in batch?</li>
-<li>How do you migrate an existing index when the embedding model version moves?</li>
-</ul>
 <h2>Installation</h2>
 <p>Three packages are needed.</p>
 <pre><code class="language-bash">pip install langchain-huggingface sentence-transformers numpy
@@ -304,6 +287,21 @@ max difference: 0.000000
 <li>[ ] Validated Korean inputs against a multilingual or Korean-specialized model</li>
 <li>[ ] Aligned the result dimension and dtype with your index schema</li>
 <li>[ ] Stored the model version alongside any embedding kept long-term</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Where do you verify that vectors from sentence-transformers are actually usable for search?</strong><br>
+  Verify shape, dtype, dimensionality, and a few similarity results before treating the vectors as search-ready.</p>
+</li>
+<li>
+<p><strong>What changes in production when you move from one-by-one encoding to batch encoding?</strong><br>
+  Batch encoding reduces per-call overhead and improves throughput, but production code must also manage latency, memory, and batch size.</p>
+</li>
+<li>
+<p><strong>What metadata must travel with saved vectors so the result can be reproduced later?</strong><br>
+  Store model name, model version, dimensionality, normalization choice, and input hashes with the vectors so the index can be reproduced.</p>
+</li>
 </ul>
 <h2>In this series</h2>
 <ul>
