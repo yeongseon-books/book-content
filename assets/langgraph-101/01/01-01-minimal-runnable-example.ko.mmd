@@ -1,0 +1,15 @@
+flowchart TD
+  Start["START"] --> Input["초기 ArticleState<br/>user_request + topic + outline + answer"]
+  Input --> Topic["choose_topic<br/>return { topic }"]
+  Topic --> Outline["build_outline<br/>return { outline }"]
+  Outline --> Answer["write_answer<br/>return { answer }"]
+  Answer --> Final["invoke() 이후 최종 상태<br/>topic + outline + answer"]
+  Final --> End["END"]
+
+  style Start fill:#e8f5e9,stroke:#388e3c
+  style Input fill:#e3f2fd,stroke:#1976d2
+  style Topic fill:#fff3e0,stroke:#f57c00
+  style Outline fill:#fff3e0,stroke:#f57c00
+  style Answer fill:#fff3e0,stroke:#f57c00
+  style Final fill:#f3e5f5,stroke:#7b1fa2
+  style End fill:#fff8e1,stroke:#f9a825

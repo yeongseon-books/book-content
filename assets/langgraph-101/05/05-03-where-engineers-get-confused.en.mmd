@@ -1,0 +1,13 @@
+flowchart TD
+  A["Supervisor<br/>choose route + own fallback + own stop rules"] --> B["Worker<br/>produce role-specific output only"]
+  B --> C["Finalizer<br/>assemble the user-facing response"]
+  C --> D["Boundary check<br/>supervisor should not write the answer"]
+  D --> E["Boundary check<br/>workers should not mutate every shared field"]
+  E --> F["Stable design<br/>clear ownership at each handoff"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#fce4ec,stroke:#c2185b
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#f3e5f5,stroke:#7b1fa2

@@ -1,0 +1,17 @@
+flowchart TD
+  A["classify_question()<br/>route를 상태에 기록"] --> B["route_question()<br/>다음 route 라벨만 반환"]
+  B --> C["경로 맵<br/>코드 / 개념 / 디버그 / 대체 경로"]
+  C --> D["작업 분기<br/>선택된 노드 실행"]
+
+  C --> E["예상 밖 route?<br/>대체 경로로 이동"]
+  D --> F["반복이 있나?<br/>종료 규칙 + 재귀 한도"]
+  E --> F
+  F --> G["안전한 종료<br/>END 또는 안정적 다음 단계"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#fce4ec,stroke:#c2185b
+  style G fill:#e0f2f1,stroke:#00796b
