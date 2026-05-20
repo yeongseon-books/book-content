@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:04:36+00:00
+Generated: 2026-05-20T12:04:56+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **3**
-- Series at or above 5 issues: **1**
-- Total issues: **14**
-  - BadImg: **14**
+- Series with any issue: **2**
+- Series at or above 5 issues: **0**
+- Total issues: **6**
+  - BadImg: **6**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,21 +41,8 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 2 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 3 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## rag-benchmark-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png:1` — PNG height 88px <= 100px (size=907x88)
-- `assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png:1` — PNG height 67px <= 100px (size=781x67)
-- `assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png:1` — PNG height 67px <= 100px (size=935x67)
-- `assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png:1` — PNG height 67px <= 100px (size=796x67)
-- `assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png:1` — PNG height 67px <= 100px (size=862x67)
-- ... 3 more
+| 1 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 2 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## azure-aca-101 — Total 4
 

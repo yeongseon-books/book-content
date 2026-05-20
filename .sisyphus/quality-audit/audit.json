@@ -1,249 +1,21 @@
 {
-  "generated_at": "2026-05-20T12:04:36+00:00",
+  "generated_at": "2026-05-20T12:04:56+00:00",
   "series_count": 92,
-  "problem_series_count": 3,
-  "series_with_5_plus": 1,
+  "problem_series_count": 2,
+  "series_with_5_plus": 0,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 14,
+    "BadImg": 6,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 14
+    "all": 6
   },
   "results": [
-    {
-      "series": "rag-benchmark-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 8,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-03-high-hit-rate-with-weak-ranking.en.png",
-            "width": 907,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-03-high-hit-rate-with-weak-ranking.ko.png",
-            "width": 781,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-boundary-between-embedding-and-search-ti.en.png",
-            "width": 935,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-boundary-between-embedding-and-search-ti.ko.png",
-            "width": 796,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-verification-flow-before-metric-executio.en.png",
-            "width": 862,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-verification-flow-before-metric-executio.ko.png",
-            "width": 792,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-04-baseline-to-decision-benchmark-loop.en.png",
-            "width": 1049,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-04-baseline-to-decision-benchmark-loop.ko.png",
-            "width": 820,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-03-high-hit-rate-with-weak-ranking.en.png",
-            "width": 907,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-03-high-hit-rate-with-weak-ranking.ko.png",
-            "width": 781,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-boundary-between-embedding-and-search-ti.en.png",
-            "width": 935,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-boundary-between-embedding-and-search-ti.ko.png",
-            "width": 796,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-verification-flow-before-metric-executio.en.png",
-            "width": 862,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-verification-flow-before-metric-executio.ko.png",
-            "width": 792,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-04-baseline-to-decision-benchmark-loop.en.png",
-            "width": 1049,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/rag-benchmark-101/06/06-04-baseline-to-decision-benchmark-loop.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-04-baseline-to-decision-benchmark-loop.ko.png",
-            "width": 820,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
     {
       "series": "azure-aca-101",
       "counts": {
@@ -1478,6 +1250,20 @@
     },
     {
       "series": "python-package-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "rag-benchmark-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
