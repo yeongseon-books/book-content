@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:01:32+00:00
+Generated: 2026-05-20T12:01:53+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **10**
-- Series at or above 5 issues: **8**
-- Total issues: **84**
-  - BadImg: **84**
+- Series with any issue: **9**
+- Series at or above 5 issues: **7**
+- Total issues: **78**
+  - BadImg: **78**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -48,9 +48,8 @@ Warnings:
 | 5 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 6 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 7 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 8 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 9 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 10 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 8 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 9 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -134,18 +133,6 @@ Warnings:
 - `assets/mlops-101/05/05-01-see-the-flow-first.en.png:1` — PNG height 67px <= 100px (size=1028x67)
 - `assets/mlops-101/05/05-01-see-the-flow-first.ko.png:1` — PNG height 67px <= 100px (size=1028x67)
 - `assets/mlops-101/08/08-01-see-the-flow-first.en.png:1` — PNG height 67px <= 100px (size=898x67)
-- ... 1 more
-
-## observability-101 — Total 6
-
-- BadImg=6 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/observability-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=761x67)
-- `assets/observability-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=781x67)
-- `assets/observability-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=981x67)
-- `assets/observability-101/04/04-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=799x67)
-- `assets/observability-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1060x67)
 - ... 1 more
 
 ## azure-aca-101 — Total 4
