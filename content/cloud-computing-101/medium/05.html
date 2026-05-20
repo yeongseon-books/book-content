@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Storage</title>
+<title>Cloud Computing 101 (5/10): Storage</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Storage</h1>
+<h1>Cloud Computing 101 (5/10): Storage</h1>
 <p>S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data, but they are optimized for very different access patterns, durability expectations, and recovery trade-offs.</p>
 <p>Storage mistakes often stay hidden at first. The system seems fine until backup, restore, sharing, or long-term retention turns into the expensive part of the design. Picking the right storage tier early prevents a surprising amount of later rework.</p>
 <p>This is post 5 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll compare object, block, file, and archive storage and connect each one to the workload shape it actually fits.</p>
 <blockquote>
 <p>Storage is not just where data sits. It is part of the operating contract for latency, recovery time, cost, and sharing semantics.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Storage?</li>
+<li>Which signal should the example or diagram make visible for Storage?</li>
+<li>What failure should be prevented first when Storage reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 5 flow overview</em></p>
+<p>This picture places Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Storage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>The wrong storage choice is <em>expensive, slow, and fragile</em>. The right one quietly works for years.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Block, object, file, and archive storage split by access pattern and operating need" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Block, object, file, and archive storage split by access pattern and operating need</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Object</strong>: key-value with metadata (S3).</li>
@@ -171,11 +182,21 @@ s3 = boto3.client(&quot;s3&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once data sits somewhere, you have to <em>connect</em> to it. The next post covers Network.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><strong>What boundary should you inspect first when applying Storage?</strong></li>
+<li>The article treats Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Storage?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Storage reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Cloud Computing 101 (3/10): Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Cloud Computing 101 (4/10): Compute</a></li>
 <li><strong>Storage (current)</strong></li>
 <li>Network (upcoming)</li>
 <li>Identity and Security (upcoming)</li>

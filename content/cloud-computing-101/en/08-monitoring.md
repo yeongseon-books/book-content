@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 8
-title: Monitoring
+title: "Cloud Computing 101 (8/10): Monitoring"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: CloudWatch metrics, logs, and alarms — the foundation of clou
 last_reviewed: '2026-05-14'
 ---
 
-# Monitoring
+# Cloud Computing 101 (8/10): Monitoring
 
 If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.
 
@@ -31,6 +31,22 @@ This is post 8 in the Cloud Computing 101 series.
 In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.
 
 > Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Monitoring?
+- Which signal should the example or diagram make visible for Monitoring?
+- What failure should be prevented first when Monitoring reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 8 flow overview*
+
+This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing
 Without monitoring, your *customers* tell you about outages first. A single well-tuned alarm protects entire weekends.
 
 ## Concept at a Glance
-
-![Monitoring flow from application signals to alarms, notifications, and log analysis](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
-
-*Monitoring flow from application signals to alarms, notifications, and log analysis*
 
 ## Key Terms
 
@@ -180,17 +192,29 @@ ALB 5xx rate, RDS connections, Lambda error rate, and orders-per-minute all flow
 
 Once visibility is in place, you have to control the bill. The next post covers Cost Management.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Monitoring?**
+  - The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Monitoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Monitoring reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity and Security](./07-identity-and-security.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity and Security](./07-identity-and-security.md)
 - **Monitoring (current)**
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

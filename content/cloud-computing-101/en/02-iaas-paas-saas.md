@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 2
-title: IaaS, PaaS, SaaS
+title: "Cloud Computing 101 (2/10): IaaS, PaaS, SaaS"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Compare IaaS, PaaS, and SaaS by what you operate vs what the pr
 last_reviewed: '2026-05-14'
 ---
 
-# IaaS, PaaS, SaaS
+# Cloud Computing 101 (2/10): IaaS, PaaS, SaaS
 
 EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when you operate them. One makes you think about instances and patching. One wants your code and a start command. One gives you a finished application and asks almost nothing about infrastructure.
 
@@ -31,6 +31,22 @@ This is post 2 in the Cloud Computing 101 series.
 In this post, we'll compare service models through control, speed, lock-in, and operational burden so you can match them to real workloads.
 
 > Cloud service models are easiest to understand as operating boundaries: the more the provider runs for you, the less control you keep and the faster you usually move.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying IaaS, PaaS, SaaS?
+- Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?
+- What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 2 flow overview*
+
+This picture places IaaS, PaaS, SaaS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of IaaS, PaaS, SaaS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll compare service models through control, speed, lock-in, and 
 Pick the wrong model and you waste both *cost* and *speed*. Each stage of an organization fits a different abstraction level.
 
 ## Concept at a Glance
-
-![As the service model rises, the portion you operate directly gets smaller](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
-
-*As the service model rises, the portion you operate directly gets smaller*
 
 ## Key Terms
 
@@ -177,8 +189,19 @@ Early-stage startups run on PaaS like Heroku or Render. As they grow they move w
 
 Once you pick a model, the next question is *where it runs*. The next post covers Regions and Availability Zones.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying IaaS, PaaS, SaaS?**
+  - The article treats IaaS, PaaS, SaaS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
 - **IaaS, PaaS, SaaS (current)**
 - Region and Availability Zone (upcoming)
 - Compute (upcoming)
@@ -188,6 +211,7 @@ Once you pick a model, the next question is *where it runs*. The next post cover
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

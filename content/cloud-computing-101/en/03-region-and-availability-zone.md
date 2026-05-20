@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 3
-title: Region and Availability Zone
+title: "Cloud Computing 101 (3/10): Region and Availability Zone"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Regions vs Availability Zones, Multi-AZ vs Multi-Region tradeof
 last_reviewed: '2026-05-14'
 ---
 
-# Region and Availability Zone
+# Cloud Computing 101 (3/10): Region and Availability Zone
 
 Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.
 
@@ -31,6 +31,22 @@ This is post 3 in the Cloud Computing 101 series.
 In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.
 
 > A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Region and Availability Zone?
+- Which signal should the example or diagram make visible for Region and Availability Zone?
+- What failure should be prevented first when Region and Availability Zone reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 3 flow overview*
+
+This picture places Region and Availability Zone inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Region and Availability Zone is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll separate Regions, Availability Zones, and edge locations, th
 If everything sits in one AZ, a single data center fire takes down your service. Distribution is the *prerequisite* for availability.
 
 ## Concept at a Glance
-
-![A Region contains multiple Availability Zones that separate failure boundaries](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
-
-*A Region contains multiple Availability Zones that separate failure boundaries*
 
 ## Key Terms
 
@@ -174,9 +186,20 @@ Payment services run Multi-AZ, global product pages cache at the edge, and disas
 
 Now that you have a place, you need things to run there. The next post covers Compute.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Region and Availability Zone?**
+  - The article treats Region and Availability Zone as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Region and Availability Zone?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Region and Availability Zone reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
 - **Region and Availability Zone (current)**
 - Compute (upcoming)
 - Storage (upcoming)
@@ -185,6 +208,7 @@ Now that you have a place, you need things to run there. The next post covers Co
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

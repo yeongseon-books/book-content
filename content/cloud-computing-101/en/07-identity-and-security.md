@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 7
-title: Identity and Security
+title: "Cloud Computing 101 (7/10): Identity and Security"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: IAM users, roles, policies, MFA, and KMS — cloud security fun
 last_reviewed: '2026-05-14'
 ---
 
-# Identity and Security
+# Cloud Computing 101 (7/10): Identity and Security
 
 Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.
 
@@ -31,6 +31,22 @@ This is post 7 in the Cloud Computing 101 series.
 In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.
 
 > Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Identity and Security?
+- Which signal should the example or diagram make visible for Identity and Security?
+- What failure should be prevented first when Identity and Security reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 7 flow overview*
+
+This picture places Identity and Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Identity and Security is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll break down users, groups, roles, policies, MFA, and KMS thro
 Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.
 
 ## Concept at a Glance
-
-![Core IAM relationship between users, roles, policies, and protected resources](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
-
-*Core IAM relationship between users, roles, policies, and protected resources*
 
 ## Key Terms
 
@@ -186,17 +198,29 @@ EC2 roles access S3. KMS encrypts data at rest. AWS SSO handles staff login. MFA
 
 Once permissions are right, the next question is *what is actually happening*. The next post covers Monitoring.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Identity and Security?**
+  - The article treats Identity and Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Identity and Security?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Identity and Security reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
 - **Identity and Security (current)**
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

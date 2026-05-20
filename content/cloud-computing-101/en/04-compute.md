@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 4
-title: Compute
+title: "Cloud Computing 101 (4/10): Compute"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: VMs, containers, and serverless — when to pick which, plus Au
 last_reviewed: '2026-05-14'
 ---
 
-# Compute
+# Cloud Computing 101 (4/10): Compute
 
 Compute is where cloud architecture becomes tangible. The same application can run on a VM, inside a container platform, or in a serverless runtime, but those choices produce very different bills, scaling behavior, and operational load.
 
@@ -31,6 +31,22 @@ This is post 4 in the Cloud Computing 101 series.
 In this post, we'll compare VMs, containers, serverless, and bare metal, then connect those choices to Auto Scaling and pricing models.
 
 > Compute choices trade control for automation. The right answer depends less on fashion and more on the failure modes and operating rhythm of the workload.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Compute?
+- Which signal should the example or diagram make visible for Compute?
+- What failure should be prevented first when Compute reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 4 flow overview*
+
+This picture places Compute inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Compute is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll compare VMs, containers, serverless, and bare metal, then co
 Compute choice drives roughly 60% of your bill and most of your operational pain.
 
 ## Concept at a Glance
-
-![The compute spectrum shifts from maximum control to maximum platform automation](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
-
-*The compute spectrum shifts from maximum control to maximum platform automation*
 
 ## Key Terms
 
@@ -172,10 +184,21 @@ Web tier runs On-Demand inside an ASG, batch jobs ride Spot, the database lives 
 
 Compute moves data — and data has to live somewhere. The next post covers Storage.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Compute?**
+  - The article treats Compute as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Compute?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Compute reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
 - **Compute (current)**
 - Storage (upcoming)
 - Network (upcoming)
@@ -183,6 +206,7 @@ Compute moves data — and data has to live somewhere. The next post covers Stor
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

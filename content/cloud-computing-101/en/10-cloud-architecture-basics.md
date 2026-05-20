@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 10
-title: Cloud Architecture Basics
+title: "Cloud Computing 101 (10/10): Cloud Architecture Basics"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: The five Well-Architected pillars and a layered web architectur
 last_reviewed: '2026-05-14'
 ---
 
-# Cloud Architecture Basics
+# Cloud Computing 101 (10/10): Cloud Architecture Basics
 
 By the end of a cloud fundamentals series, the risk is thinking in product lists instead of systems. Compute, storage, networking, security, monitoring, and cost all make sense individually, but production architecture begins when those pieces reinforce each other inside one design.
 
@@ -31,6 +31,22 @@ This is the final post in the Cloud Computing 101 series.
 In this post, we'll pull the series together through the Well-Architected pillars and a layered reference design you can reuse as a review lens.
 
 > Cloud architecture is the discipline of turning separate service choices into one coherent operating system for reliability, security, performance, and cost.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cloud Architecture Basics?
+- Which signal should the example or diagram make visible for Cloud Architecture Basics?
+- What failure should be prevented first when Cloud Architecture Basics reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 10 flow overview*
+
+This picture places Cloud Architecture Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cloud Architecture Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll pull the series together through the Well-Architected pillar
 The same feature can cost ten times more or ten times less depending on the architecture. This final post pulls the whole series into one picture.
 
 ## Concept at a Glance
-
-![A layered web architecture with CDN, load balancer, stateless app tier, and data services](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
-
-*A layered web architecture with CDN, load balancer, stateless app tier, and data services*
 
 ## Key Terms
 
@@ -158,17 +170,29 @@ CloudFront in front of ALB, an ASG of stateless apps, RDS Multi-AZ, Redis for ho
 
 That closes out *Cloud Computing 101*. The next series — *Containers 101*, *Kubernetes 101*, and *Serverless 101* — go deep on the compute abstractions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cloud Architecture Basics?**
+  - The article treats Cloud Architecture Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cloud Architecture Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cloud Architecture Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity and Security](./07-identity-and-security.md)
-- [Monitoring](./08-monitoring.md)
-- [Cost Management](./09-cost-management.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity and Security](./07-identity-and-security.md)
+- [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
+- [Cloud Computing 101 (9/10): Cost Management](./09-cost-management.md)
 - **Cloud Architecture Basics (current)**
+
 <!-- toc:end -->
 
 ## References

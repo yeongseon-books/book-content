@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Monitoring</title>
+<title>Cloud Computing 101 (8/10): Monitoring</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Monitoring</h1>
+<h1>Cloud Computing 101 (8/10): Monitoring</h1>
 <p>If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.</p>
 <p>Good monitoring is not about collecting everything. It is about connecting three questions quickly: what changed, why it changed, and who should respond first.</p>
 <p>This is post 8 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.</p>
 <blockquote>
 <p>Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Monitoring?</li>
+<li>Which signal should the example or diagram make visible for Monitoring?</li>
+<li>What failure should be prevented first when Monitoring reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 8 flow overview</em></p>
+<p>This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>Without monitoring, your <em>customers</em> tell you about outages first. A single well-tuned alarm protects entire weekends.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Monitoring flow from application signals to alarms, notifications, and log analysis" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Monitoring flow from application signals to alarms, notifications, and log analysis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a numeric time series (CPU, latency).</li>
@@ -177,14 +188,24 @@ sns = boto3.client(&quot;sns&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once visibility is in place, you have to control the bill. The next post covers Cost Management.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Identity and Security</a></li>
+<li><strong>What boundary should you inspect first when applying Monitoring?</strong></li>
+<li>The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Monitoring?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Monitoring reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Cloud Computing 101 (3/10): Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Cloud Computing 101 (4/10): Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Cloud Computing 101 (5/10): Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Cloud Computing 101 (6/10): Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Cloud Computing 101 (7/10): Identity and Security</a></li>
 <li><strong>Monitoring (current)</strong></li>
 <li>Cost Management (upcoming)</li>
 <li>Cloud Architecture Basics (upcoming)</li>

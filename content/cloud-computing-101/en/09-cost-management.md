@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 9
-title: Cost Management
+title: "Cloud Computing 101 (9/10): Cost Management"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Tags, budgets, Savings Plans, and rightsizing — the FinOps fu
 last_reviewed: '2026-05-14'
 ---
 
-# Cost Management
+# Cloud Computing 101 (9/10): Cost Management
 
 Cloud lets you create infrastructure quickly, which also means you can create cost quickly. Surprise invoices are common not because the cloud is mysterious, but because visibility, ownership, and cleanup policies were weak from the start.
 
@@ -31,6 +31,22 @@ This is post 9 in the Cloud Computing 101 series.
 In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a practical framework for engineering-led cost control.
 
 > FinOps starts with visibility, not discounts. Make cost attributable first, then automate alerts, commitments, and cleanup around real usage patterns.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cost Management?
+- Which signal should the example or diagram make visible for Cost Management?
+- What failure should be prevented first when Cost Management reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 9 flow overview*
+
+This picture places Cost Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cost Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a pract
 A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.
 
 ## Concept at a Glance
-
-![The basic cost-control loop of visibility, alerts, commitments, and optimization](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
-
-*The basic cost-control loop of visibility, alerts, commitments, and optimization*
 
 ## Key Terms
 
@@ -184,17 +196,29 @@ A `Project=acme` tag separates team costs. A scheduled Lambda stops non-prod at 
 
 Operations, security, and cost are all in. Time to stitch the picture together. The next post covers Cloud Architecture Basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost Management?**
+  - The article treats Cost Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity and Security](./07-identity-and-security.md)
-- [Monitoring](./08-monitoring.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity and Security](./07-identity-and-security.md)
+- [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
 - **Cost Management (current)**
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

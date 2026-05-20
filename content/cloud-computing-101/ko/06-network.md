@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 6
-title: Network
+title: "Cloud Computing 101 (6/10): Network"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: VPC, 서브넷, 보안 그룹, 로드밸런서의 역할과 설
 last_reviewed: '2026-05-14'
 ---
 
-# Network
+# Cloud Computing 101 (6/10): Network
 
 클라우드 네트워크는 처음 설계할 때는 단순해 보여도, 한번 구조가 잡히면 나중에 되돌리기 가장 어려운 영역 중 하나입니다. VPC, 서브넷, 보안 그룹, 로드밸런서는 이름만 보면 비슷하게 느껴지지만 서로 다른 층위의 책임을 맡습니다.
 
@@ -30,15 +30,21 @@ last_reviewed: '2026-05-14'
 
 여기서는 클라우드 네트워크를 격리, 배치, 허용, 분산이라는 네 단계로 이해해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - VPC와 서브넷은 무엇이 다를까요?
 - Security Group과 NACL은 왜 따로 존재할까요?
 - Public 서브넷과 Private 서브넷은 어떤 패턴으로 나누는 것이 일반적일까요?
-- 로드밸런서는 단순 라운드로빈 그 이상으로 어떤 역할을 할까요?
-- 네트워크 설계에서 가장 자주 하는 실수는 무엇일까요?
 
-> 클라우드 네트워킹은 VPC로 격리하고, 서브넷으로 배치하고, SG/NACL로 허용 범위를 정하고, LB로 트래픽을 분산하는 구조입니다.
+## 큰 그림
+
+![Cloud Computing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Cloud Computing 101 6장 흐름 개요*
+
+이 그림에서는 Network를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Network의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,9 +54,6 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![외부 공개 지점은 로드밸런서로 제한하고 앱과 데이터는 내부 서브넷으로 숨기는 패턴](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
-
-*외부 공개 지점은 로드밸런서로 제한하고 앱과 데이터는 내부 서브넷으로 숨기는 패턴*
 외부 인터넷은 로드밸런서로만 들어오고, 애플리케이션과 데이터베이스는 내부망에 둡니다. 이런 구성이 흔한 이유는 멋져서가 아니라, 공개 지점을 최소화하는 편이 가장 강력한 기본 보안이기 때문입니다.
 
 ## 핵심 용어
@@ -186,17 +189,29 @@ aws ec2 describe-security-groups --group-ids sg-xxxxxxxx sg-yyyyyyyy
 
 연결 경로를 정했다면, 이제는 누가 어떤 권한으로 그 경로를 사용할지를 설계해야 합니다. 다음 글에서는 Identity와 Security를 다루겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **VPC와 서브넷은 무엇이 다를까요?**
+  - 본문의 기준은 Network를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Security Group과 NACL은 왜 따로 존재할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Public 서브넷과 Private 서브넷은 어떤 패턴으로 나누는 것이 일반적일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region과 Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
+## 시리즈 목차
+
+- [Cloud Computing 101 (1/10): Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region과 Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
 - **Network (현재 글)**
 - Identity와 Security (예정)
 - Monitoring (예정)
 - Cost Management (예정)
 - Cloud Architecture 기초 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 10
-title: Cloud Architecture 기초
+title: "Cloud Computing 101 (10/10): Cloud Architecture 기초"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: Well-Architected 5대 기둥과 기본 웹 아키텍처를 한 
 last_reviewed: '2026-05-14'
 ---
 
-# Cloud Architecture 기초
+# Cloud Computing 101 (10/10): Cloud Architecture 기초
 
 이 시리즈에서 살펴본 컴퓨트, 스토리지, 네트워크, 보안, 모니터링, 비용은 각각 따로 존재하는 지식이 아닙니다. 실제 시스템에서는 이 조각들이 한 구조 안에서 함께 움직입니다.
 
@@ -30,15 +30,21 @@ last_reviewed: '2026-05-14'
 
 여기서는 Well-Architected의 다섯 가지 관점을 기준으로, 앞선 내용이 하나의 클라우드 아키텍처로 어떻게 이어지는지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Well-Architected의 다섯 기둥은 각각 무엇을 보라고 말할까요?
 - 기본적인 다층 웹 아키텍처는 어떤 모습일까요?
 - Stateless와 Stateful을 왜 분리해야 할까요?
-- IaC는 왜 선택이 아니라 필수에 가까울까요?
-- 클라우드 아키텍처에서 가장 자주 하는 실수는 무엇일까요?
 
-> 운영, 보안, 신뢰성, 성능, 비용이라는 다섯 기둥을 기준으로 느슨하게 결합된 계층형 구조를 조립하는 것이 클라우드 아키텍처의 기본입니다.
+## 큰 그림
+
+![Cloud Computing 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Cloud Computing 101 10장 흐름 개요*
+
+이 그림에서는 Cloud Architecture 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Cloud Architecture 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,9 +54,6 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![CDN, 로드밸런서, 앱, 캐시, 데이터 저장소가 계층형으로 연결된 기본 웹 아키텍처](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
-
-*CDN, 로드밸런서, 앱, 캐시, 데이터 저장소가 계층형으로 연결된 기본 웹 아키텍처*
 이 그림은 전형적인 다층 웹 구조를 보여 줍니다. CDN이 정적 콘텐츠와 글로벌 읽기 트래픽을 흡수하고, ALB가 요청을 분산하며, 앱 계층은 Stateless하게 확장되고, 데이터 계층은 캐시·DB·오브젝트 스토리지로 역할이 나뉩니다.
 
 ## 핵심 용어
@@ -165,17 +168,29 @@ def alb(): return {"listeners": [{"port": 443, "tls": True}], "target": "asg"}
 
 여기까지가 Cloud Computing 101의 마무리입니다. 이제 클라우드를 하나의 서비스 목록이 아니라, 운영·보안·신뢰성·성능·비용을 함께 조립하는 설계 문제로 볼 수 있어야 합니다. 다음 시리즈에서는 Containers 101, Kubernetes 101, Serverless 101처럼 더 구체적인 실행 추상화로 들어가게 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **Well-Architected의 다섯 기둥은 각각 무엇을 보라고 말할까요?**
+  - 본문의 기준은 Cloud Architecture 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **기본적인 다층 웹 아키텍처는 어떤 모습일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Stateless와 Stateful을 왜 분리해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region과 Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
-- [Identity와 Security](./07-identity-and-security.md)
-- [Monitoring](./08-monitoring.md)
-- [Cost Management](./09-cost-management.md)
+## 시리즈 목차
+
+- [Cloud Computing 101 (1/10): Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region과 Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
+- [Cloud Computing 101 (7/10): Identity와 Security](./07-identity-and-security.md)
+- [Cloud Computing 101 (8/10): Monitoring](./08-monitoring.md)
+- [Cloud Computing 101 (9/10): Cost Management](./09-cost-management.md)
 - **Cloud Architecture 기초 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

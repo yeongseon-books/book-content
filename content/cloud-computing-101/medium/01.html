@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is Cloud Computing?</title>
+<title>Cloud Computing 101 (1/10): What is Cloud Computing?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>What is Cloud Computing?</h1>
+<h1>Cloud Computing 101 (1/10): What is Cloud Computing?</h1>
 <p>Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.</p>
 <p>That convenience is only half of the story. Cloud is not just "someone else's server." It is an operating model where you provision compute, storage, and network on demand, pay for what you actually use, and split responsibility with the provider.</p>
 <p>This is the first post in the Cloud Computing 101 series.</p>
 <p>In this post, we'll build the mental model that makes later topics like service models, regions, networking, security, and cost control easier to reason about.</p>
 <blockquote>
 <p>Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What is Cloud Computing??</li>
+<li>Which signal should the example or diagram make visible for What is Cloud Computing??</li>
+<li>What failure should be prevented first when What is Cloud Computing? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 1 flow overview</em></p>
+<p>This picture places What is Cloud Computing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is Cloud Computing? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>You can launch a global service with <em>zero up-front capital</em>. The trade-off is that you must understand <em>cost</em> and <em>responsibility boundaries</em> from day one.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Basic flow where a user requests abstracted cloud resources through the provider" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Basic flow where a user requests abstracted cloud resources through the provider</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>CSP</strong>: Cloud Service Provider (AWS, Azure, GCP).</li>
@@ -167,6 +178,16 @@ aws s3 ls s3://my-test-bucket-2026
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Cloud is a <em>model</em>, not a technology. The next post draws the lines between IaaS, PaaS, and SaaS.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What is Cloud Computing??</strong></li>
+<li>The article treats What is Cloud Computing? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What is Cloud Computing??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What is Cloud Computing? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is Cloud Computing? (current)</strong></li>
 <li>IaaS, PaaS, SaaS (upcoming)</li>

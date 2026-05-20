@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Identity and Security</title>
+<title>Cloud Computing 101 (7/10): Identity and Security</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Identity and Security</h1>
+<h1>Cloud Computing 101 (7/10): Identity and Security</h1>
 <p>Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.</p>
 <p>That is why IAM matters so much. In API-driven infrastructure, identity is not a side concern. It is the operating model that decides who may call what, from where, and for how long.</p>
 <p>This is post 7 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.</p>
 <blockquote>
 <p>Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Identity and Security?</li>
+<li>Which signal should the example or diagram make visible for Identity and Security?</li>
+<li>What failure should be prevented first when Identity and Security reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 7 flow overview</em></p>
+<p>This picture places Identity and Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Identity and Security is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Core IAM relationship between users, roles, policies, and protected resources" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Core IAM relationship between users, roles, policies, and protected resources</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>User</strong>: a person or long-lived credential.</li>
@@ -183,13 +194,23 @@ aws iam list-attached-role-policies --role-name my-app-role
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once permissions are right, the next question is <em>what is actually happening</em>. The next post covers Monitoring.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
+<li><strong>What boundary should you inspect first when applying Identity and Security?</strong></li>
+<li>The article treats Identity and Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Identity and Security?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Identity and Security reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Cloud Computing 101 (3/10): Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Cloud Computing 101 (4/10): Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Cloud Computing 101 (5/10): Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Cloud Computing 101 (6/10): Network</a></li>
 <li><strong>Identity and Security (current)</strong></li>
 <li>Monitoring (upcoming)</li>
 <li>Cost Management (upcoming)</li>

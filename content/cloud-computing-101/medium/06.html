@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Network</title>
+<title>Cloud Computing 101 (6/10): Network</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Network</h1>
+<h1>Cloud Computing 101 (6/10): Network</h1>
 <p>Cloud networking looks simple until you have to change it. VPCs, subnets, security groups, NACLs, and load balancers all sound like pieces of the same thing, but they solve different boundary problems at different layers.</p>
 <p>The cost of getting the model wrong shows up later. Public exposure becomes too broad, routing rules become hard to reason about, and simple changes start requiring structural rewrites instead of safe configuration updates.</p>
 <p>This is post 6 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll use a four-step mental model — isolate, place, allow, distribute — to make the core cloud networking pieces easier to reason about.</p>
 <blockquote>
 <p>Cloud networking is mostly boundary design: isolate with VPCs, place with subnets, define trust with SGs and NACLs, and shape traffic with load balancers.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Network?</li>
+<li>Which signal should the example or diagram make visible for Network?</li>
+<li>What failure should be prevented first when Network reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 6 flow overview</em></p>
+<p>This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>Network design is the hardest decision to undo later. The first hour shapes the next several years.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A common public-private subnet pattern that limits exposure to the load balancer" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A common public-private subnet pattern that limits exposure to the load balancer</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>VPC</strong>: a logically isolated virtual network.</li>
@@ -176,12 +187,22 @@ ec2 = boto3.client(&quot;ec2&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once the wires are in, the question becomes <em>who</em> may use them. The next post covers Identity and Security.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
+<li><strong>What boundary should you inspect first when applying Network?</strong></li>
+<li>The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Network?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Network reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Cloud Computing 101 (3/10): Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Cloud Computing 101 (4/10): Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Cloud Computing 101 (5/10): Storage</a></li>
 <li><strong>Network (current)</strong></li>
 <li>Identity and Security (upcoming)</li>
 <li>Monitoring (upcoming)</li>

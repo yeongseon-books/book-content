@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 1
-title: What is Cloud Computing?
+title: "Cloud Computing 101 (1/10): What is Cloud Computing?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical primer on cloud computing — five core characteris
 last_reviewed: '2026-05-14'
 ---
 
-# What is Cloud Computing?
+# Cloud Computing 101 (1/10): What is Cloud Computing?
 
 Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.
 
@@ -31,6 +31,22 @@ This is the first post in the Cloud Computing 101 series.
 In this post, we'll build the mental model that makes later topics like service models, regions, networking, security, and cost control easier to reason about.
 
 > Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What is Cloud Computing??
+- Which signal should the example or diagram make visible for What is Cloud Computing??
+- What failure should be prevented first when What is Cloud Computing? reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 1 flow overview*
+
+This picture places What is Cloud Computing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is Cloud Computing? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll build the mental model that makes later topics like service 
 You can launch a global service with *zero up-front capital*. The trade-off is that you must understand *cost* and *responsibility boundaries* from day one.
 
 ## Concept at a Glance
-
-![Basic flow where a user requests abstracted cloud resources through the provider](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
-
-*Basic flow where a user requests abstracted cloud resources through the provider*
 
 ## Key Terms
 
@@ -170,7 +182,18 @@ Startups begin on AWS Free Tier, scale with Auto Scaling Groups when traffic gro
 
 Cloud is a *model*, not a technology. The next post draws the lines between IaaS, PaaS, and SaaS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What is Cloud Computing??**
+  - The article treats What is Cloud Computing? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What is Cloud Computing??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What is Cloud Computing? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is Cloud Computing? (current)**
 - IaaS, PaaS, SaaS (upcoming)
 - Region and Availability Zone (upcoming)
@@ -181,6 +204,7 @@ Cloud is a *model*, not a technology. The next post draws the lines between IaaS
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

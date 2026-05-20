@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 6
-title: Network
+title: "Cloud Computing 101 (6/10): Network"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: VPC, subnets, security groups, and load balancers — the core 
 last_reviewed: '2026-05-14'
 ---
 
-# Network
+# Cloud Computing 101 (6/10): Network
 
 Cloud networking looks simple until you have to change it. VPCs, subnets, security groups, NACLs, and load balancers all sound like pieces of the same thing, but they solve different boundary problems at different layers.
 
@@ -31,6 +31,22 @@ This is post 6 in the Cloud Computing 101 series.
 In this post, we'll use a four-step mental model — isolate, place, allow, distribute — to make the core cloud networking pieces easier to reason about.
 
 > Cloud networking is mostly boundary design: isolate with VPCs, place with subnets, define trust with SGs and NACLs, and shape traffic with load balancers.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Network?
+- Which signal should the example or diagram make visible for Network?
+- What failure should be prevented first when Network reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 6 flow overview*
+
+This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll use a four-step mental model — isolate, place, allow, dist
 Network design is the hardest decision to undo later. The first hour shapes the next several years.
 
 ## Concept at a Glance
-
-![A common public-private subnet pattern that limits exposure to the load balancer](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
-
-*A common public-private subnet pattern that limits exposure to the load balancer*
 
 ## Key Terms
 
@@ -179,17 +191,29 @@ The ALB sits in public subnets. App servers live in private subnets. RDS sits in
 
 Once the wires are in, the question becomes *who* may use them. The next post covers Identity and Security.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Network?**
+  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Network?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Network reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
 - **Network (current)**
 - Identity and Security (upcoming)
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References

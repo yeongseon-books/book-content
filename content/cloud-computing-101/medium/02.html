@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>IaaS, PaaS, SaaS</title>
+<title>Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>IaaS, PaaS, SaaS</h1>
+<h1>Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</h1>
 <p>EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when you operate them. One makes you think about instances and patching. One wants your code and a start command. One gives you a finished application and asks almost nothing about infrastructure.</p>
 <p>The fastest way to sort out that difference is to stop memorizing acronyms and ask a simpler question: who operates what? Once you do that, IaaS, PaaS, and SaaS become responsibility boundaries instead of marketing labels.</p>
 <p>This is post 2 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll compare service models through control, speed, lock-in, and operational burden so you can match them to real workloads.</p>
 <blockquote>
 <p>Cloud service models are easiest to understand as operating boundaries: the more the provider runs for you, the less control you keep and the faster you usually move.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying IaaS, PaaS, SaaS?</li>
+<li>Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?</li>
+<li>What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 2 flow overview</em></p>
+<p>This picture places IaaS, PaaS, SaaS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of IaaS, PaaS, SaaS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>Pick the wrong model and you waste both <em>cost</em> and <em>speed</em>. Each stage of an organization fits a different abstraction level.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="As the service model rises, the portion you operate directly gets smaller" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>As the service model rises, the portion you operate directly gets smaller</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>IaaS</strong>: VMs, disks, and networks only.</li>
@@ -174,8 +185,18 @@ curl http://127.0.0.1:8000/
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once you pick a model, the next question is <em>where it runs</em>. The next post covers Regions and Availability Zones.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><strong>What boundary should you inspect first when applying IaaS, PaaS, SaaS?</strong></li>
+<li>The article treats IaaS, PaaS, SaaS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
 <li><strong>IaaS, PaaS, SaaS (current)</strong></li>
 <li>Region and Availability Zone (upcoming)</li>
 <li>Compute (upcoming)</li>

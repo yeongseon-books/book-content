@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 7
-title: Identity와 Security
+title: "Cloud Computing 101 (7/10): Identity와 Security"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: IAM 사용자, 역할, 정책, MFA, KMS의 기본 원칙을 정
 last_reviewed: '2026-05-14'
 ---
 
-# Identity와 Security
+# Cloud Computing 101 (7/10): Identity와 Security
 
 클라우드 보안 사고의 많은 출발점은 해커의 정교한 공격보다 과도한 권한과 방치된 키에 있습니다. IAM 사용자와 역할, 정책, MFA, KMS를 제대로 이해하면 단일 실수의 폭발 반경을 크게 줄일 수 있습니다.
 
@@ -30,15 +30,21 @@ last_reviewed: '2026-05-14'
 
 여기서는 클라우드 보안을 최소 권한과 역할 기반 위임이라는 관점에서 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - IAM 사용자, 그룹, 역할, 정책은 어떻게 구분할까요?
 - 최소 권한 원칙은 왜 기본값이어야 할까요?
 - MFA와 키 회전은 왜 운영 루틴이 되어야 할까요?
-- KMS는 암호화에서 어떤 역할을 맡을까요?
-- 클라우드 보안에서 가장 자주 하는 실수는 무엇일까요?
 
-> 클라우드 보안의 출발점은 최소 권한이고, 역할 기반 위임으로 장기 자격 증명을 줄이며, 암호화와 키 관리를 기본값으로 두는 것입니다.
+## 큰 그림
+
+![Cloud Computing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Cloud Computing 101 7장 흐름 개요*
+
+이 그림에서는 Identity와 Security를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Identity와 Security의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,9 +54,6 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![사용자와 역할, 정책이 자원 접근 권한을 연결하는 IAM 기본 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
-
-*사용자와 역할, 정책이 자원 접근 권한을 연결하는 IAM 기본 구조*
 사람은 사용자와 그룹으로 관리하는 경우가 많고, 애플리케이션은 역할을 통해 임시 자격 증명을 받는 구조가 일반적입니다. 정책은 이 둘에게 어떤 자원에 무엇을 할 수 있는지 정의합니다.
 
 ## 핵심 용어
@@ -195,17 +198,29 @@ aws iam list-attached-role-policies --role-name my-app-role
 
 권한 구성을 바로 세웠다면 이제 시스템에서 실제로 무슨 일이 일어나는지 관찰할 수 있어야 합니다. 다음 글에서는 Metrics, Logs, Traces를 다루는 Monitoring으로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **IAM 사용자, 그룹, 역할, 정책은 어떻게 구분할까요?**
+  - 본문의 기준은 Identity와 Security를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **최소 권한 원칙은 왜 기본값이어야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **MFA와 키 회전은 왜 운영 루틴이 되어야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region과 Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
-- [Storage](./05-storage.md)
-- [Network](./06-network.md)
+## 시리즈 목차
+
+- [Cloud Computing 101 (1/10): Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region과 Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
+- [Cloud Computing 101 (5/10): Storage](./05-storage.md)
+- [Cloud Computing 101 (6/10): Network](./06-network.md)
 - **Identity와 Security (현재 글)**
 - Monitoring (예정)
 - Cost Management (예정)
 - Cloud Architecture 기초 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cost Management</title>
+<title>Cloud Computing 101 (9/10): Cost Management</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Cost Management</h1>
+<h1>Cloud Computing 101 (9/10): Cost Management</h1>
 <p>Cloud lets you create infrastructure quickly, which also means you can create cost quickly. Surprise invoices are common not because the cloud is mysterious, but because visibility, ownership, and cleanup policies were weak from the start.</p>
 <p>Cost control works best when engineers treat it as a design signal instead of a finance report. If the bill is invisible, no one can improve it. If ownership is unclear, drift becomes normal.</p>
 <p>This is post 9 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a practical framework for engineering-led cost control.</p>
 <blockquote>
 <p>FinOps starts with visibility, not discounts. Make cost attributable first, then automate alerts, commitments, and cleanup around real usage patterns.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Cost Management?</li>
+<li>Which signal should the example or diagram make visible for Cost Management?</li>
+<li>What failure should be prevented first when Cost Management reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 9 flow overview</em></p>
+<p>This picture places Cost Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cost Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="The basic cost-control loop of visibility, alerts, commitments, and optimization" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>The basic cost-control loop of visibility, alerts, commitments, and optimization</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Tag</strong>: a key-value label attached to a resource.</li>
@@ -181,15 +192,25 @@ account_id = boto3.client(&quot;sts&quot;).get_caller_identity()[&quot;Account&q
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Operations, security, and cost are all in. Time to stitch the picture together. The next post covers Cloud Architecture Basics.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Identity and Security</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/08-monitoring.md">Monitoring</a></li>
+<li><strong>What boundary should you inspect first when applying Cost Management?</strong></li>
+<li>The article treats Cost Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Cost Management?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Cost Management reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Cloud Computing 101 (3/10): Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Cloud Computing 101 (4/10): Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Cloud Computing 101 (5/10): Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Cloud Computing 101 (6/10): Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Cloud Computing 101 (7/10): Identity and Security</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/08-monitoring.md">Cloud Computing 101 (8/10): Monitoring</a></li>
 <li><strong>Cost Management (current)</strong></li>
 <li>Cloud Architecture Basics (upcoming)</li>
 </ul>

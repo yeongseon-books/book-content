@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 5
-title: Storage
+title: "Cloud Computing 101 (5/10): Storage"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 객체, 블록, 파일, 아카이브 스토리지의 차이와 
 last_reviewed: '2026-05-14'
 ---
 
-# Storage
+# Cloud Computing 101 (5/10): Storage
 
 클라우드 스토리지는 전부 비슷해 보이지만, 실제로는 접근 패턴과 내구성, 비용 구조에 따라 완전히 다른 서비스로 나뉩니다. S3, EBS, EFS, Glacier가 따로 존재하는 이유도 여기에 있습니다.
 
@@ -30,15 +30,21 @@ last_reviewed: '2026-05-14'
 
 여기서는 객체, 블록, 파일, 아카이브 스토리지를 어떤 기준으로 구분해야 하는지 살펴보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 객체, 블록, 파일, 아카이브 스토리지는 각각 무엇이 다를까요?
 - 내구성과 가용성은 왜 같은 말이 아닐까요?
 - S3 라이프사이클 정책은 어떤 문제를 해결할까요?
-- 암호화는 언제 선택 기능이 아니라 기본값이 될까요?
-- 스토리지 선택에서 가장 자주 하는 실수는 무엇일까요?
 
-> 스토리지는 접근 패턴과 내구성·비용의 균형에 따라 객체, 블록, 파일, 아카이브로 나뉩니다.
+## 큰 그림
+
+![Cloud Computing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
+
+*Cloud Computing 101 5장 흐름 개요*
+
+이 그림에서는 Storage를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Storage의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,9 +54,6 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![접근 패턴에 따라 블록, 객체, 파일, 아카이브 스토리지가 나뉘는 구조](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
-
-*접근 패턴에 따라 블록, 객체, 파일, 아카이브 스토리지가 나뉘는 구조*
 블록 스토리지는 디스크처럼, 객체 스토리지는 키-값 저장소처럼, 파일 스토리지는 공유 디렉터리처럼 동작합니다. 아카이브는 거의 읽지 않지만 오래 보관해야 하는 데이터를 위한 계층입니다.
 
 ## 핵심 용어
@@ -183,17 +186,29 @@ aws s3api get-bucket-lifecycle-configuration --bucket my-test-bucket-2026
 
 데이터가 어디에 놓일지 정했다면, 이제는 그 데이터에 어떻게 연결하고 어떤 경로로 접근을 통제할지 살펴봐야 합니다. 다음 글에서는 Cloud 네트워킹의 기본인 Network로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **객체, 블록, 파일, 아카이브 스토리지는 각각 무엇이 다를까요?**
+  - 본문의 기준은 Storage를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **내구성과 가용성은 왜 같은 말이 아닐까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **S3 라이프사이클 정책은 어떤 문제를 해결할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region과 Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
+## 시리즈 목차
+
+- [Cloud Computing 101 (1/10): Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region과 Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
 - **Storage (현재 글)**
 - Network (예정)
 - Identity와 Security (예정)
 - Monitoring (예정)
 - Cost Management (예정)
 - Cloud Architecture 기초 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

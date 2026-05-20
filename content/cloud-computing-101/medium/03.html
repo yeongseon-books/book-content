@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Region and Availability Zone</title>
+<title>Cloud Computing 101 (3/10): Region and Availability Zone</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,13 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Region and Availability Zone</h1>
+<h1>Cloud Computing 101 (3/10): Region and Availability Zone</h1>
 <p>Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.</p>
 <p>In cloud systems, choosing where something runs is not a cosmetic decision. It sets the floor for latency, shapes your failover blast radius, and determines how expensive replication will become later.</p>
 <p>This is post 3 in the Cloud Computing 101 series.</p>
 <p>In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.</p>
 <blockquote>
 <p>A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Region and Availability Zone?</li>
+<li>Which signal should the example or diagram make visible for Region and Availability Zone?</li>
+<li>What failure should be prevented first when Region and Availability Zone reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="cloud computing 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>cloud computing 101 chapter 3 flow overview</em></p>
+<p>This picture places Region and Availability Zone inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Region and Availability Zone is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -72,8 +85,6 @@
 <h2>Why It Matters</h2>
 <p>If everything sits in one AZ, a single data center fire takes down your service. Distribution is the <em>prerequisite</em> for availability.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A Region contains multiple Availability Zones that separate failure boundaries" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>A Region contains multiple Availability Zones that separate failure boundaries</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Region</strong>: a continent- or city-scale location.</li>
@@ -171,9 +182,19 @@ python -c 'import boto3; print([r[&quot;RegionName&quot;] for r in boto3.client(
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Now that you have a place, you need things to run there. The next post covers Compute.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><strong>What boundary should you inspect first when applying Region and Availability Zone?</strong></li>
+<li>The article treats Region and Availability Zone as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Region and Availability Zone?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Region and Availability Zone reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">Cloud Computing 101 (1/10): What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">Cloud Computing 101 (2/10): IaaS, PaaS, SaaS</a></li>
 <li><strong>Region and Availability Zone (current)</strong></li>
 <li>Compute (upcoming)</li>
 <li>Storage (upcoming)</li>

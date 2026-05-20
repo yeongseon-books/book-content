@@ -1,7 +1,7 @@
 ---
 series: cloud-computing-101
 episode: 5
-title: Storage
+title: "Cloud Computing 101 (5/10): Storage"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Object, block, file, and archive cloud storage compared by acce
 last_reviewed: '2026-05-14'
 ---
 
-# Storage
+# Cloud Computing 101 (5/10): Storage
 
 S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data, but they are optimized for very different access patterns, durability expectations, and recovery trade-offs.
 
@@ -31,6 +31,22 @@ This is post 5 in the Cloud Computing 101 series.
 In this post, we'll compare object, block, file, and archive storage and connect each one to the workload shape it actually fits.
 
 > Storage is not just where data sits. It is part of the operating contract for latency, recovery time, cost, and sharing semantics.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Storage?
+- Which signal should the example or diagram make visible for Storage?
+- What failure should be prevented first when Storage reaches a real system?
+
+## Big Picture
+
+![cloud computing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
+
+*cloud computing 101 chapter 5 flow overview*
+
+This picture places Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Storage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -45,10 +61,6 @@ In this post, we'll compare object, block, file, and archive storage and connect
 The wrong storage choice is *expensive, slow, and fragile*. The right one quietly works for years.
 
 ## Concept at a Glance
-
-![Block, object, file, and archive storage split by access pattern and operating need](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
-
-*Block, object, file, and archive storage split by access pattern and operating need*
 
 ## Key Terms
 
@@ -174,17 +186,29 @@ Logs land in S3 and transition to Glacier after 90 days. Database volumes use EB
 
 Once data sits somewhere, you have to *connect* to it. The next post covers Network.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Storage?**
+  - The article treats Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Storage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Storage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Cloud Computing?](./01-what-is-cloud-computing.md)
-- [IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
-- [Region and Availability Zone](./03-region-and-availability-zone.md)
-- [Compute](./04-compute.md)
+## In this series
+
+- [Cloud Computing 101 (1/10): What is Cloud Computing?](./01-what-is-cloud-computing.md)
+- [Cloud Computing 101 (2/10): IaaS, PaaS, SaaS](./02-iaas-paas-saas.md)
+- [Cloud Computing 101 (3/10): Region and Availability Zone](./03-region-and-availability-zone.md)
+- [Cloud Computing 101 (4/10): Compute](./04-compute.md)
 - **Storage (current)**
 - Network (upcoming)
 - Identity and Security (upcoming)
 - Monitoring (upcoming)
 - Cost Management (upcoming)
 - Cloud Architecture Basics (upcoming)
+
 <!-- toc:end -->
 
 ## References
