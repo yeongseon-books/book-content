@@ -1,5 +1,5 @@
 ---
-title: Row factories and type adapters (sqlite3, PEP 249)
+title: "Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 6
 language: en
@@ -22,7 +22,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
   ''Alice''} ▼ or dataclass / Pydantic tuple shape (row step) ```'
 ---
 
-# Row factories and type adapters (sqlite3, PEP 249)
+# Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)
 
 Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.
 
@@ -31,15 +31,22 @@ This is the 6th article in the Python DB-API 101 series.
 ![Row factories and type adapters (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 
 *Row factories and type adapters (sqlite3, PEP 249)*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - How do you receive default tuple results as dict, dataclass, or Pydantic models?
 - What is `sqlite3.Row` and when is it enough?
 - What does `detect_types` actually detect?
-- How do you safely map custom types such as `Decimal`, `datetime`, `Enum`, or JSON?
-- How do adapters and converters fit into the PEP 249 model?
 
-> Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.
+## Big Picture
+
+![python db-api 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+
+*python db-api 101 chapter 6 flow overview*
+
+This picture places Row factories and type adapters (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Row factories and type adapters (sqlite3, PEP 249) is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What you will learn
 
@@ -65,9 +72,6 @@ This post unifies row factories and type adapters so your repository layer survi
 
 ## Mental Model — two-step conversion
 
-![Mental model - two-step conversion](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
-
-*Mental model - two-step conversion*
 ```text
 Database row             Python value
 ─────────────             ────────────
@@ -422,19 +426,28 @@ Separate **shape** (row factory) from **value** (adapter/converter) and sqlite3'
 
 The next post covers **error handling and the exception hierarchy** — the eight exception classes defined by PEP 249, sqlite3's mapping (IntegrityError, OperationalError, ProgrammingError, etc.), the difference between `BUSY` and `LOCKED`, and concrete retry strategies.
 
+## Answering the Opening Questions
+
+- **How do you receive default tuple results as dict, dataclass, or Pydantic models?**
+  - The article treats Row factories and type adapters (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is `sqlite3.Row` and when is it enough?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does `detect_types` actually detect?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- **Row factories and type adapters (sqlite3, PEP 249) (current)**
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- **Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (current)**
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

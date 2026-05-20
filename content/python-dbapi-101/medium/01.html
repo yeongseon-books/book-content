@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why DB-API 2.0 - The Problem PEP 249 Solved</title>
+<title>Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,30 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Why DB-API 2.0 - The Problem PEP 249 Solved</h1>
+<h1>Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved</h1>
 <p>If you have used Python with a database, you have probably touched <code>sqlite3</code>, <code>psycopg</code>, <code>pymysql</code>, or <code>oracledb</code>. Their APIs feel oddly similar: <code>connect()</code> to open a connection, <code>cursor()</code> to get a cursor, <code>execute()</code> to run a query, <code>fetchone()</code> / <code>fetchall()</code> to read results. That uniformity is not a coincidence. It comes from a 1996 standard called <strong>PEP 249 — Python Database API Specification v2.0</strong> (DB-API 2.0 for short).</p>
 <p>This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.</p>
 <p>This is the first article in the Python DB-API 101 series.</p>
-<!-- a-grade-intro:begin -->
-
 <p><img alt="Why DB-API 2.0 - the problem PEP 249 solved" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png"></p>
 <p><em>Why DB-API 2.0 - the problem PEP 249 solved</em></p>
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How was database access done in Python before PEP 249?</li>
 <li>What five things did DB-API 2.0 actually standardize?</li>
 <li>Why does paramstyle differ across drivers, and how do you protect your code?</li>
-<li>Where does DB-API stop and other layers begin?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="python db-api 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png"></p>
+<p><em>python db-api 101 chapter 1 flow overview</em></p>
+<p>This picture places Why DB-API 2.0 - The Problem PEP 249 Solved inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>The point of DB-API 2.0 is not to make every driver identical. It is to let application code run on top of a common minimum contract.</p>
+<p>The core of Why DB-API 2.0 - The Problem PEP 249 Solved is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>1. The Chaos Before DB-API</h2>
-<p><img alt="The chaos before DB-API" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png"></p>
-<p><em>The chaos before DB-API</em><br>
-Before the standard, every database library had its own API.</p>
+<p>Before the standard, every database library had its own API.</p>
 <pre><code class="language-python"># Imagined old oracle module
 conn = oracle.open(&quot;dsn&quot;, &quot;user&quot;, &quot;pass&quot;)
 result = oracle.run_sql(conn, &quot;SELECT * FROM users&quot;)
@@ -239,18 +236,27 @@ cur.execute(f&quot;SELECT * FROM users WHERE name = '{name}'&quot;)
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How was database access done in Python before PEP 249?</strong></li>
+<li>The article treats Why DB-API 2.0 - The Problem PEP 249 Solved as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What five things did DB-API 2.0 actually standardize?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does paramstyle differ across drivers, and how do you protect your code?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>Why DB-API 2.0 - The Problem PEP 249 Solved (current)</strong></li>
-<li>Connection and Cursor Lifecycle (upcoming)</li>
-<li>execute, executemany, and Fetch Patterns (upcoming)</li>
-<li>Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)</li>
-<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
-<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
-<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
-<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
-<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
-<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+<li><strong>Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved (current)</strong></li>
+<li>Python DB-API 101 (2/10): Connection and Cursor Lifecycle (upcoming)</li>
+<li>Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns (upcoming)</li>
+<li>Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)</li>
+<li>Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

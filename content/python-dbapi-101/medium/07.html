@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>PEP 249 Exception Hierarchy and SQLite Error Handling</title>
+<title>Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,30 @@
 </style>
 </head>
 <body>
-<h1>PEP 249 Exception Hierarchy and SQLite Error Handling</h1>
+<h1>Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling</h1>
 <p>The most common line in database code is <code>try/except Exception</code>. Catching everything in one place feels short and convenient, but in production it forces you to treat "irreversible data corruption" and "a lock that will release in 30 ms" with the same weight. PEP 249 introduced eight standard exception classes precisely to solve this, and <code>sqlite3</code> maps the error codes that the SQLite engine returns onto that hierarchy.</p>
 <p>This post is not about memorizing the mapping table. It is about turning the exception hierarchy into an operational decision tree: "Should I retry this?", "Should I roll back the transaction or leave it open?", "Is this a user input problem or a code bug?" Each PEP 249 class encodes one of those answers.</p>
 <p>This is the 7th article in the Python DB-API 101 series.</p>
 <p><img alt="PEP 249 exception hierarchy and SQLite error handling" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.en.png"></p>
 <p><em>PEP 249 exception hierarchy and SQLite error handling</em></p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What do the eight PEP 249 exceptions mean and how are they related?</li>
 <li>How does <code>sqlite3</code> map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?</li>
 <li>Which of <code>OperationalError</code>, <code>IntegrityError</code>, <code>ProgrammingError</code> is safe to retry and which one is a bug?</li>
-<li>What is the difference between BUSY and LOCKED, and how should each be handled?</li>
-<li>What problem do <code>sqlite3.Error.sqlite_errorcode</code> and <code>sqlite_errorname</code> (Python 3.11+) actually solve?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="python db-api 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png"></p>
+<p><em>python db-api 101 chapter 7 flow overview</em></p>
+<p>This picture places PEP 249 Exception Hierarchy and SQLite Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of PEP 249 Exception Hierarchy and SQLite Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>A common reaction to seeing <code>OperationalError: database is locked</code> in production is one of two extremes: (1) wrap every SQL call in <code>try/except</code> and retry forever, or (2) propagate every error to the user. Both are wrong.</p>
 <p>Option (1) keeps retrying <code>IntegrityError</code>, which never resolves on its own, and locks the worker for minutes. Option (2) turns a 30 ms lock contention into a failed request. The right answer is to react differently per exception class, and that requires the hierarchy to be visible in the code rather than buried in a generic handler.</p>
 <p>A second reason: <code>sqlite3</code> exception messages are English sentences, so it is tempting to branch on <code>if "locked" in str(e)</code>. That code breaks the moment SQLite changes its message wording. Branching on classes and on <code>sqlite_errorcode</code> is the only stable strategy.</p>
 <h2>Mental Model: An exception is a signal about how to react</h2>
-<p><img alt="Mental Model: an exception is a signal about how to react" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png"></p>
-<p><em>Mental Model: an exception is a signal about how to react</em></p>
 <blockquote>
 <p>An exception class is a signal about how to react in production. Retry, 4xx, or fail-loud should be encoded by the class itself.</p>
 </blockquote>
@@ -369,18 +372,27 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 <li>Retry the entire transactional block, cap attempts, add jitter, and log codes.</li>
 </ul>
 <p>The next post moves from errors to connections themselves: SQLite's thread-safety modes, <code>check_same_thread</code>, per-thread vs shared connections, and connection management in FastAPI.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What do the eight PEP 249 exceptions mean and how are they related?</strong></li>
+<li>The article treats PEP 249 Exception Hierarchy and SQLite Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How does <code>sqlite3</code> map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which of <code>OperationalError</code>, <code>IntegrityError</code>, <code>ProgrammingError</code> is safe to retry and which one is a bug?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Transactions and isolation levels (sqlite3, PEP 249)</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Row factories and type adapters (sqlite3, PEP 249)</a></li>
-<li><strong>PEP 249 Exception Hierarchy and SQLite Error Handling (current)</strong></li>
-<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
-<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
-<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Python DB-API 101 (2/10): Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/04-parameter-binding-sql-injection.md">Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/05-transactions-isolation.md">Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/06-row-factories-adapters.md">Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)</a></li>
+<li><strong>Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (current)</strong></li>
+<li>Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

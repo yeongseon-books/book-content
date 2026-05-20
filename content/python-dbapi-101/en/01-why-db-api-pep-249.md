@@ -1,5 +1,5 @@
 ---
-title: Why DB-API 2.0 - The Problem PEP 249 Solved
+title: "Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved"
 series: python-dbapi-101
 episode: 1
 language: en
@@ -22,7 +22,7 @@ seo_description: If you have used Python with a database, you have probably touc
   sqlite3, psycopg, pymysql, or oracledb.
 ---
 
-# Why DB-API 2.0 - The Problem PEP 249 Solved
+# Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved
 
 If you have used Python with a database, you have probably touched `sqlite3`, `psycopg`, `pymysql`, or `oracledb`. Their APIs feel oddly similar: `connect()` to open a connection, `cursor()` to get a cursor, `execute()` to run a query, `fetchone()` / `fetchall()` to read results. That uniformity is not a coincidence. It comes from a 1996 standard called **PEP 249 — Python Database API Specification v2.0** (DB-API 2.0 for short).
 
@@ -30,27 +30,28 @@ This first episode walks through why DB-API 2.0 exists, what it standardizes, wh
 
 This is the first article in the Python DB-API 101 series.
 
-<!-- a-grade-intro:begin -->
-
 ![Why DB-API 2.0 - the problem PEP 249 solved](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
-## Key Questions
+
+## Questions to Keep in Mind
 
 - How was database access done in Python before PEP 249?
 - What five things did DB-API 2.0 actually standardize?
 - Why does paramstyle differ across drivers, and how do you protect your code?
-- Where does DB-API stop and other layers begin?
 
-> The point of DB-API 2.0 is not to make every driver identical. It is to let application code run on top of a common minimum contract.
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![python db-api 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
+
+*python db-api 101 chapter 1 flow overview*
+
+This picture places Why DB-API 2.0 - The Problem PEP 249 Solved inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why DB-API 2.0 - The Problem PEP 249 Solved is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## 1. The Chaos Before DB-API
 
-![The chaos before DB-API](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
-
-*The chaos before DB-API*
 Before the standard, every database library had its own API.
 
 ```python
@@ -249,19 +250,28 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **How was database access done in Python before PEP 249?**
+  - The article treats Why DB-API 2.0 - The Problem PEP 249 Solved as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What five things did DB-API 2.0 actually standardize?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does paramstyle differ across drivers, and how do you protect your code?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Why DB-API 2.0 - The Problem PEP 249 Solved (current)**
-- Connection and Cursor Lifecycle (upcoming)
-- execute, executemany, and Fetch Patterns (upcoming)
-- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
-- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
-- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- **Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved (current)**
+- Python DB-API 101 (2/10): Connection and Cursor Lifecycle (upcoming)
+- Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns (upcoming)
+- Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: PEP 249 Exception Hierarchy and SQLite Error Handling
+title: "Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling"
 seo_description: An exception class is a signal about how to react in production.
   Retry, 4xx, or fail-loud should be encoded by the class itself.
 ---
 
-# PEP 249 Exception Hierarchy and SQLite Error Handling
+# Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling
 
 The most common line in database code is `try/except Exception`. Catching everything in one place feels short and convenient, but in production it forces you to treat "irreversible data corruption" and "a lock that will release in 30 ms" with the same weight. PEP 249 introduced eight standard exception classes precisely to solve this, and `sqlite3` maps the error codes that the SQLite engine returns onto that hierarchy.
 
@@ -33,13 +33,22 @@ This is the 7th article in the Python DB-API 101 series.
 ![PEP 249 exception hierarchy and SQLite error handling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.en.png)
 
 *PEP 249 exception hierarchy and SQLite error handling*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - What do the eight PEP 249 exceptions mean and how are they related?
 - How does `sqlite3` map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?
 - Which of `OperationalError`, `IntegrityError`, `ProgrammingError` is safe to retry and which one is a bug?
-- What is the difference between BUSY and LOCKED, and how should each be handled?
-- What problem do `sqlite3.Error.sqlite_errorcode` and `sqlite_errorname` (Python 3.11+) actually solve?
+
+## Big Picture
+
+![python db-api 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
+
+*python db-api 101 chapter 7 flow overview*
+
+This picture places PEP 249 Exception Hierarchy and SQLite Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of PEP 249 Exception Hierarchy and SQLite Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -51,9 +60,6 @@ A second reason: `sqlite3` exception messages are English sentences, so it is te
 
 ## Mental Model: An exception is a signal about how to react
 
-![Mental Model: an exception is a signal about how to react](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
-
-*Mental Model: an exception is a signal about how to react*
 > An exception class is a signal about how to react in production. Retry, 4xx, or fail-loud should be encoded by the class itself.
 
 Reread the PEP 249 hierarchy with operations in mind:
@@ -343,19 +349,28 @@ Do not write a custom handler for `ProgrammingError` or `InterfaceError`. Let th
 
 The next post moves from errors to connections themselves: SQLite's thread-safety modes, `check_same_thread`, per-thread vs shared connections, and connection management in FastAPI.
 
+## Answering the Opening Questions
+
+- **What do the eight PEP 249 exceptions mean and how are they related?**
+  - The article treats PEP 249 Exception Hierarchy and SQLite Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does `sqlite3` map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which of `OperationalError`, `IntegrityError`, `ProgrammingError` is safe to retry and which one is a bug?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- **PEP 249 Exception Hierarchy and SQLite Error Handling (current)**
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- **Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (current)**
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

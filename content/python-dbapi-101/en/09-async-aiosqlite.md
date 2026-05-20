@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Asynchronous SQLite with aiosqlite
+title: "Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite"
 seo_description: aiosqlite does not make SQLite asynchronous. It spawns a background
   thread per connection, queues the awaited method calls onto that thread, and…
 ---
 
-# Asynchronous SQLite with aiosqlite
+# Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite
 
 What happens if you call `sqlite3.connect()` directly inside `asyncio` code? The code runs, but every `execute()` is a synchronous call that blocks the event loop for its duration. A 1-second query starves every other request the worker is trying to serve.
 
@@ -33,13 +33,22 @@ This is the 9th article in the Python DB-API 101 series.
 ![Asynchronous SQLite with aiosqlite](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.en.png)
 
 *Asynchronous SQLite with aiosqlite*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - How does `aiosqlite` work under the hood? Is it real async I/O?
 - How should you hold connections and transactions in an async path?
 - What does the `async with` syntax guarantee, and what does it not?
-- Is it worth building a connection pool on top of `aiosqlite`?
-- How does it compose with FastAPI's async endpoints?
+
+## Big Picture
+
+![python db-api 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png)
+
+*python db-api 101 chapter 9 flow overview*
+
+This picture places Asynchronous SQLite with aiosqlite inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Asynchronous SQLite with aiosqlite is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -51,9 +60,6 @@ The honest pitch: this post is about what `aiosqlite` actually does and does not
 
 ## Mental Model: aiosqlite is sqlite3 + thread + Future
 
-![Mental Model: aiosqlite is sqlite3 + thread + future](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png)
-
-*Mental Model: aiosqlite is sqlite3 + thread + future*
 > `aiosqlite` does not make SQLite asynchronous. It spawns a background thread per connection, queues the awaited method calls onto that thread, and returns a Future the event loop can await.
 
 Implications:
@@ -349,19 +355,28 @@ If none of those apply, `def` + `sqlite3` is simpler and often faster. Adopt `ai
 
 The next post (Episode 10, the series finale) consolidates production patterns: retry plus timeout plus observability, slow-query logging, OpenTelemetry instrumentation, and a backup strategy.
 
+## Answering the Opening Questions
+
+- **How does `aiosqlite` work under the hood? Is it real async I/O?**
+  - The article treats Asynchronous SQLite with aiosqlite as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you hold connections and transactions in an async path?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does the `async with` syntax guarantee, and what does it not?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
-- [SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
-- **Asynchronous SQLite with aiosqlite (current)**
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- [Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
+- **Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (current)**
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

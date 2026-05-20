@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: 'SQLite Connection Management: thread-safety, check_same_thread, and Pooling'
+title: "Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling"
 seo_description: A SQLite connection is not the client/server connection you know
   from PostgreSQL or MySQL. There is no separate process.
 ---
 
-# SQLite Connection Management: thread-safety, check_same_thread, and Pooling
+# Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling
 
 Unlike most databases, SQLite has no separate server process. A connection is just a file handle, and transaction locks are expressed in the filesystem. That simplicity is why SQLite shows up everywhere from embedded apps to mid-sized web services, but it also pushes connection-management decisions back onto the application developer.
 
@@ -33,13 +33,22 @@ This is the 8th article in the Python DB-API 101 series.
 ![SQLite connection Management: thread-safety, check_same_thread, and pooling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.en.png)
 
 *SQLite connection Management: thread-safety, check_same_thread, and pooling*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?
 - What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?
 - When is per-thread vs shared connection appropriate?
-- Why does a large connection pool (PostgreSQL-style) not fit SQLite well?
-- How should you hold a SQLite connection in FastAPI?
+
+## Big Picture
+
+![python db-api 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
+
+*python db-api 101 chapter 8 flow overview*
+
+This picture places SQLite Connection Management: thread-safety, check_same_thread, and Pooling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQLite Connection Management: thread-safety, check_same_thread, and Pooling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -49,9 +58,6 @@ The right answer is to verify the thread-safety mode your build offers and pick 
 
 ## Mental Model: a connection is a file handle
 
-![Mental Model: a connection is a file handle](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
-
-*Mental Model: a connection is a file handle*
 > A SQLite connection is not the client/server connection you know from PostgreSQL or MySQL. There is no separate process. The lock is a filesystem lock, and the connection object is essentially a file handle plus cache plus transaction state.
 
 This model decides several things:
@@ -351,19 +357,28 @@ Reads stay on per-request connections. Thanks to WAL, readers do not wait on the
 
 The next post leaves the synchronous world and moves to `aiosqlite`. We will look at how to hold connections and transactions inside asyncio, and how this composes with FastAPI's async paths.
 
+## Answering the Opening Questions
+
+- **What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?**
+  - The article treats SQLite Connection Management: thread-safety, check_same_thread, and Pooling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is per-thread vs shared connection appropriate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
-- **SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)**
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- **Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (current)**
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 

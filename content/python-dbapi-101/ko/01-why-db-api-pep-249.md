@@ -1,5 +1,5 @@
 ---
-title: 왜 DB-API 2.0인가 - PEP 249가 푼 문제
+title: "Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제"
 series: python-dbapi-101
 episode: 1
 language: ko
@@ -22,7 +22,7 @@ seo_description: Python으로 데이터베이스를 다룬 적이 있다면 sqli
   패키지를 한 번쯤…
 ---
 
-# 왜 DB-API 2.0인가 - PEP 249가 푼 문제
+# Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제
 
 Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`, `pymysql`, `oracledb` 같은 패키지를 한 번쯤 써봤을 겁니다. 그리고 신기하게도 그 사용법이 묘하게 비슷합니다. `connect()`로 연결을 만들고 `cursor()`로 cursor를 받고 `execute()`로 쿼리를 던지고 `fetchone()`/`fetchall()`로 결과를 꺼냅니다. 이 통일성은 우연이 아니라 1996년에 합의된 표준, **PEP 249 — Python Database API Specification v2.0** (줄여서 DB-API 2.0) 덕분입니다.
 
@@ -34,20 +34,24 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?
 - DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?
 - driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?
-- DB-API가 일부러 표준화하지 않은 영역은 어디까지일까요?
 
-> DB-API 2.0의 핵심은 "모든 driver를 똑같이 만드는 것"이 아니라, 애플리케이션 코드가 공통된 최소 계약 위에서 움직이게 만드는 것입니다.
+## 큰 그림
+
+![Python DB-API 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
+
+*Python DB-API 101 1장 흐름 개요*
+
+이 그림에서는 왜 DB-API 2.0인가 - PEP 249가 푼 문제를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 왜 DB-API 2.0인가 - PEP 249가 푼 문제의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 1. DB-API 이전의 혼돈
 
-![DB-API 이전의 혼돈](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
-
-*DB-API 이전의 혼돈*
 표준이 없던 시절, 각 데이터베이스 라이브러리는 자기만의 API를 가졌습니다.
 
 ```python
@@ -246,19 +250,28 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 
 <!-- a-grade-example:end -->
 
+## 처음 질문으로 돌아가기
+
+- **PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?**
+  - 본문의 기준은 왜 DB-API 2.0인가 - PEP 249가 푼 문제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **왜 DB-API 2.0인가 - PEP 249가 푼 문제 (현재 글)**
-- Connection과 Cursor Lifecycle (예정)
-- execute, executemany, fetch 패턴 (예정)
-- Parameter binding과 SQL injection 방어 (sqlite3, PEP 249) (예정)
-- Transaction과 isolation level (sqlite3, PEP 249) (예정)
-- Row factory와 type adapter (sqlite3, PEP 249) (예정)
-- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- **Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제 (현재 글)**
+- Python DB-API 101 (2/10): Connection과 Cursor Lifecycle (예정)
+- Python DB-API 101 (3/10): execute, executemany, fetch 패턴 (예정)
+- Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249) (예정)
+- Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 

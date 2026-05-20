@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: 'SQLite Production Patterns: retry, timeout, observability, backup'
+title: "Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup"
 seo_description: SQLite being a single file simplifies operations, but treating it
   as "just a file" is dangerous.
 ---
 
-# SQLite Production Patterns: retry, timeout, observability, backup
+# Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup
 
 The previous nine posts covered nearly every behavior of SQLite and PEP 249. This finale is about wiring those behaviors into a production-grade application. SQLite is light, but lightness is not an excuse to drop operational visibility. Retries should be measured, slow queries should be flagged automatically, traces should reach the SQL layer, and backups should be verified.
 
@@ -33,13 +33,22 @@ This is the final article in the Python DB-API 101 series.
 ![SQLite production Patterns: retry, timeout, observability, backup](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png)
 
 *SQLite production Patterns: retry, timeout, observability, backup*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - How should retry, timeout, and `busy_timeout` be configured together?
 - How do you automate slow-query logging, and how do you pick the threshold?
 - How do you instrument SQLite calls with OpenTelemetry?
-- What is the difference between the three backup methods (file copy, `.backup`, online backup API)?
-- What absolutely belongs on a SQLite production checklist?
+
+## Big Picture
+
+![python db-api 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
+
+*python db-api 101 chapter 10 flow overview*
+
+This picture places SQLite Production Patterns: retry, timeout, observability, backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQLite Production Patterns: retry, timeout, observability, backup is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -49,9 +58,6 @@ The goal here is to remove luck from the picture. Retries become measurable than
 
 ## Mental Model: SQLite is still a DBMS
 
-![SQLite is still a DBMS](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
-
-*SQLite is still a DBMS*
 > SQLite being a single file simplifies operations, but treating it as "just a file" is dangerous. Copying a file mid-transaction yields a corrupted backup. SQLite is light, but it is a DBMS.
 
 Four production axes:
@@ -357,19 +363,28 @@ You now have the tools to build a small but operable SQLite-backed service. The 
 
 Thanks for reading.
 
+## Answering the Opening Questions
+
+- **How should retry, timeout, and `busy_timeout` be configured together?**
+  - The article treats SQLite Production Patterns: retry, timeout, observability, backup as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you automate slow-query logging, and how do you pick the threshold?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you instrument SQLite calls with OpenTelemetry?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
-- [Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- [Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
-- [PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
-- [SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
-- [Asynchronous SQLite with aiosqlite](./09-async-aiosqlite.md)
-- **SQLite Production Patterns: retry, timeout, observability, backup (current)**
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- [Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249)](./06-row-factories-adapters.md)
+- [Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling](./07-error-handling-exception-hierarchy.md)
+- [Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling](./08-connection-pooling.md)
+- [Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite](./09-async-aiosqlite.md)
+- **Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (current)**
 
 <!-- toc:end -->
 

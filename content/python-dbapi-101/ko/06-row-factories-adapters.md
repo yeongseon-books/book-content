@@ -1,5 +1,5 @@
 ---
-title: Row factory와 type adapter (sqlite3, PEP 249)
+title: "Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)"
 series: python-dbapi-101
 episode: 6
 language: ko
@@ -23,7 +23,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
   ''Alice''} ▼…'
 ---
 
-# Row factory와 type adapter (sqlite3, PEP 249)
+# Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249)
 
 `row[3]` 같은 코드는 스키마가 바뀌는 순간 조용히 깨집니다. 이 글에서는 row factory와 type adapter를 함께 다뤄 결과 shape와 값 변환을 한 곳에서 통제하는 방법을 설명합니다.
 
@@ -33,21 +33,23 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-`row[3]`처럼 인덱스로 컬럼을 꺼내는 코드는 schema가 바뀌는 순간 침묵 속에 깨집니다. `row['name']`처럼 이름으로 꺼내거나, `row.name` 형태의 dataclass를 쓰면 schema 변경이 import error로 즉시 드러납니다.
+- Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
+- Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
+- Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
 
-타입 변환도 마찬가지입니다. SQLite에 금액을 `REAL`(float)로 저장하면 0.1 + 0.2 = 0.30000000000000004 같은 정밀도 사고가 발생합니다. `Decimal`을 등록하고 `TEXT`로 저장하면 정확도를 유지할 수 있습니다.
+## 큰 그림
 
-이 글은 row factory와 type adapter를 한 번에 정리해, repository 레이어가 schema/타입 변경에 견디게 만드는 방법을 코드로 보여 줍니다.
+![Python DB-API 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
----
+*Python DB-API 101 6장 흐름 개요*
+
+이 그림에서는 Row factory와 type adapter (sqlite3, PEP 249)를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Row factory와 type adapter (sqlite3, PEP 249)의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## Mental Model — 두 단계 변환
-
-![Mental Model - 두 단계 변환](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
-
-*Mental Model - 두 단계 변환*
 
 > SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
 
@@ -193,19 +195,28 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 
 다음 글에서는 **error handling과 exception hierarchy**를 다룹니다. PEP 249가 정의한 8개 예외 클래스, sqlite3의 매핑(IntegrityError, OperationalError, ProgrammingError 등), `BUSY`와 `LOCKED`의 차이, 그리고 retry 전략을 코드로 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
+  - 본문의 기준은 Row factory와 type adapter (sqlite3, PEP 249)를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
-- [Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- [execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
-- [Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
-- [Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
-- **Row factory와 type adapter (sqlite3, PEP 249) (현재 글)**
-- PEP 249 예외 계층과 SQLite 에러 처리 (예정)
-- SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
-- aiosqlite로 비동기 SQLite 다루기 (예정)
-- SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
+- [Python DB-API 101 (1/10): 왜 DB-API 2.0인가 - PEP 249가 푼 문제](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection과 Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- [Python DB-API 101 (3/10): execute, executemany, fetch 패턴](./03-execute-fetch-patterns.md)
+- [Python DB-API 101 (4/10): Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)](./04-parameter-binding-sql-injection.md)
+- [Python DB-API 101 (5/10): Transaction과 isolation level (sqlite3, PEP 249)](./05-transactions-isolation.md)
+- **Python DB-API 101 (6/10): Row factory와 type adapter (sqlite3, PEP 249) (현재 글)**
+- Python DB-API 101 (7/10): PEP 249 예외 계층과 SQLite 에러 처리 (예정)
+- Python DB-API 101 (8/10): SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링 (예정)
+- Python DB-API 101 (9/10): aiosqlite로 비동기 SQLite 다루기 (예정)
+- Python DB-API 101 (10/10): SQLite Production 패턴: retry, timeout, 관측성, 백업 (예정)
 
 <!-- toc:end -->
 

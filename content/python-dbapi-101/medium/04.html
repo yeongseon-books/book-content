@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Parameter binding and SQL injection defense (sqlite3, PEP 249)</title>
+<title>Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Parameter binding and SQL injection defense (sqlite3, PEP 249)</h1>
+<h1>Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249)</h1>
 <p>SQL injection starts the moment query text and user input become the same string. This post uses sqlite3 to show how PEP 249 parameter binding keeps them separate and why that design matters in production.</p>
 <p>This is the 4th article in the Python DB-API 101 series.</p>
 <p><img alt="Parameter binding and SQL injection defense (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png"></p>
 <p><em>Parameter binding and SQL injection defense (sqlite3, PEP 249)</em></p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is building SQL with f-strings dangerous?</li>
 <li>When do you use <code>?</code> versus <code>:name</code> placeholders?</li>
 <li>How does binding work with <code>executemany</code> for bulk inserts?</li>
-<li>Why can't you bind table or column names?</li>
-<li>What does it mean that <code>paramstyle</code> differs by driver?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="python db-api 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png"></p>
+<p><em>python db-api 101 chapter 4 flow overview</em></p>
+<p>This picture places Parameter binding and SQL injection defense (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>SQL injection happens at the moment the query string and user input meet. PEP 249's parameter binding keeps the two separate end-to-end.</p>
+<p>The core of Parameter binding and SQL injection defense (sqlite3, PEP 249) is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What you will learn</h2>
 <p>This post covers PEP 249 parameter binding in depth using <code>sqlite3</code>. Specifically:</p>
@@ -85,8 +87,6 @@
 <p>This post reproduces the attack with sqlite3 and contrasts it with the binding fix line by line. Once you have seen it work, you stop writing f-string SQL forever.</p>
 <hr>
 <h2>Mental Model — keep query string and values separate</h2>
-<p><img alt="Mental model - keep query string and values separate" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png"></p>
-<p><em>Mental model - keep query string and values separate</em></p>
 <pre><code class="language-text">[ User input ] ─┐
                 │
                 ▼
@@ -311,18 +311,27 @@ bandit -r src/ -ll
 <h2>Summary and next post</h2>
 <p>PEP 249 parameter binding is the simplest yet strongest tool for blocking SQL injection. The principle is to keep values and SQL syntax separate end-to-end; for positions where that separation breaks (such as table names), compensate with whitelist validation.</p>
 <p>The next post covers <strong>transactions and isolation levels</strong> — the precise meaning of <code>commit</code>/<code>rollback</code>, sqlite3's <code>isolation_level=None</code> autocommit mode, and the BEGIN variants (DEFERRED, IMMEDIATE, EXCLUSIVE) with their lock behaviour, all illustrated with code.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is building SQL with f-strings dangerous?</strong></li>
+<li>The article treats Parameter binding and SQL injection defense (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When do you use <code>?</code> versus <code>:name</code> placeholders?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does binding work with <code>executemany</code> for bulk inserts?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Connection and Cursor Lifecycle</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">execute, executemany, and Fetch Patterns</a></li>
-<li><strong>Parameter binding and SQL injection defense (sqlite3, PEP 249) (current)</strong></li>
-<li>Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
-<li>Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
-<li>PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
-<li>SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
-<li>Asynchronous SQLite with aiosqlite (upcoming)</li>
-<li>SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/01-why-db-api-pep-249.md">Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/02-connection-cursor-lifecycle.md">Python DB-API 101 (2/10): Connection and Cursor Lifecycle</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/python-dbapi-101/en/03-execute-fetch-patterns.md">Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns</a></li>
+<li><strong>Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (current)</strong></li>
+<li>Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)</li>
+<li>Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)</li>
+<li>Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)</li>
+<li>Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)</li>
+<li>Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)</li>
+<li>Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

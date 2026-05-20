@@ -1,5 +1,5 @@
 ---
-title: execute, executemany, and Fetch Patterns
+title: "Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns"
 series: python-dbapi-101
 episode: 3
 language: en
@@ -22,33 +22,34 @@ seo_description: 'Every query in DB-API ultimately reduces to five cursor method
   execute(), executemany(), and fetchone()/fetchall()/fetchmany().'
 ---
 
-# execute, executemany, and Fetch Patterns
+# Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns
 
 Every query in DB-API ultimately reduces to five cursor methods: `execute()`, `executemany()`, and `fetchone()`/`fetchall()`/`fetchmany()`. The API surface is tiny, but choosing the wrong fetch method decides whether your service streams gracefully or OOMs at 3 AM. This article walks through each method and the rules for picking one.
 
 This is the 3rd article in the Python DB-API 101 series.
 
-<!-- a-grade-intro:begin -->
-
 ![execute, executemany, and fetch patterns](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.en.png)
 
 *execute, executemany, and fetch patterns*
-## Key Questions
+
+## Questions to Keep in Mind
 
 - When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?
 - How do you process large result sets without blowing up memory?
 - What metadata does cursor.description expose?
-- What are the key ingredients of a streaming + transformation pipeline?
 
-> Choosing a fetch method is not a matter of taste; it is a question of result size and memory budget. `fetchall()` is fine for small results; streaming is the default for large ones.
+## Big Picture
 
-<!-- a-grade-intro:end -->
+![python db-api 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
+
+*python db-api 101 chapter 3 flow overview*
+
+This picture places execute, executemany, and Fetch Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of execute, executemany, and Fetch Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## 1. execute - one statement at a time
 
-![execute - one statement at a time](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
-
-*execute - one statement at a time*
 `cursor.execute(operation, parameters=None)` runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.
 
 ```python
@@ -224,19 +225,28 @@ The next episode covers parameter binding and SQL injection defense.
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?**
+  - The article treats execute, executemany, and Fetch Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you process large result sets without blowing up memory?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What metadata does cursor.description expose?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
-- [Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
-- **execute, executemany, and Fetch Patterns (current)**
-- Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
-- Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
-- Row factories and type adapters (sqlite3, PEP 249) (upcoming)
-- PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
-- SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
-- Asynchronous SQLite with aiosqlite (upcoming)
-- SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
+- [Python DB-API 101 (1/10): Why DB-API 2.0 - The Problem PEP 249 Solved](./01-why-db-api-pep-249.md)
+- [Python DB-API 101 (2/10): Connection and Cursor Lifecycle](./02-connection-cursor-lifecycle.md)
+- **Python DB-API 101 (3/10): execute, executemany, and Fetch Patterns (current)**
+- Python DB-API 101 (4/10): Parameter binding and SQL injection defense (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (5/10): Transactions and isolation levels (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (6/10): Row factories and type adapters (sqlite3, PEP 249) (upcoming)
+- Python DB-API 101 (7/10): PEP 249 Exception Hierarchy and SQLite Error Handling (upcoming)
+- Python DB-API 101 (8/10): SQLite Connection Management: thread-safety, check_same_thread, and Pooling (upcoming)
+- Python DB-API 101 (9/10): Asynchronous SQLite with aiosqlite (upcoming)
+- Python DB-API 101 (10/10): SQLite Production Patterns: retry, timeout, observability, backup (upcoming)
 
 <!-- toc:end -->
 
