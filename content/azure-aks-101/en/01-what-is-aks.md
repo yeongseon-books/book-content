@@ -20,7 +20,7 @@ seo_description: Understand the responsibility boundary of Azure Kubernetes Serv
 
 # Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
 
-> Azure Kubernetes Service 101 series (1/7)
+This is the first article in the Azure Kubernetes Service 101 series.
 
 Running a couple of containers isn't the hard part anymore. The hard part starts right after that: recovering failed pods, scaling both replicas and nodes under load, exposing services safely, and collecting enough telemetry to operate the whole thing without guessing. Kubernetes solves that category of problems, but self-managing Kubernetes comes with real cognitive and operational cost.
 

@@ -21,7 +21,7 @@ seo_description: All code citations in this post are based on Azure/azure-functi
 
 # Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`
 
-> Azure Functions Deep Dive series (1/6)
+This is the first article in the Azure Functions Deep Dive series.
 
 ## Source Version
 

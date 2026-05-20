@@ -54,9 +54,7 @@
 </head>
 <body>
 <h1>Azure Functions Deep Dive (1/6): Host Bootstrap — Following <code>WebJobsScriptHostService</code></h1>
-<blockquote>
-<p>Azure Functions Deep Dive series (1/6)</p>
-</blockquote>
+<p>This is the first article in the Azure Functions Deep Dive series.</p>
 <h2>Source Version</h2>
 <p>All code citations in this post are based on <a href="https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7"><code>Azure/azure-functions-host @ 5e59423</code></a>.</p>
 <p>In episode 3 of the intro series, I wrote that Functions runs the Host process (.NET) and the Worker process (your language) separately, with gRPC between them. This series checks that sentence against the actual host code. It reads the <a href="https://github.com/Azure/azure-functions-host"><code>Azure/azure-functions-host</code></a> repo directly, one stage per post, from bootstrap through invocation, scaling, and cold starts.</p>
