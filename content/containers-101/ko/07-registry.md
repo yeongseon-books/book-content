@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 7
-title: Registry
+title: "Containers 101 (7/10): Registry"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 레지스트리의 역할과 push, pull, digest, 서명 기본 
 last_reviewed: '2026-05-15'
 ---
 
-# Registry
+# Containers 101 (7/10): Registry
 
 이미지를 잘 빌드해도 어디엔가 안정적으로 올리고 다시 가져올 수 없다면 배포는 완성되지 않습니다. 배포 파이프라인이 흔들리는 팀을 보면 대개 tag와 digest를 구분하지 못하거나, 누가 push 권한을 가지는지 설계하지 못한 경우가 많습니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 레지스트리를 단순한 저장소가 아니라 배포 동일성을 보장하는 시스템으로 보고, push와 pull, digest pin, 서명 정책의 출발점을 함께 설명합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 빌드한 이미지는 어디에 저장해 두어야 할까요?
 - push와 pull 흐름은 배포에서 어떤 역할을 할까요?
 - tag와 digest는 왜 구분해서 써야 할까요?
-- Docker Hub, ECR, GHCR은 어떤 맥락에서 쓰일까요?
-- 서명된 이미지는 왜 공급망 보안의 출발점일까요?
 
-> 레지스트리는 단순한 이미지 창고가 아닙니다. 빌드 결과를 배포 가능한 아티팩트로 만들고, 환경마다 같은 이미지를 다시 가져오게 해 주는 배포 흐름의 중심입니다.
+## 큰 그림
+
+![Containers 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Containers 101 7장 흐름 개요*
+
+이 그림에서는 Registry를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Registry의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
-
-*빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름*
 개발 환경에서 만든 이미지는 레지스트리에 올라가고, 운영 환경은 다시 그 이미지를 당겨 옵니다. 이 흐름이 일관되어야 같은 아티팩트를 여러 환경에서 재사용할 수 있습니다.
 
 ## 핵심 용어
@@ -194,15 +197,24 @@ docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
 
 다음 글에서는 이 이미지를 어떻게 더 안전하게 실행할지, 즉 Container Security를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **빌드한 이미지는 어디에 저장해 두어야 할까요?**
+  - 본문의 기준은 Registry를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **push와 pull 흐름은 배포에서 어떤 역할을 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **tag와 digest는 왜 구분해서 써야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Container란 무엇인가?](./01-what-is-a-container.md)
-- [Image와 Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
+- [Containers 101 (1/10): Container란 무엇인가?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image와 Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
 - **Registry (현재 글)**
 - Container Security (예정)
 - Containers vs VMs (예정)

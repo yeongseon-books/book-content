@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 1
-title: What is a Container?
+title: "Containers 101 (1/10): What is a Container?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A beginner-friendly definition of containers — how they share
 last_reviewed: '2026-05-15'
 ---
 
-# What is a Container?
+# Containers 101 (1/10): What is a Container?
 
 Containers are often introduced as tiny VMs, but that shortcut hides the exact boundary that matters in operations. The real question is which parts are shared, which parts are isolated, and what that means for reproducibility and security.
 
@@ -31,13 +31,21 @@ In this chapter, we define a container as an isolated process tree sharing the h
 
 > A container is not a tiny VM. It is an isolated process tree sharing the host kernel.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The definition of a container
-- What gets shared with the host
-- The decisive difference from a VM
-- The basic Docker workflow
-- Five common pitfalls
+- The definition of a container?
+- What gets shared with the host?
+- The decisive difference from a VM?
+
+## Big Picture
+
+![containers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 1 flow overview*
+
+This picture places What is a Container? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is a Container? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ Since 2013, the container has been the default unit of deployment. Without it, m
 
 ## Concept at a Glance
 
-![Container processes sharing the host kernel](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png)
-
-*Container processes sharing the host kernel*
 ## Key Terms
 
 - **Container**: an isolated bundle of processes.
@@ -167,6 +172,15 @@ Developers build the same image on Docker Desktop. CI pushes that image to a reg
 ## Wrap-up and Next Steps
 
 If an image is a template, you have to understand its internals. The next post covers Image and Layer.
+
+## Answering the Opening Questions
+
+- **The definition of a container?**
+  - The article treats What is a Container? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What gets shared with the host?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The decisive difference from a VM?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
 ## In this series

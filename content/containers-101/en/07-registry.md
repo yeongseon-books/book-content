@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 7
-title: Registry
+title: "Containers 101 (7/10): Registry"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A beginner guide to container registries (Docker Hub, ECR, GHCR
 last_reviewed: '2026-05-15'
 ---
 
-# Registry
+# Containers 101 (7/10): Registry
 
 A well-built image is still useless if no one can pull the exact same artifact back later. Teams usually feel this when tags drift, push permissions are too broad, or deployment history can no longer prove what actually ran.
 
@@ -31,13 +31,21 @@ In this chapter, we treat the registry as the center of deployment identity, cov
 
 > A registry is not just storage. It is the identity system for what actually gets deployed.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The role of a *registry*
-- The *push / pull* flow
-- *Tagging* strategy
-- *Docker Hub / ECR / GHCR*
-- *Signed image* basics
+- The role of a *registry?
+- The *push / pull* flow?
+- Tagging* strategy?
+
+## Big Picture
+
+![containers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 7 flow overview*
+
+This picture places Registry inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Registry is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ A reproducible image is useless if there is *no place to fetch it from*. *Deploy
 
 ## Concept at a Glance
 
-![Push and pull flow between build output and a registry](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
-
-*Push and pull flow between build output and a registry*
 ## Key Terms
 
 - **registry**: an *image storage server*.
@@ -169,15 +174,24 @@ docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
 
 Once you know *where* to fetch images, the next question is *how to run them safely*. The next post covers *container security*.
 
+## Answering the Opening Questions
+
+- **The role of a *registry?**
+  - The article treats Registry as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *push / pull* flow?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Tagging* strategy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
 - **Registry (current)**
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)

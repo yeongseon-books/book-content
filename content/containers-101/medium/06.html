@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Network</title>
+<title>Containers 101 (6/10): Network</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Network</h1>
+<h1>Containers 101 (6/10): Network</h1>
 <p>Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.</p>
 <p>This is post 6 in the Containers 101 series.</p>
 <p>In this chapter, we compare bridge, host, overlay, and none, then explain why user-defined networks and DNS names are the stable foundation behind both Compose and Kubernetes.</p>
 <blockquote>
 <p>Stable container networking starts with names and boundaries, not with memorized IP addresses.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The bridge / host / overlay / none modes</li>
-<li>Container-to-container DNS</li>
-<li>Publish (-p) vs expose</li>
-<li>User-defined networks</li>
-<li>Five common pitfalls</li>
+<li>The bridge / host / overlay / none modes?</li>
+<li>Container-to-container DNS?</li>
+<li>Publish (-p) vs expose?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="containers 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>containers 101 chapter 6 flow overview</em></p>
+<p>This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Both Compose and Kubernetes ride on top of these abstractions. Get the basics right and the rest is easy.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Name-based connectivity on a user-defined bridge network" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Name-based connectivity on a user-defined bridge network</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>bridge</strong>: the default virtual L2 network.</li>
@@ -172,13 +175,22 @@ docker network inspect app-net
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once connectivity is solved, the next question is <em>where to keep images</em>. The next post covers Registry.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The bridge / host / overlay / none modes?</strong></li>
+<li>The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Container-to-container DNS?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Publish (-p) vs expose?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Runtime</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/04-dockerfile.md">Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/05-volume.md">Volume</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">Containers 101 (1/10): What is a Container?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Containers 101 (2/10): Image and Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Containers 101 (3/10): Runtime</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/04-dockerfile.md">Containers 101 (4/10): Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/05-volume.md">Containers 101 (5/10): Volume</a></li>
 <li><strong>Network (current)</strong></li>
 <li>Registry (upcoming)</li>
 <li>Container Security (upcoming)</li>

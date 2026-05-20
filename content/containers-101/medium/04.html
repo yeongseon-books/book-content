@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dockerfile</title>
+<title>Containers 101 (4/10): Dockerfile</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Dockerfile</h1>
+<h1>Containers 101 (4/10): Dockerfile</h1>
 <p>A Dockerfile is not just a text file that happens to build an image. Instruction order changes cache hit rate, base-image choice changes image size and CVE count, and one user directive can change the security posture of the runtime.</p>
 <p>This is post 4 in the Containers 101 series.</p>
 <p>In this chapter, we focus on cache-friendly instruction order, multi-stage builds, non-root defaults, and secret handling so the resulting image is faster, smaller, and safer to ship.</p>
 <blockquote>
 <p>Dockerfile quality is really cache quality, image quality, and runtime safety compressed into one file.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The role and order of instructions</li>
-<li>Cache-friendly authoring</li>
-<li>Multi-stage builds</li>
-<li>Security defaults</li>
-<li>Five common pitfalls</li>
+<li>The role and order of instructions?</li>
+<li>Cache-friendly authoring?</li>
+<li>Multi-stage builds?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="containers 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>containers 101 chapter 4 flow overview</em></p>
+<p>This picture places Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Dockerfile is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A Dockerfile directly drives team productivity and security. Get it right once and it pays back for years.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Builder stage separated from the runtime stage" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>Builder stage separated from the runtime stage</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>FROM</strong>: the base image.</li>
@@ -173,11 +176,20 @@ docker image inspect demo-app:dev --format &quot;user={{.Config.User}} size={{.S
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once images exist, the next question is <em>where to put state</em>. The next post covers Volume.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The role and order of instructions?</strong></li>
+<li>The article treats Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Cache-friendly authoring?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Multi-stage builds?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Runtime</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">Containers 101 (1/10): What is a Container?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Containers 101 (2/10): Image and Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Containers 101 (3/10): Runtime</a></li>
 <li><strong>Dockerfile (current)</strong></li>
 <li>Volume (upcoming)</li>
 <li>Network (upcoming)</li>

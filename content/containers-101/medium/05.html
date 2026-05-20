@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Volume</title>
+<title>Containers 101 (5/10): Volume</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Volume</h1>
+<h1>Containers 101 (5/10): Volume</h1>
 <p>Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.</p>
 <p>This is post 5 in the Containers 101 series.</p>
 <p>In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle and failure mode, then turn that model into backup and restore habits you can keep in operations.</p>
 <blockquote>
 <p>Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Volumes vs bind mounts vs tmpfs</li>
-<li>Guaranteeing data persistence</li>
-<li>Backup and migration</li>
-<li>Permission gotchas</li>
-<li>Five common pitfalls</li>
+<li>Volumes vs bind mounts vs tmpfs?</li>
+<li>Guaranteeing data persistence?</li>
+<li>Backup and migration?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="containers 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>containers 101 chapter 5 flow overview</em></p>
+<p>This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Storage paths for volumes, bind mounts, and tmpfs" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Storage paths for volumes, bind mounts, and tmpfs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Volume</strong>: a Docker-managed persistent store.</li>
@@ -174,12 +177,21 @@ docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once data has a home, communication is next. The next post covers Network.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Volumes vs bind mounts vs tmpfs?</strong></li>
+<li>The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Guaranteeing data persistence?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Backup and migration?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Runtime</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/04-dockerfile.md">Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">Containers 101 (1/10): What is a Container?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Containers 101 (2/10): Image and Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Containers 101 (3/10): Runtime</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/04-dockerfile.md">Containers 101 (4/10): Dockerfile</a></li>
 <li><strong>Volume (current)</strong></li>
 <li>Network (upcoming)</li>
 <li>Registry (upcoming)</li>

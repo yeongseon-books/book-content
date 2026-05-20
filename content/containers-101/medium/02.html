@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Image and Layer</title>
+<title>Containers 101 (2/10): Image and Layer</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Image and Layer</h1>
+<h1>Containers 101 (2/10): Image and Layer</h1>
 <p>An image can look like one opaque artifact until build time starts to hurt. Then layer order, cache reuse, transfer size, and vulnerability surface suddenly become operational concerns instead of implementation detail.</p>
 <p>This is post 2 in the Containers 101 series.</p>
 <p>In this chapter, we unpack why images are split into layers, how OverlayFS makes the stack look like one filesystem, and why Dockerfile optimization and digest-based reproducibility both depend on that structure.</p>
 <blockquote>
 <p>Layers are the reason images can be reused, cached, and transferred efficiently at the same time.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The physical structure of an image</li>
-<li>The job of a layer</li>
-<li>How OverlayFS stacks them</li>
-<li>Layer caching for fast builds</li>
-<li>Five common pitfalls</li>
+<li>The physical structure of an image?</li>
+<li>The job of a layer?</li>
+<li>How OverlayFS stacks them?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="containers 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>containers 101 chapter 2 flow overview</em></p>
+<p>This picture places Image and Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Image and Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Layer stack with a writable container layer on top" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Layer stack with a writable container layer on top</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Layer</strong>: a read-only bundle of changes.</li>
@@ -169,9 +172,18 @@ docker inspect --format &quot;{{index .RepoDigests 0}}&quot; python:3.12-slim
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>You can see how an image is built. Next, look at what runs it. The next post covers Runtime.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The physical structure of an image?</strong></li>
+<li>The article treats Image and Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The job of a layer?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How OverlayFS stacks them?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">Containers 101 (1/10): What is a Container?</a></li>
 <li><strong>Image and Layer (current)</strong></li>
 <li>Runtime (upcoming)</li>
 <li>Dockerfile (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 5
-title: Volume
+title: "Containers 101 (5/10): Volume"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Volumes, bind mounts, and tmpfs compared by lifecycle and use c
 last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Containers 101 (5/10): Volume
 
 Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.
 
@@ -31,13 +31,21 @@ In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle a
 
 > Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Volumes vs bind mounts vs tmpfs
-- Guaranteeing data persistence
-- Backup and migration
-- Permission gotchas
-- Five common pitfalls
+- Volumes vs bind mounts vs tmpfs?
+- Guaranteeing data persistence?
+- Backup and migration?
+
+## Big Picture
+
+![containers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 5 flow overview*
+
+This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ Containers are immutable, but the data they manage must survive. A bad volume de
 
 ## Concept at a Glance
 
-![Storage paths for volumes, bind mounts, and tmpfs](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
-
-*Storage paths for volumes, bind mounts, and tmpfs*
 ## Key Terms
 
 - **Volume**: a Docker-managed persistent store.
@@ -177,13 +182,22 @@ Developers use bind mounts for code hot-reload. Databases use named volumes. Sen
 
 Once data has a home, communication is next. The next post covers Network.
 
+## Answering the Opening Questions
+
+- **Volumes vs bind mounts vs tmpfs?**
+  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Guaranteeing data persistence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Backup and migration?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
 - **Volume (current)**
 - Network (upcoming)
 - Registry (upcoming)

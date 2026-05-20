@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 6
-title: Network
+title: "Containers 101 (6/10): Network"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Container network modes (bridge, host, overlay) and DNS-based s
 last_reviewed: '2026-05-15'
 ---
 
-# Network
+# Containers 101 (6/10): Network
 
 Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.
 
@@ -31,13 +31,21 @@ In this chapter, we compare bridge, host, overlay, and none, then explain why us
 
 > Stable container networking starts with names and boundaries, not with memorized IP addresses.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The bridge / host / overlay / none modes
-- Container-to-container DNS
-- Publish (-p) vs expose
-- User-defined networks
-- Five common pitfalls
+- The bridge / host / overlay / none modes?
+- Container-to-container DNS?
+- Publish (-p) vs expose?
+
+## Big Picture
+
+![containers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 6 flow overview*
+
+This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ Both Compose and Kubernetes ride on top of these abstractions. Get the basics ri
 
 ## Concept at a Glance
 
-![Name-based connectivity on a user-defined bridge network](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
-
-*Name-based connectivity on a user-defined bridge network*
 ## Key Terms
 
 - **bridge**: the default virtual L2 network.
@@ -175,14 +180,23 @@ Compose creates a per-project user-defined network. Kubernetes uses a CNI to giv
 
 Once connectivity is solved, the next question is *where to keep images*. The next post covers Registry.
 
+## Answering the Opening Questions
+
+- **The bridge / host / overlay / none modes?**
+  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Container-to-container DNS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Publish (-p) vs expose?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
 - **Network (current)**
 - Registry (upcoming)
 - Container Security (upcoming)

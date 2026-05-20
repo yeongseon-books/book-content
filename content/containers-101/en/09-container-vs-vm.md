@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 9
-title: Containers vs VMs
+title: "Containers 101 (9/10): Containers vs VMs"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A beginner guide comparing containers and VMs across kernel sha
 last_reviewed: '2026-05-15'
 ---
 
-# Containers vs VMs
+# Containers 101 (9/10): Containers vs VMs
 
 The container-versus-VM decision is not a speed contest. It is a boundary decision about isolation strength, boot cost, density, and which workloads deserve a harder separation line.
 
@@ -31,13 +31,21 @@ In this chapter, we compare shared-kernel isolation with hypervisor-based isolat
 
 > Containers and VMs solve different boundary problems. Choosing well means matching the boundary to the workload.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- *Kernel sharing* vs *hypervisor*
-- Differences in *isolation level*
-- *Startup time* and *resource* comparison
-- Right *use cases*
-- *Hybrid* approaches (Firecracker, Kata)
+- Kernel sharing* vs *hypervisor?
+- Differences in *isolation level?
+- Startup time* and *resource* comparison?
+
+## Big Picture
+
+![containers 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 9 flow overview*
+
+This picture places Containers vs VMs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Containers vs VMs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ Choosing *isolation that fits the workload* keeps both *cost* and *security* und
 
 ## Concept at a Glance
 
-![VM isolation through a hypervisor versus shared-kernel containers](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png)
-
-*VM isolation through a hypervisor versus shared-kernel containers*
 ## Key Terms
 
 - **hypervisor**: the *virtualization layer* that boots VMs.
@@ -174,17 +179,26 @@ def report(stats):
 
 It is time to *apply* every concept you have learned to *one real app*. The next post covers *building a real container app*.
 
+## Answering the Opening Questions
+
+- **Kernel sharing* vs *hypervisor?**
+  - The article treats Containers vs VMs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Differences in *isolation level?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Startup time* and *resource* comparison?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
-- [Registry](./07-registry.md)
-- [Container Security](./08-container-security.md)
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
+- [Containers 101 (7/10): Registry](./07-registry.md)
+- [Containers 101 (8/10): Container Security](./08-container-security.md)
 - **Containers vs VMs (current)**
 - Build a Container App (upcoming)
 

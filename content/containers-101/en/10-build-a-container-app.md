@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 10
-title: Build a Container App
+title: "Containers 101 (10/10): Build a Container App"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A hands-on guide to shipping a FastAPI app with Dockerfile, Com
 last_reviewed: '2026-05-15'
 ---
 
-# Build a Container App
+# Containers 101 (10/10): Build a Container App
 
 The earlier chapters only become operationally useful when they collapse into one reproducible application workflow. A single command that brings up the stack, verifies health, and tears it down cleanly is where container basics stop being vocabulary and start being practice.
 
@@ -31,13 +31,21 @@ In this chapter, we assemble a FastAPI app and Postgres into one stack with Dock
 
 > A one-command stack is where container theory becomes an operational habit you can repeat.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- A *Dockerfile* for a *FastAPI* app
-- *Compose* with a *DB* connection
-- Defining a *healthcheck*
-- Splitting *secrets*
-- *Logs* and *restart policy*
+- A *Dockerfile* for a *FastAPI* app?
+- Compose* with a *DB* connection?
+- Defining a *healthcheck?
+
+## Big Picture
+
+![containers 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png)
+
+*containers 101 chapter 10 flow overview*
+
+This picture places Build a Container App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Build a Container App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +53,6 @@ Every concept above only sticks once you *integrate* it into *one running result
 
 ## Concept at a Glance
 
-![Compose bringing up the app and database as one flow](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png)
-
-*Compose bringing up the app and database as one flow*
 ## Key Terms
 
 - **Dockerfile**: a *recipe* for building an image.
@@ -206,18 +211,27 @@ docker compose logs --tail=100
 
 This is the *finale* of *Containers 101*. The next step is *Kubernetes 101*, where you enter the world of *orchestration*.
 
+## Answering the Opening Questions
+
+- **A *Dockerfile* for a *FastAPI* app?**
+  - The article treats Build a Container App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Compose* with a *DB* connection?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Defining a *healthcheck?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Container?](./01-what-is-a-container.md)
-- [Image and Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
-- [Volume](./05-volume.md)
-- [Network](./06-network.md)
-- [Registry](./07-registry.md)
-- [Container Security](./08-container-security.md)
-- [Containers vs VMs](./09-container-vs-vm.md)
+- [Containers 101 (1/10): What is a Container?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image and Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
+- [Containers 101 (5/10): Volume](./05-volume.md)
+- [Containers 101 (6/10): Network](./06-network.md)
+- [Containers 101 (7/10): Registry](./07-registry.md)
+- [Containers 101 (8/10): Container Security](./08-container-security.md)
+- [Containers 101 (9/10): Containers vs VMs](./09-container-vs-vm.md)
 - **Build a Container App (current)**
 
 <!-- toc:end -->

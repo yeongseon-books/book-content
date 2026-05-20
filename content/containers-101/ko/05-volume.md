@@ -1,7 +1,7 @@
 ---
 series: containers-101
 episode: 5
-title: Volume
+title: "Containers 101 (5/10): Volume"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: volume, bind mount, tmpfs 차이와 데이터 보존 원칙을 
 last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Containers 101 (5/10): Volume
 
 컨테이너는 빨리 만들고 지울 수 있어야 하지만, 데이터는 그러면 안 됩니다. 이 차이를 구분하지 못하면 실습 단계에서는 편해 보여도 운영에서는 백업 실패, 권한 충돌, 데이터 유실이 바로 드러납니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 named volume, bind mount, tmpfs가 각각 어떤 수명주기와 위험을 가지는지, 백업과 복구를 어떤 절차로 표준화해야 하는지 설명합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - volume, bind mount, tmpfs는 무엇이 다를까요?
 - 컨테이너를 지워도 데이터를 남기려면 어떤 선택을 해야 할까요?
 - 백업과 복구는 어떤 방식으로 접근해야 할까요?
-- 권한 문제는 왜 자주 발생할까요?
-- 상태를 컨테이너 내부에 두면 왜 위험할까요?
 
-> 컨테이너는 불변 아티팩트이지만 데이터는 살아남아야 합니다. 상태는 컨테이너 안이 아니라 volume에 두고, volume과 bind mount와 tmpfs를 목적에 맞게 구분해야 데이터 손실을 피할 수 있습니다.
+## 큰 그림
+
+![Containers 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
+
+*Containers 101 5장 흐름 개요*
+
+이 그림에서는 Volume를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Volume의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 개념
 
-![volume, bind mount, tmpfs의 저장 경로 차이](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
-
-*volume, bind mount, tmpfs의 저장 경로 차이*
 세 가지는 모두 마운트 방식이지만 목적이 다릅니다. named volume은 지속성, bind mount는 호스트 경로 연결, tmpfs는 메모리 기반 임시 저장이 중심입니다.
 
 ## 핵심 용어
@@ -204,13 +207,22 @@ docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=
 
 다음 글에서는 데이터가 아니라 통신 관점으로 넘어가, 컨테이너들이 서로를 어떻게 찾고 연결하는지 Network를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **volume, bind mount, tmpfs는 무엇이 다를까요?**
+  - 본문의 기준은 Volume를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **컨테이너를 지워도 데이터를 남기려면 어떤 선택을 해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **백업과 복구는 어떤 방식으로 접근해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Container란 무엇인가?](./01-what-is-a-container.md)
-- [Image와 Layer](./02-image-and-layer.md)
-- [Runtime](./03-runtime.md)
-- [Dockerfile](./04-dockerfile.md)
+- [Containers 101 (1/10): Container란 무엇인가?](./01-what-is-a-container.md)
+- [Containers 101 (2/10): Image와 Layer](./02-image-and-layer.md)
+- [Containers 101 (3/10): Runtime](./03-runtime.md)
+- [Containers 101 (4/10): Dockerfile](./04-dockerfile.md)
 - **Volume (현재 글)**
 - Network (예정)
 - Registry (예정)

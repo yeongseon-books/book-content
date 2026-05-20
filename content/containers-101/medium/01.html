@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is a Container?</title>
+<title>Containers 101 (1/10): What is a Container?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What is a Container?</h1>
+<h1>Containers 101 (1/10): What is a Container?</h1>
 <p>Containers are often introduced as tiny VMs, but that shortcut hides the exact boundary that matters in operations. The real question is which parts are shared, which parts are isolated, and what that means for reproducibility and security.</p>
 <p>This is the first post in the Containers 101 series.</p>
 <p>In this chapter, we define a container as an isolated process tree sharing the host kernel, compare that model with a VM, and walk through what <code>docker run</code> actually creates when your first container starts.</p>
 <blockquote>
 <p>A container is not a tiny VM. It is an isolated process tree sharing the host kernel.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of a container</li>
-<li>What gets shared with the host</li>
-<li>The decisive difference from a VM</li>
-<li>The basic Docker workflow</li>
-<li>Five common pitfalls</li>
+<li>The definition of a container?</li>
+<li>What gets shared with the host?</li>
+<li>The decisive difference from a VM?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="containers 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>containers 101 chapter 1 flow overview</em></p>
+<p>This picture places What is a Container? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is a Container? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Since 2013, the container has been the default unit of deployment. Without it, modern DevOps is closed off to you.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Container processes sharing the host kernel" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Container processes sharing the host kernel</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Container</strong>: an isolated bundle of processes.</li>
@@ -165,6 +168,15 @@ docker ps --filter name=web
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>If an image is a template, you have to understand its internals. The next post covers Image and Layer.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The definition of a container?</strong></li>
+<li>The article treats What is a Container? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What gets shared with the host?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The decisive difference from a VM?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>What is a Container? (current)</strong></li>
