@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 9
-title: 시스템 콜
+title: "Operating Systems 101 (9/10): 시스템 콜"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 사용자 코드가 커널에 일을 맡기는 시스템 콜의
 last_reviewed: '2026-05-15'
 ---
 
-# 시스템 콜
+# Operating Systems 101 (9/10): 시스템 콜
 
 사용자 코드가 디스크나 네트워크 카드에 직접 손을 댈 수는 없습니다. 커널 자원을 쓰려면 반드시 좁은 입구를 통과해야 하고, 그 입구가 바로 시스템 콜입니다.
 
@@ -29,22 +29,26 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 9번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 사용자 공간과 커널 공간은 무엇이 다를까요?
 - 시스템 콜 한 번에는 어떤 전환 비용이 들어갈까요?
 - `strace`는 왜 OS 문제를 볼 때 가장 빠른 도구일까요?
-- 버퍼링, 일괄 처리, `vDSO`는 어떻게 비용을 줄일까요?
 
-> 시스템 콜은 사용자 코드가 커널에 일을 맡길 수 있는 유일한 계약입니다. 입구가 좁은 대신 안전하며, 그만큼 호출 횟수와 방식이 성능과 공격 표면을 함께 결정합니다.
+## 큰 그림
+
+![Operating Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
+
+*Operating Systems 101 9장 흐름 개요*
+
+이 그림에서는 시스템 콜를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 시스템 콜의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 기본 모델
 > 사용자 공간은 일반 프로그램이 도는 곳, 커널 공간은 OS의 핵심 코드가 도는 곳입니다. 둘 사이에는 권한 경계가 있고, 사용자 코드는 시스템 콜이라는 좁은 진입점만 통해 커널로 진입합니다. 진입할 때마다 컨텍스트 전환과 보안 검증이 일어나기 때문에 비쌉니다.
 
 ### 시스템 콜이 지나가는 권한 경계
-
-![시스템 콜이 지나가는 권한 경계](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
-*시스템 콜은 사용자 코드가 커널 자원에 들어갈 수 있는 유일한 문이며, 그만큼 매 호출에 비용이 붙습니다.*
 
 ```text
 [user space]
@@ -186,17 +190,29 @@ docker info | grep -i seccomp
 
 다음 글에서는 지금까지 본 OS 기본기가 컨테이너 안에서는 어떻게 다시 조합되는지를 봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **사용자 공간과 커널 공간은 무엇이 다를까요?**
+  - 본문의 기준은 시스템 콜를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **시스템 콜 한 번에는 어떤 전환 비용이 들어갈까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`strace`는 왜 OS 문제를 볼 때 가장 빠른 도구일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
-- [프로세스와 스레드](./02-processes-and-threads.md)
-- [스케줄링](./03-scheduling.md)
-- [동시성과 경쟁 상태](./04-concurrency-and-race-conditions.md)
-- [락, 뮤텍스, 세마포어](./05-locks-mutex-semaphore.md)
-- [메모리 관리](./06-memory-management.md)
-- [가상 메모리](./07-virtual-memory.md)
-- [파일 시스템](./08-file-systems.md)
+## 시리즈 목차
+
+- [Operating Systems 101 (1/10): 운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): 프로세스와 스레드](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): 스케줄링](./03-scheduling.md)
+- [Operating Systems 101 (4/10): 동시성과 경쟁 상태](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): 락, 뮤텍스, 세마포어](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): 메모리 관리](./06-memory-management.md)
+- [Operating Systems 101 (7/10): 가상 메모리](./07-virtual-memory.md)
+- [Operating Systems 101 (8/10): 파일 시스템](./08-file-systems.md)
 - **시스템 콜 (현재 글)**
 - 컨테이너와 운영체제 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

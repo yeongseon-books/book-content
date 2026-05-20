@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 7
-title: Virtual Memory
+title: "Operating Systems 101 (7/10): Virtual Memory"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Pages, page tables, the TLB, swap, and page faults — how the 
 last_reviewed: '2026-05-15'
 ---
 
-# Virtual Memory
+# Operating Systems 101 (7/10): Virtual Memory
 
 Every process appears to own a huge private memory space even though the machine has only a limited amount of RAM. That illusion is powerful, but it becomes painfully real when page faults climb, swap starts filling, and response time collapses.
 
 To understand those failures, you have to understand the machinery that builds the illusion in the first place.
 
 This is post 7 in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Virtual Memory?
+- Which signal should the example or diagram make visible for Virtual Memory?
+- What failure should be prevented first when Virtual Memory reaches a real system?
+
+## Big Picture
+
+![operating systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)
+
+*operating systems 101 chapter 7 flow overview*
+
+This picture places Virtual Memory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Virtual Memory is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -54,9 +70,6 @@ Without virtual memory you cannot diagnose "RSS is small but the system is slow"
 > Each process has its own virtual address space. Virtual addresses are split into pages (typically 4KB) and translated to physical addresses through a page table. The CPU caches recent translations in a TLB. When a translation is missing or the page is on disk, a page fault triggers and the OS handles it.
 
 ### How a virtual address reaches RAM
-
-![How a virtual address reaches RAM](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)
-*The cost of virtual memory depends on whether translation stays hot in cache or falls through to a page fault.*
 
 ```text
 virtual addr  →  [TLB hit]  →  physical addr  →  RAM
@@ -229,17 +242,29 @@ Virtual memory is an illusion, but the OS bills you precisely for it through pag
 
 The next article moves on to a resource the OS handles almost as often as memory — the file system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Virtual Memory?**
+  - The article treats Virtual Memory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Virtual Memory?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Virtual Memory reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
-- [Memory Management](./06-memory-management.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): Memory Management](./06-memory-management.md)
 - **Virtual Memory (current)**
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

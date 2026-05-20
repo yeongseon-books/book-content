@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Containers and the Operating System</title>
+<title>Operating Systems 101 (10/10): Containers and the Operating System</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Containers and the Operating System</h1>
+<h1>Operating Systems 101 (10/10): Containers and the Operating System</h1>
 <p>Containers did not invent a new operating system. They recombine existing OS features so one kernel can host many isolated execution environments, which is why container incidents are usually OS incidents wearing a different label.</p>
 <p>That is also why this chapter works as the series finale: every concept we covered earlier — processes, memory, file systems, system calls — reappears here in a more operational form.</p>
 <p>This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Containers and the Operating System?</li>
+<li>Which signal should the example or diagram make visible for Containers and the Operating System?</li>
+<li>What failure should be prevented first when Containers and the Operating System reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png"></p>
+<p><em>operating systems 101 chapter 10 flow overview</em></p>
+<p>This picture places Containers and the Operating System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Containers and the Operating System is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How do containers and virtual machines differ in the way they provide isolation?</li>
+<li>How do namespaces split "what is visible" from cgroups limiting "how much can be used"?</li>
+<li>Why does overlayfs make container images feel lightweight?</li>
+<li>If you understand the limits of container isolation, what extra protections should you design on top?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between containers and virtual machines</li>
@@ -74,8 +94,6 @@
 <p>A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.</p>
 </blockquote>
 <p><strong>The layers that create container isolation</strong></p>
-<p><img alt="The layers that create container isolation" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png"><br>
-<em>Container isolation is the combined effect of visibility boundaries, resource limits, and reduced privilege on top of one shared kernel.</em></p>
 <pre><code class="language-text">[VM]                          [Container]
 +-----------+                 +-----------+
 | Guest OS  |                 |   App     |
@@ -217,16 +235,26 @@ docker image inspect alpine | grep -i layer
 <h2>Wrap-up and Next Steps</h2>
 <p>A container is not a new OS but a tool that slices the same Linux OS precisely with namespaces, cgroups, and overlayfs. Every OS concept from this series gets reused above containers. To know containers is, finally, to know the OS.</p>
 <p>This series ends here. As a next step, follow the same OS concepts outward into networks and distributed systems (Computer Networks 101, Distributed Systems 101), or go deeper into container operations themselves (Docker 101, Kubernetes 101).</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Memory Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Virtual Memory</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/08-file-systems.md">File Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/09-system-calls.md">System Calls</a></li>
+<li><strong>What boundary should you inspect first when applying Containers and the Operating System?</strong></li>
+<li>The article treats Containers and the Operating System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Containers and the Operating System?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Containers and the Operating System reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Operating Systems 101 (3/10): Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Operating Systems 101 (4/10): Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Operating Systems 101 (6/10): Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Operating Systems 101 (7/10): Virtual Memory</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/08-file-systems.md">Operating Systems 101 (8/10): File Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/09-system-calls.md">Operating Systems 101 (9/10): System Calls</a></li>
 <li><strong>Containers and the Operating System (current)</strong></li>
 </ul>
 <h2>References</h2>

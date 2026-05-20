@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 10
-title: Containers and the Operating System
+title: "Operating Systems 101 (10/10): Containers and the Operating System"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Namespaces, cgroups, and overlayfs — how containers build iso
 last_reviewed: '2026-05-15'
 ---
 
-# Containers and the Operating System
+# Operating Systems 101 (10/10): Containers and the Operating System
 
 Containers did not invent a new operating system. They recombine existing OS features so one kernel can host many isolated execution environments, which is why container incidents are usually OS incidents wearing a different label.
 
 That is also why this chapter works as the series finale: every concept we covered earlier — processes, memory, file systems, system calls — reappears here in a more operational form.
 
 This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Containers and the Operating System?
+- Which signal should the example or diagram make visible for Containers and the Operating System?
+- What failure should be prevented first when Containers and the Operating System reaches a real system?
+
+## Big Picture
+
+![operating systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
+
+*operating systems 101 chapter 10 flow overview*
+
+This picture places Containers and the Operating System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Containers and the Operating System is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -54,9 +70,6 @@ In the container era, knowing the OS means knowing namespaces and cgroups. OOM-k
 > A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.
 
 ### The layers that create container isolation
-
-![The layers that create container isolation](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
-*Container isolation is the combined effect of visibility boundaries, resource limits, and reduced privilege on top of one shared kernel.*
 
 ```text
 [VM]                          [Container]
@@ -221,17 +234,29 @@ A container is not a new OS but a tool that slices the same Linux OS precisely w
 
 This series ends here. As a next step, follow the same OS concepts outward into networks and distributed systems (Computer Networks 101, Distributed Systems 101), or go deeper into container operations themselves (Docker 101, Kubernetes 101).
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Containers and the Operating System?**
+  - The article treats Containers and the Operating System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Containers and the Operating System?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Containers and the Operating System reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
-- [Memory Management](./06-memory-management.md)
-- [Virtual Memory](./07-virtual-memory.md)
-- [File Systems](./08-file-systems.md)
-- [System Calls](./09-system-calls.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+- [Operating Systems 101 (6/10): Memory Management](./06-memory-management.md)
+- [Operating Systems 101 (7/10): Virtual Memory](./07-virtual-memory.md)
+- [Operating Systems 101 (8/10): File Systems](./08-file-systems.md)
+- [Operating Systems 101 (9/10): System Calls](./09-system-calls.md)
 - **Containers and the Operating System (current)**
+
 <!-- toc:end -->
 
 ## References

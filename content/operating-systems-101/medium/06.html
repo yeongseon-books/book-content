@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Memory Management</title>
+<title>Operating Systems 101 (6/10): Memory Management</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Memory Management</h1>
+<h1>Operating Systems 101 (6/10): Memory Management</h1>
 <p>When a service gets slower day after day, the root cause is often memory, not CPU. A cache grows without a ceiling, references keep old objects alive, or reclamation happens so late that the system only becomes noisy when recovery is already expensive.</p>
 <p>That is why memory management is really a conversation about ownership and release, not only allocation.</p>
 <p>This is post 6 in the Operating Systems 101 series. It connects process memory layout, leaks, fragmentation, and container memory limits into one practical model.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Memory Management?</li>
+<li>Which signal should the example or diagram make visible for Memory Management?</li>
+<li>What failure should be prevented first when Memory Management reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png"></p>
+<p><em>operating systems 101 chapter 6 flow overview</em></p>
+<p>This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What regions make up a process's memory layout?</li>
+<li>What do <code>malloc</code> and <code>free</code> handle, and what does garbage collection handle instead?</li>
+<li>How are memory leaks and fragmentation different problems?</li>
+<li>Inside container limits, how should you size caches and pools?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The process memory layout — text, data, heap, stack</li>
@@ -74,8 +94,6 @@
 <p>Process memory has four main regions: code (text), globals (data/bss), heap, and stack. Heap holds dynamic allocations; stack grows and shrinks automatically with function calls. The OS gives each process a virtual address space so each process appears to own its own RAM.</p>
 </blockquote>
 <p><strong>The four major regions of process memory</strong></p>
-<p><img alt="The four major regions of process memory" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png"><br>
-<em>A useful first question in any memory problem is which region is growing and who owns its lifetime.</em></p>
 <pre><code class="language-text">high addr
 +---------+
 |  stack  |  ← function calls / locals, auto-managed
@@ -224,12 +242,22 @@ cat /sys/fs/cgroup/memory.current 2&gt;/dev/null || echo 'not in container'
 <h2>Wrap-up and Next Steps</h2>
 <p>Memory management is a reclamation problem more than an allocation problem. Make ownership and release policy explicit in both code and operations and the system can run for a long time without OOM. The single habit of writing capacity and eviction policy together kills 80% of leaks.</p>
 <p>The next article moves on to the trick that lets the OS make limited RAM look unlimited — virtual memory.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
+<li><strong>What boundary should you inspect first when applying Memory Management?</strong></li>
+<li>The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Memory Management?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Memory Management reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Operating Systems 101 (3/10): Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Operating Systems 101 (4/10): Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores</a></li>
 <li><strong>Memory Management (current)</strong></li>
 <li>Virtual Memory (upcoming)</li>
 <li>File Systems (upcoming)</li>

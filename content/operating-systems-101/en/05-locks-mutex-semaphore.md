@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 5
-title: Locks, Mutexes, and Semaphores
+title: "Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How mutexes, semaphores, and condition variables work, why dead
 last_reviewed: '2026-05-15'
 ---
 
-# Locks, Mutexes, and Semaphores
+# Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores
 
 Once you realize a race condition is real, the next instinct is usually "add a lock." That instinct is useful, but incomplete. A badly scoped lock or one inconsistent lock order can freeze an entire system just as effectively as the original bug.
 
 Synchronization primitives are simple only on the surface. Safety depends on the exact rules around ownership, order, and duration.
 
 This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?
+- Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?
+- What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?
+
+## Big Picture
+
+![operating systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
+
+*operating systems 101 chapter 5 flow overview*
+
+This picture places Locks, Mutexes, and Semaphores inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Locks, Mutexes, and Semaphores is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -54,9 +70,6 @@ A lock is the seat belt of concurrent code, but a wrongly fastened belt can pin 
 > A mutex lets one flow at a time enter the critical section. A semaphore lets up to N flows enter at once. An RLock (reentrant lock) lets the same flow take the same lock multiple times. A condition variable is a mechanism for waiting until some predicate becomes true and then waking the waiter.
 
 ### How synchronization tools gate entry
-
-![How synchronization tools gate entry](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
-*Each synchronization primitive controls entry differently, which is why the wrong one changes both safety and throughput.*
 
 ```text
 Mutex     : capacity = 1
@@ -266,17 +279,29 @@ Mutex, semaphore, RLock, and condition variable are the basic synchronization to
 
 The next article moves on to another OS fundamental — memory management. We will look at how a process gets its memory and how the OS divides limited RAM across many processes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?**
+  - The article treats Locks, Mutexes, and Semaphores as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
 - **Locks, Mutexes, and Semaphores (current)**
 - Memory Management (upcoming)
 - Virtual Memory (upcoming)
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

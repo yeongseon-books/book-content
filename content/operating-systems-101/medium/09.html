@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>System Calls</title>
+<title>Operating Systems 101 (9/10): System Calls</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>System Calls</h1>
+<h1>Operating Systems 101 (9/10): System Calls</h1>
 <p>User code cannot touch the disk controller or network card directly. Every request goes through a narrow kernel entry point, and the cost of crossing that boundary explains why two equivalent programs can differ in runtime by orders of magnitude.</p>
 <p>System calls are also where performance, debugging, and security meet. Once you can see them, many OS-level mysteries stop being mysterious.</p>
 <p>This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying System Calls?</li>
+<li>Which signal should the example or diagram make visible for System Calls?</li>
+<li>What failure should be prevented first when System Calls reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png"></p>
+<p><em>operating systems 101 chapter 9 flow overview</em></p>
+<p>This picture places System Calls inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of System Calls is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is the real difference between user space and kernel space?</li>
+<li>What transition cost is paid for each system call?</li>
+<li>Why is <code>strace</code> often the fastest tool for understanding OS-level problems?</li>
+<li>How do buffering, batching, and <code>vDSO</code> reduce syscall overhead?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The split between user space and kernel space</li>
@@ -74,8 +94,6 @@
 <p>User space is where ordinary programs run; kernel space is where the OS core runs. There is a privilege boundary between them, and user code can only enter the kernel through the narrow entry of a system call. Each entry pays for context switching and security checks, which is why it costs.</p>
 </blockquote>
 <p><strong>The privilege boundary a syscall crosses</strong></p>
-<p><img alt="The privilege boundary a syscall crosses" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png"><br>
-<em>A syscall is the only door into kernel work, which is why both performance cost and security policy accumulate there.</em></p>
 <pre><code class="language-text">[user space]
   print(...) → write(fd, buf, n)  ← syscall entry
                        ↓
@@ -208,15 +226,25 @@ docker info | grep -i seccomp
 <h2>Wrap-up and Next Steps</h2>
 <p>System calls are the only contract between user code and the kernel, and count is cost. Buffering, batching, and vDSO make equivalent operations cheaper, while seccomp narrows the security surface. strace is the fastest tool for finding clues about any OS-level mystery.</p>
 <p>The next article looks at how all of these fundamentals are reassembled inside a container.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Memory Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Virtual Memory</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/08-file-systems.md">File Systems</a></li>
+<li><strong>What boundary should you inspect first when applying System Calls?</strong></li>
+<li>The article treats System Calls as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for System Calls?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when System Calls reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Operating Systems 101 (3/10): Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Operating Systems 101 (4/10): Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Operating Systems 101 (6/10): Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Operating Systems 101 (7/10): Virtual Memory</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/08-file-systems.md">Operating Systems 101 (8/10): File Systems</a></li>
 <li><strong>System Calls (current)</strong></li>
 <li>Containers and the Operating System (upcoming)</li>
 </ul>

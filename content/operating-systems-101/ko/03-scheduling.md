@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 3
-title: 스케줄링
+title: "Operating Systems 101 (3/10): 스케줄링"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: OS 스케줄러의 역할과 정책, 컨텍스트 스위치 비
 last_reviewed: '2026-05-15'
 ---
 
-# 스케줄링
+# Operating Systems 101 (3/10): 스케줄링
 
 한 머신 안에는 늘 여러 작업이 동시에 살아 있습니다. 그런데 CPU 코어 수는 한정되어 있으니, 결국 운영체제는 매 순간 누가 다음 차례를 가져갈지 정해야 합니다.
 
@@ -29,22 +29,26 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 3번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 스케줄러는 어떤 목표들 사이에서 균형을 잡을까요?
 - 선점, 타임 슬라이스, 우선순위는 실제로 어떤 차이를 만들까요?
 - 컨텍스트 스위치는 왜 보이지 않아도 비용이 클까요?
-- `nice`, 우선순위, CPU 어피니티는 언제 조정해야 할까요?
 
-> 스케줄러는 단순히 CPU를 나눠 주는 타이머가 아닙니다. runnable 큐에서 다음 실행자를 고르는 모든 판단이 지연 시간, 처리량, 공정성, 배터리 사용량까지 함께 바꾸는 정책 엔진입니다.
+## 큰 그림
+
+![Operating Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
+
+*Operating Systems 101 3장 흐름 개요*
+
+이 그림에서는 스케줄링를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 스케줄링의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 기본 모델
 > 스케줄러는 실행 가능한(runnable) 작업의 큐에서 다음에 실행할 작업을 골라 CPU에 올립니다. 작업이 I/O를 기다리거나, 시간 할당량을 다 쓰거나, 더 높은 우선순위의 작업이 깨어날 때 스케줄러가 다시 호출됩니다.
 
 ### 스케줄러가 고르는 다음 실행자
-
-![스케줄러가 고르는 다음 실행자](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
-*스케줄러는 runnable 큐와 blocked 상태를 오가며 다음 CPU 사용자를 계속 바꿉니다.*
 
 ```text
 Runnable queue        Running              Blocked (waiting I/O)
@@ -187,9 +191,20 @@ sudo chrt -r -p 50 $(pgrep -f my_workload.py)
 
 다음 글에서는 여러 흐름이 같은 자원을 동시에 만질 때 발생하는 문제 — race condition을 봅니다. 스케줄러가 언제 흐름을 끊는지를 알면, 이 문제가 왜 그렇게 자주 생기는지가 자연스럽게 보입니다.
 
+## 처음 질문으로 돌아가기
+
+- **스케줄러는 어떤 목표들 사이에서 균형을 잡을까요?**
+  - 본문의 기준은 스케줄링를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **선점, 타임 슬라이스, 우선순위는 실제로 어떤 차이를 만들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **컨텍스트 스위치는 왜 보이지 않아도 비용이 클까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
-- [프로세스와 스레드](./02-processes-and-threads.md)
+## 시리즈 목차
+
+- [Operating Systems 101 (1/10): 운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): 프로세스와 스레드](./02-processes-and-threads.md)
 - **스케줄링 (현재 글)**
 - 동시성과 경쟁 상태 (예정)
 - 락, 뮤텍스, 세마포어 (예정)
@@ -198,6 +213,7 @@ sudo chrt -r -p 50 $(pgrep -f my_workload.py)
 - 파일 시스템 (예정)
 - 시스템 콜 (예정)
 - 컨테이너와 운영체제 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

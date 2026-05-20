@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 6
-title: Memory Management
+title: "Operating Systems 101 (6/10): Memory Management"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How stack and heap differ, what malloc and free really do, how 
 last_reviewed: '2026-05-15'
 ---
 
-# Memory Management
+# Operating Systems 101 (6/10): Memory Management
 
 When a service gets slower day after day, the root cause is often memory, not CPU. A cache grows without a ceiling, references keep old objects alive, or reclamation happens so late that the system only becomes noisy when recovery is already expensive.
 
 That is why memory management is really a conversation about ownership and release, not only allocation.
 
 This is post 6 in the Operating Systems 101 series. It connects process memory layout, leaks, fragmentation, and container memory limits into one practical model.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Memory Management?
+- Which signal should the example or diagram make visible for Memory Management?
+- What failure should be prevented first when Memory Management reaches a real system?
+
+## Big Picture
+
+![operating systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
+
+*operating systems 101 chapter 6 flow overview*
+
+This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -54,9 +70,6 @@ The most common cause of "the server gets slow after a while" is a memory leak, 
 > Process memory has four main regions: code (text), globals (data/bss), heap, and stack. Heap holds dynamic allocations; stack grows and shrinks automatically with function calls. The OS gives each process a virtual address space so each process appears to own its own RAM.
 
 ### The four major regions of process memory
-
-![The four major regions of process memory](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
-*A useful first question in any memory problem is which region is growing and who owns its lifetime.*
 
 ```text
 high addr
@@ -233,17 +246,29 @@ Memory management is a reclamation problem more than an allocation problem. Make
 
 The next article moves on to the trick that lets the OS make limited RAM look unlimited — virtual memory.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Memory Management?**
+  - The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Memory Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Memory Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is an Operating System?](./01-what-is-an-operating-system.md)
-- [Processes and Threads](./02-processes-and-threads.md)
-- [Scheduling](./03-scheduling.md)
-- [Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
-- [Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
+## In this series
+
+- [Operating Systems 101 (1/10): What Is an Operating System?](./01-what-is-an-operating-system.md)
+- [Operating Systems 101 (2/10): Processes and Threads](./02-processes-and-threads.md)
+- [Operating Systems 101 (3/10): Scheduling](./03-scheduling.md)
+- [Operating Systems 101 (4/10): Concurrency and Race Conditions](./04-concurrency-and-race-conditions.md)
+- [Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores](./05-locks-mutex-semaphore.md)
 - **Memory Management (current)**
 - Virtual Memory (upcoming)
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

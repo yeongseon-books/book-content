@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>File Systems</title>
+<title>Operating Systems 101 (8/10): File Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>File Systems</h1>
+<h1>Operating Systems 101 (8/10): File Systems</h1>
 <p>Calling <code>write()</code> does not mean your data is safe yet. Between the page cache, the journal, the disk cache, and the storage device itself, there are several layers where a crash can still turn "saved" into "partially written" or "gone."</p>
 <p>That is why storage bugs are rarely about syntax. They are about knowing exactly which guarantee the file system is making at each step.</p>
 <p>This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying File Systems?</li>
+<li>Which signal should the example or diagram make visible for File Systems?</li>
+<li>What failure should be prevented first when File Systems reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png"></p>
+<p><em>operating systems 101 chapter 8 flow overview</em></p>
+<p>This picture places File Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of File Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How do inodes and directory entries represent a file?</li>
+<li>What do the page cache and <code>fsync</code> each guarantee?</li>
+<li>What kinds of recovery does journaling make possible after a crash?</li>
+<li>Why is the atomic rename pattern so common when saving configuration files?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The structure of inodes and the directory tree</li>
@@ -74,8 +94,6 @@
 <p>A file is a combination of an inode (metadata) and data blocks. A directory is just a mapping from name to inode number. write() typically lands in the page cache, and the data hits disk later. fsync is the call that asks the OS to push it to disk now.</p>
 </blockquote>
 <p><strong>The path from write to durable storage</strong></p>
-<p><img alt="The path from write to durable storage" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png"><br>
-<em>A successful write and durable storage are different milestones, which is why fsync and journaling matter.</em></p>
 <pre><code class="language-text">path: /var/log/app.log
    ↓ directory lookup
  inode #1234 (metadata: perms, size, block pointers)
@@ -216,14 +234,24 @@ for t in ts: t.join()
 <h2>Wrap-up and Next Steps</h2>
 <p>A file system is not "write and you are done." Page cache, fsync, and atomic rename are promises that must be used precisely. Where you sit on the spectrum from fast to safe is a deliberate developer choice.</p>
 <p>The next article moves on to the way your code actually invokes everything we have seen so far — system calls.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Memory Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Virtual Memory</a></li>
+<li><strong>What boundary should you inspect first when applying File Systems?</strong></li>
+<li>The article treats File Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for File Systems?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when File Systems reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Operating Systems 101 (3/10): Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Operating Systems 101 (4/10): Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Operating Systems 101 (5/10): Locks, Mutexes, and Semaphores</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Operating Systems 101 (6/10): Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Operating Systems 101 (7/10): Virtual Memory</a></li>
 <li><strong>File Systems (current)</strong></li>
 <li>System Calls (upcoming)</li>
 <li>Containers and the Operating System (upcoming)</li>

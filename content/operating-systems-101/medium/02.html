@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Processes and Threads</title>
+<title>Operating Systems 101 (2/10): Processes and Threads</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Processes and Threads</h1>
+<h1>Operating Systems 101 (2/10): Processes and Threads</h1>
 <p>"A running program" sounds obvious until you have to debug shared-state bugs, zombie children, or a worker model that scales badly. At that point, the vague phrase stops helping and the OS's real unit boundaries start to matter.</p>
 <p>Processes and threads look like two ways to do concurrency, but they answer different questions about memory sharing, isolation, and failure blast radius.</p>
 <p>This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Processes and Threads?</li>
+<li>Which signal should the example or diagram make visible for Processes and Threads?</li>
+<li>What failure should be prevented first when Processes and Threads reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png"></p>
+<p><em>operating systems 101 chapter 2 flow overview</em></p>
+<p>This picture places Processes and Threads inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Processes and Threads is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Which resources does a process actually own?</li>
+<li>What do threads share, and what stays private to each thread?</li>
+<li>Why are <code>fork</code> and <code>exec</code> split into two separate steps?</li>
+<li>In CPU-bound and I/O-bound work, when should you choose processes and when should you choose threads?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The four resources a process owns (memory, fds, permissions, CPU state)</li>
@@ -74,8 +94,6 @@
 <p>Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.</p>
 </blockquote>
 <p><strong>What the process shares and what each thread keeps</strong></p>
-<p><img alt="What the process shares and what each thread keeps" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png"><br>
-<em>A process bundles resources for isolation, while threads multiply execution flows inside that boundary.</em></p>
 <pre><code class="language-text">+-----------------------------------------+
 |  Process                                |
 |  +----------+ +-----------+ +--------+  |
@@ -237,8 +255,18 @@ os.wait()
 <h2>Wrap-up and Next Steps</h2>
 <p>A process is an isolated bundle of resources; a thread is a unit of execution flowing inside it. Mixing them up tends to make concurrent code subtly broken or surprisingly slow. Three axes — CPU vs I/O, isolation needs, and how much memory you must share — usually pick the right tool.</p>
 <p>The next article zooms into the OS function that decides which of these many processes and threads gets the CPU next: scheduling.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
+<li><strong>What boundary should you inspect first when applying Processes and Threads?</strong></li>
+<li>The article treats Processes and Threads as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Processes and Threads?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Processes and Threads reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
 <li><strong>Processes and Threads (current)</strong></li>
 <li>Scheduling (upcoming)</li>
 <li>Concurrency and Race Conditions (upcoming)</li>

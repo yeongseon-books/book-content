@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is an Operating System?</title>
+<title>Operating Systems 101 (1/10): What Is an Operating System?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>What Is an Operating System?</h1>
+<h1>Operating Systems 101 (1/10): What Is an Operating System?</h1>
 <p>When people first hear "operating system," they often picture the software that boots a computer and launches applications. In production, the more useful question is different: why does the same code run fine on one machine, fail to open a file on another, and die with an out-of-memory kill somewhere else?</p>
 <p>To answer that, you have to stop treating the OS as background scenery. It is the execution environment that constantly decides how CPU, memory, disks, and the network are shared.</p>
 <p>This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is an Operating System??</li>
+<li>Which signal should the example or diagram make visible for What Is an Operating System??</li>
+<li>What failure should be prevented first when What Is an Operating System? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png"></p>
+<p><em>operating systems 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is an Operating System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is an Operating System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What problem does an operating system actually exist to solve?</li>
+<li>Why are kernel mode and user mode separated in the first place?</li>
+<li>What do abstractions like processes, files, and sockets actually hide?</li>
+<li>Why does understanding the operating system make production troubleshooting easier for developers?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A working definition of an operating system and its two main roles</li>
@@ -74,8 +94,6 @@
 <p>The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.</p>
 </blockquote>
 <p><strong>Where the operating system sits</strong></p>
-<p><img alt="Where the operating system sits" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png"><br>
-<em>Where the operating system sits between application code and hardware</em></p>
 <pre><code class="language-text">+---------------------------------------------+
 |  Application (Python, Browser, IDE, ...)    |
 +---------------------------------------------+
@@ -213,6 +231,16 @@ ls -l /proc/self/fd
 <h2>Wrap-up and Next Steps</h2>
 <p>An operating system is the software layer that manages hardware on behalf of applications and gives them clean abstractions to work with. The split between user mode and kernel mode, the system call as a defined boundary, and the process as the basic abstraction — these three ideas are the entry point to OS thinking.</p>
 <p>The next article zooms into the most fundamental abstraction: the process. We look at what a process actually contains, how a thread differs from a process, and how new processes are born.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is an Operating System??</strong></li>
+<li>The article treats What Is an Operating System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is an Operating System??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is an Operating System? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is an Operating System? (current)</strong></li>
 <li>Processes and Threads (upcoming)</li>

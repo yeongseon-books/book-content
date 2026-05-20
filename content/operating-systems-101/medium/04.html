@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Concurrency and Race Conditions</title>
+<title>Operating Systems 101 (4/10): Concurrency and Race Conditions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Concurrency and Race Conditions</h1>
+<h1>Operating Systems 101 (4/10): Concurrency and Race Conditions</h1>
 <p>Concurrency bugs are usually quiet in development and loud in production. They pass tests for days, then corrupt data only under load, which makes them feel random even when the mechanism is precise.</p>
 <p>What makes race conditions hard is not that they fail once, but that the result depends on interleaving you did not explicitly write.</p>
 <p>This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Concurrency and Race Conditions?</li>
+<li>Which signal should the example or diagram make visible for Concurrency and Race Conditions?</li>
+<li>What failure should be prevented first when Concurrency and Race Conditions reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png"></p>
+<p><em>operating systems 101 chapter 4 flow overview</em></p>
+<p>This picture places Concurrency and Race Conditions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Concurrency and Race Conditions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>When can you say a race condition is actually happening?</li>
+<li>How do atomicity, visibility, and ordering produce different kinds of failures?</li>
+<li>Why is even a single line of code not automatically safe?</li>
+<li>Besides locks, what design techniques reduce race conditions?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A precise definition of race conditions and why they are hard to reproduce</li>
@@ -74,8 +94,6 @@
 <p>When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.</p>
 </blockquote>
 <p><strong>How one increment gets lost</strong></p>
-<p><img alt="How one increment gets lost" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png"><br>
-<em>A race condition often looks like two flows reading the same old value and then overwriting each other's work.</em></p>
 <pre><code class="language-text">Initial: count = 0   (both threads want to add 1)
 
 Ideal                          Real
@@ -251,10 +269,20 @@ print(total)
 <h2>Wrap-up and Next Steps</h2>
 <p>Race conditions hide behind the appearance of "one line" because steps interleave. The three axes — atomicity, visibility, ordering — give you a vocabulary for them, and tools beyond locks (immutability, messages, thread-local accumulation) reduce the surface from the design stage.</p>
 <p>Next we look at the most common synchronization primitives in detail: locks (mutexes) and their cousin the semaphore.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
+<li><strong>What boundary should you inspect first when applying Concurrency and Race Conditions?</strong></li>
+<li>The article treats Concurrency and Race Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Concurrency and Race Conditions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Concurrency and Race Conditions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Operating Systems 101 (3/10): Scheduling</a></li>
 <li><strong>Concurrency and Race Conditions (current)</strong></li>
 <li>Locks, Mutexes, and Semaphores (upcoming)</li>
 <li>Memory Management (upcoming)</li>

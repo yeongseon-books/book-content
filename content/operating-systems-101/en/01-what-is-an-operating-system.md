@@ -1,7 +1,7 @@
 ---
 series: operating-systems-101
 episode: 1
-title: What Is an Operating System?
+title: "Operating Systems 101 (1/10): What Is an Operating System?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How an operating system manages hardware and exposes clean abst
 last_reviewed: '2026-05-15'
 ---
 
-# What Is an Operating System?
+# Operating Systems 101 (1/10): What Is an Operating System?
 
 When people first hear "operating system," they often picture the software that boots a computer and launches applications. In production, the more useful question is different: why does the same code run fine on one machine, fail to open a file on another, and die with an out-of-memory kill somewhere else?
 
 To answer that, you have to stop treating the OS as background scenery. It is the execution environment that constantly decides how CPU, memory, disks, and the network are shared.
 
 This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is an Operating System??
+- Which signal should the example or diagram make visible for What Is an Operating System??
+- What failure should be prevented first when What Is an Operating System? reaches a real system?
+
+## Big Picture
+
+![operating systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
+
+*operating systems 101 chapter 1 flow overview*
+
+This picture places What Is an Operating System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is an Operating System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -54,9 +70,6 @@ The OS is invisible until something breaks. Out-of-memory kills, zombie processe
 > The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.
 
 ### Where the operating system sits
-
-![Where the operating system sits](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
-*Where the operating system sits between application code and hardware*
 
 ```text
 +---------------------------------------------+
@@ -222,7 +235,18 @@ An operating system is the software layer that manages hardware on behalf of app
 
 The next article zooms into the most fundamental abstraction: the process. We look at what a process actually contains, how a thread differs from a process, and how new processes are born.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is an Operating System??**
+  - The article treats What Is an Operating System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is an Operating System??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is an Operating System? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is an Operating System? (current)**
 - Processes and Threads (upcoming)
 - Scheduling (upcoming)
@@ -233,6 +257,7 @@ The next article zooms into the most fundamental abstraction: the process. We lo
 - File Systems (upcoming)
 - System Calls (upcoming)
 - Containers and the Operating System (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scheduling</title>
+<title>Operating Systems 101 (3/10): Scheduling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Scheduling</h1>
+<h1>Operating Systems 101 (3/10): Scheduling</h1>
 <p>On a busy machine, many tasks are ready to run at once, but the number of CPU cores is fixed. The operating system has to decide who gets the next slice of CPU time, and that decision shows up as latency, throughput, fairness, and power draw.</p>
 <p>That is why scheduler behavior matters long before you start reading kernel code. It explains why a system feels sluggish, why identical runs vary, and why container CPU limits can make software feel uneven.</p>
 <p>This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Scheduling?</li>
+<li>Which signal should the example or diagram make visible for Scheduling?</li>
+<li>What failure should be prevented first when Scheduling reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="operating systems 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png"></p>
+<p><em>operating systems 101 chapter 3 flow overview</em></p>
+<p>This picture places Scheduling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scheduling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What goals is the scheduler trying to balance against each other?</li>
+<li>What practical differences do preemption, time slices, and priority actually create?</li>
+<li>Why are context switches expensive even when you do not see them directly?</li>
+<li>When should you tune <code>nice</code>, priority, or CPU affinity?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The scheduler's goals and the trade-offs between them</li>
@@ -74,8 +94,6 @@
 <p>The scheduler picks a runnable task from a queue and puts it on the CPU. It is invoked again whenever a task blocks on I/O, exhausts its time slice, or is preempted by a higher-priority task waking up.</p>
 </blockquote>
 <p><strong>How tasks move through the scheduler</strong></p>
-<p><img alt="How tasks move through the scheduler" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png"><br>
-<em>The scheduler keeps moving work between runnable and blocked states while picking the next CPU owner.</em></p>
 <pre><code class="language-text">Runnable queue        Running              Blocked (waiting I/O)
 +--------------+      +----------+         +-------------------+
 | T1, T3, T5   | ---&gt; |   T2     |         |  T4 (read)        |
@@ -208,9 +226,19 @@ sudo chrt -r -p 50 $(pgrep -f my_workload.py)
 <h2>Wrap-up and Next Steps</h2>
 <p>The scheduler picks the next CPU runner from the runnable queue. The decision balances responsiveness, throughput, fairness, and power, and context switches are the cost of executing it. Knobs like <code>nice</code> and affinity let you nudge it, but the scheduler also depends on well-behaved code.</p>
 <p>The next article looks at what happens when several flows touch the same data at once: race conditions. Knowing when the scheduler can interrupt a flow makes it obvious why these bugs are everywhere.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><strong>What boundary should you inspect first when applying Scheduling?</strong></li>
+<li>The article treats Scheduling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Scheduling?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Scheduling reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">Operating Systems 101 (1/10): What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Operating Systems 101 (2/10): Processes and Threads</a></li>
 <li><strong>Scheduling (current)</strong></li>
 <li>Concurrency and Race Conditions (upcoming)</li>
 <li>Locks, Mutexes, and Semaphores (upcoming)</li>
