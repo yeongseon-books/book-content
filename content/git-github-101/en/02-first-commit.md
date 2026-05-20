@@ -17,24 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Your first commit - init, status, add, commit
+title: "Git & GitHub 101 (2/10): Your first commit - init, status, add, commit"
 seo_description: A first commit is the act of "gathering changes from the working
   directory into the staging area, then moving them into the repository as a single…
 ---
 
-# Your first commit - init, status, add, commit
+# Git & GitHub 101 (2/10): Your first commit - init, status, add, commit
 
 The first commit is where Git stops being abstract. Once you walk one change all the way from an empty folder to a saved snapshot, later commands start to feel predictable instead of arbitrary.
 
 This is the second post in the Git & GitHub 101 series. Here, we go through the full init -> add -> commit cycle by hand.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How to create an empty repository with `git init`
-- How to read your current state with `git status`
-- What `git add` actually means when it stages a change
-- How to record your first snapshot with `git commit -m`
-- The full edit -> add -> commit cycle, walked end to end
+- How to create an empty repository with `git init`?
+- How to read your current state with `git status`?
+- What `git add` actually means when it stages a change?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 2 flow overview*
+
+This picture places Your first commit - init, status, add, commit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Your first commit - init, status, add, commit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -53,9 +61,6 @@ After one full cycle, commands you meet later (`git diff`, `git log`, `git resto
 > A first commit is the act of "gathering changes from the working directory into the staging area, then moving them into the repository as a single snapshot". `add` and `commit` exist as separate commands precisely because those are two distinct steps.
 A single edit-to-commit cycle looks like this.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png)
-
-*Mental model*
 Three verbs work together.
 
 - **edit**: change or create files in your editor. Git does not know yet.
@@ -257,19 +262,29 @@ This same cycle shows up in real work in several recurring ways.
 
 The next post takes a closer look at `git status` output and uses `git diff` and `git log` to read change history in detail.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? - foundations of distributed version control](./01-what-is-git.md)
+- **How to create an empty repository with `git init`?**
+  - The article treats Your first commit - init, status, add, commit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to read your current state with `git status`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What `git add` actually means when it stages a change?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
 - **Your first commit - init, status, add, commit (current)**
-- [Tracking Changes - Reading status, diff, and log](./03-status-diff-log.md)
-- [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
-- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
-- Connecting GitHub repositories and remotes (upcoming)
-- Collaborating with Pull Requests (upcoming)
-- Tracking work with Issues and Projects (upcoming)
-- Writing good commit messages (upcoming)
-- A real-world workflow at a glance (upcoming)
+- Reading change history - status, diff, log (upcoming)
+- Branch basics - create, switch, and compare (upcoming)
+- Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

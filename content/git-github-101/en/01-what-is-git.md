@@ -1,5 +1,5 @@
 ---
-title: What is Git? Version control fundamentals
+title: "Git & GitHub 101 (1/10): What is Git? Version control fundamentals"
 series: git-github-101
 episode: 1
 language: en
@@ -22,19 +22,27 @@ seo_description: 'Git''s core model is "a tool that keeps snapshots of your file
   in time order", and each snapshot is produced through three areas: the working…'
 ---
 
-# What is Git? Version control fundamentals
+# Git & GitHub 101 (1/10): What is Git? Version control fundamentals
 
 If version control still feels like a tool you are supposed to learn before real work begins, this is the place to reset that picture. Git becomes much easier once you see it less as a command list and more as a way to preserve and recover changes over time.
 
 This is the first post in the Git & GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The problem that a version control system (VCS) solves
-- Why Git is a distributed VCS
-- The "snapshot" model and how it differs from line-by-line tracking
-- How to install Git and finish the initial `git config`
-- What you need before making the first commit in the next post
+- The problem that a version control system (VCS) solves?
+- Why Git is a distributed VCS?
+- The "snapshot" model and how it differs from line-by-line tracking?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 1 flow overview*
+
+This picture places What is Git? Version control fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is Git? Version control fundamentals is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -53,9 +61,6 @@ Many teams and open-source projects treat Git as a standard tool. Learning it is
 > Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png)
-
-*Mental model*
 Git distinguishes three areas.
 
 - **Working Directory**: where the files you are editing live.
@@ -217,8 +222,17 @@ When you are first learning Git, the most useful exercise is not memorizing comm
 
 In the next post we start from an empty directory and build the first commit. `git init`, `git status`, `git add`, and `git commit` come in, in that order.
 
+## Answering the Opening Questions
+
+- **The problem that a version control system (VCS) solves?**
+  - The article treats What is Git? Version control fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why Git is a distributed VCS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The "snapshot" model and how it differs from line-by-line tracking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-## Series TOC
+## In this series
 
 - **What is Git? Version control fundamentals (current)**
 - Your first commit - init, status, add, commit (upcoming)

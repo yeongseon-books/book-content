@@ -17,25 +17,31 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법
+title: "Git & GitHub 101 (8/10): Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법"
 seo_description: GitHub Issue와 Project로 일감 흐름을 추적하는 방법을 설명합니다.
 ---
 
-# Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법
+# Git & GitHub 101 (8/10): Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법
 
 코드 이력은 무엇이 바뀌었는지를 잘 보여 주지만, 팀은 그보다 앞선 질문도 자주 다룹니다. 지금 무엇을 해야 하는지, 누가 맡고 있는지, 어디까지 왔는지를 저장소 안에서 함께 볼 수 있어야 일이 덜 흩어집니다.
 
 이 글은 Git/GitHub 101 시리즈의 여덟 번째 글입니다. 여기서는 Issue, Pull Request, Project board를 하나의 작업 추적 흐름으로 연결해 봅니다.
 
-## 이 글에서 다룰 문제
-
-> Issue는 무엇을 할지 기록하고, PR은 그 일을 실제로 어떻게 끝냈는지 기록하며, Project는 그 일이 지금 어느 상태에 있는지 보여 줍니다.
+## 먼저 던지는 질문
 
 - GitHub Issue는 commit이나 PR과 어떻게 다를까요?
 - label, assignee, milestone은 언제 유용할까요?
 - PR 본문의 `Closes #42`는 왜 중요한 자동화일까요?
-- Project board는 issue와 PR을 어떤 식으로 한 화면에 모을까요?
-- 혼자 쓰는 저장소에서도 issue가 왜 쓸모가 있을까요?
+
+## 큰 그림
+
+![Git & GitHub 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.ko.png)
+
+*Git & GitHub 101 8장 흐름 개요*
+
+이 그림에서는 Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,10 +50,6 @@ seo_description: GitHub Issue와 Project로 일감 흐름을 추적하는 방법
 할 일과 진행 상황을 GitHub 안에 두면 작업의 시작과 끝이 선명해집니다. issue를 열고, PR로 작업을 마치고, merge와 함께 issue를 닫으며, board에서는 상태가 카드로 보입니다. 몇 달 뒤 변경 이유를 되짚을 때도 commit → PR → issue 순서로 의도를 다시 찾을 수 있습니다.
 
 ## 핵심 그림
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.ko.png)
-
-*Mental Model*
 
 흐름은 다음과 같습니다.
 
@@ -259,19 +261,29 @@ issue는 할 일, PR은 그 일을 끝내는 변경, Project는 현재 상태를
 
 다음 글에서는 PR 본문보다 더 짧지만 훨씬 자주 읽히는 commit message를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **GitHub Issue는 commit이나 PR과 어떻게 다를까요?**
+  - 본문의 기준은 Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **label, assignee, milestone은 언제 유용할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **PR 본문의 `Closes #42`는 왜 중요한 자동화일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
-- [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
-- [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
-- [branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
-- [merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
-- [GitHub repository 만들기 - remote, push, pull 한 번에 익히기](./06-github-repository.md)
-- [Pull Request로 협업하기 - branch에서 review를 거쳐 main까지](./07-pull-request.md)
+- [Git & GitHub 101 (1/10): Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): 첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): GitHub repository 만들기 - remote, push, pull 한 번에 익히기](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Pull Request로 협업하기 - branch에서 review를 거쳐 main까지](./07-pull-request.md)
 - **Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법 (현재 글)**
-- 좋은 commit message 쓰기 (예정)
-- 실전 Git workflow 만들기 (예정)
+- 좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (예정)
+- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

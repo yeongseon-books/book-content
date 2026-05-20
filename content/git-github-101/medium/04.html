@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Branch basics - create, switch, and compare</title>
+<title>Git & GitHub 101 (4/10): Branch basics - create, switch, and compare</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Branch basics - create, switch, and compare</h1>
+<h1>Git &amp; GitHub 101 (4/10): Branch basics - create, switch, and compare</h1>
 <p>Git starts to feel powerful the moment you realize separate lines of work do not require separate folders. Branches give you room to experiment, pause, and compare without losing the safety of a shared main line.</p>
 <p>This is the fourth post in the Git &amp; GitHub 101 series. Here, we focus on creating, switching, and comparing branches before we get to merging them.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What a branch actually is (it is not a folder copy)</li>
-<li>How to list and create branches with <code>git branch</code></li>
-<li>How to move between branches with <code>git switch</code> (and how it relates to <code>git checkout</code>)</li>
-<li>How <code>HEAD</code> moves together with the current branch</li>
-<li>How to compare two branches using <code>git log</code> and <code>git diff</code></li>
+<li>What a branch actually is (it is not a folder copy)?</li>
+<li>How to list and create branches with <code>git branch</code>?</li>
+<li>How to move between branches with <code>git switch</code> (and how it relates to <code>git checkout</code>)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 4 flow overview</em></p>
+<p>This picture places Branch basics - create, switch, and compare inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Branch basics - create, switch, and compare is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>The real value of Git shows up the moment you have more than one thing in flight. If you need to work on a "login feature" and a "bug fix" in the same folder at the same time, zip backups and copy-pasted folders fall apart fast.</p>
 <p>A branch is a way to keep <strong>multiple lines of work</strong> inside the same repository. Each line accumulates its own commits, and you can merge them when you are ready.</p>
@@ -78,9 +83,7 @@
 <p>A branch is not a folder copy; it is a movable pointer to a specific commit. <code>HEAD</code> is another pointer that marks which of those branch pointers you are currently working on.<br>
 A branch is a <strong>pointer</strong> to a commit. When you make a new commit, the current branch pointer moves one step forward.</p>
 </blockquote>
-<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png"></p>
-<p><em>Mental Model</em><br>
-Two ideas to hold together:</p>
+<p>Two ideas to hold together:</p>
 <ul>
 <li><strong>A branch itself is cheap.</strong> It is roughly a 41-byte file under <code>.git/refs/heads/&lt;name&gt;</code> that stores a commit hash.</li>
 <li><strong><code>HEAD</code> is a second pointer that says "which branch am I on right now."</strong> When you switch branches, <code>HEAD</code> moves with you.</li>
@@ -283,26 +286,36 @@ Deleted branch feature/sign-up (was f1e2d3c).
 <li><code>git log --oneline --graph --decorate --all</code> is the most common combination for seeing the shape of branches and their labels at a glance.</li>
 </ul>
 <p>The next article picks up from a diverged history and walks through <code>git merge</code>, including a hands-on conflict resolution.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - the basics of distributed version control</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Make your first commit - init, status, add, commit</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Reading change history - status, diff, log</a></li>
+<li><strong>What a branch actually is (it is not a folder copy)?</strong></li>
+<li>The article treats Branch basics - create, switch, and compare as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to list and create branches with <code>git branch</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to move between branches with <code>git switch</code> (and how it relates to <code>git checkout</code>)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</a></li>
 <li><strong>Branch basics - create, switch, and compare (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
-<li>GitHub repositories and remote connections (upcoming)</li>
-<li>Collaborating with Pull Requests (upcoming)</li>
-<li>Managing work with Issues and Projects (upcoming)</li>
-<li>Writing good commit messages (upcoming)</li>
-<li>A real-world workflow at a glance (upcoming)</li>
+<li>Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)</li>
+<li>Creating a GitHub repository - remote, push, and pull in one go (upcoming)</li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
-<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell">Pro Git Book - Branches in a Nutshell</a></li>
-<li><a href="https://git-scm.com/docs/git-branch">git-branch manual</a></li>
-<li><a href="https://git-scm.com/docs/git-switch">git-switch manual</a></li>
-<li><a href="https://git-scm.com/docs/git-checkout">git-checkout manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell">Pro Git — Branches in a Nutshell</a> — Supports the chapter's central mental model of branches and <code>HEAD</code> as pointers rather than folder copies.</li>
+<li><a href="https://git-scm.com/docs/git-branch">git-branch manual</a> — The canonical reference for creating, listing, renaming, and deleting branches.</li>
+<li><a href="https://git-scm.com/docs/git-switch">git-switch manual</a> — Documents the modern branch-switching flow, including <code>git switch -c</code>.</li>
+<li><a href="https://git-scm.com/docs/git-checkout">git-checkout manual</a> — Useful for understanding the older command whose mixed responsibilities the article contrasts with <code>switch</code> and <code>restore</code>.</li>
+<li><a href="https://git-scm.com/docs/git-log">git-log manual</a> — Backs up branch-comparison patterns such as <code>main..feature/login</code> and <code>--graph --decorate --all</code>.</li>
+<li><a href="https://git-scm.com/docs/git-diff">git-diff manual</a> — Covers the file-level comparison step shown with <code>git diff main feature/login</code>.</li>
 </ul>
 <p class="tags-line">Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch</p>
 </body>

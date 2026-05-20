@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is Git? Version control fundamentals</title>
+<title>Git & GitHub 101 (1/10): What is Git? Version control fundamentals</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What is Git? Version control fundamentals</h1>
+<h1>Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</h1>
 <p>If version control still feels like a tool you are supposed to learn before real work begins, this is the place to reset that picture. Git becomes much easier once you see it less as a command list and more as a way to preserve and recover changes over time.</p>
 <p>This is the first post in the Git &amp; GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem that a version control system (VCS) solves</li>
-<li>Why Git is a distributed VCS</li>
-<li>The "snapshot" model and how it differs from line-by-line tracking</li>
-<li>How to install Git and finish the initial <code>git config</code></li>
-<li>What you need before making the first commit in the next post</li>
+<li>The problem that a version control system (VCS) solves?</li>
+<li>Why Git is a distributed VCS?</li>
+<li>The "snapshot" model and how it differs from line-by-line tracking?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 1 flow overview</em></p>
+<p>This picture places What is Git? Version control fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is Git? Version control fundamentals is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Even when you write code alone, given enough time you hit situations like these.</p>
 <ul>
@@ -78,9 +83,7 @@
 <p>Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.<br>
 In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Git distinguishes three areas.</p>
+<p>Git distinguishes three areas.</p>
 <ul>
 <li><strong>Working Directory</strong>: where the files you are editing live.</li>
 <li><strong>Staging Area</strong> (a.k.a. the index): a buffer where you collect the changes that will go into the next commit.</li>
@@ -99,7 +102,7 @@ Git distinguishes three areas.</p>
 <h2>Before-after</h2>
 <p>Compare two ways a small team might share code.</p>
 <p><strong>Before (without Git)</strong></p>
-<pre><code>project_v1.zip
+<pre><code class="language-text">project_v1.zip
 project_v2_FINAL.zip
 project_v2_FINAL_real.zip
 project_v2_FINAL_real_alice_edits.zip
@@ -205,7 +208,16 @@ $ git commit -h           # one-screen option summary (short usage)
 <li>When you forget syntax, reach for <code>git help &lt;command&gt;</code> or <code>git &lt;command&gt; -h</code>.</li>
 </ul>
 <p>In the next post we start from an empty directory and build the first commit. <code>git init</code>, <code>git status</code>, <code>git add</code>, and <code>git commit</code> come in, in that order.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The problem that a version control system (VCS) solves?</strong></li>
+<li>The article treats What is Git? Version control fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why Git is a distributed VCS?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The "snapshot" model and how it differs from line-by-line tracking?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is Git? Version control fundamentals (current)</strong></li>
 <li>Your first commit - init, status, add, commit (upcoming)</li>
@@ -220,10 +232,12 @@ $ git commit -h           # one-screen option summary (short usage)
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">Git docs — About Version Control</a></li>
-<li><a href="https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup">Git docs — First-Time Git Setup</a></li>
-<li><a href="https://git-scm.com/downloads">Git downloads</a></li>
-<li><a href="https://docs.github.com/en/get-started/quickstart/set-up-git">GitHub Docs — Set up Git</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">Pro Git — About Version Control</a> — Grounds the chapter's opening problem statement by explaining what version control solves and how centralized and distributed models differ.</li>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F">Pro Git — What is Git?</a> — Maps directly to the snapshot model and distributed-repository mental model used throughout the article.</li>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup">Pro Git — First-Time Git Setup</a> — Backs up the first-run configuration flow for <code>user.name</code> and <code>user.email</code> with the canonical walkthrough.</li>
+<li><a href="https://git-scm.com/docs/git-config">git-config manual</a> — The precise reference for <code>git config --global</code> syntax and <code>init.defaultBranch</code> settings.</li>
+<li><a href="https://git-scm.com/downloads">Git downloads</a> — The official installation entry point for each operating system.</li>
+<li><a href="https://docs.github.com/en/get-started/quickstart/set-up-git">GitHub Docs — Set up Git</a> — Summarizes the first-time Git setup steps in a GitHub-oriented workflow.</li>
 </ul>
 <p class="tags-line">Tags: git-basics, version-control, distributed-vcs, snapshot-model, git-install, git-config</p>
 </body>

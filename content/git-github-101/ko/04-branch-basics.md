@@ -17,25 +17,31 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: branch 기초 - 만들고 옮기고 비교하기
+title: "Git & GitHub 101 (4/10): branch 기초 - 만들고 옮기고 비교하기"
 seo_description: branch를 포인터로 이해하고 만들기, 전환, 비교를 익히는 글입니다.
 ---
 
-# branch 기초 - 만들고 옮기고 비교하기
+# Git & GitHub 101 (4/10): branch 기초 - 만들고 옮기고 비교하기
 
 branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로 바뀝니다. 같은 폴더 안에서 로그인 기능도 만들고 버그 수정도 하면서, 각각의 작업 줄기를 안전하게 나눌 수 있기 때문입니다.
 
 이 글은 Git/GitHub 101 시리즈의 네 번째 글입니다. 여기서는 branch를 만들고, 옮기고, 비교하는 흐름을 먼저 익히고 merge는 다음 글로 넘깁니다.
 
-## 이 글에서 다룰 문제
-
-> branch는 폴더 복사가 아니라 특정 commit을 가리키는 움직이는 포인터이며, `HEAD`는 지금 내가 어느 branch에서 작업 중인지 가리키는 또 하나의 포인터입니다.
+## 먼저 던지는 질문
 
 - branch는 왜 파일 복사본이 아니라 포인터라고 할까요?
 - `git branch`와 `git switch`는 역할이 어떻게 다를까요?
 - `HEAD`는 branch와 어떤 관계를 가질까요?
-- 두 branch가 서로 무엇이 다른지 어떻게 읽을 수 있을까요?
-- branch 이름 변경과 삭제는 언제 안전할까요?
+
+## 큰 그림
+
+![Git & GitHub 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
+
+*Git & GitHub 101 4장 흐름 개요*
+
+이 그림에서는 branch 기초 - 만들고 옮기고 비교하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> branch 기초 - 만들고 옮기고 비교하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,10 +50,6 @@ branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로
 branch는 같은 저장소 안에서 여러 줄기의 commit을 따로 쌓게 해 줍니다. 실험적인 변경을 `main`에 영향 없이 시도할 수 있고, 기능 작업을 리뷰 전까지 따로 두며, 협업에서는 사람마다 자기 branch에서 작업하고 PR로 합치는 흐름이 자연스럽게 만들어집니다.
 
 ## 핵심 그림
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
-
-*Mental Model*
 
 이 그림에서 먼저 붙잡을 것은 두 가지입니다.
 
@@ -276,19 +278,29 @@ branch는 commit을 가리키는 가벼운 포인터이고, `HEAD`는 현재 작
 
 다음 글에서는 갈라진 branch를 다시 합치는 `git merge`와 conflict 해결 흐름을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **branch는 왜 파일 복사본이 아니라 포인터라고 할까요?**
+  - 본문의 기준은 branch 기초 - 만들고 옮기고 비교하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`git branch`와 `git switch`는 역할이 어떻게 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`HEAD`는 branch와 어떤 관계를 가질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
-- [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
-- [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
+- [Git & GitHub 101 (1/10): Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): 첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
 - **branch 기초 - 만들고 옮기고 비교하기 (현재 글)**
-- merge와 conflict 해결하기 (예정)
-- GitHub repository 만들기와 remote, push, pull (예정)
-- Pull Request로 협업하기 (예정)
-- Issue와 Project로 일감 관리하기 (예정)
-- 좋은 commit message 쓰기 (예정)
-- 실전 Git workflow 만들기 (예정)
+- merge와 conflict 해결하기 - 두 줄기를 다시 합치기 (예정)
+- GitHub repository 만들기 - remote, push, pull 한 번에 익히기 (예정)
+- Pull Request로 협업하기 - branch에서 review를 거쳐 main까지 (예정)
+- Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법 (예정)
+- 좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (예정)
+- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

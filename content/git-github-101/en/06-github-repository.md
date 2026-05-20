@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Creating a GitHub repository - remote, push, and pull in one go
+title: "Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go"
 seo_description: A GitHub repository is just "another Git repository that lives across
   the network", and a remote is the nickname you give to such a repository.
 ---
 
-# Creating a GitHub repository - remote, push, and pull in one go
+# Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go
 
 Up to this point, every command has stayed on one machine. The real collaboration shift begins when your local repository gains a remote home that other people and other devices can reach.
 
@@ -39,15 +39,21 @@ This is the sixth post in the Git & GitHub 101 series. Here, we connect a local 
 
 Up through Episode 5, each command ran inside one machine. Starting now, the local repository becomes something other people can see and other machines can keep working on.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What exactly is a `remote`, and why is the first one conventionally called `origin`?
 - Which commands, in what order, connect an empty GitHub repository to your local one?
 - What two things does `git push -u origin main` do in a single shot?
-- How does `git fetch` differ from `git pull` in behavior?
-- Beyond the working tree, what else does `git clone` actually download?
-- Which signal should drive the choice between HTTPS and SSH for a remote?
 
+## Big Picture
+
+![Git & GitHub 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 6 flow overview*
+
+This picture places Creating a GitHub repository - remote, push, and pull in one go inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Creating a GitHub repository - remote, push, and pull in one go is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -68,9 +74,6 @@ Keeping these three apart is what makes "how do I safely incorporate someone els
 > A GitHub repository is just "another Git repository that lives across the network", and a `remote` is the nickname you give to such a repository. `push` and `pull` are synchronization moves that exchange commits between the two.
 A GitHub repository is just another Git repository. The only differences are that it lives on GitHub's servers and that anyone with access can reach it. Local and remote act as mirrors of each other, and push/fetch/pull are the commands that keep them aligned.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png)
-
-*Mental Model*
 Three reminders make this picture solid. First, a GitHub repository is itself nothing more than a `.git` directory. Second, each collaborator owns a complete copy on their own machine. Third, synchronization is explicit - it happens when you run a command. Skip `push`, and GitHub doesn't know. Skip `pull`, and your laptop doesn't know.
 
 ## Core concepts
@@ -341,19 +344,29 @@ This episode walked through the lifecycle of connecting a local repository to Gi
 
 Episode 7 picks up where this one leaves off: the most common collaboration unit on GitHub, the Pull Request. We'll commit and push on a branch, request review, and follow the change back to `main`.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- **Creating a GitHub Repository: remote, push, pull (current)**
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- Tracking Work with Issues and Projects (upcoming)
-- Writing Good Commit Messages (upcoming)
-- Real-World Workflow at a Glance (upcoming)
+- **What exactly is a `remote`, and why is the first one conventionally called `origin`?**
+  - The article treats Creating a GitHub repository - remote, push, and pull in one go as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which commands, in what order, connect an empty GitHub repository to your local one?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What two things does `git push -u origin main` do in a single shot?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- **Creating a GitHub repository - remote, push, and pull in one go (current)**
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Reading change history - status, diff, log</title>
+<title>Git & GitHub 101 (3/10): Reading change history - status, diff, log</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Reading change history - status, diff, log</h1>
+<h1>Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</h1>
 <p>Most Git mistakes get cheaper the moment you learn to read before you act. <code>status</code>, <code>diff</code>, and <code>log</code> are the three commands that let you inspect the current state, the exact content of a change, and the history behind it.</p>
 <p>This is the third post in the Git &amp; GitHub 101 series. Here, we focus on reading change history accurately before branches and collaboration enter the picture.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to read each line of <code>git status</code> output with confidence</li>
-<li>How to scan the same state quickly with <code>git status -s</code></li>
-<li>Which area <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> each compare</li>
-<li>How to compare two specific commits with <code>git diff &lt;a&gt; &lt;b&gt;</code></li>
-<li>The most useful shapes of <code>git log</code> output: <code>--oneline</code>, <code>--graph</code>, <code>--stat</code>, <code>--patch</code></li>
+<li>How to read each line of <code>git status</code> output with confidence?</li>
+<li>How to scan the same state quickly with <code>git status -s</code>?</li>
+<li>Which area <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> each compare?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 3 flow overview</em></p>
+<p>This picture places Reading change history - status, diff, log inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Reading change history - status, diff, log is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>The previous post walked through one full edit-to-commit cycle. From here on, real collaboration begins when you can answer not only "where does my change live?" but also "what exactly is in that change?"</p>
 <p>The three commands play different roles.</p>
@@ -78,9 +83,7 @@
 <p><code>status</code>, <code>diff</code>, and <code>log</code> are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.<br>
 Each command compares a different pair of areas.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-A one-line rule of thumb:</p>
+<p>A one-line rule of thumb:</p>
 <ul>
 <li><code>git diff</code> shows <strong>changes not yet staged</strong> (WD vs Staging).</li>
 <li><code>--cached</code> (or the synonym <code>--staged</code>) shows <strong>changes that are staged</strong> (Staging vs HEAD).</li>
@@ -325,26 +328,36 @@ index 6e85ca6..b7f5a1e 100644
 <li>The cheapest habit before any commit is <code>status -s</code> followed by <code>diff --cached</code>.</li>
 </ul>
 <p>The next post moves into branches: how to start a parallel line of work in the same folder and switch between them safely.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - foundations of distributed version control</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your first commit - init, status, add, commit</a></li>
+<li><strong>How to read each line of <code>git status</code> output with confidence?</strong></li>
+<li>The article treats Reading change history - status, diff, log as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to scan the same state quickly with <code>git status -s</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which area <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> each compare?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
 <li><strong>Reading change history - status, diff, log (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Branch Basics - Create, Switch, Compare</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
-<li>Connecting GitHub repositories and remotes (upcoming)</li>
-<li>Collaborating with Pull Requests (upcoming)</li>
-<li>Tracking work with Issues and Projects (upcoming)</li>
-<li>Writing good commit messages (upcoming)</li>
-<li>A real-world workflow at a glance (upcoming)</li>
+<li>Branch basics - create, switch, and compare (upcoming)</li>
+<li>Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)</li>
+<li>Creating a GitHub repository - remote, push, and pull in one go (upcoming)</li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
-<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History">Pro Git Book - Viewing the Commit History</a></li>
-<li><a href="https://git-scm.com/docs/git-status">git-status manual</a></li>
-<li><a href="https://git-scm.com/docs/git-diff">git-diff manual</a></li>
-<li><a href="https://git-scm.com/docs/git-log">git-log manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History">Pro Git — Viewing the Commit History</a> — Provides the bigger picture behind <code>git log --oneline</code>, <code>--graph</code>, <code>--stat</code>, and <code>-p</code> in this chapter.</li>
+<li><a href="https://git-scm.com/docs/git-status">git-status manual</a> — The canonical explanation of long-form status output and the <code>-s</code> short format.</li>
+<li><a href="https://git-scm.com/docs/git-diff">git-diff manual</a> — The source of truth for what <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> compare.</li>
+<li><a href="https://git-scm.com/docs/git-log">git-log manual</a> — Backs up the different log shapes and option combinations shown in the walkthrough.</li>
+<li><a href="https://git-scm.com/docs/git-show">git-show manual</a> — Covers the single-commit inspection shortcut the article suggests as an alternative.</li>
+<li><a href="https://git-scm.com/docs/gitrevisions">gitrevisions manual</a> — Defines revision and range notation such as <code>HEAD</code> and two-commit comparisons like <code>&lt;old&gt; &lt;new&gt;</code>.</li>
 </ul>
 <p class="tags-line">Tags: git-status, git-diff, git-log, change-history, working-tree-vs-index, log-formatting</p>
 </body>

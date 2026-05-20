@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Merge and Conflict Resolution - Bringing Two Lines Back Together</title>
+<title>Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Merge and Conflict Resolution - Bringing Two Lines Back Together</h1>
+<h1>Git &amp; GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together</h1>
 <p>Creating branches is the easy part; bringing them back together cleanly is where Git starts to feel real. If you can predict when a merge will stay automatic and when it will stop for human judgment, collaboration gets much less stressful.</p>
 <p>This is the fifth post in the Git &amp; GitHub 101 series. Here, we look at fast-forward merges, three-way merges, and the conflict resolution flow that sits between them.</p>
 <h2>What You'll Learn</h2>
@@ -64,14 +64,19 @@
 <li>What <code>git status</code> tells you in the middle of a conflict</li>
 <li>How <code>git merge --abort</code> rolls back safely</li>
 </ul>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When does a fast-forward merge happen, and when does Git create a three-way merge instead?</li>
 <li>Why does a merge commit have two parents?</li>
 <li>Which side of a conflict marker (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> / <code>=======</code> / <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) belongs to which branch?</li>
-<li>What extra information does <code>git status</code> show while a conflict is in progress?</li>
-<li>How far back does <code>git merge --abort</code> roll your work, and when is it safe to use?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 5 flow overview</em></p>
+<p>This picture places Merge and Conflict Resolution - Bringing Two Lines Back Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Merge and Conflict Resolution - Bringing Two Lines Back Together is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>In the previous chapters we created branches and moved between them to keep work separate. Eventually that work has to come back together. Merging happens when a PR lands, when you pull a teammate's changes into your branch, or when a long-running feature finally ships to <code>main</code>.</p>
 <p>Without a clear model for merging, two failure modes show up early.</p>
@@ -82,9 +87,7 @@
 <p>The goal of this chapter is to remove both. By the end you should be able to picture which kind of merge will happen before you run the command, and resolve a conflict (or back out of one) without breaking a sweat.</p>
 <h2>Mental Model</h2>
 <p>A merge produces "a new commit that combines two commits." When the two commits sit on the same line of history, Git skips the new commit and just slides a pointer forward (fast-forward). When the two commits sit on diverged lines, Git creates a new merge commit with two parents (three-way).</p>
-<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png"></p>
-<p><em>Mental Model</em><br>
-Three things to internalize:</p>
+<p>Three things to internalize:</p>
 <ul>
 <li><strong>Fast-forward</strong>: if the target branch is a direct descendant of the current branch, Git creates no new commit and just moves the current branch pointer forward.</li>
 <li><strong>Three-way merge</strong>: if the two branches diverged from a common ancestor and each has new commits, Git compares the common ancestor and the two tips, then creates a new merge commit. That commit has two parents.</li>
@@ -358,25 +361,35 @@ nothing to commit, working tree clean
 <li><code>git log --oneline --graph --decorate --all</code> is the everyday tool for telling fast-forward and three-way merges apart at a glance.</li>
 </ul>
 <p>In the next chapter we'll connect the local repo to a GitHub remote and walk through <code>git remote</code>, <code>git push</code>, and <code>git pull</code> in order.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - The Basics of Distributed Version Control</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit - init, status, add, commit</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Tracking Changes - Reading status, diff, and log</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Branch Basics - Create, Switch, Compare</a></li>
+<li><strong>When does a fast-forward merge happen, and when does Git create a three-way merge instead?</strong></li>
+<li>The article treats Merge and Conflict Resolution - Bringing Two Lines Back Together as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why does a merge commit have two parents?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which side of a conflict marker (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> / <code>=======</code> / <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) belongs to which branch?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Git &amp; GitHub 101 (4/10): Branch basics - create, switch, and compare</a></li>
 <li><strong>Merge and Conflict Resolution - Bringing Two Lines Back Together (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
-<li>Collaborating with Pull Requests (upcoming)</li>
-<li>Tracking Work with Issues and Projects (upcoming)</li>
-<li>Writing Good Commit Messages (upcoming)</li>
-<li>Real-World Workflow at a Glance (upcoming)</li>
+<li>Creating a GitHub repository - remote, push, and pull in one go (upcoming)</li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
-<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">Pro Git Book - Basic Branching and Merging</a></li>
-<li><a href="https://git-scm.com/docs/git-merge">git-merge manual</a></li>
-<li><a href="https://git-scm.com/docs/git-mergetool">git-mergetool manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">Pro Git — Basic Branching and Merging</a> — The clearest beginner-level walkthrough of fast-forward merges and basic merge flow.</li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging">Pro Git — Advanced Merging</a> — Adds deeper context for how to read and resolve conflicts once the automatic merge stops.</li>
+<li><a href="https://git-scm.com/docs/git-merge">git-merge manual</a> — The authoritative source for <code>git merge</code>, <code>--no-ff</code>, and <code>--abort</code> semantics.</li>
+<li><a href="https://git-scm.com/docs/git-mergetool">git-mergetool manual</a> — Connects to the practical note about using dedicated merge tools or IDE support during conflict resolution.</li>
+<li><a href="https://git-scm.com/docs/git-status">git-status manual</a> — The reference behind status messages such as <code>unmerged paths</code> and <code>both modified</code> during a conflict.</li>
 </ul>
 <p class="tags-line">Tags: git-merge, fast-forward, three-way-merge, merge-conflict, merge-abort, conflict-markers</p>
 </body>

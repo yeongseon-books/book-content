@@ -17,24 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Branch basics - create, switch, and compare
+title: "Git & GitHub 101 (4/10): Branch basics - create, switch, and compare"
 seo_description: A branch is not a folder copy; it is a movable pointer to a specific
   commit.
 ---
 
-# Branch basics - create, switch, and compare
+# Git & GitHub 101 (4/10): Branch basics - create, switch, and compare
 
 Git starts to feel powerful the moment you realize separate lines of work do not require separate folders. Branches give you room to experiment, pause, and compare without losing the safety of a shared main line.
 
 This is the fourth post in the Git & GitHub 101 series. Here, we focus on creating, switching, and comparing branches before we get to merging them.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What a branch actually is (it is not a folder copy)
-- How to list and create branches with `git branch`
-- How to move between branches with `git switch` (and how it relates to `git checkout`)
-- How `HEAD` moves together with the current branch
-- How to compare two branches using `git log` and `git diff`
+- What a branch actually is (it is not a folder copy)?
+- How to list and create branches with `git branch`?
+- How to move between branches with `git switch` (and how it relates to `git checkout`)?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 4 flow overview*
+
+This picture places Branch basics - create, switch, and compare inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Branch basics - create, switch, and compare is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -53,9 +61,6 @@ This article stops just before merging. We focus on **creating, switching, and c
 > A branch is not a folder copy; it is a movable pointer to a specific commit. `HEAD` is another pointer that marks which of those branch pointers you are currently working on.
 A branch is a **pointer** to a commit. When you make a new commit, the current branch pointer moves one step forward.
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png)
-
-*Mental Model*
 Two ideas to hold together:
 
 - **A branch itself is cheap.** It is roughly a 41-byte file under `.git/refs/heads/<name>` that stores a commit hash.
@@ -329,19 +334,29 @@ Deleted branch feature/sign-up (was f1e2d3c).
 
 The next article picks up from a diverged history and walks through `git merge`, including a hands-on conflict resolution.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? - the basics of distributed version control](./01-what-is-git.md)
-- [Make your first commit - init, status, add, commit](./02-first-commit.md)
-- [Reading change history - status, diff, log](./03-status-diff-log.md)
+- **What a branch actually is (it is not a folder copy)?**
+  - The article treats Branch basics - create, switch, and compare as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to list and create branches with `git branch`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to move between branches with `git switch` (and how it relates to `git checkout`)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
 - **Branch basics - create, switch, and compare (current)**
-- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
-- GitHub repositories and remote connections (upcoming)
-- Collaborating with Pull Requests (upcoming)
-- Managing work with Issues and Projects (upcoming)
-- Writing good commit messages (upcoming)
-- A real-world workflow at a glance (upcoming)
+- Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

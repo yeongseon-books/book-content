@@ -17,26 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Tracking Work with Issues and Projects - How GitHub Records What's Next
+title: "Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next"
 seo_description: Issues record "what is to be done", Pull Requests record "how it
   was actually done", and Projects record "where the work currently sits" — three…
 ---
 
-# Tracking Work with Issues and Projects - How GitHub Records What's Next
+# Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next
 
 Code history tells you what changed, but teams also need a place to record what should happen next. Issues and Projects give GitHub a planning layer, so decisions, ownership, and progress do not live only in someone's memory.
 
 This is the eighth post in the Git & GitHub 101 series. Here, we connect issues, pull requests, and project boards into one visible work-tracking flow.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What a GitHub Issue is, and how it differs from a commit or a Pull Request
-- How to open an issue and attach labels, an assignee, and a milestone
-- How a single line like `Closes #42` in a PR body auto-closes an issue on merge
-- How to set up a Project board and track issues on a Kanban-style flow
-- Why issues are useful even on a solo repository
+- What a GitHub Issue is, and how it differs from a commit or a Pull Request?
+- How to open an issue and attach labels, an assignee, and a milestone?
+- How a single line like `Closes #42` in a PR body auto-closes an issue on merge?
 
-By the end you can run a full cycle: define work as an issue, finish it through a PR, and watch the Project board reflect status as you go.
+## Big Picture
+
+![Git & GitHub 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 8 flow overview*
+
+This picture places Tracking Work with Issues and Projects - How GitHub Records What's Next inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Tracking Work with Issues and Projects - How GitHub Records What's Next is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -55,9 +61,6 @@ Even on a solo repository, issues earn their keep. Writing down the next thing t
 > Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.
 Here is how issues, PRs, and projects interlock.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
-
-*Mental model*
 Read it as a flow:
 
 1. The issue is the starting point. It explains what to do and why.
@@ -301,19 +304,29 @@ This article walked through one full issue-to-PR-to-board cycle. Recap:
 
 The next article looks at something even shorter than a PR body: the commit message. Why does `git log --oneline` lean so heavily on a single line, and what makes that line useful?
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- **Tracking Work with Issues and Projects (current)**
-- [Writing Good Commit Messages](./09-good-commit-message.md)
-- Real-World Workflow at a Glance (upcoming)
+- **What a GitHub Issue is, and how it differs from a commit or a Pull Request?**
+  - The article treats Tracking Work with Issues and Projects - How GitHub Records What's Next as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to open an issue and attach labels, an assignee, and a milestone?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How a single line like `Closes #42` in a PR body auto-closes an issue on merge?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main](./07-pull-request.md)
+- **Tracking Work with Issues and Projects - How GitHub Records What's Next (current)**
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

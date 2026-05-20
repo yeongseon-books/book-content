@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Creating a GitHub repository - remote, push, and pull in one go</title>
+<title>Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Creating a GitHub repository - remote, push, and pull in one go</h1>
+<h1>Git &amp; GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go</h1>
 <p>Up to this point, every command has stayed on one machine. The real collaboration shift begins when your local repository gains a remote home that other people and other devices can reach.</p>
 <p>This is the sixth post in the Git &amp; GitHub 101 series. Here, we connect a local repository to GitHub and walk through the first push, fetch, pull, and clone flow.</p>
 <h2>What you'll learn</h2>
@@ -66,15 +66,19 @@
 <li>When to choose HTTPS vs SSH</li>
 </ul>
 <p>Up through Episode 5, each command ran inside one machine. Starting now, the local repository becomes something other people can see and other machines can keep working on.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What exactly is a <code>remote</code>, and why is the first one conventionally called <code>origin</code>?</li>
 <li>Which commands, in what order, connect an empty GitHub repository to your local one?</li>
 <li>What two things does <code>git push -u origin main</code> do in a single shot?</li>
-<li>How does <code>git fetch</code> differ from <code>git pull</code> in behavior?</li>
-<li>Beyond the working tree, what else does <code>git clone</code> actually download?</li>
-<li>Which signal should drive the choice between HTTPS and SSH for a remote?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 6 flow overview</em></p>
+<p>This picture places Creating a GitHub repository - remote, push, and pull in one go inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Creating a GitHub repository - remote, push, and pull in one go is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>A repository that lives only on your laptop is, for collaboration purposes, not very different from a personal notebook. To share code with teammates, or to survive a stolen laptop without losing history, the repository has to exist somewhere else as well. GitHub is the most common "somewhere else."</p>
 <p>A <code>remote</code> is an alias that points to a repository at another location. Once registered, you reference it by a short name instead of typing the URL each time. The first remote is conventionally named <code>origin</code> - the word means "where this project came from," and Git uses it as the automatic default.</p>
@@ -90,9 +94,7 @@
 <p>A GitHub repository is just "another Git repository that lives across the network", and a <code>remote</code> is the nickname you give to such a repository. <code>push</code> and <code>pull</code> are synchronization moves that exchange commits between the two.<br>
 A GitHub repository is just another Git repository. The only differences are that it lives on GitHub's servers and that anyone with access can reach it. Local and remote act as mirrors of each other, and push/fetch/pull are the commands that keep them aligned.</p>
 </blockquote>
-<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png"></p>
-<p><em>Mental Model</em><br>
-Three reminders make this picture solid. First, a GitHub repository is itself nothing more than a <code>.git</code> directory. Second, each collaborator owns a complete copy on their own machine. Third, synchronization is explicit - it happens when you run a command. Skip <code>push</code>, and GitHub doesn't know. Skip <code>pull</code>, and your laptop doesn't know.</p>
+<p>Three reminders make this picture solid. First, a GitHub repository is itself nothing more than a <code>.git</code> directory. Second, each collaborator owns a complete copy on their own machine. Third, synchronization is explicit - it happens when you run a command. Skip <code>push</code>, and GitHub doesn't know. Skip <code>pull</code>, and your laptop doesn't know.</p>
 <h2>Core concepts</h2>
 <p><strong>remote</strong><br>
 - Meaning: An alias pointing to a repository at another location (typically GitHub)</p>
@@ -306,28 +308,36 @@ $ git log --oneline -2
 <li><code>git clone</code> creates a fresh local copy and registers <code>origin</code> for you</li>
 </ul>
 <p>Episode 7 picks up where this one leaves off: the most common collaboration unit on GitHub, the Pull Request. We'll commit and push on a branch, request review, and follow the change back to <code>main</code>.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
-<li><strong>Creating a GitHub Repository: remote, push, pull (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
-<li>Tracking Work with Issues and Projects (upcoming)</li>
-<li>Writing Good Commit Messages (upcoming)</li>
-<li>Real-World Workflow at a Glance (upcoming)</li>
+<li><strong>What exactly is a <code>remote</code>, and why is the first one conventionally called <code>origin</code>?</strong></li>
+<li>The article treats Creating a GitHub repository - remote, push, and pull in one go as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which commands, in what order, connect an empty GitHub repository to your local one?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What two things does <code>git push -u origin main</code> do in a single shot?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Git &amp; GitHub 101 (4/10): Branch basics - create, switch, and compare</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Git &amp; GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
+<li><strong>Creating a GitHub repository - remote, push, and pull in one go (current)</strong></li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/docs/git-remote">git-remote manual</a></li>
-<li><a href="https://git-scm.com/docs/git-push">git-push manual</a></li>
-<li><a href="https://git-scm.com/docs/git-fetch">git-fetch manual</a></li>
-<li><a href="https://git-scm.com/docs/git-pull">git-pull manual</a></li>
-<li><a href="https://git-scm.com/docs/git-clone">git-clone manual</a></li>
-<li>GitHub Docs, "About remote repositories": <a href="https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories">https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories</a></li>
-<li>GitHub Docs, "Connecting to GitHub with SSH": <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">https://docs.github.com/en/authentication/connecting-to-github-with-ssh</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes">Pro Git — Working with Remotes</a> — The best single mental-model reference for remotes, <code>origin</code>, fetch, push, and pull together.</li>
+<li><a href="https://git-scm.com/docs/git-push">git-push manual</a> — The canonical source for what <code>git push -u origin main</code> configures when it sets upstream tracking.</li>
+<li><a href="https://git-scm.com/docs/git-fetch">git-fetch manual</a> — Explains why fetching downloads remote commits without moving your local branch.</li>
+<li><a href="https://git-scm.com/docs/git-pull">git-pull manual</a> — Backs up the chapter's central distinction that pull is fetch followed by merge or rebase.</li>
+<li><a href="https://git-scm.com/docs/git-clone">git-clone manual</a> — Documents how clone creates a working copy, copies <code>.git</code>, checks out the default branch, and registers <code>origin</code>.</li>
+<li><a href="https://docs.github.com/en/get-started/git-basics/about-remote-repositories">GitHub Docs — About remote repositories</a> — Covers HTTPS vs SSH URLs, the <code>origin</code> alias, and GitHub-specific remote setup choices.</li>
 </ul>
 <p class="tags-line">Tags: github-remote, git-push, git-pull, git-clone, git-fetch, origin</p>
 </body>

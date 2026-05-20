@@ -17,25 +17,31 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: '좋은 commit message 쓰기: Conventional Commits와 좋은 본문'
+title: "Git & GitHub 101 (9/10): 좋은 commit message 쓰기: Conventional Commits와 좋은 본문"
 seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규칙을 설명합니다.
 ---
 
-# 좋은 commit message 쓰기: Conventional Commits와 좋은 본문
+# Git & GitHub 101 (9/10): 좋은 commit message 쓰기: Conventional Commits와 좋은 본문
 
 코드만으로는 왜 이런 변경이 들어왔는지 설명되지 않는 순간이 반드시 옵니다. 그때 commit message가 좋으면 history 자체가 문서가 되고, 나쁘면 원래 PR과 diff를 끝까지 다시 읽어야 합니다.
 
 이 글은 Git/GitHub 101 시리즈의 아홉 번째 글입니다. 여기서는 subject, body, footer 구조와 Conventional Commits, 그리고 message 품질을 지키는 습관을 정리합니다.
 
-## 이 글에서 다룰 문제
-
-> 좋은 commit message는 몇 달 뒤의 자신과 동료가 한 번 읽고 무엇을 왜 바꿨는지 이해하게 해 주는 작은 문서이며, subject, body, footer가 그 문서의 역할을 나눠 맡습니다.
+## 먼저 던지는 질문
 
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?
 - subject, body, footer는 각각 무엇을 담아야 할까요?
 - Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?
-- 아직 push하지 않은 commit은 어떻게 더 좋은 message로 다듬을 수 있을까요?
-- 형식을 사람의 기억이 아니라 자동화로 강제하려면 무엇이 필요할까요?
+
+## 큰 그림
+
+![Git & GitHub 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
+
+*Git & GitHub 101 9장 흐름 개요*
+
+이 그림에서는 좋은 commit message 쓰기: Conventional Commits와 좋은 본문를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 좋은 commit message 쓰기: Conventional Commits와 좋은 본문의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,10 +50,6 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 좋은 message는 자동화에도 쓰입니다. Conventional Commits를 따르면 release note 생성기나 버전 정책이 commit type을 기계적으로 읽을 수 있습니다. PR 설명이 짧더라도 commit 단위로 author의 의도를 따라갈 수 있어 리뷰 품질도 좋아집니다.
 
 ## 핵심 그림
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
-
-*Mental Model*
 
 여기서 먼저 볼 것은 세 가지입니다.
 
@@ -258,19 +260,29 @@ Subject does not match the Conventional Commits format.
 
 다음 글에서는 지금까지 배운 도구를 하나의 실전 워크플로로 묶어 issue부터 release tag까지 한 흐름으로 연결해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **좋은 commit message는 왜 코드만큼 중요한 자산일까요?**
+  - 본문의 기준은 좋은 commit message 쓰기: Conventional Commits와 좋은 본문를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **subject, body, footer는 각각 무엇을 담아야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
-- [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
-- [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
-- [branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
-- [merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
-- [GitHub repository 만들기 - remote, push, pull 한 번에 익히기](./06-github-repository.md)
-- [Pull Request로 협업하기 - branch에서 review를 거쳐 main까지](./07-pull-request.md)
-- [Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법](./08-issue-and-project.md)
+- [Git & GitHub 101 (1/10): Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): 첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): GitHub repository 만들기 - remote, push, pull 한 번에 익히기](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Pull Request로 협업하기 - branch에서 review를 거쳐 main까지](./07-pull-request.md)
+- [Git & GitHub 101 (8/10): Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법](./08-issue-and-project.md)
 - **좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (현재 글)**
-- [실전 Git workflow 만들기: issue부터 release까지 한 흐름으로](./10-real-world-workflow.md)
+- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

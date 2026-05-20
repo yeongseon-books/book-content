@@ -17,24 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Reading change history - status, diff, log
+title: "Git & GitHub 101 (3/10): Reading change history - status, diff, log"
 seo_description: 'status, diff, and log are three read-only windows that answer three
   different questions: where am I right now, what is different and how, and how…'
 ---
 
-# Reading change history - status, diff, log
+# Git & GitHub 101 (3/10): Reading change history - status, diff, log
 
 Most Git mistakes get cheaper the moment you learn to read before you act. `status`, `diff`, and `log` are the three commands that let you inspect the current state, the exact content of a change, and the history behind it.
 
 This is the third post in the Git & GitHub 101 series. Here, we focus on reading change history accurately before branches and collaboration enter the picture.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How to read each line of `git status` output with confidence
-- How to scan the same state quickly with `git status -s`
-- Which area `git diff`, `git diff --cached`, and `git diff HEAD` each compare
-- How to compare two specific commits with `git diff <a> <b>`
-- The most useful shapes of `git log` output: `--oneline`, `--graph`, `--stat`, `--patch`
+- How to read each line of `git status` output with confidence?
+- How to scan the same state quickly with `git status -s`?
+- Which area `git diff`, `git diff --cached`, and `git diff HEAD` each compare?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 3 flow overview*
+
+This picture places Reading change history - status, diff, log inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Reading change history - status, diff, log is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -53,9 +61,6 @@ Used together, they let you self-review what your next commit will contain. That
 > `status`, `diff`, and `log` are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.
 Each command compares a different pair of areas.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png)
-
-*Mental model*
 A one-line rule of thumb:
 
 - `git diff` shows **changes not yet staged** (WD vs Staging).
@@ -364,19 +369,29 @@ index 6e85ca6..b7f5a1e 100644
 
 The next post moves into branches: how to start a parallel line of work in the same folder and switch between them safely.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? - foundations of distributed version control](./01-what-is-git.md)
-- [Your first commit - init, status, add, commit](./02-first-commit.md)
+- **How to read each line of `git status` output with confidence?**
+  - The article treats Reading change history - status, diff, log as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to scan the same state quickly with `git status -s`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which area `git diff`, `git diff --cached`, and `git diff HEAD` each compare?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
 - **Reading change history - status, diff, log (current)**
-- [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
-- [Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
-- Connecting GitHub repositories and remotes (upcoming)
-- Collaborating with Pull Requests (upcoming)
-- Tracking work with Issues and Projects (upcoming)
-- Writing good commit messages (upcoming)
-- A real-world workflow at a glance (upcoming)
+- Branch basics - create, switch, and compare (upcoming)
+- Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

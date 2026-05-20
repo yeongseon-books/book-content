@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Your first commit - init, status, add, commit</title>
+<title>Git & GitHub 101 (2/10): Your first commit - init, status, add, commit</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Your first commit - init, status, add, commit</h1>
+<h1>Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</h1>
 <p>The first commit is where Git stops being abstract. Once you walk one change all the way from an empty folder to a saved snapshot, later commands start to feel predictable instead of arbitrary.</p>
 <p>This is the second post in the Git &amp; GitHub 101 series. Here, we go through the full init -&gt; add -&gt; commit cycle by hand.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to create an empty repository with <code>git init</code></li>
-<li>How to read your current state with <code>git status</code></li>
-<li>What <code>git add</code> actually means when it stages a change</li>
-<li>How to record your first snapshot with <code>git commit -m</code></li>
-<li>The full edit -&gt; add -&gt; commit cycle, walked end to end</li>
+<li>How to create an empty repository with <code>git init</code>?</li>
+<li>How to read your current state with <code>git status</code>?</li>
+<li>What <code>git add</code> actually means when it stages a change?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 2 flow overview</em></p>
+<p>This picture places Your first commit - init, status, add, commit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Your first commit - init, status, add, commit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Most Git commands make sense only when you can answer one question first: where does my change currently live? That is why the hard part of learning Git early on is not the command names but the mental picture of three areas.</p>
 <p>Making your first commit by hand makes that picture sharp very quickly.</p>
@@ -78,9 +83,7 @@
 <p>A first commit is the act of "gathering changes from the working directory into the staging area, then moving them into the repository as a single snapshot". <code>add</code> and <code>commit</code> exist as separate commands precisely because those are two distinct steps.<br>
 A single edit-to-commit cycle looks like this.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three verbs work together.</p>
+<p>Three verbs work together.</p>
 <ul>
 <li><strong>edit</strong>: change or create files in your editor. Git does not know yet.</li>
 <li><strong><code>add</code></strong>: tell Git "include this change in the next commit."</li>
@@ -237,27 +240,36 @@ $ git commit -m &quot;Add intro paragraph to notes&quot;
 <li>Walking through one full edit -&gt; add -&gt; commit cycle by hand makes later commands much easier to reason about.</li>
 </ul>
 <p>The next post takes a closer look at <code>git status</code> output and uses <code>git diff</code> and <code>git log</code> to read change history in detail.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - foundations of distributed version control</a></li>
+<li><strong>How to create an empty repository with <code>git init</code>?</strong></li>
+<li>The article treats Your first commit - init, status, add, commit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to read your current state with <code>git status</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What <code>git add</code> actually means when it stages a change?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
 <li><strong>Your first commit - init, status, add, commit (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Tracking Changes - Reading status, diff, and log</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Branch Basics - Create, Switch, Compare</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
-<li>Connecting GitHub repositories and remotes (upcoming)</li>
-<li>Collaborating with Pull Requests (upcoming)</li>
-<li>Tracking work with Issues and Projects (upcoming)</li>
-<li>Writing good commit messages (upcoming)</li>
-<li>A real-world workflow at a glance (upcoming)</li>
+<li>Reading change history - status, diff, log (upcoming)</li>
+<li>Branch basics - create, switch, and compare (upcoming)</li>
+<li>Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)</li>
+<li>Creating a GitHub repository - remote, push, and pull in one go (upcoming)</li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
-<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository">Pro Git Book - Recording Changes to the Repository</a></li>
-<li><a href="https://git-scm.com/docs/git-init">git-init manual</a></li>
-<li><a href="https://git-scm.com/docs/git-status">git-status manual</a></li>
-<li><a href="https://git-scm.com/docs/git-add">git-add manual</a></li>
-<li><a href="https://git-scm.com/docs/git-commit">git-commit manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository">Pro Git — Recording Changes to the Repository</a> — The clearest canonical walkthrough of moving a change from working directory to staging and into a commit.</li>
+<li><a href="https://git-scm.com/docs/git-init">git-init manual</a> — Documents exactly how <code>git init</code> creates a repository and which defaults it uses.</li>
+<li><a href="https://git-scm.com/docs/git-status">git-status manual</a> — The source for status terms like <code>Untracked</code>, <code>modified</code>, and <code>Changes to be committed</code> used in the examples.</li>
+<li><a href="https://git-scm.com/docs/git-add">git-add manual</a> — Explains why <code>git add</code> means “stage this change” rather than merely “add a file.”</li>
+<li><a href="https://git-scm.com/docs/git-commit">git-commit manual</a> — The authoritative reference for <code>git commit -m</code> and the act of recording a snapshot.</li>
+<li><a href="https://git-scm.com/docs/git-log">git-log manual</a> — Connects to the final verification step where the article confirms the first two commits with <code>git log --oneline</code>.</li>
 </ul>
 <p class="tags-line">Tags: git-init, git-status, git-add, git-commit, staging-area, first-repository</p>
 </body>

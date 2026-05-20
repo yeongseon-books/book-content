@@ -17,23 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: 'Writing Good Commit Messages: Conventional Commits and Useful Bodies'
+title: "Git & GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies"
 seo_description: A good commit message is a small document that lets you and your
   teammate, six months later, see in one read what changed and why.
 ---
 
-# Writing Good Commit Messages: Conventional Commits and Useful Bodies
+# Git & GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies
 
 Every repository eventually reaches the point where the code alone is not enough to explain why a change happened. A good commit message turns the history itself into documentation that survives long after the context in chat and review threads fades away.
 
 This is the ninth post in the Git & GitHub 101 series. Here, we look at message structure, Conventional Commits, and the habits that keep `git log` useful.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why a good commit message is an asset that pays off as much as the code itself.
-- How to structure a commit message with a subject, body, and footer.
-- How Conventional Commits (`feat`, `fix`, `docs`, etc.) signal the kind of change at a glance.
-- How to polish messages after the fact with `git commit --amend` and `git rebase -i`.
+- Why a good commit message is an asset that pays off as much as the code itself?
+- How to structure a commit message with a subject, body, and footer?
+- How Conventional Commits (`feat`, `fix`, `docs`, etc.) signal the kind of change at a glance?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 9 flow overview*
+
+This picture places Writing Good Commit Messages: Conventional Commits and Useful Bodies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing Good Commit Messages: Conventional Commits and Useful Bodies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -48,9 +57,6 @@ The benefit shows up in code review too. Even when a PR description is thin, wel
 > A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.
 A solid commit message has a fixed skeleton.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png)
-
-*Mental model*
 Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.
 
 ## Core concepts
@@ -292,19 +298,29 @@ A well-written commit message is the cheapest documentation that explains the in
 
 The next post stitches the tools from this series into one realistic workflow. We will follow a single change from the issue that opens it through PR merge and release, and look at how to recover with the right commands when something goes wrong along the way.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- [Tracking Work with Issues and Projects](./08-issue-and-project.md)
-- **Writing Good Commit Messages (current)**
-- [Building a Real-World Git Workflow](./10-real-world-workflow.md)
+- **Why a good commit message is an asset that pays off as much as the code itself?**
+  - The article treats Writing Good Commit Messages: Conventional Commits and Useful Bodies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to structure a commit message with a subject, body, and footer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How Conventional Commits (`feat`, `fix`, `docs`, etc.) signal the kind of change at a glance?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main](./07-pull-request.md)
+- [Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next](./08-issue-and-project.md)
+- **Writing Good Commit Messages: Conventional Commits and Useful Bodies (current)**
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

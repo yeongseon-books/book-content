@@ -17,23 +17,32 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: 'Building a real-world Git workflow: from issue to release in one cycle'
+title: "Git & GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle"
 seo_description: 'A realistic workflow is one repeating cycle: an issue defines the
   work, a branch carries the change, a Pull Request invites review, a merge brings…'
 ---
 
-# Building a real-world Git workflow: from issue to release in one cycle
+# Git & GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle
 
 Knowing isolated Git commands is not the same as knowing how a team actually ships work. The last step is to connect those commands into one repeatable loop that starts with an issue and ends with a merge, a tag, and a clean main branch.
 
 This is the final post in the Git & GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How the commands from Episodes 1–9 fit together as one realistic workflow.
-- How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close.
-- Which recovery commands to reach for when something goes wrong mid-flow.
-- Which automated guardrails (branch protection, PR template, CI) keep the same flow stable across a team.
+- How the commands from Episodes 1–9 fit together as one realistic workflow?
+- How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?
+- Which recovery commands to reach for when something goes wrong mid-flow?
+
+## Big Picture
+
+![Git & GitHub 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 10 flow overview*
+
+This picture places Building a real-world Git workflow: from issue to release in one cycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a real-world Git workflow: from issue to release in one cycle is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -48,9 +57,6 @@ When the loop becomes muscle memory, accidents drop. Force-pushing over a teamma
 > A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.
 A GitHub Flow cycle looks like this.
 
-![Mental model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
-
-*Mental model*
 The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.
 
 ## Core concepts
@@ -324,19 +330,29 @@ Every command from Episodes 1 through 9 was a step inside this single cycle. Def
 
 This post closes the Git & GitHub 101 series. The natural next step is automation. Wiring GitHub Actions into the same repository so that every PR runs lint and tests, and pushing a tag triggers an auto-generated release note, is the topic of the next series. Until then, the most useful thing you can do is run this loop once on a project of your own. A command becomes your tool only when your fingers can type it without thinking.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? Version Control Fundamentals](./01-what-is-git.md)
-- [Your First Commit: init, add, commit](./02-first-commit.md)
-- [Inspecting Changes: status, diff, log](./03-status-diff-log.md)
-- [Understanding Branches: Diverging and Switching](./04-branch-basics.md)
-- [Merging Branches and Resolving Conflicts](./05-merge-and-conflict.md)
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- [Collaborating with Pull Requests](./07-pull-request.md)
-- [Tracking Work with Issues and Projects](./08-issue-and-project.md)
-- [Writing Good Commit Messages](./09-good-commit-message.md)
-- **Building a Real-World Git Workflow (current)**
+- **How the commands from Episodes 1–9 fit together as one realistic workflow?**
+  - The article treats Building a real-world Git workflow: from issue to release in one cycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which recovery commands to reach for when something goes wrong mid-flow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go](./06-github-repository.md)
+- [Git & GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main](./07-pull-request.md)
+- [Git & GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next](./08-issue-and-project.md)
+- [Git & GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies](./09-good-commit-message.md)
+- **Building a real-world Git workflow: from issue to release in one cycle (current)**
+
 <!-- toc:end -->
 
 ## References

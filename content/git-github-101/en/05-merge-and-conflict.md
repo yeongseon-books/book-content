@@ -17,12 +17,12 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Merge and Conflict Resolution - Bringing Two Lines Back Together
+title: "Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together"
 seo_description: A merge produces "a new commit that combines two commits." When the
   two commits sit on the same line of history, Git skips the new commit and just…
 ---
 
-# Merge and Conflict Resolution - Bringing Two Lines Back Together
+# Git & GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together
 
 Creating branches is the easy part; bringing them back together cleanly is where Git starts to feel real. If you can predict when a merge will stay automatic and when it will stop for human judgment, collaboration gets much less stressful.
 
@@ -36,14 +36,21 @@ This is the fifth post in the Git & GitHub 101 series. Here, we look at fast-for
 - What `git status` tells you in the middle of a conflict
 - How `git merge --abort` rolls back safely
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - When does a fast-forward merge happen, and when does Git create a three-way merge instead?
 - Why does a merge commit have two parents?
 - Which side of a conflict marker (`<<<<<<<` / `=======` / `>>>>>>>`) belongs to which branch?
-- What extra information does `git status` show while a conflict is in progress?
-- How far back does `git merge --abort` roll your work, and when is it safe to use?
 
+## Big Picture
+
+![Git & GitHub 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png)
+
+*Git & GitHub 101 chapter 5 flow overview*
+
+This picture places Merge and Conflict Resolution - Bringing Two Lines Back Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Merge and Conflict Resolution - Bringing Two Lines Back Together is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -60,9 +67,6 @@ The goal of this chapter is to remove both. By the end you should be able to pic
 
 A merge produces "a new commit that combines two commits." When the two commits sit on the same line of history, Git skips the new commit and just slides a pointer forward (fast-forward). When the two commits sit on diverged lines, Git creates a new merge commit with two parents (three-way).
 
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png)
-
-*Mental Model*
 Three things to internalize:
 
 - **Fast-forward**: if the target branch is a direct descendant of the current branch, Git creates no new commit and just moves the current branch pointer forward.
@@ -411,19 +415,29 @@ nothing to commit, working tree clean
 
 In the next chapter we'll connect the local repo to a GitHub remote and walk through `git remote`, `git push`, and `git pull` in order.
 
-<!-- toc:begin -->
-## Series TOC
+## Answering the Opening Questions
 
-- [What is Git? - The Basics of Distributed Version Control](./01-what-is-git.md)
-- [Your First Commit - init, status, add, commit](./02-first-commit.md)
-- [Tracking Changes - Reading status, diff, and log](./03-status-diff-log.md)
-- [Branch Basics - Create, Switch, Compare](./04-branch-basics.md)
+- **When does a fast-forward merge happen, and when does Git create a three-way merge instead?**
+  - The article treats Merge and Conflict Resolution - Bringing Two Lines Back Together as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does a merge commit have two parents?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which side of a conflict marker (`<<<<<<<` / `=======` / `>>>>>>>`) belongs to which branch?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Git & GitHub 101 (1/10): What is Git? Version control fundamentals](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): Your first commit - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): Reading change history - status, diff, log](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): Branch basics - create, switch, and compare](./04-branch-basics.md)
 - **Merge and Conflict Resolution - Bringing Two Lines Back Together (current)**
-- [Creating a GitHub Repository: remote, push, pull](./06-github-repository.md)
-- Collaborating with Pull Requests (upcoming)
-- Tracking Work with Issues and Projects (upcoming)
-- Writing Good Commit Messages (upcoming)
-- Real-World Workflow at a Glance (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

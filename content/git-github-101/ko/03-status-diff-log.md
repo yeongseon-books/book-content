@@ -17,25 +17,31 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 변경 사항 확인하기 - status, diff, log로 읽기
+title: "Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기"
 seo_description: status, diff, log로 변경 위치와 내용, 이력을 읽는 방법을 설명합니다.
 ---
 
-# 변경 사항 확인하기 - status, diff, log로 읽기
+# Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기
 
 Git을 잘 쓰는 사람은 대개 치기 전에 먼저 읽습니다. `status`, `diff`, `log`를 정확히 읽을 수 있으면 잘못된 commit을 만들기 전에 스스로 한 번 걸러낼 수 있고, 협업에서도 변경을 훨씬 차분하게 설명할 수 있습니다.
 
 이 글은 Git/GitHub 101 시리즈의 세 번째 글입니다. 여기서는 현재 상태를 읽는 `status`, 줄 단위 차이를 읽는 `diff`, 이미 저장된 이력을 읽는 `log`를 한 흐름으로 정리합니다.
 
-## 이 글에서 다룰 문제
-
-> `status`, `diff`, `log`는 각각 지금 변경이 어디에 있는지, 무엇이 어떻게 바뀌었는지, 여기까지 어떤 순서로 왔는지를 보여 주는 읽기 전용 창입니다.
+## 먼저 던지는 질문
 
 - `git status`의 긴 출력과 짧은 출력은 각각 무엇을 보여 줄까요?
 - `git diff`, `git diff --cached`, `git diff HEAD`는 어느 영역끼리 비교할까요?
 - 두 commit을 직접 비교할 때는 어떤 순서로 hash를 넣어야 할까요?
-- `git log --oneline`, `--graph`, `--stat`, `-p`는 각각 언제 유용할까요?
-- commit 전에 어떤 읽기 습관을 들이면 사고를 줄일 수 있을까요?
+
+## 큰 그림
+
+![Git & GitHub 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
+
+*Git & GitHub 101 3장 흐름 개요*
+
+이 그림에서는 변경 사항 확인하기 - status, diff, log로 읽기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 변경 사항 확인하기 - status, diff, log로 읽기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -50,10 +56,6 @@ Git을 잘 쓰는 사람은 대개 치기 전에 먼저 읽습니다. `status`, 
 이 셋을 함께 쓰면 commit 직전 자기 검토가 가능해지고, 그 습관은 곧 좋은 commit message와 작은 PR로 이어집니다.
 
 ## 핵심 그림
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
-
-*Mental Model*
 
 기억할 규칙은 세 줄이면 충분합니다.
 
@@ -304,19 +306,29 @@ PR 설명을 쓸 때도 `git log --oneline origin/main..HEAD`와 `git log -p ori
 
 다음 글에서는 같은 폴더 안에서 작업 줄기를 나누는 branch를 다룹니다. branch가 폴더 복사가 아니라 포인터라는 점을 중심으로 만들기, 전환, 비교를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`git status`의 긴 출력과 짧은 출력은 각각 무엇을 보여 줄까요?**
+  - 본문의 기준은 변경 사항 확인하기 - status, diff, log로 읽기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`git diff`, `git diff --cached`, `git diff HEAD`는 어느 영역끼리 비교할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **두 commit을 직접 비교할 때는 어떤 순서로 hash를 넣어야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
-- [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (1/10): Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): 첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
 - **변경 사항 확인하기 - status, diff, log로 읽기 (현재 글)**
-- branch 이해하기: 분기와 전환 (예정)
-- merge와 conflict 해결하기 (예정)
-- GitHub repository 만들기와 remote, push, pull (예정)
-- Pull Request로 협업하기 (예정)
-- Issue와 Project로 일감 관리하기 (예정)
-- 좋은 commit message 쓰기 (예정)
-- 실전 Git workflow 만들기 (예정)
+- branch 기초 - 만들고 옮기고 비교하기 (예정)
+- merge와 conflict 해결하기 - 두 줄기를 다시 합치기 (예정)
+- GitHub repository 만들기 - remote, push, pull 한 번에 익히기 (예정)
+- Pull Request로 협업하기 - branch에서 review를 거쳐 main까지 (예정)
+- Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법 (예정)
+- 좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (예정)
+- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

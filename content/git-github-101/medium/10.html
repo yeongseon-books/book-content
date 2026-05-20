@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building a real-world Git workflow: from issue to release in one cycle</title>
+<title>Git & GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Building a real-world Git workflow: from issue to release in one cycle</h1>
+<h1>Git &amp; GitHub 101 (10/10): Building a real-world Git workflow: from issue to release in one cycle</h1>
 <p>Knowing isolated Git commands is not the same as knowing how a team actually ships work. The last step is to connect those commands into one repeatable loop that starts with an issue and ends with a merge, a tag, and a clean main branch.</p>
 <p>This is the final post in the Git &amp; GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How the commands from Episodes 1–9 fit together as one realistic workflow.</li>
-<li>How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close.</li>
-<li>Which recovery commands to reach for when something goes wrong mid-flow.</li>
-<li>Which automated guardrails (branch protection, PR template, CI) keep the same flow stable across a team.</li>
+<li>How the commands from Episodes 1–9 fit together as one realistic workflow?</li>
+<li>How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?</li>
+<li>Which recovery commands to reach for when something goes wrong mid-flow?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 10 flow overview</em></p>
+<p>This picture places Building a real-world Git workflow: from issue to release in one cycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building a real-world Git workflow: from issue to release in one cycle is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Episodes 1 through 9 introduced commands one by one. Knowing a command and knowing a workflow are different. The same <code>git commit</code> carries a different meaning depending on which branch it lands on, which PR it belongs to, and which release it is heading toward. A workflow is a contract between teammates. Once everyone follows the same loop, a new hire can tell within a week where a change starts and where it ends.</p>
 <p>GitHub Flow is the simplest version of that contract. Keep <code>main</code> deployable at all times. Do new work on a short feature branch, open a PR, get review, and squash merge. Tag a release when you need one. That single sentence is the whole post. Everything else is repetition — running the loop end to end so it sticks.</p>
@@ -72,9 +78,7 @@
 <p>A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.<br>
 A GitHub Flow cycle looks like this.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.</p>
+<p>The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.</p>
 <h2>Core concepts</h2>
 <p><strong>GitHub Flow</strong><br>
 - Description: <code>main</code> is always deployable, every change rides on a short feature branch, and PRs are the merge path. The simplicity fits small teams well.</p>
@@ -295,30 +299,36 @@ Closed • yeongseon opened about 1 hour ago
 <h2>Wrap-up</h2>
 <p>Every command from Episodes 1 through 9 was a step inside this single cycle. Define the work in an issue, stack atomic commits on a short feature branch, get review through a PR, squash-merge into <code>main</code>, and tag a release when one is needed. When something breaks, reopen the recovery table. At team scale, lean on branch protection, the PR template, CODEOWNERS, and required CI to make the flow self-enforcing.</p>
 <p>This post closes the Git &amp; GitHub 101 series. The natural next step is automation. Wiring GitHub Actions into the same repository so that every PR runs lint and tests, and pushing a tag triggers an auto-generated release note, is the topic of the next series. Until then, the most useful thing you can do is run this loop once on a project of your own. A command becomes your tool only when your fingers can type it without thinking.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Tracking Work with Issues and Projects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/09-good-commit-message.md">Writing Good Commit Messages</a></li>
-<li><strong>Building a Real-World Git Workflow (current)</strong></li>
+<li><strong>How the commands from Episodes 1–9 fit together as one realistic workflow?</strong></li>
+<li>The article treats Building a real-world Git workflow: from issue to release in one cycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which recovery commands to reach for when something goes wrong mid-flow?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Git &amp; GitHub 101 (4/10): Branch basics - create, switch, and compare</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Git &amp; GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Git &amp; GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Git &amp; GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Git &amp; GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/09-good-commit-message.md">Git &amp; GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies</a></li>
+<li><strong>Building a real-world Git workflow: from issue to release in one cycle (current)</strong></li>
 </ul>
 <h2>References</h2>
 <ul>
-<li>GitHub Docs, "GitHub flow": <a href="https://docs.github.com/en/get-started/using-github/github-flow">https://docs.github.com/en/get-started/using-github/github-flow</a></li>
-<li>Semantic Versioning 2.0.0: <a href="https://semver.org/spec/v2.0.0.html">https://semver.org/spec/v2.0.0.html</a></li>
-<li>Git docs, <code>git tag</code>: <a href="https://git-scm.com/docs/git-tag">https://git-scm.com/docs/git-tag</a></li>
-<li>Git docs, <code>git push --force-with-lease</code>: <a href="https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease">https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease</a></li>
-<li>Git docs, <code>git revert -m</code>: <a href="https://git-scm.com/docs/git-revert">https://git-scm.com/docs/git-revert</a></li>
-<li>GitHub Docs, "About protected branches": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches</a></li>
-<li>GitHub Docs, "About code owners": <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners">https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners</a></li>
-<li>GitHub Docs, "About merge methods on GitHub": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github</a></li>
-<li>GitHub Docs, "About required status checks": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging</a></li>
+<li><a href="https://docs.github.com/en/get-started/using-github/github-flow">GitHub Docs — GitHub flow</a> — The official end-to-end description of the issue → branch → PR → merge → branch cleanup loop this chapter teaches.</li>
+<li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">GitHub Docs — About merge methods on GitHub</a> — The direct reference for choosing between squash, merge-commit, and rebase-merge workflows.</li>
+<li><a href="https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease">git-push manual</a> — Explains why <code>--force-with-lease</code> is safer than plain <code>--force</code> in the recovery section.</li>
+<li><a href="https://git-scm.com/docs/git-tag">git-tag manual</a> — The canonical reference for creating and publishing annotated release tags.</li>
+<li><a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning 2.0.0</a> — Defines the <code>MAJOR.MINOR.PATCH</code> rules the release-tag examples rely on.</li>
+<li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches">GitHub Docs — About protected branches</a> — Covers the branch-protection guardrails behind no-direct-push, review, and status-check requirements.</li>
 </ul>
 <p class="tags-line">Tags: github-flow, git-workflow, conventional-commits, semantic-versioning, code-review, release-tag</p>
 </body>

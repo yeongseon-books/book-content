@@ -17,26 +17,31 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: GitHub repository 만들기 - remote, push, pull 한 번에 익히기
+title: "Git & GitHub 101 (6/10): GitHub repository 만들기 - remote, push, pull 한 번에 익히기"
 seo_description: GitHub remote를 연결하고 push, fetch, pull, clone을 익히는 글입니다.
 ---
 
-# GitHub repository 만들기 - remote, push, pull 한 번에 익히기
+# Git & GitHub 101 (6/10): GitHub repository 만들기 - remote, push, pull 한 번에 익히기
 
 지금까지의 Git은 한 대의 컴퓨터 안에서만 움직였습니다. 협업이 본격적으로 시작되는 지점은 로컬 저장소에 원격 보관 장소가 생길 때입니다. 그때부터 같은 history를 다른 사람과 다른 기기에서도 공유할 수 있습니다.
 
 이 글은 Git/GitHub 101 시리즈의 여섯 번째 글입니다. 여기서는 로컬 저장소를 GitHub에 연결하고 첫 push, fetch, pull, clone 흐름을 순서대로 살펴봅니다.
 
-## 이 글에서 다룰 문제
-
-> GitHub 저장소는 네트워크 너머에 있는 또 하나의 Git 저장소이고, remote는 그 저장소를 부르는 짧은 별명입니다. `push`, `fetch`, `pull`은 두 저장소 사이에서 commit을 주고받는 동기화 동작입니다.
+## 먼저 던지는 질문
 
 - remote는 정확히 무엇이고 왜 첫 이름이 보통 `origin`일까요?
 - 빈 GitHub 저장소를 로컬 저장소에 연결하는 순서는 어떻게 될까요?
 - `git push -u origin main`은 한 번에 무엇을 두 가지나 설정할까요?
-- `git fetch`와 `git pull`은 어떻게 다를까요?
-- `git clone`은 working tree 말고 무엇까지 내려받을까요?
-- HTTPS와 SSH 중 무엇을 기준으로 선택하면 좋을까요?
+
+## 큰 그림
+
+![Git & GitHub 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.ko.png)
+
+*Git & GitHub 101 6장 흐름 개요*
+
+이 그림에서는 GitHub repository 만들기 - remote, push, pull 한 번에 익히기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> GitHub repository 만들기 - remote, push, pull 한 번에 익히기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -47,10 +52,6 @@ remote는 외부 저장소의 별칭입니다. URL을 매번 길게 입력하지
 또한 `push`, `fetch`, `pull`을 구분해야 나중에 "다른 사람이 올린 변경을 어떻게 안전하게 가져오지?"라는 질문도 흔들리지 않습니다.
 
 ## 핵심 그림
-
-![Mental Model](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.ko.png)
-
-*Mental Model*
 
 세 가지를 함께 기억하면 충분합니다.
 
@@ -274,19 +275,29 @@ remote는 다른 위치의 저장소를 가리키는 별칭이고, 첫 이름은
 
 다음 글에서는 GitHub 협업의 핵심 단위인 Pull Request를 다룹니다. branch에서 작업한 변경이 리뷰를 거쳐 `main`으로 들어가는 과정을 따라가 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **remote는 정확히 무엇이고 왜 첫 이름이 보통 `origin`일까요?**
+  - 본문의 기준은 GitHub repository 만들기 - remote, push, pull 한 번에 익히기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **빈 GitHub 저장소를 로컬 저장소에 연결하는 순서는 어떻게 될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`git push -u origin main`은 한 번에 무엇을 두 가지나 설정할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
-- [첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
-- [변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
-- [branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
-- [merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
+- [Git & GitHub 101 (1/10): Git이란 무엇인가? 버전 관리의 시작](./01-what-is-git.md)
+- [Git & GitHub 101 (2/10): 첫 commit 만들기 - init, status, add, commit](./02-first-commit.md)
+- [Git & GitHub 101 (3/10): 변경 사항 확인하기 - status, diff, log로 읽기](./03-status-diff-log.md)
+- [Git & GitHub 101 (4/10): branch 기초 - 만들고 옮기고 비교하기](./04-branch-basics.md)
+- [Git & GitHub 101 (5/10): merge와 conflict 해결하기 - 두 줄기를 다시 합치기](./05-merge-and-conflict.md)
 - **GitHub repository 만들기 - remote, push, pull 한 번에 익히기 (현재 글)**
-- Pull Request로 협업하기 (예정)
-- Issue와 Project로 일감 관리하기 (예정)
-- 좋은 commit message 쓰기 (예정)
-- 실전 Git workflow 만들기 (예정)
+- Pull Request로 협업하기 - branch에서 review를 거쳐 main까지 (예정)
+- Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법 (예정)
+- 좋은 commit message 쓰기: Conventional Commits와 좋은 본문 (예정)
+- 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Writing Good Commit Messages: Conventional Commits and Useful Bodies</title>
+<title>Git & GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Writing Good Commit Messages: Conventional Commits and Useful Bodies</h1>
+<h1>Git &amp; GitHub 101 (9/10): Writing Good Commit Messages: Conventional Commits and Useful Bodies</h1>
 <p>Every repository eventually reaches the point where the code alone is not enough to explain why a change happened. A good commit message turns the history itself into documentation that survives long after the context in chat and review threads fades away.</p>
 <p>This is the ninth post in the Git &amp; GitHub 101 series. Here, we look at message structure, Conventional Commits, and the habits that keep <code>git log</code> useful.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why a good commit message is an asset that pays off as much as the code itself.</li>
-<li>How to structure a commit message with a subject, body, and footer.</li>
-<li>How Conventional Commits (<code>feat</code>, <code>fix</code>, <code>docs</code>, etc.) signal the kind of change at a glance.</li>
-<li>How to polish messages after the fact with <code>git commit --amend</code> and <code>git rebase -i</code>.</li>
+<li>Why a good commit message is an asset that pays off as much as the code itself?</li>
+<li>How to structure a commit message with a subject, body, and footer?</li>
+<li>How Conventional Commits (<code>feat</code>, <code>fix</code>, <code>docs</code>, etc.) signal the kind of change at a glance?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Git &amp; GitHub 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png"></p>
+<p><em>Git &amp; GitHub 101 chapter 9 flow overview</em></p>
+<p>This picture places Writing Good Commit Messages: Conventional Commits and Useful Bodies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Writing Good Commit Messages: Conventional Commits and Useful Bodies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p><code>git log</code> is a letter to your future self and to your teammates. Six months later, when <code>git blame</code> lands on a single line, a clear commit message restores the context in five seconds. The opposite — <code>fix bug</code>, <code>update</code>, <code>wip</code> — forces a reader to pull up the original PR and re-read the entire diff to figure out what happened.</p>
 <p>Good messages also feed automation. With Conventional Commits, a release script can collect each <code>feat</code> commit into a changelog and bump the major version when a <code>BREAKING CHANGE</code> footer appears. The message itself becomes the first draft of release notes.</p>
@@ -72,9 +78,7 @@
 <p>A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.<br>
 A solid commit message has a fixed skeleton.</p>
 </blockquote>
-<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png"></p>
-<p><em>Mental model</em><br>
-Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.</p>
+<p>Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.</p>
 <h2>Core concepts</h2>
 <p><strong>Subject</strong><br>
 - Description: First line, 50 characters or fewer, no trailing period, written in the imperative mood. <code>Add login button</code> is good; <code>Added login button</code> is not.</p>
@@ -255,28 +259,36 @@ $ git show --stat --summary --format=fuller HEAD
 <h2>Wrap-up and next post</h2>
 <p>A well-written commit message is the cheapest documentation that explains the intent of a change without rereading the code. With the 50-character imperative subject, the "why" body, the metadata footer, and the Conventional Commits type prefix, <code>git log</code> doubles as a change-history document. Polish unpushed commits freely with <code>--amend</code> and <code>rebase -i</code>, and let a hook plus CI lint enforce the format automatically.</p>
 <p>The next post stitches the tools from this series into one realistic workflow. We will follow a single change from the issue that opens it through PR merge and release, and look at how to recover with the right commands when something goes wrong along the way.</p>
-<h2>Series TOC</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Tracking Work with Issues and Projects</a></li>
-<li><strong>Writing Good Commit Messages (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/10-real-world-workflow.md">Building a Real-World Git Workflow</a></li>
+<li><strong>Why a good commit message is an asset that pays off as much as the code itself?</strong></li>
+<li>The article treats Writing Good Commit Messages: Conventional Commits and Useful Bodies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to structure a commit message with a subject, body, and footer?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How Conventional Commits (<code>feat</code>, <code>fix</code>, <code>docs</code>, etc.) signal the kind of change at a glance?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">Git &amp; GitHub 101 (1/10): What is Git? Version control fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Git &amp; GitHub 101 (2/10): Your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Git &amp; GitHub 101 (3/10): Reading change history - status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Git &amp; GitHub 101 (4/10): Branch basics - create, switch, and compare</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Git &amp; GitHub 101 (5/10): Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Git &amp; GitHub 101 (6/10): Creating a GitHub repository - remote, push, and pull in one go</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Git &amp; GitHub 101 (7/10): Collaborating with Pull Requests - From Branch to Review to Main</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Git &amp; GitHub 101 (8/10): Tracking Work with Issues and Projects - How GitHub Records What's Next</a></li>
+<li><strong>Writing Good Commit Messages: Conventional Commits and Useful Bodies (current)</strong></li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li>Conventional Commits, "Conventional Commits 1.0.0": <a href="https://www.conventionalcommits.org/en/v1.0.0/">https://www.conventionalcommits.org/en/v1.0.0/</a></li>
-<li>Tim Pope, "A Note About Git Commit Messages": <a href="https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html">https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html</a></li>
-<li>Git docs, <code>git commit --amend</code>: <a href="https://git-scm.com/docs/git-commit">https://git-scm.com/docs/git-commit</a></li>
-<li>Git docs, <code>git rebase -i</code>: <a href="https://git-scm.com/docs/git-rebase">https://git-scm.com/docs/git-rebase</a></li>
-<li>Git docs, "githooks - commit-msg": <a href="https://git-scm.com/docs/githooks#_commit_msg">https://git-scm.com/docs/githooks#_commit_msg</a></li>
-<li>Git docs, <code>git show</code>: <a href="https://git-scm.com/docs/git-show">https://git-scm.com/docs/git-show</a></li>
-<li>GitHub Docs, "About merge methods on GitHub": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github</a></li>
+<li><a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits — Conventional Commits 1.0.0</a> — The original specification for the <code>type(scope): subject</code> structure, body/footer layout, and SemVer connection used in this chapter.</li>
+<li><a href="https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html">Tim Pope — A Note About Git Commit Messages</a> — The classic reference behind the 50-character subject, 72-character wrapping, and imperative-mood guidance.</li>
+<li><a href="https://git-scm.com/docs/git-commit">git-commit manual</a> — The authoritative source for message entry, <code>--amend</code>, and editor-based commit flows.</li>
+<li><a href="https://git-scm.com/docs/git-rebase">git-rebase manual</a> — Backs up the <code>rebase -i</code> and <code>reword</code> workflow for polishing older commit messages.</li>
+<li><a href="https://git-scm.com/docs/githooks#_commit_msg">githooks manual — commit-msg</a> — Documents how a <code>commit-msg</code> hook can enforce the message format automatically.</li>
+<li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">GitHub Docs — About merge methods on GitHub</a> — Useful context for how squash merges turn PR titles into the default-branch history your teammates will read later.</li>
 </ul>
 <p class="tags-line">Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame</p>
 </body>
