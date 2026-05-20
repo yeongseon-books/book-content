@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:04:56+00:00
+Generated: 2026-05-20T12:05:17+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **2**
+- Series with any issue: **1**
 - Series at or above 5 issues: **0**
-- Total issues: **6**
-  - BadImg: **6**
+- Total issues: **2**
+  - BadImg: **2**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,18 +41,7 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 2 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## azure-aca-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png:1` — PNG height 67px <= 100px (size=1097x67)
-- `assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png:1` — PNG height 67px <= 100px (size=1097x67)
-- `assets/azure-aca-101/05/05-01-the-scaling-path.en.png:1` — PNG height 67px <= 100px (size=945x67)
-- `assets/azure-aca-101/05/05-01-the-scaling-path.ko.png:1` — PNG height 67px <= 100px (size=945x67)
+| 1 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## operating-systems-101 — Total 2
 

@@ -1,145 +1,21 @@
 {
-  "generated_at": "2026-05-20T12:04:56+00:00",
+  "generated_at": "2026-05-20T12:05:17+00:00",
   "series_count": 92,
-  "problem_series_count": 2,
+  "problem_series_count": 1,
   "series_with_5_plus": 0,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 6,
+    "BadImg": 2,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 6
+    "all": 2
   },
   "results": [
-    {
-      "series": "azure-aca-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 4
-      },
-      "total": 4,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-the-end-to-end-path.en.png",
-            "width": 1097,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-the-end-to-end-path.ko.png",
-            "width": 1097,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/05/05-01-the-scaling-path.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-the-scaling-path.en.png",
-            "width": 945,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/05/05-01-the-scaling-path.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-the-scaling-path.ko.png",
-            "width": 945,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-the-end-to-end-path.en.png",
-            "width": 1097,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-the-end-to-end-path.ko.png",
-            "width": 1097,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/05/05-01-the-scaling-path.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-the-scaling-path.en.png",
-            "width": 945,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aca-101/05/05-01-the-scaling-path.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-the-scaling-path.ko.png",
-            "width": 945,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
     {
       "series": "operating-systems-101",
       "counts": {
@@ -340,6 +216,20 @@
     },
     {
       "series": "api-design-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "azure-aca-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
