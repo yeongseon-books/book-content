@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:03:34+00:00
+Generated: 2026-05-20T12:03:55+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **6**
-- Series at or above 5 issues: **4**
-- Total issues: **44**
-  - BadImg: **44**
+- Series with any issue: **5**
+- Series at or above 5 issues: **3**
+- Total issues: **32**
+  - BadImg: **32**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,24 +41,11 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 2 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 3 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 4 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 5 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 6 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## llm-apps-ops-101 — Total 12
-
-- BadImg=12 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/llm-apps-ops-101/02/02-01-big-picture.en.png:1` — PNG height 67px <= 100px (size=965x67)
-- `assets/llm-apps-ops-101/02/02-01-big-picture.ko.png:1` — PNG height 67px <= 100px (size=934x67)
-- `assets/llm-apps-ops-101/03/03-01-big-picture.en.png:1` — PNG height 88px <= 100px (size=1049x88)
-- `assets/llm-apps-ops-101/03/03-01-big-picture.ko.png:1` — PNG height 67px <= 100px (size=938x67)
-- `assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png:1` — PNG height 87px <= 100px (size=1087x87)
-- ... 7 more
+| 1 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 2 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 3 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 4 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 5 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## python-package-101 — Total 10
 

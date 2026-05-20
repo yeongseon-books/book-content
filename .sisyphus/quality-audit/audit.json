@@ -1,327 +1,21 @@
 {
-  "generated_at": "2026-05-20T12:03:34+00:00",
+  "generated_at": "2026-05-20T12:03:55+00:00",
   "series_count": 92,
-  "problem_series_count": 6,
-  "series_with_5_plus": 4,
+  "problem_series_count": 5,
+  "series_with_5_plus": 3,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 44,
+    "BadImg": 32,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 44
+    "all": 32
   },
   "results": [
-    {
-      "series": "llm-apps-ops-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 12
-      },
-      "total": 12,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/02/02-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-big-picture.en.png",
-            "width": 965,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/02/02-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-big-picture.ko.png",
-            "width": 934,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/03/03-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-big-picture.en.png",
-            "width": 1049,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/03/03-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-big-picture.ko.png",
-            "width": 938,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-03-what-to-notice-in-this-code.en.png",
-            "width": 1087,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.ko.png",
-            "line": 1,
-            "message": "PNG height 89px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-03-what-to-notice-in-this-code.ko.png",
-            "width": 1039,
-            "height": 89,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png",
-            "line": 1,
-            "message": "PNG height 52px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-where-engineers-get-confused.en.png",
-            "width": 1210,
-            "height": 52,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.ko.png",
-            "line": 1,
-            "message": "PNG height 54px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-where-engineers-get-confused.ko.png",
-            "width": 1133,
-            "height": 54,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 63px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-big-picture.en.png",
-            "width": 1384,
-            "height": 63,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-big-picture.ko.png",
-            "width": 1221,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/02/02-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-big-picture.en.png",
-            "width": 965,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/02/02-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-big-picture.ko.png",
-            "width": 934,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/03/03-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-big-picture.en.png",
-            "width": 1049,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/03/03-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-big-picture.ko.png",
-            "width": 938,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-03-what-to-notice-in-this-code.en.png",
-            "width": 1087,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.ko.png",
-            "line": 1,
-            "message": "PNG height 89px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-03-what-to-notice-in-this-code.ko.png",
-            "width": 1039,
-            "height": 89,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png",
-            "line": 1,
-            "message": "PNG height 52px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-where-engineers-get-confused.en.png",
-            "width": 1210,
-            "height": 52,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.ko.png",
-            "line": 1,
-            "message": "PNG height 54px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-04-where-engineers-get-confused.ko.png",
-            "width": 1133,
-            "height": 54,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-01-big-picture.en.png",
-            "line": 1,
-            "message": "PNG height 63px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-big-picture.en.png",
-            "width": 1384,
-            "height": 63,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-01-big-picture.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-big-picture.ko.png",
-            "width": 1221,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-where-engineers-get-confused.en.png",
-            "width": 791,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.ko.png",
-            "line": 1,
-            "message": "PNG height 89px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-where-engineers-get-confused.ko.png",
-            "width": 712,
-            "height": 89,
-            "repo": null
-          }
-        ]
-      }
-    },
     {
       "series": "python-package-101",
       "counts": {
@@ -2026,6 +1720,20 @@
     },
     {
       "series": "llm-app-foundations-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "llm-apps-ops-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
