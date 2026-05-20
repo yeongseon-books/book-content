@@ -1,5 +1,5 @@
 ---
-title: Your first cluster, your first deploy — Python/FastAPI
+title: "Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI"
 series: azure-aks-101
 episode: 3
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-04-29'
 seo_description: Build your first Azure Kubernetes Service (AKS) cluster and deploy a Python/FastAPI app using Azure CLI and kubectl.
 ---
 
-# Your first cluster, your first deploy — Python/FastAPI
+# Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI
 
 > Azure Kubernetes Service 101 series (3/7)
 
@@ -28,21 +28,24 @@ This post creates a small AKS cluster, adds a user node pool, and deploys a mini
 
 This is the third post in the Azure Kubernetes Service 101 series. Here, we take the cluster model from the earlier posts and turn it into a working AKS deployment with a small FastAPI app.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What parameters absolutely must be decided when creating a minimal AKS cluster?
 - Should you reach for `az aks create` or Bicep/Terraform for your first cluster?
 - What permission model wires ACR (Azure Container Registry) to AKS?
-- What breaks most often on the first deploy (image pull, permissions, networking)?
-- How do you fetch and verify the kubectl context safely?
+
+## Big Picture
+
+![azure kubernetes service 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.en.png)
+
+*azure kubernetes service 101 chapter 3 flow overview*
+
+This picture places Your first cluster, your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Your first cluster, your first deploy — Python/FastAPI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Today's flow
 
-![Cluster creation and deployment flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.en.png)
-
-*Cluster creation and deployment flow*
 The split matters. `az` creates and configures Azure resources. `kubectl` talks to the Kubernetes API once the cluster exists.
 
 ---
@@ -386,16 +389,25 @@ This is part 3 of the Azure Kubernetes Service 101 series. The first two posts s
 - [ ] Set readiness and liveness probes on the first Deployment
 - [ ] Picked the right Service exposure (ClusterIP/LoadBalancer) for intent
 
+## Answering the Opening Questions
+
+- **What parameters absolutely must be decided when creating a minimal AKS cluster?**
+  - The article treats Your first cluster, your first deploy — Python/FastAPI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Should you reach for `az aks create` or Bicep/Terraform for your first cluster?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What permission model wires ACR (Azure Container Registry) to AKS?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- [Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
-- **Your first cluster, your first deploy — Python/FastAPI (current)**
-- Pod, Deployment, Service — the three ways you express a workload (upcoming)
-- Networking and Ingress — the path in and out of the cluster (upcoming)
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools](./02-cluster-architecture.md)
+- **Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI (current)**
+- Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload (upcoming)
+- Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (upcoming)
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

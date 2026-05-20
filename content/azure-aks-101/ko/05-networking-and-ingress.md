@@ -1,5 +1,5 @@
 ---
-title: 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
+title: "Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길"
 series: azure-aks-101
 episode: 5
 language: ko
@@ -19,7 +19,7 @@ seo_description: AKS를 쓰다 막히는 지점은 대개 네트워크입니다.
   도메인 라우팅은 왜 안…
 ---
 
-# 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
+# Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
 
 AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통신이 되는데 외부에서 붙지 않거나, Service는 있는데 도메인 라우팅이 되지 않거나, 서브넷이 충분해 보였는데 노드 수와 클러스터 수가 늘어나자 갑자기 IP 계획이 빡빡해집니다. 처음에는 전부 비슷한 문제처럼 보이지만, 사실은 서로 다른 층의 문제입니다.
 
@@ -29,13 +29,21 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통
 
 여기서는 **Pod IP 설계와 외부 HTTP 라우팅을 분리해서** AKS 네트워킹을 정리하겠습니다. Azure CNI Overlay가 왜 새 클러스터의 자연스러운 기본 선택지인지, 그리고 Service와 Ingress가 왜 L4와 L7이라는 서로 다른 층에 놓이는지 차례로 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요?
 - kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요?
 - 새 AKS 클러스터에서 Azure CNI Overlay를 먼저 검토하는 이유는 무엇일까요?
-- Service만으로 해결되지 않는 것을 Ingress controller가 정확히 무엇으로 채워 줄까요?
-- NGINX, AGIC, Application Routing add-on은 어떤 상황에서 다른 감각을 줄까요?
+
+## 큰 그림
+
+![Azure Kubernetes Service 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
+
+*Azure Kubernetes Service 101 5장 흐름 개요*
+
+이 그림에서는 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -45,7 +53,7 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통
 
 마지막으로 이 글은 6화 스케일링과도 직접 연결됩니다. 요청이 어디로 들어오는지, Pod가 어떤 IP 모델 위에서 실행되는지 이해해야 스케일아웃 시 병목이 어디서 생기는지도 읽을 수 있습니다. 네트워킹은 독립 주제가 아니라 운영 전반의 바닥 구조입니다.
 
-## AKS 네트워킹을 이해하는 가장 좋은 방법: IP 할당 모델과 트래픽 진입 계층을 분리해서 보는 것입니다
+## 핵심 관점
 
 AKS 네트워킹을 한 번에 이해하려 하면 오히려 더 헷갈립니다. 저는 먼저 아래 두 질문을 따로 둡니다. 첫째, Pod는 어떤 주소 공간을 사용하고 그 주소가 VNet과 어떤 관계를 가지는가. 둘째, 외부에서 들어온 HTTP 요청은 어떤 L7 계층을 거쳐 어떤 Service로 전달되는가. 이 둘이 섞여 보이면 kubenet과 Ingress가 같은 종류의 문제처럼 느껴집니다.
 
@@ -60,10 +68,6 @@ AKS 네트워킹을 한 번에 이해하려 하면 오히려 더 헷갈립니다
 ### 외부 요청 경로부터 먼저 보는 편이 좋습니다
 
 클러스터 밖에서 안쪽으로 들어오는 요청 관점에서는 아래 그림이 가장 중요합니다.
-
-![Ingress 앞단의 외부 요청 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
-
-*Ingress 앞단의 외부 요청 흐름*
 
 이 그림이 보여 주는 핵심은 단순합니다. Service는 클러스터 내부의 안정적인 진입점이고, Ingress는 그 앞단의 HTTP 라우터입니다. 즉 외부 요청은 보통 L7 계층을 거쳐 L4 서비스 추상화로 내려가고, 그 뒤에 Pod 집합이 있습니다.
 
@@ -258,16 +262,25 @@ NGINX는 클러스터 안에서 동작하는 프록시라는 감각이 강합니
 
 이제 다음 6화에서는 이 경로로 들어오는 부하가 늘어날 때 무슨 일이 벌어지는지 보게 됩니다. Pod 수를 늘리는 HPA, 노드 수를 늘리는 Cluster Autoscaler, 이벤트 기반 워크로드를 다루는 KEDA를 오늘 본 네트워크 구조 위에 얹어서 읽으면 훨씬 자연스럽습니다.
 
+## 처음 질문으로 돌아가기
+
+- **Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요?**
+  - 본문의 기준은 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **새 AKS 클러스터에서 Azure CNI Overlay를 먼저 검토하는 이유는 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
-- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
-- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
-- **네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 (현재 글)**
-- 스케일링 — HPA, Cluster Autoscaler, KEDA (예정)
-- 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
+- [Azure Kubernetes Service 101 (1/7): Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): 클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Azure Kubernetes Service 101 (4/7): Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- **Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길 (현재 글)**
+- Azure Kubernetes Service 101 (6/7): 스케일링 — HPA, Cluster Autoscaler, KEDA (예정)
+- Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람 (예정)
 
 <!-- toc:end -->
 

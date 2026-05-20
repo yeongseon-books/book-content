@@ -1,5 +1,5 @@
 ---
-title: 모니터링과 운영 — Container Insights, 로그, 알람
+title: "Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람"
 series: azure-aks-101
 episode: 7
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-12'
 seo_description: kube-state-metrics는 이름 그대로 Kubernetes 오브젝트의 상태를 메트릭으로 드러냅니다.
 ---
 
-# 모니터링과 운영 — Container Insights, 로그, 알람
+# Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람
 
 AKS는 배포가 끝났다고 운영이 끝나는 서비스가 아닙니다. 오히려 그때부터가 시작입니다. Pod가 왜 재시작하는지, 어떤 node pool이 먼저 포화되는지, HPA가 왜 예상대로 반응하지 않았는지, 장애 조짐을 사용자보다 먼저 볼 수 있는지는 결국 관측 체계가 얼마나 잘 잡혀 있는가에 달려 있습니다.
 
@@ -28,13 +28,21 @@ AKS는 배포가 끝났다고 운영이 끝나는 서비스가 아닙니다. 오
 
 여기서는 앞선 여섯 화에서 본 클러스터, 워크로드, 네트워크, 스케일링 이야기를 운영 관점에서 하나로 묶겠습니다. **Container Insights, Log Analytics, kube-state-metrics, 알람 계층**을 중심으로 AKS day-2 운영의 기본 시야를 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요?
 - 로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요?
 - Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요?
-- kube-state-metrics는 CPU·메모리 메트릭과 무엇이 다를까요?
-- 알람은 애플리케이션, Kubernetes 객체, 노드 계층에 어떻게 나누어 두는 편이 좋을까요?
+
+## 큰 그림
+
+![Azure Kubernetes Service 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
+
+*Azure Kubernetes Service 101 7장 흐름 개요*
+
+이 그림에서는 모니터링과 운영 — Container Insights, 로그, 알람를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 모니터링과 운영 — Container Insights, 로그, 알람의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -44,7 +52,7 @@ AKS는 배포가 끝났다고 운영이 끝나는 서비스가 아닙니다. 오
 
 마지막으로 관측은 많이 모으는 것보다 잘 읽는 것이 중요합니다. 모든 로그를 무한히 쌓는 것이 목표가 아니라, 실제 장애를 빠르게 진단할 만큼은 모으되 비용을 통제하는 것이 목표입니다. 운영 관점의 observability는 수집량 경쟁이 아니라 **질문에 답하는 체계**입니다.
 
-## 운영을 이해하는 가장 좋은 방법: 로그 경로와 메트릭 경로를 분리해서 보는 것입니다
+## 핵심 관점
 
 AKS 운영을 처음 정리할 때 가장 실용적인 기준은 텔레메트리 경로를 둘로 나누는 것입니다. 하나는 로그 경로이고, 다른 하나는 메트릭 경로입니다. 로그는 사건의 문맥과 정확한 에러 텍스트를 주고, 메트릭은 추세와 압력과 드리프트를 보여 줍니다. 이 둘을 섞으면 둘 다 애매하게 보입니다.
 
@@ -59,10 +67,6 @@ AKS 운영을 처음 정리할 때 가장 실용적인 기준은 텔레메트리
 ### 운영 시야를 한 장으로 보면 두 축이 먼저 보입니다
 
 전체 운영 구조를 먼저 그림으로 보는 편이 좋습니다.
-
-![로그와 메트릭 기반 운영 관측 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
-
-*로그와 메트릭 기반 운영 관측 구조*
 
 이 그림에서 먼저 기억할 것은 두 축입니다.
 
@@ -283,16 +287,25 @@ Azure Monitor는 AKS에 대해 여러 알람 경로를 제공합니다.
 
 시리즈 전체를 마무리하며 가장 중요하게 남아야 할 감각은 이것입니다. **AKS는 배포 도구가 아니라 운영 플랫폼입니다.** 요청이 어디로 들어오고, 어떤 객체를 거치고, 어디서 스케일하며, 문제가 생기면 어떤 로그와 메트릭을 봐야 하는지까지 한 장의 그림으로 떠올릴 수 있다면, 이제 그다음 주제는 기능 암기가 아니라 깊이 확장 문제가 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요?**
+  - 본문의 기준은 모니터링과 운영 — Container Insights, 로그, 알람를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
-- [클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
-- [첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
-- [Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
-- [네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
-- [스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
-- **모니터링과 운영 — Container Insights, 로그, 알람 (현재 글)**
+- [Azure Kubernetes Service 101 (1/7): Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes](./01-what-is-aks.md)
+- [Azure Kubernetes Service 101 (2/7): 클러스터 아키텍처 — Control Plane과 Node Pool](./02-cluster-architecture.md)
+- [Azure Kubernetes Service 101 (3/7): 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI](./03-first-cluster-and-deploy.md)
+- [Azure Kubernetes Service 101 (4/7): Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식](./04-pod-deployment-service.md)
+- [Azure Kubernetes Service 101 (5/7): 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길](./05-networking-and-ingress.md)
+- [Azure Kubernetes Service 101 (6/7): 스케일링 — HPA, Cluster Autoscaler, KEDA](./06-scaling-hpa-ca-keda.md)
+- **Azure Kubernetes Service 101 (7/7): 모니터링과 운영 — Container Insights, 로그, 알람 (현재 글)**
 
 <!-- toc:end -->
 

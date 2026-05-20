@@ -1,6 +1,5 @@
 ---
-title: What is Azure Kubernetes Service? — what managed Kubernetes actually gives
-  you
+title: "Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you"
 series: azure-aks-101
 episode: 1
 language: en
@@ -19,7 +18,7 @@ last_reviewed: '2026-04-29'
 seo_description: Understand the responsibility boundary of Azure Kubernetes Service (AKS), its managed control plane, and how it differs from other Azure compute.
 ---
 
-# What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
+# Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
 
 > Azure Kubernetes Service 101 series (1/7)
 
@@ -27,24 +26,27 @@ Running a couple of containers isn't the hard part anymore. The hard part starts
 
 AKS is Azure's answer to that cost. This first post is about understanding AKS more precisely than “Kubernetes on Azure.” The useful question is not whether AKS uses Kubernetes. It does. The useful question is which responsibilities Azure takes over, and which ones stay with you.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does AKS take off your plate compared to self-managed Kubernetes, and what stays your job?
 - Is the AKS control plane really free, and what SLA does it carry?
 - What is a node pool, and how do you split system and user pools?
-- How does AKS bind to surrounding Azure resources (VNet, Load Balancer, Storage)?
-- When should you reach for AKS instead of Azure Container Apps or App Service?
+
+## Big Picture
+
+![azure kubernetes service 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
+
+*azure kubernetes service 101 chapter 1 flow overview*
+
+This picture places What is Azure Kubernetes Service? — what managed Kubernetes actually gives you inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is Azure Kubernetes Service? — what managed Kubernetes actually gives you is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — one AKS cluster at a glance
 
 This is the map for the whole series.
 Each later post zooms into one part of the picture.
 
-![AKS cluster component relationships](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
-
-*AKS cluster component relationships*
 Part 2 zooms into the control plane and node pools, parts 3 and 4 cover Deployments, Pods, and Services, part 5 covers networking and Ingress, part 6 covers scaling, and part 7 covers monitoring and operations.
 
 ---
@@ -242,16 +244,25 @@ The point is not to solve every failure from a single table. The point is to bui
 - [ ] Diagrammed the dependencies on VNet, ACR, and Key Vault
 - [ ] Documented why AKS beats ACA/App Service for this specific workload
 
+## Answering the Opening Questions
+
+- **What does AKS take off your plate compared to self-managed Kubernetes, and what stays your job?**
+  - The article treats What is Azure Kubernetes Service? — what managed Kubernetes actually gives you as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is the AKS control plane really free, and what SLA does it carry?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is a node pool, and how do you split system and user pools?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What is Azure Kubernetes Service? — what managed Kubernetes actually gives you (current)**
-- Cluster architecture — control plane and node pools (upcoming)
-- Your first cluster, your first deploy — Python/FastAPI (upcoming)
-- Pod, Deployment, Service — the three ways you express a workload (upcoming)
-- Networking and Ingress — the path in and out of the cluster (upcoming)
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- **Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you (current)**
+- Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools (upcoming)
+- Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI (upcoming)
+- Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload (upcoming)
+- Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (upcoming)
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 

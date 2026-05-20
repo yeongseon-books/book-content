@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Networking and Ingress — the path in and out of the cluster</title>
+<title>Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Networking and Ingress — the path in and out of the cluster</h1>
+<h1>Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster</h1>
 <blockquote>
 <p>Azure Kubernetes Service 101 series (5/7)</p>
 </blockquote>
 <p>Networking is where AKS often stops feeling simple. Pods can talk to each other, but external requests fail. A Service exists, but domain-based routing does not. The subnet looked large enough, until node growth or IP planning says otherwise. At first, these all blur together.</p>
 <p>They get easier once you separate two layers: how pod IPs are assigned, and how external HTTP traffic gets from the edge into Services inside the cluster. This post is about keeping those layers straight.</p>
 <p>This is the fifth post in the Azure Kubernetes Service 101 series. Here, we connect the workload model to AKS networking by separating pod IP design from Ingress and external traffic flow.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How does pod IP assignment differ from external HTTP routing, and why keep them separate?</li>
 <li>When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?</li>
 <li>What does an Ingress controller add that a plain Service cannot?</li>
-<li>Where should TLS termination happen, and why does that choice ripple through observability?</li>
-<li>Which networking mistakes show up first when an AKS cluster scales beyond a single team?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png"></p>
+<p><em>azure kubernetes service 101 chapter 5 flow overview</em></p>
+<p>This picture places Networking and Ingress — the path in and out of the cluster inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Networking and Ingress — the path in and out of the cluster is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Start with the request path</h2>
-<p><img alt="External request flow through Ingress" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png"></p>
-<p><em>External request flow through Ingress</em><br>
-From the outside, this is the shape that matters. The Service is the stable in-cluster endpoint. The Ingress layer is the HTTP router in front of it.</p>
+<p>From the outside, this is the shape that matters. The Service is the stable in-cluster endpoint. The Ingress layer is the HTTP router in front of it.</p>
 <p>Pod IP allocation, subnet sizing, and CNI choice sit further down the stack. Related problems, yes. The same problem, no.</p>
 <hr>
 <h2>The first networking decision in AKS</h2>
@@ -238,15 +240,24 @@ NGINX feels like an in-cluster reverse proxy. AGIC feels like an Azure-native L7
 <li>[ ] Restricted pod-to-pod traffic with NetworkPolicy as intended</li>
 <li>[ ] Managed the external LoadBalancer's static IP/DNS through IaC</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How does pod IP assignment differ from external HTTP routing, and why keep them separate?</strong></li>
+<li>The article treats Networking and Ingress — the path in and out of the cluster as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What does an Ingress controller add that a plain Service cannot?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/01-what-is-aks.md">What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/02-cluster-architecture.md">Cluster architecture — control plane and node pools</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/03-first-cluster-and-deploy.md">Your first cluster, your first deploy — Python/FastAPI</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/04-pod-deployment-service.md">Pod, Deployment, Service — the three ways you express a workload</a></li>
-<li><strong>Networking and Ingress — the path in and out of the cluster (current)</strong></li>
-<li>Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)</li>
-<li>Monitoring and ops — Container Insights, logs, alerts (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/01-what-is-aks.md">Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/02-cluster-architecture.md">Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/03-first-cluster-and-deploy.md">Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/04-pod-deployment-service.md">Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload</a></li>
+<li><strong>Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (current)</strong></li>
+<li>Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)</li>
+<li>Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

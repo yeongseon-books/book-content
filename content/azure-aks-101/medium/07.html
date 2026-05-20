@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Monitoring and ops — Container Insights, logs, alerts</title>
+<title>Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Monitoring and ops — Container Insights, logs, alerts</h1>
+<h1>Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts</h1>
 <blockquote>
 <p>Azure Kubernetes Service 101 series (7/7)</p>
 </blockquote>
 <p>AKS is not done once deployment works. That is when operations starts. Why are pods restarting? Which node pool is saturating first? Why did HPA not react the way you expected? Can you see the problem before users do? Those are observability questions before they are platform questions.</p>
 <p>This final post is a 101-level operations map for AKS: what Container Insights gives you, where KQL fits, why kube-state-metrics matters, and where alerts should live.</p>
 <p>This is the final post in the Azure Kubernetes Service 101 series. Here, we tie the earlier cluster, traffic, and scaling model together from an observability and day-2 operations perspective.</p>
-<hr>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?</li>
+<li>Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?</li>
+<li>What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="azure kubernetes service 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png"></p>
+<p><em>azure kubernetes service 101 chapter 7 flow overview</em></p>
+<p>This picture places Monitoring and ops — Container Insights, logs, alerts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Monitoring and ops — Container Insights, logs, alerts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The operations view in one diagram</h2>
-<p><img alt="Operations observability across logs and metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png"></p>
-<p><em>Operations observability across logs and metrics</em><br>
-The useful split is between two telemetry paths.</p>
+<p>The useful split is between two telemetry paths.</p>
 <ul>
 <li><strong>log path</strong>: Log Analytics, Container Insights, KQL</li>
 <li><strong>metrics path</strong>: Prometheus-style metrics, kube-state-metrics, Grafana, metrics alerts</li>
@@ -240,15 +250,24 @@ Good alerting is layered. CPU over 80% by itself is rarely a complete operations
 <li>[ ] Set the policy for audit logs and API-server logs</li>
 <li>[ ] Wrote a runbook for the incidents that actually recur</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?</strong></li>
+<li>The article treats Monitoring and ops — Container Insights, logs, alerts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/01-what-is-aks.md">What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/02-cluster-architecture.md">Cluster architecture — control plane and node pools</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/03-first-cluster-and-deploy.md">Your first cluster, your first deploy — Python/FastAPI</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/04-pod-deployment-service.md">Pod, Deployment, Service — the three ways you express a workload</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/05-networking-and-ingress.md">Networking and Ingress — the path in and out of the cluster</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/06-scaling-hpa-ca-keda.md">Scaling — HPA, Cluster Autoscaler, KEDA</a></li>
-<li><strong>Monitoring and ops — Container Insights, logs, alerts (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/01-what-is-aks.md">Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/02-cluster-architecture.md">Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/03-first-cluster-and-deploy.md">Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/04-pod-deployment-service.md">Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/05-networking-and-ingress.md">Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aks-101/en/06-scaling-hpa-ca-keda.md">Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA</a></li>
+<li><strong>Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>

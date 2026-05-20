@@ -1,5 +1,5 @@
 ---
-title: Cluster architecture — control plane and node pools
+title: "Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools"
 series: azure-aks-101
 episode: 2
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-04-29'
 seo_description: Explore Azure Kubernetes Service (AKS) architecture, including the managed control plane, system vs. user node pools, and Spot capacity strategy.
 ---
 
-# Cluster architecture — control plane and node pools
+# Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools
 
 > Azure Kubernetes Service 101 series (2/7)
 
@@ -28,21 +28,24 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 This is the second post in the Azure Kubernetes Service 101 series. Here, we turn the managed-Kubernetes boundary into a concrete cluster shape by looking at the control plane, node pools, and their operational roles.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?
 - How does the kubelet, kube-proxy, and container runtime path on a node fit together?
 - Where do AKS managed identity and RBAC plug into the authn/authz flow?
-- Which resources land in the managed `MC_` resource group, and why?
-- What is the blast radius of a node upgrade versus a control-plane upgrade?
+
+## Big Picture
+
+![azure kubernetes service 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
+
+*azure kubernetes service 101 chapter 2 flow overview*
+
+This picture places Cluster architecture — control plane and node pools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cluster architecture — control plane and node pools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Cut the cluster in half
 
-![Responsibility boundary between control plane and node pools](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
-
-*Responsibility boundary between control plane and node pools*
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.
 
 ---
@@ -288,16 +291,25 @@ That is why the control-plane vs node-pool model matters operationally. It is no
 - [ ] Inventoried what AKS creates in the managed `MC_` resource group
 - [ ] Estimated blast radius of node and control-plane upgrades
 
+## Answering the Opening Questions
+
+- **What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?**
+  - The article treats Cluster architecture — control plane and node pools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the kubelet, kube-proxy, and container runtime path on a node fit together?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do AKS managed identity and RBAC plug into the authn/authz flow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
-- **Cluster architecture — control plane and node pools (current)**
-- Your first cluster, your first deploy — Python/FastAPI (upcoming)
-- Pod, Deployment, Service — the three ways you express a workload (upcoming)
-- Networking and Ingress — the path in and out of the cluster (upcoming)
-- Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
-- Monitoring and ops — Container Insights, logs, alerts (upcoming)
+- [Azure Kubernetes Service 101 (1/7): What is Azure Kubernetes Service? — what managed Kubernetes actually gives you](./01-what-is-aks.md)
+- **Azure Kubernetes Service 101 (2/7): Cluster architecture — control plane and node pools (current)**
+- Azure Kubernetes Service 101 (3/7): Your first cluster, your first deploy — Python/FastAPI (upcoming)
+- Azure Kubernetes Service 101 (4/7): Pod, Deployment, Service — the three ways you express a workload (upcoming)
+- Azure Kubernetes Service 101 (5/7): Networking and Ingress — the path in and out of the cluster (upcoming)
+- Azure Kubernetes Service 101 (6/7): Scaling — HPA, Cluster Autoscaler, KEDA (upcoming)
+- Azure Kubernetes Service 101 (7/7): Monitoring and ops — Container Insights, logs, alerts (upcoming)
 
 <!-- toc:end -->
 
