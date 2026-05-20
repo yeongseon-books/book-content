@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:00:18+00:00
+Generated: 2026-05-20T12:00:38+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **13**
+- Series with any issue: **12**
 - Series at or above 5 issues: **9**
-- Total issues: **98**
-  - BadImg: **98**
+- Total issues: **94**
+  - BadImg: **94**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -51,9 +51,8 @@ Warnings:
 | 8 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 9 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 10 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 11 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 12 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 13 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 11 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 12 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -172,16 +171,6 @@ Warnings:
 - `assets/azure-aca-101/03/03-01-the-end-to-end-path.ko.png:1` — PNG height 67px <= 100px (size=1097x67)
 - `assets/azure-aca-101/05/05-01-the-scaling-path.en.png:1` — PNG height 67px <= 100px (size=945x67)
 - `assets/azure-aca-101/05/05-01-the-scaling-path.ko.png:1` — PNG height 67px <= 100px (size=945x67)
-
-## backend-development-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/backend-development-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/backend-development-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1148x67)
-- `assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1148x67)
 
 ## azure-functions-101 — Total 2
 
