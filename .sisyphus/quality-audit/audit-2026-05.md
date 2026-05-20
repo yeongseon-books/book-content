@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:01:53+00:00
+Generated: 2026-05-20T12:02:13+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **9**
-- Series at or above 5 issues: **7**
-- Total issues: **78**
-  - BadImg: **78**
+- Series with any issue: **8**
+- Series at or above 5 issues: **6**
+- Total issues: **72**
+  - BadImg: **72**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -47,9 +47,8 @@ Warnings:
 | 4 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 5 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 6 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 7 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 8 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 9 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 7 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 8 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -122,18 +121,6 @@ Warnings:
 - `assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png:1` — PNG height 67px <= 100px (size=796x67)
 - `assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png:1` — PNG height 67px <= 100px (size=862x67)
 - ... 3 more
-
-## mlops-101 — Total 6
-
-- BadImg=6 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/mlops-101/04/04-01-see-the-flow-first.en.png:1` — PNG height 67px <= 100px (size=915x67)
-- `assets/mlops-101/04/04-01-see-the-flow-first.ko.png:1` — PNG height 67px <= 100px (size=915x67)
-- `assets/mlops-101/05/05-01-see-the-flow-first.en.png:1` — PNG height 67px <= 100px (size=1028x67)
-- `assets/mlops-101/05/05-01-see-the-flow-first.ko.png:1` — PNG height 67px <= 100px (size=1028x67)
-- `assets/mlops-101/08/08-01-see-the-flow-first.en.png:1` — PNG height 67px <= 100px (size=898x67)
-- ... 1 more
 
 ## azure-aca-101 — Total 4
 

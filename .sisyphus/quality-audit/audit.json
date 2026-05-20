@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T12:01:53+00:00",
+  "generated_at": "2026-05-20T12:02:13+00:00",
   "series_count": 92,
-  "problem_series_count": 9,
-  "series_with_5_plus": 7,
+  "problem_series_count": 8,
+  "series_with_5_plus": 6,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 78,
+    "BadImg": 72,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 78
+    "all": 72
   },
   "results": [
     {
@@ -1723,182 +1723,6 @@
       }
     },
     {
-      "series": "mlops-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 6
-      },
-      "total": 6,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/04/04-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-see-the-flow-first.en.png",
-            "width": 915,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/04/04-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-see-the-flow-first.ko.png",
-            "width": 915,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/05/05-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-see-the-flow-first.en.png",
-            "width": 1028,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/05/05-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-see-the-flow-first.ko.png",
-            "width": 1028,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/08/08-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-see-the-flow-first.en.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/08/08-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-see-the-flow-first.ko.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/04/04-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-see-the-flow-first.en.png",
-            "width": 915,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/04/04-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-see-the-flow-first.ko.png",
-            "width": 915,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/05/05-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-see-the-flow-first.en.png",
-            "width": 1028,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/05/05-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-see-the-flow-first.ko.png",
-            "width": 1028,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/08/08-01-see-the-flow-first.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-see-the-flow-first.en.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/mlops-101/08/08-01-see-the-flow-first.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-see-the-flow-first.ko.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "azure-aca-101",
       "counts": {
         "Synt": 0,
@@ -2894,6 +2718,20 @@
     },
     {
       "series": "math-for-cs-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "mlops-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
