@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:03:55+00:00
+Generated: 2026-05-20T12:04:16+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **5**
-- Series at or above 5 issues: **3**
-- Total issues: **32**
-  - BadImg: **32**
+- Series with any issue: **4**
+- Series at or above 5 issues: **2**
+- Total issues: **22**
+  - BadImg: **22**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,23 +41,10 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 2 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 3 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 4 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 5 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## python-package-101 — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/python-package-101/01/01-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=843x88)
-- `assets/python-package-101/01/01-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=825x88)
-- `assets/python-package-101/05/05-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1307x67)
-- `assets/python-package-101/05/05-01-mental-model.ko.png:1` — PNG height 67px <= 100px (size=1245x67)
-- `assets/python-package-101/06/06-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1317x67)
-- ... 5 more
+| 1 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 2 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 3 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 4 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## llm-from-scratch-101 — Total 8
 
