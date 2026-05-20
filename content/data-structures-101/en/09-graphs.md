@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 9
-title: Graphs
+title: "Data Structures 101 (9/10): Graphs"
 status: content-ready
 targets:
   tistory: false
@@ -21,17 +21,29 @@ seo_description: How to represent graphs (adjacency list vs matrix), the meaning
 last_reviewed: '2026-05-04'
 ---
 
-# Graphs
+# Data Structures 101 (9/10): Graphs
 
 This is the ninth post in the Data Structures 101 series.
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What does friend networks, road maps, dependency trees, routing tables, and recommendation systems have in common?
 
 > A graph is a data structure that captures arbitrary relationships between vertices using edges. A tree is just a special case of a graph (a connected, acyclic graph), and graphs are the basic vocabulary of nearly all relational modelling. This article walks through how to represent a graph, the basic properties (direction, weight, connectivity), and the two foundational traversal algorithms — BFS and DFS — by implementing them by hand.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graphs?
+- Which signal should the example or diagram make visible for Graphs?
+- What failure should be prevented first when Graphs reaches a real system?
+
+## Big Picture
+
+![data structures 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png)
+
+*data structures 101 chapter 9 flow overview*
+
+This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Graphs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -51,9 +63,6 @@ Graphs are the most general and powerful data structure in computer science. Soc
 > A graph G = (V, E) is a vertex set V and an edge set E. If edges have direction, you have a directed graph; if they carry weights, you have a weighted graph. Adjacency lists are memory efficient, while adjacency matrices answer "is there an edge between u and v?" in O(1).
 
 ### Graph representations
-
-![Graph representations](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png)
-*Figure. Directed edges capture one-way relationships such as service calls or package dependencies. Adjacency lists are the better default for sparse graphs, while adjacency matrices are the better fit when the graph is dense or you need constant-time edge-existence checks.*
 
 ## Key Terms
 
@@ -109,7 +118,6 @@ class Graph:
     def __iter__(self):
         return iter(self._adj)
 
-
 service_graph = Graph(directed=True)
 for u, v in [
     ("api-gateway", "auth-service"),
@@ -145,7 +153,6 @@ class MatrixGraph:
     def has_edge(self, u, v):
         return self.matrix[u][v] != 0
 
-
 matrix_graph = MatrixGraph(4, directed=True)
 matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
 print(matrix_graph.has_edge(0, 1))   # True
@@ -158,7 +165,6 @@ The matrix uses O(V^2) memory but answers "is there an edge?" in O(1). It is a g
 
 ```python
 from collections import deque
-
 
 def bfs_path(g, start, target):
     visited = {start}
@@ -178,7 +184,6 @@ def bfs_path(g, start, target):
                 prev[v] = u
                 queue.append(v)
     return []
-
 
 path = bfs_path(service_graph, "api-gateway", "warehouse-db")
 print(path)
@@ -214,7 +219,6 @@ def dfs(g, start, visited=None, order=None):
             dfs(g, v, visited, order)
     return order
 
-
 print(dfs(service_graph, "api-gateway"))
 # ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
 ```
@@ -241,7 +245,6 @@ def has_cycle_directed(g):
 
     return any(node not in visited and walk(node) for node in g)
 
-
 dependency_graph = Graph(directed=True)
 for u, v in [
     ("web", "auth"),
@@ -250,7 +253,6 @@ for u, v in [
     ("ledger", "web"),
 ]:
     dependency_graph.add_edge(u, v)
-
 
 cycle_found = has_cycle_directed(dependency_graph)
 print(cycle_found)
@@ -315,17 +317,29 @@ A graph captures arbitrary relationships using vertices and edges, and it is the
 
 The next article closes the series with a practical guide to choosing among the data structures we've covered, given a particular situation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graphs?**
+  - The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graphs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graphs reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
-- [Trees](./06-trees.md)
-- [Binary Search Trees](./07-binary-search-trees.md)
-- [Heaps](./08-heaps.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
+- [Data Structures 101 (6/10): Trees](./06-trees.md)
+- [Data Structures 101 (7/10): Binary Search Trees](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): Heaps](./08-heaps.md)
 - **Graphs (current)**
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

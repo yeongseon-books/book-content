@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 5
-title: 해시 테이블
+title: "Data Structures 101 (5/10): 해시 테이블"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,25 @@ seo_description: 해시 테이블의 O(1) 탐색, 충돌 처리, dict 내부 아
 last_reviewed: '2026-05-12'
 ---
 
-# 해시 테이블
+# Data Structures 101 (5/10): 해시 테이블
 
 이 글은 Data Structures 101 시리즈의 다섯 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 해시 함수는 어떤 역할을 하며, 좋은 해시 함수는 무엇이 다를까요?
 - 충돌은 왜 생기고 어떤 방식으로 해결할 수 있을까요?
 - 부하율(load factor)과 리해싱은 어떤 관계일까요?
-- 파이썬의 `dict`와 `set`은 내부에서 어떤 아이디어를 사용하고 있을까요?
 
-1조 개 중 하나를 거의 한 번의 연산으로 찾는 구조가 있다고 하면 과장처럼 들립니다. 하지만 해시 테이블은 평균적으로 정말 그 정도의 직관을 제공합니다. 다만 그 성능은 좋은 해시 함수와 충돌 처리 전략 위에서만 유지됩니다.
+## 큰 그림
 
-> 해시 테이블은 키를 해시 함수로 정수 인덱스로 바꾼 뒤 배열의 특정 위치로 곧바로 점프하는 구조입니다. 평균 시간 복잡도는 O(1)로 매우 강력하지만, 충돌·리해싱·해시 품질을 함께 다뤄야 실제 성능이 유지됩니다.
+![Data Structures 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/05/05-01-big-picture.ko.png)
+
+*Data Structures 101 5장 흐름 개요*
+
+이 그림에서는 해시 테이블를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 해시 테이블의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -123,7 +128,6 @@ class HashTable:
                 return v
         raise KeyError(key)
 
-
 h = HashTable()
 h.put("apple", 1); h.put("banana", 2)
 print(h.get("apple"))   # 1
@@ -149,7 +153,6 @@ class HashTable2(HashTable):
         self._size = 0
         for k, v in old:
             super().put(k, v)
-
 
 h = HashTable2(capacity=4)
 for i in range(10):
@@ -186,7 +189,6 @@ class OpenAddressTable:
             self._size += 1
         self._slots[idx] = (key, value)
 
-
 t = OpenAddressTable()
 t.put("a", 1); t.put("b", 2)
 ```
@@ -204,7 +206,6 @@ class BadHash:
         return 0
     def __eq__(self, other):
         return self.val == other.val
-
 
 import time
 
@@ -295,17 +296,29 @@ print({frozenset({1, 2}): "value"})
 
 다음 글에서는 계층 구조를 자연스럽게 표현하는 트리를 봅니다. 파일 시스템, DOM, 조직도처럼 관계가 위에서 아래로 펼쳐지는 데이터의 기본 골격입니다.
 
+## 처음 질문으로 돌아가기
+
+- **해시 함수는 어떤 역할을 하며, 좋은 해시 함수는 무엇이 다를까요?**
+  - 본문의 기준은 해시 테이블를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **충돌은 왜 생기고 어떤 방식으로 해결할 수 있을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **부하율(load factor)과 리해싱은 어떤 관계일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
-- [연결 리스트](./03-linked-lists.md)
-- [스택과 큐](./04-stacks-and-queues.md)
+## 시리즈 목차
+
+- [Data Structures 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
+- [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
 - **해시 테이블 (현재 글)**
 - 트리 (예정)
 - 이진 탐색 트리 (예정)
 - 힙 (예정)
 - 그래프 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

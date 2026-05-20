@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Graphs</title>
+<title>Data Structures 101 (9/10): Graphs</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Graphs</h1>
-<blockquote>
-<p>Data Structures 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Data Structures 101 (9/10): Graphs</h1>
+<p>This is the ninth post in the Data Structures 101 series.</p>
 <p><strong>Core question</strong>: What does friend networks, road maps, dependency trees, routing tables, and recommendation systems have in common?</p>
 <blockquote>
 <p>A graph is a data structure that captures arbitrary relationships between vertices using edges. A tree is just a special case of a graph (a connected, acyclic graph), and graphs are the basic vocabulary of nearly all relational modelling. This article walks through how to represent a graph, the basic properties (direction, weight, connectivity), and the two foundational traversal algorithms — BFS and DFS — by implementing them by hand.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Data Structures 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Graphs?</li>
+<li>Which signal should the example or diagram make visible for Graphs?</li>
+<li>What failure should be prevented first when Graphs reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data structures 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png"></p>
+<p><em>data structures 101 chapter 9 flow overview</em></p>
+<p>This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Graphs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Core graph terminology (vertex, edge, degree, path)</li>
@@ -82,18 +88,7 @@
 <blockquote>
 <p>A graph G = (V, E) is a vertex set V and an edge set E. If edges have direction, you have a directed graph; if they carry weights, you have a weighted graph. Adjacency lists are memory efficient, while adjacency matrices answer "is there an edge between u and v?" in O(1).</p>
 </blockquote>
-<pre><code class="language-text">Undirected graph             Directed graph
-    A ─── B                   A ──→ B
-    │     │                   │     ↓
-    C ─── D                   C ←── D
-
-Adjacency list               Adjacency matrix
-A: [B, C]                      A B C D
-B: [A, D]                    A 0 1 1 0
-C: [A, D]                    B 1 0 0 1
-D: [B, C]                    C 1 0 0 1
-                             D 0 1 1 0
-</code></pre>
+<p><strong>Graph representations</strong></p>
 <h2>Key Terms</h2>
 <p><strong>Vertex</strong><br>
 - Meaning: A node in the graph</p>
@@ -107,7 +102,7 @@ D: [B, C]                    C 1 0 0 1
 - Meaning: A path whose start and end are the same vertex</p>
 <h2>Before / After</h2>
 <p><strong>Before — ad-hoc dict-of-dict representation:</strong></p>
-<pre><code class="language-python">graph = {&quot;A&quot;: {&quot;B&quot;: 1}, &quot;B&quot;: {&quot;A&quot;: 1, &quot;C&quot;: 2}, ...}
+<pre><code class="language-text">graph = {&quot;A&quot;: {&quot;B&quot;: 1}, &quot;B&quot;: {&quot;A&quot;: 1, &quot;C&quot;: 2}, ...}
 # It works, but with no consistent interface every algorithm becomes awkward
 </code></pre>
 <p><strong>After — an explicit Graph class:</strong></p>
@@ -139,106 +134,139 @@ D: [B, C]                    C 1 0 0 1
     def __iter__(self):
         return iter(self._adj)
 
-g = Graph()
-for u, v in [(&quot;A&quot;, &quot;B&quot;), (&quot;A&quot;, &quot;C&quot;), (&quot;B&quot;, &quot;D&quot;), (&quot;C&quot;, &quot;D&quot;), (&quot;D&quot;, &quot;E&quot;)]:
-    g.add_edge(u, v)
+service_graph = Graph(directed=True)
+for u, v in [
+    (&quot;api-gateway&quot;, &quot;auth-service&quot;),
+    (&quot;api-gateway&quot;, &quot;catalog-service&quot;),
+    (&quot;auth-service&quot;, &quot;user-db&quot;),
+    (&quot;catalog-service&quot;, &quot;inventory-service&quot;),
+    (&quot;inventory-service&quot;, &quot;warehouse-db&quot;),
+    (&quot;inventory-service&quot;, &quot;cache&quot;),
+    (&quot;cache&quot;, &quot;warehouse-db&quot;),
+]:
+    service_graph.add_edge(u, v)
 
-for node in g:
-    print(node, g.neighbors(node))
+for node in service_graph:
+    print(node, service_graph.neighbors(node))
 </code></pre>
-<p>This stores the adjacency list as dict + list. Memory usage is O(V + E).</p>
+<p>This stores the adjacency list as dict + list. Memory usage is O(V + E), which is why it is the right default for sparse real-world graphs such as service dependencies.</p>
 <p><strong>Step 2: Represent a graph with an adjacency matrix</strong></p>
 <pre><code class="language-python">class MatrixGraph:
-    def __init__(self, n):
+    def __init__(self, n, directed=False):
         self.n = n
+        self.directed = directed
         self.matrix = [[0] * n for _ in range(n)]
 
     def add_edge(self, u, v, weight=1):
         self.matrix[u][v] = weight
-        self.matrix[v][u] = weight   # undirected
+        if not self.directed:
+            self.matrix[v][u] = weight
 
     def has_edge(self, u, v):
         return self.matrix[u][v] != 0
 
-g = MatrixGraph(5)
-g.add_edge(0, 1); g.add_edge(0, 2); g.add_edge(1, 3); g.add_edge(2, 3); g.add_edge(3, 4)
-print(g.has_edge(0, 1))   # True
-print(g.has_edge(1, 2))   # False
+matrix_graph = MatrixGraph(4, directed=True)
+matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
+print(matrix_graph.has_edge(0, 1))   # True
+print(matrix_graph.has_edge(1, 0))   # False
 </code></pre>
 <p>The matrix uses O(V^2) memory but answers "is there an edge?" in O(1). It is a good fit when the vertex count is small and the graph is dense.</p>
-<p><strong>Step 3: BFS (shortest path length)</strong></p>
+<p><strong>Step 3: BFS (shortest path)</strong></p>
 <pre><code class="language-python">from collections import deque
 
-def bfs_shortest(g, start, target):
-    visited = {start: 0}
+def bfs_path(g, start, target):
+    visited = {start}
+    prev = {start: None}
     queue = deque([start])
     while queue:
         u = queue.popleft()
         if u == target:
-            return visited[u]
+            path = []
+            while u is not None:
+                path.append(u)
+                u = prev[u]
+            return list(reversed(path))
         for v, _ in g.neighbors(u):
             if v not in visited:
-                visited[v] = visited[u] + 1
+                visited.add(v)
+                prev[v] = u
                 queue.append(v)
-    return -1
+    return []
 
-print(bfs_shortest(g, &quot;A&quot;, &quot;E&quot;))   # 3
+path = bfs_path(service_graph, &quot;api-gateway&quot;, &quot;warehouse-db&quot;)
+print(path)
+print(f&quot;hop count: {len(path) - 1}&quot;)
+
+expected = [
+    &quot;api-gateway&quot;,
+    &quot;catalog-service&quot;,
+    &quot;inventory-service&quot;,
+    &quot;warehouse-db&quot;,
+]
+print(f&quot;path matches expectation: {path == expected}&quot;)
+
+# ['api-gateway', 'catalog-service', 'inventory-service', 'warehouse-db']
+# hop count: 3
+# path matches expectation: True
 </code></pre>
-<p>BFS visits closer vertices first, so it naturally yields the shortest path in an unweighted graph.</p>
+<p>BFS visits closer vertices first, so it naturally yields the shortest path in an unweighted graph. If this path or hop count differs, you probably lost the queue discipline, marked <code>visited</code> too late, or mixed edge direction by mistake.</p>
 <p><strong>Step 4: DFS (recursive)</strong></p>
-<pre><code class="language-python">def dfs(g, start, visited=None):
+<pre><code class="language-python">def dfs(g, start, visited=None, order=None):
     if visited is None:
         visited = set()
+    if order is None:
+        order = []
     visited.add(start)
-    print(start, end=&quot; &quot;)
+    order.append(start)
     for v, _ in g.neighbors(start):
         if v not in visited:
-            dfs(g, v, visited)
+            dfs(g, v, visited, order)
+    return order
 
-dfs(g, &quot;A&quot;)   # e.g. A B D C E
-print()
+print(dfs(service_graph, &quot;api-gateway&quot;))
+# ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
 </code></pre>
 <p>DFS walks one branch all the way down before backtracking. It is the workhorse of cycle detection, topological sort, and connected-component traversal.</p>
-<p><strong>Step 5: Cycle detection and connected components</strong></p>
-<pre><code class="language-python">def has_cycle(g, start, visited=None, parent=None):
-    if visited is None:
-        visited = set()
-    visited.add(start)
-    for v, _ in g.neighbors(start):
-        if v not in visited:
-            if has_cycle(g, v, visited, start):
-                return True
-        elif v != parent:
-            return True
-    return False
-
-def connected_components(g):
+<p><strong>Step 5: Cycle detection in a dependency graph</strong></p>
+<pre><code class="language-python">def has_cycle_directed(g):
     visited = set()
-    components = []
-    for node in g:
-        if node not in visited:
-            comp = set()
-            stack = [node]
-            while stack:
-                u = stack.pop()
-                if u in comp:
-                    continue
-                comp.add(u)
-                for v, _ in g.neighbors(u):
-                    stack.append(v)
-            components.append(comp)
-            visited.update(comp)
-    return components
+    active = set()
 
-print(has_cycle(g, &quot;A&quot;))           # True (A-B-D-C-A)
-print(connected_components(g))     # [{'A','B','C','D','E'}]
+    def walk(node):
+        visited.add(node)
+        active.add(node)
+        for neighbor, _ in g.neighbors(node):
+            if neighbor not in visited and walk(neighbor):
+                return True
+            if neighbor in active:
+                return True
+        active.remove(node)
+        return False
+
+    return any(node not in visited and walk(node) for node in g)
+
+dependency_graph = Graph(directed=True)
+for u, v in [
+    (&quot;web&quot;, &quot;auth&quot;),
+    (&quot;auth&quot;, &quot;payments&quot;),
+    (&quot;payments&quot;, &quot;ledger&quot;),
+    (&quot;ledger&quot;, &quot;web&quot;),
+]:
+    dependency_graph.add_edge(u, v)
+
+cycle_found = has_cycle_directed(dependency_graph)
+print(cycle_found)
+print(f&quot;topological traversal possible: {not cycle_found}&quot;)
+
+# True
+# topological traversal possible: False
 </code></pre>
-<p>Both are applications of DFS. Cycle detection shows up in friend-network validation and dependency-graph validation; connected components power clustering and network analysis.</p>
+<p>This is the DFS-style verification loop you need in practice: a back edge means the dependency graph cannot be topologically ordered. If <code>cycle_found</code> is <code>False</code> here, you probably treated a directed graph as undirected or forgot to track the active recursion stack.</p>
 <h2>Notable Points</h2>
 <ul>
 <li>An adjacency list suits sparse graphs, while a matrix suits dense graphs</li>
-<li>BFS and DFS share the same code; only the data structure changes (queue vs stack)</li>
-<li>In an undirected graph, cycle detection has to track the parent vertex to be correct</li>
+<li>BFS and DFS share the same traversal skeleton; queue vs recursion/stack changes the behaviour</li>
+<li>In a directed graph, cycle detection has to track the active recursion stack to be correct</li>
 <li>A graph is the generalisation of a tree and is the basic vocabulary of relational modelling</li>
 </ul>
 <h2>Five Common Mistakes</h2>
@@ -291,15 +319,25 @@ print(connected_components(g))     # [{'A','B','C','D','E'}]
 <h2>Wrap-Up and Next Steps</h2>
 <p>A graph captures arbitrary relationships using vertices and edges, and it is the most general and most powerful model in computer science. Understand the trade-off between adjacency lists and matrices, and handle the basic properties — direction, weight, connectivity — precisely. BFS and DFS are the foundation of every graph algorithm, and the same skeleton becomes one or the other purely by choice of data structure.</p>
 <p>The next article closes the series with a practical guide to choosing among the data structures we've covered, given a particular situation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Binary Search Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/08-heaps.md">Heaps</a></li>
+<li><strong>What boundary should you inspect first when applying Graphs?</strong></li>
+<li>The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Graphs?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Graphs reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">Data Structures 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Data Structures 101 (2/10): Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Data Structures 101 (3/10): Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Data Structures 101 (4/10): Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Data Structures 101 (5/10): Hash Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Data Structures 101 (6/10): Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Data Structures 101 (7/10): Binary Search Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/08-heaps.md">Data Structures 101 (8/10): Heaps</a></li>
 <li><strong>Graphs (current)</strong></li>
 <li>Choosing Data Structures (upcoming)</li>
 </ul>

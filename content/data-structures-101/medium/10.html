@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Choosing Data Structures</title>
+<title>Data Structures 101 (10/10): Choosing Data Structures</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Choosing Data Structures</h1>
+<h1>Data Structures 101 (10/10): Choosing Data Structures</h1>
 <blockquote>
 <p>Data Structures 101 series (10/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: You've now studied nine data structures. When you face a brand-new problem, what should come to mind first?</p>
 <blockquote>
 <p>Choosing a data structure is decided by "which operations happen most often", not by "what kind of data you store". Even with the same user records, frequent lookups want a hash table; frequent sorted iteration wants a BST; frequent push and pop at both ends wants a deque; frequent priority access wants a heap. This closing article wraps up the series with how to analyse workloads, a decision tree, and the bad picks you'll encounter most often in real projects.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the final post in the Data Structures 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Choosing Data Structures?</li>
+<li>Which signal should the example or diagram make visible for Choosing Data Structures?</li>
+<li>What failure should be prevented first when Choosing Data Structures reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data structures 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/10/10-01-big-picture.en.png"></p>
+<p><em>data structures 101 chapter 10 flow overview</em></p>
+<p>This picture places Choosing Data Structures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Choosing Data Structures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The five core questions that define a workload</li>
@@ -276,16 +285,26 @@ for use_case, ds, complexity in cases:
 <h2>Wrap-Up and Next Steps</h2>
 <p>Choosing a data structure is the final gate of computer-science fundamentals and a decision you make every day in real projects. Start from "frequency and pattern of operations", not "shape of data", and weigh cache locality, memory, and implementation complexity alongside Big-O. Do not ask one structure to do everything; combine them based on the workload — that's the practical approach.</p>
 <p>The nine data structures covered in this series — array, linked list, stack, queue, hash table, tree, BST, heap, graph — are the vocabulary of nearly every algorithm and system design. The next series covers algorithms: sorting, searching, dynamic programming, and graph algorithms — what you build on top of these structures.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Binary Search Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/08-heaps.md">Heaps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/09-graphs.md">Graphs</a></li>
+<li><strong>What boundary should you inspect first when applying Choosing Data Structures?</strong></li>
+<li>The article treats Choosing Data Structures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Choosing Data Structures?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Choosing Data Structures reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">Data Structures 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Data Structures 101 (2/10): Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Data Structures 101 (3/10): Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Data Structures 101 (4/10): Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Data Structures 101 (5/10): Hash Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Data Structures 101 (6/10): Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Data Structures 101 (7/10): Binary Search Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/08-heaps.md">Data Structures 101 (8/10): Heaps</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/09-graphs.md">Data Structures 101 (9/10): Graphs</a></li>
 <li><strong>Choosing Data Structures (current)</strong></li>
 </ul>
 <h2>References</h2>

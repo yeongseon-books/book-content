@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Heaps</title>
+<title>Data Structures 101 (8/10): Heaps</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Heaps</h1>
-<blockquote>
-<p>Data Structures 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Data Structures 101 (8/10): Heaps</h1>
+<p>This is the eighth post in the Data Structures 101 series.</p>
 <p><strong>Core question</strong>: When you constantly need to pull out the highest-priority task, which data structure should you reach for? Keeping the data sorted makes inserts slow; leaving it unordered makes pops slow.</p>
 <blockquote>
 <p>A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the <code>heapq</code> module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the Data Structures 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Heaps?</li>
+<li>Which signal should the example or diagram make visible for Heaps?</li>
+<li>What failure should be prevented first when Heaps reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data structures 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png"></p>
+<p><em>data structures 101 chapter 8 flow overview</em></p>
+<p>This picture places Heaps inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Heaps is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The heap invariant and its relationship to a complete binary tree</li>
@@ -82,14 +88,7 @@
 <blockquote>
 <p>A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.</p>
 </blockquote>
-<pre><code class="language-text">Min-heap
-        1            index: 0  1  2  3  4  5  6
-       / \           array: [1, 3, 2, 5, 4, 6, 7]
-      3   2
-     / \ / \         parent(i)      = (i - 1) // 2
-    5  4 6  7        left_child(i)  = 2*i + 1
-                     right_child(i) = 2*i + 2
-</code></pre>
+<p><strong>Heap array mapping</strong></p>
 <h2>Key Terms</h2>
 <p><strong>Min-heap</strong><br>
 - Meaning: Parent ≤ children</p>
@@ -195,22 +194,46 @@ print(heapq.nlargest(3, data))    # [9, 8, 7]
 <p><code>heapq</code> only ships a min-heap. If you need a max-heap, negate the values when you insert and again when you pop.</p>
 <p><strong>Step 3: Use it as a priority queue</strong></p>
 <pre><code class="language-python">import heapq
+from itertools import count
 
-# Store (priority, task) tuples
-tasks = []
-heapq.heappush(tasks, (3, &quot;report&quot;))
-heapq.heappush(tasks, (1, &quot;alert&quot;))
-heapq.heappush(tasks, (2, &quot;email&quot;))
+queue = []
+tie_breaker = count()
 
-while tasks:
-    priority, task = heapq.heappop(tasks)
-    print(f&quot;[{priority}] {task}&quot;)
+def schedule(priority, task):
+    heapq.heappush(queue, (priority, next(tie_breaker), task))
 
-# [1] alert
-# [2] email
-# [3] report
+schedule(0, &quot;critical alert&quot;)
+schedule(2, &quot;nightly batch&quot;)
+schedule(1, &quot;retry failed payment&quot;)
+schedule(0, &quot;page on-call&quot;)
+schedule(1, &quot;retry webhook&quot;)
+
+order = []
+while queue:
+    priority, _, task = heapq.heappop(queue)
+    order.append((priority, task))
+
+print(order)
+
+expected = [
+    (0, &quot;critical alert&quot;),
+    (0, &quot;page on-call&quot;),
+    (1, &quot;retry failed payment&quot;),
+    (1, &quot;retry webhook&quot;),
+    (2, &quot;nightly batch&quot;),
+]
+print(f&quot;order matches expectation: {order == expected}&quot;)
+
+# [
+#   (0, 'critical alert'),
+#   (0, 'page on-call'),
+#   (1, 'retry failed payment'),
+#   (1, 'retry webhook'),
+#   (2, 'nightly batch'),
+# ]
+# order matches expectation: True
 </code></pre>
-<p>If you need to break ties at the same priority, switch to <code>(priority, counter, task)</code> so the comparison stays stable.</p>
+<p>This is much closer to a real scheduler than a three-item toy demo. If the dequeue order differs, you probably flipped the priority direction, forgot the tie-break counter, or broke the heap invariant by mutating queue entries in place.</p>
 <p><strong>Step 4: heapify — turn an array into a heap in one pass</strong></p>
 <pre><code class="language-python">import heapq
 
@@ -288,14 +311,24 @@ print(heap_sort([5, 3, 8, 1, 9, 2, 7]))
 <h2>Wrap-Up and Next Steps</h2>
 <p>A heap is a complete binary tree specialised for handling the two extremes quickly, and it is the standard implementation of a priority queue. It packs into an array with no gaps, both insert and delete run in O(log n), and heapify runs in an elegant O(n). Arbitrary key search is O(n), so its purpose is clearly different from a BST or a dict. It powers task scheduling, Dijkstra's algorithm, event simulation, and any other system that has to decide "what's next" quickly.</p>
 <p>The next article moves on to graphs, the most general way to represent relationships in data. A tree is a special case of a graph, and you will study the standard ways to represent graphs together with the basic algorithms.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Binary Search Trees</a></li>
+<li><strong>What boundary should you inspect first when applying Heaps?</strong></li>
+<li>The article treats Heaps as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Heaps?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Heaps reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">Data Structures 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Data Structures 101 (2/10): Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Data Structures 101 (3/10): Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Data Structures 101 (4/10): Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Data Structures 101 (5/10): Hash Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Data Structures 101 (6/10): Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Data Structures 101 (7/10): Binary Search Trees</a></li>
 <li><strong>Heaps (current)</strong></li>
 <li>Graphs (upcoming)</li>
 <li>Choosing Data Structures (upcoming)</li>

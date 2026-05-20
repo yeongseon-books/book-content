@@ -18,23 +18,28 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 그래프
+title: "Data Structures 101 (9/10): 그래프"
 ---
 
-# 그래프
+# Data Structures 101 (9/10): 그래프
 
 이 글은 Data Structures 101 시리즈의 아홉 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 정점, 간선, 차수, 경로 같은 그래프 용어를 어떻게 정확히 쓸까요?
 - 인접 리스트와 인접 행렬은 어떤 트레이드오프를 가질까요?
 - 방향 그래프와 무방향 그래프, 가중치 그래프와 비가중치 그래프는 무엇이 다를까요?
-- BFS와 DFS는 구현에서 무엇이 다르고 각각 어떤 문제에 잘 맞을까요?
 
-친구 관계, 도로망, 의존성 그래프, 라우팅 테이블, 추천 시스템은 겉보기에는 전혀 다르지만 공통된 표현 언어를 갖습니다. 트리보다 훨씬 일반적인 관계 표현인 그래프입니다.
+## 큰 그림
 
-> 그래프는 정점(vertex)과 간선(edge)으로 임의의 관계를 표현하는 자료구조입니다. 트리는 연결되고 사이클이 없는 그래프라는 특수한 경우일 뿐이고, 현실의 관계 모델링은 대부분 그래프 쪽에 더 가깝습니다. 그래서 BFS와 DFS는 컴퓨터과학의 가장 기본적인 탐색 어휘가 됩니다.
+![Data Structures 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.ko.png)
+
+*Data Structures 101 9장 흐름 개요*
+
+이 그림에서는 그래프를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 그래프의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -47,9 +52,6 @@ title: 그래프
 > 그래프 `G = (V, E)`는 정점 집합 V와 간선 집합 E로 정의합니다. 간선에 방향이 있으면 방향 그래프, 가중치가 있으면 가중치 그래프입니다. 인접 리스트는 메모리 효율이 좋고, 인접 행렬은 두 정점 사이 간선 존재 여부를 O(1)에 확인할 수 있습니다.
 
 ### 그래프 표현 방식
-
-![그래프 표현 방식](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.ko.png)
-*그림. 방향 간선은 서비스 호출이나 패키지 의존성처럼 한쪽으로 흐르는 관계를 표현할 때 적합합니다. 희소 그래프에는 인접 리스트가 기본 선택이고, 그래프가 조밀하거나 간선 존재 여부를 즉시 확인해야 하면 인접 행렬이 더 잘 맞습니다.*
 
 ## 핵심 용어
 
@@ -107,7 +109,6 @@ class Graph:
     def __iter__(self):
         return iter(self._adj)
 
-
 service_graph = Graph(directed=True)
 for u, v in [
     ("api-gateway", "auth-service"),
@@ -143,7 +144,6 @@ class MatrixGraph:
     def has_edge(self, u, v):
         return self.matrix[u][v] != 0
 
-
 matrix_graph = MatrixGraph(4, directed=True)
 matrix_graph.add_edge(0, 1); matrix_graph.add_edge(0, 2); matrix_graph.add_edge(1, 3); matrix_graph.add_edge(2, 3)
 print(matrix_graph.has_edge(0, 1))   # True
@@ -156,7 +156,6 @@ print(matrix_graph.has_edge(1, 0))   # False
 
 ```python
 from collections import deque
-
 
 def bfs_path(g, start, target):
     visited = {start}
@@ -176,7 +175,6 @@ def bfs_path(g, start, target):
                 prev[v] = u
                 queue.append(v)
     return []
-
 
 path = bfs_path(service_graph, "api-gateway", "warehouse-db")
 print(path)
@@ -212,7 +210,6 @@ def dfs(g, start, visited=None, order=None):
             dfs(g, v, visited, order)
     return order
 
-
 print(dfs(service_graph, "api-gateway"))
 # ['api-gateway', 'auth-service', 'user-db', 'catalog-service', 'inventory-service', 'warehouse-db', 'cache']
 ```
@@ -239,7 +236,6 @@ def has_cycle_directed(g):
 
     return any(node not in visited and walk(node) for node in g)
 
-
 dependency_graph = Graph(directed=True)
 for u, v in [
     ("web", "auth"),
@@ -248,7 +244,6 @@ for u, v in [
     ("ledger", "web"),
 ]:
     dependency_graph.add_edge(u, v)
-
 
 cycle_found = has_cycle_directed(dependency_graph)
 print(cycle_found)
@@ -313,17 +308,29 @@ print(f"topological traversal possible: {not cycle_found}")
 
 다음 글에서는 시리즈를 마무리하며, 지금까지 본 자료구조들을 어떤 상황에서 어떻게 선택할지 실전 관점으로 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **정점, 간선, 차수, 경로 같은 그래프 용어를 어떻게 정확히 쓸까요?**
+  - 본문의 기준은 그래프를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **인접 리스트와 인접 행렬은 어떤 트레이드오프를 가질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **방향 그래프와 무방향 그래프, 가중치 그래프와 비가중치 그래프는 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
-- [연결 리스트](./03-linked-lists.md)
-- [스택과 큐](./04-stacks-and-queues.md)
-- [해시 테이블](./05-hash-tables.md)
-- [트리](./06-trees.md)
-- [이진 탐색 트리](./07-binary-search-trees.md)
-- [힙](./08-heaps.md)
+## 시리즈 목차
+
+- [Data Structures 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
+- [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): 해시 테이블](./05-hash-tables.md)
+- [Data Structures 101 (6/10): 트리](./06-trees.md)
+- [Data Structures 101 (7/10): 이진 탐색 트리](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): 힙](./08-heaps.md)
 - **그래프 (현재 글)**
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

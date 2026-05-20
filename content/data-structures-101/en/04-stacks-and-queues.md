@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 4
-title: Stacks and Queues
+title: "Data Structures 101 (4/10): Stacks and Queues"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How stacks (LIFO) and queues (FIFO) work, how to implement them
 last_reviewed: '2026-05-04'
 ---
 
-# Stacks and Queues
+# Data Structures 101 (4/10): Stacks and Queues
 
 > Data Structures 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What data structure underlies a function call? Why do message queues, work queues, and printer queues all share the word "queue"?
 
 > A stack is last-in-first-out (LIFO); a queue is first-in-first-out (FIFO). The two ADTs are simple, but they sit at the heart of nearly every system: function calls, tree traversal, task scheduling, message passing. This article walks through both by implementing them and then shows how they appear in production software.
 
-<!-- a-grade-intro:end -->
-
 This is post 4 in the Data Structures 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Stacks and Queues?
+- Which signal should the example or diagram make visible for Stacks and Queues?
+- What failure should be prevented first when Stacks and Queues reaches a real system?
+
+## Big Picture
+
+![data structures 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/04/04-01-big-picture.en.png)
+
+*data structures 101 chapter 4 flow overview*
+
+This picture places Stacks and Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Stacks and Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -124,7 +136,6 @@ class Stack:
     def __len__(self):
         return len(self._data)
 
-
 s = Stack()
 for v in [1, 2, 3]:
     s.push(v)
@@ -137,7 +148,6 @@ When you only operate on one end of an array, every operation is O(1), so a plai
 
 ```python
 from collections import deque
-
 
 class Queue:
     def __init__(self):
@@ -153,7 +163,6 @@ class Queue:
 
     def __len__(self):
         return len(self._data)
-
 
 q = Queue()
 for v in ["A", "B", "C"]:
@@ -179,7 +188,6 @@ def is_balanced(expr: str) -> bool:
                 return False
     return not stack
 
-
 print(is_balanced("({[]})"))   # True
 print(is_balanced("({[})"))    # False
 print(is_balanced("(("))       # False
@@ -191,7 +199,6 @@ Push on opens, pop on closes, and check the match. Compiler parsing works on the
 
 ```python
 from collections import deque
-
 
 def bfs(graph: dict, start: str) -> list:
     visited = {start}
@@ -206,7 +213,6 @@ def bfs(graph: dict, start: str) -> list:
                 visited.add(neighbor)
                 queue.append(neighbor)
     return order
-
 
 graph = {
     "A": ["B", "C"],
@@ -291,10 +297,21 @@ Stacks and queues are the simplest ADTs and the ones you encounter most often. A
 
 Next we look at the magic of finding a value by key instantly — the hash table. We see how average O(1) search works and how collisions are resolved.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Stacks and Queues?**
+  - The article treats Stacks and Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Stacks and Queues?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Stacks and Queues reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
 - **Stacks and Queues (current)**
 - Hash Tables (upcoming)
 - Trees (upcoming)
@@ -302,6 +319,7 @@ Next we look at the magic of finding a value by key instantly — the hash table
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

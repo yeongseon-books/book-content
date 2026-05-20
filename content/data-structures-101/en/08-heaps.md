@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 8
-title: Heaps
+title: "Data Structures 101 (8/10): Heaps"
 status: content-ready
 targets:
   tistory: false
@@ -21,17 +21,29 @@ seo_description: How a heap is structured, why it is the standard implementation
 last_reviewed: '2026-05-04'
 ---
 
-# Heaps
+# Data Structures 101 (8/10): Heaps
 
 This is the eighth post in the Data Structures 101 series.
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When you constantly need to pull out the highest-priority task, which data structure should you reach for? Keeping the data sorted makes inserts slow; leaving it unordered makes pops slow.
 
 > A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the `heapq` module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Heaps?
+- Which signal should the example or diagram make visible for Heaps?
+- What failure should be prevented first when Heaps reaches a real system?
+
+## Big Picture
+
+![data structures 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
+
+*data structures 101 chapter 8 flow overview*
+
+This picture places Heaps inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Heaps is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -51,9 +63,6 @@ Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulatio
 > A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.
 
 ### Heap array mapping
-
-![Heap array mapping](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
-*Figure. A heap stays complete, so the tree can be packed into a flat array without gaps. That is what makes index arithmetic enough to recover parent and child relationships while keeping the minimum value at the root.*
 
 ## Key Terms
 
@@ -139,7 +148,6 @@ class MinHeap:
             self._data[i], self._data[smallest] = self._data[smallest], self._data[i]
             i = smallest
 
-
 h = MinHeap()
 for v in [5, 3, 8, 1, 9, 2]:
     h.push(v)
@@ -183,10 +191,8 @@ from itertools import count
 queue = []
 tie_breaker = count()
 
-
 def schedule(priority, task):
     heapq.heappush(queue, (priority, next(tie_breaker), task))
-
 
 schedule(0, "critical alert")
 schedule(2, "nightly batch")
@@ -239,12 +245,10 @@ Pushing n items into an empty heap costs O(n log n), but heapifying once costs O
 ```python
 import heapq
 
-
 def heap_sort(data):
     h = data[:]
     heapq.heapify(h)
     return [heapq.heappop(h) for _ in range(len(h))]
-
 
 print(heap_sort([5, 3, 8, 1, 9, 2, 7]))
 # [1, 2, 3, 5, 7, 8, 9]
@@ -305,17 +309,29 @@ A heap is a complete binary tree specialised for handling the two extremes quick
 
 The next article moves on to graphs, the most general way to represent relationships in data. A tree is a special case of a graph, and you will study the standard ways to represent graphs together with the basic algorithms.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Heaps?**
+  - The article treats Heaps as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Heaps?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Heaps reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
-- [Linked Lists](./03-linked-lists.md)
-- [Stacks and Queues](./04-stacks-and-queues.md)
-- [Hash Tables](./05-hash-tables.md)
-- [Trees](./06-trees.md)
-- [Binary Search Trees](./07-binary-search-trees.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): Arrays and Dynamic Arrays](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): Linked Lists](./03-linked-lists.md)
+- [Data Structures 101 (4/10): Stacks and Queues](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): Hash Tables](./05-hash-tables.md)
+- [Data Structures 101 (6/10): Trees](./06-trees.md)
+- [Data Structures 101 (7/10): Binary Search Trees](./07-binary-search-trees.md)
 - **Heaps (current)**
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References

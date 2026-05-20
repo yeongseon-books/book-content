@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 3
-title: 연결 리스트
+title: "Data Structures 101 (3/10): 연결 리스트"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,25 @@ seo_description: 노드와 포인터 기반의 연결 리스트 구조를 이해
 last_reviewed: '2026-05-12'
 ---
 
-# 연결 리스트
+# Data Structures 101 (3/10): 연결 리스트
 
 이 글은 Data Structures 101 시리즈의 세 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 단일 연결 리스트와 이중 연결 리스트는 구조적으로 무엇이 다를까요?
 - 연결 리스트는 왜 양 끝 삽입·삭제에 강하고, 왜 인덱스 접근에는 약할까요?
 - 포인터 조작을 직접 구현할 때 어떤 실수를 가장 조심해야 할까요?
-- 실무에서 연결 리스트가 배열보다 더 잘 맞는 상황은 언제일까요?
 
-배열의 중간에 값을 넣으려면 뒤 원소를 한 칸씩 모두 밀어야 합니다. 그렇다면 관계만 다시 이어 붙이면 되는 구조는 없을까요?
+## 큰 그림
 
-> 연결 리스트는 각 값을 노드에 넣고, 다음 노드를 가리키는 포인터로 순서를 만듭니다. 메모리에 흩어져 있어도 포인터만 따라가면 순서대로 방문할 수 있습니다. 알려진 위치에서의 삽입·삭제는 주변 포인터 두세 개만 바꾸면 되므로 O(1)이지만, 인덱싱은 머리부터 따라가야 해서 O(n)입니다.
+![Data Structures 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/03/03-01-big-picture.ko.png)
+
+*Data Structures 101 3장 흐름 개요*
+
+이 그림에서는 연결 리스트를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 연결 리스트의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -85,7 +90,6 @@ class Node:
     def __init__(self, value, next=None):
         self.value, self.next = value, next
 
-
 head = None
 for v in range(1_000_000):
     head = Node(v, head)   # O(1) insert each time
@@ -103,7 +107,6 @@ class Node:
     def __init__(self, value, next=None):
         self.value = value
         self.next = next
-
 
 class SinglyLinkedList:
     def __init__(self):
@@ -131,7 +134,6 @@ class SinglyLinkedList:
             yield cur.value
             cur = cur.next
 
-
 lst = SinglyLinkedList()
 for v in [3, 2, 1]:
     lst.push_front(v)
@@ -157,7 +159,6 @@ def remove_value(self, target):
         prev, cur = cur, cur.next
     return False
 
-
 SinglyLinkedList.remove_value = remove_value
 
 lst = SinglyLinkedList()
@@ -178,7 +179,6 @@ class DNode:
         self.value = value
         self.prev = None
         self.next = None
-
 
 class DoublyLinkedList:
     def __init__(self):
@@ -312,9 +312,20 @@ print(f"deque[mid]: {(time.perf_counter() - start) * 1e6:.0f} us")
 
 다음 글에서는 배열이나 연결 리스트 위에 세워지는 두 ADT, 스택과 큐를 살펴봅니다. LIFO와 FIFO라는 단순한 규칙이 어떻게 강력한 추상화가 되는지 이어서 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **단일 연결 리스트와 이중 연결 리스트는 구조적으로 무엇이 다를까요?**
+  - 본문의 기준은 연결 리스트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **연결 리스트는 왜 양 끝 삽입·삭제에 강하고, 왜 인덱스 접근에는 약할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **포인터 조작을 직접 구현할 때 어떤 실수를 가장 조심해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+## 시리즈 목차
+
+- [Data Structures 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
 - **연결 리스트 (현재 글)**
 - 스택과 큐 (예정)
 - 해시 테이블 (예정)
@@ -323,6 +334,7 @@ print(f"deque[mid]: {(time.perf_counter() - start) * 1e6:.0f} us")
 - 힙 (예정)
 - 그래프 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

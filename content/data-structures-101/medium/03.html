@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Linked Lists</title>
+<title>Data Structures 101 (3/10): Linked Lists</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Linked Lists</h1>
+<h1>Data Structures 101 (3/10): Linked Lists</h1>
 <blockquote>
 <p>Data Structures 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Inserting a value in the middle of an array shifts every element by one slot. Is there a structure that avoids that?</p>
 <blockquote>
 <p>A linked list stores each value in a node that holds a pointer to the next node. Even when scattered across memory, you can visit values in order by following the pointers. Inserting or removing a node only updates the two pointers around it — that is O(1). On the other hand, indexing must follow pointers from the head and is O(n). This article walks through singly and doubly linked lists and the trade-offs between them.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 3 in the Data Structures 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Linked Lists?</li>
+<li>Which signal should the example or diagram make visible for Linked Lists?</li>
+<li>What failure should be prevented first when Linked Lists reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data structures 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/03/03-01-big-picture.en.png"></p>
+<p><em>data structures 101 chapter 3 flow overview</em></p>
+<p>This picture places Linked Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Linked Lists is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The structural difference between singly and doubly linked lists</li>
@@ -316,9 +325,19 @@ print(f&quot;deque[mid]: {(time.perf_counter() - start) * 1e6:.0f} us&quot;)
 <h2>Wrap-Up and Next Steps</h2>
 <p>A linked list joins nodes through pointers, giving O(1) insertion and deletion at the ends or at known positions. In exchange, random access is O(n) and cache friendliness lags arrays. The choice between singly and doubly linked is a trade-off between the cost of an extra pointer and the ability to traverse both ways.</p>
 <p>Next we look at two ADTs built on top of arrays or linked lists — stacks and queues. We see how the simple rules LIFO and FIFO become powerful abstractions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><strong>What boundary should you inspect first when applying Linked Lists?</strong></li>
+<li>The article treats Linked Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Linked Lists?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Linked Lists reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">Data Structures 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Data Structures 101 (2/10): Arrays and Dynamic Arrays</a></li>
 <li><strong>Linked Lists (current)</strong></li>
 <li>Stacks and Queues (upcoming)</li>
 <li>Hash Tables (upcoming)</li>

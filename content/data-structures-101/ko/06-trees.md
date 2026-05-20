@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 6
-title: 트리
+title: "Data Structures 101 (6/10): 트리"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,25 @@ seo_description: 계층적 데이터를 표현하는 트리의 핵심 용어와 
 last_reviewed: '2026-05-12'
 ---
 
-# 트리
+# Data Structures 101 (6/10): 트리
 
 이 글은 Data Structures 101 시리즈의 여섯 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 루트, 리프, 깊이, 높이 같은 트리 용어를 어떻게 정확히 구분할까요?
 - 일반 트리와 이진 트리는 어떤 점이 다를까요?
 - 전위·중위·후위 순회는 무엇이 다르고 어디에 쓰일까요?
-- DFS와 BFS의 차이가 결국 스택과 큐의 차이라는 말은 왜 성립할까요?
 
-파일 시스템, HTML DOM, 조직도, 정규식 파서는 서로 다른 분야처럼 보이지만 공통된 뼈대를 공유합니다. 바로 계층 구조를 표현하는 트리입니다.
+## 큰 그림
 
-> 트리는 하나의 시작 노드에서 여러 자식으로 뻗어나가는 계층 구조입니다. 사이클이 없고 각 노드는 부모를 하나만 가진다는 두 규칙만으로도 대부분의 계층 데이터를 표현할 수 있습니다. 그래서 트리는 재귀가 가장 자연스럽게 들어맞는 자료구조입니다.
+![Data Structures 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/06/06-01-big-picture.ko.png)
+
+*Data Structures 101 6장 흐름 개요*
+
+이 그림에서는 트리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 트리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -117,7 +122,6 @@ class TreeNode:
         self.children.append(child)
         return child
 
-
 root = TreeNode("CEO")
 cto = root.add(TreeNode("CTO"))
 cfo = root.add(TreeNode("CFO"))
@@ -136,7 +140,6 @@ class BinaryNode:
         self.value = value
         self.left = left
         self.right = right
-
 
 # Build the tree
 #         1
@@ -162,7 +165,6 @@ def preorder(node):
     preorder(node.left)
     preorder(node.right)
 
-
 def inorder(node):
     """left -> root -> right"""
     if node is None:
@@ -171,7 +173,6 @@ def inorder(node):
     print(node.value, end=" ")
     inorder(node.right)
 
-
 def postorder(node):
     """left -> right -> root"""
     if node is None:
@@ -179,7 +180,6 @@ def postorder(node):
     postorder(node.left)
     postorder(node.right)
     print(node.value, end=" ")
-
 
 print("preorder: ", end=""); preorder(root); print()
 print("inorder:  ", end=""); inorder(root); print()
@@ -196,7 +196,6 @@ print("postorder:", end=""); postorder(root); print()
 ```python
 from collections import deque
 
-
 def bfs(root):
     if root is None:
         return
@@ -208,7 +207,6 @@ def bfs(root):
             queue.append(node.left)
         if node.right:
             queue.append(node.right)
-
 
 print("BFS:", end=" "); bfs(root); print()   # 1 2 3 4 5
 ```
@@ -223,12 +221,10 @@ def height(node):
         return -1
     return 1 + max(height(node.left), height(node.right))
 
-
 def count(node):
     if node is None:
         return 0
     return 1 + count(node.left) + count(node.right)
-
 
 print(f"height: {height(root)}")    # 2
 print(f"count:  {count(root)}")     # 5
@@ -289,17 +285,29 @@ print(f"count:  {count(root)}")     # 5
 
 다음 글에서는 정렬된 이진 트리인 이진 탐색 트리(BST)를 봅니다. 평균 O(log n) 탐색을 제공하지만 균형이 깨지면 O(n)으로 무너지는, 매우 중요한 구조입니다.
 
+## 처음 질문으로 돌아가기
+
+- **루트, 리프, 깊이, 높이 같은 트리 용어를 어떻게 정확히 구분할까요?**
+  - 본문의 기준은 트리를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **일반 트리와 이진 트리는 어떤 점이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **전위·중위·후위 순회는 무엇이 다르고 어디에 쓰일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
-- [연결 리스트](./03-linked-lists.md)
-- [스택과 큐](./04-stacks-and-queues.md)
-- [해시 테이블](./05-hash-tables.md)
+## 시리즈 목차
+
+- [Data Structures 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
+- [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): 해시 테이블](./05-hash-tables.md)
 - **트리 (현재 글)**
 - 이진 탐색 트리 (예정)
 - 힙 (예정)
 - 그래프 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 10
-title: 자료구조 선택 기준
+title: "Data Structures 101 (10/10): 자료구조 선택 기준"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,25 @@ seo_description: 워크로드와 연산 패턴 분석을 통해 시스템 성능
 last_reviewed: '2026-05-12'
 ---
 
-# 자료구조 선택 기준
+# Data Structures 101 (10/10): 자료구조 선택 기준
 
 이 글은 Data Structures 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 새로운 문제를 만났을 때 자료구조 선택은 무엇부터 생각해야 할까요?
 - 워크로드를 정의하는 다섯 가지 질문은 무엇일까요?
 - 자료구조 선택을 결정 트리처럼 체계화할 수 있을까요?
-- 실무에서 가장 흔한 잘못된 선택은 무엇이고 어떻게 고칠 수 있을까요?
 
-이제 배열, 연결 리스트, 스택, 큐, 해시 테이블, 트리, BST, 힙, 그래프를 모두 훑었습니다. 그다음 단계는 개별 구조를 더 외우는 것이 아니라, 새로운 문제를 봤을 때 어떤 질문부터 던져야 하는지 체계를 갖추는 일입니다.
+## 큰 그림
 
-> 자료구조 선택은 “무슨 데이터를 저장하나”보다 “어떤 연산이 가장 자주 일어나나”로 결정됩니다. 같은 사용자 데이터라도 키 조회가 많으면 해시 테이블, 정렬 순회가 많으면 BST, 양 끝 조작이 많으면 deque, 우선순위 접근이 많으면 힙이 더 적합합니다. 결국 핵심은 데이터의 모양이 아니라 워크로드입니다.
+![Data Structures 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/10/10-01-big-picture.ko.png)
+
+*Data Structures 101 10장 흐름 개요*
+
+이 그림에서는 자료구조 선택 기준를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 자료구조 선택 기준의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -152,7 +157,6 @@ def recommend_structure(workload):
         return "list / array"
     return "list (default)"
 
-
 print(recommend_structure({"primary_op": "key_lookup"}))     # dict / set
 print(recommend_structure({"primary_op": "min_or_max"}))      # heap
 print(recommend_structure({"primary_op": "both_ends"}))       # deque
@@ -269,17 +273,29 @@ for use_case, ds, complexity in cases:
 
 이 시리즈에서 다룬 아홉 가지 자료구조 — 배열, 연결 리스트, 스택, 큐, 해시 테이블, 트리, BST, 힙, 그래프 — 는 거의 모든 알고리즘과 시스템 설계의 어휘입니다. 다음 단계는 알고리즘 시리즈입니다. 정렬, 탐색, 동적 계획법, 그래프 알고리즘처럼, 이제 이 구조들 위에서 실제로 무엇을 할지로 넘어갑니다.
 
+## 처음 질문으로 돌아가기
+
+- **새로운 문제를 만났을 때 자료구조 선택은 무엇부터 생각해야 할까요?**
+  - 본문의 기준은 자료구조 선택 기준를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **워크로드를 정의하는 다섯 가지 질문은 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **자료구조 선택을 결정 트리처럼 체계화할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
-- [연결 리스트](./03-linked-lists.md)
-- [스택과 큐](./04-stacks-and-queues.md)
-- [해시 테이블](./05-hash-tables.md)
-- [트리](./06-trees.md)
-- [이진 탐색 트리](./07-binary-search-trees.md)
-- [힙](./08-heaps.md)
-- [그래프](./09-graphs.md)
+## 시리즈 목차
+
+- [Data Structures 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures 101 (2/10): 배열과 동적 배열](./02-arrays-and-dynamic-arrays.md)
+- [Data Structures 101 (3/10): 연결 리스트](./03-linked-lists.md)
+- [Data Structures 101 (4/10): 스택과 큐](./04-stacks-and-queues.md)
+- [Data Structures 101 (5/10): 해시 테이블](./05-hash-tables.md)
+- [Data Structures 101 (6/10): 트리](./06-trees.md)
+- [Data Structures 101 (7/10): 이진 탐색 트리](./07-binary-search-trees.md)
+- [Data Structures 101 (8/10): 힙](./08-heaps.md)
+- [Data Structures 101 (9/10): 그래프](./09-graphs.md)
 - **자료구조 선택 기준 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

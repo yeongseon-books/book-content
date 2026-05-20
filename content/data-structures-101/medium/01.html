@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Are Data Structures?</title>
+<title>Data Structures 101 (1/10): What Are Data Structures?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Are Data Structures?</h1>
+<h1>Data Structures 101 (1/10): What Are Data Structures?</h1>
 <blockquote>
 <p>Data Structures 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: The same data, the same task — yet one program finishes in one second and another takes an hour. What makes the difference?</p>
 <blockquote>
 <p>A data structure defines how data is laid out in memory and which operations it can support efficiently. The task "find a user among 10 million" needs five million comparisons on average if you scan an array, but only one if you use a hash table. This article defines data structures, contrasts them with abstract data types (ADTs), and maps out the entire series.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the first post in the Data Structures 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Are Data Structures??</li>
+<li>Which signal should the example or diagram make visible for What Are Data Structures??</li>
+<li>What failure should be prevented first when What Are Data Structures? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data structures 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/01/01-01-big-picture.en.png"></p>
+<p><em>data structures 101 chapter 1 flow overview</em></p>
+<p>This picture places What Are Data Structures? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Are Data Structures? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The relationship between a data structure and an abstract data type (ADT)</li>
@@ -288,6 +297,16 @@ for num, title, keywords in roadmap:
 <h2>Wrap-Up and Next Steps</h2>
 <p>A data structure decides how data sits in memory and which operations it can run efficiently. The same data with the wrong structure can be tens to thousands of times slower. The ADT names the interface; the data structure names the implementation. Keeping them separate sharpens your design.</p>
 <p>Next we look at the most basic structure — the array. We compare fixed-size and dynamic arrays and trace what Python's <code>list</code> actually does under the hood.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Are Data Structures??</strong></li>
+<li>The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Are Data Structures??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Are Data Structures? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Are Data Structures? (current)</strong></li>
 <li>Arrays and Dynamic Arrays (upcoming)</li>

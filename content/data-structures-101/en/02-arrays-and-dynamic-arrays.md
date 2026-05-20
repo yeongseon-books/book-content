@@ -1,7 +1,7 @@
 ---
 series: data-structures-101
 episode: 2
-title: Arrays and Dynamic Arrays
+title: "Data Structures 101 (2/10): Arrays and Dynamic Arrays"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How fixed and dynamic arrays differ, what Python's list does in
 last_reviewed: '2026-05-04'
 ---
 
-# Arrays and Dynamic Arrays
+# Data Structures 101 (2/10): Arrays and Dynamic Arrays
 
 > Data Structures 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why does calling `append` on a Python list a million times stay fast? Surely it must reallocate memory each time?
 
 > An array stores elements of the same type contiguously in memory. Indexing is instant, but the size is fixed. A dynamic array breaks that limit by allocating a larger block and copying existing elements when capacity runs out. This article walks through both structures, their time complexity, and how Python's list is actually implemented.
 
-<!-- a-grade-intro:end -->
-
 This is post 2 in the Data Structures 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Arrays and Dynamic Arrays?
+- Which signal should the example or diagram make visible for Arrays and Dynamic Arrays?
+- What failure should be prevented first when Arrays and Dynamic Arrays reaches a real system?
+
+## Big Picture
+
+![data structures 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/02/02-01-big-picture.en.png)
+
+*data structures 101 chapter 2 flow overview*
+
+This picture places Arrays and Dynamic Arrays inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Arrays and Dynamic Arrays is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -150,7 +162,6 @@ class DynamicArray:
 
     def __len__(self):
         return self._size
-
 
 arr = DynamicArray()
 for i in range(10):
@@ -278,8 +289,19 @@ An array places same-sized elements contiguously in memory; indexing is O(1) and
 
 Next we look at linked lists — nodes joined by pointers. We compare how they solve the "expensive middle insert" problem of arrays, and what they give up in exchange.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Arrays and Dynamic Arrays?**
+  - The article treats Arrays and Dynamic Arrays as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Arrays and Dynamic Arrays?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Arrays and Dynamic Arrays reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
+## In this series
+
+- [Data Structures 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
 - **Arrays and Dynamic Arrays (current)**
 - Linked Lists (upcoming)
 - Stacks and Queues (upcoming)
@@ -289,6 +311,7 @@ Next we look at linked lists — nodes joined by pointers. We compare how they s
 - Heaps (upcoming)
 - Graphs (upcoming)
 - Choosing Data Structures (upcoming)
+
 <!-- toc:end -->
 
 ## References
