@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 10
-title: Skills to Have Before Graduation
+title: "Computer Science Major 101 (10/10): Skills to Have Before Graduation"
 status: publish-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Skills to Have Before Graduation
+# Computer Science Major 101 (10/10): Skills to Have Before Graduation
 
 As graduation gets closer, many students feel the same anxiety. They have almost finished the coursework, but they are still not sure whether they are actually ready for work.
 
 This is the final post in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Skills to Have Before Graduation?
+- Which signal should the example or diagram make visible for Skills to Have Before Graduation?
+- What failure should be prevented first when Skills to Have Before Graduation reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
+
+*computer science major 101 chapter 10 flow overview*
+
+This picture places Skills to Have Before Graduation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Skills to Have Before Graduation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -47,10 +63,6 @@ This is the final post in the Computer Science Major 101 series.
 The first few months of your first job matter more than many students expect. That period often sets the baseline for how the rest of your early career unfolds, so a graduation self-check is less about self-esteem and more about strengthening your starting point.
 
 ## Concept at a Glance
-
-![Graduation skill map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
-
-*How fundamentals, systems, data, collaboration, and writing form graduation readiness*
 
 > A graduation self-check is not about counting completed courses. It is about making sure the five practical axes you will use at work are not empty.
 
@@ -169,17 +181,29 @@ The point of this table is not size. It is linkage. You do not need a huge proje
 
 Before graduation, it is more useful to check which abilities you can actually demonstrate than to count how many courses you completed. If you revisit yourself through the five axes of fundamentals, systems, data, collaboration, and writing, the empty spots become much easier to see. This series ends here, but the next stage of study usually starts with the weakest axis you still need to strengthen.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Skills to Have Before Graduation?**
+  - The article treats Skills to Have Before Graduation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Skills to Have Before Graduation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Skills to Have Before Graduation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
-- [Understanding Systems Subjects](./04-systems-subjects.md)
-- [Database and Network](./05-database-and-network.md)
-- [AI and Data Science](./06-ai-and-data-science.md)
-- [Project Subjects](./07-project-subjects.md)
-- [How to Study Computer Science](./08-how-to-study-cs.md)
-- [Build Your Portfolio](./09-build-your-portfolio.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): Understanding Systems Subjects](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): Database and Network](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI and Data Science](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): Project Subjects](./07-project-subjects.md)
+- [Computer Science Major 101 (8/10): How to Study Computer Science](./08-how-to-study-cs.md)
+- [Computer Science Major 101 (9/10): Build Your Portfolio](./09-build-your-portfolio.md)
 - **Skills to Have Before Graduation (current)**
+
 <!-- toc:end -->
 
 ## References

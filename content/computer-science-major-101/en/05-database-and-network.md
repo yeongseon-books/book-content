@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 5
-title: Database and Network
+title: "Computer Science Major 101 (5/10): Database and Network"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Database and Network
+# Computer Science Major 101 (5/10): Database and Network
 
 > Computer Science Major 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: *Why* are *database* and *network* the *pillars* of *every service*?
 
 > *Data* is *stored* and the *network* *delivers* it — together they *are* the service.
 
-<!-- a-grade-intro:end -->
-
 This is post 5 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Database and Network?
+- Which signal should the example or diagram make visible for Database and Network?
+- What failure should be prevented first when Database and Network reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
+
+*computer science major 101 chapter 5 flow overview*
+
+This picture places Database and Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Database and Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -48,10 +60,6 @@ This is post 5 in the Computer Science Major 101 series.
 *Most* of *backend time* is spent in *DB* and *network* code.
 
 ## Concept at a Glance
-
-![Request-to-database flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
-
-*The basic service path from network request to database query*
 
 ## Key Terms
 
@@ -145,17 +153,29 @@ print(urllib.request.urlopen("http://example.com").status)
 
 Next post: *AI and Data Science*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Database and Network?**
+  - The article treats Database and Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Database and Network?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Database and Network reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
-- [Understanding Systems Subjects](./04-systems-subjects.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): Understanding Systems Subjects](./04-systems-subjects.md)
 - **Database and Network (current)**
 - AI and Data Science (upcoming)
 - Project Subjects (upcoming)
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

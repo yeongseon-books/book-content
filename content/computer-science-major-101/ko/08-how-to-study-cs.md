@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 8
-title: 전공 공부 방법
+title: "Computer Science Major 101 (8/10): 전공 공부 방법"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# 전공 공부 방법
+# Computer Science Major 101 (8/10): 전공 공부 방법
 
 같은 시간을 써도 어떤 학생은 개념이 남고, 어떤 학생은 강의 직후부터 빠르게 잊어버립니다. 차이를 만드는 것은 재능보다 공부 방법의 구조인 경우가 많습니다.
 
 이 글은 Computer Science Major 101 시리즈의 8번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 같은 시간을 써도 공부 방법에 따라 결과가 크게 달라지는 이유는 무엇일까요?
 - 강의, 노트, 복습, 코딩 연습은 어떤 흐름으로 묶는 것이 좋을까요?
 - 시험 직전 몰아서 하는 공부가 전공 과목에서 특히 잘 통하지 않는 이유는 무엇일까요?
-- 질문하고 기록하는 습관은 왜 오래 남는 차이를 만들까요?
+
+## 큰 그림
+
+![Computer Science Major 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.ko.png)
+
+*Computer Science Major 101 8장 흐름 개요*
+
+이 그림에서는 전공 공부 방법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 전공 공부 방법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -47,10 +56,6 @@ last_reviewed: '2026-05-14'
 전공에서는 남은 차이를 만드는 요소가 공부 효율인 경우가 많습니다. 같은 강의를 들어도 복습 간격, 실습 빈도, 질문 습관이 다르면 이해 속도와 유지 시간이 크게 달라집니다.
 
 ## 한눈에 보는 개념
-
-![전공 공부 루프](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.ko.png)
-
-*강의, 노트, 복습, 연습, 질문으로 이어지는 학습 루프*
 
 > 전공 공부는 강의를 듣는 순간 끝나는 일이 아니라, 다시 꺼내 보고 손으로 확인하는 순환 구조입니다.
 
@@ -102,7 +107,6 @@ sessions = [
     },
 ]
 
-
 def build_weekly_report(entries):
     totals = defaultdict(int)
     weak_areas = []
@@ -127,7 +131,6 @@ def build_weekly_report(entries):
     summary = ", ".join(f"{course}={minutes}m" for course, minutes in totals.items())
     weak_summary = ", ".join(weak_areas) if weak_areas else "none"
     return "\n".join(lines + [f"weekly_totals: {summary}", f"weak_areas: {weak_summary}"])
-
 
 print(build_weekly_report(sessions))
 ```
@@ -202,17 +205,29 @@ weak_areas: operating-systems, databases
 
 전공 공부는 의욕만으로 오래 버티기 어렵습니다. 강의, 노트, 복습, 연습, 질문이 하나의 흐름으로 묶여야 누적이 생깁니다. 같은 시간을 써도 방법이 다르면 결과는 크게 달라집니다. 다음 글에서는 과제와 프로젝트를 밖에서 읽히는 포트폴리오로 바꾸는 방법을 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **같은 시간을 써도 공부 방법에 따라 결과가 크게 달라지는 이유는 무엇일까요?**
+  - 본문의 기준은 전공 공부 방법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **강의, 노트, 복습, 코딩 연습은 어떤 흐름으로 묶는 것이 좋을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **시험 직전 몰아서 하는 공부가 전공 과목에서 특히 잘 통하지 않는 이유는 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
-- [1학년 과목 이해하기](./02-first-year-subjects.md)
-- [자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
-- [시스템 과목 이해하기](./04-systems-subjects.md)
-- [데이터베이스와 네트워크](./05-database-and-network.md)
-- [AI와 데이터사이언스](./06-ai-and-data-science.md)
-- [프로젝트 과목](./07-project-subjects.md)
+## 시리즈 목차
+
+- [Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): 데이터베이스와 네트워크](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI와 데이터사이언스](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): 프로젝트 과목](./07-project-subjects.md)
 - **전공 공부 방법 (현재 글)**
 - 포트폴리오로 연결하기 (예정)
 - 졸업 전 갖춰야 할 역량 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

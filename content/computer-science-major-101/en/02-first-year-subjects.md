@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 2
-title: Understanding First Year Subjects
+title: "Computer Science Major 101 (2/10): Understanding First Year Subjects"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Understanding First Year Subjects
+# Computer Science Major 101 (2/10): Understanding First Year Subjects
 
 > Computer Science Major 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why do first year CS subjects *focus* on *math* and *intro programming*?
 
 > Because *foundation strength* must be built in *one year* before upper courses pile on top.
 
-<!-- a-grade-intro:end -->
-
 This is post 2 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding First Year Subjects?
+- Which signal should the example or diagram make visible for Understanding First Year Subjects?
+- What failure should be prevented first when Understanding First Year Subjects reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
+
+*computer science major 101 chapter 2 flow overview*
+
+This picture places Understanding First Year Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding First Year Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -48,10 +60,6 @@ This is post 2 in the Computer Science Major 101 series.
 Year-one *foundations* underlie *algorithms*, *AI*, and *systems* — every later course.
 
 ## Concept at a Glance
-
-![First-year foundation map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
-
-*How first-year subjects support later CS courses*
 
 ## Key Terms
 
@@ -142,8 +150,19 @@ If your *algebra* and *logic* shake during code review, *upper work* also collap
 
 Next post: *Data Structures and Algorithms*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding First Year Subjects?**
+  - The article treats Understanding First Year Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding First Year Subjects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding First Year Subjects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
 - **Understanding First Year Subjects (current)**
 - Data Structures and Algorithms (upcoming)
 - Understanding Systems Subjects (upcoming)
@@ -153,6 +172,7 @@ Next post: *Data Structures and Algorithms*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

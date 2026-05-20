@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Build Your Portfolio</title>
+<title>Computer Science Major 101 (9/10): Build Your Portfolio</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Build Your Portfolio</h1>
+<h1>Computer Science Major 101 (9/10): Build Your Portfolio</h1>
 <p>Assignments and projects disappear faster than most students expect if they are left inside local folders with no explanation. A year later, even the person who built them may struggle to remember what they did and why it mattered.</p>
 <p>This is post 9 in the Computer Science Major 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Build Your Portfolio?</li>
+<li>Which signal should the example or diagram make visible for Build Your Portfolio?</li>
+<li>What failure should be prevented first when Build Your Portfolio reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer science major 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png"></p>
+<p><em>computer science major 101 chapter 9 flow overview</em></p>
+<p>This picture places Build Your Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Build Your Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>How can assignments and major projects become portfolio pieces?</li>
@@ -74,8 +87,6 @@
 <h2>Why It Matters</h2>
 <p>Applications need visible evidence to start a real conversation. A repository, README, and demo link say far more than a single line on a resume because they reveal not only what you built, but how you explain and present your work.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Portfolio publishing flow" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png"></p>
-<p><em>How coursework becomes a portfolio through repositories and documentation</em></p>
 <blockquote>
 <p>An assignment ends at submission, but a portfolio starts only when the work is organized into a repository and explained through documentation.</p>
 </blockquote>
@@ -91,32 +102,95 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: Your assignment folders live only on your local machine.</p>
 <p><strong>After</strong>: You leave behind a public repository, README, and demo that other people can verify.</p>
-<h2>Hands-on: Mini Portfolio Setup</h2>
-<p><strong>Step 1 — Repo name</strong></p>
-<pre><code class="language-python">name = &quot;schedule-checker&quot;
+<h2>Hands-on: A README Starter Generator</h2>
+<p>Weak portfolios usually do not fail because the code is missing. They fail because the reader cannot tell what to verify, how to run the project, or what counts as real evidence. The example below turns project metadata into a README draft that is ready to publish.</p>
+<pre><code class="language-python">from textwrap import dedent
+
+project = {
+    &quot;name&quot;: &quot;schedule-checker&quot;,
+    &quot;summary&quot;: &quot;A Flask web tool that finds conflicts in a student's class schedule.&quot;,
+    &quot;demo_evidence&quot;: [
+        &quot;Demo video (recorded walkthrough): docs/demo-walkthrough.mp4&quot;,
+        &quot;Local demo GIF: docs/demo.gif&quot;,
+    ],
+    &quot;run_steps&quot;: [
+        &quot;python -m venv .venv&quot;,
+        &quot;source .venv/bin/activate&quot;,
+        &quot;pip install -r requirements.txt&quot;,
+        &quot;flask --app app run&quot;,
+    ],
+    &quot;tech_stack&quot;: [&quot;Python&quot;, &quot;Flask&quot;, &quot;SQLite&quot;, &quot;Bootstrap&quot;],
+    &quot;license_note&quot;: &quot;MIT License&quot;,
+    &quot;learned&quot;: [
+        &quot;Input validation had to become stable before UI polish mattered.&quot;,
+        &quot;Conflict-detection rules became easier to debug once they were written as tests first.&quot;,
+    ],
+}
+
+def build_readme(project):
+    demo_lines = &quot;\n&quot;.join(f&quot;- {item}&quot; for item in project[&quot;demo_evidence&quot;])
+    run_lines = &quot;\n&quot;.join(f&quot;1. {step}&quot; for step in project[&quot;run_steps&quot;])
+    stack = &quot;, &quot;.join(project[&quot;tech_stack&quot;])
+    learned_lines = &quot;\n&quot;.join(f&quot;- {item}&quot; for item in project[&quot;learned&quot;])
+
+    return dedent(
+        f&quot;&quot;&quot;
+        # {project['name']}
+
+        ## Project Summary
+        {project['summary']}
+
+        ## Demo Evidence
+        {demo_lines}
+
+        ## Setup and Run
+        {run_lines}
+
+        ## Tech Stack
+        {stack}
+
+        ## License
+        {project['license_note']}
+
+        ## What I Learned
+        {learned_lines}
+        &quot;&quot;&quot;
+    ).strip()
+
+print(build_readme(project))
 </code></pre>
-<p>Names shape searchability and first impression. A short name that clearly reveals the function is much easier for other people to remember.</p>
-<p><strong>Step 2 — README sections</strong></p>
-<pre><code class="language-python">sections = [&quot;overview&quot;, &quot;demo&quot;, &quot;stack&quot;, &quot;run&quot;, &quot;license&quot;]
+<p>With the sample input, you should get output like this.</p>
+<pre><code class="language-markdown"># schedule-checker
+
+## Project Summary
+A Flask web tool that finds conflicts in a student's class schedule.
+
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
+
+## Setup and Run
+1. python -m venv .venv
+2. source .venv/bin/activate
+3. pip install -r requirements.txt
+4. flask --app app run
+
+## Tech Stack
+Python, Flask, SQLite, Bootstrap
+
+## License
+MIT License
+
+## What I Learned
+- Input validation had to become stable before UI polish mattered.
+- Conflict-detection rules became easier to debug once they were written as tests first.
 </code></pre>
-<p>These five sections already make a repository much easier to read. In many student projects, overview, demo, stack, run instructions, and license are enough to establish trust.</p>
-<p><strong>Step 3 — One-line overview</strong></p>
-<pre><code class="language-python">overview = &quot;Conflict checker for course schedules&quot;
-</code></pre>
-<p>This line compresses the problem definition into a single sentence. A short, sharp description usually works better than a long abstract introduction.</p>
-<p><strong>Step 4 — Run commands</strong></p>
-<pre><code class="language-python">run = [&quot;pip install -r requirements.txt&quot;, &quot;python app.py&quot;]
-</code></pre>
-<p>If there are no run instructions, other people cannot verify the project. This is where README quality often separates one repository from another.</p>
-<p><strong>Step 5 — Demo link</strong></p>
-<pre><code class="language-python">demo = &quot;https://example.com/demo&quot;
-</code></pre>
-<p>A demo is one of the strongest forms of proof. A live deployment or even a short video often persuades faster than paragraphs of explanation.</p>
+<p>The important part is that there is no fake-looking <code>https://example.com/demo</code> link anywhere. If you do not have a live deployment, name the evidence honestly: a recorded walkthrough, a local GIF, a screenshot folder, or a release artifact. Clear evidence is more credible than a placeholder URL.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The repository name affects searchability and memory.</li>
-<li>README sections help the reader set expectations quickly.</li>
-<li>A demo is stronger evidence than explanation alone.</li>
+<li>A README is both an introduction document and a reproducibility document.</li>
+<li>Demo sections work only when the evidence type is explicit.</li>
+<li>A short reflection section turns a repository from a dump of files into a record of engineering judgment.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
@@ -129,19 +203,23 @@
 <h2>How This Shows Up in Production</h2>
 <p>Interviewers and reviewers often read the README before they open the code. How you introduce the project, explain run steps, and care for documentation tells them a great deal about your collaboration habits.</p>
 <h2>README Draft Example</h2>
-<p>Many students try to write an overly long README and end up burying the essentials. In the beginning, it is often better to fill in the four lines below and then add only what the project truly needs.</p>
+<p>Many students try to write an overly long README and end up burying the essentials. In the beginning, it is usually better to publish a short but complete draft that shows evidence and reproducibility clearly.</p>
 <pre><code class="language-markdown"># Schedule Checker
 
 A web tool that finds conflicts in a student's class schedule.
 
-## Demo
-- https://example.com/demo
+## Demo Evidence
+- Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
+- Local demo GIF: docs/demo.gif
 
 ## Run
-- pip install -r requirements.txt
-- python app.py
+1. pip install -r requirements.txt
+2. flask --app app run
+
+## What I Learned
+- I stabilized the conflict rules by writing tests before polishing the UI.
 </code></pre>
-<p>Even this small draft already answers three questions for the reader: what the project is, where they can see it, and how they can run it locally. The first gate of a portfolio is not flashiness. It is reproducibility.</p>
+<p>Even this small draft already answers four questions for the reader: what the project is, what kind of evidence exists, how to run it locally, and what the builder learned. The first gate of a portfolio is not flashiness. It is reproducibility.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Publishing your work is part of learning.</li>
@@ -165,24 +243,34 @@ A web tool that finds conflicts in a student's class schedule.
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A portfolio is not a decorative extra for exceptional students. It is the work of turning assignments and projects you already built into a form that another person can read. Once repository name, README, run steps, demo, and documentation are in place, even a small class project can become credible evidence. In the next post, we will close the series by looking at the skills worth checking before graduation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Data Structures and Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/04-systems-subjects.md">Understanding Systems Subjects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/05-database-and-network.md">Database and Network</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/06-ai-and-data-science.md">AI and Data Science</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/07-project-subjects.md">Project Subjects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/08-how-to-study-cs.md">How to Study Computer Science</a></li>
+<li><strong>What boundary should you inspect first when applying Build Your Portfolio?</strong></li>
+<li>The article treats Build Your Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Build Your Portfolio?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Build Your Portfolio reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">Computer Science Major 101 (1/10): What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Computer Science Major 101 (2/10): Understanding First Year Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Computer Science Major 101 (3/10): Data Structures and Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/04-systems-subjects.md">Computer Science Major 101 (4/10): Understanding Systems Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/05-database-and-network.md">Computer Science Major 101 (5/10): Database and Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/06-ai-and-data-science.md">Computer Science Major 101 (6/10): AI and Data Science</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/07-project-subjects.md">Computer Science Major 101 (7/10): Project Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/08-how-to-study-cs.md">Computer Science Major 101 (8/10): How to Study Computer Science</a></li>
 <li><strong>Build Your Portfolio (current)</strong></li>
 <li>Skills to Have Before Graduation (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.makeareadme.com/">Make a README</a></li>
-<li><a href="https://choosealicense.com/">Choose a License</a></li>
-<li><a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme">GitHub Profile README Guide</a></li>
-<li><a href="https://github.com/matiassingers/awesome-readme">Awesome README</a></li>
+<li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">GitHub Docs - About READMEs</a></li>
+<li><a href="https://opensource.guide/starting-a-project/">Open Source Guides - Starting an Open Source Project</a></li>
+<li><a href="https://book.the-turing-way.org/">The Turing Way</a></li>
+<li><a href="https://doi.org/10.1371/journal.pcbi.1005510">Good Enough Practices in Scientific Computing</a></li>
 </ul>
 <p class="tags-line">Tags: CS, Portfolio, GitHub, Career, Beginner</p>
 </body>

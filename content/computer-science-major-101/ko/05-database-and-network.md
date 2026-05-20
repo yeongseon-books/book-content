@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 5
-title: 데이터베이스와 네트워크
+title: "Computer Science Major 101 (5/10): 데이터베이스와 네트워크"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# 데이터베이스와 네트워크
+# Computer Science Major 101 (5/10): 데이터베이스와 네트워크
 
 서비스를 만든다는 말은 결국 데이터를 저장하고, 그 데이터를 네트워크를 통해 주고받는다는 뜻입니다. 화면과 코드만으로는 서비스가 완성되지 않는 이유도 여기에 있습니다.
 
 이 글은 Computer Science Major 101 시리즈의 5번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 데이터베이스와 네트워크는 왜 거의 모든 서비스의 바닥에 놓일까요?
 - SQL, 테이블, 인덱스는 실제 성능과 어떻게 연결될까요?
 - TCP/IP와 HTTP는 어떤 층에서 역할을 나눌까요?
-- 저장과 전달을 함께 이해해야 하는 이유는 무엇일까요?
+
+## 큰 그림
+
+![Computer Science Major 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
+
+*Computer Science Major 101 5장 흐름 개요*
+
+이 그림에서는 데이터베이스와 네트워크를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터베이스와 네트워크의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -47,10 +56,6 @@ last_reviewed: '2026-05-14'
 백엔드 코드의 상당수는 결국 데이터베이스와 네트워크를 다룹니다. 많은 장애와 지연도 저장 계층과 통신 계층에서 함께 시작되기 때문에, 두 과목을 따로 배우더라도 머릿속에서는 한 흐름으로 묶어 이해하는 편이 좋습니다.
 
 ## 한눈에 보는 개념
-
-![요청에서 데이터베이스까지의 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
-
-*네트워크 요청이 데이터베이스 조회로 이어지는 서비스 기본 경로*
 
 > 서비스는 네트워크가 요청을 옮기고 데이터베이스가 상태를 보관할 때 비로소 완성됩니다.
 
@@ -158,17 +163,29 @@ print(urllib.request.urlopen("http://example.com").status)
 
 데이터베이스와 네트워크는 각각 저장과 전달을 담당하지만, 실제 서비스에서는 거의 하나의 흐름처럼 움직입니다. 데이터를 어디에 어떻게 보관할지, 요청을 어떤 규칙으로 주고받을지를 함께 이해해야 서비스의 속도와 안정성을 설명할 수 있습니다. 다음 글에서는 데이터와 모델을 다루는 AI와 데이터사이언스로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **데이터베이스와 네트워크는 왜 거의 모든 서비스의 바닥에 놓일까요?**
+  - 본문의 기준은 데이터베이스와 네트워크를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **SQL, 테이블, 인덱스는 실제 성능과 어떻게 연결될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **TCP/IP와 HTTP는 어떤 층에서 역할을 나눌까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
-- [1학년 과목 이해하기](./02-first-year-subjects.md)
-- [자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
-- [시스템 과목 이해하기](./04-systems-subjects.md)
+## 시리즈 목차
+
+- [Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
 - **데이터베이스와 네트워크 (현재 글)**
 - AI와 데이터사이언스 (예정)
 - 프로젝트 과목 (예정)
 - 전공 공부 방법 (예정)
 - 포트폴리오로 연결하기 (예정)
 - 졸업 전 갖춰야 할 역량 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

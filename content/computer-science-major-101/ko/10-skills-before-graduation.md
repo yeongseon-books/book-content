@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 10
-title: 졸업 전 갖춰야 할 역량
+title: "Computer Science Major 101 (10/10): 졸업 전 갖춰야 할 역량"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# 졸업 전 갖춰야 할 역량
+# Computer Science Major 101 (10/10): 졸업 전 갖춰야 할 역량
 
 졸업이 가까워질수록 많은 학생이 비슷한 불안을 느낍니다. 과목은 거의 다 들었는데, 정말 현업에 들어갈 준비가 되었는지는 잘 모르겠다는 감각입니다.
 
 이 글은 Computer Science Major 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 졸업장만으로는 설명되지 않는 역량은 무엇일까요?
 - 기초, 시스템, 데이터, 협업, 문서화라는 다섯 축은 왜 함께 봐야 할까요?
 - 학점과 자격증만으로 실력을 설명하기 어려운 이유는 무엇일까요?
-- 졸업 직전 스스로를 점검하려면 어떤 기준이 필요할까요?
+
+## 큰 그림
+
+![Computer Science Major 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
+
+*Computer Science Major 101 10장 흐름 개요*
+
+이 그림에서는 졸업 전 갖춰야 할 역량를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 졸업 전 갖춰야 할 역량의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -47,10 +56,6 @@ last_reviewed: '2026-05-14'
 첫 직장에 들어간 뒤 처음 몇 달은 생각보다 중요합니다. 이 시기의 기본기가 이후 경력의 기준선을 만들기 때문에, 졸업 직전 점검은 단순한 자기평가가 아니라 출발점을 다지는 작업에 가깝습니다.
 
 ## 한눈에 보는 개념
-
-![졸업 전 역량 지도](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
-
-*기초, 시스템, 데이터, 협업, 문서화가 졸업 역량으로 이어지는 구조*
 
 > 졸업 직전 점검은 과목 이름을 세는 일이 아니라, 현업에서 바로 쓰일 다섯 축이 비어 있지 않은지 확인하는 일입니다.
 
@@ -169,17 +174,29 @@ docs = ["readme", "design_doc", "post_mortem"]
 
 졸업 전에는 과목 이수 여부보다 어떤 역량을 실제로 갖추었는지 점검하는 편이 더 중요합니다. 기초, 시스템, 데이터, 협업, 문서화라는 다섯 축으로 자신을 다시 보면 어디가 비어 있는지 분명해집니다. 이 시리즈는 여기서 마무리하지만, 다음 공부는 가장 약한 축을 메우는 일에서 시작하면 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **졸업장만으로는 설명되지 않는 역량은 무엇일까요?**
+  - 본문의 기준은 졸업 전 갖춰야 할 역량를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **기초, 시스템, 데이터, 협업, 문서화라는 다섯 축은 왜 함께 봐야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **학점과 자격증만으로 실력을 설명하기 어려운 이유는 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
-- [1학년 과목 이해하기](./02-first-year-subjects.md)
-- [자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
-- [시스템 과목 이해하기](./04-systems-subjects.md)
-- [데이터베이스와 네트워크](./05-database-and-network.md)
-- [AI와 데이터사이언스](./06-ai-and-data-science.md)
-- [프로젝트 과목](./07-project-subjects.md)
-- [전공 공부 방법](./08-how-to-study-cs.md)
-- [포트폴리오로 연결하기](./09-build-your-portfolio.md)
+## 시리즈 목차
+
+- [Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): 데이터베이스와 네트워크](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI와 데이터사이언스](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): 프로젝트 과목](./07-project-subjects.md)
+- [Computer Science Major 101 (8/10): 전공 공부 방법](./08-how-to-study-cs.md)
+- [Computer Science Major 101 (9/10): 포트폴리오로 연결하기](./09-build-your-portfolio.md)
 - **졸업 전 갖춰야 할 역량 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

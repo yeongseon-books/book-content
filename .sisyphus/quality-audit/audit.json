@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-20T11:08:10+00:00",
+  "generated_at": "2026-05-20T11:09:08+00:00",
   "series_count": 92,
-  "problem_series_count": 60,
-  "series_with_5_plus": 45,
+  "problem_series_count": 59,
+  "series_with_5_plus": 44,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 37,
+    "Shrt": 32,
     "NoEn": 0,
-    "all": 569
+    "all": 564
   },
   "results": [
     {
@@ -12782,156 +12782,6 @@
       }
     },
     {
-      "series": "computer-science-major-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 5,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 5,
-      "max_issue_kind": "Shrt",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/01-what-cs-majors-learn.md",
-            "line": 23,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "01-what-cs-majors-learn.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/02-first-year-subjects.md",
-            "line": 23,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "02-first-year-subjects.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/04-systems-subjects.md",
-            "line": 23,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "04-systems-subjects.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/05-database-and-network.md",
-            "line": 23,
-            "message": "markdown body has 146 lines (< 150)",
-            "article": "05-database-and-network.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/06-ai-and-data-science.md",
-            "line": 23,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "06-ai-and-data-science.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/01-what-cs-majors-learn.md",
-            "line": 23,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "01-what-cs-majors-learn.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/02-first-year-subjects.md",
-            "line": 23,
-            "message": "markdown body has 143 lines (< 150)",
-            "article": "02-first-year-subjects.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/04-systems-subjects.md",
-            "line": 23,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "04-systems-subjects.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/05-database-and-network.md",
-            "line": 23,
-            "message": "markdown body has 146 lines (< 150)",
-            "article": "05-database-and-network.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/computer-science-major-101/en/06-ai-and-data-science.md",
-            "line": 23,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "06-ai-and-data-science.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "statistics-101",
       "counts": {
         "Synt": 0,
@@ -14681,6 +14531,20 @@
     },
     {
       "series": "computer-science-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "computer-science-major-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 4
-title: Understanding Systems Subjects
+title: "Computer Science Major 101 (4/10): Understanding Systems Subjects"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Understanding Systems Subjects
+# Computer Science Major 101 (4/10): Understanding Systems Subjects
 
 > Computer Science Major 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Do *systems* courses really explain *why* a single line of code *behaves* the way it does?
 
 > Yes. *OS*, *architecture*, and *compilers* are the *stage* on which your code runs.
 
-<!-- a-grade-intro:end -->
-
 This is post 4 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Systems Subjects?
+- Which signal should the example or diagram make visible for Understanding Systems Subjects?
+- What failure should be prevented first when Understanding Systems Subjects reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
+
+*computer science major 101 chapter 4 flow overview*
+
+This picture places Understanding Systems Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Systems Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -48,10 +60,6 @@ This is post 4 in the Computer Science Major 101 series.
 *Performance* and *incident analysis* are only possible on top of *systems knowledge*.
 
 ## Concept at a Glance
-
-![Systems stack map](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
-
-*How hardware, OS, compilers, and programs connect*
 
 ## Key Terms
 
@@ -148,10 +156,21 @@ Root cause in incident reports is *usually* an *OS resource* limit.
 
 Next post: *Database and Network*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Systems Subjects?**
+  - The article treats Understanding Systems Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Systems Subjects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Systems Subjects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
 - **Understanding Systems Subjects (current)**
 - Database and Network (upcoming)
 - AI and Data Science (upcoming)
@@ -159,6 +178,7 @@ Next post: *Database and Network*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

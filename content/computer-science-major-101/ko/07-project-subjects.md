@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 7
-title: 프로젝트 과목
+title: "Computer Science Major 101 (7/10): 프로젝트 과목"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# 프로젝트 과목
+# Computer Science Major 101 (7/10): 프로젝트 과목
 
 전공 후반부에 들어가면 많은 학생이 비슷한 질문을 합니다. 이제까지 배운 것을 어디에 써 보아야 하는지, 과목별 지식을 어떻게 하나의 결과물로 묶어야 하는지 감이 잘 오지 않기 때문입니다.
 
 이 글은 Computer Science Major 101 시리즈의 7번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 프로젝트 과목은 전공 후반부의 핵심으로 여겨질까요?
 - 팀 프로젝트는 개인 과제와 무엇이 다르고 어떤 준비를 더 요구할까요?
 - 문제 정의, 범위 조절, 일정 관리, 시연 준비는 왜 모두 중요할까요?
-- 프로젝트 과목이 포트폴리오와 취업 준비로 이어지는 이유는 무엇일까요?
+
+## 큰 그림
+
+![Computer Science Major 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
+
+*Computer Science Major 101 7장 흐름 개요*
+
+이 그림에서는 프로젝트 과목를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 프로젝트 과목의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -47,10 +56,6 @@ last_reviewed: '2026-05-14'
 많은 학생의 첫 포트폴리오는 전공 프로젝트에서 나옵니다. 무엇을 만들었는지뿐 아니라 어떤 판단을 했고, 어떻게 협업했고, 어떤 결과를 남겼는지까지 보여 줄 수 있기 때문입니다.
 
 ## 한눈에 보는 개념
-
-![프로젝트 진행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
-
-*계획부터 설계, 구현, 테스트, 시연으로 이어지는 프로젝트 흐름*
 
 > 프로젝트 과목은 지식을 묻는 수업이 아니라, 제한된 시간 안에 작은 제품을 완성하는 수업에 가깝습니다.
 
@@ -104,7 +109,6 @@ spec = {
     ],
 }
 
-
 def build_brief(spec):
     problem_statement = (
         f"{spec['project']} helps {', '.join(spec['users'])} "
@@ -137,7 +141,6 @@ def build_brief(spec):
         {risk_lines}
         """
     ).strip()
-
 
 print(build_brief(spec))
 ```
@@ -215,17 +218,29 @@ Problem statement: Campus Schedule Checker helps students, academic advisors by 
 
 프로젝트 과목은 전공 지식을 한데 묶어 결과물로 바꾸는 단계입니다. 문제 정의, 사용자 이해, 범위 조절, 협업, 테스트, 시연까지 모두 경험해야 비로소 작은 제품을 만든 감각이 남습니다. 다음 글에서는 이런 과정을 꾸준히 버티게 해 주는 전공 공부 방법을 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 프로젝트 과목은 전공 후반부의 핵심으로 여겨질까요?**
+  - 본문의 기준은 프로젝트 과목를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **팀 프로젝트는 개인 과제와 무엇이 다르고 어떤 준비를 더 요구할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **문제 정의, 범위 조절, 일정 관리, 시연 준비는 왜 모두 중요할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
-- [1학년 과목 이해하기](./02-first-year-subjects.md)
-- [자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
-- [시스템 과목 이해하기](./04-systems-subjects.md)
-- [데이터베이스와 네트워크](./05-database-and-network.md)
-- [AI와 데이터사이언스](./06-ai-and-data-science.md)
+## 시리즈 목차
+
+- [Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): 데이터베이스와 네트워크](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI와 데이터사이언스](./06-ai-and-data-science.md)
 - **프로젝트 과목 (현재 글)**
 - 전공 공부 방법 (예정)
 - 포트폴리오로 연결하기 (예정)
 - 졸업 전 갖춰야 할 역량 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

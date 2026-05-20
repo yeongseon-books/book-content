@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>How to Study Computer Science</title>
+<title>Computer Science Major 101 (8/10): How to Study Computer Science</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>How to Study Computer Science</h1>
+<h1>Computer Science Major 101 (8/10): How to Study Computer Science</h1>
 <p>Some students remember concepts weeks later, while others lose them almost as soon as the lecture ends. The gap is often less about talent than about whether their study method has a repeatable structure.</p>
 <p>This is post 8 in the Computer Science Major 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying How to Study Computer Science?</li>
+<li>Which signal should the example or diagram make visible for How to Study Computer Science?</li>
+<li>What failure should be prevented first when How to Study Computer Science reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer science major 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png"></p>
+<p><em>computer science major 101 chapter 8 flow overview</em></p>
+<p>This picture places How to Study Computer Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of How to Study Computer Science is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Why does the same amount of study time produce very different results depending on the method?</li>
@@ -74,8 +87,6 @@
 <h2>Why It Matters</h2>
 <p>Study efficiency creates a large share of the gap between students in a CS major. Two students can attend the same lecture, but review spacing, practice frequency, and question habits create very different levels of understanding and retention.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Study loop for CS majors" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png"></p>
-<p><em>The study loop from lecture to questions and practice</em></p>
 <blockquote>
 <p>Studying computer science does not end when the lecture ends. It becomes real only when you revisit the idea, test it with your hands, and use questions to clear what still feels vague.</p>
 </blockquote>
@@ -91,33 +102,75 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: You study only right before exams.</p>
 <p><strong>After</strong>: You spread lectures, review, and practice across a weekly routine.</p>
-<h2>Hands-on: Study Tracking Script</h2>
-<p><strong>Step 1 — Register subjects</strong></p>
-<pre><code class="language-python">log = {&quot;algorithms&quot;: [], &quot;os&quot;: [], &quot;db&quot;: []}
+<h2>Hands-on: A Weekly Review Loop Tracker</h2>
+<p>Counting hours is not enough for CS study. You also need to know when you heard the concept, when you plan to revisit it, whether the review actually happened, and where your open questions still live. The script below creates a small weekly report around that loop.</p>
+<pre><code class="language-python">from collections import defaultdict
+from datetime import date, timedelta
+
+sessions = [
+    {
+        &quot;course&quot;: &quot;algorithms&quot;,
+        &quot;lecture_date&quot;: date(2026, 5, 4),
+        &quot;study_minutes&quot;: 100,
+        &quot;review_completed&quot;: True,
+        &quot;questions&quot;: [&quot;Why does merge sort stay O(n log n)?&quot;],
+    },
+    {
+        &quot;course&quot;: &quot;operating-systems&quot;,
+        &quot;lecture_date&quot;: date(2026, 5, 5),
+        &quot;study_minutes&quot;: 60,
+        &quot;review_completed&quot;: False,
+        &quot;questions&quot;: [&quot;What exactly causes context-switch overhead?&quot;],
+    },
+    {
+        &quot;course&quot;: &quot;databases&quot;,
+        &quot;lecture_date&quot;: date(2026, 5, 6),
+        &quot;study_minutes&quot;: 45,
+        &quot;review_completed&quot;: False,
+        &quot;questions&quot;: [],
+    },
+]
+
+def build_weekly_report(entries):
+    totals = defaultdict(int)
+    weak_areas = []
+    lines = []
+
+    for entry in entries:
+        next_review = entry[&quot;lecture_date&quot;] + timedelta(days=2)
+        totals[entry[&quot;course&quot;]] += entry[&quot;study_minutes&quot;]
+        status = &quot;done&quot; if entry[&quot;review_completed&quot;] else &quot;pending&quot;
+        lines.append(
+            f&quot;{entry['course']}: lecture={entry['lecture_date']}, &quot;
+            f&quot;next_review={next_review}, review={status}, &quot;
+            f&quot;questions={len(entry['questions'])}&quot;
+        )
+
+    for course, minutes in totals.items():
+        if minutes &lt; 90 or any(
+            e[&quot;course&quot;] == course and not e[&quot;review_completed&quot;] for e in entries
+        ):
+            weak_areas.append(course)
+
+    summary = &quot;, &quot;.join(f&quot;{course}={minutes}m&quot; for course, minutes in totals.items())
+    weak_summary = &quot;, &quot;.join(weak_areas) if weak_areas else &quot;none&quot;
+    return &quot;\n&quot;.join(lines + [f&quot;weekly_totals: {summary}&quot;, f&quot;weak_areas: {weak_summary}&quot;])
+
+print(build_weekly_report(sessions))
 </code></pre>
-<p>First decide what you want to track. The structure does not need to be elaborate. Even a tiny record is enough if it makes your habits visible.</p>
-<p><strong>Step 2 — Record sessions</strong></p>
-<pre><code class="language-python">log[&quot;algorithms&quot;].append({&quot;date&quot;: &quot;2026-05-01&quot;, &quot;hours&quot;: 2})
+<p>With the sample input, you should see output like this.</p>
+<pre><code class="language-text">algorithms: lecture=2026-05-04, next_review=2026-05-06, review=done, questions=1
+operating-systems: lecture=2026-05-05, next_review=2026-05-07, review=pending, questions=1
+databases: lecture=2026-05-06, next_review=2026-05-08, review=pending, questions=0
+weekly_totals: algorithms=100m, operating-systems=60m, databases=45m
+weak_areas: operating-systems, databases
 </code></pre>
-<p>Writing down when and how long you studied already changes your behavior. Memory alone often distorts how much time you actually spent.</p>
-<p><strong>Step 3 — Mark reviewed</strong></p>
-<pre><code class="language-python">def reviewed(entry):
-    return entry.get(&quot;review&quot;, False)
-</code></pre>
-<p>Once you track review separately, the log stops being a time sheet and starts becoming a learning-cycle record. That distinction matters a lot in CS study.</p>
-<p><strong>Step 4 — Weekly total</strong></p>
-<pre><code class="language-python">total = sum(e[&quot;hours&quot;] for e in log[&quot;algorithms&quot;])
-</code></pre>
-<p>Totals reveal whether one course is quietly receiving too little attention. Time distribution is far easier to judge with numbers than with intuition.</p>
-<p><strong>Step 5 — Find weak subjects</strong></p>
-<pre><code class="language-python">weak = [c for c, es in log.items() if sum(e[&quot;hours&quot;] for e in es) &lt; 5]
-</code></pre>
-<p>The subjects you want to avoid are often the ones that need the clearest label. The earlier you surface a weak area, the cheaper it is to fix.</p>
+<p>This report makes three claims visible at once: when the next review should happen, where unanswered questions are accumulating, and which courses are receiving too little practice. That is the practical link between spaced review, question habits, and weekly planning.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>Logging makes habits visible.</li>
-<li>Review marks are what make spaced learning possible.</li>
-<li>Totals reveal imbalance across subjects.</li>
+<li>Lecture date and next review date turn spaced learning into a concrete schedule.</li>
+<li>Review status and question count reveal where understanding is still weak.</li>
+<li>Weekly totals only become useful when you read them together with unfinished reviews.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
@@ -173,24 +226,34 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>You cannot sustain CS study for long on motivation alone. Lectures, notes, review, practice, and questions need to form one loop before learning starts to accumulate. The same amount of time can produce very different results depending on the method. In the next post, we will look at how to turn coursework and projects into a portfolio that other people can read.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Data Structures and Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/04-systems-subjects.md">Understanding Systems Subjects</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/05-database-and-network.md">Database and Network</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/06-ai-and-data-science.md">AI and Data Science</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/07-project-subjects.md">Project Subjects</a></li>
+<li><strong>What boundary should you inspect first when applying How to Study Computer Science?</strong></li>
+<li>The article treats How to Study Computer Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for How to Study Computer Science?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when How to Study Computer Science reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">Computer Science Major 101 (1/10): What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Computer Science Major 101 (2/10): Understanding First Year Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Computer Science Major 101 (3/10): Data Structures and Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/04-systems-subjects.md">Computer Science Major 101 (4/10): Understanding Systems Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/05-database-and-network.md">Computer Science Major 101 (5/10): Database and Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/06-ai-and-data-science.md">Computer Science Major 101 (6/10): AI and Data Science</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/07-project-subjects.md">Computer Science Major 101 (7/10): Project Subjects</a></li>
 <li><strong>How to Study Computer Science (current)</strong></li>
 <li>Build Your Portfolio (upcoming)</li>
 <li>Skills to Have Before Graduation (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.hup.harvard.edu/catalog.php?isbn=9780674729018">Make It Stick</a></li>
-<li><a href="https://barbaraoakley.com/books/a-mind-for-numbers/">A Mind for Numbers - Barbara Oakley</a></li>
-<li><a href="https://www.coursera.org/learn/learning-how-to-learn">Learning How to Learn - Coursera</a></li>
-<li><a href="https://www.supermemo.com/en/articles/theory">Spaced Repetition - SuperMemo</a></li>
+<li><a href="https://www.hup.harvard.edu/books/9780674729018">Make It Stick</a></li>
+<li><a href="https://journals.sagepub.com/doi/10.1177/1529100612453266">Improving Students' Learning With Effective Learning Techniques</a></li>
+<li><a href="https://www.wiley.com/en-us/How+Learning+Works%3A+Eight+Research-Based+Principles+for+Smart+Teaching-p-9780470484104">How Learning Works</a></li>
+<li><a href="https://csed.acm.org/cs2023/">ACM/IEEE-CS/AAAI Computer Science Curricula 2023</a></li>
 </ul>
 <p class="tags-line">Tags: CS, Study, Habit, Learning, Beginner</p>
 </body>

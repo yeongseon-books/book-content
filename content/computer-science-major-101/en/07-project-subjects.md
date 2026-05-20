@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 7
-title: Project Subjects
+title: "Computer Science Major 101 (7/10): Project Subjects"
 status: publish-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Project Subjects
+# Computer Science Major 101 (7/10): Project Subjects
 
 Many students reach the later years of the major and realize that knowing individual subjects is not the same thing as turning them into one working result. Project subjects are where scattered knowledge finally has to survive deadlines, teammates, testing, and a live demo.
 
 This is post 7 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Project Subjects?
+- Which signal should the example or diagram make visible for Project Subjects?
+- What failure should be prevented first when Project Subjects reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
+
+*computer science major 101 chapter 7 flow overview*
+
+This picture places Project Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Project Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -47,10 +63,6 @@ This is post 7 in the Computer Science Major 101 series.
 The *start* of your *portfolio* is often a *major project*.
 
 ## Concept at a Glance
-
-![Project delivery flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
-
-*How a project moves from planning to demo*
 
 > A project subject is not mainly about writing more code. It is about proving that a small team can turn a bounded problem into a demo, documentation, and a result another person can evaluate.
 
@@ -102,7 +114,6 @@ spec = {
     ],
 }
 
-
 def build_brief(spec):
     problem_statement = (
         f"{spec['project']} helps {', '.join(spec['users'])} "
@@ -135,7 +146,6 @@ def build_brief(spec):
         {risk_lines}
         """
     ).strip()
-
 
 print(build_brief(spec))
 ```
@@ -213,17 +223,29 @@ A startup *MVP* looks *almost the same* as a major project.
 
 Next post: *How to Study Computer Science*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Project Subjects?**
+  - The article treats Project Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Project Subjects?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Project Subjects reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
-- [Understanding Systems Subjects](./04-systems-subjects.md)
-- [Database and Network](./05-database-and-network.md)
-- [AI and Data Science](./06-ai-and-data-science.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): Understanding Systems Subjects](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): Database and Network](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI and Data Science](./06-ai-and-data-science.md)
 - **Project Subjects (current)**
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

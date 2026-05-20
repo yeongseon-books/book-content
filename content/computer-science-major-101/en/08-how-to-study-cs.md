@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 8
-title: How to Study Computer Science
+title: "Computer Science Major 101 (8/10): How to Study Computer Science"
 status: publish-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# How to Study Computer Science
+# Computer Science Major 101 (8/10): How to Study Computer Science
 
 Some students remember concepts weeks later, while others lose them almost as soon as the lecture ends. The gap is often less about talent than about whether their study method has a repeatable structure.
 
 This is post 8 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying How to Study Computer Science?
+- Which signal should the example or diagram make visible for How to Study Computer Science?
+- What failure should be prevented first when How to Study Computer Science reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)
+
+*computer science major 101 chapter 8 flow overview*
+
+This picture places How to Study Computer Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of How to Study Computer Science is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -47,10 +63,6 @@ This is post 8 in the Computer Science Major 101 series.
 Study efficiency creates a large share of the gap between students in a CS major. Two students can attend the same lecture, but review spacing, practice frequency, and question habits create very different levels of understanding and retention.
 
 ## Concept at a Glance
-
-![Study loop for CS majors](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)
-
-*The study loop from lecture to questions and practice*
 
 > Studying computer science does not end when the lecture ends. It becomes real only when you revisit the idea, test it with your hands, and use questions to clear what still feels vague.
 
@@ -102,7 +114,6 @@ sessions = [
     },
 ]
 
-
 def build_weekly_report(entries):
     totals = defaultdict(int)
     weak_areas = []
@@ -127,7 +138,6 @@ def build_weekly_report(entries):
     summary = ", ".join(f"{course}={minutes}m" for course, minutes in totals.items())
     weak_summary = ", ".join(weak_areas) if weak_areas else "none"
     return "\n".join(lines + [f"weekly_totals: {summary}", f"weak_areas: {weak_summary}"])
-
 
 print(build_weekly_report(sessions))
 ```
@@ -202,17 +212,29 @@ You do not need to copy this table exactly. The important part is that lecture, 
 
 You cannot sustain CS study for long on motivation alone. Lectures, notes, review, practice, and questions need to form one loop before learning starts to accumulate. The same amount of time can produce very different results depending on the method. In the next post, we will look at how to turn coursework and projects into a portfolio that other people can read.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying How to Study Computer Science?**
+  - The article treats How to Study Computer Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for How to Study Computer Science?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when How to Study Computer Science reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
-- [Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
-- [Understanding Systems Subjects](./04-systems-subjects.md)
-- [Database and Network](./05-database-and-network.md)
-- [AI and Data Science](./06-ai-and-data-science.md)
-- [Project Subjects](./07-project-subjects.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): Data Structures and Algorithms](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): Understanding Systems Subjects](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): Database and Network](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI and Data Science](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): Project Subjects](./07-project-subjects.md)
 - **How to Study Computer Science (current)**
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

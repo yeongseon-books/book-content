@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Structures and Algorithms</title>
+<title>Computer Science Major 101 (3/10): Data Structures and Algorithms</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Data Structures and Algorithms</h1>
+<h1>Computer Science Major 101 (3/10): Data Structures and Algorithms</h1>
 <blockquote>
 <p>Computer Science Major 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Why are <em>data structures</em> and <em>algorithms</em> the <em>core</em> course for <em>every</em> CS major?</p>
 <blockquote>
 <p>Because they are the <em>common language</em> of <em>problem solving</em>.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 3 in the Computer Science Major 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Structures and Algorithms?</li>
+<li>Which signal should the example or diagram make visible for Data Structures and Algorithms?</li>
+<li>What failure should be prevented first when Data Structures and Algorithms reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer science major 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png"></p>
+<p><em>computer science major 101 chapter 3 flow overview</em></p>
+<p>This picture places Data Structures and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Structures and Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Meaning of <em>data structures</em></li>
@@ -77,8 +86,6 @@
 <h2>Why It Matters</h2>
 <p><em>Complexity</em> thinking is the first <em>standard</em> of <em>code quality</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="DSA problem-solving flow" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png"></p>
-<p><em>How data structures and algorithms feed problem solving</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>array</strong>: <em>contiguous</em> memory.</li>
@@ -167,9 +174,19 @@ def bfs(g, s):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Understanding Systems Subjects</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
+<li><strong>What boundary should you inspect first when applying Data Structures and Algorithms?</strong></li>
+<li>The article treats Data Structures and Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Structures and Algorithms?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Structures and Algorithms reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">Computer Science Major 101 (1/10): What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Computer Science Major 101 (2/10): Understanding First Year Subjects</a></li>
 <li><strong>Data Structures and Algorithms (current)</strong></li>
 <li>Understanding Systems Subjects (upcoming)</li>
 <li>Database and Network (upcoming)</li>

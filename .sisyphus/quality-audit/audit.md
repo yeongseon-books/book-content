@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:08:10+00:00
+Generated: 2026-05-20T11:09:08+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,13 +27,13 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **60**
-- Series at or above 5 issues: **45**
-- Total issues: **569**
+- Series with any issue: **59**
+- Series at or above 5 issues: **44**
+- Total issues: **564**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **37**
+  - Shrt: **32**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -84,23 +84,22 @@ Warnings:
 | 41 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 42 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
 | 43 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 44 | `computer-science-major-101` | 5 | 0 | 0 | 0 | 5 | 0 |
-| 45 | `statistics-101` | 5 | 0 | 0 | 0 | 5 | 0 |
-| 46 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 47 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 48 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 49 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 50 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 51 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 52 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 53 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 54 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
-| 55 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 56 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 57 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 58 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 59 | `math-for-cs-101` | 1 | 0 | 0 | 0 | 1 | 0 |
-| 60 | `technical-writing-101` | 1 | 0 | 0 | 0 | 1 | 0 |
+| 44 | `statistics-101` | 5 | 0 | 0 | 0 | 5 | 0 |
+| 45 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 46 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 47 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 48 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 49 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 50 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 51 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 52 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 53 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
+| 54 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 55 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 56 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 57 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 58 | `math-for-cs-101` | 1 | 0 | 0 | 0 | 1 | 0 |
+| 59 | `technical-writing-101` | 1 | 0 | 0 | 0 | 1 | 0 |
 
 ## python-dbapi-101 — Total 42
 
@@ -653,17 +652,6 @@ Warnings:
 - `assets/git-github-101/06/06-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=828x88)
 - `assets/git-github-101/06/06-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=735x88)
 - `assets/git-github-101/10/10-01-mental-model.ko.png:1` — PNG height 75px <= 100px (size=1384x75)
-
-## computer-science-major-101 — Total 5
-
-- BadImg=0 Synt=0 BrkLink=0 Shrt=5 NoEn=0
-
-### Shrt
-- `content/computer-science-major-101/en/01-what-cs-majors-learn.md:23` — markdown body has 143 lines (< 150)
-- `content/computer-science-major-101/en/02-first-year-subjects.md:23` — markdown body has 143 lines (< 150)
-- `content/computer-science-major-101/en/04-systems-subjects.md:23` — markdown body has 149 lines (< 150)
-- `content/computer-science-major-101/en/05-database-and-network.md:23` — markdown body has 146 lines (< 150)
-- `content/computer-science-major-101/en/06-ai-and-data-science.md:23` — markdown body has 149 lines (< 150)
 
 ## statistics-101 — Total 5
 

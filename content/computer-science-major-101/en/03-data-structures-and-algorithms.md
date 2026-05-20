@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 3
-title: Data Structures and Algorithms
+title: "Computer Science Major 101 (3/10): Data Structures and Algorithms"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# Data Structures and Algorithms
+# Computer Science Major 101 (3/10): Data Structures and Algorithms
 
 > Computer Science Major 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why are *data structures* and *algorithms* the *core* course for *every* CS major?
 
 > Because they are the *common language* of *problem solving*.
 
-<!-- a-grade-intro:end -->
-
 This is post 3 in the Computer Science Major 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Structures and Algorithms?
+- Which signal should the example or diagram make visible for Data Structures and Algorithms?
+- What failure should be prevented first when Data Structures and Algorithms reaches a real system?
+
+## Big Picture
+
+![computer science major 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
+
+*computer science major 101 chapter 3 flow overview*
+
+This picture places Data Structures and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Structures and Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -48,10 +60,6 @@ This is post 3 in the Computer Science Major 101 series.
 *Complexity* thinking is the first *standard* of *code quality*.
 
 ## Concept at a Glance
-
-![DSA problem-solving flow](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
-
-*How data structures and algorithms feed problem solving*
 
 ## Key Terms
 
@@ -164,9 +172,20 @@ Most API *latency* problems start at *data structure choice*.
 
 Next post: *Understanding Systems Subjects*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Structures and Algorithms?**
+  - The article treats Data Structures and Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Structures and Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Structures and Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
-- [Understanding First Year Subjects](./02-first-year-subjects.md)
+## In this series
+
+- [Computer Science Major 101 (1/10): What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): Understanding First Year Subjects](./02-first-year-subjects.md)
 - **Data Structures and Algorithms (current)**
 - Understanding Systems Subjects (upcoming)
 - Database and Network (upcoming)
@@ -175,6 +194,7 @@ Next post: *Understanding Systems Subjects*.
 - How to Study Computer Science (upcoming)
 - Build Your Portfolio (upcoming)
 - Skills to Have Before Graduation (upcoming)
+
 <!-- toc:end -->
 
 ## References

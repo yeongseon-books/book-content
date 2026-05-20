@@ -1,7 +1,7 @@
 ---
 series: computer-science-major-101
 episode: 9
-title: 포트폴리오로 연결하기
+title: "Computer Science Major 101 (9/10): 포트폴리오로 연결하기"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,27 @@ code_required: false
 last_reviewed: '2026-05-14'
 ---
 
-# 포트폴리오로 연결하기
+# Computer Science Major 101 (9/10): 포트폴리오로 연결하기
 
 학생 때 만든 과제와 프로젝트는 정리하지 않으면 생각보다 빨리 사라집니다. 로컬 폴더에만 남아 있고 설명도 없다면, 나중에는 만든 사람조차 다시 꺼내 보기 어려워집니다.
 
 이 글은 Computer Science Major 101 시리즈의 9번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 전공 과제와 프로젝트는 어떻게 포트폴리오가 될 수 있을까요?
 - GitHub 저장소, README, 실행 방법, 데모 링크는 왜 모두 중요할까요?
 - 코드만 올려 두는 것과 설명 가능한 결과물을 공개하는 것은 무엇이 다를까요?
-- 포트폴리오가 지원 과정에서 대화를 여는 역할을 하는 이유는 무엇일까요?
+
+## 큰 그림
+
+![Computer Science Major 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
+
+*Computer Science Major 101 9장 흐름 개요*
+
+이 그림에서는 포트폴리오로 연결하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 포트폴리오로 연결하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -47,10 +56,6 @@ last_reviewed: '2026-05-14'
 지원 단계에서는 눈에 보이는 결과가 있어야 대화가 시작됩니다. 이력서 한 줄보다 저장소와 README, 데모 링크가 훨씬 더 많은 정보를 담고, 문제 해결 방식과 협업 태도까지 보여 줍니다.
 
 ## 한눈에 보는 개념
-
-![과제에서 포트폴리오로 가는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
-
-*과제가 저장소와 README를 거쳐 포트폴리오로 바뀌는 흐름*
 
 > 과제는 제출로 끝나지만, 포트폴리오는 설명 가능한 저장소와 문서가 붙을 때 시작됩니다.
 
@@ -98,7 +103,6 @@ project = {
     ],
 }
 
-
 def build_readme(project):
     demo_lines = "\n".join(f"- {item}" for item in project["demo_evidence"])
     run_lines = "\n".join(f"1. {step}" for step in project["run_steps"])
@@ -128,7 +132,6 @@ def build_readme(project):
         {learned_lines}
         """
     ).strip()
-
 
 print(build_readme(project))
 ```
@@ -230,17 +233,29 @@ MIT License
 
 포트폴리오는 특별한 사람만 만드는 장식물이 아니라, 이미 만든 과제와 프로젝트를 읽을 수 있는 형태로 정리하는 작업입니다. 저장소 이름, README, 실행 방법, 데모, 문서화가 갖춰지면 작은 과제도 충분히 의미 있는 결과물이 됩니다. 다음 글에서는 시리즈를 마무리하며 졸업 전에 갖춰 두면 좋은 역량을 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **전공 과제와 프로젝트는 어떻게 포트폴리오가 될 수 있을까요?**
+  - 본문의 기준은 포트폴리오로 연결하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **GitHub 저장소, README, 실행 방법, 데모 링크는 왜 모두 중요할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **코드만 올려 두는 것과 설명 가능한 결과물을 공개하는 것은 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
-- [1학년 과목 이해하기](./02-first-year-subjects.md)
-- [자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
-- [시스템 과목 이해하기](./04-systems-subjects.md)
-- [데이터베이스와 네트워크](./05-database-and-network.md)
-- [AI와 데이터사이언스](./06-ai-and-data-science.md)
-- [프로젝트 과목](./07-project-subjects.md)
-- [전공 공부 방법](./08-how-to-study-cs.md)
+## 시리즈 목차
+
+- [Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가](./01-what-cs-majors-learn.md)
+- [Computer Science Major 101 (2/10): 1학년 과목 이해하기](./02-first-year-subjects.md)
+- [Computer Science Major 101 (3/10): 자료구조와 알고리즘](./03-data-structures-and-algorithms.md)
+- [Computer Science Major 101 (4/10): 시스템 과목 이해하기](./04-systems-subjects.md)
+- [Computer Science Major 101 (5/10): 데이터베이스와 네트워크](./05-database-and-network.md)
+- [Computer Science Major 101 (6/10): AI와 데이터사이언스](./06-ai-and-data-science.md)
+- [Computer Science Major 101 (7/10): 프로젝트 과목](./07-project-subjects.md)
+- [Computer Science Major 101 (8/10): 전공 공부 방법](./08-how-to-study-cs.md)
 - **포트폴리오로 연결하기 (현재 글)**
 - 졸업 전 갖춰야 할 역량 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
