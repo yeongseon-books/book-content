@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 1
-title: What Is a Programming Language?
+title: "Programming Languages 101 (1/10): What Is a Programming Language?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A programming language is not just a way to talk to a machine. 
 last_reviewed: '2026-05-15'
 ---
 
-# What Is a Programming Language?
+# Programming Languages 101 (1/10): What Is a Programming Language?
 
 When you write Python every day, it is easy to treat the language as nothing more than a convenient tool. But solving the same problem in assembly changes more than line count. It changes how you break the problem apart, how you name things, and how you manage state.
 
 This is the first post in the Programming Languages 101 series.
 
 In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Programming Language??
+- Which signal should the example or diagram make visible for What Is a Programming Language??
+- What failure should be prevented first when What Is a Programming Language? reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 1 flow overview*
+
+This picture places What Is a Programming Language? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Programming Language? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ If you treat a language as just a tool, every new language feels like starting o
 > "Learning a language" really means learning the way of thinking that language emphasizes.
 
 ## Concept at a Glance
-
-![Abstraction layers from high-level code down to machine code](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
-
-*Abstraction layers from high-level code down to machine code*
 
 The higher up, the easier for humans to read; the lower down, the closer to what the CPU executes directly. A programming language picks a layer and decides what abstractions to offer there. One line of Python can correspond to dozens of lines of assembly.
 
@@ -196,7 +208,18 @@ When you join a team and meet a language you do not know, the first week's job i
 
 A programming language is at once a way to instruct a machine and a frame that constrains how we think. The same problem expressed under different paradigms produces very different code, and that difference shapes the system. Next we will look at the two axes every language is built on — syntax and semantics — and see what each one really means.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Programming Language??**
+  - The article treats What Is a Programming Language? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Programming Language??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Programming Language? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Programming Language? (current)**
 - Syntax and Semantics (upcoming)
 - Type Systems (upcoming)
@@ -207,6 +230,7 @@ A programming language is at once a way to instruct a machine and a frame that c
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

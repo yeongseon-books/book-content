@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 4
-title: Scope and Binding
+title: "Programming Languages 101 (4/10): Scope and Binding"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Where a name resolves to which value is one of the most foundat
 last_reviewed: '2026-05-15'
 ---
 
-# Scope and Binding
+# Programming Languages 101 (4/10): Scope and Binding
 
 The same variable name can refer to different values inside and outside a function, and yet the program still behaves predictably. That ordinary-looking fact rests on one of the most important rule sets in language design.
 
 This is post 4 in the Programming Languages 101 series.
 
 In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Scope and Binding?
+- Which signal should the example or diagram make visible for Scope and Binding?
+- What failure should be prevented first when Scope and Binding reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 4 flow overview*
+
+This picture places Scope and Binding inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Scope and Binding is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Without a grasp of scope, "why isn't this variable updating?" or "why am I sudde
 > Binding ties a name to a value; scope is the region where that tie is visible.
 
 ## Concept at a Glance
-
-![The LEGB lookup path from local names out to built-ins](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
-
-*The LEGB lookup path from local names out to built-ins*
 
 Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.
 
@@ -217,10 +229,21 @@ Testing follows the same pattern. A function that depends on global state is har
 
 Scope is the region a name is visible in; binding is the act of attaching a value to a name. Once you understand lexical scope deeply, the next episode — closures — falls out of it naturally, because closures are what lexical scope plus first-class functions allow.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Scope and Binding?**
+  - The article treats Scope and Binding as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Scope and Binding?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Scope and Binding reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
 - **Scope and Binding (current)**
 - Functions and Closures (upcoming)
 - Objects and Prototypes (upcoming)
@@ -228,6 +251,7 @@ Scope is the region a name is visible in; binding is the act of attaching a valu
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

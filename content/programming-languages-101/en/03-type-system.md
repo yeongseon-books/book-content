@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 3
-title: Type Systems
+title: "Programming Languages 101 (3/10): Type Systems"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A type system is not just data tagging. It is a proof tool that
 last_reviewed: '2026-05-15'
 ---
 
-# Type Systems
+# Programming Languages 101 (3/10): Type Systems
 
 Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.
 
 This is post 3 in the Programming Languages 101 series.
 
 In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Type Systems?
+- Which signal should the example or diagram make visible for Type Systems?
+- What failure should be prevented first when Type Systems reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 3 flow overview*
+
+This picture places Type Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Type Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Most modern languages have some kind of type system, and even Python, JavaScript
 > A type narrows down, in advance, which inputs are even legal.
 
 ## Concept at a Glance
-
-![One layer of type information feeding both compile-time checks and IDE tooling](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
-
-*One layer of type information feeding both compile-time checks and IDE tooling*
 
 The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.
 
@@ -154,11 +166,9 @@ Trying to write the type accurately tends to expose ambiguity in the data model 
 # 6_boundary.py
 from typing import TypedDict
 
-
 class LineItem(TypedDict):
     price: int
     quantity: int
-
 
 def parse_line_item(raw: dict[str, object]) -> LineItem:
     price = raw.get("price")
@@ -167,10 +177,8 @@ def parse_line_item(raw: dict[str, object]) -> LineItem:
         raise ValueError("price and quantity must be integers")
     return {"price": price, "quantity": quantity}
 
-
 def subtotal(item: LineItem) -> int:
     return item["price"] * item["quantity"]
-
 
 payload = {"price": 1200, "quantity": 3}
 item = parse_line_item(payload)
@@ -226,9 +234,20 @@ Types are a refactoring safety net. When changing the order of a function's argu
 
 A type system gives you safety, documentation, and tooling at the same time. Not every language needs every level of typing, but for large systems with many boundaries it is almost always a win. Next we look at another universal pillar — scope and binding.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Type Systems?**
+  - The article treats Type Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Type Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Type Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
 - **Type Systems (current)**
 - Scope and Binding (upcoming)
 - Functions and Closures (upcoming)
@@ -237,6 +256,7 @@ A type system gives you safety, documentation, and tooling at the same time. Not
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

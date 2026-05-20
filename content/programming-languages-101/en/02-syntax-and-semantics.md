@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 2
-title: Syntax and Semantics
+title: "Programming Languages 101 (2/10): Syntax and Semantics"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Whether characters form a legal program (syntax) and what they 
 last_reviewed: '2026-05-15'
 ---
 
-# Syntax and Semantics
+# Programming Languages 101 (2/10): Syntax and Semantics
 
 Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.
 
 This is post 2 in the Programming Languages 101 series.
 
 In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Syntax and Semantics?
+- Which signal should the example or diagram make visible for Syntax and Semantics?
+- What failure should be prevented first when Syntax and Semantics reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 2 flow overview*
+
+This picture places Syntax and Semantics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Syntax and Semantics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Reading errors quickly, picking up new language syntax fast, and understanding w
 > "It builds" only means syntax passed. It does not mean the meaning matches your intent.
 
 ## Concept at a Glance
-
-![The pipeline from tokenization to execution, split into syntax and semantics](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
-
-*The pipeline from tokenization to execution, split into syntax and semantics*
 
 The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.
 
@@ -240,8 +252,19 @@ It also helps when reading logs. `Unexpected token` is a syntax-stage message. `
 
 Syntax is the question of legality. Semantics is the question of meaning. Splitting them clarifies what an error really is and tells you where to look first when meeting a new language. Next we examine the biggest tool in static semantics — the type system.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Syntax and Semantics?**
+  - The article treats Syntax and Semantics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Syntax and Semantics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Syntax and Semantics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
 - **Syntax and Semantics (current)**
 - Type Systems (upcoming)
 - Scope and Binding (upcoming)
@@ -251,6 +274,7 @@ Syntax is the question of legality. Semantics is the question of meaning. Splitt
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

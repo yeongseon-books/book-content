@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Functions and Closures</title>
+<title>Programming Languages 101 (5/10): Functions and Closures</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Functions and Closures</h1>
+<h1>Programming Languages 101 (5/10): Functions and Closures</h1>
 <p>A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.</p>
 <p>This is post 5 in the Programming Languages 101 series.</p>
 <p>In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What first-class functions are and why they matter</li>
-<li>The exact definition and behavior of a closure</li>
-<li>That closures capture references, not copies</li>
-<li>The classic late-binding pitfall</li>
-<li>Small design patterns built on closures (callbacks, factories, memoization)</li>
+<li>What boundary should you inspect first when applying Functions and Closures?</li>
+<li>Which signal should the example or diagram make visible for Functions and Closures?</li>
+<li>What failure should be prevented first when Functions and Closures reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 5 flow overview</em></p>
+<p>This picture places Functions and Closures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Functions and Closures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is the difference between first-class functions and higher-order functions?</li>
+<li>What exactly does a closure capture?</li>
+<li>Why do lambdas created inside a loop print the same value?</li>
+<li>In what way are closures similar to objects?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Closures are the foundation of callbacks, decorators, partial application, and module-style encapsulation. Without a clear mental model you fall into classics like "all functions made inside a for-loop print the same value."</p>
@@ -71,8 +83,6 @@
 <p>A closure is "a function plus the environment it grew up in."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A closure carrying both function logic and the binding it captured" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>A closure carrying both function logic and the binding it captured</em></p>
 <p>The <code>add</code> returned by <code>make_adder</code> carries the binding <code>x = 10</code> along with it. The caller cannot see inside, but <code>add</code> computes on top of that environment.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -207,11 +217,21 @@ print(slow_square(7), slow_square(7))  # 49 49 — second is cached
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A closure is "function plus environment." It falls out naturally where lexical scope meets first-class functions. Next we look at the same idea in a different shape — objects and prototypes.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
+<li><strong>What boundary should you inspect first when applying Functions and Closures?</strong></li>
+<li>The article treats Functions and Closures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Functions and Closures?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Functions and Closures reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Programming Languages 101 (3/10): Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Programming Languages 101 (4/10): Scope and Binding</a></li>
 <li><strong>Functions and Closures (current)</strong></li>
 <li>Objects and Prototypes (upcoming)</li>
 <li>Memory Management (upcoming)</li>

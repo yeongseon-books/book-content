@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 9
-title: Static vs Dynamic Languages
+title: "Programming Languages 101 (9/10): Static vs Dynamic Languages"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Static vs dynamic is not better vs worse. It is a choice about 
 last_reviewed: '2026-05-15'
 ---
 
-# Static vs Dynamic Languages
+# Programming Languages 101 (9/10): Static vs Dynamic Languages
 
 People often say static typing is safer, but the moment you ask what that safety really covers, the answer gets fuzzy. The same thing happens on the other side: dynamic languages are called faster, when the real question is faster in what sense and for which stage of work.
 
 This is post 9 in the Programming Languages 101 series.
 
 In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Static vs Dynamic Languages?
+- Which signal should the example or diagram make visible for Static vs Dynamic Languages?
+- What failure should be prevented first when Static vs Dynamic Languages reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 9 flow overview*
+
+This picture places Static vs Dynamic Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Static vs Dynamic Languages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Every team debates "should we add more types?" Holding that conversation well re
 > A type is a promise about the shape of data. Where that promise is checked is what static vs dynamic comes down to.
 
 ## Concept at a Glance
-
-![The same type error surfacing at build time in static typing and at runtime in dynamic typing](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
-
-*The same type error surfacing at build time in static typing and at runtime in dynamic typing*
 
 The same kind of bug — caught by static at build time, by dynamic at run time.
 
@@ -172,18 +184,15 @@ Metaprogramming and plugin patterns are possible in static typing too, but usual
 # 6_boundary_validation.py
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Item:
     price: int
-
 
 def parse_item(raw: dict[str, object]) -> Item:
     price = raw.get("price")
     if not isinstance(price, int):
         raise ValueError("price must be int")
     return Item(price=price)
-
 
 payload = {"price": 10}
 item = parse_item(payload)
@@ -239,17 +248,29 @@ A common design pattern is now "validate strongly at the boundary, type precisel
 
 Static and dynamic are not better and worse — they are tradeoffs. In the final episode we put all these choices together and ask what makes a good language design.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Static vs Dynamic Languages?**
+  - The article treats Static vs Dynamic Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Static vs Dynamic Languages?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Static vs Dynamic Languages reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
-- [Memory Management](./07-memory-management.md)
-- [Interpreters and Compilers](./08-interpreter-and-compiler.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
+- [Programming Languages 101 (7/10): Memory Management](./07-memory-management.md)
+- [Programming Languages 101 (8/10): Interpreters and Compilers](./08-interpreter-and-compiler.md)
 - **Static vs Dynamic Languages (current)**
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

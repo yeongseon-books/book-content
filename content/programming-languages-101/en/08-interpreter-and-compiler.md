@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 8
-title: Interpreters and Compilers
+title: "Programming Languages 101 (8/10): Interpreters and Compilers"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Interpreters and compilers do the same job at different times. 
 last_reviewed: '2026-05-15'
 ---
 
-# Interpreters and Compilers
+# Programming Languages 101 (8/10): Interpreters and Compilers
 
 Python is often called an interpreted language, yet it still produces `.pyc` files. That tension is a useful clue. It means the common “interpreted vs compiled” contrast is too blunt to describe what actually happens at runtime.
 
 This is post 8 in the Programming Languages 101 series.
 
 In this post, we will treat interpreters and compilers as two strategies for the same translation problem. We will use Python bytecode as the concrete example, then connect that path to AOT and JIT so the execution model feels like an engineering choice instead of a slogan.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Interpreters and Compilers?
+- Which signal should the example or diagram make visible for Interpreters and Compilers?
+- What failure should be prevented first when Interpreters and Compilers reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 8 flow overview*
+
+This picture places Interpreters and Compilers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Interpreters and Compilers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ When performance hurts, being able to answer "what does this line actually run a
 > The same algorithm can run 100x faster or slower depending on the execution model.
 
 ## Concept at a Glance
-
-![Source code splitting into bytecode, JIT, and ahead-of-time compilation paths](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
-
-*Source code splitting into bytecode, JIT, and ahead-of-time compilation paths*
 
 Python takes `A → ... → D → E`. JVM bumps hot code to `F`. C and Rust go straight to `G`.
 
@@ -216,17 +228,29 @@ The JVM defaults to JIT — start with interpretation, compile hot paths to nati
 
 Interpreters, compilers, and JITs are not enemies; they are different answers to the same question. Next we look at the other big axis that shapes execution — the static vs dynamic typing tradeoff.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Interpreters and Compilers?**
+  - The article treats Interpreters and Compilers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Interpreters and Compilers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Interpreters and Compilers reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
-- [Memory Management](./07-memory-management.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
+- [Programming Languages 101 (7/10): Memory Management](./07-memory-management.md)
 - **Interpreters and Compilers (current)**
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

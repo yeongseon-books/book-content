@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 7
-title: Memory Management
+title: "Programming Languages 101 (7/10): Memory Management"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Watch objects appear and disappear with one line of code. Trace
 last_reviewed: '2026-05-15'
 ---
 
-# Memory Management
+# Programming Languages 101 (7/10): Memory Management
 
 Writing `del x` does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.
 
 This is post 7 in the Programming Languages 101 series.
 
 In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Memory Management?
+- Which signal should the example or diagram make visible for Memory Management?
+- What failure should be prevented first when Memory Management reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 7 flow overview*
+
+This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Long-running services often slowly creep up in memory. Finding the cause means b
 > Most leaks start with one forgotten reference.
 
 ## Concept at a Glance
-
-![The lifetime flow from stack frames to heap objects, refcounts, and tracing GC](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
-
-*The lifetime flow from stack frames to heap objects, refcounts, and tracing GC*
 
 The stack is reclaimed when the function returns. The heap needs someone to collect it.
 
@@ -224,17 +236,29 @@ C, C++, and Rust take different paths — Rust uses compile-time ownership inste
 
 The memory model answers "who holds it, when do they let go?" Next we look at the two roads that execute these objects — interpreters and compilers.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Memory Management?**
+  - The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Memory Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Memory Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
 - **Memory Management (current)**
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

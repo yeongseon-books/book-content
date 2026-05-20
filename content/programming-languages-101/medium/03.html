@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Type Systems</title>
+<title>Programming Languages 101 (3/10): Type Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Type Systems</h1>
+<h1>Programming Languages 101 (3/10): Type Systems</h1>
 <p>Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.</p>
 <p>This is post 3 in the Programming Languages 101 series.</p>
 <p>In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The roles a type plays — checking, documentation, tool support</li>
-<li>The tradeoffs between static and dynamic typing</li>
-<li>How strong/weak differs from static/dynamic</li>
-<li>What type inference actually buys you</li>
-<li>The intuition behind generics and union/intersection types</li>
+<li>What boundary should you inspect first when applying Type Systems?</li>
+<li>Which signal should the example or diagram make visible for Type Systems?</li>
+<li>What failure should be prevented first when Type Systems reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 3 flow overview</em></p>
+<p>This picture places Type Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Type Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What role does a type actually play?</li>
+<li>What do static types and dynamic types check, and when do they check it?</li>
+<li>Why are strong vs weak typing and static vs dynamic typing different axes?</li>
+<li>Why do type inference and generics improve productivity?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Most modern languages have some kind of type system, and even Python, JavaScript, and Ruby grew gradual type systems (type hints, TypeScript). To use autocompletion, refactoring tools, and build-stage error messages well, you need to understand types. The later episodes — scope and closures — also operate on top of types.</p>
@@ -71,8 +83,6 @@
 <p>A type narrows down, in advance, which inputs are even legal.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="One layer of type information feeding both compile-time checks and IDE tooling" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>One layer of type information feeding both compile-time checks and IDE tooling</em></p>
 <p>The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -207,9 +217,19 @@ print(subtotal(item))  # 3600
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A type system gives you safety, documentation, and tooling at the same time. Not every language needs every level of typing, but for large systems with many boundaries it is almost always a win. Next we look at another universal pillar — scope and binding.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><strong>What boundary should you inspect first when applying Type Systems?</strong></li>
+<li>The article treats Type Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Type Systems?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Type Systems reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
 <li><strong>Type Systems (current)</strong></li>
 <li>Scope and Binding (upcoming)</li>
 <li>Functions and Closures (upcoming)</li>

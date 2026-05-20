@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scope and Binding</title>
+<title>Programming Languages 101 (4/10): Scope and Binding</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Scope and Binding</h1>
+<h1>Programming Languages 101 (4/10): Scope and Binding</h1>
 <p>The same variable name can refer to different values inside and outside a function, and yet the program still behaves predictably. That ordinary-looking fact rests on one of the most important rule sets in language design.</p>
 <p>This is post 4 in the Programming Languages 101 series.</p>
 <p>In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Precise definitions of scope and binding</li>
-<li>Lexical vs dynamic scope</li>
-<li>The intent and danger of variable shadowing</li>
-<li>Python's LEGB rule</li>
-<li>The foundation needed for closures (next episode)</li>
+<li>What boundary should you inspect first when applying Scope and Binding?</li>
+<li>Which signal should the example or diagram make visible for Scope and Binding?</li>
+<li>What failure should be prevented first when Scope and Binding reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 4 flow overview</em></p>
+<p>This picture places Scope and Binding inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scope and Binding is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is the precise difference between scope and binding?</li>
+<li>How do lexical scope and dynamic scope change the result?</li>
+<li>Why can shadowing the same name in an inner scope be risky?</li>
+<li>In what order does Python's LEGB rule resolve names?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Without a grasp of scope, "why isn't this variable updating?" or "why am I suddenly getting NameError?" become mysteries. With it, you see that functions, modules, and closures are all variations of the same rule.</p>
@@ -71,8 +83,6 @@
 <p>Binding ties a name to a value; scope is the region where that tie is visible.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The LEGB lookup path from local names out to built-ins" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>The LEGB lookup path from local names out to built-ins</em></p>
 <p>Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -206,10 +216,20 @@ def total(items):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Scope is the region a name is visible in; binding is the act of attaching a value to a name. Once you understand lexical scope deeply, the next episode — closures — falls out of it naturally, because closures are what lexical scope plus first-class functions allow.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
+<li><strong>What boundary should you inspect first when applying Scope and Binding?</strong></li>
+<li>The article treats Scope and Binding as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Scope and Binding?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Scope and Binding reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Programming Languages 101 (3/10): Type Systems</a></li>
 <li><strong>Scope and Binding (current)</strong></li>
 <li>Functions and Closures (upcoming)</li>
 <li>Objects and Prototypes (upcoming)</li>

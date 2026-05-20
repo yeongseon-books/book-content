@@ -18,10 +18,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 정적 언어와 동적 언어
+title: "Programming Languages 101 (9/10): 정적 언어와 동적 언어"
 ---
 
-# 정적 언어와 동적 언어
+# Programming Languages 101 (9/10): 정적 언어와 동적 언어
 
 정적 타입이 더 안전하다는 말은 자주 듣지만, 그 안전이 정확히 무엇을 덮는지 묻는 순간 답이 흐려지는 경우가 많습니다. 반대로 동적 언어가 더 빠르다는 말도 자주 나오지만, 실제로는 어떤 종류의 속도를 말하는지 구분이 필요합니다.
 
@@ -29,24 +29,27 @@ title: 정적 언어와 동적 언어
 
 이 글에서는 정적 언어와 동적 언어를 우열의 문제가 아니라 검사 시점의 선택으로 보겠습니다. 같은 함수를 타입 힌트 없이 쓴 버전과 명시적으로 쓴 버전을 나란히 놓고, 어떤 종류의 오류를 언제 잡을 수 있는지 현실적으로 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 정적과 동적의 가장 짧은 정의는 무엇일까요?
 - 같은 코드가 두 모델에서 어떻게 다르게 검증될까요?
 - mypy나 pyright가 잡을 수 있는 것과 없는 것은 무엇일까요?
-- 점진적 타입은 어떤 타협을 가능하게 할까요?
 
-> 정적과 동적의 차이는 좋은 쪽과 나쁜 쪽의 차이가 아니라, 타입 약속을 언제 검사하느냐의 차이입니다. 같은 종류의 오류라도 정적 언어는 빌드 전에, 동적 언어는 실행 중에 드러나게 만드는 편입니다.
+## 큰 그림
+
+![Programming Languages 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Programming Languages 101 9장 흐름 개요*
+
+이 그림에서는 정적 언어와 동적 언어를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 정적 언어와 동적 언어의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
 팀이 커질수록 “타입을 더 붙일까?”라는 논의가 반복됩니다. 이때 필요한 것은 신념이 아니라, 정적 검사가 무엇을 보장하고 무엇을 보장하지 않는지 한 문장으로 설명할 수 있는 감각입니다.
 
 ## 핵심 개념 한눈에 보기
-
-![같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
-
-*같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교*
 
 같은 유형의 오류라도 어느 시점에 드러나는지가 다릅니다. 정적 타입은 실행 전에 막고, 동적 타입은 실행 흐름이 그 지점에 도달했을 때 드러냅니다.
 
@@ -172,18 +175,15 @@ call_all(ops, 3, 4)
 # 6_boundary_validation.py
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Item:
     price: int
-
 
 def parse_item(raw: dict[str, object]) -> Item:
     price = raw.get("price")
     if not isinstance(price, int):
         raise ValueError("price must be int")
     return Item(price=price)
-
 
 payload = {"price": 10}
 item = parse_item(payload)
@@ -231,17 +231,29 @@ print(item.price + 5)  # 15
 
 정적과 동적은 우열이 아니라 선택입니다. 중요한 것은 어떤 오류를 언제 발견하고 싶은가입니다. 다음 마지막 글에서는 지금까지 본 모든 개념을 묶어 좋은 언어 설계가 무엇인지로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **정적과 동적의 가장 짧은 정의는 무엇일까요?**
+  - 본문의 기준은 정적 언어와 동적 언어를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **같은 코드가 두 모델에서 어떻게 다르게 검증될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **mypy나 pyright가 잡을 수 있는 것과 없는 것은 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [프로그래밍 언어란 무엇인가?](./01-what-is-a-programming-language.md)
-- [구문과 의미](./02-syntax-and-semantics.md)
-- [타입 시스템](./03-type-system.md)
-- [스코프와 바인딩](./04-scope-and-binding.md)
-- [함수와 클로저](./05-functions-and-closures.md)
-- [객체와 프로토타입](./06-objects-and-prototypes.md)
-- [메모리 관리](./07-memory-management.md)
-- [인터프리터와 컴파일러](./08-interpreter-and-compiler.md)
+## 시리즈 목차
+
+- [Programming Languages 101 (1/10): 프로그래밍 언어란 무엇인가?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): 구문과 의미](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): 타입 시스템](./03-type-system.md)
+- [Programming Languages 101 (4/10): 스코프와 바인딩](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): 함수와 클로저](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): 객체와 프로토타입](./06-objects-and-prototypes.md)
+- [Programming Languages 101 (7/10): 메모리 관리](./07-memory-management.md)
+- [Programming Languages 101 (8/10): 인터프리터와 컴파일러](./08-interpreter-and-compiler.md)
 - **정적 언어와 동적 언어 (현재 글)**
 - 좋은 언어 설계란 무엇인가? (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

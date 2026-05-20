@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 5
-title: Functions and Closures
+title: "Programming Languages 101 (5/10): Functions and Closures"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A closure is not magic. It is what lexical scope and first-clas
 last_reviewed: '2026-05-15'
 ---
 
-# Functions and Closures
+# Programming Languages 101 (5/10): Functions and Closures
 
 A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.
 
 This is post 5 in the Programming Languages 101 series.
 
 In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Functions and Closures?
+- Which signal should the example or diagram make visible for Functions and Closures?
+- What failure should be prevented first when Functions and Closures reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 5 flow overview*
+
+This picture places Functions and Closures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Functions and Closures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Closures are the foundation of callbacks, decorators, partial application, and m
 > A closure is "a function plus the environment it grew up in."
 
 ## Concept at a Glance
-
-![A closure carrying both function logic and the binding it captured](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
-
-*A closure carrying both function logic and the binding it captured*
 
 The `add` returned by `make_adder` carries the binding `x = 10` along with it. The caller cannot see inside, but `add` computes on top of that environment.
 
@@ -218,17 +230,29 @@ In library design, "take a user-supplied function and call it inside our environ
 
 A closure is "function plus environment." It falls out naturally where lexical scope meets first-class functions. Next we look at the same idea in a different shape — objects and prototypes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Functions and Closures?**
+  - The article treats Functions and Closures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Functions and Closures?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Functions and Closures reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
 - **Functions and Closures (current)**
 - Objects and Prototypes (upcoming)
 - Memory Management (upcoming)
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

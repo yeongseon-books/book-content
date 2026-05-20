@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Memory Management</title>
+<title>Programming Languages 101 (7/10): Memory Management</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Memory Management</h1>
+<h1>Programming Languages 101 (7/10): Memory Management</h1>
 <p>Writing <code>del x</code> does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.</p>
 <p>This is post 7 in the Programming Languages 101 series.</p>
 <p>In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Stack vs heap in one sentence</li>
-<li>How Python's reference counting works</li>
-<li>How a garbage collector untangles cycles</li>
-<li>Why "memory leaks" still happen in GC languages</li>
-<li>The tradeoffs between manual free, RAII, and GC</li>
+<li>What boundary should you inspect first when applying Memory Management?</li>
+<li>Which signal should the example or diagram make visible for Memory Management?</li>
+<li>What failure should be prevented first when Memory Management reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 7 flow overview</em></p>
+<p>This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How are the stack and the heap different?</li>
+<li>When does Python's reference counting free an object immediately?</li>
+<li>Why do cyclic references require a separate garbage collector?</li>
+<li>Why do memory leaks still happen even in GC languages?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Long-running services often slowly creep up in memory. Finding the cause means being able to answer "why is this object still alive?" Memory models are the tools that produce that answer.</p>
@@ -71,8 +83,6 @@
 <p>Most leaks start with one forgotten reference.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The lifetime flow from stack frames to heap objects, refcounts, and tracing GC" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>The lifetime flow from stack frames to heap objects, refcounts, and tracing GC</em></p>
 <p>The stack is reclaimed when the function returns. The heap needs someone to collect it.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -215,13 +225,23 @@ with opened(&quot;config.yml&quot;) as f:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The memory model answers "who holds it, when do they let go?" Next we look at the two roads that execute these objects — interpreters and compilers.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Objects and Prototypes</a></li>
+<li><strong>What boundary should you inspect first when applying Memory Management?</strong></li>
+<li>The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Memory Management?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Memory Management reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Programming Languages 101 (3/10): Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Programming Languages 101 (4/10): Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Programming Languages 101 (5/10): Functions and Closures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Programming Languages 101 (6/10): Objects and Prototypes</a></li>
 <li><strong>Memory Management (current)</strong></li>
 <li>Interpreters and Compilers (upcoming)</li>
 <li>Static vs Dynamic Languages (upcoming)</li>

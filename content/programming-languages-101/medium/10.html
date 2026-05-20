@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Makes a Good Language Design?</title>
+<title>Programming Languages 101 (10/10): What Makes a Good Language Design?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Makes a Good Language Design?</h1>
+<h1>Programming Languages 101 (10/10): What Makes a Good Language Design?</h1>
 <p>We sometimes say a language is well designed, but that phrase usually hides several different claims at once. Do we mean it is fast, easy to learn, resistant to mistakes, or pleasant to read? Without a frame, those judgments blur together.</p>
 <p>This is the final post in the Programming Languages 101 series.</p>
 <p>In this post, we will treat language design as an explicit tradeoff problem. The concepts from the earlier chapters — syntax, types, scope, closures, objects, memory, execution, and static vs dynamic checking — all become easier to compare once we place them on a handful of design axes.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Five axes for evaluating a language design</li>
-<li>Tradeoffs among consistency, simplicity, expressiveness, safety, and performance</li>
-<li>How Python, Go, and Rust answered the same problems differently</li>
-<li>Why the concepts in this series ended up the way they are</li>
-<li>The five questions to ask first when meeting any new language</li>
+<li>What boundary should you inspect first when applying What Makes a Good Language Design??</li>
+<li>Which signal should the example or diagram make visible for What Makes a Good Language Design??</li>
+<li>What failure should be prevented first when What Makes a Good Language Design? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 10 flow overview</em></p>
+<p>This picture places What Makes a Good Language Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Makes a Good Language Design? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What axes should you use to evaluate a language design?</li>
+<li>Why do consistency, simplicity, expressiveness, safety, and performance conflict with each other?</li>
+<li>Why do Python, Go, and Rust give different answers to the same problems?</li>
+<li>What should you ask first when you meet a new language?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Design sense is not just for evaluating languages — <strong>the same instinct applies every time you design an API, library, or internal DSL</strong>. Even a single function signature meets the same tradeoffs.</p>
@@ -71,8 +83,6 @@
 <p>Good design is not "good for everyone." It is "an answer that made its choices clear."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The five design axes pulling against one another in language design" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>The five design axes pulling against one another in language design</em></p>
 <p>The five axes are coupled — push one down and another rises.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -235,16 +245,26 @@ fn first(xs: &amp;[i32]) -&gt; Option&lt;&amp;i32&gt; {
 <h2>Wrap-up and Next Steps</h2>
 <p>Good language design is the honest declaration of how to weight the five axes. Everything you saw in this series — syntax, types, scope, closures, objects, memory, execution model, static vs dynamic — was an expression of those weights. The next step is to bring this instinct to your own code and API design.</p>
 <p>This series ends here. Suggested next reading paths: <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101">compilers-101</a>, <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101">api-design-101</a>, <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101">software-design-101</a>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Objects and Prototypes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/07-memory-management.md">Memory Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/08-interpreter-and-compiler.md">Interpreters and Compilers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/09-static-vs-dynamic.md">Static vs Dynamic Languages</a></li>
+<li><strong>What boundary should you inspect first when applying What Makes a Good Language Design??</strong></li>
+<li>The article treats What Makes a Good Language Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Makes a Good Language Design??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Makes a Good Language Design? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Programming Languages 101 (3/10): Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Programming Languages 101 (4/10): Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Programming Languages 101 (5/10): Functions and Closures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Programming Languages 101 (6/10): Objects and Prototypes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/07-memory-management.md">Programming Languages 101 (7/10): Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/08-interpreter-and-compiler.md">Programming Languages 101 (8/10): Interpreters and Compilers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/09-static-vs-dynamic.md">Programming Languages 101 (9/10): Static vs Dynamic Languages</a></li>
 <li><strong>What Makes a Good Language Design? (current)</strong></li>
 </ul>
 <h2>References</h2>

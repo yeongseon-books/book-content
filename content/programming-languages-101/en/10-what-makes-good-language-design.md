@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 10
-title: What Makes a Good Language Design?
+title: "Programming Languages 101 (10/10): What Makes a Good Language Design?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A good language balances consistency, simplicity, expressivenes
 last_reviewed: '2026-05-15'
 ---
 
-# What Makes a Good Language Design?
+# Programming Languages 101 (10/10): What Makes a Good Language Design?
 
 We sometimes say a language is well designed, but that phrase usually hides several different claims at once. Do we mean it is fast, easy to learn, resistant to mistakes, or pleasant to read? Without a frame, those judgments blur together.
 
 This is the final post in the Programming Languages 101 series.
 
 In this post, we will treat language design as an explicit tradeoff problem. The concepts from the earlier chapters — syntax, types, scope, closures, objects, memory, execution, and static vs dynamic checking — all become easier to compare once we place them on a handful of design axes.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Makes a Good Language Design??
+- Which signal should the example or diagram make visible for What Makes a Good Language Design??
+- What failure should be prevented first when What Makes a Good Language Design? reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 10 flow overview*
+
+This picture places What Makes a Good Language Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Makes a Good Language Design? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Design sense is not just for evaluating languages — **the same instinct applie
 > Good design is not "good for everyone." It is "an answer that made its choices clear."
 
 ## Concept at a Glance
-
-![The five design axes pulling against one another in language design](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png)
-
-*The five design axes pulling against one another in language design*
 
 The five axes are coupled — push one down and another rises.
 
@@ -207,17 +219,29 @@ Good language design is the honest declaration of how to weight the five axes. E
 
 This series ends here. Suggested next reading paths: [compilers-101](../../compilers-101/), [api-design-101](../../api-design-101/), [software-design-101](../../software-design-101/).
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Makes a Good Language Design??**
+  - The article treats What Makes a Good Language Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Makes a Good Language Design??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Makes a Good Language Design? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
-- [Objects and Prototypes](./06-objects-and-prototypes.md)
-- [Memory Management](./07-memory-management.md)
-- [Interpreters and Compilers](./08-interpreter-and-compiler.md)
-- [Static vs Dynamic Languages](./09-static-vs-dynamic.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
+- [Programming Languages 101 (6/10): Objects and Prototypes](./06-objects-and-prototypes.md)
+- [Programming Languages 101 (7/10): Memory Management](./07-memory-management.md)
+- [Programming Languages 101 (8/10): Interpreters and Compilers](./08-interpreter-and-compiler.md)
+- [Programming Languages 101 (9/10): Static vs Dynamic Languages](./09-static-vs-dynamic.md)
 - **What Makes a Good Language Design? (current)**
+
 <!-- toc:end -->
 
 ## References

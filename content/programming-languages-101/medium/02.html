@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Syntax and Semantics</title>
+<title>Programming Languages 101 (2/10): Syntax and Semantics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Syntax and Semantics</h1>
+<h1>Programming Languages 101 (2/10): Syntax and Semantics</h1>
 <p>Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.</p>
 <p>This is post 2 in the Programming Languages 101 series.</p>
 <p>In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The exact boundary between syntax and semantics</li>
-<li>The pipeline from tokens to grammar to an AST</li>
-<li>Why "syntactically valid but meaningfully wrong" code happens</li>
-<li>The difference between static and dynamic semantics</li>
+<li>What boundary should you inspect first when applying Syntax and Semantics?</li>
+<li>Which signal should the example or diagram make visible for Syntax and Semantics?</li>
+<li>What failure should be prevented first when Syntax and Semantics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 2 flow overview</em></p>
+<p>This picture places Syntax and Semantics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Syntax and Semantics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Where exactly is the boundary between syntax and semantics?</li>
+<li>How do tokens, grammar, and an AST connect in sequence?</li>
+<li>Why can code be valid yet still behave differently from what you intended?</li>
+<li>How do static semantics and dynamic semantics differ?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Reading errors quickly, picking up new language syntax fast, and understanding why the same code behaves differently across languages all require splitting the two axes. The later episodes — type systems, scope, closures — are all examples of "same syntax, different semantics."</p>
@@ -70,8 +83,6 @@
 <p>"It builds" only means syntax passed. It does not mean the meaning matches your intent.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The pipeline from tokenization to execution, split into syntax and semantics" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>The pipeline from tokenization to execution, split into syntax and semantics</em></p>
 <p>The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -83,7 +94,7 @@
 </ul>
 <h2>Before/After</h2>
 <p><strong>Before — confusing syntax errors with intent errors</strong></p>
-<pre><code class="language-python"># Both are &quot;errors,&quot; but they live in different layers.
+<pre><code class="language-text"># Both are &quot;errors,&quot; but they live in different layers.
 print(&quot;hello&quot;   # SyntaxError
 divide(10, 0)   # legal syntax, throws ZeroDivisionError at runtime
 </code></pre>
@@ -123,7 +134,7 @@ print(tokenize(&quot;3 + 4 * 2&quot;))
 <p>This step only cuts text into meaningful chunks. It does not interpret meaning.</p>
 <p><strong>Step 2 — Define a grammar</strong></p>
 <p>In BNF-flavored notation:</p>
-<pre><code>expr    = term  (&quot;+&quot; term  | &quot;-&quot; term)*
+<pre><code class="language-text">expr    = term  (&quot;+&quot; term  | &quot;-&quot; term)*
 term    = factor (&quot;*&quot; factor | &quot;/&quot; factor)*
 factor  = NUM | &quot;(&quot; expr &quot;)&quot;
 </code></pre>
@@ -226,8 +237,18 @@ print(evaluate_strange((&quot;+&quot;, 3, (&quot;*&quot;, 4, 2))))  # 24 — mea
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Syntax is the question of legality. Semantics is the question of meaning. Splitting them clarifies what an error really is and tells you where to look first when meeting a new language. Next we examine the biggest tool in static semantics — the type system.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><strong>What boundary should you inspect first when applying Syntax and Semantics?</strong></li>
+<li>The article treats Syntax and Semantics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Syntax and Semantics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Syntax and Semantics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
 <li><strong>Syntax and Semantics (current)</strong></li>
 <li>Type Systems (upcoming)</li>
 <li>Scope and Binding (upcoming)</li>

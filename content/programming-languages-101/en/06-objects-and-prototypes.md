@@ -1,7 +1,7 @@
 ---
 series: programming-languages-101
 episode: 6
-title: Objects and Prototypes
+title: "Programming Languages 101 (6/10): Objects and Prototypes"
 status: publish-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Class-based and prototype-based OOP are two expressions of the 
 last_reviewed: '2026-05-15'
 ---
 
-# Objects and Prototypes
+# Programming Languages 101 (6/10): Objects and Prototypes
 
 Java classes and JavaScript prototypes are both called object-oriented, but their surfaces look very different. The interesting question is not whether one is “real OOP.” It is what both systems are actually trying to solve underneath.
 
 This is post 6 in the Programming Languages 101 series.
 
 In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Objects and Prototypes?
+- Which signal should the example or diagram make visible for Objects and Prototypes?
+- What failure should be prevented first when Objects and Prototypes reaches a real system?
+
+## Big Picture
+
+![programming languages 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
+
+*programming languages 101 chapter 6 flow overview*
+
+This picture places Objects and Prototypes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Objects and Prototypes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Once you understand the object model precisely, "why is this method being called
 > Object = state + behavior. Classes and prototypes are different tools for making the same kind of bundle.
 
 ## Concept at a Glance
-
-![Class-based lookup and prototype chains meeting at the same delegation idea](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
-
-*Class-based lookup and prototype chains meeting at the same delegation idea*
 
 Class-based on top, prototype-based below. Same idea: **delegate one level up when not found**.
 
@@ -211,17 +223,29 @@ When designing, write down "what state does this object hold?" first. If the ans
 
 Objects bundle state and behavior; the two models are different ways of building that bundle. Either way, the essence is delegation. Next we look at how those objects live and die in memory — memory management.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Objects and Prototypes?**
+  - The article treats Objects and Prototypes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Objects and Prototypes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Objects and Prototypes reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
-- [Syntax and Semantics](./02-syntax-and-semantics.md)
-- [Type Systems](./03-type-system.md)
-- [Scope and Binding](./04-scope-and-binding.md)
-- [Functions and Closures](./05-functions-and-closures.md)
+## In this series
+
+- [Programming Languages 101 (1/10): What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Programming Languages 101 (2/10): Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Programming Languages 101 (3/10): Type Systems](./03-type-system.md)
+- [Programming Languages 101 (4/10): Scope and Binding](./04-scope-and-binding.md)
+- [Programming Languages 101 (5/10): Functions and Closures](./05-functions-and-closures.md)
 - **Objects and Prototypes (current)**
 - Memory Management (upcoming)
 - Interpreters and Compilers (upcoming)
 - Static vs Dynamic Languages (upcoming)
 - What Makes a Good Language Design? (upcoming)
+
 <!-- toc:end -->
 
 ## References

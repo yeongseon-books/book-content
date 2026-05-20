@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Objects and Prototypes</title>
+<title>Programming Languages 101 (6/10): Objects and Prototypes</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Objects and Prototypes</h1>
+<h1>Programming Languages 101 (6/10): Objects and Prototypes</h1>
 <p>Java classes and JavaScript prototypes are both called object-oriented, but their surfaces look very different. The interesting question is not whether one is “real OOP.” It is what both systems are actually trying to solve underneath.</p>
 <p>This is post 6 in the Programming Languages 101 series.</p>
 <p>In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>A precise definition of "object" under two models</li>
-<li>The method-lookup difference between class-based and prototype-based</li>
-<li>That Python classes are themselves objects</li>
-<li>The relationship between inheritance and delegation</li>
-<li>That closures and objects are two views of the same idea</li>
+<li>What boundary should you inspect first when applying Objects and Prototypes?</li>
+<li>Which signal should the example or diagram make visible for Objects and Prototypes?</li>
+<li>What failure should be prevented first when Objects and Prototypes reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="programming languages 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>programming languages 101 chapter 6 flow overview</em></p>
+<p>This picture places Objects and Prototypes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Objects and Prototypes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is the simplest way to define an object?</li>
+<li>How do class-based and prototype-based models differ in method lookup?</li>
+<li>What does it mean when people say that classes themselves are objects in Python?</li>
+<li>What is the relationship between inheritance and delegation?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Once you understand the object model precisely, "why is this method being called?" or "why does super behave this way?" becomes a single answer. Knowing both models lets you adapt to any new OOP language fast.</p>
@@ -71,8 +83,6 @@
 <p>Object = state + behavior. Classes and prototypes are different tools for making the same kind of bundle.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Class-based lookup and prototype chains meeting at the same delegation idea" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Class-based lookup and prototype chains meeting at the same delegation idea</em></p>
 <p>Class-based on top, prototype-based below. Same idea: <strong>delegate one level up when not found</strong>.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -200,12 +210,22 @@ print(u[&quot;greet&quot;]())  # hi, kim
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Objects bundle state and behavior; the two models are different ways of building that bundle. Either way, the essence is delegation. Next we look at how those objects live and die in memory — memory management.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
+<li><strong>What boundary should you inspect first when applying Objects and Prototypes?</strong></li>
+<li>The article treats Objects and Prototypes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Objects and Prototypes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Objects and Prototypes reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">Programming Languages 101 (1/10): What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Programming Languages 101 (2/10): Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Programming Languages 101 (3/10): Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Programming Languages 101 (4/10): Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Programming Languages 101 (5/10): Functions and Closures</a></li>
 <li><strong>Objects and Prototypes (current)</strong></li>
 <li>Memory Management (upcoming)</li>
 <li>Interpreters and Compilers (upcoming)</li>
