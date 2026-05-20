@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 3
-title: Sets and Functions
+title: "Math for CS 101 (3/10): Sets and Functions"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to sets and functions covering union,
 last_reviewed: '2026-05-04'
 ---
 
-# Sets and Functions
+# Math for CS 101 (3/10): Sets and Functions
 
 When you learn data structures, you usually start with lists, dictionaries, mapping, and filtering. Step back a little, though, and two simpler ideas sit underneath all of them: sets tell you what belongs, and functions tell you how one value becomes another.
 
@@ -30,15 +30,21 @@ This is post 3 in the Math for CS 101 series.
 
 Here we use sets and functions as the foundation for data modeling and transformation, not just as definitions to memorize.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why are sets such a useful foundation for data structures and validation?
 - How do union, intersection, and difference show up in ordinary code?
 - What separates a function from a more general relation?
-- Why do injective, surjective, and bijective mappings matter in practice?
-- How does function composition resemble a production data pipeline?
 
-> Sets make the boundary of allowed values explicit. Functions make the transformation from input to output explicit. Once those two axes are clear, both code and design decisions get easier to defend.
+## Big Picture
+
+![math for cs 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 3 flow overview*
+
+This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Python's `set`, `dict`, `map`, and `filter` already carry the mental model of se
 That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png)
-*Sets define the boundary of values, while functions define the rule that moves values through the system.*
 
 ## Key Terms
 
@@ -146,9 +149,20 @@ Sets clarify the shape of data, and functions clarify the shape of change. Toget
 
 Next, we broaden that structural view into graphs, where relationships between objects become the main story.
 
+## Answering the Opening Questions
+
+- **Why are sets such a useful foundation for data structures and validation?**
+  - The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do union, intersection, and difference show up in ordinary code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What separates a function from a more general relation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
 - **Sets and Functions (current)**
 - Graphs (upcoming)
 - Combinatorics (upcoming)
@@ -157,6 +171,7 @@ Next, we broaden that structural view into graphs, where relationships between o
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

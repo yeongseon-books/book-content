@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 6
-title: Probability
+title: "Math for CS 101 (6/10): Probability"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of sample space, events, conditional p
 last_reviewed: '2026-05-04'
 ---
 
-# Probability
+# Math for CS 101 (6/10): Probability
 
 Engineering work is full of uncertainty. Was that A/B test result luck or a real signal? Is a false positive rate acceptable? How likely is a failure pattern to repeat? If you do not have a probability model, those questions often collapse into intuition dressed up as confidence.
 
@@ -30,15 +30,21 @@ This is post 6 in the Math for CS 101 series.
 
 Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How do you turn uncertainty into a model instead of a vague guess?
 - What is the difference between a sample space and an event?
 - Why is conditional probability really about changing the denominator world?
-- How does Bayes theorem update a belief when new evidence arrives?
-- Why do expectation and variance matter together in decision-making?
 
-> Probability is not a magic prediction tool. It is a way to structure uncertainty so that comparisons, trade-offs, and updates become explicit.
+## Big Picture
+
+![math for cs 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 6 flow overview*
+
+This picture places Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Probability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ A/B testing, recommendation ranking, classifier evaluation, and reliability work
 The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
-*Probability starts with possible outcomes, then adds conditions, updates beliefs, and separates average outcome from risk.*
 
 ## Key Terms
 
@@ -148,17 +151,29 @@ Probability gives you a way to reason about uncertainty without pretending that 
 
 Next, we move into linear algebra, where the focus shifts from uncertainty to representing data and transformations in a compact form.
 
+## Answering the Opening Questions
+
+- **How do you turn uncertainty into a model instead of a vague guess?**
+  - The article treats Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between a sample space and an event?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is conditional probability really about changing the denominator world?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
 - **Probability (current)**
 - Linear Algebra (upcoming)
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

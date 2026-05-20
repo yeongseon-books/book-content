@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Algorithms and Math</title>
+<title>Math for CS 101 (10/10): Algorithms and Math</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Algorithms and Math</h1>
+<h1>Math for CS 101 (10/10): Algorithms and Math</h1>
 <p>When people first learn algorithms, they usually focus on implementation. If the code works, it feels like progress. In production systems, though, the harder questions arrive right after that: how quickly does it grow, what model makes the problem tractable, when is randomness acceptable, and where are the theoretical limits no optimization can cross?</p>
 <p>That is where the full series comes back together. Combinatorics explains explosive search spaces, graphs expose problem structure, probability enables randomized methods, calculus drives optimization, and information theory marks the floor you cannot beat.</p>
 <p>This is the final post in the Math for CS 101 series.</p>
 <p>Here we use algorithm design as the place where all of those mathematical tools finally meet.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How do the math topics from this series combine in algorithm design?</li>
 <li>Why does combinatorics matter so much for complexity analysis?</li>
 <li>How does graph modeling change the solution strategy itself?</li>
-<li>What do randomness, optimization, and information-theoretic limits each contribute?</li>
-<li>Why does a mathematical framing often change implementation outcomes?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 10 flow overview</em></p>
+<p>This picture places Algorithms and Math inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An algorithm is not just code. Before implementation, it is a model to choose, a cost to analyze, and a limit to acknowledge.</p>
+<p>The core of Algorithms and Math is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>If you treat algorithms as code only, you often stop at whether they run. In real systems, you also need to know whether the model is right, whether the cost will scale, whether approximation is acceptable, and whether the theoretical lower bound already tells you to change strategy.</p>
 <p>That is why mathematical framing matters so much. It is not decoration around implementation. It is often the thing that tells you whether an implementation direction is sensible in the first place.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png"><br>
-<em>Algorithm design combines counting, structure, uncertainty, optimization, and lower bounds into one decision-making workflow before code is finalized.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>complexity</strong>: <em>cost</em> vs <em>input size</em>.</li>
@@ -169,16 +169,26 @@ def lower_bound_bits(probs):
 <h2>Wrap-up and Next Steps</h2>
 <p>This chapter closes the series by putting the full toolbox back into one frame. Math is not a barrier that makes code harder. It is the map that tells you which models are useful, which paths scale, and which limits you must respect.</p>
 <p>If this series did its job, the next time you approach an algorithmic problem you will ask about structure, cost, randomness, and limits before you rush into implementation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Linear Algebra</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Calculus</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/09-information-theory.md">Information Theory</a></li>
+<li><strong>How do the math topics from this series combine in algorithm design?</strong></li>
+<li>The article treats Algorithms and Math as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why does combinatorics matter so much for complexity analysis?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does graph modeling change the solution strategy itself?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Math for CS 101 (5/10): Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Math for CS 101 (6/10): Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Math for CS 101 (7/10): Linear Algebra</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Math for CS 101 (8/10): Calculus</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/09-information-theory.md">Math for CS 101 (9/10): Information Theory</a></li>
 <li><strong>Algorithms and Math (current)</strong></li>
 </ul>
 <h2>References</h2>

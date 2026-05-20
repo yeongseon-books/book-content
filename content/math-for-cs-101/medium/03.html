@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Sets and Functions</title>
+<title>Math for CS 101 (3/10): Sets and Functions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Sets and Functions</h1>
+<h1>Math for CS 101 (3/10): Sets and Functions</h1>
 <p>When you learn data structures, you usually start with lists, dictionaries, mapping, and filtering. Step back a little, though, and two simpler ideas sit underneath all of them: sets tell you what belongs, and functions tell you how one value becomes another.</p>
 <p>In real systems these two ideas rarely stay separate. Deduplication, permission checks, feature preprocessing, key mapping, and serialization pipelines all become easier to reason about once you can describe them as set boundaries plus transformation rules.</p>
 <p>This is post 3 in the Math for CS 101 series.</p>
 <p>Here we use sets and functions as the foundation for data modeling and transformation, not just as definitions to memorize.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why are sets such a useful foundation for data structures and validation?</li>
 <li>How do union, intersection, and difference show up in ordinary code?</li>
 <li>What separates a function from a more general relation?</li>
-<li>Why do injective, surjective, and bijective mappings matter in practice?</li>
-<li>How does function composition resemble a production data pipeline?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 3 flow overview</em></p>
+<p>This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Sets make the boundary of allowed values explicit. Functions make the transformation from input to output explicit. Once those two axes are clear, both code and design decisions get easier to defend.</p>
+<p>The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Python's <code>set</code>, <code>dict</code>, <code>map</code>, and <code>filter</code> already carry the mental model of sets and functions. Deduplication is a set operation. Data transformation is often a chain of functions. Permission checks usually become set membership or set intersection once you make the model explicit.</p>
 <p>That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>Sets define the boundary of values, while functions define the rule that moves values through the system.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>set</strong>: a collection of <em>distinct</em> elements.</li>
@@ -146,9 +146,19 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Sets clarify the shape of data, and functions clarify the shape of change. Together they provide a compact vocabulary for boundary checks, deterministic transformations, and reversible mappings.</p>
 <p>Next, we broaden that structural view into graphs, where relationships between objects become the main story.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><strong>Why are sets such a useful foundation for data structures and validation?</strong></li>
+<li>The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do union, intersection, and difference show up in ordinary code?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What separates a function from a more general relation?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
 <li><strong>Sets and Functions (current)</strong></li>
 <li>Graphs (upcoming)</li>
 <li>Combinatorics (upcoming)</li>

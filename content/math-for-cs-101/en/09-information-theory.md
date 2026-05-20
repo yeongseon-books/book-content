@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 9
-title: Information Theory
+title: "Math for CS 101 (9/10): Information Theory"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of bits, entropy, cross entropy, KL di
 last_reviewed: '2026-05-04'
 ---
 
-# Information Theory
+# Math for CS 101 (9/10): Information Theory
 
 To understand why compression works, why cross entropy appears in classifier loss functions, or why language-model perplexity drops when predictions improve, you need a common concept underneath all three. That concept is information theory.
 
@@ -30,15 +30,21 @@ This is post 9 in the Math for CS 101 series.
 
 Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does it mean to measure information in bits?
 - Why is entropy called average information content?
 - Why is cross entropy so common as an ML loss function?
-- What does KL divergence reveal that entropy alone does not?
-- How does information theory tell us both what is possible and what is impossible in compression?
 
-> Information theory measures uncertainty in bits. That is why it can connect compression, communication, and predictive modeling without changing languages.
+## Big Picture
+
+![math for cs 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 9 flow overview*
+
+This picture places Information Theory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Information Theory is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Classifier losses, communication codes, compression formats, and language-model 
 Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
-*Information theory links distributional uncertainty to coding cost, model loss, and the floor that compression cannot cross.*
 
 ## Key Terms
 
@@ -149,17 +152,29 @@ Information theory gives you a way to read surprise, uncertainty, and coding cos
 
 Next, we close the series by tying these mathematical tools back into algorithm design as one capstone view.
 
+## Answering the Opening Questions
+
+- **What does it mean to measure information in bits?**
+  - The article treats Information Theory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is entropy called average information content?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is cross entropy so common as an ML loss function?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
-- [Linear Algebra](./07-linear-algebra.md)
-- [Calculus](./08-calculus.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
+- [Math for CS 101 (7/10): Linear Algebra](./07-linear-algebra.md)
+- [Math for CS 101 (8/10): Calculus](./08-calculus.md)
 - **Information Theory (current)**
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

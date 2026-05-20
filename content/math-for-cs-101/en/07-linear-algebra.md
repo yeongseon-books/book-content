@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 7
-title: Linear Algebra
+title: "Math for CS 101 (7/10): Linear Algebra"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of vectors, matrices, dot products, ma
 last_reviewed: '2026-05-04'
 ---
 
-# Linear Algebra
+# Math for CS 101 (7/10): Linear Algebra
 
 Linear algebra often feels intimidating to beginners because the notation becomes dense fast. In practice, though, the topic is less about ceremonial symbols and more about one useful idea: representing data and transformations in a compact, reusable form.
 
@@ -30,15 +30,21 @@ This is post 7 in the Math for CS 101 series.
 
 Here we use linear algebra as a practical language for data, similarity, and transformation.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How do vectors and matrices represent data in a useful way?
 - Why is the dot product so central to similarity and scoring?
 - What is the difference between a matrix as a table and a matrix as a transform?
-- When does a transpose change the way you should interpret the data?
-- Why does basis intuition matter once dimensions carry meaning?
 
-> Linear algebra lets you treat data and transforms with the same grammar. That is why it appears in ML, graphics, simulation, and ranking systems so often.
+## Big Picture
+
+![math for cs 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 7 flow overview*
+
+This picture places Linear Algebra inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Linear Algebra is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on 
 That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
-*Linear algebra treats vectors as data and matrices as the transformations that move or reinterpret that data.*
 
 ## Key Terms
 
@@ -148,17 +151,29 @@ Linear algebra gives you a compact way to talk about direction, similarity, and 
 
 Next, we move into calculus, where the focus becomes change, direction, and optimization.
 
+## Answering the Opening Questions
+
+- **How do vectors and matrices represent data in a useful way?**
+  - The article treats Linear Algebra as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is the dot product so central to similarity and scoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the difference between a matrix as a table and a matrix as a transform?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
 - **Linear Algebra (current)**
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

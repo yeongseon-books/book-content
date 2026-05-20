@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Combinatorics</title>
+<title>Math for CS 101 (5/10): Combinatorics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Combinatorics</h1>
+<h1>Math for CS 101 (5/10): Combinatorics</h1>
 <p>If you want to explain why an algorithm suddenly becomes too slow, why test cases explode, or why collisions become unavoidable, you end up counting possibilities. The problem is that real systems produce too many cases to enumerate by hand.</p>
 <p>Combinatorics is what lets you count without listing everything. Once you know whether order matters, whether repetition is allowed, and whether choices are independent or exclusive, the structure often tells you how to count.</p>
 <p>This is post 5 in the Math for CS 101 series.</p>
 <p>Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why can we count accurately without enumerating every case?</li>
 <li>When should you use the product rule versus the sum rule?</li>
 <li>What is the practical difference between permutations and combinations?</li>
-<li>Why does the pigeonhole principle prove collisions so quickly?</li>
-<li>How do binomial coefficients connect counting to probability?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 5 flow overview</em></p>
+<p>This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Combinatorics is really about structure before arithmetic. Once the structure is right, the count usually follows.</p>
+<p>The core of Combinatorics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Complexity analysis, probability, collision analysis, and test generation all depend on counting. If you underestimate the size of the possibility space, you can choose an algorithm that already fails before optimization begins.</p>
 <p>The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>Counting principles help you detect search-space explosion early, before an implementation commits you to impossible work.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>product rule</strong>: multiply <em>sequential</em> choices.</li>
@@ -150,11 +150,21 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Combinatorics teaches you to read possibility spaces structurally instead of by brute force. That shift is what makes complexity analysis and probability feel connected instead of separate topics.</p>
 <p>Next, we continue into probability, where counting becomes a way to reason about uncertainty instead of certainty alone.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
+<li><strong>Why can we count accurately without enumerating every case?</strong></li>
+<li>The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you use the product rule versus the sum rule?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What is the practical difference between permutations and combinations?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
 <li><strong>Combinatorics (current)</strong></li>
 <li>Probability (upcoming)</li>
 <li>Linear Algebra (upcoming)</li>

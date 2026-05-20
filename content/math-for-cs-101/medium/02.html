@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Logic and Proofs</title>
+<title>Math for CS 101 (2/10): Logic and Proofs</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Logic and Proofs</h1>
+<h1>Math for CS 101 (2/10): Logic and Proofs</h1>
 <p>Developers make logical claims all the time: this condition is sufficient, that state transition is safe, and this algorithm stays correct for every valid input. At first you can test a few examples and move on, but important logic eventually demands a stronger explanation.</p>
 <p>As the number of branches and state transitions grows, writing more tests alone is not enough. You also need a clean way to separate the claim itself, the assumptions behind it, and the counterexamples that would invalidate it.</p>
 <p>This is post 2 in the Math for CS 101 series.</p>
 <p>Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How is a proof different from running a handful of examples?</li>
 <li>How do propositions, implication, and equivalence map to real code?</li>
 <li>When is a direct proof clearer than proof by contradiction?</li>
-<li>Why does induction feel so close to loop reasoning?</li>
-<li>Why is a single counterexample often enough to overturn a broad claim?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 2 flow overview</em></p>
+<p>This picture places Logic and Proofs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Logic gives you the grammar for true and false statements. Proof turns that grammar into a disciplined way to explain why an algorithm or program behavior should hold in all relevant cases.</p>
+<p>The core of Logic and Proofs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>A test checks specific cases. A proof targets the whole claim. Those two tools are complementary, but they are not interchangeable. Three passing examples do not establish correctness for every <code>n</code>, every input ordering, or every edge case.</p>
 <p>That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>Logic organizes the claim, and proof chooses the route from assumption to conclusion: direct reasoning, contradiction, or induction.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>proposition</strong>: a <em>true/false</em> statement.</li>
@@ -148,8 +148,18 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Logic and proofs give you a way to explain correctness instead of only hoping repeated examples are representative. Once you can separate assumptions, implications, and counterexamples, design reviews become far more precise.</p>
 <p>Next, we move into sets and functions, where that logical precision starts shaping data boundaries and transformation rules.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><strong>How is a proof different from running a handful of examples?</strong></li>
+<li>The article treats Logic and Proofs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do propositions, implication, and equivalence map to real code?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When is a direct proof clearer than proof by contradiction?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
 <li><strong>Logic and Proofs (current)</strong></li>
 <li>Sets and Functions (upcoming)</li>
 <li>Graphs (upcoming)</li>

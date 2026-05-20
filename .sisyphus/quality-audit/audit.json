@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-20T11:10:01+00:00",
+  "generated_at": "2026-05-20T11:10:24+00:00",
   "series_count": 92,
-  "problem_series_count": 59,
+  "problem_series_count": 58,
   "series_with_5_plus": 44,
   "gate": null,
   "gate_failed_series": [],
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 32,
+    "Shrt": 31,
     "NoEn": 0,
-    "all": 564
+    "all": 563
   },
   "results": [
     {
@@ -14284,52 +14284,6 @@
       }
     },
     {
-      "series": "math-for-cs-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 1,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 1,
-      "max_issue_kind": "Shrt",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/math-for-cs-101/en/03-sets-and-functions.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "03-sets-and-functions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/math-for-cs-101/en/03-sets-and-functions.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "03-sets-and-functions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "technical-writing-101",
       "counts": {
         "Synt": 0,
@@ -14741,6 +14695,20 @@
     },
     {
       "series": "llm-finetuning-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "math-for-cs-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

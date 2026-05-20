@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Linear Algebra</title>
+<title>Math for CS 101 (7/10): Linear Algebra</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Linear Algebra</h1>
+<h1>Math for CS 101 (7/10): Linear Algebra</h1>
 <p>Linear algebra often feels intimidating to beginners because the notation becomes dense fast. In practice, though, the topic is less about ceremonial symbols and more about one useful idea: representing data and transformations in a compact, reusable form.</p>
 <p>Embeddings, dimensionality reduction, camera transforms, and neural network forward passes all become easier to understand once vectors and matrices stop looking like mysterious tables and start looking like data plus movement rules.</p>
 <p>This is post 7 in the Math for CS 101 series.</p>
 <p>Here we use linear algebra as a practical language for data, similarity, and transformation.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How do vectors and matrices represent data in a useful way?</li>
 <li>Why is the dot product so central to similarity and scoring?</li>
 <li>What is the difference between a matrix as a table and a matrix as a transform?</li>
-<li>When does a transpose change the way you should interpret the data?</li>
-<li>Why does basis intuition matter once dimensions carry meaning?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 7 flow overview</em></p>
+<p>This picture places Linear Algebra inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Linear algebra lets you treat data and transforms with the same grammar. That is why it appears in ML, graphics, simulation, and ranking systems so often.</p>
+<p>The core of Linear Algebra is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on linear algebra. The common theme is not just computation speed. It is that vectors and matrices give you a way to describe meaning, similarity, and transformation in one framework.</p>
 <p>That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png"><br>
-<em>Linear algebra treats vectors as data and matrices as the transformations that move or reinterpret that data.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>vector</strong>: <em>direction and magnitude</em>.</li>
@@ -148,13 +148,23 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Linear algebra gives you a compact way to talk about direction, similarity, and transformation. Once those concepts feel natural, modern data and ML systems look much less like black boxes.</p>
 <p>Next, we move into calculus, where the focus becomes change, direction, and optimization.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
+<li><strong>How do vectors and matrices represent data in a useful way?</strong></li>
+<li>The article treats Linear Algebra as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is the dot product so central to similarity and scoring?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What is the difference between a matrix as a table and a matrix as a transform?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Math for CS 101 (5/10): Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Math for CS 101 (6/10): Probability</a></li>
 <li><strong>Linear Algebra (current)</strong></li>
 <li>Calculus (upcoming)</li>
 <li>Information Theory (upcoming)</li>

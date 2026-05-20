@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Probability</title>
+<title>Math for CS 101 (6/10): Probability</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Probability</h1>
+<h1>Math for CS 101 (6/10): Probability</h1>
 <p>Engineering work is full of uncertainty. Was that A/B test result luck or a real signal? Is a false positive rate acceptable? How likely is a failure pattern to repeat? If you do not have a probability model, those questions often collapse into intuition dressed up as confidence.</p>
 <p>Probability does not eliminate uncertainty. It gives you a structured way to compare and update beliefs under uncertainty. Once you separate the possible outcomes, the event you care about, and the conditions already known, fuzzy judgment becomes something you can reason about.</p>
 <p>This is post 6 in the Math for CS 101 series.</p>
 <p>Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How do you turn uncertainty into a model instead of a vague guess?</li>
 <li>What is the difference between a sample space and an event?</li>
 <li>Why is conditional probability really about changing the denominator world?</li>
-<li>How does Bayes theorem update a belief when new evidence arrives?</li>
-<li>Why do expectation and variance matter together in decision-making?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 6 flow overview</em></p>
+<p>This picture places Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Probability is not a magic prediction tool. It is a way to structure uncertainty so that comparisons, trade-offs, and updates become explicit.</p>
+<p>The core of Probability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>A/B testing, recommendation ranking, classifier evaluation, and reliability work all rely on probability. Without the model, the numbers are still there, but the interpretation is shaky because the conditions behind the numbers stay hidden.</p>
 <p>The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>Probability starts with possible outcomes, then adds conditions, updates beliefs, and separates average outcome from risk.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>sample space</strong>: set of <em>possible outcomes</em>.</li>
@@ -148,12 +148,22 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Probability gives you a way to reason about uncertainty without pretending that uncertainty disappears. Once you can describe events, conditions, priors, averages, and spread clearly, many engineering discussions become less emotional and more precise.</p>
 <p>Next, we move into linear algebra, where the focus shifts from uncertainty to representing data and transformations in a compact form.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
+<li><strong>How do you turn uncertainty into a model instead of a vague guess?</strong></li>
+<li>The article treats Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the difference between a sample space and an event?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is conditional probability really about changing the denominator world?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Math for CS 101 (5/10): Combinatorics</a></li>
 <li><strong>Probability (current)</strong></li>
 <li>Linear Algebra (upcoming)</li>
 <li>Calculus (upcoming)</li>

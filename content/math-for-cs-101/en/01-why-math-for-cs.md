@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 1
-title: Why Math for CS
+title: "Math for CS 101 (1/10): Why Math for CS"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly look at why math matters for CS, covering a
 last_reviewed: '2026-05-04'
 ---
 
-# Why Math for CS
+# Math for CS 101 (1/10): Why Math for CS
 
 When you first learn programming, it is easy to think that running code is enough. If a script works on your laptop or a small feature behaves correctly in a quick test, math can feel like an optional detour.
 
@@ -30,15 +30,21 @@ This is the first post in the Math for CS 101 series.
 
 Here we start with the big picture: math in CS is less about memorizing formulas and more about building a language for abstraction, proof, modeling, and analysis.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do you need math even if you can already write code?
 - How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?
 - What changes when you can restate a problem mathematically instead of relying on intuition alone?
-- How do the major topics in this series connect to one another?
-- What is a low-friction way to start learning without treating math as a separate world?
 
-> Math is not mainly a formula sheet. It is the workbench that lets you compress patterns, justify claims, model reality, and measure cost before code surprises you in production.
+## Big Picture
+
+![math for cs 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 1 flow overview*
+
+This picture places Why Math for CS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Math for CS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ In software work, a successful run only verifies one moment, one environment, an
 Math helps you separate those concerns. Sets make boundaries explicit. Logic makes conditions and conclusions precise. Combinatorics shows when the search space is already exploding. Probability gives you a way to reason about uncertainty without hand-waving. Linear algebra, calculus, and information theory later become the language behind modern ML, optimization, and compression.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
-*Math for CS connects abstraction, proof, modeling, and analysis into one mental model for understanding why code works and where it breaks.*
 
 ## Key Terms
 
@@ -148,7 +151,18 @@ This chapter sets up the full series. Math does not replace implementation, but 
 
 Next, we move into logic and proofs, where that abstract promise becomes a concrete way to reason about program behavior.
 
+## Answering the Opening Questions
+
+- **Why do you need math even if you can already write code?**
+  - The article treats Why Math for CS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What changes when you can restate a problem mathematically instead of relying on intuition alone?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **Why Math for CS (current)**
 - Logic and Proofs (upcoming)
 - Sets and Functions (upcoming)
@@ -159,6 +173,7 @@ Next, we move into logic and proofs, where that abstract promise becomes a concr
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

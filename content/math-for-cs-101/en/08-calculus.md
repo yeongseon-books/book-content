@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 8
-title: Calculus
+title: "Math for CS 101 (8/10): Calculus"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of limits, derivatives, gradients, the
 last_reviewed: '2026-05-04'
 ---
 
-# Calculus
+# Math for CS 101 (8/10): Calculus
 
 When a model trains by reducing a loss, when a numerical method searches for a better answer, or when a simulation tracks how a system evolves over time, the core question is the same: from the current position, which way should we move?
 
@@ -30,15 +30,21 @@ This is post 8 in the Math for CS 101 series.
 
 Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why can local slope tell you so much about a global optimization process?
 - How are limits and derivatives connected?
 - What changes when one variable becomes many variables?
-- Why is the chain rule the backbone of backpropagation?
-- How does gradient descent turn slope information into repeated improvement?
 
-> Calculus is not mainly about memorizing curves. It is about reading change, choosing direction, and iterating toward a better state.
+## Big Picture
+
+![math for cs 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 8 flow overview*
+
+This picture places Calculus inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Calculus is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Machine learning training, numerical optimization, physical simulation, and many
 That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
-*Calculus turns tiny local change into practical direction: first a derivative, then a gradient, then a repeated optimization procedure.*
 
 ## Key Terms
 
@@ -151,17 +154,29 @@ Calculus gives you a language for change that scales from one slope to full opti
 
 Next, we move into information theory, where uncertainty gets measured in bits instead of slopes.
 
+## Answering the Opening Questions
+
+- **Why can local slope tell you so much about a global optimization process?**
+  - The article treats Calculus as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are limits and derivatives connected?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What changes when one variable becomes many variables?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
-- [Combinatorics](./05-combinatorics.md)
-- [Probability](./06-probability.md)
-- [Linear Algebra](./07-linear-algebra.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
+- [Math for CS 101 (5/10): Combinatorics](./05-combinatorics.md)
+- [Math for CS 101 (6/10): Probability](./06-probability.md)
+- [Math for CS 101 (7/10): Linear Algebra](./07-linear-algebra.md)
 - **Calculus (current)**
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

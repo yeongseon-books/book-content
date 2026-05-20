@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Information Theory</title>
+<title>Math for CS 101 (9/10): Information Theory</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Information Theory</h1>
+<h1>Math for CS 101 (9/10): Information Theory</h1>
 <p>To understand why compression works, why cross entropy appears in classifier loss functions, or why language-model perplexity drops when predictions improve, you need a common concept underneath all three. That concept is information theory.</p>
 <p>Information theory treats information as something measurable instead of something merely descriptive. It lets you ask how surprising an event is, how uncertain a distribution is, and how far a predictive distribution is from the real one, all in a shared quantitative language.</p>
 <p>This is post 9 in the Math for CS 101 series.</p>
 <p>Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does it mean to measure information in bits?</li>
 <li>Why is entropy called average information content?</li>
 <li>Why is cross entropy so common as an ML loss function?</li>
-<li>What does KL divergence reveal that entropy alone does not?</li>
-<li>How does information theory tell us both what is possible and what is impossible in compression?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 9 flow overview</em></p>
+<p>This picture places Information Theory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Information theory measures uncertainty in bits. That is why it can connect compression, communication, and predictive modeling without changing languages.</p>
+<p>The core of Information Theory is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Classifier losses, communication codes, compression formats, and language-model evaluation all rely on information-theoretic ideas. The formulas differ by domain, but the underlying questions are similar: how surprising is this event, how uncertain is this source, and how expensive is it to encode reality with the wrong distribution?</p>
 <p>Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>Information theory links distributional uncertainty to coding cost, model loss, and the floor that compression cannot cross.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>bit</strong>: a <em>binary</em> unit.</li>
@@ -149,15 +149,25 @@ def info(p):
 <h2>Wrap-up and Next Steps</h2>
 <p>Information theory gives you a way to read surprise, uncertainty, and coding cost as parts of the same system. That makes compression, language modeling, and classification losses much easier to interpret.</p>
 <p>Next, we close the series by tying these mathematical tools back into algorithm design as one capstone view.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Linear Algebra</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Calculus</a></li>
+<li><strong>What does it mean to measure information in bits?</strong></li>
+<li>The article treats Information Theory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is entropy called average information content?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is cross entropy so common as an ML loss function?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Math for CS 101 (5/10): Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Math for CS 101 (6/10): Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Math for CS 101 (7/10): Linear Algebra</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Math for CS 101 (8/10): Calculus</a></li>
 <li><strong>Information Theory (current)</strong></li>
 <li>Algorithms and Math (upcoming)</li>
 </ul>

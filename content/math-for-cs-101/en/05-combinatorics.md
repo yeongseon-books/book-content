@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 5
-title: Combinatorics
+title: "Math for CS 101 (5/10): Combinatorics"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of product rule, sum rule, permutation
 last_reviewed: '2026-05-04'
 ---
 
-# Combinatorics
+# Math for CS 101 (5/10): Combinatorics
 
 If you want to explain why an algorithm suddenly becomes too slow, why test cases explode, or why collisions become unavoidable, you end up counting possibilities. The problem is that real systems produce too many cases to enumerate by hand.
 
@@ -30,15 +30,21 @@ This is post 5 in the Math for CS 101 series.
 
 Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why can we count accurately without enumerating every case?
 - When should you use the product rule versus the sum rule?
 - What is the practical difference between permutations and combinations?
-- Why does the pigeonhole principle prove collisions so quickly?
-- How do binomial coefficients connect counting to probability?
 
-> Combinatorics is really about structure before arithmetic. Once the structure is right, the count usually follows.
+## Big Picture
+
+![math for cs 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 5 flow overview*
+
+This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Combinatorics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Complexity analysis, probability, collision analysis, and test generation all de
 The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
-*Counting principles help you detect search-space explosion early, before an implementation commits you to impossible work.*
 
 ## Key Terms
 
@@ -150,17 +153,29 @@ Combinatorics teaches you to read possibility spaces structurally instead of by 
 
 Next, we continue into probability, where counting becomes a way to reason about uncertainty instead of certainty alone.
 
+## Answering the Opening Questions
+
+- **Why can we count accurately without enumerating every case?**
+  - The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you use the product rule versus the sum rule?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the practical difference between permutations and combinations?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Graphs](./04-graphs.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Math for CS 101 (4/10): Graphs](./04-graphs.md)
 - **Combinatorics (current)**
 - Probability (upcoming)
 - Linear Algebra (upcoming)
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

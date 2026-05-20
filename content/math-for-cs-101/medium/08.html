@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Calculus</title>
+<title>Math for CS 101 (8/10): Calculus</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Calculus</h1>
+<h1>Math for CS 101 (8/10): Calculus</h1>
 <p>When a model trains by reducing a loss, when a numerical method searches for a better answer, or when a simulation tracks how a system evolves over time, the core question is the same: from the current position, which way should we move?</p>
 <p>Calculus gives you that directional sense. You do not need to understand an entire curve at once to learn something useful. Often it is enough to understand how the value wants to change right here, right now, at a single point.</p>
 <p>This is post 8 in the Math for CS 101 series.</p>
 <p>Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why can local slope tell you so much about a global optimization process?</li>
 <li>How are limits and derivatives connected?</li>
 <li>What changes when one variable becomes many variables?</li>
-<li>Why is the chain rule the backbone of backpropagation?</li>
-<li>How does gradient descent turn slope information into repeated improvement?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="math for cs 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>math for cs 101 chapter 8 flow overview</em></p>
+<p>This picture places Calculus inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Calculus is not mainly about memorizing curves. It is about reading change, choosing direction, and iterating toward a better state.</p>
+<p>The core of Calculus is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Machine learning training, numerical optimization, physical simulation, and many control problems rely on calculus because they all need a way to reason about change. The point is not to understand every detail of a function globally before you act. The point is to know enough local structure to take the next useful step.</p>
 <p>That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>Calculus turns tiny local change into practical direction: first a derivative, then a gradient, then a repeated optimization procedure.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>limit</strong>: the value being <em>approached</em>.</li>
@@ -151,14 +151,24 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Calculus gives you a language for change that scales from one slope to full optimization loops. Once you connect derivatives, gradients, and the chain rule, many ML and numerical methods stop feeling like magic.</p>
 <p>Next, we move into information theory, where uncertainty gets measured in bits instead of slopes.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Linear Algebra</a></li>
+<li><strong>Why can local slope tell you so much about a global optimization process?</strong></li>
+<li>The article treats Calculus as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How are limits and derivatives connected?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What changes when one variable becomes many variables?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Math for CS 101 (1/10): Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Math for CS 101 (2/10): Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Math for CS 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Math for CS 101 (4/10): Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Math for CS 101 (5/10): Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Math for CS 101 (6/10): Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Math for CS 101 (7/10): Linear Algebra</a></li>
 <li><strong>Calculus (current)</strong></li>
 <li>Information Theory (upcoming)</li>
 <li>Algorithms and Math (upcoming)</li>

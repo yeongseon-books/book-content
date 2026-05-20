@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 4
-title: Graphs
+title: "Math for CS 101 (4/10): Graphs"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly intro to graphs covering vertices, edges, d
 last_reviewed: '2026-05-04'
 ---
 
-# Graphs
+# Math for CS 101 (4/10): Graphs
 
 Lists and tables are not enough once the important question becomes who is connected to whom, which task depends on which other task, or which route can reach a target. At that point the data is no longer just a collection of values. It is a web of relationships.
 
@@ -30,15 +30,21 @@ This is post 4 in the Math for CS 101 series.
 
 Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do relationship-heavy problems become clearer when modeled as graphs?
 - What do vertices and edges correspond to in real systems?
 - How do directed and undirected graphs change the meaning of a model?
-- When is an adjacency list better than an adjacency matrix?
-- Why is breadth-first search such a common starting point?
 
-> A graph is not mainly a storage trick. It is a model for problems where relationships matter more than isolated values.
+## Big Picture
+
+![math for cs 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 4 flow overview*
+
+This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Graphs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ Friend recommendations, route planning, build dependencies, and service maps all
 That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
-*Graphs turn connected data into a structure you can traverse, measure, and reason about step by step.*
 
 ## Key Terms
 
@@ -156,10 +159,21 @@ Graphs give you a way to describe systems where connections drive the behavior. 
 
 Next, we turn to combinatorics, where the focus shifts from connection structure to counting how quickly possibilities grow.
 
+## Answering the Opening Questions
+
+- **Why do relationship-heavy problems become clearer when modeled as graphs?**
+  - The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do vertices and edges correspond to in real systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do directed and undirected graphs change the meaning of a model?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
-- [Logic and Proofs](./02-logic-and-proofs.md)
-- [Sets and Functions](./03-sets-and-functions.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
+- [Math for CS 101 (2/10): Logic and Proofs](./02-logic-and-proofs.md)
+- [Math for CS 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
 - **Graphs (current)**
 - Combinatorics (upcoming)
 - Probability (upcoming)
@@ -167,6 +181,7 @@ Next, we turn to combinatorics, where the focus shifts from connection structure
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References

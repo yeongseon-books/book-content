@@ -1,7 +1,7 @@
 ---
 series: math-for-cs-101
 episode: 2
-title: Logic and Proofs
+title: "Math for CS 101 (2/10): Logic and Proofs"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of propositions, truth tables, implica
 last_reviewed: '2026-05-04'
 ---
 
-# Logic and Proofs
+# Math for CS 101 (2/10): Logic and Proofs
 
 Developers make logical claims all the time: this condition is sufficient, that state transition is safe, and this algorithm stays correct for every valid input. At first you can test a few examples and move on, but important logic eventually demands a stronger explanation.
 
@@ -30,15 +30,21 @@ This is post 2 in the Math for CS 101 series.
 
 Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How is a proof different from running a handful of examples?
 - How do propositions, implication, and equivalence map to real code?
 - When is a direct proof clearer than proof by contradiction?
-- Why does induction feel so close to loop reasoning?
-- Why is a single counterexample often enough to overturn a broad claim?
 
-> Logic gives you the grammar for true and false statements. Proof turns that grammar into a disciplined way to explain why an algorithm or program behavior should hold in all relevant cases.
+## Big Picture
+
+![math for cs 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
+
+*math for cs 101 chapter 2 flow overview*
+
+This picture places Logic and Proofs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Logic and Proofs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -47,9 +53,6 @@ A test checks specific cases. A proof targets the whole claim. Those two tools a
 That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
-*Logic organizes the claim, and proof chooses the route from assumption to conclusion: direct reasoning, contradiction, or induction.*
 
 ## Key Terms
 
@@ -148,8 +151,19 @@ Logic and proofs give you a way to explain correctness instead of only hoping re
 
 Next, we move into sets and functions, where that logical precision starts shaping data boundaries and transformation rules.
 
+## Answering the Opening Questions
+
+- **How is a proof different from running a handful of examples?**
+  - The article treats Logic and Proofs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do propositions, implication, and equivalence map to real code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is a direct proof clearer than proof by contradiction?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [Why Math for CS](./01-why-math-for-cs.md)
+## In this series
+
+- [Math for CS 101 (1/10): Why Math for CS](./01-why-math-for-cs.md)
 - **Logic and Proofs (current)**
 - Sets and Functions (upcoming)
 - Graphs (upcoming)
@@ -159,6 +173,7 @@ Next, we move into sets and functions, where that logical precision starts shapi
 - Calculus (upcoming)
 - Information Theory (upcoming)
 - Algorithms and Math (upcoming)
+
 <!-- toc:end -->
 
 ## References
