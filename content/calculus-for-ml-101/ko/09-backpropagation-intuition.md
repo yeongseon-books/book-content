@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 9
-title: 역전파 직관
+title: "Calculus for ML 101 (9/10): 역전파 직관"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 역전파, 계산 그래프, 순전파, 역방향 gradient, aut
 last_reviewed: '2026-05-12'
 ---
 
-# 역전파 직관
+# Calculus for ML 101 (9/10): 역전파 직관
 
 지금까지 이 시리즈에서는 미분, 편미분, gradient, chain rule, 손실, optimizer를 차례로 보았습니다. 이제 남은 핵심 질문은 하나입니다. 수천 개, 수백만 개의 파라미터에 대한 gradient를 실제로 어떻게 한 번에 계산할까요? 모든 weight를 수치 미분으로 하나씩 검사하는 방식은 너무 느리고 비현실적입니다.
 
@@ -32,13 +32,21 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 `zero_grad`, gradient accumulation, graph retention 같은 실무 용어가 더 이상 API 암기가 아니라 자연스러운 운영 개념으로 보이게 됩니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 역전파는 수많은 weight의 gradient를 왜 한 번에 계산할 수 있을까요?
 - 계산 그래프 관점에서 순전파와 역전파는 각각 무엇을 남길까요?
 - local derivative를 저장한다는 말은 실제로 어떤 의미일까요?
-- gradient accumulation은 왜 필요하고, 왜 `zero_grad`가 중요할까요?
-- autograd를 이해하면 학습 버그를 어떻게 더 빨리 찾을 수 있을까요?
+
+## 큰 그림
+
+![Calculus for ML 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Calculus for ML 101 9장 흐름 개요*
+
+이 그림에서는 역전파 직관를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 역전파 직관의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,7 +56,7 @@ PyTorch, TensorFlow, JAX는 모두 gradient를 자동으로 계산해 줍니다.
 
 또한 이 글은 시리즈의 마지막 글을 위한 직접적인 준비입니다. 딥러닝 학습 루프 전체를 보려면 forward, loss, backward, update가 하나의 닫힌 고리라는 점을 이해해야 하고, 역전파는 그중 backward 단계를 담당합니다.
 
-## 역전파를 이해하는 가장 좋은 방법: 각 노드가 자기 local derivative를 들고 있는 계산 그래프를 뒤로 훑는 것으로 보는 것입니다
+## 핵심 관점
 
 역전파를 가장 직관적으로 이해하는 방법은 계산 그래프를 생각하는 것입니다. 각 노드는 값을 계산하고, 자신의 부모 노드에 대한 local derivative를 알고 있습니다. 최종 출력에서 시작해 이 local derivative를 곱해 뒤로 전달하면 각 입력이 결과에 얼마나 기여했는지 계산할 수 있습니다.
 
@@ -60,9 +68,6 @@ PyTorch, TensorFlow, JAX는 모두 gradient를 자동으로 계산해 줍니다.
 
 역전파의 전체 흐름은 아래처럼 볼 수 있습니다.
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
-
-*역전파 흐름: 손실에서 시작한 gradient가 계산 그래프를 따라 입력 방향으로 누적됩니다.*
 ### 가장 작은 계산 그래프 노드부터 시작합니다
 
 ```python
@@ -178,17 +183,26 @@ optimizer.step()
 
 다음 글에서는 이 시리즈 전체를 하나의 학습 루프로 묶겠습니다. forward, loss, backward, optimizer step이 어떻게 하나의 사이클을 이루는지, 그리고 왜 이것이 딥러닝 학습의 표준 골격인지 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **역전파는 수많은 weight의 gradient를 왜 한 번에 계산할 수 있을까요?**
+  - 본문의 기준은 역전파 직관를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **계산 그래프 관점에서 순전파와 역전파는 각각 무엇을 남길까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **local derivative를 저장한다는 말은 실제로 어떤 의미일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [미분이란 무엇인가](./01-what-is-derivative.md)
-- [함수와 기울기](./02-functions-and-slope.md)
-- [편미분](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [연쇄 법칙](./05-chain-rule.md)
-- [손실 함수](./06-loss-function.md)
-- [경사하강법](./07-gradient-descent.md)
-- [최적화](./08-optimization.md)
+- [Calculus for ML 101 (1/10): 미분이란 무엇인가](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): 함수와 기울기](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): 편미분](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): 연쇄 법칙](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): 손실 함수](./06-loss-function.md)
+- [Calculus for ML 101 (7/10): 경사하강법](./07-gradient-descent.md)
+- [Calculus for ML 101 (8/10): 최적화](./08-optimization.md)
 - **역전파 직관 (현재 글)**
 - 딥러닝에서의 미분 (예정)
 

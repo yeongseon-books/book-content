@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Functions and Slope</title>
+<title>Calculus for ML 101 (2/10): Functions and Slope</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Functions and Slope</h1>
+<h1>Calculus for ML 101 (2/10): Functions and Slope</h1>
 <p>An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.</p>
 <p>This is post 2 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.</p>
 <blockquote>
 <p>A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of a <em>function</em></li>
-<li><em>Slope</em> of a <em>linear</em> function</li>
-<li><em>Local slope</em> of a <em>nonlinear</em> function</li>
-<li>The <em>graphical meaning</em> of a derivative</li>
-<li>Intuition for ML <em>activations</em></li>
+<li>What boundary should you inspect first when applying Functions and Slope?</li>
+<li>Which signal should the example or diagram make visible for Functions and Slope?</li>
+<li>What failure should be prevented first when Functions and Slope reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 2 flow overview</em></p>
+<p>This picture places Functions and Slope inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Functions and Slope is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why should a function be understood as an input-output contract rather than just a formula?</li>
+<li>How does the slope of a linear function differ from the local slope of a nonlinear one?</li>
+<li>How does the slope difference between ReLU and sigmoid affect learning?</li>
+<li>Why does the graph-level meaning of a derivative make activation design easier to reason about?</li>
+<li>How do input scale and function shape affect the way you interpret gradients?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>ML models are <em>function compositions</em>, and training pushes signals through <em>each function gradient</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept flow: the input-function-output contract gains meaning once slope and derivative are layered onto it.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>function</strong>: maps <em>input</em> to <em>output</em>.</li>
@@ -146,8 +157,18 @@ def sigmoid(x):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Partial Derivatives</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
+<li><strong>What boundary should you inspect first when applying Functions and Slope?</strong></li>
+<li>The article treats Functions and Slope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Functions and Slope?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Functions and Slope reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
 <li><strong>Functions and Slope (current)</strong></li>
 <li>Partial Derivatives (upcoming)</li>
 <li>Gradient (upcoming)</li>

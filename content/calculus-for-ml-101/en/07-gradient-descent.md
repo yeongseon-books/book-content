@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 7
-title: Gradient Descent
+title: "Calculus for ML 101 (7/10): Gradient Descent"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of gradient descent, learning rate, co
 last_reviewed: '2026-05-15'
 ---
 
-# Gradient Descent
+# Calculus for ML 101 (7/10): Gradient Descent
 
 Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.
 
@@ -29,6 +29,22 @@ This is post 7 in the Calculus for ML 101 series.
 In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.
 
 > Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Gradient Descent?
+- Which signal should the example or diagram make visible for Gradient Descent?
+- What failure should be prevented first when Gradient Descent reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 7 flow overview*
+
+This picture places Gradient Descent inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Gradient Descent is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ Most ML training is a *variant* of gradient descent.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
-
-*Gradient-descent loop: weights produce a gradient, the step flips direction, and loss moves downward.*
 ## Key Terms
 
 - **GD**: gradient over *all data*.
@@ -154,17 +167,29 @@ for lr in [0.001, 0.1, 1.5]:
 
 Next post: *Optimization*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Gradient Descent?**
+  - The article treats Gradient Descent as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Gradient Descent?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Gradient Descent reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
-- [Loss Function](./06-loss-function.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): Loss Function](./06-loss-function.md)
 - **Gradient Descent (current)**
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

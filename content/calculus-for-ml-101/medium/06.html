@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Loss Function</title>
+<title>Calculus for ML 101 (6/10): Loss Function</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Loss Function</h1>
+<h1>Calculus for ML 101 (6/10): Loss Function</h1>
 <p>Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.</p>
 <p>This is post 6 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.</p>
 <blockquote>
 <p>A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of <em>loss</em></li>
-<li><em>MSE</em> for regression</li>
-<li><em>Cross entropy</em> for classification</li>
-<li>The meaning of the <em>gradient</em></li>
-<li><em>Training signal</em> intuition</li>
+<li>What boundary should you inspect first when applying Loss Function?</li>
+<li>Which signal should the example or diagram make visible for Loss Function?</li>
+<li>What failure should be prevented first when Loss Function reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 6 flow overview</em></p>
+<p>This picture places Loss Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Loss Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How is a loss function different from a simple evaluation metric?</li>
+<li>Why is MSE common in regression and cross entropy common in classification?</li>
+<li>Why is the gradient of a loss function called a training signal?</li>
+<li>How does the choice between averaging and summing affect optimization scale?</li>
+<li>How can a numerically unstable loss implementation break training?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>The <em>wrong loss</em> yields the <em>wrong model</em>. <em>Choosing the loss</em> is <em>defining the problem</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Loss flow: the gap between truth and prediction becomes loss, gradient, and finally an update signal.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>loss</strong>: a <em>number</em> representing <em>error</em>.</li>
@@ -148,12 +159,22 @@ loss = bce(y, p)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Gradient Descent</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
+<li><strong>What boundary should you inspect first when applying Loss Function?</strong></li>
+<li>The article treats Loss Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Loss Function?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Loss Function reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Calculus for ML 101 (3/10): Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Calculus for ML 101 (4/10): Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Calculus for ML 101 (5/10): Chain Rule</a></li>
 <li><strong>Loss Function (current)</strong></li>
 <li>Gradient Descent (upcoming)</li>
 <li>Optimization (upcoming)</li>

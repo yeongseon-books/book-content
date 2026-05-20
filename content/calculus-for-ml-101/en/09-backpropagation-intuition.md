@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 9
-title: Backpropagation Intuition
+title: "Calculus for ML 101 (9/10): Backpropagation Intuition"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of backpropagation, computation graphs
 last_reviewed: '2026-05-15'
 ---
 
-# Backpropagation Intuition
+# Calculus for ML 101 (9/10): Backpropagation Intuition
 
 So far in this series, we've built the math behind derivatives, partial derivatives, gradients, the chain rule, loss, and optimization. The remaining practical question is computational: how do you produce gradients for thousands or millions of weights without numerically perturbing each one?
 
@@ -29,6 +29,22 @@ This is post 9 in the Calculus for ML 101 series.
 In this post, we'll use computation graphs, forward and backward passes, local derivatives, and gradient accumulation to explain backpropagation. The goal is not to reimplement a deep learning framework, but to understand why one backward pass can still recover the full gradient efficiently.
 
 > Backpropagation is not new math. It is the chain rule executed systematically over a computation graph, with cached forward values and accumulated backward signals.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Backpropagation Intuition?
+- Which signal should the example or diagram make visible for Backpropagation Intuition?
+- What failure should be prevented first when Backpropagation Intuition reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 9 flow overview*
+
+This picture places Backpropagation Intuition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Backpropagation Intuition is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ In this post, we'll use computation graphs, forward and backward passes, local d
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
-
-*Backpropagation flow: loss sends gradient signals backward through the computation graph.*
 ## Key Terms
 
 - **graph**: a *graph of computations*.
@@ -185,17 +198,29 @@ The reason `zero_grad()` matters is now easier to see. In many frameworks, gradi
 
 Next post: the *Calculus in Deep Learning* capstone.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Backpropagation Intuition?**
+  - The article treats Backpropagation Intuition as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Backpropagation Intuition?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Backpropagation Intuition reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
-- [Loss Function](./06-loss-function.md)
-- [Gradient Descent](./07-gradient-descent.md)
-- [Optimization](./08-optimization.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): Loss Function](./06-loss-function.md)
+- [Calculus for ML 101 (7/10): Gradient Descent](./07-gradient-descent.md)
+- [Calculus for ML 101 (8/10): Optimization](./08-optimization.md)
 - **Backpropagation Intuition (current)**
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 1
-title: What Is a Derivative
+title: "Calculus for ML 101 (1/10): What Is a Derivative"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of derivatives, rate of change, tangen
 last_reviewed: '2026-05-15'
 ---
 
-# What Is a Derivative
+# Calculus for ML 101 (1/10): What Is a Derivative
 
 When people first meet derivatives, they often memorize rules before they build a working mental model. In ML, that order tends to fail quickly. The useful question is simpler: if you nudge a parameter a little, does the loss go up or down, and how sharply?
 
@@ -29,6 +29,22 @@ This is the first post in the Calculus for ML 101 series.
 In this post, we'll connect average rate of change, tangent lines, limits, and numerical differentiation into one practical picture. Once that picture is clear, a gradient stops looking like a mysterious number and starts looking like a directional signal for training.
 
 > A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Derivative?
+- Which signal should the example or diagram make visible for What Is a Derivative?
+- What failure should be prevented first when What Is a Derivative reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 1 flow overview*
+
+This picture places What Is a Derivative inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Derivative is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ In this post, we'll connect average rate of change, tangent lines, limits, and n
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
-
-*Concept flow: changes in a function become limits, derivatives, and finally an ML training signal.*
 ## Key Terms
 
 - **derivative**: *instantaneous rate of change*.
@@ -142,7 +155,18 @@ Updating *model weights* using the *loss gradient* is the *core loop* of every M
 
 Next post: *Functions and Slope*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Derivative?**
+  - The article treats What Is a Derivative as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Derivative?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Derivative reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Derivative (current)**
 - Functions and Slope (upcoming)
 - Partial Derivatives (upcoming)
@@ -153,6 +177,7 @@ Next post: *Functions and Slope*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

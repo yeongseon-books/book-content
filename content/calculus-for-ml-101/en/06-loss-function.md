@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 6
-title: Loss Function
+title: "Calculus for ML 101 (6/10): Loss Function"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of loss functions, MSE, cross entropy,
 last_reviewed: '2026-05-15'
 ---
 
-# Loss Function
+# Calculus for ML 101 (6/10): Loss Function
 
 Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.
 
@@ -29,6 +29,22 @@ This is post 6 in the Calculus for ML 101 series.
 In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.
 
 > A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Loss Function?
+- Which signal should the example or diagram make visible for Loss Function?
+- What failure should be prevented first when Loss Function reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 6 flow overview*
+
+This picture places Loss Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Loss Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ The *wrong loss* yields the *wrong model*. *Choosing the loss* is *defining the 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
-
-*Loss flow: the gap between truth and prediction becomes loss, gradient, and finally an update signal.*
 ## Key Terms
 
 - **loss**: a *number* representing *error*.
@@ -145,17 +158,29 @@ def signal(y, p):
 
 Next post: *Gradient Descent*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Loss Function?**
+  - The article treats Loss Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Loss Function?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Loss Function reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
 - **Loss Function (current)**
 - Gradient Descent (upcoming)
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

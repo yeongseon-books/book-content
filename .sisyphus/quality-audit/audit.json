@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-20T11:10:24+00:00",
+  "generated_at": "2026-05-20T11:10:43+00:00",
   "series_count": 92,
   "problem_series_count": 58,
-  "series_with_5_plus": 44,
+  "series_with_5_plus": 43,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 31,
+    "Shrt": 25,
     "NoEn": 0,
-    "all": 563
+    "all": 557
   },
   "results": [
     {
@@ -9382,290 +9382,6 @@
       }
     },
     {
-      "series": "calculus-for-ml-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 6,
-        "NoEn": 0,
-        "BadImg": 4
-      },
-      "total": 10,
-      "max_issue_kind": "Shrt",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/ko/03-partial-derivatives.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "03-partial-derivatives.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/01-what-is-derivative.md",
-            "line": 22,
-            "message": "markdown body has 144 lines (< 150)",
-            "article": "01-what-is-derivative.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/02-functions-and-slope.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "02-functions-and-slope.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/03-partial-derivatives.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "03-partial-derivatives.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/04-gradient.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "04-gradient.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/06-loss-function.md",
-            "line": 22,
-            "message": "markdown body has 147 lines (< 150)",
-            "article": "06-loss-function.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 780,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 673,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 612,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 612,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/ko/03-partial-derivatives.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "03-partial-derivatives.md",
-            "lang": "ko",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/01-what-is-derivative.md",
-            "line": 22,
-            "message": "markdown body has 144 lines (< 150)",
-            "article": "01-what-is-derivative.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/02-functions-and-slope.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "02-functions-and-slope.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/03-partial-derivatives.md",
-            "line": 22,
-            "message": "markdown body has 145 lines (< 150)",
-            "article": "03-partial-derivatives.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/04-gradient.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "04-gradient.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/calculus-for-ml-101/en/06-loss-function.md",
-            "line": 22,
-            "message": "markdown body has 147 lines (< 150)",
-            "article": "06-loss-function.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 780,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 673,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 612,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 612,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "sql-101",
       "counts": {
         "Synt": 0,
@@ -13297,6 +13013,130 @@
             "code": null,
             "image": "09-01-concept-at-a-glance.ko.png",
             "width": 1148,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "calculus-for-ml-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 4
+      },
+      "total": 4,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 780,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.ko.png",
+            "width": 673,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 612,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.ko.png",
+            "width": 612,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 780,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.ko.png",
+            "width": 673,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 612,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.ko.png",
+            "width": 612,
             "height": 67,
             "repo": null
           }

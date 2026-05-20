@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Calculus in Deep Learning</title>
+<title>Calculus for ML 101 (10/10): Calculus in Deep Learning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Calculus in Deep Learning</h1>
+<h1>Calculus for ML 101 (10/10): Calculus in Deep Learning</h1>
 <p>The ideas from this series do not live in isolation. Functions and slopes, partial derivatives, gradients, the chain rule, loss functions, gradient descent, optimizers, and backpropagation all show up inside the same training loop. The goal of this final post is to put those pieces back together as one working system.</p>
 <p>This is the final post in the Calculus for ML 101 series.</p>
 <p>In this post, we'll walk through the forward pass, loss computation, backward pass, optimizer update, and the operating rules around that loop. Once the full cycle is visible, calculus stops feeling like a separate math chapter and starts feeling like the control interface for learning itself.</p>
 <blockquote>
 <p>In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>5 stages</em> of the training loop</li>
-<li><em>Forward pass</em></li>
-<li><em>Loss computation</em></li>
-<li><em>Backward pass</em></li>
-<li><em>Weight update</em></li>
+<li>What boundary should you inspect first when applying Calculus in Deep Learning?</li>
+<li>Which signal should the example or diagram make visible for Calculus in Deep Learning?</li>
+<li>What failure should be prevented first when Calculus in Deep Learning reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 10 flow overview</em></p>
+<p>This picture places Calculus in Deep Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Calculus in Deep Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What stages make up the deep learning training loop, and where does calculus appear in each one?</li>
+<li>How do the forward pass and loss computation prepare the work that backward needs to do?</li>
+<li>How do gradient computation and the optimizer update connect?</li>
+<li>Why do practical details such as <code>zero_grad</code>, eval/train mode, and reproducibility belong inside this loop?</li>
+<li>How do all the calculus ideas from this series collapse into one final picture?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>This <em>capstone</em> synthesizes the series and lets you implement the <em>common skeleton</em> shared by every ML training run.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Training-loop flow: forward, loss, backward, and update repeat as one closed cycle.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>forward</strong>: produce a <em>prediction</em>.</li>
@@ -181,16 +192,26 @@ optimizer.step()
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>This post wraps the <em>Calculus for ML 101</em> series. When people say a deep learning model <em>learns</em>, what they really mean is that the training loop keeps converting prediction error into gradients and then into parameter updates. Calculus is the language that makes that conversion possible.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Gradient Descent</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/08-optimization.md">Optimization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/09-backpropagation-intuition.md">Backpropagation Intuition</a></li>
+<li><strong>What boundary should you inspect first when applying Calculus in Deep Learning?</strong></li>
+<li>The article treats Calculus in Deep Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Calculus in Deep Learning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Calculus in Deep Learning reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Calculus for ML 101 (3/10): Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Calculus for ML 101 (4/10): Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Calculus for ML 101 (5/10): Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Calculus for ML 101 (6/10): Loss Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Calculus for ML 101 (7/10): Gradient Descent</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/08-optimization.md">Calculus for ML 101 (8/10): Optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/09-backpropagation-intuition.md">Calculus for ML 101 (9/10): Backpropagation Intuition</a></li>
 <li><strong>Calculus in Deep Learning (current)</strong></li>
 </ul>
 <h2>References</h2>

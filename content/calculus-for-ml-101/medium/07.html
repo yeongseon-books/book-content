@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Gradient Descent</title>
+<title>Calculus for ML 101 (7/10): Gradient Descent</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Gradient Descent</h1>
+<h1>Calculus for ML 101 (7/10): Gradient Descent</h1>
 <p>Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.</p>
 <p>This is post 7 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.</p>
 <blockquote>
 <p>Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>gradient descent</em> algorithm</li>
-<li>The role of the <em>learning rate</em></li>
-<li><em>Convergence</em> and <em>divergence</em></li>
-<li><em>Stochastic</em> gradient descent (SGD)</li>
-<li>Intuition for <em>mini-batches</em></li>
+<li>What boundary should you inspect first when applying Gradient Descent?</li>
+<li>Which signal should the example or diagram make visible for Gradient Descent?</li>
+<li>What failure should be prevented first when Gradient Descent reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 7 flow overview</em></p>
+<p>This picture places Gradient Descent inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Gradient Descent is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why does moving in the direction opposite the gradient reduce the loss?</li>
+<li>What does the learning rate do beyond acting as a simple multiplier?</li>
+<li>How can you tell the difference between convergence and divergence in gradient descent?</li>
+<li>What changes when you use the full-dataset gradient versus SGD or mini-batch gradients?</li>
+<li>How do initialization and gradient noise affect the optimization path?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Most ML training is a <em>variant</em> of gradient descent.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Gradient-descent loop: weights produce a gradient, the step flips direction, and loss moves downward.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>GD</strong>: gradient over <em>all data</em>.</li>
@@ -157,13 +168,23 @@ def sgd(data, w0, lr=0.01, epochs=10):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Optimization</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
+<li><strong>What boundary should you inspect first when applying Gradient Descent?</strong></li>
+<li>The article treats Gradient Descent as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Gradient Descent?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Gradient Descent reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Calculus for ML 101 (3/10): Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Calculus for ML 101 (4/10): Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Calculus for ML 101 (5/10): Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Calculus for ML 101 (6/10): Loss Function</a></li>
 <li><strong>Gradient Descent (current)</strong></li>
 <li>Optimization (upcoming)</li>
 <li>Backpropagation Intuition (upcoming)</li>

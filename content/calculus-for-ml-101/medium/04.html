@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Gradient</title>
+<title>Calculus for ML 101 (4/10): Gradient</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Gradient</h1>
+<h1>Calculus for ML 101 (4/10): Gradient</h1>
 <p>Once you have one partial derivative per variable, the next question is operational: how do you use all of them together? A model rarely updates one parameter in isolation. Training moves the whole parameter state at once, so you need a representation that preserves both per-coordinate responsibility and overall direction.</p>
 <p>This is post 4 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll treat the gradient as a direction vector on a loss landscape rather than as a bag of numbers. That makes it much easier to understand why gradient descent follows the negative gradient, why gradient norm matters, and why contour-line intuition is so useful in practice.</p>
 <blockquote>
 <p>A gradient is not just a list of slopes. It is the direction-and-strength signal that tells an optimizer how the loss surface is pushing back at the current point.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of a <em>gradient</em></li>
-<li><em>Direction</em> and <em>magnitude</em></li>
-<li>Intuition for <em>contour lines</em></li>
-<li>The <em>steepest ascent</em> direction</li>
-<li>The meaning of the <em>opposite</em> direction</li>
+<li>What boundary should you inspect first when applying Gradient?</li>
+<li>Which signal should the example or diagram make visible for Gradient?</li>
+<li>What failure should be prevented first when Gradient reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 4 flow overview</em></p>
+<p>This picture places Gradient inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Gradient is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What does it actually mean to bundle multiple partial derivatives into one gradient vector?</li>
+<li>What do the direction and magnitude of a gradient each mean in practice?</li>
+<li>Why does the gradient point in the direction of steepest increase in the loss?</li>
+<li>Why does gradient descent move in the opposite direction of the gradient?</li>
+<li>Why do contour lines make gradient intuition easier to build?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p><em>Gradient descent</em> takes <em>one step</em> in the <em>opposite</em> direction of the gradient.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>Gradient flow: multiple partial derivatives combine into one vector with direction and magnitude.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>gradient</strong>: vector of <em>partial derivatives</em>.</li>
@@ -150,10 +161,20 @@ def norm(v):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Chain Rule</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
+<li><strong>What boundary should you inspect first when applying Gradient?</strong></li>
+<li>The article treats Gradient as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Gradient?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Gradient reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Calculus for ML 101 (3/10): Partial Derivatives</a></li>
 <li><strong>Gradient (current)</strong></li>
 <li>Chain Rule (upcoming)</li>
 <li>Loss Function (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 5
-title: Chain Rule
+title: "Calculus for ML 101 (5/10): Chain Rule"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of the chain rule, function compositio
 last_reviewed: '2026-05-15'
 ---
 
-# Chain Rule
+# Calculus for ML 101 (5/10): Chain Rule
 
 Neural networks are not single functions. They are functions composed inside other functions, layer after layer, until a final loss is produced. In that setting, the key question is no longer "can I differentiate this formula?" but "how does a change at one stage travel through the whole path?"
 
@@ -29,6 +29,22 @@ This is post 5 in the Calculus for ML 101 series.
 In this post, we'll use outer and inner functions, stage-by-stage derivatives, and broken gradient paths to explain the chain rule. The point is not to memorize a formula, but to see why backpropagation is fundamentally a disciplined application of local derivatives.
 
 > The chain rule says you do not differentiate the whole system in one mysterious jump. You differentiate each local stage and connect those local sensitivities in the right order.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Chain Rule?
+- Which signal should the example or diagram make visible for Chain Rule?
+- What failure should be prevented first when Chain Rule reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 5 flow overview*
+
+This picture places Chain Rule inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Chain Rule is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ A *neural network* is a *long composition* of functions, and only the chain rule
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png)
-
-*Chain-rule flow: local derivatives from each stage connect to produce the full derivative.*
 ## Key Terms
 
 - **composition**: a *function of a function*.
@@ -155,17 +168,29 @@ def chain(*derivs):
 
 Next post: *Loss Function*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Chain Rule?**
+  - The article treats Chain Rule as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Chain Rule?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Chain Rule reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
 - **Chain Rule (current)**
 - Loss Function (upcoming)
 - Gradient Descent (upcoming)
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

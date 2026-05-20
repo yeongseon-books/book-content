@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 7
-title: 경사하강법
+title: "Calculus for ML 101 (7/10): 경사하강법"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 경사하강법, learning rate, 수렴, 발산, stochastic grad
 last_reviewed: '2026-05-12'
 ---
 
-# 경사하강법
+# Calculus for ML 101 (7/10): 경사하강법
 
 미분과 gradient를 안다고 해서 학습이 자동으로 진행되지는 않습니다. 이제 남은 질문은 그 gradient를 실제 움직임으로 어떻게 바꾸느냐입니다. 경사하강법은 현재 위치의 gradient를 읽고, 그 반대 방향으로 작은 스텝을 반복해 손실을 줄여 나가는 가장 기본적인 알고리즘입니다.
 
@@ -32,13 +32,21 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 optimizer 로그에서 loss curve를 볼 때 왜 learning rate가 가장 먼저 의심되는지 자연스럽게 설명할 수 있게 됩니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - gradient의 반대 방향으로 이동하면 왜 손실이 줄어들까요?
 - learning rate는 단순한 배율 이상으로 어떤 역할을 할까요?
 - 경사하강법이 수렴하거나 발산하는 패턴은 어떻게 구분할 수 있을까요?
-- 전체 데이터 gradient와 SGD, mini-batch gradient는 어떤 차이를 만들까요?
-- 초기화와 gradient noise는 optimization 경로에 어떤 영향을 줄까요?
+
+## 큰 그림
+
+![Calculus for ML 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Calculus for ML 101 7장 흐름 개요*
+
+이 그림에서는 경사하강법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 경사하강법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 또한 SGD가 가져오는 noise와 mini-batch가 만드는 trade-off를 이해해야 학습 곡선의 흔들림을 자연스럽게 읽을 수 있습니다. 이 감각은 다음 글의 고급 optimizer로 넘어갈 때도 그대로 이어집니다.
 
-## 경사하강법을 이해하는 가장 좋은 방법: gradient가 알려 준 반대 방향으로 반복적으로 미세 조정하는 루프로 보는 것입니다
+## 핵심 관점
 
 경사하강법은 사실상 매우 단순한 루프입니다. 현재 파라미터에서 gradient를 계산하고, 그 gradient를 learning rate만큼 스케일한 뒤 반대 방향으로 이동합니다. 이 루프를 반복하면서 손실을 낮춥니다.
 
@@ -60,9 +68,6 @@ last_reviewed: '2026-05-12'
 
 경사하강법의 흐름은 다음과 같습니다.
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
-
-*경사하강법 루프: 현재 가중치에서 gradient를 계산하고 반대 방향 step으로 손실을 줄입니다.*
 ### 가장 단순한 손실과 gradient부터 봅시다
 
 ```python
@@ -149,15 +154,24 @@ for lr in [0.001, 0.1, 1.5]:
 
 다음 글에서는 plain GD의 약점을 보완하는 momentum, RMSProp, Adam 같은 최적화 기법을 보겠습니다. 그러면 왜 현대 학습 루프가 그 변형들을 쓰는지 연결해서 이해할 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **gradient의 반대 방향으로 이동하면 왜 손실이 줄어들까요?**
+  - 본문의 기준은 경사하강법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **learning rate는 단순한 배율 이상으로 어떤 역할을 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **경사하강법이 수렴하거나 발산하는 패턴은 어떻게 구분할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [미분이란 무엇인가](./01-what-is-derivative.md)
-- [함수와 기울기](./02-functions-and-slope.md)
-- [편미분](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [연쇄 법칙](./05-chain-rule.md)
-- [손실 함수](./06-loss-function.md)
+- [Calculus for ML 101 (1/10): 미분이란 무엇인가](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): 함수와 기울기](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): 편미분](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): 연쇄 법칙](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): 손실 함수](./06-loss-function.md)
 - **경사하강법 (현재 글)**
 - 최적화 (예정)
 - 역전파 직관 (예정)

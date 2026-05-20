@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 8
-title: Optimization
+title: "Calculus for ML 101 (8/10): Optimization"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of momentum, RMSProp, Adam, learning-r
 last_reviewed: '2026-05-15'
 ---
 
-# Optimization
+# Calculus for ML 101 (8/10): Optimization
 
 Plain gradient descent gives you the basic learning loop, but real deep learning losses are rougher than that simple picture suggests. Valleys can be long and narrow, gradient scale can vary by coordinate, and the first few hundred steps may need very different behavior from the last few thousand.
 
@@ -29,6 +29,22 @@ This is post 8 in the Calculus for ML 101 series.
 In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization as one optimization toolkit. The goal is not to memorize optimizer names, but to see which weakness of plain gradient descent each tool is trying to fix.
 
 > Modern optimizers do not replace gradient descent with unrelated magic. They are gradient descent with extra machinery for stability, scale mismatch, and stage-specific control.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Optimization?
+- Which signal should the example or diagram make visible for Optimization?
+- What failure should be prevented first when Optimization reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 8 flow overview*
+
+This picture places Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ Modern optimizers like *Adam* work well — and you should *understand why*.
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png)
-
-*Optimization flow: gradient signals are shaped by momentum, adaptive scaling, and scheduling.*
 ## Key Terms
 
 - **momentum**: a *running mean of gradients*.
@@ -150,17 +163,29 @@ def l2_step(w, g, lr=0.1, wd=1e-4):
 
 Next post: *Backpropagation Intuition*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Optimization?**
+  - The article treats Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Optimization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Optimization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
-- [Functions and Slope](./02-functions-and-slope.md)
-- [Partial Derivatives](./03-partial-derivatives.md)
-- [Gradient](./04-gradient.md)
-- [Chain Rule](./05-chain-rule.md)
-- [Loss Function](./06-loss-function.md)
-- [Gradient Descent](./07-gradient-descent.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
+- [Calculus for ML 101 (2/10): Functions and Slope](./02-functions-and-slope.md)
+- [Calculus for ML 101 (3/10): Partial Derivatives](./03-partial-derivatives.md)
+- [Calculus for ML 101 (4/10): Gradient](./04-gradient.md)
+- [Calculus for ML 101 (5/10): Chain Rule](./05-chain-rule.md)
+- [Calculus for ML 101 (6/10): Loss Function](./06-loss-function.md)
+- [Calculus for ML 101 (7/10): Gradient Descent](./07-gradient-descent.md)
 - **Optimization (current)**
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References

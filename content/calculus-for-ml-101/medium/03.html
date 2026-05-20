@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Partial Derivatives</title>
+<title>Calculus for ML 101 (3/10): Partial Derivatives</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Partial Derivatives</h1>
+<h1>Calculus for ML 101 (3/10): Partial Derivatives</h1>
 <p>Real ML losses are not single-input functions. They depend on many weights, biases, activations, and inputs at once. If you want to know which parameter is responsible for a change in loss, you need a way to isolate one variable without pretending the others disappeared.</p>
 <p>This is post 3 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll use multivariable functions, fixed variables, and per-parameter responsibility to build intuition for partial derivatives. That is the conceptual step that turns "a derivative" into "a gradient for every trainable weight."</p>
 <blockquote>
 <p>A partial derivative is the rule that lets you ask one focused question at a time: if only this variable moved, how would the loss respond?</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Multivariable</em> functions</li>
-<li>The definition of a <em>partial derivative</em></li>
-<li>The intuition of <em>holding variables</em></li>
-<li><em>Per-variable</em> slopes</li>
-<li>The meaning of ML <em>weights</em></li>
+<li>What boundary should you inspect first when applying Partial Derivatives?</li>
+<li>Which signal should the example or diagram make visible for Partial Derivatives?</li>
+<li>What failure should be prevented first when Partial Derivatives reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 3 flow overview</em></p>
+<p>This picture places Partial Derivatives inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Partial Derivatives is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why do you need to look at slopes one variable at a time in a function with multiple inputs?</li>
+<li>In a partial derivative, what does it really mean to "hold the other variables fixed"?</li>
+<li>Why can the same function produce different derivative values depending on which variable you differentiate with respect to?</li>
+<li>Why do you need a clear variable order before you can build a gradient vector?</li>
+<li>How do partial derivatives divide responsibility across weights in ML?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Every ML <em>weight</em> receives its <em>share of responsibility</em> through a <em>partial derivative</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Partial-derivative flow: hold one variable fixed and isolate responsibility along the other axis.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>multivariable</strong>: <em>many</em> inputs.</li>
@@ -146,9 +157,19 @@ g1, g2 = partials(loss, 0.0, 0.0)  # responsibility per weight
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Gradient</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
+<li><strong>What boundary should you inspect first when applying Partial Derivatives?</strong></li>
+<li>The article treats Partial Derivatives as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Partial Derivatives?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Partial Derivatives reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
 <li><strong>Partial Derivatives (current)</strong></li>
 <li>Gradient (upcoming)</li>
 <li>Chain Rule (upcoming)</li>

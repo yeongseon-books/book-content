@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Optimization</title>
+<title>Calculus for ML 101 (8/10): Optimization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>Optimization</h1>
+<h1>Calculus for ML 101 (8/10): Optimization</h1>
 <p>Plain gradient descent gives you the basic learning loop, but real deep learning losses are rougher than that simple picture suggests. Valleys can be long and narrow, gradient scale can vary by coordinate, and the first few hundred steps may need very different behavior from the last few thousand.</p>
 <p>This is post 8 in the Calculus for ML 101 series.</p>
 <p>In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization as one optimization toolkit. The goal is not to memorize optimizer names, but to see which weakness of plain gradient descent each tool is trying to fix.</p>
 <blockquote>
 <p>Modern optimizers do not replace gradient descent with unrelated magic. They are gradient descent with extra machinery for stability, scale mismatch, and stage-specific control.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Momentum</em></li>
-<li><em>RMSProp</em></li>
-<li><em>Adam</em></li>
-<li><em>Learning-rate schedules</em></li>
-<li>Intuition for <em>regularization</em></li>
+<li>What boundary should you inspect first when applying Optimization?</li>
+<li>Which signal should the example or diagram make visible for Optimization?</li>
+<li>What failure should be prevented first when Optimization reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 8 flow overview</em></p>
+<p>This picture places Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Where does plain gradient descent start to break down in real deep learning training?</li>
+<li>Why is momentum easiest to understand through the metaphor of inertia?</li>
+<li>How do RMSProp and Adam reduce coordinate-wise differences in gradient scale?</li>
+<li>Why are learning-rate schedules and warmup as important as the optimizer itself?</li>
+<li>How does regularization act as a control mechanism for generalization rather than just a penalty term?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Modern optimizers like <em>Adam</em> work well — and you should <em>understand why</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Optimization flow: gradient signals are shaped by momentum, adaptive scaling, and scheduling.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>momentum</strong>: a <em>running mean of gradients</em>.</li>
@@ -153,14 +164,24 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Backpropagation Intuition</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Gradient Descent</a></li>
+<li><strong>What boundary should you inspect first when applying Optimization?</strong></li>
+<li>The article treats Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Optimization?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Optimization reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">Calculus for ML 101 (1/10): What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Calculus for ML 101 (2/10): Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Calculus for ML 101 (3/10): Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Calculus for ML 101 (4/10): Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Calculus for ML 101 (5/10): Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Calculus for ML 101 (6/10): Loss Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Calculus for ML 101 (7/10): Gradient Descent</a></li>
 <li><strong>Optimization (current)</strong></li>
 <li>Backpropagation Intuition (upcoming)</li>
 <li>Calculus in Deep Learning (upcoming)</li>

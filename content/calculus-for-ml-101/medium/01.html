@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Derivative</title>
+<title>Calculus for ML 101 (1/10): What Is a Derivative</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,37 @@
 </style>
 </head>
 <body>
-<h1>What Is a Derivative</h1>
+<h1>Calculus for ML 101 (1/10): What Is a Derivative</h1>
 <p>When people first meet derivatives, they often memorize rules before they build a working mental model. In ML, that order tends to fail quickly. The useful question is simpler: if you nudge a parameter a little, does the loss go up or down, and how sharply?</p>
 <p>This is the first post in the Calculus for ML 101 series.</p>
 <p>In this post, we'll connect average rate of change, tangent lines, limits, and numerical differentiation into one practical picture. Once that picture is clear, a gradient stops looking like a mysterious number and starts looking like a directional signal for training.</p>
 <blockquote>
 <p>A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.</p>
 </blockquote>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>intuition</em> behind a derivative</li>
-<li><em>Rate of change</em> and the <em>tangent line</em></li>
-<li>The role of <em>limits</em></li>
-<li><em>Numerical differentiation</em></li>
-<li>The <em>link to ML</em></li>
+<li>What boundary should you inspect first when applying What Is a Derivative?</li>
+<li>Which signal should the example or diagram make visible for What Is a Derivative?</li>
+<li>What failure should be prevented first when What Is a Derivative reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="calculus for ml 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>calculus for ml 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Derivative inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Derivative is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why is learning in ML directly tied to derivatives?</li>
+<li>What is the difference between average rate of change and instantaneous rate of change, and why does that distinction matter?</li>
+<li>What is the most practical way to relate the slope of a tangent line to the derivative?</li>
+<li>Why are limits indispensable in the definition of a derivative?</li>
+<li>When is numerical differentiation useful, and how much should you trust it?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p><em>Gradient descent</em>, <em>backprop</em>, and <em>learning rate</em> are all defined on top of derivatives.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept flow: changes in a function become limits, derivatives, and finally an ML training signal.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>derivative</strong>: <em>instantaneous rate of change</em>.</li>
@@ -145,6 +156,16 @@ g = deriv(loss, 0.0)   # negative -&gt; increase w to reduce loss
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next post: <em>Functions and Slope</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is a Derivative?</strong></li>
+<li>The article treats What Is a Derivative as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is a Derivative?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is a Derivative reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Derivative (current)</strong></li>
 <li>Functions and Slope (upcoming)</li>

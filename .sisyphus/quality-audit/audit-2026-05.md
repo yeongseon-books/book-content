@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:10:24+00:00
+Generated: 2026-05-20T11:10:43+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -28,12 +28,12 @@ Warnings:
 
 - Series audited: **92**
 - Series with any issue: **58**
-- Series at or above 5 issues: **44**
-- Total issues: **563**
+- Series at or above 5 issues: **43**
+- Total issues: **557**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **31**
+  - Shrt: **25**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -68,26 +68,26 @@ Warnings:
 | 25 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 26 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 27 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 28 | `calculus-for-ml-101` | 10 | 4 | 0 | 0 | 6 | 0 |
-| 29 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 30 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 33 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 34 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 35 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 36 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 37 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 38 | `machine-learning-101` | 7 | 6 | 0 | 0 | 1 | 0 |
-| 39 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 40 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 41 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 42 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 43 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 44 | `statistics-101` | 5 | 0 | 0 | 0 | 5 | 0 |
-| 45 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 46 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 47 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 28 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
+| 29 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 32 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 33 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 34 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 35 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 36 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 37 | `machine-learning-101` | 7 | 6 | 0 | 0 | 1 | 0 |
+| 38 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 39 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 40 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 41 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 42 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 43 | `statistics-101` | 5 | 0 | 0 | 0 | 5 | 0 |
+| 44 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 45 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 46 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 47 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 48 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 49 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 50 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
@@ -450,24 +450,6 @@ Warnings:
 - `assets/python-package-101/06/06-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1317x67)
 - ... 5 more
 
-## calculus-for-ml-101 — Total 10
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=6 NoEn=0
-
-### BadImg
-- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=780x67)
-- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=673x67)
-- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=612x67)
-- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=612x67)
-
-### Shrt
-- `content/calculus-for-ml-101/ko/03-partial-derivatives.md:22` — markdown body has 148 lines (< 150)
-- `content/calculus-for-ml-101/en/01-what-is-derivative.md:22` — markdown body has 144 lines (< 150)
-- `content/calculus-for-ml-101/en/02-functions-and-slope.md:22` — markdown body has 145 lines (< 150)
-- `content/calculus-for-ml-101/en/03-partial-derivatives.md:22` — markdown body has 145 lines (< 150)
-- `content/calculus-for-ml-101/en/04-gradient.md:22` — markdown body has 149 lines (< 150)
-- ... 1 more
-
 ## sql-101 — Total 9
 
 - BadImg=8 Synt=0 BrkLink=0 Shrt=1 NoEn=0
@@ -692,6 +674,16 @@ Warnings:
 - `assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1148x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1148x67)
+
+## calculus-for-ml-101 — Total 4
+
+- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=780x67)
+- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=673x67)
+- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=612x67)
+- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=612x67)
 
 ## data-warehouse-101 — Total 4
 

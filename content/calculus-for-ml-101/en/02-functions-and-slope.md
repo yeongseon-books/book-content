@@ -1,7 +1,7 @@
 ---
 series: calculus-for-ml-101
 episode: 2
-title: Functions and Slope
+title: "Calculus for ML 101 (2/10): Functions and Slope"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of functions, slope, linear and nonlin
 last_reviewed: '2026-05-15'
 ---
 
-# Functions and Slope
+# Calculus for ML 101 (2/10): Functions and Slope
 
 An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.
 
@@ -29,6 +29,22 @@ This is post 2 in the Calculus for ML 101 series.
 In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.
 
 > A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Functions and Slope?
+- Which signal should the example or diagram make visible for Functions and Slope?
+- What failure should be prevented first when Functions and Slope reaches a real system?
+
+## Big Picture
+
+![calculus for ml 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
+
+*calculus for ml 101 chapter 2 flow overview*
+
+This picture places Functions and Slope inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Functions and Slope is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -44,9 +60,6 @@ ML models are *function compositions*, and training pushes signals through *each
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
-
-*Concept flow: the input-function-output contract gains meaning once slope and derivative are layered onto it.*
 ## Key Terms
 
 - **function**: maps *input* to *output*.
@@ -143,8 +156,19 @@ Picking *activations*, building *graphical intuition*, and diagnosing *vanishing
 
 Next post: *Partial Derivatives*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Functions and Slope?**
+  - The article treats Functions and Slope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Functions and Slope?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Functions and Slope reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Derivative](./01-what-is-derivative.md)
+## In this series
+
+- [Calculus for ML 101 (1/10): What Is a Derivative](./01-what-is-derivative.md)
 - **Functions and Slope (current)**
 - Partial Derivatives (upcoming)
 - Gradient (upcoming)
@@ -154,6 +178,7 @@ Next post: *Partial Derivatives*.
 - Optimization (upcoming)
 - Backpropagation Intuition (upcoming)
 - Calculus in Deep Learning (upcoming)
+
 <!-- toc:end -->
 
 ## References
