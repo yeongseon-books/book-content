@@ -42,7 +42,7 @@ This is post 5 in the Statistics 101 series. Here we will compare point estimati
 
 This picture places Estimation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Estimation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> An estimate is not a guess—it is a *procedure* that produces a *best guess plus a measure of how far off it might be*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ Reporting a mean is not the end. *How close it is* must be reported *together* s
 > *An estimate always carries error with it.*
 
 ## Concept at a Glance
-
+The goal of estimation is to use your sample data to infer the *true value* in the population. But your estimate will always be *off* by some amount. The question is: how much?
 ## Key Terms
 
 - **Point Estimate**: a *single value* estimate of a parameter (x̄).

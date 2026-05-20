@@ -44,7 +44,7 @@ This is post 4 in the Testing 101 series. Here we walk through the role of E2E t
 
 This picture places E2E Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of E2E Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> E2E tests prove that the user can actually complete the flow, not just that the code says the flow should work.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ A passing E2E test means *frontend, backend, and DB work together*. It is the *m
 > E2E is the *user's point of view*.
 
 ## Concept at a Glance
-
+An E2E test navigates a real browser through a complete user scenario—signing up, logging in, making a payment, or searching—and confirms that every screen, navigation path, and API interaction works end-to-end from the user's perspective.
 ## Key Terms
 
 - **E2E (end-to-end)**: the full flow from *user start to result*.

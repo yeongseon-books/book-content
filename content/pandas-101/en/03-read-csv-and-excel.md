@@ -42,7 +42,7 @@ In this chapter, we will treat `read_csv` and `read_excel` as data-loading contr
 
 This picture places Reading CSV and Excel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Reading CSV and Excel is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Reading is not just opening a file — it's your **first quality gate**. Encoding, delimiter, dtype, datetime parsing — get these right here or pay for it later.
 
 ## Why It Matters
 

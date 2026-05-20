@@ -44,7 +44,7 @@ This is post 5 in the Portfolio Project 101 series. Here we will treat deploymen
 
 This picture places Deploying the Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deploying the Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Code that only runs locally is not evidence. When deployed so anyone can access it, then and only then does it read like an intentionally completed project.
 
 ## Why It Matters
 

@@ -42,7 +42,7 @@ This is post 7 in the Observability 101 series.
 
 This picture places Alerts and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Alerts and On-Call is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Alerts and On-Call is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 > *Alerts have a *wake-up cost*. If you do not know it, you go *bankrupt*.*
 
 ## Concept at a Glance
+
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 

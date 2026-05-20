@@ -44,7 +44,7 @@ This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a 
 
 This picture places Running Tests in CI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Running Tests in CI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> CI transforms "works on my machine" from an anecdote into a requirement.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Local environments *differ from person to person*. *CI* validates *every PR* in 
 > Tests without CI are tests that *passed by accident*.
 
 ## Concept at a Glance
-
+Continuous Integration runs tests automatically on every commit and PR in a controlled environment, catching environment-specific failures, dependency version mismatches, and test order dependencies that local runs would miss, turning test results into organizational evidence rather than individual confidence.
 ## Key Terms
 
 - **CI**: *Continuous Integration*. *Auto-validate* every commit.

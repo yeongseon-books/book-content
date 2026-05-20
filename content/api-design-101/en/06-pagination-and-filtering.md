@@ -41,9 +41,9 @@ Here, we treat pagination, sorting, and filtering as part of the API's correctne
 
 *api design 101 chapter 6 flow overview*
 
-This picture places Pagination and Filtering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows how to handle large result sets: limit and offset split results into pages, and filters (by status, date, keyword) let clients ask for exactly what they need instead of receiving everything.
 
-> The core of Pagination and Filtering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Pagination and filtering are not about performance — they are about letting the client ask questions instead of forcing it to process the entire dataset.
 
 ## Why It Matters
 

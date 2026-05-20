@@ -42,7 +42,7 @@ This is post 8 in the Statistics 101 series. Here we will compare correlation co
 
 This picture places Correlation and Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Correlation and Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Correlation shows *co-movement*; regression shows *prediction*. *Neither* proves *causation*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ This picture places Correlation and Regression inside an operating flow. The poi
 > *Correlation is not causation.*
 
 ## Concept at a Glance
-
+Correlation measures how tightly two variables move together. Regression builds a *line* (or *model*) to predict one variable from another. Both are powerful—and both are easily misused.
 ## Key Terms
 
 - **Pearson r**: strength of *linear correlation* (-1 to +1).

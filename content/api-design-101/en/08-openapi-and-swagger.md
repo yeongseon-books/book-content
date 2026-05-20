@@ -41,9 +41,9 @@ Here, we treat OpenAPI and Swagger as contract automation, not just documentatio
 
 *api design 101 chapter 8 flow overview*
 
-This picture places OpenAPI and Swagger inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows OpenAPI as the API's machine-readable blueprint: it lists every endpoint, method, parameter, request schema, response schema, and status code in YAML or JSON, so tools can auto-generate clients, tests, and documentation.
 
-> The core of OpenAPI and Swagger is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> OpenAPI is not a documentation tool — it is a single source of truth that prevents documentation and code from drifting apart.
 
 ## Why It Matters
 

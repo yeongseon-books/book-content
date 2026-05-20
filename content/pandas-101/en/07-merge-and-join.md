@@ -42,7 +42,7 @@ Here we will treat `merge` and `join` as tools for validating relationships betw
 
 This picture places Merge and Join inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Merge and Join is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Merge is not just combining tables — it's validating relationships. Duplicate keys, unmatched rows, row explosion — most of this is *preventable by checking your keys first.
 
 ## Why It Matters
 

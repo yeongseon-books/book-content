@@ -42,7 +42,7 @@ This is the final post in the Technical Writing 101 series. It turns that last-p
 
 This picture places Pre-publish Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pre-publish Checklist is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A pre-publish pass is the difference between a fix that costs 24 hours (before readers see it) and a fix that costs a week (after they do).
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ A *fix after publish* is far more expensive than a *check before publish*.
 
 ## Concept at a Glance
 
+A pre-publish checklist is not perfectionism; it is cost control. One round of automated checks plus one round of human review can catch broken links, stale commands, missing captions, and edge cases before real readers encounter them.
 ## Key Terms
 
 - **link rot**: A *broken link* over time.

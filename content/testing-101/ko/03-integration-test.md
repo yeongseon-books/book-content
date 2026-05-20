@@ -40,9 +40,9 @@ last_reviewed: '2026-05-12'
 
 *Testing 101 3장 흐름 개요*
 
-이 그림에서는 통합 테스트를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림에서는 여러 부품의 연결 지점에서 드러나는 버그를 보여줍니다. 단위 테스트가 모두 통과해도 실제 데이터베이스나 외부 시스템을 연결하면 다른 문제가 생길 수 있습니다.
 
-> 통합 테스트의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 통합 테스트는 부품 조립 상태의 계약 위반을 감시합니다.
 
 ## 왜 중요한가
 
@@ -80,6 +80,86 @@ last_reviewed: '2026-05-12'
 ```
 
 단위 테스트가 쓸모없다는 뜻은 아닙니다. 다만 부품 검수만으로 조립 불량을 막을 수 없다는 뜻입니다. 통합 테스트는 상위 계층에서 조립 상태를 한 번 더 확인합니다.
+
+## 인메모리 DB vs 실제 DB 선택
+
+통합 테스트에서 데이터베이스를 어떻게 준비할지는 자주 논쟁이 됩니다. 속도를 택하면 인메모리 DB를, 신뢰성을 택하면 실제 DB를 씁니다.
+
+| 기준 | 인메모리 DB (SQLite) | 실제 DB (Postgres, MySQL) |
+|---|---|---|
+| 실행 속도 | 빠름 (수백 ms) | 느림 (수초) |
+| 설정 복잡도 | 낮음 | 높음 (Docker 또는 별도 서버) |
+| 운영 환경과의 일치 | 낮음 (SQL 방언 차이 존재) | 높음 |
+| 트랜잭션 격리 | 제한적 | 완전 지원 |
+| JSON 컬럼, Full-text 검색 | 제한적 | 전체 지원 |
+| CI 속도 | 빠름 | 느림 |
+
+대부분의 팀은 개발 중에는 SQLite로 빠르게 돌리고, CI에서는 실제 DB를 띄워 운영 환경과의 차이를 검증합니다. 둘 중 하나만 고르지 말고 상황에 따라 바꿀 수 있게 만드는 편이 좋습니다.
+
+## FastAPI TestClient와 httpx
+
+FastAPI의 `TestClient`는 내부에서 `httpx`를 씁니다. 실제 HTTP 요청을 만들지 않고도 ASGI 인터페이스를 직접 호출하므로, 네트워크 오버헤드 없이 라우팅과 미들웨어까지 검증할 수 있습니다.
+
+```python
+from fastapi.testclient import TestClient
+from src.app import app
+
+client = TestClient(app)
+
+def test_post_with_headers():
+    res = client.post(
+        "/users",
+        json={"email": "a@b.com"},
+        headers={"Authorization": "Bearer token"}
+    )
+    assert res.status_code == 200
+    assert "id" in res.json()
+```
+
+이 방식은 단위 테스트보다는 느리지만, 실제 서버를 띄우는 것보다는 빠릅니다. 인증 헤더, 쿠키, 쿼리 파라미터까지 모두 검증할 수 있어, API 계약 테스트로 쓰기에 적합합니다.
+
+## 테스트 격리 — 트랜잭션 롤백 패턴
+
+각 테스트가 깨끗한 상태에서 시작하려면 스키마를 매번 재생성하거나, 트랜잭션을 열고 끝에서 롤백하는 방법을 씁니다.
+
+```python
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from src.app import Base
+
+engine = create_engine("sqlite:///./test.db", future=True)
+Session = sessionmaker(bind=engine, future=True)
+
+@pytest.fixture(autouse=True)
+def reset_db():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    yield
+```
+
+더 빠른 방법은 트랜잭션 안에서 테스트를 실행하고 끝에 롤백하는 것입니다. Django는 `TransactionTestCase`, SQLAlchemy는 fixture로 이를 지원합니다. 다만 롤백 패턴은 중첩 트랜잭션이나 `COMMIT`을 호출하는 코드와 충돌할 수 있으므로, 팀 상황에 맞게 고르는 것이 좋습니다.
+
+## 테스트 컨테이너로 실제 DB 띄우기
+
+인메모리 DB로 충분하지 않을 때는 Docker 컨테이너로 실제 DB를 잠깐 띄울 수 있습니다. `testcontainers-python`을 쓰면 테스트 시작 시 Postgres를 자동으로 올리고, 끝나면 내립니다.
+
+```python
+import pytest
+from testcontainers.postgres import PostgresContainer
+from sqlalchemy import create_engine
+
+@pytest.fixture(scope="session")
+def postgres():
+    with PostgresContainer("postgres:15") as pg:
+        yield pg.get_connection_url()
+
+def test_user_creation_with_real_db(postgres):
+    engine = create_engine(postgres)
+    # 실제 Postgres 테스트 진행
+```
+
+이 방식은 로컬과 CI에서 모두 같은 환경을 만들 수 있어 운영 DB와의 차이를 미리 잡습니다. 다만 컨테이너 시작 시간이 수 초 걸리므로, 자주 돌리는 테스트보다는 CI 전용 검증에 더 적합합니다.
 
 ## 다섯 단계로 FastAPI와 SQLite 붙여 보기
 
@@ -216,11 +296,11 @@ pytest -m slow         # 야간 실행
 ## 처음 질문으로 돌아가기
 
 - **통합 테스트는 무엇을 함께 검증할까요?**
-  - 본문의 기준은 통합 테스트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 통합 테스트는 여러 컴포넌트가 함께 동작할 때의 데이터 흐름과 상태 변화를 검증합니다.
 - **실제 DB나 HTTP 계층은 왜 붙여 봐야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 실제 DB나 외부 API를 붙임으로써 단위 테스트가 놓칠 수 있는 스키마 미스매치나 프로토콜 오류를 미리 잡습니다.
 - **테스트 컨테이너와 픽스처는 어떤 상황에서 유용할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 느린 통합 테스트를 기본 실행에서 분리하면 개발자 피드백 속도를 유지하면서도 CI에서 철저히 검증할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

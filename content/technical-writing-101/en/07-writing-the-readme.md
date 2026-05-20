@@ -42,7 +42,7 @@ This is post 7 in the Technical Writing 101 series. It focuses on designing that
 
 This picture places Writing the README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing the README is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A README succeeds when a first-time visitor reaches a visible success without leaving the screen.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ The *README* is the *first impression* of a project.
 
 ## Concept at a Glance
 
+A strong README compresses the install, run, and verification steps into one screen so the reader gets a first success before reading the full backstory. That early win makes the rest of the README feel safer to trust.
 ## Key Terms
 
 - **What**: What it *is*.

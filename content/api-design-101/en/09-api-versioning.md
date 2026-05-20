@@ -41,9 +41,9 @@ Here, we treat versioning as change-management discipline rather than just `/v1`
 
 *api design 101 chapter 9 flow overview*
 
-This picture places API Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows multiple API versions coexisting: v1 and v2 run in parallel so old clients stay on v1 while new clients migrate to v2 at their own pace; sunset dates let outdated versions retire gracefully.
 
-> The core of API Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> API versioning is not admitting defeat — it is the contract recognizing that both client and server evolve, and building compatibility into that evolution from the start.
 
 ## Why It Matters
 

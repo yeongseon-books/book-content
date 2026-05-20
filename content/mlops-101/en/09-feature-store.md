@@ -44,7 +44,7 @@ Here, we will treat a feature store not as a storage box for features, but as th
 
 This picture places Feature Store inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Feature Store is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A feature store is not a data warehouse. It is a definition layer that guarantees training uses the same features as serving, eliminating one large class of production bugs.
 
 ## Questions this article answers
 

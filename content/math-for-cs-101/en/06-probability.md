@@ -44,7 +44,7 @@ Here we use probability as the language for uncertainty in engineering decisions
 
 This picture places Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Probability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Probability lets you stop hand-waving about uncertainty and instead reason quantitatively about expectations and distributions.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ A/B testing, recommendation ranking, classifier evaluation, and reliability work
 
 The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.
 
+
 ## Concept at a Glance
+
+Probability quantifies *likelihood* through events, conditional probabilities, distributions, and Bayes' theorem. It turns vague "probably" into precise numbers.
+
+## Before/After
+
+**Before**: "This might fail sometimes."
+
+**After**: "This fails with probability 0.001 under these assumptions.
 
 ## Key Terms
 

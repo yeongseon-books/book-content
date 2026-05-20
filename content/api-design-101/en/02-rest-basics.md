@@ -41,9 +41,9 @@ Here, we treat REST as a set of architectural constraints rather than a fashiona
 
 *api design 101 chapter 2 flow overview*
 
-This picture places REST Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram maps HTTP verbs (GET, POST, PUT, DELETE) to operations: each verb tells the server what kind of action the client wants, and the path identifies which resource to act upon.
 
-> The core of REST Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> REST is not a list of rules — it is the discipline of thinking in HTTP verbs and resources instead of arbitrary function names.
 
 ## Why It Matters
 

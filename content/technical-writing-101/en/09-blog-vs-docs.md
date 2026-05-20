@@ -42,7 +42,7 @@ This is post 9 in the Technical Writing 101 series. It distinguishes blogs from 
 
 This picture places Blog vs Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Blog vs Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Blogs preserve experience and interpretation; documentation preserves the current operational truth.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ When *kinds of writing* mix up, the *reader* gets *lost*.
 
 ## Concept at a Glance
 
+Blogs and docs both serve engineering teams, but they have different owners, freshness rules, and lifespans. Separating them with clear ownership and deliberate links prevents the reader from following stale advice or citing context as official policy.
 ## Key Terms
 
 - **Diátaxis**: A *four quadrant* documentation model.

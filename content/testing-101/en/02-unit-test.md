@@ -44,7 +44,7 @@ This is post 2 in the Testing 101 series. Here we define the scope of a unit tes
 
 This picture places Unit Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Unit Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A good unit test fails loudly when the contract breaks, and passes silently when it holds.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Unit tests are *the base of the pyramid*. Because they are fast, *thousands* of 
 > Many fast unit tests are the *foundation of the whole strategy*.
 
 ## Concept at a Glance
-
+A unit test verifies one behavior by isolating a single function or method from its external dependencies, running it in milliseconds, and confirming its output or state change without touching real databases, APIs, or clocks.
 ## Key Terms
 
 - **Unit**: a *minimal piece* such as a single function, method, or class.

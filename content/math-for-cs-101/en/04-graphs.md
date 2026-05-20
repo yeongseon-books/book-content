@@ -44,7 +44,7 @@ Here we treat graphs as the baseline language for relationship-heavy systems, wi
 
 This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Graphs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A graph structures relationships and transforms complex problems into connectivity and pathfinding challenges that become solvable.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ Friend recommendations, route planning, build dependencies, and service maps all
 
 That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.
 
+
 ## Concept at a Glance
+
+Graphs consist of *nodes*, *edges*, and *properties* (directed, weighted, cyclic). Most real problems—networks, dependencies, recommendations, social connections—naturally become graphs.
+
+## Before/After
+
+**Before**: "This is a tangled mess of relationships."
+
+**After**: "This is a graph; now I can ask structured questions about paths, cycles, and reachability.
 
 ## Key Terms
 

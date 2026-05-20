@@ -42,7 +42,7 @@ In this chapter, we will keep time series work inside core Pandas patterns. The 
 
 This picture places Time Series inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Time Series is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Time series is about *order and frequency*. Skip the date index, miss a time period, or ignore seasonality and your trend analysis crumbles.
 
 ## Why It Matters
 

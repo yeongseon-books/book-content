@@ -42,7 +42,7 @@ This is post 6 in the Probability 101 series. Here we define expectation and var
 
 This picture places Expectation and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Expectation and Variance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Expectation and Variance requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

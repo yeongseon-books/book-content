@@ -42,7 +42,7 @@ This is post 4 in the Statistics 101 series. Here we will clarify the relationsh
 
 This picture places Sample and Population inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sample and Population is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> You can *never* measure the entire population — so statistics teaches you how to *measure the sample* and *speak confidently* about the whole.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ This picture places Sample and Population inside an operating flow. The point is
 > *Garbage sample → Garbage decision.*
 
 ## Concept at a Glance
-
+Every statistic you compute comes from a *sample*—a *part* of the population you actually care about. The quality of your inference depends on whether that sample is *representative* and *large enough*.
 ## Key Terms
 
 - **Population**: the *whole group* we want to learn about.

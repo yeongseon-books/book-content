@@ -46,7 +46,7 @@ This is the first post in the Portfolio Project 101 series. Here we will define 
 
 This picture places What is a Portfolio Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is a Portfolio Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A portfolio project is not a pile of features. It is a public case study that makes the problem, the judgment, and the result visible at a glance.
 
 ## Why It Matters
 

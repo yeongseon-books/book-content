@@ -40,9 +40,9 @@ This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity,
 
 *sql 101 chapter 9 flow overview*
 
-This picture places Index and Query Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+An index lets the database find rows quickly by a specific column value, but maintaining indexes slows down writes. EXPLAIN shows the execution plan, revealing whether your index is actually being used.
 
-> The core of Index and Query Plan is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Indexing is not about adding indexes everywhere; it's about using EXPLAIN to identify slow queries, understanding why they're slow, and adding indexes only where they help.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Query tuning becomes more valuable as data grows because small predicate differe
 Indexes are powerful precisely because they are selective. They make some reads much faster while increasing storage and write cost. That means index work is not about adding more structures everywhere. It is about matching read patterns to the right access path and confirming the plan actually changes.
 
 ## Plan selection flow
+
+Run EXPLAIN on a slow query to see if the planner chooses a sequential scan or an index scan. A sequential scan isn't always bad; sometimes it's actually faster than an index for small tables. Check the actual row counts and timing.
 
 ## Key Terms
 

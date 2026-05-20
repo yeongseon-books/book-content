@@ -40,9 +40,9 @@ This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that contr
 
 *sql 101 chapter 3 flow overview*
 
-This picture places WHERE and Conditions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+WHERE filters rows based on conditions. The correctness of those conditions and whether an index can speed them up makes the difference between a fast query and a slow one.
 
-> The core of WHERE and Conditions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> WHERE determines which rows even make it into the result. Getting the logic right is non-negotiable; getting the performance is about knowing when the database can use an index.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ A single predicate often decides most of the cost of a query. Whether an index i
 Correctness is just as important. A query that returns the wrong answer quickly is more dangerous than one that fails loudly, and NULL handling plus precedence mistakes are common reasons apparently reasonable queries end up lying quietly.
 
 ## WHERE evaluation flow
+
+WHERE is evaluated before SELECT, which means column aliases from SELECT aren't visible in WHERE. This is why you sometimes need to repeat the same expression—the evaluation order dictates visibility.
 
 ## Key Terms
 

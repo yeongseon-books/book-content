@@ -42,7 +42,7 @@ This is post 9 in the Statistics 101 series. Here we will define the p-value car
 
 This picture places Understanding p-value inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding p-value is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The p-value is *not* the probability your result is true—it is the probability your *data* would appear this extreme if the null were true.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ Most papers and reports collapse a *conclusion* into one line: *p < 0.05*. Yet *
 > *A p-value is not an answer; it is the *start of a question*.*
 
 ## Concept at a Glance
-
+A small p-value (say, p < 0.05) means your data is *unlikely* if there were no true effect. But it does not tell you the *size* of the effect, nor does it prove your hypothesis is correct.
 ## Key Terms
 
 - **p-value**: under the *assumption that H0 is true*, the probability of seeing a *result at least as extreme* as the observed one.

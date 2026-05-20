@@ -44,7 +44,7 @@ This is the final post in the Testing 101 series. Here we connect the earlier la
 
 This picture places Building a Test Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Test Strategy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A strategy without measurement is just a wish; a measurement without strategy is just a metric.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Tests are *not free*. They cost time to write, to run, and to fix. A strategy-le
 > A good strategy *catches bugs while protecting development speed*.
 
 ## Concept at a Glance
-
+A test strategy distributes testing investment across layers: many fast unit tests on core logic, fewer slower integration tests at component boundaries, and a small number of expensive E2E tests on critical user paths, guided by risk not uniformity.
 ## Key Terms
 
 - **Test pyramid**: a distribution model with *many unit / fewer integration / even fewer E2E* tests.

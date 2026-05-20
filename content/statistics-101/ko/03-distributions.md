@@ -40,9 +40,9 @@ last_reviewed: '2026-05-12'
 
 *Statistics 101 3장 흐름 개요*
 
-이 그림에서는 분포를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+분포는 데이터의 전체 모양을 한눈에 보여주는 도구입니다. 평균이 같아도 분포가 다르면 완전히 다른 이야기를 하게 됩니다.
 
-> 분포의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 분포를 이해하면 단순 요약값 너머의 데이터 성격을 정확히 읽을 수 있습니다.
 
 ## 왜 중요한가
 
@@ -56,6 +56,72 @@ last_reviewed: '2026-05-12'
 
 정규분포는 대칭적인 종 모양이고, 균등분포는 값이 비슷한 빈도로 나타납니다. 지수분포와 멱법칙 분포는 한쪽 꼬리가 길며, 운영 데이터에서는 이런 형태가 더 자주 보입니다.
 
+### 주요 분포 비교표
+
+| 분포 | 형태 | 매개변수 | 실무 예시 |
+|---|---|---|---|
+| **정규분포** | 좌우 대칭 종 모양 | 평균 μ, 표준편차 σ | 시험 점수, 센서 오차, 키와 몸무게 |
+| **이항분포** | 성공 횟수 막대 | 시행 수 n, 성공 확률 p | 클릭 여부, A/B 테스트 전환 |
+| **포아송분포** | 단위 시간당 사건 발생 수 | 평균 발생 수 λ | 시간당 요청 수, 하루 장애 건수 |
+| **균등분포** | 모든 구간이 동일한 확률 | 최솟값 a, 최댓값 b | 난수 생성, 랜덤 샘플링 |
+| **지수분포** | 대기 시간, 작은 값 많음 | 비율 λ | 서버 요청 간 간격, 고객 이탈 시간 |
+| **멱법칙분포** | 긴 꼬리 | 멱지수 α | 매출 분포, 조회 수, 소득 |
+
+실무에서는 정규분포보다 긴 꼬리를 가진 분포를 훨씬 자주 만납니다. 응답 시간, 매출, 사용자 행동 로그는 대부분 멱법칙이나 지수분포 계열입니다. 정규분포를 기본값처럼 가정하면 p95, p99 같은 꼬리 지표를 놓치게 됩니다.
+
+## 분포를 왜 알아야 하는가
+
+분포를 모르면 평균과 분산이 같아도 완전히 다른 행동을 하는 데이터를 같은 것으로 오해할 수 있습니다. 두 데이터셋의 평균이 100이고 표준편차가 20으로 같더라도, 하나는 정규분포이고 다른 하나는 지수분포라면 극단값 발생 빈도가 전혀 다릅니다.
+
+### 분포가 통계 기법 선택을 결정합니다
+
+많은 통계 기법은 정규성 가정을 전제로 합니다. t-검정, ANOVA, 선형회귀 모두 잔차가 정규분포를 따른다고 가정합니다. 만약 데이터가 긴 꼬리를 가지면 이런 기법들은 신뢰구간을 잘못 계산하거나 검정력이 떨어질 수 있습니다. 그럴 때는 비모수 검정(Mann-Whitney U, Kruskal-Wallis)이나 로그 변환을 고려해야 합니다.
+
+### 분포가 SLA와 알림 기준을 결정합니다
+
+정규분포라면 평균 ± 2σ 구간에 95%가 들어가므로 평균 기준 관리가 가능합니다. 하지만 긴 꼬리 분포라면 평균은 대부분 사용자 경험을 대표하지 못하고, p95나 p99 같은 분위수 기준이 필요합니다. Datadog, Grafana, New Relic 같은 모니터링 도구가 평균보다 p95/p99를 강조하는 이유가 여기에 있습니다.
+
+## Python으로 분포 그리고 검증하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import skew, kurtosis, normaltest
+
+# 긴 꼬리 분포 시뮬레이션
+np.random.seed(42)
+latency = np.concatenate([
+    np.random.exponential(scale=100, size=950),
+    np.random.exponential(scale=500, size=50)
+])
+
+# 히스토그램
+plt.figure(figsize=(10, 4))
+plt.hist(latency, bins=50, edgecolor="black", alpha=0.7)
+plt.xlabel("Latency (ms)")
+plt.ylabel("Frequency")
+plt.title("응답 시간 분포 (긴 꼬리)")
+plt.axvline(latency.mean(), color="red", linestyle="--", label=f"평균: {latency.mean():.1f}")
+plt.axvline(np.median(latency), color="blue", linestyle="--", label=f"중앙값: {np.median(latency):.1f}")
+plt.legend()
+plt.show()
+
+# 분포 요약 통계
+print(f"평균: {latency.mean():.1f} ms")
+print(f"중앙값: {np.median(latency):.1f} ms")
+print(f"p95: {np.percentile(latency, 95):.1f} ms")
+print(f"p99: {np.percentile(latency, 99):.1f} ms")
+print(f"왜도: {skew(latency):.2f}")
+print(f"첨도: {kurtosis(latency):.2f}")
+
+# 정규성 검정
+stat, p = normaltest(latency)
+print(f"정규성 검정 p-value: {p:.4f}")
+if p < 0.05:
+    print("→ 정규분포가 아닙니다. 비모수 기법이나 분위수 기준을 고려하세요.")
+```
+
+왜도가 양수면 오른쪽 꼬리가 길고, 첨도가 크면 극단값이 자주 나타납니다. 정규성 검정 p-value가 0.05보다 작으면 정규분포 가정을 기각하고, t-검정 대신 Mann-Whitney U 검정을 쓰거나 로그 변환을 고려해야 합니다.
 ## 핵심 용어
 
 - 정규분포: 좌우가 대칭인 종 모양 분포입니다.
@@ -163,11 +229,11 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 ## 처음 질문으로 돌아가기
 
 - **데이터의 분포 모양은 왜 중요한가요?**
-  - 본문의 기준은 분포를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 히스토그램, boxplot, QQ plot으로 데이터 모양을 다각도로 확인합니다.
 - **정규, 균등, 지수, 멱법칙 분포는 어떤 차이를 보일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 분포를 알면 같은 평균에서도 왜 다른 행동이 나오는지 설명할 수 있습니다.
 - **왜도와 첨도는 무엇을 수치로 말해 줄까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 이상한 분포는 데이터 수집 오류를 알리므로 운영에서는 자동 알림 기준이 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -192,4 +258,66 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 - [Wikipedia — Power Law](https://en.wikipedia.org/wiki/Power_law)
 - [Brendan Gregg — Latency Distributions](https://www.brendangregg.com/blog/2014-06-23/latency-heat-maps.html)
 
+### Q-Q Plot으로 정규성 진단하기
+
+Q-Q plot(Quantile-Quantile plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교하는 그래프입니다. 데이터가 정규분포를 따르면 점들이 대각선 위에 일직선으로 놓입니다.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# 정규분포 vs 지수분포
+np.random.seed(42)
+normal_data = np.random.normal(loc=100, scale=20, size=500)
+exp_data = np.random.exponential(scale=100, size=500)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# 정규분포 Q-Q plot
+stats.probplot(normal_data, dist="norm", plot=axes[0])
+axes[0].set_title("정규분포 Q-Q Plot")
+
+# 지수분포 Q-Q plot
+stats.probplot(exp_data, dist="norm", plot=axes[1])
+axes[1].set_title("지수분포 Q-Q Plot (정규 기준)")
+
+plt.tight_layout()
+plt.show()
+```
+
+정규분포 데이터는 점들이 직선에 가깝게 놓이지만, 지수분포 데이터는 오른쪽 끝이 위로 휘어집니다. 이는 오른쪽 꼬리가 정규분포보다 길다는 뜻입니다.
+
+### 로그 변환으로 긴 꼬리 다루기
+
+긴 꼬리 분포는 로그 변환을 하면 정규분포에 가까워지는 경우가 많습니다. 특히 매출, 소득, 응답 시간처럼 양수이면서 극단값이 있는 데이터에서 유용합니다.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 긴 꼬리 데이터 (로그정규분포)
+np.random.seed(42)
+data = np.random.lognormal(mean=4, sigma=1, size=1000)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+# 원본 분포
+axes[0].hist(data, bins=50, edgecolor="black")
+axes[0].set_title("원본 분포 (긴 꼬리)")
+axes[0].set_xlabel("값")
+
+# 로그 변환 후
+axes[1].hist(np.log(data), bins=50, edgecolor="black")
+axes[1].set_title("로그 변환 후 (정규에 가까움)")
+axes[1].set_xlabel("log(값)")
+
+plt.tight_layout()
+plt.show()
+
+print(f"원본 평균: {data.mean():.1f}, 중앙값: {np.median(data):.1f}")
+print(f"로그 변환 후 평균: {np.log(data).mean():.2f}, 중앙값: {np.median(np.log(data)):.2f}")
+```
+
+로그 변환 후에는 평균과 중앙값이 가까워지고 히스토그램도 대칭에 가까워집니다. 이렇게 변환한 뒤 t-검정이나 회귀분석을 적용하면 정규성 가정을 만족하기 쉬워집니다.
 Tags: Statistics, Distribution, Normal, Skew, Beginner

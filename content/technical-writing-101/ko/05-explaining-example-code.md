@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Technical Writing 101 5장 흐름 개요*
 
-이 그림에서는 예제 코드 설명하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+최소 실행 예제를 먼저 제시하고, 핵심 줄을 짚고, 실행 결과로 검증하고, 전체 코드 링크로 닫는 흐름이 좋은 코드 설명의 기본 구조입니다.
 
-> 예제 코드 설명하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 좋은 예제 코드는 양으로 설득하지 않습니다. 가장 작은 코드를 보여 주고, 핵심을 짚고, 실행하게 하고, 출력으로 닫습니다.
 
 ## 이 글에서 배울 것
 
@@ -101,6 +101,251 @@ curl "http://127.0.0.1:8000/add?a=2&b=3"
 
 이 예제에서 독자가 가장 먼저 봐야 할 줄은 함수 본문이 아니라 `@app.get`과 `curl` 명령입니다. 하나는 진입점을 만들고, 다른 하나는 독자가 직접 성공을 확인하게 합니다. 코드 설명은 소스만 해설하는 일이 아니라 검증 경로를 열어 주는 일입니다.
 
+## 코드 예제의 세 가지 계층
+
+코드 예제는 복잡도에 따라 세 계층으로 나눌 수 있습니다. 각 계층은 서로 다른 목적을 가집니다.
+
+### 계층 1: 스니펫 (Snippet)
+
+**특징**: 3-5줄, 한 가지 개념만 보여주기
+
+**예시**:
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+```
+
+**목적**: 구문 확인, 빠른 참조
+
+### 계층 2: MWE (Minimal Working Example)
+
+**특징**: 10-20줄, 실행 가능, 하나의 기능 완성
+
+**예시**:
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
+
+# 실행: uvicorn main:app --reload
+```
+
+**목적**: 첫 번째 성공 경험 제공
+
+### 계층 3: 실무 예제 (Production-like Example)
+
+**특징**: 50-100줄, 오류 처리, 검증, 로깅 포함
+
+**예시**:
+
+```python
+from fastapi import FastAPI, HTTPException
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI()
+
+@app.get("/users/{user_id}")
+async def get_user(user_id: int):
+    logger.info(f"Fetching user {user_id}")
+    
+    if user_id < 0:
+        logger.warning(f"Invalid user_id: {user_id}")
+        raise HTTPException(status_code=400, detail="Invalid ID")
+    
+    # 실제로는 DB에서 가져와야 함
+    return {"user_id": user_id, "name": "Jimin"}
+```
+
+**목적**: 실무에 적용할 수 있는 패턴 제공
+
+## 코드 예제 배치 전략
+
+글의 목적에 따라 코드 예제를 배치하는 위치가 달라집니다.
+
+### 전략 1: 개념 설명 후 코드 (튜토리얼)
+
+1. 개념 정의
+2. 비유
+3. **코드 예시**
+4. 코드 해설
+
+**적합한 경우**: 입문자가 개념을 처음 배울 때
+
+### 전략 2: 코드 먼저, 설명 나중 (Quick Start)
+
+1. **코드 예시**
+2. 실행 명령
+3. 결과 확인
+4. 동작 원리 설명
+
+**적합한 경우**: 경험 있는 개발자가 빠르게 시작하고 싶을 때
+
+### 전략 3: 문제-솔루션 패턴 (트러블슈팅)
+
+1. 문제 상황 모사
+2. **나쁜 코드 예시**
+3. 문제점 설명
+4. **좋은 코드 예시**
+5. 개선 사항 설명
+
+**적합한 경우**: 흔한 실수를 예방하거나 기존 코드를 개선할 때
+## 코드 예제 작성 원칙 5가지
+
+좋은 코드 예제는 독자가 복사해 붙여 넣고 바로 실행할 수 있어야 합니다. 아래는 실무에서 검증된 다섯 가지 원칙과 나쁜 예, 좋은 예입니다.
+
+### 원칙 1: 최소 실행 예제(MWE)로 시작하기
+
+**나쁜 예**: 200줄짜리 전체 프로젝트 코드를 한 번에 붙여 넣기
+
+**좋은 예**: 핵심 기능만 담은 8줄 코드
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
+```
+
+**이유**: 독자는 처음 보는 코드가 짧을수록 빠르게 이해하고, 빠르게 실행하고, 빠르게 성공을 확인할 수 있습니다.
+
+### 원칙 2: 실행 명령 바로 아래 붙이기
+
+**나쁜 예**: "이 코드를 실행하세요" (명령 없음)
+
+**좋은 예**:
+
+```bash
+uvicorn main:app --reload
+```
+
+**이유**: 독자가 다음에 무엇을 해야 할지 찾아다니지 않게 만듭니다.
+
+### 원칙 3: 예상 출력 명시하기
+
+**나쁜 예**: (출력 없음)
+
+**좋은 예**:
+
+```json
+{"message": "Hello World"}
+```
+
+**이유**: 독자가 자기 실행 결과가 정상인지 즉시 확인할 수 있습니다.
+
+### 원칙 4: 버전 고정하기
+
+**나쁜 예**: "FastAPI를 설치하세요"
+
+**좋은 예**:
+
+```bash
+pip install fastapi==0.115.0 uvicorn[standard]==0.32.0
+```
+
+**이유**: 시간이 지나도 독자가 같은 환경에서 같은 결과를 얻을 수 있습니다.
+
+### 원칙 5: 전체 코드 링크 제공하기
+
+**나쁜 예**: (링크 없음)
+
+**좋은 예**:
+
+"전체 코드는 [GitHub 저장소](https://github.com/example/fastapi-examples/blob/main/01-hello/main.py)에서 확인할 수 있습니다."
+
+**이유**: 독자가 예제를 확장하거나 디버깅할 때 전체 맥락을 참고할 수 있습니다.
+
+## 인라인 주석 vs 본문 설명 — 언제 쓸까
+
+코드 안 주석과 코드 밖 설명은 각각 다른 목적을 가지고 있습니다. 둘을 적절히 섞어야 코드 예제가 과하지도 부족하지도 않습니다.
+
+| 상황 | 인라인 주석 (코드 안) | 본문 설명 (코드 밖) | 예시 |
+| --- | --- | --- | --- |
+| 한 줄이 핵심일 때 | ✅ 사용 | ❌ 중복 | `result = a + b  # 두 수를 더합니다` |
+| 흐름 전체를 설명할 때 | ❌ 주석이 너무 길어짐 | ✅ 사용 | "이 함수는 요청을 받아 검증하고 DB에 저장합니다" |
+| 독자가 한 줄만 수정해야 할 때 | ✅ 사용 | ✅ 강조 병행 | `# TODO: 여기에 API 키를 입력하세요` |
+| 코드가 이미 자명할 때 | ❌ 불필요 | ❌ 불필요 | `x = 1  # x에 1을 할당` (나쁜 주석) |
+| 트레이드오프 설명할 때 | ❌ 코드 흐름 방해 | ✅ 사용 | "여기서 동기 호출 대신 async를 쓰면..." |
+
+**좋은 예 (인라인 주석과 본문 설명 조합):**
+
+```python
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    if user_id < 0:
+        raise HTTPException(status_code=400, detail="Invalid ID")  # 음수 ID 거부
+    return {"user_id": user_id, "name": "Jimin"}
+```
+
+**본문 설명:**
+
+"이 엔드포인트는 경로 파라미터로 `user_id`를 받아 검증합니다. 음수가 입력되면 HTTP 400 오류를 반환하고, 정상 값이 입력되면 사용자 정보를 JSON으로 돌려줍니다."
+
+## Progressive Disclosure: 간단한 예제에서 복잡한 예제로
+
+코드 예제를 한 번에 복잡하게 제시하면 독자는 첫 단계에서 포기합니다. 대신 간단한 예제부터 시작해 점진적으로 기능을 추가하는 방식이 훨씬 효과적입니다.
+
+### 단계 1: Hello World (최소 동작 확인)
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
+```
+
+**실행**: `uvicorn main:app --reload`
+
+**검증**: `curl http://127.0.0.1:8000/` → `{"message": "Hello World"}`
+
+### 단계 2: 경로 파라미터 추가
+
+```python
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    return {"user_id": user_id}
+```
+
+**검증**: `curl http://127.0.0.1:8000/users/42` → `{"user_id": 42}`
+
+### 단계 3: 검증 로직 추가
+
+```python
+from fastapi import HTTPException
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    if user_id < 0:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+    return {"user_id": user_id}
+```
+
+**검증**: `curl http://127.0.0.1:8000/users/-1` → HTTP 400 오류
+
+### 단계 4: 데이터베이스 연결 (다음 글 예고)
+
+"지금까지는 하드코딩된 값을 반환했습니다. 다음 글에서는 SQLite 데이터베이스에서 실제 사용자 정보를 조회하는 방법을 다룹니다."
+
+**효과**: 독자는 각 단계에서 성공을 확인하며 자신감을 쌓고, 다음 단계로 자연스럽게 넘어갈 수 있습니다.
 ## 실습: 예제 하나 설명해 보기
 
 ### 1단계 — 최소 코드
@@ -180,11 +425,11 @@ full_code_url = "https://github.com/example/repo/blob/main/m.py"
 ## 처음 질문으로 돌아가기
 
 - **코드를 붙여 넣었는데도 왜 독자는 길을 잃을까요?**
-  - 본문의 기준은 예제 코드 설명하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  어디가 핵심인지, 무엇을 실행해야 하는지, 어떤 출력이 정상인지 보이지 않으면 코드는 설명이 아니라 장애물이 됩니다.
 - **최소 예제와 설명 줄과 출력 결과는 어떤 순서로 배치해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  코드 → 실행 명령 → 예상 출력 → 설명 줄 순서로 배치하면 독자가 실행과 검증을 먼저 하고, 이해를 나중에 할 수 있습니다.
 - **코드 안 주석과 코드 밖 설명은 언제 나누는 편이 좋을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  한 줄 핵심은 인라인 주석으로, 흐름 전체와 트레이드오프는 본문 설명으로 나눕니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -42,7 +42,7 @@ This is post 7 in the Statistics 101 series. Here we will define the null and al
 
 This picture places Hypothesis Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Hypothesis Testing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Hypothesis testing answers: *Is this difference real or just noise?* It does not prove truth—it *measures evidence*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ This picture places Hypothesis Testing inside an operating flow. The point is no
 > *Asking the right question matters more than the answer.*
 
 ## Concept at a Glance
-
+A hypothesis test starts with a claim (the *null hypothesis*), then checks whether your data is *consistent* with that claim. If your data is *too unusual* under that assumption, you reject the claim.
 ## Key Terms
 
 - **H0 (Null Hypothesis)**: *no difference*.

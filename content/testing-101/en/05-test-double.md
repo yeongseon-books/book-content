@@ -44,7 +44,7 @@ This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Moc
 
 This picture places Test Double inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Test Double is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The right test double is the lightest one that still isolates the dependency without distorting the contract you want to prove.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ Tests must be *fast and deterministic*. Calling a real payment API is *slow and 
 > Used well: *fast trust*. Used poorly: *false trust*.
 
 ## Concept at a Glance
-
+Test doubles stand in for external dependencies (email services, payment APIs, clocks, databases, queues) and come in five flavors: Dummy (passed but unused), Stub (returns canned answers), Spy (records calls), Mock (verifies interactions), and Fake (lightweight real implementation).
 ## Key Terms (Meszaros' five)
 
 - **Dummy**: a placeholder object that is *only passed around*.

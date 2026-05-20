@@ -42,7 +42,7 @@ This is post 6 in the Observability 101 series.
 
 This picture places Dashboard Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dashboard Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Dashboard Design is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Most dashboards are *decoration*. If you do not know *where to look* during an i
 > *A dashboard is a *tool that answers*. If it does not answer, delete it.*
 
 ## Concept at a Glance
+
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 

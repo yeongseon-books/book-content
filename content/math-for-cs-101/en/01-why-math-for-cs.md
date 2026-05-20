@@ -44,7 +44,7 @@ Here we start with the big picture: math in CS is less about memorizing formulas
 
 This picture places Why Math for CS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Math for CS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Math is not a subject about memorizing formulas; it is about building a language for abstraction, proof, modeling, and analysis that spans code, systems, and engineering decisions.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ In software work, a successful run only verifies one moment, one environment, an
 
 Math helps you separate those concerns. Sets make boundaries explicit. Logic makes conditions and conclusions precise. Combinatorics shows when the search space is already exploding. Probability gives you a way to reason about uncertainty without hand-waving. Linear algebra, calculus, and information theory later become the language behind modern ML, optimization, and compression.
 
+
 ## Concept at a Glance
+
+Math in CS consists of five overlapping tools: **abstraction** (extracting patterns), **proof** (guaranteeing truth), **modeling** (turning reality into equations), **analysis** (measuring behavior), and **invariant** (properties that persist).
+
+## Before/After
+
+**Before**: If the *code runs*, you're done.
+
+**After**: Explain *why it runs* and *when it fails* with math.
 
 ## Key Terms
 

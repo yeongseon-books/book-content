@@ -44,7 +44,7 @@ This is post 4 in the Portfolio Project 101 series. Here we will treat the demo 
 
 This picture places Building the Demo inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building the Demo is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Code without demonstration doesn't convince anyone. A live proof that the project actually runs, and can be inspected by any visitor, creates trust.
 
 ## Why It Matters
 

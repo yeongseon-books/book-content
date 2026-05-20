@@ -44,7 +44,7 @@ Here, we will treat data versioning not as file backup, but as a reproducibility
 
 This picture places Data Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Data versioning is not a tool that forces large files into git. It is a pointer-plus-storage system that identifies the exact input state so the whole team can pull the same data in the same moment in time.
 
 ## Questions this article answers
 

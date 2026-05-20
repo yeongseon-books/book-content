@@ -42,7 +42,7 @@ This is post 8 in the Technical Writing 101 series. It turns tutorials into veri
 
 This picture places Writing Tutorials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing Tutorials is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A tutorial step is only strong when it leaves behind a checkpoint the reader can verify before moving on.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ A *first success* creates the will to keep *learning*.
 
 ## Concept at a Glance
 
+Tutorials differ from reference docs because they prioritize momentum and small wins over completeness. Each step should reveal visible proof of progress and include a recovery path for the most likely failure.
 ## Key Terms
 
 - **tutorial**: A *learning* oriented post.

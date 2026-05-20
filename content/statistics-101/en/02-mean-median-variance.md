@@ -42,7 +42,7 @@ This is post 2 in the Statistics 101 series. Here we will compare mean, median, 
 
 This picture places Mean, Median, and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Mean, Median, and Variance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The *right* summary statistic depends on the *shape* of your data — not just the *math*, but the *meaning*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ Data has *thousands of rows*, but humans decide with *one or two numbers*. *Whic
 > *One wrong mean writes one wrong decision.*
 
 ## Concept at a Glance
-
+A single number—the mean—can hide crucial facts. If you report only the average, you may misrepresent what a *typical* user experiences. Choosing between mean, median, and measures of spread is a *design decision*, not just a calculation.
 ## Key Terms
 
 - **Mean**: sum / count. *Sensitive to outliers*.

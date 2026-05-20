@@ -42,7 +42,7 @@ This is post 2 in the Observability 101 series.
 
 This picture places Metrics, Logs, and Traces inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Metrics, Logs, and Traces is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Metrics, Logs, and Traces is about the boundary decision, not the tool choice.
 
 ## What You Will Learn
 
@@ -59,6 +59,8 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 > *One right signal beats *ten wrong dashboards*.*
 
 ## Concept at a Glance
+
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 

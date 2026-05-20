@@ -42,7 +42,7 @@ This is post 6 in the Technical Writing 101 series. It covers when to use figure
 
 This picture places Using Figures and Tables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Using Figures and Tables is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A figure answers one question; a table makes side-by-side comparison possible; captions tie them both to the text.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ One *figure* often replaces *five* paragraphs.
 
 ## Concept at a Glance
 
+Figures work best for flow and relationships; tables work best for trade-offs and decisions. Choosing the right visual form based on the reader's actual question is what separates editorial clarity from decorative noise.
 ## Key Terms
 
 - **flowchart**: A *flow diagram*.

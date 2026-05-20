@@ -40,9 +40,9 @@ This is post 6 in the SQL 101 series. Here we focus on breaking layered question
 
 *sql 101 chapter 6 flow overview*
 
-This picture places Subquery inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+Subqueries and CTEs (WITH clauses) let you break complex logic into named, reusable steps. A CTE is like giving a temporary name to a subquery result so you can reference it multiple times.
 
-> The core of Subquery is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Subqueries and CTEs don't add new capabilities; they add clarity. They let you name each step, test each piece separately, and build the final query without nesting everything into one unreadable line.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Analytical queries are usually layered. You compute a cohort start date, attach 
 Readable layers are operationally valuable. Once each step has a name, you can test intermediate results, reason about row counts, and explain the logic during review instead of staring at one oversized FROM clause.
 
 ## Subquery layering flow
+
+A subquery is a query inside a query, often in the FROM or WHERE clause. A CTE is the same idea but uses WITH to name it first, then the main query uses that name. CTEs are usually more readable.
 
 ## Key Terms
 

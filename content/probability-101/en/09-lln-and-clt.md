@@ -42,7 +42,7 @@ This is post 9 in the Probability 101 series. Here we build intuition for the LL
 
 This picture places Law of Large Numbers and CLT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Law of Large Numbers and CLT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Law of Large Numbers and CLT requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

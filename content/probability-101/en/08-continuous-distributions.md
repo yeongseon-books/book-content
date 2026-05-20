@@ -42,7 +42,7 @@ This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Expon
 
 This picture places Continuous Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Continuous Distributions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Continuous Distributions requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

@@ -44,7 +44,7 @@ Here, we will treat MLOps not as a list of tool names, but as the operational lo
 
 This picture places What Is MLOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is MLOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> MLOps is not the tool collection that runs when a model file lands on a server. It is the operational system linking data → training → registration → deployment → monitoring → retraining in one loop.
 
 ## Questions this article answers
 

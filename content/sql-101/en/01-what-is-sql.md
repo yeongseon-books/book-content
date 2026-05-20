@@ -40,9 +40,9 @@ This is the first post in the SQL 101 series. It establishes the declarative men
 
 *sql 101 chapter 1 flow overview*
 
-This picture places What Is SQL? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+SQL's strength is that you describe the rows and columns you need, and the database engine figures out the fastest way to get them.
 
-> The core of What Is SQL? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> SQL's power isn't in memorizing syntax, but in understanding how the relational model and declarative execution model work together to keep data reliable and queries portable across systems.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Analysts, backend engineers, and data engineers all meet the same database from 
 SQL also ages unusually well. PostgreSQL, MySQL, SQLite, BigQuery, and Snowflake differ in details, but the core patterns stay familiar. Once you learn the language properly, you carry that skill across products instead of relearning everything from scratch.
 
 ## Query flow at a glance
+
+The database engine receives a SQL statement, parses it into an execution plan, and returns the result set. The key insight: you don't tell the engine which index to scan or in what order. You say what you want, and the engine chooses how.
 
 ## Key Terms
 

@@ -44,7 +44,7 @@ This is post 3 in the Testing 101 series. Here we show what integration tests ve
 
 This picture places Integration Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Integration Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Integration tests verify that the contract between modules stays intact as they evolve.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Most bugs live at *the seams* — DB schema, API contracts, authorization checks
 > Unit tests look at *parts*; integration tests look at *the assembly*.
 
 ## Concept at a Glance
-
+Integration tests exercise two or more modules working together: typically a handler calling a service calling a repository, or a service calling an external API, running against a real or temporary database to catch schema mismatches and state transitions that unit tests cannot see.
 ## Key Terms
 
 - **Integration test**: a test that exercises *two or more components* *together*.

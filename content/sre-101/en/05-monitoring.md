@@ -42,7 +42,7 @@ This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriente
 
 This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 
 ## Why this topic matters
 

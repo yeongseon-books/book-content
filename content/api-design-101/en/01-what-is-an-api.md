@@ -41,9 +41,9 @@ Here, we frame an API as a long-lived external contract rather than a bag of fun
 
 *api design 101 chapter 1 flow overview*
 
-This picture places What Is an API? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows the path from client request through the server boundary to response: the API contract sits exactly at that boundary, defining what the server promises and what clients must rely on.
 
-> The core of What Is an API? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> An API is not code you call — it is a contract you commit to maintaining.
 
 ## Why It Matters
 

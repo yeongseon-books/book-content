@@ -44,7 +44,7 @@ This is post 8 in the Testing 101 series. Here we walk through the bug → repro
 
 This picture places Regression Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Regression Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Every bug-fix PR should include a test that fails before the fix and passes after.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Software has *no memory*. A bug fixed once can be *reintroduced by the next cont
 > A team without regression tests fixes *the same bug forever*.
 
 ## Concept at a Glance
-
+A regression test is a test case extracted from a real bug report: it fails on the broken code, passes after the fix, and lives in the suite to ensure the same bug never silently returns during future refactors or merges.
 ## Key Terms
 
 - **Regression**: a *previously fixed behavior* that *breaks again*.

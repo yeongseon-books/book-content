@@ -44,7 +44,7 @@ Here we connect limits, derivatives, gradients, the chain rule, and gradient des
 
 This picture places Calculus inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Calculus is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Calculus is the mathematics of continuous change; it underpins optimization, machine learning, and any system where rates of change matter.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ Machine learning training, numerical optimization, physical simulation, and many
 
 That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.
 
+
 ## Concept at a Glance
+
+Calculus deals with *continuous change*: derivatives measure *rates of change*; integrals measure *accumulated quantity*; optimization finds *extrema*.
+
+## Before/After
+
+**Before**: Approximate change with finite differences.
+
+**After**: Model change precisely with derivatives and predict long-term behavior.
 
 ## Key Terms
 

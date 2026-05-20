@@ -42,7 +42,7 @@ This is the final post in the Probability 101 series. Here we connect probabilit
 
 This picture places Probability in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Probability in Machine Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Probability in Machine Learning requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

@@ -40,9 +40,9 @@ last_reviewed: '2026-05-12'
 
 *Testing 101 7장 흐름 개요*
 
-이 그림에서는 테스트 커버리지를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림에서는 라인 커버리지, 브랜치 커버리지, 경로 커버리지의 차이와 각각의 한계를 보여줍니다. 높은 커버리지 수치가 반드시 높은 품질을 보장하지는 않습니다.
 
-> 테스트 커버리지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 커버리지는 지표일 뿐 목표가 아닙니다. 100% 커버리지도 모든 버그를 잡지는 못합니다.
 
 ## 왜 중요한가
 
@@ -61,6 +61,21 @@ last_reviewed: '2026-05-12'
 - **함수 커버리지**: 함수가 한 번이라도 호출됐는지 보는 지표입니다.
 - **미검증 코드(uncovered code)**: 테스트 실행 중 한 번도 지나가지 않은 코드입니다.
 - **커버리지 게이트**: 최소 기준 아래로 떨어지면 CI를 실패시키는 설정입니다.
+
+## 커버리지 종류
+
+pytest-cov가 측정할 수 있는 커버리지 종류는 여러 가지입니다. 각각이 보여 주는 관점이 다릅니다.
+
+| 종류 | 설명 | 예시 |
+|---|---|---|
+| **라인 커버리지** | 전체 코드 줄 중 실행된 줄의 비율 | `result = a + b` 줄이 실행되면 카운트 |
+| **브랜치 커버리지** | `if/else` 분기의 양쪽 경로가 모두 실행된 비율 | `if x > 0:` 의 True와 False 두 경로 |
+| **조건 커버리지** | 복합 조건 내 각 하위 조건이 모두 평가된 비율 | `if a > 0 and b < 10:` 에서 a와 b의 True/False 조합 |
+| **경로 커버리지** | 모든 가능한 실행 경로를 지나간 비율 | 여러 분기점 조합 |
+
+라인 커버리지는 가장 기본이지만, `if/else`에서 한쪽만 지나가도 수치가 높게 나올 수 있습니다. 그래서 **브랜치 커버리지**를 함께 보는 편이 더 정직합니다.
+
+경로 커버리지는 이론상 가장 꼼꼼하지만, 분기가 많아지면 경로 수가 폭발적으로 늘어나서 현실적으로 모두 커버하기 어렵습니다. 대부분의 팀은 라인과 브랜치 커버리지 두 가지를 함께 봅니다.
 
 ## 바꾸기 전과 후
 
@@ -131,6 +146,44 @@ pytest --cov=src
 # Coverage failure: total of 78 is less than fail_under=80
 ```
 
+### pytest-cov 터미널 출력 예시
+
+실제 `pytest --cov` 명령을 실행하면 다음과 같은 텍스트 형식의 보고서가 나옵니다.
+
+```text
+========================= test session starts ==========================
+platform linux -- Python 3.11.5, pytest-7.4.3, pluggy-1.3.0
+rootdir: /home/user/project
+plugins: cov-4.1.0
+collected 42 items
+
+tests/test_auth.py .......                                        [ 16%]
+tests/test_payment.py ............                                [ 45%]
+tests/test_order.py .......................                       [100%]
+
+---------- coverage: platform linux, python 3.11.5 -----------
+Name                    Stmts   Miss  Cover   Missing
+-------------------------------------------------------
+src/__init__.py             0      0   100%
+src/auth.py                45      8    82%   34, 41-49
+src/order.py               92     12    87%   105, 118-128
+src/payment.py             38      2    95%   67-68
+src/utils.py               25      5    80%   15, 22-25
+-------------------------------------------------------
+TOTAL                     200     27    86%
+
+========================= 42 passed in 2.34s ===========================
+```
+
+이 보고서에서 볼 점은 다음과 같습니다.
+
+- **Stmts**: 전체 실행 가능한 줄 수
+- **Miss**: 테스트가 닿지 않은 줄 수
+- **Cover**: 커버리지 비율 `(Stmts - Miss) / Stmts * 100`
+- **Missing**: 테스트가 빠진 구체적인 줄 번호
+
+`--cov-report=term-missing` 옵션을 추가하면 Missing 열이 표시되고, 어느 파일의 어느 줄이 비었는지 바로 볼 수 있습니다. 이 정보로 다음 테스트를 어디에 추가할지 판단합니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 라인 커버리지는 실행 여부만 보여 줍니다. 값이 맞는지는 단언문이 따로 보장해야 합니다.
@@ -139,6 +192,58 @@ pytest --cov=src
 
 그래서 숫자 하나보다 보고서의 빈칸이 더 중요합니다. 어떤 분기가 빠졌는지, 예외 경로가 비어 있는지, 핵심 도메인 코드가 낮은지부터 봐야 합니다.
 
+## 커버리지 100%의 함정
+
+커버리지 100%는 모든 코드가 실행됐다는 의미이지, 모든 코드가 **올바르게 검증됐다**는 의미가 아닙니다. 코드가 실행되었지만 단언문이 없으면 버그는 그대로 남습니다.
+
+**100% 커버리지인데 버그가 있는 코드**
+
+```python
+def calculate_discount(price: float, user_tier: str) -> float:
+    """Calculate discount based on user tier."""
+    discount = 0.0
+    if user_tier == "gold":
+        discount = price * 0.2
+    elif user_tier == "silver":
+        discount = price * 0.1
+    return price - discount
+
+
+def test_calculate_discount():
+    result = calculate_discount(100, "gold")
+    # 실행만 하고 검증하지 않음
+    
+    result2 = calculate_discount(100, "silver")
+    # 역시 검증 없음
+```
+
+이 테스트는 모든 분기를 지나가므로 커버리지는 100%입니다. 하지만 단언문이 없으므로 다음 버그를 잡지 못합니다.
+
+```python
+# 버그: 할인을 빼면 음수가 될 수 있음
+result = calculate_discount(10, "gold")  # 10 - 2 = 8 (OK)
+result = calculate_discount(5, "gold")   # 5 - 1 = 4 (OK)
+# 그런데 비즈니스 로직상 할인은 최대 50%여야 하는데, 테스트가 이를 확인하지 않음
+```
+
+**수정한 테스트**
+
+```python
+def test_calculate_discount_with_assertions():
+    # gold tier: 20% discount
+    assert calculate_discount(100, "gold") == 80
+    
+    # silver tier: 10% discount
+    assert calculate_discount(100, "silver") == 90
+    
+    # unknown tier: no discount
+    assert calculate_discount(100, "bronze") == 100
+    
+    # edge case: zero price
+    assert calculate_discount(0, "gold") == 0
+```
+
+이제 테스트가 결과를 실제로 확인합니다. 커버리지 수치는 같지만 의미는 완전히 달라졌습니다. 커버리지는 테스트 **범위**를 보여 주지만, 테스트 **품질**까지 보장하지는 못합니다.
 ## 어디서 자주 헷갈릴까요?
 
 가장 흔한 실수는 100퍼센트를 KPI처럼 다루는 일입니다. 그러면 의미 없는 호출 테스트나 단언문 없는 테스트가 늘어납니다.
@@ -146,6 +251,73 @@ pytest --cov=src
 둘째, 라인 커버리지만 보고 안심하는 경우입니다. `if/else`에서 한쪽만 지나가도 라인 수치가 높게 나올 수 있으므로 브랜치 커버리지를 함께 봐야 합니다.
 
 셋째, 새 코드와 레거시 코드를 같은 기준으로 묶는 경우입니다. 오래된 코드베이스에서는 전체 평균보다 변경 라인 기준이나 신규 코드 기준을 따로 두는 편이 현실적일 때가 많습니다.
+
+## 위험 기반 커버리지 — 어디에 투자할까
+
+만약 커버리지 80%를 목표로 한다면, 그 80%를 어떻게 채울지가 중요합니다. 모든 코드를 균등하게 볼 필요는 없습니다.
+
+**위험도별 커버리지 우선순위**
+
+| 영역 | 위험도 | 목표 커버리지 | 이유 |
+|---|---|---|---|
+| 핵심 도메인 로직 | High | 90%+ | 비즈니스 규칙, 금액 계산, 상태 전이 |
+| 외부 통합 | Medium | 70~80% | API 호출, 결제, 네트워크 실패 처리 |
+| 유틸리티 함수 | Low | 50~60% | 로깅, 포매팅, 단순 변환 |
+| UI/화면 계층 | Very Low | 30~50% | 표시 로직, 레이아웃 분기 |
+
+**예시: 핵심 로직 집중 테스트**
+
+```python
+# src/order.py — 핵심 도메인
+def calculate_order_total(items: list[Item], user: User) -> Money:
+    """Calculate order total with discounts and tax."""
+    subtotal = sum(item.price * item.quantity for item in items)
+    discount = apply_user_discount(subtotal, user.tier)
+    tax = calculate_tax(subtotal - discount, user.region)
+    return Money(subtotal - discount + tax)
+
+
+# tests/test_order.py — 90%+ 커버리지 목표
+def test_calculate_order_total_all_paths():
+    # normal case
+    items = [Item(price=100, quantity=2)]
+    user = User(tier="gold", region="KR")
+    total = calculate_order_total(items, user)
+    assert total.amount == 186  # 200 - 20 (discount) + 6 (tax)
+    
+    # no discount
+    user_basic = User(tier="basic", region="KR")
+    total_basic = calculate_order_total(items, user_basic)
+    assert total_basic.amount == 206
+    
+    # zero items
+    assert calculate_order_total([], user).amount == 0
+    
+    # different region
+    user_us = User(tier="gold", region="US")
+    total_us = calculate_order_total(items, user_us)
+    assert total_us.amount == 188  # different tax rate
+```
+
+```python
+# src/utils/formatting.py — 유틸리티
+def format_currency(amount: float, currency: str = "USD") -> str:
+    """Format amount as currency string."""
+    if currency == "USD":
+        return f"${amount:.2f}"
+    elif currency == "KRW":
+        return f"₩{int(amount):,}"
+    return f"{amount:.2f} {currency}"
+
+
+# tests/test_formatting.py — 50% 커버리지로 충분
+def test_format_currency_common_cases():
+    assert format_currency(100.5, "USD") == "$100.50"
+    assert format_currency(10000, "KRW") == "₩10,000"
+    # 소수 통화는 테스트하지 않아도 됨 (실무에서 거의 안 쓰임)
+```
+
+위험 기반 접근을 쓰면 제한된 시간을 가장 중요한 곳에 집중할 수 있습니다. 평균 80% 커버리지라도, 핵심 로직은 90%+, 유틸리티는 50%로 분산하는 것이 순수 전체 평균보다 훬씬 효과적입니다.
 
 ## 직접 검증해 볼 것
 
@@ -187,11 +359,11 @@ pytest --cov=src
 ## 처음 질문으로 돌아가기
 
 - **라인, 브랜치, 함수 커버리지는 무엇이 다를까요?**
-  - 본문의 기준은 테스트 커버리지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 커버리지 도구는 테스트가 코드의 어느 부분을 실행했는지 측정하는 수단입니다.
 - **`pytest-cov`로 커버리지를 어떻게 측정할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 같은 커버리지 수치라도 라인 커버리지, 브랜치 커버리지, 경로 커버리지는 다른 결과를 줄 수 있습니다.
 - **테스트가 닿지 않은 코드는 어떻게 찾을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 무리해서 100% 커버리지를 쫓기보다는 위험한 로직부터 촘촘히 검증하는 것이 비용 효율이 좋습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

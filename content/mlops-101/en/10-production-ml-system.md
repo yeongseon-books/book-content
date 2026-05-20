@@ -44,7 +44,7 @@ Here, we will connect the previous nine pieces into one closed operational loop 
 
 This picture places Building a Production ML System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Production ML System is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Production ML is not one tool or one team. It is a system where data integrity, model quality, deployment safety, and operational alertness all work together so a model can stay alive and useful in production.
 
 ## Questions this article answers
 

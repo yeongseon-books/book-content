@@ -40,9 +40,9 @@ This is post 7 in the SQL 101 series. Here we focus on the row-preserving calcul
 
 *sql 101 chapter 7 flow overview*
 
-This picture places Window Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+Window functions calculate a value for each row using other rows in a defined window, without collapsing multiple rows into one like GROUP BY does.
 
-> The core of Window Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Window functions let you compute context (rank, running total, comparison) for each row while keeping all the original rows. It's analytical power without aggregation.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Rankings, differences, cumulative sums, and month-over-month comparisons are all
 This is one of the places where SQL becomes more than a retrieval language. Once windows become natural, cohort analysis, retention, funnels, and trend reporting stop feeling like special tricks and start looking like combinations of familiar building blocks.
 
 ## Window calculation flow
+
+A window function has three parts: the function (ROW_NUMBER, SUM, LAG, etc.), the PARTITION BY (optional grouping), and ORDER BY (the sequence within each partition). PARTITION BY divides the data; ORDER BY sets the order within each partition.
 
 ## Key Terms
 

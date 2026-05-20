@@ -40,9 +40,9 @@ This is post 8 in the SQL 101 series. Here we focus on how to change rows safely
 
 *sql 101 chapter 8 flow overview*
 
-This picture places INSERT, UPDATE, DELETE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+INSERT adds rows, UPDATE modifies them, DELETE removes them. Each must respect constraints, and errors can silently corrupt data if you're not careful with your WHERE conditions.
 
-> The core of INSERT, UPDATE, DELETE is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Data-changing operations demand more care than reads. A single WHERE typo in DELETE can erase months of data. Always test your filter conditions on a SELECT first.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Production data is harder to repair than to damage. A missing WHERE clause or a 
 Transactions and RETURNING help turn risky changes into auditable ones. They let you see what changed before you commit, and they make rollback part of the default workflow instead of an afterthought.
 
 ## Safe data-change flow
+
+Before you INSERT, check PRIMARY KEY and NOT NULL constraints. Before you UPDATE or DELETE, always write a SELECT with the same WHERE condition first, and verify you're changing the right rows. Use transactions so you can ROLLBACK if something goes wrong.
 
 ## Key Terms
 

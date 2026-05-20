@@ -42,7 +42,7 @@ My goal here is to organize selection tools as a small decision framework: label
 
 This picture places Filtering and Selection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Filtering and Selection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Filtering is repeating at every stage of analysis. Slow or ambiguous selection code breaks everything downstream — treat this as a core skill, not syntax.
 
 ## Why It Matters
 

@@ -40,9 +40,9 @@ This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shap
 
 *sql 101 chapter 2 flow overview*
 
-This picture places SELECT Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+SELECT shapes the result set by choosing which columns to pull, renaming them for clarity, and optionally sorting or limiting the output.
 
-> The core of SELECT Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> SELECT is your first tool for designing result sets. Explicit column lists, meaningful aliases, and clear sorting make the difference between a query that gets answered fast and one that creates confusion downstream.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Analysts write SELECT statements dozens of times a day, and application code beh
 Explicit column lists help more than the current query. They show future readers what information was actually needed, and they make it obvious when a query starts dragging along unused JSON blobs, large text columns, or unstable positional ordering.
 
 ## SELECT evaluation flow
+
+The logical flow is FROM (source) → WHERE (filter) → SELECT (shape) → ORDER BY (sort) → LIMIT (bound). Though you write them in a different order, understanding this sequence helps explain why aliases work in some clauses and not others.
 
 ## Key Terms
 

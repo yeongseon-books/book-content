@@ -42,7 +42,7 @@ This is post 2 in the Technical Writing 101 series. Here we turn the reader into
 
 This picture places Defining the Reader inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Defining the Reader is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> When the reader is blurry, everything else—depth, vocabulary, scope—drifts with it.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ A blurry *reader* leads to blurry *sentences*.
 
 ## Concept at a Glance
 
+A persona is not a demographic profile; it is a decision boundary. It answers how much background to include, which terms need explanation, how hard examples can be, and what the post should deliberately skip.
 ## Key Terms
 
 - **persona**: A *model of the reader*.

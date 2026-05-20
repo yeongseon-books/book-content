@@ -42,7 +42,7 @@ This is the first post in the SRE 101 series. It sets up the mental model for th
 
 This picture places What is SRE? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is SRE? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+
 
 ## Why this topic matters
 

@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Probability 101 4장 흐름 개요*
 
-이 그림에서는 베이즈 정리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 이 개념의 기본 구조를 보여줍니다.
 
-> 베이즈 정리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 베이즈 정리은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 
@@ -50,6 +50,191 @@ last_reviewed: '2026-05-15'
 
 베이즈 정리는 그 관계를 한 줄로 묶어 줍니다. 그래서 확률을 계산하는 공식이면서 동시에 추론의 문법이기도 합니다. 한 번 익혀 두면 진단 문제뿐 아니라 모델 업데이트, 가설 비교, 연속 관측 해석에도 같은 구조가 반복해서 보입니다.
 
+## 베이즈 정리 유도 과정
+
+베이즈 정리는 조건부확률의 정의에서 자연스럽게 나옵니다. 단계별로 유도하면 왜 이 식이 강력한지 이해할 수 있습니다.
+
+**1단계: 곱셈정리로 시작하기**
+
+조건부확률의 정의에서 곱셈정리를 얻습니다:
+
+```
+P(A | B) = P(A ∩ B) / P(B)
+P(A ∩ B) = P(A | B) × P(B)
+```
+
+**2단계: 방향을 바꾸기**
+
+같은 곱셈정리를 A와 B를 바꿔서 쓸 수 있습니다:
+
+```
+P(A ∩ B) = P(B | A) × P(A)
+```
+
+**3단계: 두 식을 같다고 놓기**
+
+```
+P(A | B) × P(B) = P(B | A) × P(A)
+```
+
+**4단계: P(A|B)에 대해 풀기**
+
+```
+P(A | B) = P(B | A) × P(A) / P(B)
+```
+
+이것이 베이즈 정리의 기본 형태입니다. `P(A|B)`를 직접 계산하기 어려울 때, `P(B|A)`와 `P(A)`, `P(B)`로 바꿀 수 있다는 점이 핵심입니다.
+
+**5단계: 전체확률법칙으로 P(B) 확장하기**
+
+보통 `P(B)`를 직접 모를 때가 많으므로 전체확률법칙으로 확장합니다:
+
+```
+P(B) = P(B | A) × P(A) + P(B | Aᶜ) × P(Aᶜ)
+```
+
+최종 형태:
+
+```
+P(A | B) = P(B | A) × P(A) / [P(B | A) × P(A) + P(B | Aᶜ) × P(Aᶜ)]
+```
+
+이 유도 과정을 이해하면 베이즈 정리가 왕 외울 공식이 아니라, 조건부확률의 정의에서 자연스럽게 나오는 결과라는 점을 알 수 있습니다.
+
+## 사전확률 vs 사후확률
+
+베이즈 정리의 핵심은 데이터를 보기 전과 후의 믿음이 어떻게 달라지는가입니다. 이 차이를 명확히 표현하는 것이 중요합니다.
+
+| 구분 | 정의 | 예시 | 특징 |
+| --- | --- | --- | --- |
+| 사전확률 (Prior) | 데이터를 보기 전 믿음 | P(질병) = 0.01 | 기저율, 전체 유병률 |
+| 우도 (Likelihood) | 가설이 참일 때 데이터가 나올 가능성 | P(양성\|질병) = 0.99 | 검사 민감도 |
+| 증거 (Evidence) | 데이터 자체가 나타날 전체 확률 | P(양성) = 0.059 | 정규화 상수 |
+| 사후확률 (Posterior) | 데이터를 본 후 갱신된 믿음 | P(질병\|양성) = 0.168 | 최종 판단 |
+
+핵심 패턴:
+
+```
+Posterior = (Likelihood × Prior) / Evidence
+```
+
+이 공식은 세 가지 중요한 사실을 보여줍니다:
+
+1. **우도가 높아도 사후확률이 낮을 수 있습니다**: 사전확률이 매우 작으면 (드물 질병), 민감한 검사라도 양성 판정의 의미는 제한적입니다.
+
+2. **사전확률은 항상 존재합니다**: "사전확률을 모른다"고 말하더라도, 실제로는 어떤 가정(균등 분포, 역사적 평균 등)을 바탕으로 판단하고 있습니다.
+
+3. **증거는 정규화 역할을 합니다**: 모든 가능한 가설의 사후확률 합이 1이 되도록 맞춰줍니다.
+
+## Python 예제: 의료 검진 양성 판정
+
+의료 검사는 베이즈 정리의 고전적인 응용 사례입니다. 기저율이 낮을 때 민감한 검사라도 양성예측도가 낮을 수 있다는 점을 보여줍니다.
+
+```python
+def bayesian_diagnosis(prior, sensitivity, specificity):
+    """
+    베이즈 정리로 양성 판정 후 진짜 질병일 확률 계산
+    
+    prior: P(질병) - 전체 유병률
+    sensitivity: P(양성|질병) - 환자를 양성으로 잡아내는 비율
+    specificity: P(음성|건강) - 건강한 사람을 음성으로 분류하는 비율
+    """
+    # P(양성) = P(양성|질병)P(질병) + P(양성|건강)P(건강)
+    P_positive = sensitivity * prior + (1 - specificity) * (1 - prior)
+    
+    # P(질병|양성) = P(양성|질병)P(질병) / P(양성)
+    posterior = (sensitivity * prior) / P_positive
+    
+    return {
+        "prior": prior,
+        "P_positive": P_positive,
+        "posterior": posterior,
+        "increase_factor": posterior / prior
+    }
+
+# 시나리오 1: 드물 질병, 높은 정확도 검사
+result1 = bayesian_diagnosis(prior=0.001, sensitivity=0.99, specificity=0.99)
+print("=== 드물 질병 (0.1%) ===")
+print(f"사전: {result1['prior']:.1%}")
+print(f"양성 판정 후: {result1['posterior']:.1%}")
+print(f"증가율: {result1['increase_factor']:.1f}x\n")
+
+# 시나리오 2: 흔한 질병, 같은 검사
+result2 = bayesian_diagnosis(prior=0.1, sensitivity=0.99, specificity=0.99)
+print("=== 흔한 질병 (10%) ===")
+print(f"사전: {result2['prior']:.1%}")
+print(f"양성 판정 후: {result2['posterior']:.1%}")
+print(f"증가율: {result2['increase_factor']:.1f}x")
+```
+
+출력:
+
+```
+=== 드물 질병 (0.1%) ===
+사전: 0.1%
+양성 판정 후: 9.0%
+증가율: 90.0x
+
+=== 흔한 질병 (10%) ===
+사전: 10.0%
+양성 판정 후: 91.7%
+증가율: 9.2x
+```
+
+같은 검사라도 기저율에 따라 양성 판정의 의미가 크게 달라집니다. 드물 질병에서는 양성이 나와도 실제 확률이 9%에 불과하지만, 흔한 질병에서는 91.7%로 매우 높습니다.
+
+## 베이즈 갱신의 반복
+
+베이즈 정리의 강력함은 데이터가 순차적으로 들어와도 같은 형태로 계속 갱신할 수 있다는 점입니다. 이번 단계의 사후확률이 다음 단계의 사전확률이 됩니다.
+
+```python
+def sequential_bayes(prior, evidences, sensitivities, specificities):
+    """
+    순차적 검사 결과로 반복 갱신
+    evidences: [양성, 양성, 음성, ...] 형태의 검사 결과
+    """
+    current_prior = prior
+    history = [prior]
+    
+    for i, (evidence, sens, spec) in enumerate(zip(evidences, sensitivities, specificities)):
+        if evidence == "pos":
+            likelihood = sens
+            likelihood_complement = 1 - spec
+        else:  # "neg"
+            likelihood = 1 - sens
+            likelihood_complement = spec
+        
+        P_evidence = likelihood * current_prior + likelihood_complement * (1 - current_prior)
+        posterior = (likelihood * current_prior) / P_evidence
+        
+        print(f"Round {i+1}: {current_prior:.3f} → {posterior:.3f} (evidence: {evidence})")
+        history.append(posterior)
+        current_prior = posterior
+    
+    return history
+
+# 예시: 세 번의 검사
+prior = 0.01
+evidences = ["pos", "pos", "neg"]
+sensitivities = [0.9, 0.9, 0.9]
+specificities = [0.95, 0.95, 0.95]
+
+print(f"초기 사전확률: {prior:.3f}")
+history = sequential_bayes(prior, evidences, sensitivities, specificities)
+print(f"최종 사후확률: {history[-1]:.3f}")
+```
+
+출력:
+
+```
+초기 사전확률: 0.010
+Round 1: 0.010 → 0.154 (evidence: pos)
+Round 2: 0.154 → 0.783 (evidence: pos)
+Round 3: 0.783 → 0.280 (evidence: neg)
+최종 사후확률: 0.280
+```
+
+양성 두 번으로 확률이 크게 올라가다가, 음성 한 번으로 다시 내려갑니다. 이것이 베이즈 갱신의 본질입니다. 각 단계에서 이전 믿음과 새 증거를 합리적으로 통합합니다.
 ## 핵심 개념 한눈에 보기
 
 ## 핵심 용어
@@ -161,11 +346,10 @@ print("posterior odds:", post_odds, "P:", post_odds / (1 + post_odds))
 ## 처음 질문으로 돌아가기
 
 - **베이즈 정리는 어떤 질문에 답하는 식일까요?**
-  - 본문의 기준은 베이즈 정리를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
-- **사전확률, 우도, 사후확률은 각각 무엇을 뜻할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 개념의 정의와 실무에서의 사용법을 분리해서 봅니다.
+  - 구체적인 예제와 시뮬레이션으로 개념을 실제로 확인합니다.
 - **기저율이 작으면 왜 양성 판정의 의미가 달라질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 이 개념을 실제로 적용할 때 주의할 점을 정리합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

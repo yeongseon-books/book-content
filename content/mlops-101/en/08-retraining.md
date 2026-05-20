@@ -44,7 +44,7 @@ Here, we will treat retraining as an operating loop that starts from an explicit
 
 This picture places Retraining inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Retraining is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Retraining is not automatic just because you built the trigger. It is a policy question: which signals justify training, how good must the new model be to promote, and what happens if everything fails?
 
 ## Questions this article answers
 

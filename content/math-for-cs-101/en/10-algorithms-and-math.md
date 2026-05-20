@@ -44,7 +44,7 @@ Here we use algorithm design as the place where all of those mathematical tools 
 
 This picture places Algorithms and Math inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Algorithms and Math is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Algorithm performance and correctness are guaranteed only through complexity analysis and proof; math is the tool that makes verification rigorous.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ If you treat algorithms as code only, you often stop at whether they run. In rea
 
 That is why mathematical framing matters so much. It is not decoration around implementation. It is often the thing that tells you whether an implementation direction is sensible in the first place.
 
+
 ## Concept at a Glance
+
+Algorithm analysis combines *complexity* (how cost scales), *proof* (why an algorithm works), and *trade-offs* (time vs. space, correctness vs. performance).
+
+## Before/After
+
+**Before**: "Run a benchmark and see which is faster."
+
+**After**: "Analyze the complexity and predict behavior across all input sizes.
 
 ## Key Terms
 

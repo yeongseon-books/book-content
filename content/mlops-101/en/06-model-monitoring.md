@@ -44,7 +44,7 @@ Here, we will treat monitoring as the observation layer where system metrics, mo
 
 This picture places Model Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Model Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Model monitoring is not watching a dashboard. It is catching production anomalies fast enough to prevent silent performance loss from compounding into a large incident.
 
 ## Questions this article answers
 

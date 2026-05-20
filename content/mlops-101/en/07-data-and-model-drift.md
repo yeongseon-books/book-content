@@ -44,7 +44,7 @@ Here, we will separate data drift from model drift and connect statistical signa
 
 This picture places Data Drift and Model Drift inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Drift and Model Drift is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Drift detection is not a single metric threshold. It is an early warning system that catches data and model changes before they cascade into visible business failure.
 
 ## Questions this article answers
 

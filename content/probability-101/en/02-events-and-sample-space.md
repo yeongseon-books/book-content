@@ -42,7 +42,7 @@ This is post 2 in the Probability 101 series. Here we define sample spaces and e
 
 This picture places Events and Sample Space inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Events and Sample Space is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Events and Sample Space requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

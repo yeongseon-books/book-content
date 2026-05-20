@@ -41,9 +41,9 @@ Here, we treat documentation as the full adoption path rather than as a referenc
 
 *api design 101 chapter 10 flow overview*
 
-This picture places Writing Good API Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows documentation as the living contract: it specifies endpoint paths, required parameters, response schemas, and example calls; when it is auto-generated from OpenAPI, code and docs stay synchronized.
 
-> The core of Writing Good API Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Documentation is not optional — it is the primary way clients discover what they can do with your API, so it must be accurate, complete, and up-to-date by construction.
 
 ## Why It Matters
 

@@ -41,9 +41,9 @@ Here, we treat schemas as boundary contracts that must be enforced, not as optio
 
 *api design 101 chapter 5 flow overview*
 
-This picture places Request and Response Schemas inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows the shape of the contract: what fields are required in the request, what optional fields the API accepts, and what the response always contains; schemas make that contract machine-verifiable.
 
-> The core of Request and Response Schemas is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A schema is not documentation — it is a testable promise that every request and response will match the shape the client and server agreed upon.
 
 ## Why It Matters
 

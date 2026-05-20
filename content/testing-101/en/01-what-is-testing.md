@@ -44,7 +44,7 @@ This is the first post in the Testing 101 series. Here we define what a test is,
 
 This picture places What Is Testing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Testing? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Without tests, every change carries hidden risk — testing is how a team avoids repeating the same failure.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Without tests, *every change is a gamble*. You fix signup and *payments* break; 
 > Tests turn *slow hands* into *fast code*.
 
 ## Concept at a Glance
-
+Testing is a decision-making process: choosing what to verify, when to verify it, and which layers handle which kinds of failures. Manual tests answer individual questions once; automated tests answer the same questions repeatedly, forever.
 ## Key Terms
 
 - **Test**: a check that expresses *expected behavior* in *code*.

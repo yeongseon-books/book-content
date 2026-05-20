@@ -44,7 +44,7 @@ Here we use sets and functions as the foundation for data modeling and transform
 
 This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Sets and functions are not abstract concepts; they are the mathematical foundations of type systems and data transformations in code.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ Python's `set`, `dict`, `map`, and `filter` already carry the mental model of se
 
 That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.
 
+
 ## Concept at a Glance
+
+Sets define *membership* and *boundaries*; functions map *inputs to outputs* systematically. Together they form the vocabulary of types and data transformations.
+
+## Before/After
+
+**Before**: Think of functions as "just code that does something."
+
+**After**: See functions as *precise mappings* with defined domains and codomains.
 
 ## Key Terms
 

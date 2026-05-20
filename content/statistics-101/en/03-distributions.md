@@ -42,7 +42,7 @@ This is post 3 in the Statistics 101 series. Here we will build intuition for re
 
 This picture places Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Distributions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Understanding the *shape* of your data unlocks why the *same mean* can hide *different realities*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ This picture places Distributions inside an operating flow. The point is not to 
 > *Pick the tool by the shape.*
 
 ## Concept at a Glance
-
+Visualizing distributions reveals patterns that summaries alone cannot capture. A distribution tells you not just where data *lives*, but how *wide* the variation is and whether there are *outliers* or *gaps*.
 ## Key Terms
 
 - **Normal**: a *symmetric bell* shape; common in nature and measurement noise.

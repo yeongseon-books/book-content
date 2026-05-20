@@ -42,7 +42,7 @@ This is post 5 in the Technical Writing 101 series. It shows how to choose a min
 
 This picture places Explaining Example Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Explaining Example Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A snippet only teaches when the reader can isolate the interesting lines, understand them, and verify the result with one command.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ A *runnable* example must reach the reader's *hands* to teach.
 
 ## Concept at a Glance
 
+Code walkthroughs are stronger when they isolate the key lines, pair them with a short callout, and close the loop with visible output. That is what turns a copy-paste gamble into a reusable learning step.
 ## Key Terms
 
 - **MWE**: A *Minimal Working Example*.

@@ -42,7 +42,7 @@ In this chapter, we will connect everything into one standard workflow: load, cl
 
 This picture places Real-World Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Real-World Data Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Analysis is *iteration*. First read is never perfect, first aggregation is never final, you always come back to re-validate.
 
 ## Why It Matters
 

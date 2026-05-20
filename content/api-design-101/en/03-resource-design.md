@@ -41,9 +41,9 @@ Here, we treat a good REST path as the output of a solid resource model rather t
 
 *api design 101 chapter 3 flow overview*
 
-This picture places Resource Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows how resources nest and relate: users have orders, orders have items, and the path structure `/users/{id}/orders/{order_id}` reflects those relationships, making the API predictable.
 
-> The core of Resource Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Resource design is not about naming — it is about finding the natural hierarchy in your domain and making that hierarchy visible in every URL.
 
 ## Why It Matters
 

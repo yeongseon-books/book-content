@@ -42,7 +42,7 @@ In this chapter, I will treat `NaN` as a signal to interpret before it becomes a
 
 This picture places Handling Missing Values inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Handling Missing Values is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *NaN is not garbage — it's a signal. Whether you drop, fill, or interpolate *changes your distribution and your sample size. Choose mindfully.
 
 ## Why It Matters
 

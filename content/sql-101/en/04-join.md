@@ -40,9 +40,9 @@ This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship opera
 
 *sql 101 chapter 4 flow overview*
 
-This picture places JOIN inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+JOINs combine rows from multiple tables based on matching conditions. The type of join (INNER, LEFT, FULL, CROSS) and the join condition together determine both the size and the contents of the result.
 
-> The core of JOIN is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> JOIN is not about memorizing the types; it's about predicting what the result will look like when you connect two tables on a condition, and knowing when to use each type.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Most real queries include a join somewhere in the middle. Reports pull users, or
 Strong SQL reviewers do not just read the ON clause. They ask what kind of match count is expected on each side and whether a later SUM or COUNT will stay stable after that expansion.
 
 ## JOIN result flow
+
+INNER JOIN keeps only matching rows. LEFT JOIN keeps all left rows and fills right columns with NULL where there's no match. FULL OUTER JOIN keeps both sides. CROSS JOIN produces every combination—use carefully.
 
 ## Key Terms
 

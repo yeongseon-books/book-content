@@ -44,7 +44,7 @@ This is post 6 in the Testing 101 series. Here we use `unittest.mock` to separat
 
 This picture places Mock and Stub inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Mock and Stub is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The distinction matters: a Stub proves the result; a Mock proves the interaction happened.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ Confusing Mock and Stub leads to *over-mocking* and *brittle tests*. Knowing the
 > A good test tells you *"what broke"* in *one line*.
 
 ## Concept at a Glance
-
+Stubs and Mocks serve different purposes: Stubs provide canned answers to verify outcomes (state verification), while Mocks enforce that dependencies were called in expected ways (interaction verification), and conflating them leads to brittle tests.
 ## Key Terms
 
 - **State verification**: verifying the SUT's *final state or return value*.

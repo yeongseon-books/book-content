@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Technical Writing 101 8장 흐름 개요*
 
-이 그림에서는 튜토리얼 작성하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+단순 단계라를 보여줁니다.
 
-> 튜토리얼 작성하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 단순 단계라를 보여중닉니다.
 
 ## 이 글에서 배울 것
 
@@ -99,6 +99,171 @@ Uvicorn running on http://127.0.0.1:8000
 ```
 
 복구 힌트도 한 줄은 있어야 합니다. 예를 들어 `fastapi: command not found`가 보이면 `python3 -m pip install "fastapi[standard]"`를 다시 실행하라고 바로 적어 두면 독자는 검색창으로 새어나가지 않고 튜토리얼 안에서 문제를 풀 수 있습니다.
+
+## 튜토리얼 구조 템플릿
+
+좋은 튜토리얼은 단계별로 번호를 매기고, 각 단계에서 독자가 무엇을 해야 하는지와 무엇을 확인해야 하는지 명확하게 적습니다.
+
+```markdown
+# FastAPI 첫 단계 튜토리얼
+
+## 전제 조건
+
+- Python 3.11 이상
+- 터미널 접근 가능
+- 10분 소요
+
+## 1단계 — 가상 환경 만들기
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**확인**: 프롬프트 앞에 `(.venv)`가 나타납니다.
+
+## 2단계 — FastAPI 설치
+
+```bash
+pip install "fastapi[standard]"
+```
+
+**확인**: `Successfully installed fastapi` 메시지가 보입니다.
+
+## 3단계 — 코드 작성
+
+`main.py`를 만듭니다.
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
+```
+
+## 4단계 — 서버 실행
+
+```bash
+fastapi dev main.py
+```
+
+**확인**: `Uvicorn running on http://127.0.0.1:8000` 메시지가 보입니다.
+
+## 5단계 — 브라우저에서 테스트
+
+브라우저에서 `http://127.0.0.1:8000`을 엽니다.
+
+**확인**: `{"message":"Hello World"}`가 화면에 보입니다.
+
+## 변문 해결
+
+- `fastapi: command not found` → `pip install "fastapi[standard]"` 다시 실행
+- `ModuleNotFoundError: No module named 'fastapi'` → 가상 환경 활성화 확인
+- `Address already in use` → `fastapi dev main.py --port 8001` 로 포트 변경
+
+## 다음 단계
+
+- [FastAPI 공식 튜토리얼](https://fastapi.tiangolo.com/tutorial/)
+- [경로 매개변수 다루기](./02-path-parameters.md)
+```
+
+이 템플릿은 단계별로 명확한 확인 지점과 변문 해결 방법을 모두 담았습니다.
+
+## 튜토리얼 vs How-to vs Reference
+
+| 항목 | Tutorial | How-to | Reference |
+| --- | --- | --- | --- |
+| **목적** | 처음 배우기 | 특정 문제 해결 | 전체 사양 확인 |
+| **독자 상태** | 초보, 이해 필요 | 중급, 특정 목표 있음 | 숙련, 빠른 참조 |
+| **구조** | 순차적 단계 | 문제 → 해결 | 알파벳 또는 분류 |
+| **분량** | 5-10분 분량 | 2-5분 분량 | 전체 API 커버 |
+| **톤** | 친근하고 설명적 | 직접적이고 명령적 | 간결하고 정확 |
+| **예시** | "FastAPI 첫 단계" | "CORS 설정 방법" | "FastAPI API 문서" |
+
+튜토리얼은 학습이 목적이고, How-to는 문제 해결이 목적이고, Reference는 빠른 참조가 목적입니다. 각 형식은 독자의 상황과 필요에 맞춰 선택해야 합니다.
+
+## 검증 지점 설계
+
+각 단계가 끝나는 시점에 독자가 성공을 확인할 수 있도록 검증 지점을 명확히 설계해야 합니다.
+
+### 1. 명령 실행 후 터미널 출력
+
+```bash
+pip install fastapi
+# 기대 출력: Successfully installed fastapi
+```
+
+### 2. 파일 생성 후 확인
+
+```bash
+ls -la main.py
+# 기대 출력: -rw-r--r-- 1 user user 156 May 21 10:00 main.py
+```
+
+### 3. 서버 실행 후 HTTP 응답
+
+```bash
+curl http://127.0.0.1:8000/
+# 기대 출력: {"message":"Hello World"}
+```
+
+### 4. 브라우저 화면
+
+브라우저에서 `http://127.0.0.1:8000/docs`를 열면 Swagger UI가 보여야 합니다.
+
+검증 지점은 독자가 스스로 문제를 해결할 수 있는 기준을 제공합니다.
+
+## 코드 진행 예시
+
+튜토리얼은 작은 코드에서 시작해 조금씩 기능을 추가하며 발전하는 패턴을 따라야 합니다.
+
+**1단계 — 최소 코드**
+
+```python
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Hello"}
+```
+
+**2단계 — 경로 매개변수 추가**
+
+```python
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Hello"}
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    return {"user_id": user_id}
+```
+
+**3단계 — 입력 검증 추가**
+
+```python
+from fastapi import FastAPI, HTTPException
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Hello"}
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    if user_id < 1:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+    return {"user_id": user_id}
+```
+
+각 단계마다 하나의 개념만 추가하면 독자는 부담 없이 따라갈 수 있습니다.
 
 ## 실습: 5분 튜토리얼 만들기
 
@@ -170,6 +335,54 @@ fastapi dev main.py
 - [ ] 작은 성공이 하나 있는가
 - [ ] 다음 단계가 보이는가
 
+## 튜토리얼 진행 속도 관리
+
+튜토리얼은 너무 빠르면 독자가 따라오지 못하고, 너무 느리면 지루해집니다.
+
+### 적정 속도 가이드
+
+| 단계 | 예상 소요 시간 | 수준 |
+| --- | --- | --- |
+| 전제 조건 확인 | 1분 | 초보 |
+| 설치 | 2분 | 초보 |
+| 코드 작성 | 3분 | 초보 |
+| 실행과 테스트 | 2분 | 초보 |
+| 변문 해결 | 2분 | 초보 |
+
+전체 10분 안에 첨 성공을 만들어야 튜토리얼이 효과적입니다.
+
+## 변문 해결 섹션 작성법
+
+변문 해결 섹션은 독자가 막혔을 때 가장 먼저 찾는 곳입니다.
+
+### 구조
+
+```markdown
+## 변문 해결
+
+### 오류: `ModuleNotFoundError: No module named 'fastapi'`
+
+**원인**: 가상 환경이 활성화되지 않았거나 패키지가 설치되지 않았습니다.
+
+**해결**:
+
+```bash
+source .venv/bin/activate
+pip install "fastapi[standard]"
+```
+
+### 오류: `Address already in use`
+
+**원인**: 포트 8000이 이미 사용 중입니다.
+
+**해결**:
+
+```bash
+fastapi dev main.py --port 8001
+```
+```
+
+각 오류마다 원인과 해결을 함께 적습니다.
 ## 연습 문제
 
 1. tutorial의 뜻을 한 줄로 적어 보세요.
@@ -183,11 +396,11 @@ fastapi dev main.py
 ## 처음 질문으로 돌아가기
 
 - **따라 하기 글은 설명 글이나 레퍼런스와 무엇이 다를까요?**
-  - 본문의 기준은 튜토리얼 작성하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  단띄닉니다.
 - **독자가 따라만 해도 동작하는 튜토리얼은 어떻게 만들까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  단렷닉니다.
 - **전제 조건, 작은 성공, 복구 안내, 다음 단계는 어떤 순서로 놓여야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  늨륹 낸말니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -41,9 +41,9 @@ Here, we treat HTTP methods and status codes as the client-side branching model 
 
 *api design 101 chapter 4 flow overview*
 
-This picture places HTTP Methods and Status Codes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram pairs request verbs with response codes: GET returns 200 if found or 404 if not; POST returns 201 if created or 400 if input is invalid; each combination signals a different outcome that clients can act on.
 
-> The core of HTTP Methods and Status Codes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The power of HTTP methods and status codes is that clients do not need to parse response bodies to know what happened — the code tells the story.
 
 ## Why It Matters
 

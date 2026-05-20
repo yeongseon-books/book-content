@@ -44,7 +44,7 @@ Here, we will treat experiment tracking as the team's short-term memory and focu
 
 This picture places Experiment Tracking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Experiment Tracking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> An experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format so the team never repeats the same mistake twice.
 
 ## Questions this article answers
 

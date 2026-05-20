@@ -44,7 +44,7 @@ Here we treat logic and proof as a practical grammar for explaining correctness 
 
 This picture places Logic and Proofs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Logic and Proofs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Logic is about making the relationship between assumptions and conclusions explicit; proof is about guaranteeing that relationship holds in every case.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ A test checks specific cases. A proof targets the whole claim. Those two tools a
 
 That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.
 
+
 ## Concept at a Glance
+
+Logic distinguishes between a *true proposition*, an *implication* (`p → q`), proof methods (direct, contradiction, induction), and the power of *one counterexample* to invalidate a universal claim.
+
+## Before/After
+
+**Before**: Test passes on three examples → assume the code is correct.
+
+**After**: Prove correctness for *all* valid inputs.
 
 ## Key Terms
 

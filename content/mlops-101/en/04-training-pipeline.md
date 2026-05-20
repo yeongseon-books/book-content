@@ -44,7 +44,7 @@ Here, we will distinguish a training pipeline from simple script automation and 
 
 This picture places Model Training Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Model Training Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed so failed stages do not force the whole run to restart.
 
 ## Questions this article answers
 

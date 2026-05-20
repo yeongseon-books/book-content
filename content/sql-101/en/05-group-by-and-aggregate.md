@@ -40,9 +40,9 @@ This is post 5 in the SQL 101 series. Here we focus on how aggregation turns man
 
 *sql 101 chapter 5 flow overview*
 
-This picture places GROUP BY and Aggregates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+GROUP BY divides rows into groups and aggregate functions (SUM, COUNT, AVG) summarize each group down to a single row.
 
-> The core of GROUP BY and Aggregates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> GROUP BY's value is not in the aggregate function names, but in deciding the right grouping level so that your summary answers the actual business question.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Most dashboard metrics are grouped metrics. Daily active users, revenue by count
 It is also one of the easiest places to create plausible but incorrect numbers. A missing grouping key, a join that multiplies rows, or a misunderstood NULL rule can produce a chart that looks clean while hiding a logic bug underneath.
 
 ## Aggregation flow
+
+Think of GROUP BY as a pivot: many input rows become fewer output rows. Each row in the output represents one group. You can only SELECT the grouping columns and aggregate functions; other columns have no single value per group.
 
 ## Key Terms
 

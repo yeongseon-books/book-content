@@ -42,7 +42,7 @@ This is post 3 in the Technical Writing 101 series. It focuses on shaping titles
 
 This picture places Title and Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Title and Structure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A title makes the promise, and the section headings prove you can deliver it.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ The *title* earns the *click*, and the *structure* earns the *time*.
 
 ## Concept at a Glance
 
+A strong outline does more than organize sections. It exposes the reader's journey. If someone reads only the title and H2 headings and can still predict the next action, the structure is working.
 ## Key Terms
 
 - **SEO title**: A *search-friendly title*.

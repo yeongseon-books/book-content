@@ -42,7 +42,7 @@ This is the first post in the Statistics 101 series. Here we will split statisti
 
 This picture places What Is Statistics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Statistics? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Statistics is the bridge between data and decisions — making decisions that are *less uncertain*.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ As data piles up, the question *“is this really true?”* shows up more and mo
 > *Good statistical thinking produces decisions, not numbers.*
 
 ## Concept at a Glance
-
+Data is messy. Numbers alone do not tell us whether a change is real or just noise. Statistics layers **thinking** on top of **numbers**, turning observations into *judgments we can defend*.
 ## Key Terms
 
 - **Descriptive Statistics**: statistics that *summarize* data (mean, variance, etc.).

@@ -44,7 +44,7 @@ This is post 7 in the Testing 101 series. Here we separate line, branch, and fun
 
 This picture places Test Coverage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Test Coverage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Coverage is a diagnostic tool that reveals blind spots — not a scorecard that proves correctness.
 
 ## What You Will Learn
 
@@ -61,7 +61,7 @@ If you do not know *where tests reach*, incidents happen in the *blind spots*. A
 > Coverage is a *compass*, not a *map*.
 
 ## Concept at a Glance
-
+Coverage measures which lines, branches, and functions tests execute, using tools like pytest-cov, and reveals untested code paths—branches, exception handlers, edge cases—that manual inspection might miss, though high percentage coverage can hide shallow tests.
 ## Key Terms
 
 - **Line coverage**: ratio of *executed lines / total lines*.

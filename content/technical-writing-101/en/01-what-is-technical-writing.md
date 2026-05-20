@@ -42,7 +42,7 @@ This is the first post in the Technical Writing 101 series. It establishes the r
 
 This picture places What Is Technical Writing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Technical Writing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Technical writing succeeds when it changes what readers can do, not just what they know.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ Writing tends to *outlive* the *code* it describes.
 
 ## Concept at a Glance
 
+Technical writing differs from everyday prose because it must close the loop: reader → task → measurable outcome. That closure is what separates a document that stalls on confusion from one that drives action.
 ## Key Terms
 
 - **technical writing**: Prose that *delivers technical information*.

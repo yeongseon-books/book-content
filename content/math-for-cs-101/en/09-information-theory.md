@@ -44,7 +44,7 @@ Here we connect information content, entropy, cross entropy, KL divergence, and 
 
 This picture places Information Theory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Information Theory is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Entropy and information measure the theoretical limits of communication, compression, and storage; they set the boundaries of what is possible.
 
 ## Why It Matters
 
@@ -52,7 +52,16 @@ Classifier losses, communication codes, compression formats, and language-model 
 
 Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.
 
+
 ## Concept at a Glance
+
+Information theory measures *entropy* (uncertainty), *mutual information* (shared knowledge), and compression ratios. It defines what is theoretically possible.
+
+## Before/After
+
+**Before**: "Compress this data as much as you can."
+
+**After**: "The Shannon limit sets an absolute lower bound; anything better is impossible.
 
 ## Key Terms
 

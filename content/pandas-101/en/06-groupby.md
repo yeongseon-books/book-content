@@ -42,7 +42,7 @@ In this chapter, we will frame `groupby` as the split-apply-combine workflow. Th
 
 This picture places Groupby and Aggregation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Groupby and Aggregation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Aggregation starts with the split. Group by customer, by date, or by region on the same data — you get completely different answers. Choose your grain first.
 
 ## Why It Matters
 

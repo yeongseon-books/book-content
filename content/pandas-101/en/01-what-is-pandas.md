@@ -42,7 +42,7 @@ In this post, I want to define Pandas by role rather than by feature list. Panda
 
 This picture places What Is Pandas? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Pandas? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Pandas is the standard language for reading, exploring, reshaping, and summarizing tabular data* within the memory you have. Master this layer first.
 
 ## Why It Matters
 

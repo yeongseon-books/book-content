@@ -40,9 +40,9 @@ This is the final post in the SQL 101 series. It ties the earlier clauses togeth
 
 *sql 101 chapter 10 flow overview*
 
-This picture places Practical Analysis SQL inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+Real analysis queries combine SELECT, filtering, joins, aggregation, and often window functions. The challenge isn't any single clause; it's breaking the problem into clear, testable steps.
 
-> The core of Practical Analysis SQL is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A production analysis query is built from the pieces you've learned: filters that are correct, joins that produce the right cardinality, aggregations that answer the actual question, and windows that add rank or context without losing rows.
 
 ## Why It Matters
 
@@ -51,6 +51,8 @@ Most analytics requests are variations on a small set of patterns: active users,
 Well-structured analytics SQL also becomes reusable team knowledge. A clean cohort query or funnel query does not just answer one ticket. It becomes the basis for dashboards, models, and later reviews about whether the metric definition is still correct.
 
 ## Analytics query layering flow
+
+Build analysis queries step-by-step using CTEs. Each CTE represents one logical step: 'filter to the date range,' 'join with customer info,' 'aggregate by segment,' 'rank within segment.' Test each CTE independently before combining them.
 
 ## Key Terms
 

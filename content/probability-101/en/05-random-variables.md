@@ -42,7 +42,7 @@ This is post 5 in the Probability 101 series. Here we define random variables, s
 
 This picture places Random Variables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Random Variables is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Random Variables requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

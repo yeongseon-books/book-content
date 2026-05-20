@@ -42,7 +42,7 @@ This is post 3 in the Observability 101 series.
 
 This picture places Collecting and Visualizing Metrics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Collecting and Visualizing Metrics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Collecting and Visualizing Metrics is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 > *What you do not measure *does not exist*.*
 
 ## Concept at a Glance
+
+Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms
 

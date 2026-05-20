@@ -41,9 +41,9 @@ Here, we treat errors as first-class contract design. Status codes, machine-read
 
 *api design 101 chapter 7 flow overview*
 
-This picture places Designing Error Responses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+The diagram shows error responses as structured data: a status code signals the category (4xx for client error, 5xx for server error), and the body explains the specific reason in a consistent format that clients can parse and handle.
 
-> The core of Designing Error Responses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A good error response tells the client not just that something failed, but why, and what it can do about it.
 
 ## Why It Matters
 

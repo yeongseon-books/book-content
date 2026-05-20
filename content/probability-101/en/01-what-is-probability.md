@@ -42,7 +42,7 @@ This is the first post in the Probability 101 series. It sets up the core idea o
 
 This picture places What Is Probability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Probability? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> What Is Probability? requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

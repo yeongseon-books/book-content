@@ -42,7 +42,7 @@ The core idea in this chapter is simple. A DataFrame is a collection of Series t
 
 This picture places Series and DataFrame inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Series and DataFrame is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *DataFrame is really a *collection of Series* that share the same index. Understand this, and alignment, broadcasting, and method chaining all make sense.
 
 ## Why It Matters
 

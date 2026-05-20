@@ -44,7 +44,7 @@ Here, we will wrap a trained artifact in an API and a container, then connect th
 
 This picture places Model Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Model Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Model deployment is not copying a model file to a server. It is wrapping the model, code, dependencies, and a rollback plan into one reproducible versioned unit.
 
 ## Questions this article answers
 

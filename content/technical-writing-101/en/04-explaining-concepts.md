@@ -42,7 +42,7 @@ This is post 4 in the Technical Writing 101 series. Here we build that four-part
 
 This picture places Explaining Concepts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Explaining Concepts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A concept without a boundary is just a fact to memorize; with a boundary, it becomes a tool to apply.
 
 ## Why It Matters
 
@@ -52,6 +52,7 @@ If the *concept* stays blurry, everything after it is a *sandcastle*.
 
 ## Concept at a Glance
 
+The strongest concept explanations follow a pattern: definition, analogy, counterexample, and a worked example. This combination helps readers test the idea instead of just memorizing it.
 ## Key Terms
 
 - **definition**: A *one line definition*.

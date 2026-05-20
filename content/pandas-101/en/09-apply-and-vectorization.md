@@ -42,7 +42,7 @@ In this chapter, I do not want to ban `apply` as a slogan. I want to explain why
 
 This picture places Apply and Vectorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Apply and Vectorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> *Vectorization is Pandas' *superpower. Reach for `apply` only after built-in methods, list comprehensions, and NumPy fail you.
 
 ## Why It Matters
 

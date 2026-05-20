@@ -42,7 +42,7 @@ This is post 6 in the Statistics 101 series. Here we will pin down what a 95% co
 
 This picture places Confidence Interval inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Confidence Interval is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A confidence interval transforms *uncertainty* into a *range*—a way to communicate what you know and don't know.
 
 ## Why It Matters
 
@@ -51,7 +51,7 @@ Confidence intervals are the *most common tool* for showing uncertainty — and 
 > *A 95% CI is the *hit rate of the method*, not the probability of *this* particular interval.*
 
 ## Concept at a Glance
-
+Rather than reporting a single number, a confidence interval says: *"I am 95% confident the true value lies between X and Y."* It quantifies the gap between your sample and the population.
 ## Key Terms
 
 - **Confidence Interval**: an interval such that, if the *procedure* were repeated infinitely, *95% of intervals* would contain the parameter.
