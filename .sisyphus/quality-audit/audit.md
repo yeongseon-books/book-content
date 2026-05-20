@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:43:35+00:00
+Generated: 2026-05-20T11:45:16+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **45**
+- Series with any issue: **44**
 - Series at or above 5 issues: **33**
-- Total issues: **355**
-  - BadImg: **355**
+- Total issues: **351**
+  - BadImg: **351**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -80,12 +80,11 @@ Warnings:
 | 37 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 38 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 39 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 42 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 43 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 44 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 45 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 40 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 41 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 42 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 43 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 44 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -540,16 +539,6 @@ Warnings:
 - `assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=725x67)
 - `assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=750x67)
 - `assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=750x67)
-
-## functional-programming-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png:1` — PNG height 68px <= 100px (size=1054x68)
-- `assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png:1` — PNG height 68px <= 100px (size=858x68)
-- `assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png:1` — PNG height 67px <= 100px (size=1014x67)
-- `assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png:1` — PNG height 67px <= 100px (size=864x67)
 
 ## programming-languages-101 — Total 4
 

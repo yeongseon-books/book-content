@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:43:35+00:00",
+  "generated_at": "2026-05-20T11:45:16+00:00",
   "series_count": 92,
-  "problem_series_count": 45,
+  "problem_series_count": 44,
   "series_with_5_plus": 33,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 355,
+    "BadImg": 351,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 355
+    "all": 351
   },
   "results": [
     {
@@ -9195,130 +9195,6 @@
       }
     },
     {
-      "series": "functional-programming-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 4
-      },
-      "total": 4,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png",
-            "line": 1,
-            "message": "PNG height 68px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-lazy-pipeline-pull-model.en.png",
-            "width": 1054,
-            "height": 68,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png",
-            "line": 1,
-            "message": "PNG height 68px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-lazy-pipeline-pull-model.ko.png",
-            "width": 858,
-            "height": 68,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-how-a-readable-pipeline-flows.en.png",
-            "width": 1014,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-how-a-readable-pipeline-flows.ko.png",
-            "width": 864,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png",
-            "line": 1,
-            "message": "PNG height 68px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-lazy-pipeline-pull-model.en.png",
-            "width": 1054,
-            "height": 68,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png",
-            "line": 1,
-            "message": "PNG height 68px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "08-01-lazy-pipeline-pull-model.ko.png",
-            "width": 858,
-            "height": 68,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-how-a-readable-pipeline-flows.en.png",
-            "width": 1014,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-how-a-readable-pipeline-flows.ko.png",
-            "width": 864,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "programming-languages-101",
       "counts": {
         "Synt": 0,
@@ -10066,6 +9942,20 @@
     },
     {
       "series": "document-ingestion-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "functional-programming-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
