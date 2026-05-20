@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:59:37+00:00
+Generated: 2026-05-20T11:59:56+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **15**
-- Series at or above 5 issues: **11**
-- Total issues: **114**
-  - BadImg: **114**
+- Series with any issue: **14**
+- Series at or above 5 issues: **10**
+- Total issues: **106**
+  - BadImg: **106**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -46,16 +46,15 @@ Warnings:
 | 3 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 4 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 5 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 6 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 7 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 8 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 9 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 10 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 11 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 12 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 13 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 14 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 15 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 6 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 7 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 8 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 9 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 10 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 11 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 12 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 13 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 14 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -115,18 +114,6 @@ Warnings:
 - `assets/devops-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=967x67)
 - `assets/devops-101/06/06-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=967x67)
 - `assets/devops-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=884x67)
-- ... 3 more
-
-## kubernetes-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=592x67)
-- `assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=592x67)
-- `assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=634x67)
-- `assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=634x67)
-- `assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=807x67)
 - ... 3 more
 
 ## llm-from-scratch-101 — Total 8
