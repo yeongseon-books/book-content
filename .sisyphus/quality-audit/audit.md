@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:47:10+00:00
+Generated: 2026-05-20T11:47:29+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **41**
+- Series with any issue: **40**
 - Series at or above 5 issues: **30**
-- Total issues: **323**
-  - BadImg: **323**
+- Total issues: **319**
+  - BadImg: **319**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -71,17 +71,16 @@ Warnings:
 | 28 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 29 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
 | 30 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 31 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 32 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 33 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 34 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 35 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 36 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 37 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 38 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 39 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 40 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 41 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 31 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 32 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 33 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 34 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 35 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 36 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 37 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 38 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 39 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 40 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -440,16 +439,6 @@ Warnings:
 - `assets/git-github-101/06/06-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=828x88)
 - `assets/git-github-101/06/06-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=735x88)
 - `assets/git-github-101/10/10-01-mental-model.ko.png:1` — PNG height 75px <= 100px (size=1384x75)
-
-## alembic-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png:1` — PNG height 80px <= 100px (size=1384x80)
-- `assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.ko.png:1` — PNG height 67px <= 100px (size=1335x67)
-- `assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png:1` — PNG height 88px <= 100px (size=1237x88)
-- `assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png:1` — PNG height 67px <= 100px (size=1181x67)
 
 ## azure-aca-101 — Total 4
 

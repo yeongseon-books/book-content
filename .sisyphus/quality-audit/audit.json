@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:47:10+00:00",
+  "generated_at": "2026-05-20T11:47:29+00:00",
   "series_count": 92,
-  "problem_series_count": 41,
+  "problem_series_count": 40,
   "series_with_5_plus": 30,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 323,
+    "BadImg": 319,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 323
+    "all": 319
   },
   "results": [
     {
@@ -7663,130 +7663,6 @@
       }
     },
     {
-      "series": "alembic-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 4
-      },
-      "total": 4,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png",
-            "line": 1,
-            "message": "PNG height 80px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram-how-revision-history-reaches-the.en.png",
-            "width": 1384,
-            "height": 80,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram-how-revision-history-reaches-the.ko.png",
-            "width": 1335,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-diagram-the-blue-green-compatibility-win.en.png",
-            "width": 1237,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-diagram-the-blue-green-compatibility-win.ko.png",
-            "width": 1181,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png",
-            "line": 1,
-            "message": "PNG height 80px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram-how-revision-history-reaches-the.en.png",
-            "width": 1384,
-            "height": 80,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram-how-revision-history-reaches-the.ko.png",
-            "width": 1335,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-diagram-the-blue-green-compatibility-win.en.png",
-            "width": 1237,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-diagram-the-blue-green-compatibility-win.ko.png",
-            "width": 1181,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "azure-aca-101",
       "counts": {
         "Synt": 0,
@@ -8916,6 +8792,20 @@
     },
     {
       "series": "ai-web-dev-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "alembic-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
