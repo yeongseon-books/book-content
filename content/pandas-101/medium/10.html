@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Real-World Data Analysis</title>
+<title>Pandas 101 (10/10): Real-World Data Analysis</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Real-World Data Analysis</h1>
+<h1>Pandas 101 (10/10): Real-World Data Analysis</h1>
 <p>The earlier chapters covered loading, cleaning, selecting, grouping, joining, time handling, and performance habits one piece at a time. Real analysis becomes useful only when those pieces connect into one repeatable flow. That is usually where the gap between knowing Pandas features and delivering analysis results becomes visible.</p>
 <p>This is the final post in the Pandas 101 series.</p>
 <p>In this chapter, we will connect everything into one standard workflow: load, clean, enrich, aggregate, and visualize. The goal is not a flashy notebook. It is a pipeline you can rerun, review, and share with confidence.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The standard <em>EDA workflow</em></li>
-<li>The value of <em>function-level separation</em></li>
-<li>Building <em>reproducible analysis</em></li>
-<li>A 5-step end-to-end run</li>
-<li>Five common mistakes</li>
+<li>The standard *EDA workflow?</li>
+<li>The value of *function-level separation?</li>
+<li>Building *reproducible analysis?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 10 flow overview</em></p>
+<p>This picture places Real-World Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Good analysis is visible as a sequence: load, clean, enrich, aggregate, and visualize. If that sequence is explicit in code, the work becomes much easier to rerun, review, and trust.</p>
+<p>The core of Real-World Data Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Knowing each tool separately is not the same as <em>producing a result</em>. <em>Pro analysts</em> are defined by their <em>connecting ability</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A reproducible analysis pipeline from loading to KPI charts" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png"><br>
-<em>A reproducible analysis pipeline from loading to KPI charts</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>EDA</strong>: <em>Exploratory Data Analysis</em>.</li>
@@ -176,16 +176,26 @@ plt.savefig(&quot;monthly.png&quot;)
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>You have completed <em>Pandas 101</em>. Next stops: <em>Polars, Dask</em>, or <em>visualization (Matplotlib/Plotly)</em>, then <em>ML preprocessing (scikit-learn)</em>. Every road in data work <em>starts at Pandas</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Groupby and Aggregation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Time Series</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/09-apply-and-vectorization.md">Apply and Vectorization</a></li>
+<li><strong>The standard *EDA workflow?</strong></li>
+<li>The article treats Real-World Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The value of *function-level separation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Building *reproducible analysis?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">Pandas 101 (1/10): What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Pandas 101 (2/10): Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Pandas 101 (3/10): Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Pandas 101 (4/10): Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Pandas 101 (5/10): Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Pandas 101 (6/10): Groupby and Aggregation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Pandas 101 (7/10): Merge and Join</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Pandas 101 (8/10): Time Series</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/09-apply-and-vectorization.md">Pandas 101 (9/10): Apply and Vectorization</a></li>
 <li><strong>Real-World Data Analysis (current)</strong></li>
 </ul>
 <h2>References</h2>

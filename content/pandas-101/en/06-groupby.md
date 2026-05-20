@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 6
-title: Groupby and Aggregation
+title: "Pandas 101 (6/10): Groupby and Aggregation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Understand groupby through split-apply-combine and master agg, 
 last_reviewed: '2026-05-15'
 ---
 
-# Groupby and Aggregation
+# Pandas 101 (6/10): Groupby and Aggregation
 
 Analysis almost never ends with reading a table. Sooner or later you need sales by city, conversion rate by segment, or monthly KPI summaries. That is why `groupby` is not just another Pandas method. It is one of the main ways raw tables become decisions.
 
@@ -28,24 +28,27 @@ This is post 6 in the Pandas 101 series.
 
 In this chapter, we will frame `groupby` as the split-apply-combine workflow. That gives you a clearer mental model for when to reach for `agg`, `transform`, or `filter`.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The *split-apply-combine* model
-- The difference between *agg / transform / filter*
-- *Multi-key grouping*
-- A 5-step groupby hands-on
-- Five common mistakes
+- The *split-apply-combine* model?
+- The difference between *agg / transform / filter?
+- Multi-key grouping?
 
-> If you think of groupby as just a summary function, you only see the output. If you think of it as split, apply, and combine, the difference between agg, transform, and filter becomes much easier to reason about.
+## Big Picture
+
+![pandas 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 6 flow overview*
+
+This picture places Groupby and Aggregation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Groupby and Aggregation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Aggregation is the core of analysis*. With *groupby*, *dozens of for-loop lines* collapse into *one*.
 
 ## Concept at a Glance
-
-![The split, apply, and combine flow behind groupby work](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
-*The split, apply, and combine flow behind groupby work*
 
 ## Key Terms
 
@@ -89,7 +92,6 @@ Busan    175
 Seoul    220
 Name: sales, dtype: int64
 ```
-
 
 ### Step 3 — agg with multiple stats
 
@@ -170,17 +172,29 @@ Segment analysis, cohort retention, KPI aggregation — *groupby* powers *busine
 
 groupby is the *engine of analysis*. Next we cover *merge and join*.
 
+## Answering the Opening Questions
+
+- **The *split-apply-combine* model?**
+  - The article treats Groupby and Aggregation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between *agg / transform / filter?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Multi-key grouping?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
 - **Groupby and Aggregation (current)**
 - Merge and Join (upcoming)
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 8
-title: Time Series
+title: "Pandas 101 (8/10): Time Series"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Work with DatetimeIndex, resample, rolling, and time zones — 
 last_reviewed: '2026-05-15'
 ---
 
-# Time Series
+# Pandas 101 (8/10): Time Series
 
 Sales, traffic, sensor, and financial data often stop behaving like ordinary tables once time becomes the main organizing dimension. If dates stay as strings, comparisons feel awkward and weekly summaries or moving averages become noisier to implement than they should be. The whole experience changes once time becomes the index.
 
@@ -28,24 +28,27 @@ This is post 8 in the Pandas 101 series.
 
 In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The intuition of *DatetimeIndex*
-- *resample* and *rolling*
-- Handling *time zones (tz)*
-- A 5-step time series hands-on
-- Five common mistakes
+- The intuition of *DatetimeIndex?
+- resample* and *rolling?
+- Handling *time zones (tz)?
 
-> In time series work, the real primary key is the timeline itself. Once time becomes the index, slicing, resampling, and rolling calculations stop feeling like separate tricks and start feeling like one language.
+## Big Picture
+
+![pandas 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 8 flow overview*
+
+This picture places Time Series inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Time Series is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Sales, traffic, sensors, finance — *most operational data* is time series. Treating *time as an index* makes *KPI trends* visible immediately.
 
 ## Concept at a Glance
-
-![A time-first workflow with resampling, rolling windows, and time zones](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
-*A time-first workflow with resampling, rolling windows, and time zones*
 
 ## Key Terms
 
@@ -165,17 +168,29 @@ Sales trends, user activity patterns, IoT sensor monitoring — *time-bucket con
 
 Time series is *a Pandas strength*. Next we cover *apply and vectorization*.
 
+## Answering the Opening Questions
+
+- **The intuition of *DatetimeIndex?**
+  - The article treats Time Series as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **resample* and *rolling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Handling *time zones (tz)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [Groupby and Aggregation](./06-groupby.md)
-- [Merge and Join](./07-merge-and-join.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
+- [Pandas 101 (7/10): Merge and Join](./07-merge-and-join.md)
 - **Time Series (current)**
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

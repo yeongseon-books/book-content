@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Pandas?</title>
+<title>Pandas 101 (1/10): What Is Pandas?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Is Pandas?</h1>
+<h1>Pandas 101 (1/10): What Is Pandas?</h1>
 <p>Pandas is easy to misunderstand when you first learn it. On one day it feels like a friendlier spreadsheet library. On another day it looks like the entire foundation of Python data work. If you never settle that ambiguity, filtering, aggregation, joins, and time series features keep feeling like disconnected tricks instead of one coherent toolkit.</p>
 <p>This is the first post in the Pandas 101 series.</p>
 <p>In this post, I want to define Pandas by role rather than by feature list. Pandas is the standard environment for reading, inspecting, reshaping, and summarizing in-memory tabular data with short, expressive code.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>definition</em> of <em>Pandas</em> and where it sits</li>
-<li>The intuition behind <em>Series</em> and <em>DataFrame</em></li>
-<li>The basic <em>load → inspect → summarize</em> workflow</li>
-<li>A 5-step first hands-on</li>
-<li>Five common mistakes</li>
+<li>The <em>definition</em> of <em>Pandas</em> and where it sits?</li>
+<li>The intuition behind <em>Series</em> and *DataFrame?</li>
+<li>The basic <em>load → inspect → summarize</em> workflow?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Pandas? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Pandas? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>CSV, Excel, databases, APIs — <em>80% of real-world data</em> is <em>tabular</em>. If you cannot drive <em>Pandas</em>, you cannot start <em>data analysis</em>.</p>
 <blockquote>
 <p><em>If your data fits in memory, Pandas is usually the right answer.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Pandas between raw files, tabular transforms, and analysis outputs" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>Pandas between raw files, tabular transforms, and analysis outputs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Series</strong>: a <em>1D labeled array</em>.</li>
@@ -162,6 +165,16 @@ print(df.describe(include=&quot;all&quot;))
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>Pandas is the <em>standard language for tabular data</em>. Next we go deep into the <em>internal structure</em> of <em>Series and DataFrame</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The <em>definition</em> of <em>Pandas</em> and where it sits?</strong></li>
+<li>The article treats What Is Pandas? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The intuition behind <em>Series</em> and *DataFrame?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The basic <em>load → inspect → summarize</em> workflow?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Pandas? (current)</strong></li>
 <li>Series and DataFrame (upcoming)</li>

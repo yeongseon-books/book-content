@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Reading CSV and Excel</title>
+<title>Pandas 101 (3/10): Reading CSV and Excel</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Reading CSV and Excel</h1>
+<h1>Pandas 101 (3/10): Reading CSV and Excel</h1>
 <p>A lot of analysis work goes wrong long before modeling or visualization starts. If text encoding breaks, numeric columns land as strings, or dates stay as plain text, every downstream calculation becomes less trustworthy. File loading is not a throwaway pre-step. It is where data quality gets its first serious test.</p>
 <p>This is post 3 in the Pandas 101 series.</p>
 <p>In this chapter, we will treat <code>read_csv</code> and <code>read_excel</code> as data-loading contracts rather than convenience helpers. The goal is to make data land in memory the way you intended on the first read.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>core options</em> of <em>read_csv</em> and <em>read_excel</em></li>
-<li>Handling <em>encoding</em> and <em>separators</em></li>
-<li>The value of explicit <em>dtype</em></li>
-<li>A 5-step loading hands-on</li>
-<li>Five common mistakes</li>
+<li>The <em>core options</em> of <em>read_csv</em> and *read_excel?</li>
+<li>Handling <em>encoding</em> and *separators?</li>
+<li>The value of explicit *dtype?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 3 flow overview</em></p>
+<p>This picture places Reading CSV and Excel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>File loading is really contract interpretation. If you settle encoding, separators, dtypes, and date columns up front, you remove a surprising amount of downstream debugging work.</p>
+<p>The core of Reading CSV and Excel is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p><em>80%</em> of analysis is <em>loading and cleaning</em>. <em>Mistakes at load time</em> come back as <em>debugging cost</em> later.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A loading flow that checks encoding, dtypes, and headers early" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>A loading flow that checks encoding, dtypes, and headers early</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>encoding</strong>: file's <em>character encoding</em> (utf-8, cp949, latin-1).</li>
@@ -163,9 +163,19 @@ print(total)
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>Good loading is the <em>start of good analysis</em>. Next we cover <em>filtering and selection</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
+<li><strong>The <em>core options</em> of <em>read_csv</em> and *read_excel?</strong></li>
+<li>The article treats Reading CSV and Excel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Handling <em>encoding</em> and *separators?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The value of explicit *dtype?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">Pandas 101 (1/10): What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Pandas 101 (2/10): Series and DataFrame</a></li>
 <li><strong>Reading CSV and Excel (current)</strong></li>
 <li>Filtering and Selection (upcoming)</li>
 <li>Handling Missing Values (upcoming)</li>

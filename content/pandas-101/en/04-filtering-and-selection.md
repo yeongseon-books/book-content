@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 4
-title: Filtering and Selection
+title: "Pandas 101 (4/10): Filtering and Selection"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Master loc, iloc, boolean indexing, and query — the four ways
 last_reviewed: '2026-05-15'
 ---
 
-# Filtering and Selection
+# Pandas 101 (4/10): Filtering and Selection
 
 Pandas gets confusing fast when you notice that there are several ways to pick rows and columns from the same table. `loc`, `iloc`, boolean masks, and `query` can look interchangeable at first, but they are not. If you do not separate them by intent, selection code becomes harder to read and assignment bugs show up sooner than you expect.
 
@@ -28,24 +28,27 @@ This is post 4 in the Pandas 101 series.
 
 My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between *loc* and *iloc*
-- The intuition behind *boolean indexing*
-- The readability of *query*
-- A 5-step selection hands-on
-- Five common mistakes
+- The difference between *loc* and *iloc?
+- The intuition behind *boolean indexing?
+- The readability of *query?
 
-> Pandas does not give you four competing selection tools. It gives you different handles for different intent: labels, positions, and conditions. Matching the tool to the intent keeps code readable.
+## Big Picture
+
+![pandas 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 4 flow overview*
+
+This picture places Filtering and Selection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Filtering and Selection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Every step of analysis* involves *subset extraction*. *Slow or wrong selection* shakes the *whole pipeline*.
 
 ## Concept at a Glance
-
-![Choosing between labels, positions, boolean masks, and query syntax](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
-*Choosing between labels, positions, boolean masks, and query syntax*
 
 ## Key Terms
 
@@ -166,10 +169,21 @@ KPI dashboards, outlier detection, A/B test slicing — *condition-based selecti
 
 Selection is the *primitive operation of analysis*. Next we tackle *missing value handling*.
 
+## Answering the Opening Questions
+
+- **The difference between *loc* and *iloc?**
+  - The article treats Filtering and Selection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The intuition behind *boolean indexing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The readability of *query?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
 - **Filtering and Selection (current)**
 - Handling Missing Values (upcoming)
 - Groupby and Aggregation (upcoming)
@@ -177,6 +191,7 @@ Selection is the *primitive operation of analysis*. Next we tackle *missing valu
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

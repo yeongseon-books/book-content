@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 7
-title: Merge and Join
+title: "Pandas 101 (7/10): Merge and Join"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Master inner, left, right, outer, and cross joins, and learn th
 last_reviewed: '2026-05-15'
 ---
 
-# Merge and Join
+# Pandas 101 (7/10): Merge and Join
 
 Production data rarely lives in one perfect table. Customer attributes sit in one dataset, orders in another, and campaign or event data somewhere else. That means the skill of combining tables safely is not optional. It is one of the most important parts of analysis work.
 
@@ -28,24 +28,27 @@ This is post 7 in the Pandas 101 series.
 
 Here we will treat `merge` and `join` as tools for validating relationships between key systems, not just for gluing columns together. Row counts and key assumptions matter as much as the output table itself.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- *inner / left / right / outer / cross* joins
-- The difference between *merge* and *join*
-- Options *suffixes / indicator / validate*
-- A 5-step join hands-on
-- Five common mistakes
+- inner / left / right / outer / cross* joins?
+- The difference between *merge* and *join?
+- Options *suffixes / indicator / validate?
 
-> Joining tables is really about validating relationships between key systems. If you ignore row counts and key duplication, a join can look successful while the result is already wrong.
+## Big Picture
+
+![pandas 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 7 flow overview*
+
+This picture places Merge and Join inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Merge and Join is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Real data is *spread across many tables*. *Joining ability* equals *analysis ability*.
 
 ## Concept at a Glance
-
-![A safe join flow that checks key assumptions and row counts](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
-*A safe join flow that checks key assumptions and row counts*
 
 ## Key Terms
 
@@ -164,17 +167,29 @@ CRM x orders, ads x conversions, users x events — *80% of analysis is joins*. 
 
 Joining is *half of analysis*. Next we cover *time series*.
 
+## Answering the Opening Questions
+
+- **inner / left / right / outer / cross* joins?**
+  - The article treats Merge and Join as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between *merge* and *join?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Options *suffixes / indicator / validate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [Groupby and Aggregation](./06-groupby.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
 - **Merge and Join (current)**
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

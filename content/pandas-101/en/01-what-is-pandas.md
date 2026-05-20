@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 1
-title: What Is Pandas?
+title: "Pandas 101 (1/10): What Is Pandas?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly intro to Pandas — what Series and DataFra
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Pandas?
+# Pandas 101 (1/10): What Is Pandas?
 
 Pandas is easy to misunderstand when you first learn it. On one day it feels like a friendlier spreadsheet library. On another day it looks like the entire foundation of Python data work. If you never settle that ambiguity, filtering, aggregation, joins, and time series features keep feeling like disconnected tricks instead of one coherent toolkit.
 
@@ -28,13 +28,21 @@ This is the first post in the Pandas 101 series.
 
 In this post, I want to define Pandas by role rather than by feature list. Pandas is the standard environment for reading, inspecting, reshaping, and summarizing in-memory tabular data with short, expressive code.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The *definition* of *Pandas* and where it sits
-- The intuition behind *Series* and *DataFrame*
-- The basic *load → inspect → summarize* workflow
-- A 5-step first hands-on
-- Five common mistakes
+- The *definition* of *Pandas* and where it sits?
+- The intuition behind *Series* and *DataFrame?
+- The basic *load → inspect → summarize* workflow?
+
+## Big Picture
+
+![pandas 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 1 flow overview*
+
+This picture places What Is Pandas? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Pandas? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,9 +51,6 @@ CSV, Excel, databases, APIs — *80% of real-world data* is *tabular*. If you ca
 > *If your data fits in memory, Pandas is usually the right answer.*
 
 ## Concept at a Glance
-
-![Pandas between raw files, tabular transforms, and analysis outputs](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
-*Pandas between raw files, tabular transforms, and analysis outputs*
 
 ## Key Terms
 
@@ -167,7 +172,18 @@ Data cleaning, report generation, ML preprocessing, dashboard prep — *every da
 
 Pandas is the *standard language for tabular data*. Next we go deep into the *internal structure* of *Series and DataFrame*.
 
+## Answering the Opening Questions
+
+- **The *definition* of *Pandas* and where it sits?**
+  - The article treats What Is Pandas? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The intuition behind *Series* and *DataFrame?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The basic *load → inspect → summarize* workflow?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Pandas? (current)**
 - Series and DataFrame (upcoming)
 - Reading CSV and Excel (upcoming)
@@ -178,6 +194,7 @@ Pandas is the *standard language for tabular data*. Next we go deep into the *in
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

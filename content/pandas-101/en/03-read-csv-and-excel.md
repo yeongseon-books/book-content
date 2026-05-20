@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 3
-title: Reading CSV and Excel
+title: "Pandas 101 (3/10): Reading CSV and Excel"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Master read_csv and read_excel — encoding, separator, dtype, 
 last_reviewed: '2026-05-15'
 ---
 
-# Reading CSV and Excel
+# Pandas 101 (3/10): Reading CSV and Excel
 
 A lot of analysis work goes wrong long before modeling or visualization starts. If text encoding breaks, numeric columns land as strings, or dates stay as plain text, every downstream calculation becomes less trustworthy. File loading is not a throwaway pre-step. It is where data quality gets its first serious test.
 
@@ -28,24 +28,27 @@ This is post 3 in the Pandas 101 series.
 
 In this chapter, we will treat `read_csv` and `read_excel` as data-loading contracts rather than convenience helpers. The goal is to make data land in memory the way you intended on the first read.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The *core options* of *read_csv* and *read_excel*
-- Handling *encoding* and *separators*
-- The value of explicit *dtype*
-- A 5-step loading hands-on
-- Five common mistakes
+- The *core options* of *read_csv* and *read_excel?
+- Handling *encoding* and *separators?
+- The value of explicit *dtype?
 
-> File loading is really contract interpretation. If you settle encoding, separators, dtypes, and date columns up front, you remove a surprising amount of downstream debugging work.
+## Big Picture
+
+![pandas 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 3 flow overview*
+
+This picture places Reading CSV and Excel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Reading CSV and Excel is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *80%* of analysis is *loading and cleaning*. *Mistakes at load time* come back as *debugging cost* later.
 
 ## Concept at a Glance
-
-![A loading flow that checks encoding, dtypes, and headers early](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
-*A loading flow that checks encoding, dtypes, and headers early*
 
 ## Key Terms
 
@@ -168,9 +171,20 @@ ERP CSV exports, accounting Excel files, CSV from external APIs — to *load rel
 
 Good loading is the *start of good analysis*. Next we cover *filtering and selection*.
 
+## Answering the Opening Questions
+
+- **The *core options* of *read_csv* and *read_excel?**
+  - The article treats Reading CSV and Excel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Handling *encoding* and *separators?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The value of explicit *dtype?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
 - **Reading CSV and Excel (current)**
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
@@ -179,6 +193,7 @@ Good loading is the *start of good analysis*. Next we cover *filtering and selec
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

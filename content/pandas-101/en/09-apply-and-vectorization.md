@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 9
-title: Apply and Vectorization
+title: "Pandas 101 (9/10): Apply and Vectorization"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn the trap of apply and the power of NumPy and Pandas vecto
 last_reviewed: '2026-05-15'
 ---
 
-# Apply and Vectorization
+# Pandas 101 (9/10): Apply and Vectorization
 
 Once you get comfortable with Pandas syntax, the next big lesson is that “working code” and “fast code” are not the same thing. `apply(axis=1)` often feels natural because it resembles row-by-row reasoning, but it becomes a bottleneck surprisingly quickly as datasets grow. Performance improves once you understand what Pandas is optimized to do well.
 
@@ -28,24 +28,27 @@ This is post 9 in the Pandas 101 series.
 
 In this chapter, I do not want to ban `apply` as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when `map`, NumPy operations, or direct Series math are the better tools.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The meaning of *vectorization*
-- The difference between *apply / map / vectorize*
-- *Interop* with *NumPy*
-- A 5-step performance hands-on
-- Five common mistakes
+- The meaning of *vectorization?
+- The difference between *apply / map / vectorize?
+- Interop* with *NumPy?
 
-> Pandas gets fast when work moves to whole-column array math. The reason apply feels convenient and the reason it becomes slow are the same: it keeps pulling the computation back into Python one row at a time.
+## Big Picture
+
+![pandas 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 9 flow overview*
+
+This picture places Apply and Vectorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Apply and Vectorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Analysis speed can differ by *tens to hundreds of times*. *Vectorization* is the *essence of Pandas*, and *apply abuse* is the *most common antipattern*.
 
 ## Concept at a Glance
-
-![Why column-wise math outruns row-wise apply calls](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
-*Why column-wise math outruns row-wise apply calls*
 
 ## Key Terms
 
@@ -161,17 +164,29 @@ ETL transforms, feature engineering, large reports — *vectorization* directly 
 
 Vectorization is the *essence of Pandas*. Next we cover a *real-world data analysis* example.
 
+## Answering the Opening Questions
+
+- **The meaning of *vectorization?**
+  - The article treats Apply and Vectorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The difference between *apply / map / vectorize?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Interop* with *NumPy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [Groupby and Aggregation](./06-groupby.md)
-- [Merge and Join](./07-merge-and-join.md)
-- [Time Series](./08-time-series.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
+- [Pandas 101 (7/10): Merge and Join](./07-merge-and-join.md)
+- [Pandas 101 (8/10): Time Series](./08-time-series.md)
 - **Apply and Vectorization (current)**
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 10
-title: Real-World Data Analysis
+title: "Pandas 101 (10/10): Real-World Data Analysis"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Tie load, clean, transform, aggregate, and visualize into one r
 last_reviewed: '2026-05-15'
 ---
 
-# Real-World Data Analysis
+# Pandas 101 (10/10): Real-World Data Analysis
 
 The earlier chapters covered loading, cleaning, selecting, grouping, joining, time handling, and performance habits one piece at a time. Real analysis becomes useful only when those pieces connect into one repeatable flow. That is usually where the gap between knowing Pandas features and delivering analysis results becomes visible.
 
@@ -28,24 +28,27 @@ This is the final post in the Pandas 101 series.
 
 In this chapter, we will connect everything into one standard workflow: load, clean, enrich, aggregate, and visualize. The goal is not a flashy notebook. It is a pipeline you can rerun, review, and share with confidence.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The standard *EDA workflow*
-- The value of *function-level separation*
-- Building *reproducible analysis*
-- A 5-step end-to-end run
-- Five common mistakes
+- The standard *EDA workflow?
+- The value of *function-level separation?
+- Building *reproducible analysis?
 
-> Good analysis is visible as a sequence: load, clean, enrich, aggregate, and visualize. If that sequence is explicit in code, the work becomes much easier to rerun, review, and trust.
+## Big Picture
+
+![pandas 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 10 flow overview*
+
+This picture places Real-World Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Real-World Data Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Knowing each tool separately is not the same as *producing a result*. *Pro analysts* are defined by their *connecting ability*.
 
 ## Concept at a Glance
-
-![A reproducible analysis pipeline from loading to KPI charts](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
-*A reproducible analysis pipeline from loading to KPI charts*
 
 ## Key Terms
 
@@ -181,17 +184,29 @@ KPI report automation, marketing analytics, ops dashboards — *analysis pipelin
 
 You have completed *Pandas 101*. Next stops: *Polars, Dask*, or *visualization (Matplotlib/Plotly)*, then *ML preprocessing (scikit-learn)*. Every road in data work *starts at Pandas*.
 
+## Answering the Opening Questions
+
+- **The standard *EDA workflow?**
+  - The article treats Real-World Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The value of *function-level separation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Building *reproducible analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
-- [Handling Missing Values](./05-missing-values.md)
-- [Groupby and Aggregation](./06-groupby.md)
-- [Merge and Join](./07-merge-and-join.md)
-- [Time Series](./08-time-series.md)
-- [Apply and Vectorization](./09-apply-and-vectorization.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
+- [Pandas 101 (5/10): Handling Missing Values](./05-missing-values.md)
+- [Pandas 101 (6/10): Groupby and Aggregation](./06-groupby.md)
+- [Pandas 101 (7/10): Merge and Join](./07-merge-and-join.md)
+- [Pandas 101 (8/10): Time Series](./08-time-series.md)
+- [Pandas 101 (9/10): Apply and Vectorization](./09-apply-and-vectorization.md)
 - **Real-World Data Analysis (current)**
+
 <!-- toc:end -->
 
 ## References

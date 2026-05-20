@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Series and DataFrame</title>
+<title>Pandas 101 (2/10): Series and DataFrame</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Series and DataFrame</h1>
+<h1>Pandas 101 (2/10): Series and DataFrame</h1>
 <p>Very early in Pandas, most people run into the same question: are Series and DataFrame just two names for similar containers, or are they different views of one data model? If that relationship stays fuzzy, column selection, arithmetic, sorting, and joins all feel like memorized syntax instead of predictable behavior.</p>
 <p>This is post 2 in the Pandas 101 series.</p>
 <p>The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>internal structure</em> of a <em>Series</em></li>
-<li><em>Column-oriented</em> thinking with <em>DataFrame</em></li>
-<li>The role of the <em>Index</em></li>
-<li>A 5-step build-from-scratch</li>
-<li>Five common mistakes</li>
+<li>The <em>internal structure</em> of a *Series?</li>
+<li>Column-oriented<em> thinking with </em>DataFrame?</li>
+<li>The role of the *Index?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 2 flow overview</em></p>
+<p>This picture places Series and DataFrame inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A DataFrame stops being mysterious once you see it as a set of Series sharing one index. That perspective explains column selection, label alignment, and arithmetic far better than row-by-row thinking.</p>
+<p>The core of Series and DataFrame is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p><em>Every Pandas operation</em> eventually reduces to <em>Series-level work</em>. A <em>DataFrame column is a Series</em>. Understanding this model makes <em>everything else easy</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A DataFrame built from multiple Series sharing one index" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>A DataFrame built from multiple Series sharing one index</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Series</strong>: <em>values + index</em> — a <em>NumPy array</em> with <em>labels</em> on top.</li>
@@ -164,8 +164,18 @@ dtype: float64
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>A DataFrame is <em>a collection of Series</em>. Next we cover <em>reading CSV and Excel files</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
+<li><strong>The <em>internal structure</em> of a *Series?</strong></li>
+<li>The article treats Series and DataFrame as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Column-oriented<em> thinking with </em>DataFrame?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The role of the *Index?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">Pandas 101 (1/10): What Is Pandas?</a></li>
 <li><strong>Series and DataFrame (current)</strong></li>
 <li>Reading CSV and Excel (upcoming)</li>
 <li>Filtering and Selection (upcoming)</li>

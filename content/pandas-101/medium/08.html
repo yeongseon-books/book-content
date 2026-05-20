@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Time Series</title>
+<title>Pandas 101 (8/10): Time Series</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Time Series</h1>
+<h1>Pandas 101 (8/10): Time Series</h1>
 <p>Sales, traffic, sensor, and financial data often stop behaving like ordinary tables once time becomes the main organizing dimension. If dates stay as strings, comparisons feel awkward and weekly summaries or moving averages become noisier to implement than they should be. The whole experience changes once time becomes the index.</p>
 <p>This is post 8 in the Pandas 101 series.</p>
 <p>In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The intuition of <em>DatetimeIndex</em></li>
-<li><em>resample</em> and <em>rolling</em></li>
-<li>Handling <em>time zones (tz)</em></li>
-<li>A 5-step time series hands-on</li>
-<li>Five common mistakes</li>
+<li>The intuition of *DatetimeIndex?</li>
+<li>resample<em> and </em>rolling?</li>
+<li>Handling *time zones (tz)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 8 flow overview</em></p>
+<p>This picture places Time Series inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>In time series work, the real primary key is the timeline itself. Once time becomes the index, slicing, resampling, and rolling calculations stop feeling like separate tricks and start feeling like one language.</p>
+<p>The core of Time Series is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Sales, traffic, sensors, finance — <em>most operational data</em> is time series. Treating <em>time as an index</em> makes <em>KPI trends</em> visible immediately.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="A time-first workflow with resampling, rolling windows, and time zones" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>A time-first workflow with resampling, rolling windows, and time zones</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DatetimeIndex</strong>: an index of <em>time labels</em>.</li>
@@ -160,14 +160,24 @@ Freq: D, dtype: int64
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>Time series is <em>a Pandas strength</em>. Next we cover <em>apply and vectorization</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Groupby and Aggregation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
+<li><strong>The intuition of *DatetimeIndex?</strong></li>
+<li>The article treats Time Series as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>resample<em> and </em>rolling?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Handling *time zones (tz)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">Pandas 101 (1/10): What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Pandas 101 (2/10): Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Pandas 101 (3/10): Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Pandas 101 (4/10): Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Pandas 101 (5/10): Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Pandas 101 (6/10): Groupby and Aggregation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Pandas 101 (7/10): Merge and Join</a></li>
 <li><strong>Time Series (current)</strong></li>
 <li>Apply and Vectorization (upcoming)</li>
 <li>Real-World Data Analysis (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 2
-title: Series and DataFrame
+title: "Pandas 101 (2/10): Series and DataFrame"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A clear introduction to the two core Pandas data structures —
 last_reviewed: '2026-05-15'
 ---
 
-# Series and DataFrame
+# Pandas 101 (2/10): Series and DataFrame
 
 Very early in Pandas, most people run into the same question: are Series and DataFrame just two names for similar containers, or are they different views of one data model? If that relationship stays fuzzy, column selection, arithmetic, sorting, and joins all feel like memorized syntax instead of predictable behavior.
 
@@ -28,24 +28,27 @@ This is post 2 in the Pandas 101 series.
 
 The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The *internal structure* of a *Series*
-- *Column-oriented* thinking with *DataFrame*
-- The role of the *Index*
-- A 5-step build-from-scratch
-- Five common mistakes
+- The *internal structure* of a *Series?
+- Column-oriented* thinking with *DataFrame?
+- The role of the *Index?
 
-> A DataFrame stops being mysterious once you see it as a set of Series sharing one index. That perspective explains column selection, label alignment, and arithmetic far better than row-by-row thinking.
+## Big Picture
+
+![pandas 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 2 flow overview*
+
+This picture places Series and DataFrame inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Series and DataFrame is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Every Pandas operation* eventually reduces to *Series-level work*. A *DataFrame column is a Series*. Understanding this model makes *everything else easy*.
 
 ## Concept at a Glance
-
-![A DataFrame built from multiple Series sharing one index](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
-*A DataFrame built from multiple Series sharing one index*
 
 ## Key Terms
 
@@ -169,8 +172,19 @@ A/B test comparison, time series aggregation, joining *data from multiple source
 
 A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel files*.
 
+## Answering the Opening Questions
+
+- **The *internal structure* of a *Series?**
+  - The article treats Series and DataFrame as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Column-oriented* thinking with *DataFrame?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of the *Index?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
 - **Series and DataFrame (current)**
 - Reading CSV and Excel (upcoming)
 - Filtering and Selection (upcoming)
@@ -180,6 +194,7 @@ A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel fi
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: pandas-101
 episode: 5
-title: Handling Missing Values
+title: "Pandas 101 (5/10): Handling Missing Values"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Handle missing data with isna, dropna, fillna, and interpolate 
 last_reviewed: '2026-05-15'
 ---
 
-# Handling Missing Values
+# Pandas 101 (5/10): Handling Missing Values
 
 Real datasets are rarely complete. Sensors miss readings, surveys leave blanks behind, and transaction pipelines drop fields at inconvenient moments. That means missing-value handling is not cosmetic cleanup. It is one of the choices that most directly shapes the credibility of your analysis.
 
@@ -28,24 +28,27 @@ This is post 5 in the Pandas 101 series.
 
 In this chapter, I will treat `NaN` as a signal to interpret before it becomes a value to drop or fill. The right first question is not “which method should I use?” but “why is this value missing at all?”
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The meaning of *NaN* and its *dtype* impact
-- How to use *isna / dropna / fillna*
-- The intuition behind *interpolate*
-- A 5-step missing-value hands-on
-- Five common mistakes
+- The meaning of *NaN* and its *dtype* impact?
+- How to use *isna / dropna / fillna?
+- The intuition behind *interpolate?
 
-> A missing value can mean bad data, but it can also mean an incomplete process. If you fill or drop before you understand the cause, the table may look cleaner while the interpretation gets worse.
+## Big Picture
+
+![pandas 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
+
+*pandas 101 chapter 5 flow overview*
+
+This picture places Handling Missing Values inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Handling Missing Values is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Real data is *full of missing values*. How you handle them decides *model performance* and *analysis credibility*.
 
 ## Concept at a Glance
-
-![A missing-data workflow that starts with cause before drop or fill](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
-*A missing-data workflow that starts with cause before drop or fill*
 
 ## Key Terms
 
@@ -165,17 +168,29 @@ Sensor streams, surveys, transaction logs — the *missingness pattern itself* i
 
 Missing-value handling decides *analysis integrity*. Next we cover *groupby*.
 
+## Answering the Opening Questions
+
+- **The meaning of *NaN* and its *dtype* impact?**
+  - The article treats Handling Missing Values as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to use *isna / dropna / fillna?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The intuition behind *interpolate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Pandas?](./01-what-is-pandas.md)
-- [Series and DataFrame](./02-series-and-dataframe.md)
-- [Reading CSV and Excel](./03-read-csv-and-excel.md)
-- [Filtering and Selection](./04-filtering-and-selection.md)
+## In this series
+
+- [Pandas 101 (1/10): What Is Pandas?](./01-what-is-pandas.md)
+- [Pandas 101 (2/10): Series and DataFrame](./02-series-and-dataframe.md)
+- [Pandas 101 (3/10): Reading CSV and Excel](./03-read-csv-and-excel.md)
+- [Pandas 101 (4/10): Filtering and Selection](./04-filtering-and-selection.md)
 - **Handling Missing Values (current)**
 - Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
 - Apply and Vectorization (upcoming)
 - Real-World Data Analysis (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Apply and Vectorization</title>
+<title>Pandas 101 (9/10): Apply and Vectorization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Apply and Vectorization</h1>
+<h1>Pandas 101 (9/10): Apply and Vectorization</h1>
 <p>Once you get comfortable with Pandas syntax, the next big lesson is that “working code” and “fast code” are not the same thing. <code>apply(axis=1)</code> often feels natural because it resembles row-by-row reasoning, but it becomes a bottleneck surprisingly quickly as datasets grow. Performance improves once you understand what Pandas is optimized to do well.</p>
 <p>This is post 9 in the Pandas 101 series.</p>
 <p>In this chapter, I do not want to ban <code>apply</code> as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when <code>map</code>, NumPy operations, or direct Series math are the better tools.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The meaning of <em>vectorization</em></li>
-<li>The difference between <em>apply / map / vectorize</em></li>
-<li><em>Interop</em> with <em>NumPy</em></li>
-<li>A 5-step performance hands-on</li>
-<li>Five common mistakes</li>
+<li>The meaning of *vectorization?</li>
+<li>The difference between *apply / map / vectorize?</li>
+<li>Interop<em> with </em>NumPy?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="pandas 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>pandas 101 chapter 9 flow overview</em></p>
+<p>This picture places Apply and Vectorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Pandas gets fast when work moves to whole-column array math. The reason apply feels convenient and the reason it becomes slow are the same: it keeps pulling the computation back into Python one row at a time.</p>
+<p>The core of Apply and Vectorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Analysis speed can differ by <em>tens to hundreds of times</em>. <em>Vectorization</em> is the <em>essence of Pandas</em>, and <em>apply abuse</em> is the <em>most common antipattern</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Why column-wise math outruns row-wise apply calls" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>Why column-wise math outruns row-wise apply calls</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Vectorization</strong>: array-level computation <em>without explicit loops</em>.</li>
@@ -156,15 +156,25 @@ dtype: object
 </ol>
 <h2>Wrap-up and next steps</h2>
 <p>Vectorization is the <em>essence of Pandas</em>. Next we cover a <em>real-world data analysis</em> example.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Groupby and Aggregation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Time Series</a></li>
+<li><strong>The meaning of *vectorization?</strong></li>
+<li>The article treats Apply and Vectorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The difference between *apply / map / vectorize?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Interop<em> with </em>NumPy?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">Pandas 101 (1/10): What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Pandas 101 (2/10): Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Pandas 101 (3/10): Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Pandas 101 (4/10): Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Pandas 101 (5/10): Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Pandas 101 (6/10): Groupby and Aggregation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Pandas 101 (7/10): Merge and Join</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Pandas 101 (8/10): Time Series</a></li>
 <li><strong>Apply and Vectorization (current)</strong></li>
 <li>Real-World Data Analysis (upcoming)</li>
 </ul>
