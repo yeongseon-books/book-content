@@ -1,5 +1,5 @@
 ---
-title: PII Detection and Redaction
+title: "AI Safety & Guardrails 101 (4/10): PII Detection and Redaction"
 series: ai-safety-guardrails-101
 episode: 4
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Protect user privacy and maintain GDPR compliance by redacting PII in LLM inputs and outputs using Microsoft Presidio and reversible tokenization.
 ---
 
-# PII Detection and Redaction
+# AI Safety & Guardrails 101 (4/10): PII Detection and Redaction
 
 > AI Safety & Guardrails 101 Series (4/10)
 
@@ -26,15 +26,21 @@ LLM applications handle personal data in both directions. Users send sensitive i
 
 This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why must PII protection separate what is sent to the model from what is stored internally?
+- Where are regex, Presidio, and reversible tokenization each useful?
+- What leak appears if outbound responses are not checked again?
 
-- Where does PII leak into an LLM system besides the user prompt itself?
-- Which PII categories are easy for regex and which need NER support?
-- When is Microsoft Presidio a better fit than hand-written patterns alone?
-- Why is reversible tokenization sometimes safer than plain masking?
-- Why does every outbound response need a separate PII re-check?
+## Big Picture
+
+![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
+
+*section 1: PII categories*
+
+This picture shows PII detected and replaced before model calls while stored internal data stays separate from model input. A PII guardrail is not a one-time masking function; it protects both inbound and outbound data boundaries.
+
+> The core of PII protection is not simply hiding data; it is separating what the model may see from what the system must retain.
 
 ## "Did You Mask the Email?"
 
@@ -56,9 +62,6 @@ This post covers:
 ---
 
 ## Section 1 — PII Categories
-
-![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
-*PII protection has to cover inbound detection, model-time masking, outbound re-checking, and storage separation.*
 
 | Category | Examples |
 | --- | --- |
@@ -265,19 +268,28 @@ Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce pr
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Output Filtering and Content Moderation](./03-output-filtering.md)
-- **PII Detection and Redaction (current)**
-- Jailbreak Detection (upcoming)
-- Toxicity and Bias Detection (upcoming)
-- Hallucination Guardrails — Grounding Checks (upcoming)
-- Rate Limiting and Abuse Prevention (upcoming)
-- Audit Logging and Compliance (upcoming)
-- Building a Production Guardrail System (upcoming)
+- **Why must PII protection separate what is sent to the model from what is stored internally?**
+  - Send only minimized tokens or masked values to the model while keeping originals in access-controlled storage to reduce blast radius.
+- **Where are regex, Presidio, and reversible tokenization each useful?**
+  - Regex is a fast starting point, Presidio helps with richer entity detection, and reversible tokenization fits workflows that need later restoration.
+- **What leak appears if outbound responses are not checked again?**
+  - The model may reconstruct or echo private data from context, so outbound re-checks are needed before the user sees the response.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- **AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (current)**
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

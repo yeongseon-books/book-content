@@ -1,5 +1,5 @@
 ---
-title: Toxicity and Bias Detection
+title: "AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection"
 series: ai-safety-guardrails-101
 episode: 6
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Address toxicity with real-time blocking and manage systematic bias through offline audits and counterfactual evaluation to ensure AI fairness.
 ---
 
-# Toxicity and Bias Detection
+# AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection
 
 > AI Safety & Guardrails 101 Series (6/10)
 
@@ -26,15 +26,21 @@ Toxicity and bias often get grouped together, but they are not the same operatio
 
 This is post 6 in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should toxicity blocking and bias measurement not be treated as the same problem?
+- What signals should inline moderation and offline audits each own?
+- What must be monitored to reduce false positives without weakening protection?
 
-- Why do toxicity and bias need different operational workflows?
-- Which classifier families are practical for inline toxicity blocking?
-- How should streaming responses be buffered to avoid leaking toxic tokens?
-- Why does bias evaluation require counterfactual sets instead of single examples?
-- Which fairness metrics matter once the model influences decisions?
+## Big Picture
+
+![Toxicity and bias guardrail flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.en.png)
+
+*Toxicity and bias guardrail flow*
+
+This picture separates inline toxicity blocking from long-running bias sampling and audits that feed policy improvement. Toxicity and bias guardrails must distinguish immediate harm from imbalance that must be measured over time.
+
+> Toxicity is an immediate risk to block; bias is a system tendency to measure and reduce over time.
 
 ## Toxicity and Bias Are Different Problems
 
@@ -217,19 +223,28 @@ Surface three numbers on a dashboard at all times: per-category block rate, fals
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak Detection](./05-jailbreak-detection.md)
-- **Ep6 Toxicity and Bias Detection (current)**
-- Ep7 Hallucination Guardrails - Grounding Checks (upcoming)
-- Ep8 Rate Limiting and Abuse Prevention (upcoming)
-- Ep9 Audit Logging and Compliance (upcoming)
-- Ep10 Building a Production Guardrail System (upcoming)
+- **Why should toxicity blocking and bias measurement not be treated as the same problem?**
+  - Toxicity concerns immediate harm in one response; bias concerns longer-term differences in quality, exposure, or decisions across groups.
+- **What signals should inline moderation and offline audits each own?**
+  - Inline moderation owns blocking and user protection; offline audits own demographic parity, representation, and false-positive distribution.
+- **What must be monitored to reduce false positives without weakening protection?**
+  - Track block rates, appeals, group-level false positives, edge-case samples, and metric shifts before and after policy changes.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- **AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (current)**
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

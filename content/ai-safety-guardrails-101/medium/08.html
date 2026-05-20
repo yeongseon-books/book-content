@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Rate Limiting and Abuse Prevention</title>
+<title>AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Rate Limiting and Abuse Prevention</h1>
+<h1>AI Safety &amp; Guardrails 101 (8/10): Rate Limiting and Abuse Prevention</h1>
 <blockquote>
 <p>AI Safety &amp; Guardrails 101 Series (8/10)</p>
 </blockquote>
 <p>Rate limiting for LLM APIs is not just about requests per second. Token volume, streaming output, and cost all move independently, so abuse control has to watch more than one meter.</p>
 <p>This is post 8 in the AI Safety &amp; Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why is LLM rate limiting about more than requests per second?</li>
-<li>How do token bucket and sliding window serve different goals?</li>
-<li>Why should user, IP, and API-key quotas overlap?</li>
-<li>How do output-token and spend caps differ from request limits?</li>
-<li>Why is staged escalation safer than instant suspension?</li>
+<li>Why should LLM rate limiting measure resource consumption instead of only request count?</li>
+<li>What abuse is controlled by token, cost, user, and key-level limits?</li>
+<li>How should hard blocking and degraded responses be separated when limits are exceeded?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Rate limiting and abuse prevention flow" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.en.png"></p>
+<p><em>Rate limiting and abuse prevention flow</em></p>
+<p>This picture meters tokens and cost for each request, debits a bucket, and then blocks or degrades when limits are exceeded. LLM abuse prevention should be designed around consumed resources rather than request count alone.</p>
+<blockquote>
+<p>The unit of LLM rate limiting is not just a request; it is the resource that actually gets exhausted: tokens, cost, and tool calls.</p>
+</blockquote>
 <h2>Why Rate Limiting Is Different for LLM APIs</h2>
 <p>Traditional API abuse control is mostly about requests per second. LLM APIs add two dimensions.</p>
 <ul>
@@ -221,18 +225,27 @@ class AnomalyDetector:
 <li>[ ] Keep cost-critical counters strongly consistent even if regional RPS counters are local.</li>
 </ul>
 <hr>
-<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">Ep7 Hallucination Guardrails - Grounding Checks</a></li>
-<li><strong>Ep8 Rate Limiting and Abuse Prevention (current)</strong></li>
-<li>Ep9 Audit Logging and Compliance (upcoming)</li>
-<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+<li><strong>Why should LLM rate limiting measure resource consumption instead of only request count?</strong></li>
+<li>Short and long requests have very different costs, and output-token explosions or tool loops are invisible if you count only requests.</li>
+<li><strong>What abuse is controlled by token, cost, user, and key-level limits?</strong></li>
+<li>Token limits control context and output explosions, cost limits control budget abuse, and user/key limits control credential sharing or scraping.</li>
+<li><strong>How should hard blocking and degraded responses be separated when limits are exceeded?</strong></li>
+<li>Block malicious repeated abuse, but degrade legitimate overages with shorter answers, waiting, smaller models, or retry guidance.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">AI Safety &amp; Guardrails 101 (1/10): Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">AI Safety &amp; Guardrails 101 (2/10): Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">AI Safety &amp; Guardrails 101 (3/10): Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">AI Safety &amp; Guardrails 101 (4/10): PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">AI Safety &amp; Guardrails 101 (5/10): Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">AI Safety &amp; Guardrails 101 (6/10): Toxicity and Bias Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">AI Safety &amp; Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks</a></li>
+<li><strong>AI Safety &amp; Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (current)</strong></li>
+<li>AI Safety &amp; Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

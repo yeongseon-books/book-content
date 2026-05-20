@@ -1,5 +1,5 @@
 ---
-title: Rate Limiting and Abuse Prevention
+title: "AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention"
 series: ai-safety-guardrails-101
 episode: 8
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Prevent LLM API abuse and cost overruns by tracking requests, tokens, and spend using hybrid token bucket and anomaly detection algorithms.
 ---
 
-# Rate Limiting and Abuse Prevention
+# AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention
 
 > AI Safety & Guardrails 101 Series (8/10)
 
@@ -26,15 +26,21 @@ Rate limiting for LLM APIs is not just about requests per second. Token volume, 
 
 This is post 8 in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should LLM rate limiting measure resource consumption instead of only request count?
+- What abuse is controlled by token, cost, user, and key-level limits?
+- How should hard blocking and degraded responses be separated when limits are exceeded?
 
-- Why is LLM rate limiting about more than requests per second?
-- How do token bucket and sliding window serve different goals?
-- Why should user, IP, and API-key quotas overlap?
-- How do output-token and spend caps differ from request limits?
-- Why is staged escalation safer than instant suspension?
+## Big Picture
+
+![Rate limiting and abuse prevention flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.en.png)
+
+*Rate limiting and abuse prevention flow*
+
+This picture meters tokens and cost for each request, debits a bucket, and then blocks or degrades when limits are exceeded. LLM abuse prevention should be designed around consumed resources rather than request count alone.
+
+> The unit of LLM rate limiting is not just a request; it is the resource that actually gets exhausted: tokens, cost, and tool calls.
 
 ## Why Rate Limiting Is Different for LLM APIs
 
@@ -222,19 +228,28 @@ LLM APIs care about cost caps, so most teams pick strong consistency for cost di
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak Detection](./05-jailbreak-detection.md)
-- [Ep6 Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
-- [Ep7 Hallucination Guardrails - Grounding Checks](./07-hallucination-guardrails.md)
-- **Ep8 Rate Limiting and Abuse Prevention (current)**
-- Ep9 Audit Logging and Compliance (upcoming)
-- Ep10 Building a Production Guardrail System (upcoming)
+- **Why should LLM rate limiting measure resource consumption instead of only request count?**
+  - Short and long requests have very different costs, and output-token explosions or tool loops are invisible if you count only requests.
+- **What abuse is controlled by token, cost, user, and key-level limits?**
+  - Token limits control context and output explosions, cost limits control budget abuse, and user/key limits control credential sharing or scraping.
+- **How should hard blocking and degraded responses be separated when limits are exceeded?**
+  - Block malicious repeated abuse, but degrade legitimate overages with shorter answers, waiting, smaller models, or retry guidance.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks](./07-hallucination-guardrails.md)
+- **AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (current)**
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

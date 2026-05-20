@@ -1,5 +1,5 @@
 ---
-title: Why AI Safety Matters
+title: "AI Safety & Guardrails 101 (1/10): Why AI Safety Matters"
 series: ai-safety-guardrails-101
 episode: 1
 language: en
@@ -18,23 +18,27 @@ last_reviewed: '2026-05-14'
 seo_description: Establish a robust threat model for LLM applications and learn why code-level guardrails are essential for production security beyond simple prompts.
 ---
 
-# Why AI Safety Matters
+# AI Safety & Guardrails 101 (1/10): Why AI Safety Matters
 
 The first version of an LLM app feels simple. Pass user input to the model and render the answer, and the demo works. Production exposes the rest of the problem: prompt injection, PII leaks, hallucinations, and abuse that a prompt alone cannot control.
 
 This is the first post in the AI Safety & Guardrails 101 series. It frames why guardrails are not optional polish around a prompt but part of the core operating model for an LLM application.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- What risk do you miss when an LLM call is treated as inside the trust boundary?
+- How must a guardrail differ from a prompt rule to become a real safety control?
+- Where should the first minimum production guardrail sit?
 
-- What is the difference between a prompt instruction and a guardrail?
-- Why does a good system prompt still fail under real user traffic?
-- Which threat categories should you define before shipping an LLM feature?
-- Where do guardrails sit in the request path?
-- What is the smallest code-level guardrail worth shipping on day one?
+## Big Picture
 
-> Treat every LLM call as an untrusted boundary. The model may still be useful, but the system must assume that inputs, retrieved context, tool calls, and outputs can all fail in different ways.
+![section 4: four guardrail locations](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
+
+*section 4: four guardrail locations*
+
+This picture treats the LLM call as an untrusted boundary and places guardrails around input, model calls, output, and operational logs. AI safety starts by validating model-produced data instead of trusting it.
+
+> An LLM call is not a safe function call; it is an untrusted data boundary.
 
 ## "Just Call the LLM API, Right?"
 
@@ -113,9 +117,6 @@ You cannot defend against everything. Prioritize by domain. A medical chatbot ra
 
 Guardrails fit at four points in the call pipeline:
 
-![section 4: four guardrail locations](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
-*Guardrails sit on the request boundary before and after the model, while audit traces every decision.*
-
 ```text
 [User Input] → (1) Pre-input → [LLM Call] → (2) Post-output → [User]
                                     ↓
@@ -187,13 +188,11 @@ BLOCKED_PATTERNS = [
     r"system\s+prompt\s+leak",
 ]
 
-
 @dataclass
 class GuardDecision:
     allowed: bool
     stage: str
     reason: str | None = None
-
 
 def input_guardrail(text: str) -> GuardDecision:
     if len(text) > 2_000:
@@ -203,12 +202,10 @@ def input_guardrail(text: str) -> GuardDecision:
             return GuardDecision(False, "pre-input", "prompt_injection_pattern")
     return GuardDecision(True, "pre-input")
 
-
 def output_guardrail(text: str) -> GuardDecision:
     if re.search(r"\b\d{3}-\d{2}-\d{4}\b", text):
         return GuardDecision(False, "post-output", "pii_detected")
     return GuardDecision(True, "post-output")
-
 
 def log_decision(request_id: str, decision: GuardDecision) -> None:
     print(json.dumps({
@@ -304,19 +301,28 @@ The remaining nine episodes each take one guardrail category in depth:
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- **Why AI Safety Matters (current)**
-- Prompt Injection Defense (upcoming)
-- Output Filtering and Content Moderation (upcoming)
-- PII Detection and Redaction (upcoming)
-- Jailbreak Detection (upcoming)
-- Toxicity and Bias Detection (upcoming)
-- Hallucination Guardrails — Grounding Checks (upcoming)
-- Rate Limiting and Abuse Prevention (upcoming)
-- Audit Logging and Compliance (upcoming)
-- Building a Production Guardrail System (upcoming)
+- **What risk do you miss when an LLM call is treated as inside the trust boundary?**
+  - You assume the model will automatically respect policy, permissions, factuality, and privacy, so risky behavior appears too late.
+- **How must a guardrail differ from a prompt rule to become a real safety control?**
+  - A prompt rule is a request. A guardrail must be enforced in the execution path through code, policy checks, logging, and blocking.
+- **Where should the first minimum production guardrail sit?**
+  - Place the first guardrail between input handling and output/tool execution, especially before the user sees the response or a tool runs.
+<!-- toc:begin -->
+## In this series
+
+- **AI Safety & Guardrails 101 (1/10): Why AI Safety Matters (current)**
+- AI Safety & Guardrails 101 (2/10): Prompt Injection Defense (upcoming)
+- AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation (upcoming)
+- AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (upcoming)
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

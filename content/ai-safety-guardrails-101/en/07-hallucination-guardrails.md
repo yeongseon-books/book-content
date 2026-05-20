@@ -1,5 +1,5 @@
 ---
-title: Hallucination Guardrails — Grounding Checks
+title: "AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks"
 series: ai-safety-guardrails-101
 episode: 7
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Reduce LLM hallucinations in RAG systems by implementing grounding checks, claim extraction, and NLI-based verification against source context.
 ---
 
-# Hallucination Guardrails — Grounding Checks
+# AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks
 
 > AI Safety & Guardrails 101 Series (7/10)
 
@@ -26,15 +26,21 @@ People use "hallucination" for any confident mistake, but production guardrails 
 
 This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should a hallucination guardrail inspect claims instead of the whole answer at once?
+- What do claim extraction, entailment checks, and citation format each verify?
+- When evidence is weak, should the answer be blocked, revised, or held?
 
-- Why should a production guardrail focus on closed-domain hallucinations first?
-- What is the difference between citation, source, and semantic grounding?
-- Why does claim-level verification catch errors that sentence-level checks miss?
-- When should NLI stop and a judge model take over?
-- What fallback works better than simply blocking every failed answer?
+## Big Picture
+
+![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
+
+*what grounding actually means*
+
+This picture breaks an answer into claims and checks each claim against evidence before deciding whether it passes. A hallucination guardrail must verify the relationship between claims and evidence, not the confidence of the prose.
+
+> To reduce hallucination, treat an answer as a set of verifiable claims, not as one fluent paragraph.
 
 ## The Trap in the Word "Hallucination"
 
@@ -46,9 +52,6 @@ People call any confidently wrong LLM output a hallucination, but for operations
 This episode focuses on **closed-domain**, because most production guardrails are RAG-based and grounding checks are the most reliable defense.
 
 ## What Grounding Actually Means
-
-![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
-*Grounding verification becomes manageable once the answer is decomposed into claims and checked in increasing-cost stages.*
 
 Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.
 
@@ -237,19 +240,28 @@ Example targets: claim recall 0.90, precision 0.85, average latency under 800 ms
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak Detection](./05-jailbreak-detection.md)
-- [Ep6 Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
-- **Ep7 Hallucination Guardrails - Grounding Checks (current)**
-- Ep8 Rate Limiting and Abuse Prevention (upcoming)
-- Ep9 Audit Logging and Compliance (upcoming)
-- Ep10 Building a Production Guardrail System (upcoming)
+- **Why should a hallucination guardrail inspect claims instead of the whole answer at once?**
+  - One answer can contain both supported and unsupported claims, so claim-level checks locate what must be fixed.
+- **What do claim extraction, entailment checks, and citation format each verify?**
+  - Claim extraction identifies what to verify, entailment checks whether evidence supports it, and citation format makes evidence traceable.
+- **When evidence is weak, should the answer be blocked, revised, or held?**
+  - Block high-risk unsupported claims, revise overconfident wording when evidence exists, and hold or escalate ambiguous cases.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- **AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (current)**
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

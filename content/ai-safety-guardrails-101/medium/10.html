@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building a Production Guardrail System</title>
+<title>AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,21 @@
 </style>
 </head>
 <body>
-<h1>Building a Production Guardrail System</h1>
+<h1>AI Safety &amp; Guardrails 101 (10/10): Building a Production Guardrail System</h1>
 <p>The guardrails in Episodes 1 through 9 are useful on their own, but production depends on how they fit together. You need one pipeline that makes ordering, fallback behavior, and auditability explicit.</p>
 <p>This is the final post in the AI Safety &amp; Guardrails 101 series. It turns the earlier guardrails into a single production architecture you can reason about end to end.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How should the earlier guardrails be grouped into a single production pipeline?</li>
-<li>Which checks should fail open, fail closed, or degrade with warnings?</li>
-<li>How do you keep guardrails inside a latency budget instead of serializing everything?</li>
-<li>Which metrics prove the system is both safe and usable?</li>
-<li>How do you ship a new guardrail without blocking healthy traffic by mistake?</li>
+<li>Why should a production guardrail system be a boundary-specific pipeline instead of one filter?</li>
+<li>By what risk criteria should fail-open and fail-closed behavior be chosen?</li>
+<li>How do performance budgets, observability, and CI regression fit into one system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Four-Layer Architecture" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png"></p>
+<p><em>Four-Layer Architecture</em></p>
+<p>This picture splits guardrail responsibility across input, retrieval/context, model output, and tool/action layers. A production guardrail is not one universal filter; it is a system that controls different risks at different boundaries.</p>
 <blockquote>
-<p>A production guardrail system is not a list of detectors. It is a boundary-by-boundary operating model with explicit ordering, failure policy, observability, and rollout discipline.</p>
+<p>A production guardrail system is not one place where risk is stopped; it is a pipeline where each boundary controls a different failure.</p>
 </blockquote>
 <h2>Wiring Nine Components Into One System</h2>
 <p>Episodes 1 through 9 covered guardrails as independent components. In production you need a single architecture diagram that shows where each one sits, the order they run in, and what happens when they fail. This capstone builds that architecture.</p>
@@ -79,8 +80,6 @@
 </ul>
 <h2>Four-Layer Architecture</h2>
 <p>Guardrails live in four positions in an LLM system.</p>
-<p><img alt="Four-Layer Architecture" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png"><br>
-<em>A production guardrail pipeline separates pre-input, pre-prompt, post-output, and audit responsibilities so that every block and bypass has a visible stage.</em></p>
 <p><strong>Pre-input</strong><br>
 - When it runs: Right after the user request arrives<br>
 - Guardrails: rate limit, jailbreak detection, prompt injection normalization</p>
@@ -307,18 +306,27 @@ async def run_post_output(answer: str, chunks: list[dict]) -&gt; list[GuardrailR
 <li>[ ] Roll out new blocking logic through shadow, canary, and full phases with feature flags.</li>
 </ul>
 <hr>
-<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">Ep7 Hallucination Guardrails - Grounding Checks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/08-rate-limiting-abuse-prevention.md">Ep8 Rate Limiting and Abuse Prevention</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/09-audit-logging-compliance.md">Ep9 Audit Logging and Compliance</a></li>
-<li><strong>Ep10 Building a Production Guardrail System (current)</strong></li>
+<li><strong>Why should a production guardrail system be a boundary-specific pipeline instead of one filter?</strong></li>
+<li>Input attacks, retrieval contamination, output policy violations, and tool-execution risk happen at different points, so one filter cannot own them all.</li>
+<li><strong>By what risk criteria should fail-open and fail-closed behavior be chosen?</strong></li>
+<li>Use fail-closed for high-impact safety, legal, or data-changing risks; consider fail-open or degradation for lower-risk auxiliary features.</li>
+<li><strong>How do performance budgets, observability, and CI regression fit into one system?</strong></li>
+<li>Connect each guardrail’s latency budget, decision log, alert, and regression case through the same request id and release pipeline.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">AI Safety &amp; Guardrails 101 (1/10): Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">AI Safety &amp; Guardrails 101 (2/10): Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">AI Safety &amp; Guardrails 101 (3/10): Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">AI Safety &amp; Guardrails 101 (4/10): PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">AI Safety &amp; Guardrails 101 (5/10): Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">AI Safety &amp; Guardrails 101 (6/10): Toxicity and Bias Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/07-hallucination-guardrails.md">AI Safety &amp; Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/08-rate-limiting-abuse-prevention.md">AI Safety &amp; Guardrails 101 (8/10): Rate Limiting and Abuse Prevention</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/09-audit-logging-compliance.md">AI Safety &amp; Guardrails 101 (9/10): Audit Logging and Compliance</a></li>
+<li><strong>AI Safety &amp; Guardrails 101 (10/10): Building a Production Guardrail System (current)</strong></li>
 </ul>
 <h2>References</h2>
 <ul>

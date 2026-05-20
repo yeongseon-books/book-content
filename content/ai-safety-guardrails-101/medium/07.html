@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Hallucination Guardrails — Grounding Checks</title>
+<title>AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Hallucination Guardrails — Grounding Checks</h1>
+<h1>AI Safety &amp; Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks</h1>
 <blockquote>
 <p>AI Safety &amp; Guardrails 101 Series (7/10)</p>
 </blockquote>
 <p>People use "hallucination" for any confident mistake, but production guardrails need a tighter target. In RAG systems, the practical question is whether the answer is actually grounded in the provided evidence.</p>
 <p>This is post 7 in the AI Safety &amp; Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why should a production guardrail focus on closed-domain hallucinations first?</li>
-<li>What is the difference between citation, source, and semantic grounding?</li>
-<li>Why does claim-level verification catch errors that sentence-level checks miss?</li>
-<li>When should NLI stop and a judge model take over?</li>
-<li>What fallback works better than simply blocking every failed answer?</li>
+<li>Why should a hallucination guardrail inspect claims instead of the whole answer at once?</li>
+<li>What do claim extraction, entailment checks, and citation format each verify?</li>
+<li>When evidence is weak, should the answer be blocked, revised, or held?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="what grounding actually means" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png"></p>
+<p><em>what grounding actually means</em></p>
+<p>This picture breaks an answer into claims and checks each claim against evidence before deciding whether it passes. A hallucination guardrail must verify the relationship between claims and evidence, not the confidence of the prose.</p>
+<blockquote>
+<p>To reduce hallucination, treat an answer as a set of verifiable claims, not as one fluent paragraph.</p>
+</blockquote>
 <h2>The Trap in the Word "Hallucination"</h2>
 <p>People call any confidently wrong LLM output a hallucination, but for operations you need a tighter definition.</p>
 <ul>
@@ -76,8 +80,6 @@
 </ul>
 <p>This episode focuses on <strong>closed-domain</strong>, because most production guardrails are RAG-based and grounding checks are the most reliable defense.</p>
 <h2>What Grounding Actually Means</h2>
-<p><img alt="what grounding actually means" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png"><br>
-<em>Grounding verification becomes manageable once the answer is decomposed into claims and checked in increasing-cost stages.</em></p>
 <p>Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.</p>
 <p><strong>Citation grounding</strong><br>
 - Meaning: Every factual sentence carries a citation marker<br>
@@ -234,18 +236,27 @@ def citation_check(answer: str, retrieved_ids: set[int]) -&gt; dict:
 <li>[ ] Track claim precision, recall, latency, and cost on regression sets.</li>
 </ul>
 <hr>
-<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">Ep5 Jailbreak Detection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">Ep6 Toxicity and Bias Detection</a></li>
-<li><strong>Ep7 Hallucination Guardrails - Grounding Checks (current)</strong></li>
-<li>Ep8 Rate Limiting and Abuse Prevention (upcoming)</li>
-<li>Ep9 Audit Logging and Compliance (upcoming)</li>
-<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+<li><strong>Why should a hallucination guardrail inspect claims instead of the whole answer at once?</strong></li>
+<li>One answer can contain both supported and unsupported claims, so claim-level checks locate what must be fixed.</li>
+<li><strong>What do claim extraction, entailment checks, and citation format each verify?</strong></li>
+<li>Claim extraction identifies what to verify, entailment checks whether evidence supports it, and citation format makes evidence traceable.</li>
+<li><strong>When evidence is weak, should the answer be blocked, revised, or held?</strong></li>
+<li>Block high-risk unsupported claims, revise overconfident wording when evidence exists, and hold or escalate ambiguous cases.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">AI Safety &amp; Guardrails 101 (1/10): Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">AI Safety &amp; Guardrails 101 (2/10): Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">AI Safety &amp; Guardrails 101 (3/10): Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">AI Safety &amp; Guardrails 101 (4/10): PII Detection and Redaction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/05-jailbreak-detection.md">AI Safety &amp; Guardrails 101 (5/10): Jailbreak Detection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/06-toxicity-bias-detection.md">AI Safety &amp; Guardrails 101 (6/10): Toxicity and Bias Detection</a></li>
+<li><strong>AI Safety &amp; Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (current)</strong></li>
+<li>AI Safety &amp; Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,5 +1,5 @@
 ---
-title: Building a Production Guardrail System
+title: "AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System"
 series: ai-safety-guardrails-101
 episode: 10
 language: en
@@ -18,23 +18,27 @@ last_reviewed: '2026-05-14'
 seo_description: Architect a production-grade LLM safety system by integrating multiple guardrail layers with explicit fail-safe policies and performance optimization.
 ---
 
-# Building a Production Guardrail System
+# AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System
 
 The guardrails in Episodes 1 through 9 are useful on their own, but production depends on how they fit together. You need one pipeline that makes ordering, fallback behavior, and auditability explicit.
 
 This is the final post in the AI Safety & Guardrails 101 series. It turns the earlier guardrails into a single production architecture you can reason about end to end.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should a production guardrail system be a boundary-specific pipeline instead of one filter?
+- By what risk criteria should fail-open and fail-closed behavior be chosen?
+- How do performance budgets, observability, and CI regression fit into one system?
 
-- How should the earlier guardrails be grouped into a single production pipeline?
-- Which checks should fail open, fail closed, or degrade with warnings?
-- How do you keep guardrails inside a latency budget instead of serializing everything?
-- Which metrics prove the system is both safe and usable?
-- How do you ship a new guardrail without blocking healthy traffic by mistake?
+## Big Picture
 
-> A production guardrail system is not a list of detectors. It is a boundary-by-boundary operating model with explicit ordering, failure policy, observability, and rollout discipline.
+![Four-Layer Architecture](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
+
+*Four-Layer Architecture*
+
+This picture splits guardrail responsibility across input, retrieval/context, model output, and tool/action layers. A production guardrail is not one universal filter; it is a system that controls different risks at different boundaries.
+
+> A production guardrail system is not one place where risk is stopped; it is a pipeline where each boundary controls a different failure.
 
 ## Wiring Nine Components Into One System
 
@@ -50,9 +54,6 @@ Goals:
 ## Four-Layer Architecture
 
 Guardrails live in four positions in an LLM system.
-
-![Four-Layer Architecture](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
-*A production guardrail pipeline separates pre-input, pre-prompt, post-output, and audit responsibilities so that every block and bypass has a visible stage.*
 
 | Layer | When it runs | Guardrails |
 | --- | --- | --- |
@@ -189,14 +190,12 @@ The biggest latency win is to stop pretending every step depends on every other 
 ```python
 import asyncio
 
-
 async def run_pre_input(request: dict) -> list[GuardrailResult]:
     return await asyncio.gather(
         rate_limit_async(request),
         jailbreak_async(request["prompt"]),
         authz_async(request),
     )
-
 
 async def run_post_output(answer: str, chunks: list[dict]) -> list[GuardrailResult]:
     return await asyncio.gather(
@@ -307,19 +306,28 @@ Some risk does not yield to technical guardrails alone.
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak Detection](./05-jailbreak-detection.md)
-- [Ep6 Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
-- [Ep7 Hallucination Guardrails - Grounding Checks](./07-hallucination-guardrails.md)
-- [Ep8 Rate Limiting and Abuse Prevention](./08-rate-limiting-abuse-prevention.md)
-- [Ep9 Audit Logging and Compliance](./09-audit-logging-compliance.md)
-- **Ep10 Building a Production Guardrail System (current)**
+- **Why should a production guardrail system be a boundary-specific pipeline instead of one filter?**
+  - Input attacks, retrieval contamination, output policy violations, and tool-execution risk happen at different points, so one filter cannot own them all.
+- **By what risk criteria should fail-open and fail-closed behavior be chosen?**
+  - Use fail-closed for high-impact safety, legal, or data-changing risks; consider fail-open or degradation for lower-risk auxiliary features.
+- **How do performance budgets, observability, and CI regression fit into one system?**
+  - Connect each guardrail’s latency budget, decision log, alert, and regression case through the same request id and release pipeline.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks](./07-hallucination-guardrails.md)
+- [AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention](./08-rate-limiting-abuse-prevention.md)
+- [AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance](./09-audit-logging-compliance.md)
+- **AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (current)**
+
 <!-- toc:end -->
 
 ## References

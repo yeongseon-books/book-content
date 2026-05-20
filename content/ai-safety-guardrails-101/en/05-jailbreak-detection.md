@@ -1,5 +1,5 @@
 ---
-title: Jailbreak Detection
+title: "AI Safety & Guardrails 101 (5/10): Jailbreak Detection"
 series: ai-safety-guardrails-101
 episode: 5
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Detect and block jailbreak attempts by combining known pattern matching, payload normalization, and semantic embedding similarity checks.
 ---
 
-# Jailbreak Detection
+# AI Safety & Guardrails 101 (5/10): Jailbreak Detection
 
 > AI Safety & Guardrails 101 Series (5/10)
 
@@ -26,15 +26,21 @@ A jailbreak does more than override a system instruction. It tries to peel back 
 
 This is post 5 in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why is keyword blocking not enough for jailbreak detection?
+- How should normalization, pattern checks, embeddings, and an LLM judge be layered?
+- How should multilingual and encoded bypass cases be preserved in the regression dataset?
 
-- Where does jailbreak overlap with prompt injection, and where does it differ?
-- Which known patterns are worth catching with the cheapest detector?
-- Why do encoded payloads and multilingual variants force a normalization stage?
-- How do embeddings and judge models divide the detection workload?
-- What kind of regression set proves that a detector is really improving?
+## Big Picture
+
+![Jailbreak detection layers](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/05/05-01-big-picture.en.png)
+
+*Jailbreak detection layers*
+
+This picture layers input normalization, pattern checks, similarity detection, LLM intent judgment, and block or isolation decisions. Jailbreak defense is not one detector; it is a pipeline that reads bypass intent across layers.
+
+> A jailbreak is not one phrase; it is an intent signal that tries to bypass alignment and policy.
 
 ## What a Jailbreak Is
 
@@ -275,19 +281,28 @@ Example targets: recall above 0.95, false positive rate below 0.01. Whenever you
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- **Ep5 Jailbreak Detection (current)**
-- Ep6 Toxicity and Bias Detection (upcoming)
-- Ep7 Hallucination Guardrails - Grounding Checks (upcoming)
-- Ep8 Rate Limiting and Abuse Prevention (upcoming)
-- Ep9 Audit Logging and Compliance (upcoming)
-- Ep10 Building a Production Guardrail System (upcoming)
+- **Why is keyword blocking not enough for jailbreak detection?**
+  - Attackers can bypass keywords with spacing, encoding, multilingual phrasing, roleplay, or indirect wording.
+- **How should normalization, pattern checks, embeddings, and an LLM judge be layered?**
+  - Normalize first, use known patterns and similarity checks for fast filtering, then send ambiguous cases to an LLM judge.
+- **How should multilingual and encoded bypass cases be preserved in the regression dataset?**
+  - Store the original payload, normalized result, language, bypass technique, and expected decision so future changes are tested against it.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- **AI Safety & Guardrails 101 (5/10): Jailbreak Detection (current)**
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,5 +1,5 @@
 ---
-title: Prompt Injection Defense
+title: "AI Safety & Guardrails 101 (2/10): Prompt Injection Defense"
 series: ai-safety-guardrails-101
 episode: 2
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Defend against direct and indirect prompt injection using a layered strategy of regex filters, embedding classifiers, and secondary LLM judges.
 ---
 
-# Prompt Injection Defense
+# AI Safety & Guardrails 101 (2/10): Prompt Injection Defense
 
 > AI Safety & Guardrails 101 Series (2/10)
 
@@ -26,15 +26,21 @@ Prompt injection works because system and user messages end up in the same conte
 
 This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- When does prompt injection begin by turning data into instructions?
+- How do direct and indirect injection differ in where they must be defended?
+- What should be recorded when red-team cases become a regression set?
 
-- What separates direct injection from indirect injection structurally?
-- Where does regex help, and where does it fail immediately?
-- Why do embedding classifiers catch variants that pattern matching misses?
-- When is a secondary LLM judge worth the latency and cost?
-- How should untrusted external documents be wrapped before the model sees them?
+## Big Picture
+
+![Prompt injection defense flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.en.png)
+
+*Prompt injection defense flow*
+
+This picture routes user input and external documents through instruction boundaries, risk decisions, and safe execution so data is not mistaken for commands. Prompt-injection defense is structural separation of data and instructions, not merely telling the model to be careful.
+
+> Prompt injection is not just a bad sentence; it is a boundary failure where untrusted data becomes executable instruction.
 
 ## Why "Ignore Previous Instructions" Works
 
@@ -295,19 +301,28 @@ Wire this red-team set into CI (the regression pattern from Ep8) so every guardr
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- **Prompt Injection Defense (current)**
-- Output Filtering and Content Moderation (upcoming)
-- PII Detection and Redaction (upcoming)
-- Jailbreak Detection (upcoming)
-- Toxicity and Bias Detection (upcoming)
-- Hallucination Guardrails — Grounding Checks (upcoming)
-- Rate Limiting and Abuse Prevention (upcoming)
-- Audit Logging and Compliance (upcoming)
-- Building a Production Guardrail System (upcoming)
+- **When does prompt injection begin by turning data into instructions?**
+  - It starts when the model interprets user or external text as instructions at the same level as system policy.
+- **How do direct and indirect injection differ in where they must be defended?**
+  - Direct injection is defended at the user-input boundary; indirect injection is defended where retrieved or external data enters context.
+- **What should be recorded when red-team cases become a regression set?**
+  - Record the payload, normalized form, detection signals, expected block decision, and bypass outcome so the case can be rerun.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- **AI Safety & Guardrails 101 (2/10): Prompt Injection Defense (current)**
+- AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation (upcoming)
+- AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (upcoming)
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

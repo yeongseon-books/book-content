@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Jailbreak Detection</title>
+<title>AI Safety & Guardrails 101 (5/10): Jailbreak Detection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Jailbreak Detection</h1>
+<h1>AI Safety &amp; Guardrails 101 (5/10): Jailbreak Detection</h1>
 <blockquote>
 <p>AI Safety &amp; Guardrails 101 Series (5/10)</p>
 </blockquote>
 <p>A jailbreak does more than override a system instruction. It tries to peel back the model's safety alignment itself, and once a successful prompt escapes into the wild it gets copied at scale.</p>
 <p>This is post 5 in the AI Safety &amp; Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Where does jailbreak overlap with prompt injection, and where does it differ?</li>
-<li>Which known patterns are worth catching with the cheapest detector?</li>
-<li>Why do encoded payloads and multilingual variants force a normalization stage?</li>
-<li>How do embeddings and judge models divide the detection workload?</li>
-<li>What kind of regression set proves that a detector is really improving?</li>
+<li>Why is keyword blocking not enough for jailbreak detection?</li>
+<li>How should normalization, pattern checks, embeddings, and an LLM judge be layered?</li>
+<li>How should multilingual and encoded bypass cases be preserved in the regression dataset?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Jailbreak detection layers" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/05/05-01-big-picture.en.png"></p>
+<p><em>Jailbreak detection layers</em></p>
+<p>This picture layers input normalization, pattern checks, similarity detection, LLM intent judgment, and block or isolation decisions. Jailbreak defense is not one detector; it is a pipeline that reads bypass intent across layers.</p>
+<blockquote>
+<p>A jailbreak is not one phrase; it is an intent signal that tries to bypass alignment and policy.</p>
+</blockquote>
 <h2>What a Jailbreak Is</h2>
 <p>A jailbreak is an attack that bypasses the safety alignment a model learned during training, coaxing it into producing policy-violating output. While prompt injection (Ep2) overwrites system instructions through user input, jailbreak goes one step further and unlocks the alignment itself.</p>
 <p>Common patterns include:</p>
@@ -277,18 +281,27 @@ def multilingual_check(text: str) -&gt; bool:
 <li>[ ] Review missed jailbreaks weekly and add them to regression suites.</li>
 </ul>
 <hr>
-<h2>AI Safety &amp; Guardrails 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">Ep1 Why AI Safety Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">Ep2 Prompt Injection Defense</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">Ep3 Output Filtering and Content Moderation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">Ep4 PII Detection and Redaction</a></li>
-<li><strong>Ep5 Jailbreak Detection (current)</strong></li>
-<li>Ep6 Toxicity and Bias Detection (upcoming)</li>
-<li>Ep7 Hallucination Guardrails - Grounding Checks (upcoming)</li>
-<li>Ep8 Rate Limiting and Abuse Prevention (upcoming)</li>
-<li>Ep9 Audit Logging and Compliance (upcoming)</li>
-<li>Ep10 Building a Production Guardrail System (upcoming)</li>
+<li><strong>Why is keyword blocking not enough for jailbreak detection?</strong></li>
+<li>Attackers can bypass keywords with spacing, encoding, multilingual phrasing, roleplay, or indirect wording.</li>
+<li><strong>How should normalization, pattern checks, embeddings, and an LLM judge be layered?</strong></li>
+<li>Normalize first, use known patterns and similarity checks for fast filtering, then send ambiguous cases to an LLM judge.</li>
+<li><strong>How should multilingual and encoded bypass cases be preserved in the regression dataset?</strong></li>
+<li>Store the original payload, normalized result, language, bypass technique, and expected decision so future changes are tested against it.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/01-why-ai-safety-matters.md">AI Safety &amp; Guardrails 101 (1/10): Why AI Safety Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/02-prompt-injection-defense.md">AI Safety &amp; Guardrails 101 (2/10): Prompt Injection Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/03-output-filtering.md">AI Safety &amp; Guardrails 101 (3/10): Output Filtering and Content Moderation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/04-pii-detection-redaction.md">AI Safety &amp; Guardrails 101 (4/10): PII Detection and Redaction</a></li>
+<li><strong>AI Safety &amp; Guardrails 101 (5/10): Jailbreak Detection (current)</strong></li>
+<li>AI Safety &amp; Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)</li>
+<li>AI Safety &amp; Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official Docs and Papers</strong></p>

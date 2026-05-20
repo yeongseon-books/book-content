@@ -1,5 +1,5 @@
 ---
-title: Prompt Injection 방어
+title: "AI Safety & Guardrails 101 (2/10): Prompt Injection 방어"
 series: ai-safety-guardrails-101
 episode: 2
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Ep1에서 본 가장 단순한 prompt injection은 다음과 같았습니다.
 ---
 
-# Prompt Injection 방어
+# AI Safety & Guardrails 101 (2/10): Prompt Injection 방어
 
 Prompt injection은 프롬프트를 잘못 쓴 실수가 아니라 입력 경계가 무너진 상태입니다. 시스템 메시지와 사용자 메시지가 같은 컨텍스트 창에 들어가는 순간, 사용자는 단순한 데이터가 아니라 지시 채널이 될 수 있습니다. 이 사실을 코드 구조로 받아들이지 않으면 방어는 늘 한 단계 늦습니다.
 
@@ -30,13 +30,21 @@ Prompt injection은 프롬프트를 잘못 쓴 실수가 아니라 입력 경계
 
 이 글에서는 “Ignore previous instructions”가 왜 통하는지와, regex·임베딩·LLM judge를 결합한 다층 방어 구조를 설명합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- direct injection과 indirect injection은 구조적으로 무엇이 다를까요?
-- 단순한 regex 차단은 어디까지 유효하고 어디서 무너질까요?
-- 임베딩 기반 분류는 어떤 우회 변형을 더 잘 잡을 수 있을까요?
-- 보조 LLM judge는 언제 쓰고 어디까지 신뢰해야 할까요?
-- 외부 문서를 모델에 넣을 때 왜 반드시 비신뢰 데이터로 감싸야 할까요?
+- Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요?
+- 직접 injection과 간접 injection은 방어 위치가 어떻게 다를까요?
+- Red team 사례를 regression set으로 남기려면 무엇을 기록해야 할까요?
+
+## 큰 그림
+
+![Prompt injection 방어 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.ko.png)
+
+*Prompt injection 방어 흐름*
+
+이 그림에서는 사용자 입력과 외부 문서가 명령으로 오인되지 않도록 instruction boundary, risk decision, safe execution을 거치는 흐름을 봅니다. Prompt injection 방어의 핵심은 모델에게 조심하라고 말하는 것이 아니라 데이터와 지시를 구조적으로 분리하는 일입니다.
+
+> Prompt injection은 나쁜 문장이 아니라, 비신뢰 데이터가 실행 지시로 승격되는 경계 실패입니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ Prompt injection 방어를 제대로 설계하면 팀은 입력 경계에 대한
 
 결국 prompt injection은 모델의 예절 문제가 아니라 입력 분류와 문맥 위생 문제입니다. 그래서 방어 기준도 “좋은 프롬프트를 썼는가”가 아니라 “비신뢰 데이터를 별도 정책으로 통제하는가”가 되어야 합니다.
 
-## Prompt injection을 이해하는 가장 좋은 방법: 데이터가 지시로 변하는 순간을 추적하는 것입니다
+## 핵심 관점
 
 모델은 시스템 메시지와 사용자 메시지를 운영체제 권한처럼 구분하지 않습니다. 강한 우선순위 힌트는 있지만, 결국 모두 같은 컨텍스트 안에서 다음 토큰을 예측합니다. 그래서 사용자 입력이 시스템 정책을 덮어쓰는 문장으로 바뀌면, 애플리케이션 관점의 데이터가 모델 관점의 지시로 변합니다.
 
@@ -281,19 +289,28 @@ Prompt injection은 결국 텍스트 분류 문제가 아니라 시스템 경계
 
 다음 단계의 핵심은 모든 비신뢰 데이터를 구조적으로 표시하는 습관입니다. direct injection을 막는 일과 indirect injection을 다루는 일은 별개가 아니라, 같은 원칙의 두 표현입니다.
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- **Prompt Injection 방어 (현재 글)**
-- [출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [Jailbreak 탐지](./05-jailbreak-detection.md)
-- [독성과 편향 탐지](./06-toxicity-bias-detection.md)
-- [Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+- **Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요?**
+  - 사용자나 외부 문서의 텍스트를 모델이 시스템 지시와 같은 층위의 명령으로 해석하는 순간 시작됩니다.
+- **직접 injection과 간접 injection은 방어 위치가 어떻게 다를까요?**
+  - 직접 injection은 사용자 입력 앞단에서, 간접 injection은 검색·메일·문서 같은 외부 데이터가 context로 들어오는 경계에서 막아야 합니다.
+- **Red team 사례를 regression set으로 남기려면 무엇을 기록해야 할까요?**
+  - 공격 원문, 정규화된 payload, 탐지 신호, 기대 차단 결과, 우회 여부를 남겨 재발 방지 테스트로 돌립니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
+- **AI Safety & Guardrails 101 (2/10): Prompt Injection 방어 (현재 글)**
+- AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션 (예정)
+- AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹 (예정)
+- AI Safety & Guardrails 101 (5/10): Jailbreak 탐지 (예정)
+- AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지 (예정)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증 (예정)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (예정)
+- AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (예정)
+- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

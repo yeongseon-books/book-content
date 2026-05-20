@@ -1,5 +1,5 @@
 ---
-title: Output Filtering and Content Moderation
+title: "AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation"
 series: ai-safety-guardrails-101
 episode: 3
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Implement independent output filtering and content moderation using the OpenAI Moderation API, Llama Guard, and custom policy-based LLM judges.
 ---
 
-# Output Filtering and Content Moderation
+# AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation
 
 > AI Safety & Guardrails 101 Series (3/10)
 
@@ -26,15 +26,21 @@ Model vendors ship safety training, but the output is still untrusted data. A su
 
 This is post 3 in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should model output be validated again as data before users see it?
+- Where should policy violations, sensitive data, and streaming responses each be filtered?
+- What fallback is needed when a blocked response becomes part of user experience?
 
-- Why is vendor-side safety training not enough for application safety?
-- How should moderation categories turn into domain-specific thresholds?
-- Where do open-source classifiers fit next to managed moderation APIs?
-- How do company-specific policies stay separate from generic harm categories?
-- What changes once the response is streamed token by token?
+## Big Picture
+
+![Output filtering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/03/03-01-big-picture.en.png)
+
+*Output filtering flow*
+
+This picture shows model output passing through policy checks, redaction or blocking, fallback replies, and monitoring. Output filtering is not decorative post-processing; it is the last safety boundary before the user sees the response.
+
+> A model response is not finished just because the model produced it; it is data that must be validated before delivery.
 
 ## The Model Does Not Promise Safety
 
@@ -321,19 +327,28 @@ If FP rate exceeds 5%, retune thresholds or revisit category coverage.
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Prompt Injection Defense](./02-prompt-injection-defense.md)
-- **Output Filtering and Content Moderation (current)**
-- PII Detection and Redaction (upcoming)
-- Jailbreak Detection (upcoming)
-- Toxicity and Bias Detection (upcoming)
-- Hallucination Guardrails — Grounding Checks (upcoming)
-- Rate Limiting and Abuse Prevention (upcoming)
-- Audit Logging and Compliance (upcoming)
-- Building a Production Guardrail System (upcoming)
+- **Why should model output be validated again as data before users see it?**
+  - The model does not guarantee policy or privacy compliance, so output must be inspected like any other untrusted data.
+- **Where should policy violations, sensitive data, and streaming responses each be filtered?**
+  - Policy violations belong at moderation or judge boundaries, sensitive data at redaction boundaries, and streaming at low-latency chunk checks.
+- **What fallback is needed when a blocked response becomes part of user experience?**
+  - Provide safe rewriting, scoped alternatives, human escalation, or retry guidance without revealing too much about the blocked content.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- **AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation (current)**
+- AI Safety & Guardrails 101 (4/10): PII Detection and Redaction (upcoming)
+- AI Safety & Guardrails 101 (5/10): Jailbreak Detection (upcoming)
+- AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection (upcoming)
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks (upcoming)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention (upcoming)
+- AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (upcoming)
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References

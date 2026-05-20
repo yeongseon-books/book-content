@@ -1,5 +1,5 @@
 ---
-title: 독성과 편향 탐지
+title: "AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지"
 series: ai-safety-guardrails-101
 episode: 6
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audit로 나누어 설계합니다.
 ---
 
-# 독성과 편향 탐지
+# AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지
 
 독성과 편향은 함께 묶여 자주 이야기되지만, 운영에서는 완전히 다른 문제입니다. 독성은 사용자가 지금 당장 피해를 보는 단일 출력 문제이고, 편향은 여러 응답을 모아 봐야 드러나는 통계적 불균형 문제입니다. 같은 분류기 하나로 두 문제를 처리하려 하면 둘 다 제대로 해결되지 않습니다.
 
@@ -30,13 +30,21 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 
 이 글에서는 독성 분류기 선택, 실시간 차단, 스트리밍 보호, counterfactual 편향 평가, 공정성 지표를 함께 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 독성과 편향은 왜 하나의 실시간 분류 문제로 묶으면 안 될까요?
-- 독성 분류기는 어떤 도구를 조합해 threshold를 정하는 편이 좋을까요?
-- 스트리밍 응답에서 독성 토큰 유출은 어떻게 막아야 할까요?
-- 편향은 왜 개별 응답이 아니라 counterfactual 세트로 측정해야 할까요?
-- 공정성 지표는 어떤 의사결정 시스템에서 특히 중요할까요?
+- 독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?
+- 실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?
+- false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요?
+
+## 큰 그림
+
+![독성·편향 guardrail 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.ko.png)
+
+*독성·편향 guardrail 흐름*
+
+이 그림에서는 실시간 독성 차단과 장기 편향 샘플링·감사를 분리해 정책 개선으로 되돌리는 흐름을 봅니다. 독성과 편향 guardrail은 즉시 차단할 위험과 오래 측정해야 할 불균형을 나눠 봐야 합니다.
+
+> 독성은 지금 막아야 할 위험이고, 편향은 오래 측정해 줄여야 할 시스템 성향입니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 
 결국 핵심은 시간축 분리입니다. 즉시 막아야 하는 피해와, 누적 데이터를 통해 교정해야 하는 편차를 같은 방법으로 다루지 않는 것입니다.
 
-## 독성과 편향을 이해하는 가장 좋은 방법: 실시간 차단 문제와 장기 측정 문제로 분리하는 것입니다
+## 핵심 관점
 
 독성은 한 번의 응답으로도 바로 피해를 만듭니다. 욕설, 위협, 혐오 표현은 사용자에게 즉시 전달되므로 inline guardrail이 필요합니다. 반면 편향은 개별 응답만 보면 잘 드러나지 않습니다. 이름이나 성별, 인종, 나이 같은 보호 속성에 따라 지속적으로 다른 품질과 톤이 나오면서 통계적으로 드러납니다.
 
@@ -204,19 +212,28 @@ if max(rates.values()) - min(rates.values()) > 0.1:
 
 한 문장으로 줄이면 이렇습니다. 사용자에게 지금 해를 끼칠 수 있는 것은 막고, 시스템이 장기적으로 특정 집단에 불리하게 작동하는지는 측정해서 고칩니다.
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
-- [Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [PII 감지와 마스킹](./04-pii-detection-redaction.md)
-- [Jailbreak 탐지](./05-jailbreak-detection.md)
-- **독성과 편향 탐지 (현재 글)**
-- [Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
-- [Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- [감사 로깅과 컴플라이언스](./09-audit-logging-compliance.md)
-- [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+- **독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?**
+  - 독성은 개별 응답의 즉시 피해를 다루고, 편향은 집단별 품질·노출·판정 차이를 장기적으로 다룹니다.
+- **실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?**
+  - 실시간 moderation은 차단과 사용자 보호, offline audit은 demographic parity, 대표성, false positive 분포를 담당합니다.
+- **false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요?**
+  - 차단율, 이의 제기, 집단별 false positive, edge case 샘플, 정책 변경 전후의 지표 변화를 함께 봐야 합니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Safety & Guardrails 101 (1/10): AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection 방어](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII 감지와 마스킹](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak 탐지](./05-jailbreak-detection.md)
+- **AI Safety & Guardrails 101 (6/10): 독성과 편향 탐지 (현재 글)**
+- AI Safety & Guardrails 101 (7/10): Hallucination Guardrail — Grounding 검증 (예정)
+- AI Safety & Guardrails 101 (8/10): Rate Limiting과 남용 방지 (예정)
+- AI Safety & Guardrails 101 (9/10): 감사 로깅과 컴플라이언스 (예정)
+- AI Safety & Guardrails 101 (10/10): 운영 가드레일 시스템 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

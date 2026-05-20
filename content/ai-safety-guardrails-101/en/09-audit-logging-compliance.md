@@ -1,5 +1,5 @@
 ---
-title: Audit Logging and Compliance
+title: "AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance"
 series: ai-safety-guardrails-101
 episode: 9
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Maintain decision traceability and compliance with GDPR and HIPAA through immutable audit logs, hash chains, and secure PII-separated storage.
 ---
 
-# Audit Logging and Compliance
+# AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance
 
 > AI Safety & Guardrails 101 Series (9/10)
 
@@ -26,15 +26,21 @@ In an LLM system, audit logs are not just verbose application logs. They are the
 
 This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- How must audit logs differ from ordinary debug logs to support compliance?
+- What evidence is preserved by PII masking, append-only storage, and decision rationale?
+- What must be fixed in the log schema to produce automatic compliance reports?
 
-- Why must audit logs live separately from ordinary application logs?
-- Which fields are required to reconstruct an LLM decision later?
-- Why should raw prompts and responses stay outside the audit store?
-- How do you prove append-only integrity instead of merely claiming it?
-- Why do retention and deletion events need their own audit trail?
+## Big Picture
+
+![Audit logging and compliance flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/09/09-01-big-picture.en.png)
+
+*Audit logging and compliance flow*
+
+This picture connects request tracing, PII masking, append-only logs, decision rationale, and audit reports into one audit flow. Audit logging is not for debugging convenience; it is an integrity model for reconstructing and explaining a run later.
+
+> An audit log is not more logging; it is evidence that lets you reconstruct who did what and why.
 
 ## Why Audit Logs Differ From Application Logs
 
@@ -240,19 +246,28 @@ Send the report monthly to security, compliance, and leadership. Anomalies show 
 
 ---
 
-<!-- toc:begin -->
-## AI Safety & Guardrails 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why AI Safety Matters](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection Defense](./02-prompt-injection-defense.md)
-- [Ep3 Output Filtering and Content Moderation](./03-output-filtering.md)
-- [Ep4 PII Detection and Redaction](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak Detection](./05-jailbreak-detection.md)
-- [Ep6 Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
-- [Ep7 Hallucination Guardrails - Grounding Checks](./07-hallucination-guardrails.md)
-- [Ep8 Rate Limiting and Abuse Prevention](./08-rate-limiting-abuse-prevention.md)
-- **Ep9 Audit Logging and Compliance (current)**
-- Ep10 Building a Production Guardrail System (upcoming)
+- **How must audit logs differ from ordinary debug logs to support compliance?**
+  - They must be hard to tamper with, have fixed required fields, control access to private data, and follow retention and deletion policies.
+- **What evidence is preserved by PII masking, append-only storage, and decision rationale?**
+  - PII masking reduces exposure, append-only storage protects integrity, and decision rationale explains allow/block or approval decisions.
+- **What must be fixed in the log schema to produce automatic compliance reports?**
+  - Request id, actor, action, policy decision, tool call, masked fields, timestamps, retention class, and rationale must be fixed fields.
+<!-- toc:begin -->
+## In this series
+
+- [AI Safety & Guardrails 101 (1/10): Why AI Safety Matters](./01-why-ai-safety-matters.md)
+- [AI Safety & Guardrails 101 (2/10): Prompt Injection Defense](./02-prompt-injection-defense.md)
+- [AI Safety & Guardrails 101 (3/10): Output Filtering and Content Moderation](./03-output-filtering.md)
+- [AI Safety & Guardrails 101 (4/10): PII Detection and Redaction](./04-pii-detection-redaction.md)
+- [AI Safety & Guardrails 101 (5/10): Jailbreak Detection](./05-jailbreak-detection.md)
+- [AI Safety & Guardrails 101 (6/10): Toxicity and Bias Detection](./06-toxicity-bias-detection.md)
+- [AI Safety & Guardrails 101 (7/10): Hallucination Guardrails — Grounding Checks](./07-hallucination-guardrails.md)
+- [AI Safety & Guardrails 101 (8/10): Rate Limiting and Abuse Prevention](./08-rate-limiting-abuse-prevention.md)
+- **AI Safety & Guardrails 101 (9/10): Audit Logging and Compliance (current)**
+- AI Safety & Guardrails 101 (10/10): Building a Production Guardrail System (upcoming)
+
 <!-- toc:end -->
 
 ## References
