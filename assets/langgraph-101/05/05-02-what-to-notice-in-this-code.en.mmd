@@ -1,0 +1,14 @@
+flowchart TD
+  A["SupervisorState<br/>request + route + worker_result + final_answer"] --> B["supervisor<br/>choose research or code"]
+  B --> C["Worker node<br/>write only worker_result"]
+  C --> D["finalize<br/>assemble final_answer"]
+
+  B --> E["Dedicated route field<br/>keeps delegation visible"]
+  C --> F["Minimal shared state<br/>limit coupling across workers"]
+
+  style A fill:#e3f2fd,stroke:#1976d2
+  style B fill:#fff3e0,stroke:#f57c00
+  style C fill:#e8f5e9,stroke:#388e3c
+  style D fill:#f3e5f5,stroke:#7b1fa2
+  style E fill:#fff8e1,stroke:#f9a825
+  style F fill:#fce4ec,stroke:#c2185b
