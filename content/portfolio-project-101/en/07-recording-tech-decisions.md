@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 7
-title: Recording Tech Decisions
+title: "Portfolio Project 101 (7/10): Recording Tech Decisions"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to use lightweight ADRs to record technical choices, altern
 last_reviewed: '2026-05-15'
 ---
 
-# Recording Tech Decisions
+# Portfolio Project 101 (7/10): Recording Tech Decisions
 
 When reviewers inspect a portfolio project, they care about more than the final code. They also want to know why a specific stack was chosen, what alternatives were considered, and what trade-offs were accepted. Code shows the outcome, but it rarely shows the judgment on its own.
 
@@ -30,12 +30,21 @@ This is post 7 in the Portfolio Project 101 series. Here we will use a lightweig
 
 > A good decision note does not declare a perfect answer. It records what options existed, why one was chosen, and what consequences came with it.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do technical choices usually stay invisible if you only show code?
 - How do alternatives and consequences make a project more persuasive?
 - How lightweight can an ADR be and still be useful?
-- What kinds of written traces make judgment visible in a portfolio?
+
+## Big Picture
+
+![portfolio project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 7 flow overview*
+
+This picture places Recording Tech Decisions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Recording Tech Decisions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ Decision records help because they make constraint-aware thinking visible. They 
 ## Mental Model
 
 A useful decision record usually flows from context to options, then to the decision, the consequence, and the likely next step.
-
-![The ADR flow from context and options to consequence and next step](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
-
-*The ADR flow from context and options to consequence and next step*
 
 This order matters because choices only make sense inside a real situation. “We picked FastAPI” is weak on its own. “We picked FastAPI because we had a solo developer, a short deadline, and a need for fast API docs” is much more informative.
 
@@ -162,19 +167,29 @@ Technical decision records reveal the judgment behind the result. When you write
 
 Next, we will expand the project beyond the repository and look at how to turn it into a technical post that others can discover through search.
 
+## Answering the Opening Questions
+
+- **Why do technical choices usually stay invisible if you only show code?**
+  - The article treats Recording Tech Decisions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do alternatives and consequences make a project more persuasive?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How lightweight can an ADR be and still be useful?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
-- [Deploying the Project](./05-deploying-the-project.md)
-- [Tests and Documentation](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): Deploying the Project](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): Tests and Documentation](./06-tests-and-documentation.md)
 - **Recording Tech Decisions (current)**
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

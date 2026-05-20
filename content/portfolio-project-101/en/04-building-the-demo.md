@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 4
-title: Building the Demo
+title: "Portfolio Project 101 (4/10): Building the Demo"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to design a portfolio demo so a first-time visitor can unde
 last_reviewed: '2026-05-15'
 ---
 
-# Building the Demo
+# Portfolio Project 101 (4/10): Building the Demo
 
 A README alone is not enough. A portfolio project becomes much more convincing when another person can click around and feel the value directly. If there is no demo, or if the first screen is empty, or if the login step blocks everything, the reviewer often leaves before the project has a chance to explain itself.
 
@@ -30,12 +30,21 @@ This is post 4 in the Portfolio Project 101 series. Here we will treat the demo 
 
 > A good demo does not need to show everything. It needs to make the core value obvious quickly.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is the first screen the most important part of a portfolio demo?
 - What do seed data and a shared demo account solve?
 - What role does a backup video play when the live demo is not enough?
-- Why should failure handling and health checks count as part of demo quality?
+
+## Big Picture
+
+![portfolio project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 4 flow overview*
+
+This picture places Building the Demo inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building the Demo is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ That does not mean you need to expose every feature. Portfolio demos are usually
 ## Mental Model
 
 A useful demo often follows a short path: landing screen, sample context, one action, visible result, then a next step.
-
-![The shortest path from landing screen to felt value in a demo](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
-
-*The shortest path from landing screen to felt value in a demo*
 
 This flow helps you decide what to remove. Most visitors do not want a full feature tour. They want to know what the product does, why it matters, and whether it really works.
 
@@ -162,12 +167,21 @@ A strong demo does not have to show every feature. It should show context on the
 
 Next, we will look at deployment and at what makes a portfolio project verifiable from a public URL instead of only from your machine.
 
+## Answering the Opening Questions
+
+- **Why is the first screen the most important part of a portfolio demo?**
+  - The article treats Building the Demo as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do seed data and a shared demo account solve?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What role does a backup video play when the live demo is not enough?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
 - **Building the Demo (current)**
 - Deploying the Project (upcoming)
 - Tests and Documentation (upcoming)
@@ -175,6 +189,7 @@ Next, we will look at deployment and at what makes a portfolio project verifiabl
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

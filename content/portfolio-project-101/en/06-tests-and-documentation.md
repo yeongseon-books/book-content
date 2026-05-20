@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 6
-title: Tests and Documentation
+title: "Portfolio Project 101 (6/10): Tests and Documentation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to prove a portfolio project is reliable through a minimum 
 last_reviewed: '2026-05-15'
 ---
 
-# Tests and Documentation
+# Portfolio Project 101 (6/10): Tests and Documentation
 
 Saying that a project works is very different from showing that it has been verified. If a reviewer opens the repository and finds no tests and no docs beyond a short README, the whole project starts to look like practice code—even if the app itself is functional.
 
@@ -30,12 +30,21 @@ This is post 6 in the Portfolio Project 101 series. Here we will look at the lev
 
 > Working code is only a claim until another person can verify it through tests, docs, and repeatable checks.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What do unit tests, integration tests, and end-to-end checks each prove?
 - Why does even a small portfolio project benefit from automated verification?
 - What kinds of docs make a repository easier to trust and adopt?
-- Why do projects without tests or docs feel unfinished so quickly?
+
+## Big Picture
+
+![portfolio project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 6 flow overview*
+
+This picture places Tests and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Tests and Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ Documentation does the same thing for humans. It lowers the cost of understandin
 ## Mental Model
 
 Verification usually grows from small logic checks to full user flow checks, then out to docs and CI.
-
-![How tests, documentation, and CI stack into one verification flow](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
-
-*How tests, documentation, and CI stack into one verification flow*
 
 That order matters. Unit tests catch fast local mistakes. Integration tests validate boundaries. End-to-end checks confirm the main user path. Documentation and CI make the whole verification story reusable.
 
@@ -167,19 +172,29 @@ In a portfolio project, tests and documentation are evidence. Unit checks create
 
 Next, we will look at how to record the technical decisions behind the project so reviewers can see not just the result, but the judgment behind it.
 
+## Answering the Opening Questions
+
+- **What do unit tests, integration tests, and end-to-end checks each prove?**
+  - The article treats Tests and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does even a small portfolio project benefit from automated verification?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What kinds of docs make a repository easier to trust and adopt?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
-- [Deploying the Project](./05-deploying-the-project.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): Deploying the Project](./05-deploying-the-project.md)
 - **Tests and Documentation (current)**
 - Recording Tech Decisions (upcoming)
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 8
-title: Summarizing as Blog Posts
+title: "Portfolio Project 101 (8/10): Summarizing as Blog Posts"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to turn a finished project into a technical post that expla
 last_reviewed: '2026-05-15'
 ---
 
-# Summarizing as Blog Posts
+# Portfolio Project 101 (8/10): Summarizing as Blog Posts
 
 A GitHub repository is a strong place to show the finished artifact, but it is not usually where people discover the work in the first place. Most readers search for the problem, the debugging path, or the lesson behind the project. If your portfolio stops at the repository, the result is visible, but the process and judgment are much harder to find.
 
@@ -30,12 +30,21 @@ This is post 8 in the Portfolio Project 101 series. Here we will turn a project 
 
 > Good technical posts do not paste the whole codebase. They explain why a problem mattered, how it was approached, and what result or lesson came out of it.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does a problem-first structure work better than a code-first structure in technical writing?
 - How should code excerpts and repository links divide responsibility?
 - Why do numbers make a blog post more persuasive?
-- How do titles and series links improve discoverability?
+
+## Big Picture
+
+![portfolio project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 8 flow overview*
+
+This picture places Summarizing as Blog Posts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Summarizing as Blog Posts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ Posts also preserve context better than code alone. The reason you chose the pro
 ## Mental Model
 
 Strong technical posts usually move from problem to approach, then into code, result, and lesson.
-
-![The standard flow of a technical post from problem to lesson](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
-
-*The standard flow of a technical post from problem to lesson*
 
 That flow matches reader curiosity. Once the reader understands the problem, they want the approach. Once the approach makes sense, they want the key implementation idea. Then they want the result and the reusable takeaway.
 
@@ -164,19 +169,29 @@ When you turn a project into a blog post, clarity matters more than code volume.
 
 Next, we will take the same project and compress it into an interview answer that sounds clear under time pressure.
 
+## Answering the Opening Questions
+
+- **Why does a problem-first structure work better than a code-first structure in technical writing?**
+  - The article treats Summarizing as Blog Posts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should code excerpts and repository links divide responsibility?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do numbers make a blog post more persuasive?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
-- [Deploying the Project](./05-deploying-the-project.md)
-- [Tests and Documentation](./06-tests-and-documentation.md)
-- [Recording Tech Decisions](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): Deploying the Project](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): Tests and Documentation](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): Recording Tech Decisions](./07-recording-tech-decisions.md)
 - **Summarizing as Blog Posts (current)**
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

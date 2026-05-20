@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building the Demo</title>
+<title>Portfolio Project 101 (4/10): Building the Demo</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,31 @@
 </style>
 </head>
 <body>
-<h1>Building the Demo</h1>
+<h1>Portfolio Project 101 (4/10): Building the Demo</h1>
 <p>A README alone is not enough. A portfolio project becomes much more convincing when another person can click around and feel the value directly. If there is no demo, or if the first screen is empty, or if the login step blocks everything, the reviewer often leaves before the project has a chance to explain itself.</p>
 <p>This is post 4 in the Portfolio Project 101 series. Here we will treat the demo not as a feature showroom, but as a short experience that lets a first-time visitor understand the core value within the first few clicks.</p>
 <hr>
 <blockquote>
 <p>A good demo does not need to show everything. It needs to make the core value obvious quickly.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is the first screen the most important part of a portfolio demo?</li>
 <li>What do seed data and a shared demo account solve?</li>
 <li>What role does a backup video play when the live demo is not enough?</li>
-<li>Why should failure handling and health checks count as part of demo quality?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="portfolio project 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>portfolio project 101 chapter 4 flow overview</em></p>
+<p>This picture places Building the Demo inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building the Demo is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A live demo makes the project feel alive. Without it, the reviewer is still depending on your description. With it, they can verify the project on their own terms.</p>
 <p>That does not mean you need to expose every feature. Portfolio demos are usually stronger when they focus on one sharp path and remove friction from the first experience.</p>
 <h2>Mental Model</h2>
 <p>A useful demo often follows a short path: landing screen, sample context, one action, visible result, then a next step.</p>
-<p><img alt="The shortest path from landing screen to felt value in a demo" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>The shortest path from landing screen to felt value in a demo</em></p>
 <p>This flow helps you decide what to remove. Most visitors do not want a full feature tour. They want to know what the product does, why it matters, and whether it really works.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -147,11 +151,20 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>A strong demo does not have to show every feature. It should show context on the first screen, let the reviewer take one meaningful action, and produce a clear result. When you add a shared path, a backup video, and a health check, even a small project starts to feel much more real.</p>
 <p>Next, we will look at deployment and at what makes a portfolio project verifiable from a public URL instead of only from your machine.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is the first screen the most important part of a portfolio demo?</strong></li>
+<li>The article treats Building the Demo as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What do seed data and a shared demo account solve?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What role does a backup video play when the live demo is not enough?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">Portfolio Project 101 (1/10): What is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Portfolio Project 101 (2/10): Traits of a Good Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Portfolio Project 101 (3/10): Writing the README</a></li>
 <li><strong>Building the Demo (current)</strong></li>
 <li>Deploying the Project (upcoming)</li>
 <li>Tests and Documentation (upcoming)</li>

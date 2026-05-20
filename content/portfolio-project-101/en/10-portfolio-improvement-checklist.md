@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 10
-title: Portfolio Improvement Checklist
+title: "Portfolio Project 101 (10/10): Portfolio Improvement Checklist"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A final portfolio review checklist covering README, demo, code,
 last_reviewed: '2026-05-15'
 ---
 
-# Portfolio Improvement Checklist
+# Portfolio Project 101 (10/10): Portfolio Improvement Checklist
 
 The biggest quality gap in a portfolio often appears in the final polish, not in the first implementation pass. Many projects feel almost done, but still leave a strangely incomplete impression because the README is stale, the demo is brittle, or the project story is spread across too many places.
 
@@ -30,12 +30,21 @@ This is the final post in the Portfolio Project 101 series. Here we will walk th
 
 > Finishing a portfolio is mostly about removing the points where a first-time visitor is likely to stop.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What are the most important areas to check before sharing a project publicly?
 - Why should README, demo, code, story, and publishing links be reviewed separately?
 - Where do the author's assumptions usually diverge most from a first-time visitor’s experience?
-- How does a small review routine raise quality over time?
+
+## Big Picture
+
+![portfolio project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 10 flow overview*
+
+This picture places Portfolio Improvement Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Portfolio Improvement Checklist is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ A portfolio is also something you reuse. You send the link more than once. You r
 ## Mental Model
 
 The most practical review order often follows the same sequence a visitor follows: README, demo, code, story, then public sharing channels.
-
-![The final review order before you share a portfolio project publicly](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
-
-*The final review order before you share a portfolio project publicly*
 
 That order works because it mirrors how the project is actually experienced from the outside. The better your review order matches the visitor’s path, the fewer blind spots you leave behind.
 
@@ -163,19 +168,29 @@ Final portfolio polish is mostly about removing friction. If you review the READ
 
 This closes the Portfolio Project 101 series. Reusing the same review loop on future projects is one of the easiest ways to raise your baseline quality over time.
 
+## Answering the Opening Questions
+
+- **What are the most important areas to check before sharing a project publicly?**
+  - The article treats Portfolio Improvement Checklist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should README, demo, code, story, and publishing links be reviewed separately?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do the author's assumptions usually diverge most from a first-time visitor’s experience?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
-- [Deploying the Project](./05-deploying-the-project.md)
-- [Tests and Documentation](./06-tests-and-documentation.md)
-- [Recording Tech Decisions](./07-recording-tech-decisions.md)
-- [Summarizing as Blog Posts](./08-summarizing-as-blog-posts.md)
-- [Explaining in Interviews](./09-explaining-in-interviews.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): Deploying the Project](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): Tests and Documentation](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): Recording Tech Decisions](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (8/10): Summarizing as Blog Posts](./08-summarizing-as-blog-posts.md)
+- [Portfolio Project 101 (9/10): Explaining in Interviews](./09-explaining-in-interviews.md)
 - **Portfolio Improvement Checklist (current)**
+
 <!-- toc:end -->
 
 ## References

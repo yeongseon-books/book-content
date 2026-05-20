@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Recording Tech Decisions</title>
+<title>Portfolio Project 101 (7/10): Recording Tech Decisions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,31 @@
 </style>
 </head>
 <body>
-<h1>Recording Tech Decisions</h1>
+<h1>Portfolio Project 101 (7/10): Recording Tech Decisions</h1>
 <p>When reviewers inspect a portfolio project, they care about more than the final code. They also want to know why a specific stack was chosen, what alternatives were considered, and what trade-offs were accepted. Code shows the outcome, but it rarely shows the judgment on its own.</p>
 <p>This is post 7 in the Portfolio Project 101 series. Here we will use a lightweight ADR-style format to record technical choices and make design judgment visible in a way that is easy to keep up.</p>
 <hr>
 <blockquote>
 <p>A good decision note does not declare a perfect answer. It records what options existed, why one was chosen, and what consequences came with it.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do technical choices usually stay invisible if you only show code?</li>
 <li>How do alternatives and consequences make a project more persuasive?</li>
 <li>How lightweight can an ADR be and still be useful?</li>
-<li>What kinds of written traces make judgment visible in a portfolio?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="portfolio project 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>portfolio project 101 chapter 7 flow overview</em></p>
+<p>This picture places Recording Tech Decisions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Recording Tech Decisions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Hiring loops often care as much about decision quality as implementation quality. Two projects may ship the same capability, but the one that explains why a framework was chosen and what was sacrificed for speed or simplicity usually reads much deeper.</p>
 <p>Decision records help because they make constraint-aware thinking visible. They also help you later, when you need to remember why something was done a certain way.</p>
 <h2>Mental Model</h2>
 <p>A useful decision record usually flows from context to options, then to the decision, the consequence, and the likely next step.</p>
-<p><img alt="The ADR flow from context and options to consequence and next step" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>The ADR flow from context and options to consequence and next step</em></p>
 <p>This order matters because choices only make sense inside a real situation. “We picked FastAPI” is weak on its own. “We picked FastAPI because we had a solo developer, a short deadline, and a need for fast API docs” is much more informative.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -147,14 +151,23 @@
 <h2>Wrap-up and Next Steps</h2>
 <p>Technical decision records reveal the judgment behind the result. When you write down the context, compare the alternatives, explain the decision criteria, and record the consequence honestly, even a small project becomes much easier to evaluate as real engineering work.</p>
 <p>Next, we will expand the project beyond the repository and look at how to turn it into a technical post that others can discover through search.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why do technical choices usually stay invisible if you only show code?</strong></li>
+<li>The article treats Recording Tech Decisions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do alternatives and consequences make a project more persuasive?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How lightweight can an ADR be and still be useful?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Building the Demo</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/05-deploying-the-project.md">Deploying the Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/06-tests-and-documentation.md">Tests and Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">Portfolio Project 101 (1/10): What is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Portfolio Project 101 (2/10): Traits of a Good Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Portfolio Project 101 (3/10): Writing the README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Portfolio Project 101 (4/10): Building the Demo</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/05-deploying-the-project.md">Portfolio Project 101 (5/10): Deploying the Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/06-tests-and-documentation.md">Portfolio Project 101 (6/10): Tests and Documentation</a></li>
 <li><strong>Recording Tech Decisions (current)</strong></li>
 <li>Summarizing as Blog Posts (upcoming)</li>
 <li>Explaining in Interviews (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 9
-title: Explaining in Interviews
+title: "Portfolio Project 101 (9/10): Explaining in Interviews"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to explain a portfolio project in interviews using a short 
 last_reviewed: '2026-05-15'
 ---
 
-# Explaining in Interviews
+# Portfolio Project 101 (9/10): Explaining in Interviews
 
 Interview answers do not get stronger just because they get longer. In most cases, a tighter explanation of the problem, the decision, and the result is much more persuasive than a broad tour of every library in the stack. Interviewers usually want to hear judgment, not a dependency list.
 
@@ -30,12 +30,21 @@ This is post 9 in the Portfolio Project 101 series. Here we will shape a portfol
 
 > A strong interview answer is not a product pitch. It is a compressed record of problem, task, action, result, and learning.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What do interviewers usually want to hear before they care about implementation detail?
 - Why is the STAR structure especially useful for short project answers?
 - How do numbers and trade-offs change the credibility of the answer?
-- How do you make your personal contribution clear in solo and team contexts?
+
+## Big Picture
+
+![portfolio project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 9 flow overview*
+
+This picture places Explaining in Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Explaining in Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ The first minute or two matters a lot because it shapes the quality of the follo
 ## Mental Model
 
 A project answer becomes much easier to control when it follows situation, task, action, and result.
-
-![The STAR answer shape from situation to measurable result](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
-
-*The STAR answer shape from situation to measurable result*
 
 This structure prevents a common failure mode: jumping straight into implementation without first explaining why the project existed or what success looked like.
 
@@ -162,19 +167,29 @@ Explaining a portfolio project well is about structure, not volume. When situati
 
 Next, we will close the series with a final checklist you can use before sharing a portfolio project publicly.
 
+## Answering the Opening Questions
+
+- **What do interviewers usually want to hear before they care about implementation detail?**
+  - The article treats Explaining in Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is the STAR structure especially useful for short project answers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do numbers and trade-offs change the credibility of the answer?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
-- [Deploying the Project](./05-deploying-the-project.md)
-- [Tests and Documentation](./06-tests-and-documentation.md)
-- [Recording Tech Decisions](./07-recording-tech-decisions.md)
-- [Summarizing as Blog Posts](./08-summarizing-as-blog-posts.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): Deploying the Project](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): Tests and Documentation](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): Recording Tech Decisions](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (8/10): Summarizing as Blog Posts](./08-summarizing-as-blog-posts.md)
 - **Explaining in Interviews (current)**
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

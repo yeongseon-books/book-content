@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 5
-title: Deploying the Project
+title: "Portfolio Project 101 (5/10): Deploying the Project"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to deploy a portfolio project so other people can verify it
 last_reviewed: '2026-05-15'
 ---
 
-# Deploying the Project
+# Portfolio Project 101 (5/10): Deploying the Project
 
 A portfolio project is only halfway finished if it runs on localhost and nowhere else. There is a big difference between saying the project works and giving another person a URL where they can verify it. Without that public path, the project still depends on explanation.
 
@@ -30,12 +30,21 @@ This is post 5 in the Portfolio Project 101 series. Here we will treat deploymen
 
 > Deployment is not about getting the app up once. It is about making the app reachable, repeatable, and inspectable.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is a public URL close to mandatory for a portfolio project?
 - What should you optimize for when choosing a hosting platform?
 - Why should secrets and environment configuration live outside the codebase?
-- How do health checks and repeatable deploys raise trust in a small project?
+
+## Big Picture
+
+![portfolio project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 5 flow overview*
+
+This picture places Deploying the Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deploying the Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,10 +55,6 @@ A deployment setup also reveals operational judgment. Even a small project looks
 ## Mental Model
 
 You do not need a complicated model: code is pushed, built, deployed, checked, and then made available through a public URL.
-
-![The path from git push to a public URL that others can verify](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
-
-*The path from git push to a public URL that others can verify*
 
 This flow is also what helps you debug. Was the build broken? Did deployment finish but the app fail to start? Is the URL reachable while internal state is unhealthy? Reviewers will not ask those questions explicitly, but your project feels more mature when the deployment story can answer them.
 
@@ -162,19 +167,29 @@ Portfolio deployment does not require giant infrastructure. A public URL, separa
 
 Next, we will turn that trust into explicit proof through tests, documentation, and automated verification.
 
+## Answering the Opening Questions
+
+- **Why is a public URL close to mandatory for a portfolio project?**
+  - The article treats Deploying the Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What should you optimize for when choosing a hosting platform?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should secrets and environment configuration live outside the codebase?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
-- [Writing the README](./03-writing-the-readme.md)
-- [Building the Demo](./04-building-the-demo.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): Writing the README](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): Building the Demo](./04-building-the-demo.md)
 - **Deploying the Project (current)**
 - Tests and Documentation (upcoming)
 - Recording Tech Decisions (upcoming)
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

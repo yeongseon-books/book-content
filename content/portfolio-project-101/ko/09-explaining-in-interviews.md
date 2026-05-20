@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 9
-title: 면접에서 설명하기
+title: "Portfolio Project 101 (9/10): 면접에서 설명하기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,20 +20,27 @@ seo_description: 면접에서 프로젝트 성과와 기술 난관 극복을 STA
 last_reviewed: '2026-05-15'
 ---
 
-# 면접에서 설명하기
+# Portfolio Project 101 (9/10): 면접에서 설명하기
 
 면접에서 프로젝트 설명이 길어질수록 평가가 좋아지는 것은 아닙니다. 오히려 짧은 시간 안에 문제, 판단, 결과를 또렷하게 말하는 편이 훨씬 강합니다. 면접관이 듣고 싶은 것은 기술 이름 목록이 아니라, 어떤 문제를 이해했고 어떤 기준으로 결정을 내렸는지입니다.
 
 이 글은 Portfolio Project 101 시리즈의 9번째 글입니다. 여기서는 포트폴리오 프로젝트를 면접에서 설명할 때 짧은 시간 안에 핵심을 전달하는 구조를 살펴보겠습니다. 목표는 많이 말하는 것이 아니라, 판단력이 들리는 답변을 만드는 데 있습니다.
 
-## 이 글에서 다룰 문제
-
-> 좋은 면접 답변은 프로젝트 자랑이 아니라 문제, 과제, 행동, 결과를 짧게 압축한 판단 기록입니다.
+## 먼저 던지는 질문
 
 - 면접관은 코드 양보다 무엇을 더 듣고 싶어 할까요?
 - STAR 구조는 왜 짧은 답변에서 특히 강할까요?
 - 숫자와 트레이드오프는 답변 설득력을 어떻게 바꿀까요?
-- 팀 프로젝트나 개인 프로젝트에서 내 기여를 어떻게 또렷하게 말할 수 있을까요?
+
+## 큰 그림
+
+![Portfolio Project 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-diagram.ko.png)
+
+*Portfolio Project 101 9장 흐름 개요*
+
+이 그림에서는 면접에서 설명하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 면접에서 설명하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,10 +51,6 @@ last_reviewed: '2026-05-15'
 ## 머릿속에 먼저 그릴 그림
 
 프로젝트 설명은 상황, 과제, 행동, 결과 순서로 정리하면 놓치기 쉽지 않습니다.
-
-![상황에서 결과로 이어지는 STAR 답변 구조](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-diagram.ko.png)
-
-*상황에서 결과로 이어지는 STAR 답변 구조*
 
 이 구조는 답변이 자연스럽게 질문을 예방하게 만듭니다. 왜 이걸 만들었는지, 정확히 무엇을 해야 했는지, 본인이 무엇을 했는지, 결국 어떤 결과가 나왔는지가 한 흐름으로 이어지기 때문입니다.
 
@@ -160,17 +163,29 @@ lesson = "Small MVPs survive"
 
 다음 글에서는 시리즈를 마무리하면서 공개 직전에 무엇을 점검하면 포트폴리오 전체 완성도를 높일 수 있는지 체크리스트 관점에서 정리해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **면접관은 코드 양보다 무엇을 더 듣고 싶어 할까요?**
+  - 본문의 기준은 면접에서 설명하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **STAR 구조는 왜 짧은 답변에서 특히 강할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **숫자와 트레이드오프는 답변 설득력을 어떻게 바꿀까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [포트폴리오 프로젝트란 무엇인가](./01-what-is-a-portfolio-project.md)
-- [좋은 프로젝트의 조건](./02-traits-of-a-good-project.md)
-- [README 작성](./03-writing-the-readme.md)
-- [데모 만들기](./04-building-the-demo.md)
-- [배포하기](./05-deploying-the-project.md)
-- [테스트와 문서화](./06-tests-and-documentation.md)
-- [기술적 의사결정 기록](./07-recording-tech-decisions.md)
-- [블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
+## 시리즈 목차
+
+- [Portfolio Project 101 (1/10): 포트폴리오 프로젝트란 무엇인가](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): 좋은 프로젝트의 조건](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): README 작성](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): 데모 만들기](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): 배포하기](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): 테스트와 문서화](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): 기술적 의사결정 기록](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (8/10): 블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
 - **면접에서 설명하기 (현재 글)**
 - 포트폴리오 개선 체크리스트 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

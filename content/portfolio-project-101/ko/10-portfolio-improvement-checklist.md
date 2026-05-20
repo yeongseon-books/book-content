@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 10
-title: 포트폴리오 개선 체크리스트
+title: "Portfolio Project 101 (10/10): 포트폴리오 개선 체크리스트"
 status: publish-ready
 targets:
   tistory: true
@@ -20,20 +20,27 @@ seo_description: 포트폴리오 공개 전 코드 품질, 문서화 수준, 데
 last_reviewed: '2026-05-15'
 ---
 
-# 포트폴리오 개선 체크리스트
+# Portfolio Project 101 (10/10): 포트폴리오 개선 체크리스트
 
 포트폴리오는 만드는 일보다 다듬는 일에서 품질 차이가 크게 납니다. 기능은 얼추 완성됐는데도 어딘가 덜 준비된 느낌이 드는 프로젝트가 있습니다. 대개는 구현이 부족해서가 아니라, 공개 전 마지막 점검이 빠졌기 때문입니다. README가 오래되었거나, 데모 링크가 깨졌거나, 프로젝트 서사가 흩어져 있으면 첫인상에서 바로 손해를 봅니다.
 
 이 글은 Portfolio Project 101 시리즈의 마지막 글입니다. 여기서는 공개 직전에 무엇을 점검하면 포트폴리오 전체 완성도를 끌어올릴 수 있는지, 처음 방문한 사람의 시선으로 다시 보는 체크리스트를 정리하겠습니다.
 
-## 이 글에서 다룰 문제
-
-> 포트폴리오 마무리는 기능 추가가 아니라 처음 보는 사람이 어디에서 멈출지 미리 없애는 작업입니다.
+## 먼저 던지는 질문
 
 - 공개 전 마지막으로 확인해야 할 핵심 영역은 무엇일까요?
 - README, 데모, 코드, 서사, 공개 채널은 왜 따로 점검해야 할까요?
 - 작성자 시선과 처음 방문한 사람의 시선은 어디에서 가장 크게 어긋날까요?
-- 작은 프로젝트라도 반복 가능한 점검 루틴이 있으면 무엇이 달라질까요?
+
+## 큰 그림
+
+![Portfolio Project 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-diagram.ko.png)
+
+*Portfolio Project 101 10장 흐름 개요*
+
+이 그림에서는 포트폴리오 개선 체크리스트를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 포트폴리오 개선 체크리스트의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,10 +51,6 @@ last_reviewed: '2026-05-15'
 ## 머릿속에 먼저 그릴 그림
 
 공개 전 점검은 README, 데모, 코드, 서사, 공개 채널 순서로 보면 빠뜨릴 부분이 적습니다.
-
-![공개 전 최종 점검의 기본 순서](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-diagram.ko.png)
-
-*공개 전 최종 점검의 기본 순서*
 
 이 순서는 독자가 프로젝트를 만나는 순서와도 비슷합니다. 설명을 보고, 실제로 눌러 보고, 저장소를 살펴본 뒤, 이 프로젝트를 어떻게 기억할지 정하고, 마지막으로 외부 채널에서 다시 마주칩니다. 그래서 점검도 같은 순서가 잘 맞습니다.
 
@@ -161,17 +164,29 @@ launch = ["GitHub", "Blog", "LinkedIn"]
 
 이 글로 Portfolio Project 101 시리즈를 마칩니다. 다음 프로젝트를 만들 때도 같은 점검 루틴을 반복하면, 결과물 수보다 완성도에서 더 큰 차이가 쌓이게 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **공개 전 마지막으로 확인해야 할 핵심 영역은 무엇일까요?**
+  - 본문의 기준은 포트폴리오 개선 체크리스트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **README, 데모, 코드, 서사, 공개 채널은 왜 따로 점검해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **작성자 시선과 처음 방문한 사람의 시선은 어디에서 가장 크게 어긋날까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [포트폴리오 프로젝트란 무엇인가](./01-what-is-a-portfolio-project.md)
-- [좋은 프로젝트의 조건](./02-traits-of-a-good-project.md)
-- [README 작성](./03-writing-the-readme.md)
-- [데모 만들기](./04-building-the-demo.md)
-- [배포하기](./05-deploying-the-project.md)
-- [테스트와 문서화](./06-tests-and-documentation.md)
-- [기술적 의사결정 기록](./07-recording-tech-decisions.md)
-- [블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
-- [면접에서 설명하기](./09-explaining-in-interviews.md)
+## 시리즈 목차
+
+- [Portfolio Project 101 (1/10): 포트폴리오 프로젝트란 무엇인가](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): 좋은 프로젝트의 조건](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (3/10): README 작성](./03-writing-the-readme.md)
+- [Portfolio Project 101 (4/10): 데모 만들기](./04-building-the-demo.md)
+- [Portfolio Project 101 (5/10): 배포하기](./05-deploying-the-project.md)
+- [Portfolio Project 101 (6/10): 테스트와 문서화](./06-tests-and-documentation.md)
+- [Portfolio Project 101 (7/10): 기술적 의사결정 기록](./07-recording-tech-decisions.md)
+- [Portfolio Project 101 (8/10): 블로그 글로 정리하기](./08-summarizing-as-blog-posts.md)
+- [Portfolio Project 101 (9/10): 면접에서 설명하기](./09-explaining-in-interviews.md)
 - **포트폴리오 개선 체크리스트 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

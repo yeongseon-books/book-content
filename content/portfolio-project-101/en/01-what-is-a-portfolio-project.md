@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 1
-title: What is a Portfolio Project
+title: "Portfolio Project 101 (1/10): What is a Portfolio Project"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: What separates a portfolio project from a practice repo, and wh
 last_reviewed: '2026-05-15'
 ---
 
-# What is a Portfolio Project
+# Portfolio Project 101 (1/10): What is a Portfolio Project
 
 A lot of junior developers create a GitHub repository and call it a portfolio project the same day. That is understandable, but it misses the hiring point. A repository can hold code. A portfolio project has to hold evidence: what problem you chose, what trade-offs you made, and what result another person can actually inspect.
 
@@ -32,12 +32,21 @@ This is the first post in the Portfolio Project 101 series. Here we will define 
 
 > A portfolio project is not a pile of features. It is a public case study that makes the problem, the judgment, and the result visible at a glance.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What is the difference between a portfolio project and a simple practice repository?
 - What do hiring managers or reviewers usually look for before they ever read the code?
 - What is the minimum structure that makes even a small project feel worth reviewing?
-- How does decision-making show up in public project artifacts?
+
+## Big Picture
+
+![portfolio project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 1 flow overview*
+
+This picture places What is a Portfolio Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is a Portfolio Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -48,10 +57,6 @@ That is where a portfolio project becomes useful. Reviewers rarely spend a long 
 ## Mental Model
 
 A strong portfolio project is easiest to understand as a flow from problem to solution, then to code, deployment, and explanation.
-
-![The basic flow that turns a project into a portfolio case study](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
-
-*The basic flow that turns a project into a portfolio case study*
 
 The diagram matters because it shows why code alone is not enough. If there is no problem statement, a reviewer cannot tell why the project exists. If there is no deployment or demo, they cannot verify that it works. If there is no README, they have to reconstruct the value on their own. A portfolio project is closer to a well-packaged public proof than to a private implementation note.
 
@@ -164,6 +169,15 @@ A portfolio project is more than public code. It becomes reviewable only when th
 
 In the next post, we will turn that definition into evaluation criteria and look at what makes one project feel much stronger than another.
 
+## Answering the Opening Questions
+
+- **What is the difference between a portfolio project and a simple practice repository?**
+  - The article treats What is a Portfolio Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do hiring managers or reviewers usually look for before they ever read the code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the minimum structure that makes even a small project feel worth reviewing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -177,6 +191,7 @@ In the next post, we will turn that definition into evaluation criteria and look
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

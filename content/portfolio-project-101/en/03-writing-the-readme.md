@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 3
-title: Writing the README
+title: "Portfolio Project 101 (3/10): Writing the README"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to write a README that helps a hiring reviewer understand y
 last_reviewed: '2026-05-15'
 ---
 
-# Writing the README
+# Portfolio Project 101 (3/10): Writing the README
 
 A good project can still lose power at the entrance if the README is weak. Most visitors read the README before they read any code. In that short window, they need to understand what problem the project solves, whether there is a demo worth opening, and how they could run it themselves.
 
@@ -32,12 +32,21 @@ This is post 3 in the Portfolio Project 101 series. Here we will treat the READM
 
 > A strong README is not just a repository description. It is an entry document that helps a first-time visitor decide what to do next.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What information should a portfolio README show first?
 - Why does the order pitch → demo → stack → run → next feel easy to scan?
 - Why can a README still feel weak even when it contains many screenshots?
-- How do you reduce friction for a reviewer who wants to run or inspect the project immediately?
+
+## Big Picture
+
+![portfolio project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 3 flow overview*
+
+This picture places Writing the README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing the README is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -48,10 +57,6 @@ In portfolio work, that matters a lot because the reviewer is not a teammate who
 ## Mental Model
 
 The simplest way to design a README is to follow the visitor’s question order.
-
-![The question order most reviewers follow when reading a README](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
-
-*The question order most reviewers follow when reading a README*
 
 Most first-time readers think in roughly this order: what is this, does it work, what is it built with, can I run it, and what is still left. A README works best when it follows that flow instead of following the author's implementation history.
 
@@ -165,11 +170,20 @@ A README is not just a summary page. It is the first user experience of the proj
 
 Next, we will move from the repository to the product surface itself and look at how to build a demo that reveals value quickly.
 
+## Answering the Opening Questions
+
+- **What information should a portfolio README show first?**
+  - The article treats Writing the README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does the order pitch → demo → stack → run → next feel easy to scan?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why can a README still feel weak even when it contains many screenshots?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
-- [Traits of a Good Project](./02-traits-of-a-good-project.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (2/10): Traits of a Good Project](./02-traits-of-a-good-project.md)
 - **Writing the README (current)**
 - Building the Demo (upcoming)
 - Deploying the Project (upcoming)
@@ -178,6 +192,7 @@ Next, we will move from the repository to the product surface itself and look at
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References

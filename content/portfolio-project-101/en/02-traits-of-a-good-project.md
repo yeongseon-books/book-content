@@ -1,7 +1,7 @@
 ---
 series: portfolio-project-101
 episode: 2
-title: Traits of a Good Project
+title: "Portfolio Project 101 (2/10): Traits of a Good Project"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: What makes a project worth showing to a hiring team, from clear
 last_reviewed: '2026-05-15'
 ---
 
-# Traits of a Good Project
+# Portfolio Project 101 (2/10): Traits of a Good Project
 
 It is tempting to think a portfolio project becomes stronger as you keep adding features. In practice, the opposite is often true. As the scope grows, the finish quality usually drops, the core problem gets harder to explain, and the result becomes harder to defend.
 
@@ -32,12 +32,21 @@ This is post 2 in the Portfolio Project 101 series. Here we will look at the tra
 
 > Good projects win with focus, visible results, and repeatable verification—not with an endless feature list.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is a bigger project not automatically a better portfolio project?
 - How do problem clarity, measurable results, maintainability, and reproducibility show up in practice?
 - What makes a small project still feel strong and credible?
-- What signals do reviewers trust more than a flashy stack?
+
+## Big Picture
+
+![portfolio project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
+
+*portfolio project 101 chapter 2 flow overview*
+
+This picture places Traits of a Good Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Traits of a Good Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -48,10 +57,6 @@ A portfolio is not product marketing. It is evidence of engineering judgment. Th
 ## Mental Model
 
 A strong project usually connects five traits in one chain: focus, problem clarity, measurable results, maintainability, and reproducibility.
-
-![How focus, clarity, results, maintainability, and reproducibility connect](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
-
-*How focus, clarity, results, maintainability, and reproducibility connect*
 
 The chain matters because each quality reinforces the next one. A smaller scope makes it easier to explain the problem clearly. A clear problem makes results easier to measure. Measured results are easier to trust when the code is maintainable and the whole project is reproducible.
 
@@ -164,10 +169,19 @@ Strong portfolio projects do not need to be large. They need to be focused, meas
 
 Next, we will move to the repository entrance itself and look at how the README should present that value.
 
+## Answering the Opening Questions
+
+- **Why is a bigger project not automatically a better portfolio project?**
+  - The article treats Traits of a Good Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do problem clarity, measurable results, maintainability, and reproducibility show up in practice?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What makes a small project still feel strong and credible?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
+- [Portfolio Project 101 (1/10): What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
 - **Traits of a Good Project (current)**
 - Writing the README (upcoming)
 - Building the Demo (upcoming)
@@ -177,6 +191,7 @@ Next, we will move to the repository entrance itself and look at how the README 
 - Summarizing as Blog Posts (upcoming)
 - Explaining in Interviews (upcoming)
 - Portfolio Improvement Checklist (upcoming)
+
 <!-- toc:end -->
 
 ## References
