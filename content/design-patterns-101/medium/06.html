@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Adapter Pattern</title>
+<title>Design Patterns 101 (6/10): The Adapter Pattern</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>The Adapter Pattern</h1>
+<h1>Design Patterns 101 (6/10): The Adapter Pattern</h1>
 <p>Production systems rarely talk only to interfaces we designed ourselves. Payment SDKs, storage clients, mail providers, and third-party APIs all arrive with their own method names, error models, and data shapes. The trouble begins when those external details leak through the domain.</p>
 <p>This is post 6 in the Design Patterns 101 series.</p>
 <p>In this post, we'll use the Adapter pattern as a thin translation layer at the boundary. The aim is to let the domain speak in its own contract while the adapter absorbs SDK-specific calls, types, and exceptions.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem Adapter solves</li>
-<li>Define a domain interface, then wrap external calls</li>
-<li>Object Adapter vs Class Adapter</li>
-<li>Adapter and test doubles</li>
-<li>Signs an Adapter has gone wrong</li>
+<li>The problem Adapter solves?</li>
+<li>Define a domain interface, then wrap external calls?</li>
+<li>Object Adapter vs Class Adapter?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 6 flow overview</em></p>
+<p>This picture places The Adapter Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Adapter Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When external library calls scatter through the domain, every library tweak shakes the domain. An Adapter pins that movement to a single <em>boundary line</em>.</p>
 <blockquote>
 <p>An Adapter is a <em>thin coat</em> at the boundary.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>The Adapter keeps the domain on its own contract while infrastructure-specific calls stay behind the boundary.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Target</strong>: the interface the domain wants.</li>
@@ -196,14 +199,24 @@ class InMemoryFileStore:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Adapter is the <em>thin coat</em> at the boundary. The next post moves to inter-object notification — the Observer pattern.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
+<li><strong>The problem Adapter solves?</strong></li>
+<li>The article treats The Adapter Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Define a domain interface, then wrap external calls?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Object Adapter vs Class Adapter?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Design Patterns 101 (2/10): Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Design Patterns 101 (3/10): Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Design Patterns 101 (4/10): Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">Design Patterns 101 (5/10): The Strategy Pattern</a></li>
 <li><strong>The Adapter Pattern (current)</strong></li>
-<li>Observer Pattern (upcoming)</li>
+<li>The Observer Pattern (upcoming)</li>
 <li>Factory and Dependency Injection (upcoming)</li>
 <li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>

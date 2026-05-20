@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 2
-title: Creational Patterns
+title: "Design Patterns 101 (2/10): Creational Patterns"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How creational patterns separate object construction from use s
 last_reviewed: '2026-05-15'
 ---
 
-# Creational Patterns
+# Design Patterns 101 (2/10): Creational Patterns
 
 There is a point where object creation becomes more noticeable than the code using those objects. `new SomeService()` starts appearing everywhere, environment-specific construction branches spread, and constructor arguments keep growing. At that point, the real problem is not business logic. It is who owns creation.
 
@@ -29,13 +29,21 @@ This is post 2 in the Design Patterns 101 series.
 
 In this post, we'll look at creational patterns as tools for concentrating construction responsibility in one place. The important question is not just what gets built, but who builds it and how much the caller needs to know.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem creational patterns solve
-- Factory Method and Abstract Factory
-- When you actually need a Builder
-- The risks of Singleton
-- Where Prototype fits
+- The problem creational patterns solve?
+- Factory Method and Abstract Factory?
+- When you actually need a Builder?
+
+## Big Picture
+
+![design patterns 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 2 flow overview*
+
+This picture places Creational Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Creational Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ When `new SomeService()` is sprinkled throughout the code, coupling is already l
 > Where you build an object matters more than what you build.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
-*Creational patterns give four common ways to pull construction responsibility away from callers and into a safer assembly boundary.*
 
 ## Key Terms
 
@@ -206,17 +211,29 @@ Before introducing a creational pattern, test these checkpoints.
 
 Once you control creation, coupling loosens. Next up — how objects get *composed* together — Structural patterns.
 
+## Answering the Opening Questions
+
+- **The problem creational patterns solve?**
+  - The article treats Creational Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Factory Method and Abstract Factory?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When you actually need a Builder?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
 - **Creational Patterns (current)**
 - Structural Patterns (upcoming)
 - Behavioral Patterns (upcoming)
-- Strategy Pattern (upcoming)
-- Adapter Pattern (upcoming)
-- Observer Pattern (upcoming)
+- The Strategy Pattern (upcoming)
+- The Adapter Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
-- How Not to Overuse Patterns (upcoming)
+- Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

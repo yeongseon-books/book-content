@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 10
-title: Pythonic Patterns
+title: "Design Patterns 101 (10/10): Pythonic Patterns"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How Python modules, functions, Protocols, and decorators expres
 last_reviewed: '2026-05-15'
 ---
 
-# Pythonic Patterns
+# Design Patterns 101 (10/10): Pythonic Patterns
 
 It is tempting to copy GoF structures directly into every language. In Python, that often produces more ceremony than value. Modules, first-class functions, Protocols, decorators, and dataclasses already carry much of the same intent in lighter forms.
 
@@ -29,13 +29,21 @@ This is the final post in the Design Patterns 101 series.
 
 In this post, we'll look at how Python's own tools can express classic pattern ideas with less code and less inheritance. The point is not to reject patterns, but to translate their intent into forms that read naturally in Python.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why a module is already a Singleton
-- Strategy and Command expressed as functions
-- Interfaces expressed as Protocols
-- `@dataclass` and value objects
-- Decorator (the pattern) expressed as `@decorator`
+- Why a module is already a Singleton?
+- Strategy and Command expressed as functions?
+- Interfaces expressed as Protocols?
+
+## Big Picture
+
+![design patterns 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 10 flow overview*
+
+This picture places Pythonic Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pythonic Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Python's basic tools — modules, functions, Protocols — already provide *runt
 > Reach for the language's tools first; pull out a pattern only when those fall short.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
-*In Python, the same pattern intent often survives best when expressed through modules, functions, Protocols, and decorators instead of heavier class scaffolding.*
 
 ## Key Terms
 
@@ -210,17 +215,29 @@ Use this check before porting a textbook GoF structure straight into Python.
 
 GoF is a *vocabulary*, not a *manual*. Look at Python's tools first, and reach for pattern names only where the tools fall short. The Design Patterns 101 series ends here — use these terms as *units of thought*, not as instruments.
 
+## Answering the Opening Questions
+
+- **Why a module is already a Singleton?**
+  - The article treats Pythonic Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Strategy and Command expressed as functions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Interfaces expressed as Protocols?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
-- [The Strategy Pattern](./05-strategy-pattern.md)
-- [The Adapter Pattern](./06-adapter-pattern.md)
-- [The Observer Pattern](./07-observer-pattern.md)
-- [Factory and Dependency Injection](./08-factory-and-di.md)
-- [Avoiding Pattern Overuse](./09-avoiding-pattern-overuse.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): The Strategy Pattern](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): The Adapter Pattern](./06-adapter-pattern.md)
+- [Design Patterns 101 (7/10): The Observer Pattern](./07-observer-pattern.md)
+- [Design Patterns 101 (8/10): Factory and Dependency Injection](./08-factory-and-di.md)
+- [Design Patterns 101 (9/10): Avoiding Pattern Overuse](./09-avoiding-pattern-overuse.md)
 - **Pythonic Patterns (current)**
+
 <!-- toc:end -->
 
 ## References

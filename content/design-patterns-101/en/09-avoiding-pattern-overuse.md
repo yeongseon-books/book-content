@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 9
-title: Avoiding Pattern Overuse
+title: "Design Patterns 101 (9/10): Avoiding Pattern Overuse"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How to avoid pattern overuse by starting simple, waiting for re
 last_reviewed: '2026-05-15'
 ---
 
-# Avoiding Pattern Overuse
+# Design Patterns 101 (9/10): Avoiding Pattern Overuse
 
 After learning design patterns, many engineers go through a phase where almost every piece of code looks like a pattern candidate. A tiny function starts to resemble a Strategy, a simple constructor wants to become a Factory, and one wrapper invites the Decorator label. The danger is that imagined future complexity can erase present-day clarity.
 
@@ -29,13 +29,21 @@ This is post 9 in the Design Patterns 101 series.
 
 In this post, we'll focus on the difference between knowing patterns and using them well. The right direction is not “apply patterns first,” but “let repeated change justify the abstraction.”
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The antipattern that "patterns first" creates
-- The power of the simpler alternative
-- YAGNI and how it relates to patterns
-- *Discovering* a pattern through refactoring
-- Why senior engineers *delay* patterns
+- The antipattern that "patterns first" creates?
+- The power of the simpler alternative?
+- YAGNI and how it relates to patterns?
+
+## Big Picture
+
+![design patterns 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 9 flow overview*
+
+This picture places Avoiding Pattern Overuse inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Avoiding Pattern Overuse is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Pre-applied patterns easily become misapplied patterns. A simple piece of code c
 > The best abstraction shows up *late*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
-*A healthy pattern emerges from repeated pain and refactoring; a premature one usually leaves behind only extra complexity.*
 
 ## Key Terms
 
@@ -180,17 +185,29 @@ Run this check when a proposed abstraction feels suspicious.
 
 Patterns are *vocabulary*. The final post looks at how Python's first-class functions, modules, and Protocols dissolve many GoF patterns — Pythonic patterns.
 
+## Answering the Opening Questions
+
+- **The antipattern that "patterns first" creates?**
+  - The article treats Avoiding Pattern Overuse as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The power of the simpler alternative?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **YAGNI and how it relates to patterns?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
-- [The Strategy Pattern](./05-strategy-pattern.md)
-- [The Adapter Pattern](./06-adapter-pattern.md)
-- [The Observer Pattern](./07-observer-pattern.md)
-- [Factory and Dependency Injection](./08-factory-and-di.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): The Strategy Pattern](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): The Adapter Pattern](./06-adapter-pattern.md)
+- [Design Patterns 101 (7/10): The Observer Pattern](./07-observer-pattern.md)
+- [Design Patterns 101 (8/10): Factory and Dependency Injection](./08-factory-and-di.md)
 - **Avoiding Pattern Overuse (current)**
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

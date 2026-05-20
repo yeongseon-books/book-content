@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Factory and Dependency Injection</title>
+<title>Design Patterns 101 (8/10): Factory and Dependency Injection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Factory and Dependency Injection</h1>
+<h1>Design Patterns 101 (8/10): Factory and Dependency Injection</h1>
 <p>Object creation and object composition eventually collapse into one practical question: who builds this thing, where is it wired together, and who passes it in? When domain code starts creating its own repositories, mailers, or event buses, usage and assembly get tangled together.</p>
 <p>This is post 8 in the Design Patterns 101 series.</p>
 <p>In this post, we'll look at Factory and Dependency Injection as two parts of the same move. Assembly should happen at an outside entry point, while domain code should receive collaborators and focus on using them.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The cost of scattered creation responsibility</li>
-<li>The role of the Factory</li>
-<li>The thinking behind Dependency Injection</li>
-<li>What the Composition Root is</li>
-<li>When a DI container starts to earn its keep</li>
+<li>The cost of scattered creation responsibility?</li>
+<li>The role of the Factory?</li>
+<li>The thinking behind Dependency Injection?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 8 flow overview</em></p>
+<p>This picture places Factory and Dependency Injection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Factory and Dependency Injection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When the domain creates its own dependencies, it learns <em>how to make</em> them. Factory and DI separate "<em>what</em> you use" from "<em>how</em> it is built".</p>
 <blockquote>
 <p>Separating "use" from "assembly" makes testing and substitution easy.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>Factory and DI keep assembly in one place so services can focus on using collaborators instead of constructing them.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Factory</strong>: a function or object that encapsulates creation steps.</li>
@@ -190,14 +193,24 @@ class Container:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Factory and DI separate "assembly" from "use". The next post turns the lens on the <em>cost</em> of patterns — how to avoid overuse.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">The Adapter Pattern</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/07-observer-pattern.md">The Observer Pattern</a></li>
+<li><strong>The cost of scattered creation responsibility?</strong></li>
+<li>The article treats Factory and Dependency Injection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The role of the Factory?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The thinking behind Dependency Injection?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Design Patterns 101 (2/10): Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Design Patterns 101 (3/10): Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Design Patterns 101 (4/10): Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">Design Patterns 101 (5/10): The Strategy Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">Design Patterns 101 (6/10): The Adapter Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/07-observer-pattern.md">Design Patterns 101 (7/10): The Observer Pattern</a></li>
 <li><strong>Factory and Dependency Injection (current)</strong></li>
 <li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>

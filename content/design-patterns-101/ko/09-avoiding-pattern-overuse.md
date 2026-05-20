@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 9
-title: 패턴을 남용하지 않는 법
+title: "Design Patterns 101 (9/10): 패턴을 남용하지 않는 법"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 패턴 남용을 피하고 반복되는 변화가 생겼을 때
 last_reviewed: '2026-05-15'
 ---
 
-# 패턴을 남용하지 않는 법
+# Design Patterns 101 (9/10): 패턴을 남용하지 않는 법
 
 디자인 패턴을 배우고 나면 한동안은 세상이 전부 패턴 후보로 보입니다. 작은 함수도 Strategy로 보이고, 단순한 생성도 Factory로 보이며, 래퍼 하나에도 Decorator라는 이름을 붙이고 싶어집니다. 문제는 이 열정이 종종 미래 요구사항을 상상한 추상화로 이어진다는 점입니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 패턴을 잘 아는 것과 패턴을 잘 쓰는 것이 왜 다른지 정리하겠습니다. 핵심은 패턴이 문제를 부르는 것이 아니라, 반복되는 문제가 패턴을 불러야 한다는 사실입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 좋은 패턴이 어떻게 나쁜 코드로 바뀔까요?
 - 단순한 대안은 왜 종종 더 강할까요?
 - YAGNI는 패턴 선택과 어떤 관계가 있을까요?
-- 리팩터링을 통해 패턴을 “발견한다”는 말은 무슨 뜻일까요?
-- 왜 시니어 엔지니어는 패턴 도입을 일부러 늦출까요?
 
-> 멘탈 모델: 패턴은 답안지가 아니라 어휘입니다. 문제보다 먼저 도착한 패턴은 대개 추상화 비용만 남깁니다. 좋은 추상화는 늦게 나타납니다.
+## 큰 그림
+
+![Design Patterns 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Design Patterns 101 9장 흐름 개요*
+
+이 그림에서는 패턴을 남용하지 않는 법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 패턴을 남용하지 않는 법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 반대로 단순한 코드에서 시작해 반복되는 변화가 정말 생겼을 때 패턴으로 끌어올리면, 추상화의 근거를 실제 코드에서 찾을 수 있습니다. 이 차이가 패턴을 설계 도구로 쓰는 팀과 장식으로 쓰는 팀을 가릅니다.
 
 ## 한눈에 보는 개념
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
-*패턴은 실제 필요와 리팩터링이 불러와야 하고, 문제보다 먼저 도착한 추상화는 대개 복잡성만 남깁니다.*
 
 ## 핵심 용어
 
@@ -182,17 +185,29 @@ def member_price(p): return p * 0.9
 
 패턴은 어휘이지 정답이 아닙니다. 마지막 글에서는 Python의 함수, 모듈, Protocol 같은 언어 도구가 많은 GoF 패턴을 어떻게 더 가볍게 녹여 내는지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **좋은 패턴이 어떻게 나쁜 코드로 바뀔까요?**
+  - 본문의 기준은 패턴을 남용하지 않는 법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **단순한 대안은 왜 종종 더 강할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **YAGNI는 패턴 선택과 어떤 관계가 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
-- [Creational 패턴](./02-creational-patterns.md)
-- [Structural 패턴](./03-structural-patterns.md)
-- [Behavioral 패턴](./04-behavioral-patterns.md)
-- [Strategy 패턴](./05-strategy-pattern.md)
-- [Adapter 패턴](./06-adapter-pattern.md)
-- [Observer 패턴](./07-observer-pattern.md)
-- [Factory와 의존성 주입](./08-factory-and-di.md)
+## 시리즈 목차
+
+- [Design Patterns 101 (1/10): 디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational 패턴](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural 패턴](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral 패턴](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): Strategy 패턴](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): Adapter 패턴](./06-adapter-pattern.md)
+- [Design Patterns 101 (7/10): Observer 패턴](./07-observer-pattern.md)
+- [Design Patterns 101 (8/10): Factory와 의존성 주입](./08-factory-and-di.md)
 - **패턴을 남용하지 않는 법 (현재 글)**
 - Python에 어울리는 패턴 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

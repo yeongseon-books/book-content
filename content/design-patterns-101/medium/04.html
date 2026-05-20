@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Behavioral Patterns</title>
+<title>Design Patterns 101 (4/10): Behavioral Patterns</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Behavioral Patterns</h1>
+<h1>Design Patterns 101 (4/10): Behavioral Patterns</h1>
 <p>Splitting objects well is not enough when the hard part is how they collaborate. Who notifies whom, which algorithm gets selected, how a request becomes queueable, and where state transitions live all shape the cost of change. In real systems, those flow decisions are often where complexity hides.</p>
 <p>This is post 4 in the Design Patterns 101 series.</p>
 <p>In this post, we'll use behavioral patterns as a shared language for object cooperation. The key move is to turn scattered flow into named structures so that algorithms, notifications, requests, and states are easier to test and reason about.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem behavioral patterns solve</li>
-<li>Strategy, Observer, Command</li>
-<li>State and Iterator</li>
-<li>Treating flow as <em>data</em></li>
-<li>How to choose the right pattern</li>
+<li>The problem behavioral patterns solve?</li>
+<li>Strategy, Observer, Command?</li>
+<li>State and Iterator?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 4 flow overview</em></p>
+<p>This picture places Behavioral Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Behavioral Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Cooperation between objects quickly hardens into piles of if/elif. Behavioral patterns give that cooperation a <em>name</em> and a <em>shape</em>.</p>
 <blockquote>
 <p>Turn flow into objects and the flow becomes testable.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>Behavioral patterns organize cooperation by separating algorithms, notifications, requests, states, and traversal into named structures.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Strategy</strong>: turn an algorithm into an object so it can be swapped.</li>
@@ -210,14 +213,24 @@ for x in Bag([1, 2, 3]):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Behavior expressed as objects reduces branching and makes cooperation visible. The next post zooms in on the most practical behavioral pattern — Strategy.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><strong>The problem behavioral patterns solve?</strong></li>
+<li>The article treats Behavioral Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Strategy, Observer, Command?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>State and Iterator?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Design Patterns 101 (2/10): Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Design Patterns 101 (3/10): Structural Patterns</a></li>
 <li><strong>Behavioral Patterns (current)</strong></li>
-<li>Strategy Pattern (upcoming)</li>
-<li>Adapter Pattern (upcoming)</li>
-<li>Observer Pattern (upcoming)</li>
+<li>The Strategy Pattern (upcoming)</li>
+<li>The Adapter Pattern (upcoming)</li>
+<li>The Observer Pattern (upcoming)</li>
 <li>Factory and Dependency Injection (upcoming)</li>
 <li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>

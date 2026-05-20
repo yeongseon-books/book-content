@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 3
-title: Structural Patterns
+title: "Design Patterns 101 (3/10): Structural Patterns"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How structural patterns use composition and delegation to conne
 last_reviewed: '2026-05-15'
 ---
 
-# Structural Patterns
+# Design Patterns 101 (3/10): Structural Patterns
 
 Once object creation is under control, the next question is how those objects should connect. Do you expose an external SDK directly to the domain, wrap an object to add behavior, or place a simpler entry point in front of a subsystem? Those are structure decisions, and they show up in almost every real codebase.
 
@@ -29,13 +29,21 @@ This is post 3 in the Design Patterns 101 series.
 
 In this post, we'll treat structural patterns as named ways of assembling objects through composition and delegation. The real goal is to keep change local instead of freezing the whole design into an inheritance tree.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem structural patterns solve
-- Adapter, Decorator, Facade
-- Where Proxy fits
-- Composite and tree structures
-- Composition vs inheritance, the basic rule
+- The problem structural patterns solve?
+- Adapter, Decorator, Facade?
+- Where Proxy fits?
+
+## Big Picture
+
+![design patterns 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 3 flow overview*
+
+This picture places Structural Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Structural Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Inheritance freezes the structure quickly. Composition lets you assemble respons
 > Favor composition over inheritance.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
-*Structural patterns show five ways to translate, wrap, simplify, proxy, and tree-shape object relationships without freezing the design.*
 
 ## Key Terms
 
@@ -209,17 +214,29 @@ Run this check before introducing a structural pattern.
 
 Composition keeps structure ready for change. The next post moves from structure to *behavior* — the Behavioral patterns.
 
+## Answering the Opening Questions
+
+- **The problem structural patterns solve?**
+  - The article treats Structural Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Adapter, Decorator, Facade?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where Proxy fits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
 - **Structural Patterns (current)**
 - Behavioral Patterns (upcoming)
-- Strategy Pattern (upcoming)
-- Adapter Pattern (upcoming)
-- Observer Pattern (upcoming)
+- The Strategy Pattern (upcoming)
+- The Adapter Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

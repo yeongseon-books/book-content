@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Are Design Patterns?</title>
+<title>Design Patterns 101 (1/10): What Are Design Patterns?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Are Design Patterns?</h1>
+<h1>Design Patterns 101 (1/10): What Are Design Patterns?</h1>
 <p>When people first learn design patterns, they usually start by memorizing the names. Strategy, Adapter, and Observer stand out quickly. In production code, though, the value does not show up as trivia. It shows up when the same design problem keeps returning.</p>
 <p>This is the first post in the Design Patterns 101 series.</p>
 <p>In this post, we'll treat design patterns not as an answer catalog but as shared vocabulary for recurring design problems. The goal is to understand the problem shape, the solution shape, and the tradeoffs that come with the pattern name.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>A working definition of a design pattern</li>
-<li>The GoF classification of 23 patterns</li>
-<li>The real problems patterns try to solve</li>
-<li>A sane order to learn them in</li>
-<li>The moments where patterns hurt instead of help</li>
+<li>A working definition of a design pattern?</li>
+<li>The GoF classification of 23 patterns?</li>
+<li>The real problems patterns try to solve?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 1 flow overview</em></p>
+<p>This picture places What Are Design Patterns? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Are Design Patterns? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Patterns are vocabulary, not answers. The biggest payoff is that "let's pull this into a Strategy" makes everyone in the room picture the same shape.</p>
 <blockquote>
 <p>Patterns shine in conversation before they shine in code.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>A pattern becomes useful when the name brings back the problem shape, the solution shape, and the tradeoffs together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Design pattern</strong>: A proven solution to a recurring design problem.</li>
@@ -169,16 +172,26 @@ processor.charge(...)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Patterns are vocabulary. From the next article on we tour the 23 GoF patterns in three groups — Creational, Structural, and Behavioral.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>A working definition of a design pattern?</strong></li>
+<li>The article treats What Are Design Patterns? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The GoF classification of 23 patterns?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The real problems patterns try to solve?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Are Design Patterns? (current)</strong></li>
 <li>Creational Patterns (upcoming)</li>
 <li>Structural Patterns (upcoming)</li>
 <li>Behavioral Patterns (upcoming)</li>
-<li>Strategy Pattern (upcoming)</li>
-<li>Adapter Pattern (upcoming)</li>
-<li>Observer Pattern (upcoming)</li>
+<li>The Strategy Pattern (upcoming)</li>
+<li>The Adapter Pattern (upcoming)</li>
+<li>The Observer Pattern (upcoming)</li>
 <li>Factory and Dependency Injection (upcoming)</li>
-<li>How Not to Overuse Patterns (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>

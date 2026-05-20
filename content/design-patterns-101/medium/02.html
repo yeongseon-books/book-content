@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Creational Patterns</title>
+<title>Design Patterns 101 (2/10): Creational Patterns</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Creational Patterns</h1>
+<h1>Design Patterns 101 (2/10): Creational Patterns</h1>
 <p>There is a point where object creation becomes more noticeable than the code using those objects. <code>new SomeService()</code> starts appearing everywhere, environment-specific construction branches spread, and constructor arguments keep growing. At that point, the real problem is not business logic. It is who owns creation.</p>
 <p>This is post 2 in the Design Patterns 101 series.</p>
 <p>In this post, we'll look at creational patterns as tools for concentrating construction responsibility in one place. The important question is not just what gets built, but who builds it and how much the caller needs to know.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem creational patterns solve</li>
-<li>Factory Method and Abstract Factory</li>
-<li>When you actually need a Builder</li>
-<li>The risks of Singleton</li>
-<li>Where Prototype fits</li>
+<li>The problem creational patterns solve?</li>
+<li>Factory Method and Abstract Factory?</li>
+<li>When you actually need a Builder?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 2 flow overview</em></p>
+<p>This picture places Creational Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Creational Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When <code>new SomeService()</code> is sprinkled throughout the code, coupling is already locked in. Concentrating construction in one place makes swapping easy.</p>
 <blockquote>
 <p>Where you build an object matters more than what you build.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>Creational patterns give four common ways to pull construction responsibility away from callers and into a safer assembly boundary.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Factory Method</strong>: A subclass decides which concrete class to build.</li>
@@ -196,16 +199,26 @@ def new_report():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once you control creation, coupling loosens. Next up — how objects get <em>composed</em> together — Structural patterns.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><strong>The problem creational patterns solve?</strong></li>
+<li>The article treats Creational Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Factory Method and Abstract Factory?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When you actually need a Builder?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
 <li><strong>Creational Patterns (current)</strong></li>
 <li>Structural Patterns (upcoming)</li>
 <li>Behavioral Patterns (upcoming)</li>
-<li>Strategy Pattern (upcoming)</li>
-<li>Adapter Pattern (upcoming)</li>
-<li>Observer Pattern (upcoming)</li>
+<li>The Strategy Pattern (upcoming)</li>
+<li>The Adapter Pattern (upcoming)</li>
+<li>The Observer Pattern (upcoming)</li>
 <li>Factory and Dependency Injection (upcoming)</li>
-<li>How Not to Overuse Patterns (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>

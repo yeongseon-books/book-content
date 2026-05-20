@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 5
-title: The Strategy Pattern
+title: "Design Patterns 101 (5/10): The Strategy Pattern"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How the Strategy pattern turns branching algorithms into swappa
 last_reviewed: '2026-05-15'
 ---
 
-# The Strategy Pattern
+# Design Patterns 101 (5/10): The Strategy Pattern
 
 Code tilts toward conditionals when the same job can be done in several ways. It starts with one `if kind == ...`, then grows as options multiply and policy diverges. After a while, every new case means reopening existing code and retesting the whole branch tree.
 
@@ -29,13 +29,21 @@ This is post 5 in the Design Patterns 101 series.
 
 In this post, we'll look at Strategy as a way to turn algorithms into swappable units that a context can receive from the outside. In Python, that often means using a function before reaching for a class hierarchy.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem Strategy solves (branch explosion)
-- Strategy and the Open/Closed Principle
-- Class Strategy vs function Strategy
-- Runtime swapping and testing
-- When Strategy is overkill
+- The problem Strategy solves (branch explosion)?
+- Strategy and the Open/Closed Principle?
+- Class Strategy vs function Strategy?
+
+## Big Picture
+
+![design patterns 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 5 flow overview*
+
+This picture places The Strategy Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Strategy Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Branching algorithms with if/elif means editing existing code every time a new o
 > Strategy is OCP made visible in code.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
-*Strategy works when the context stays ignorant of algorithm internals and concrete behavior can swap in at the edge.*
 
 ## Key Terms
 
@@ -207,17 +212,29 @@ Use these checks to confirm that a Strategy refactor is justified.
 
 Strategy is OCP made visible. The next post zooms in on the structural pattern for compatibility — Adapter.
 
+## Answering the Opening Questions
+
+- **The problem Strategy solves (branch explosion)?**
+  - The article treats The Strategy Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Strategy and the Open/Closed Principle?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Class Strategy vs function Strategy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
 - **The Strategy Pattern (current)**
-- Adapter Pattern (upcoming)
-- Observer Pattern (upcoming)
+- The Adapter Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

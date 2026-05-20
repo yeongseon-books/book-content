@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 6
-title: The Adapter Pattern
+title: "Design Patterns 101 (6/10): The Adapter Pattern"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How the Adapter pattern protects domain boundaries by translati
 last_reviewed: '2026-05-15'
 ---
 
-# The Adapter Pattern
+# Design Patterns 101 (6/10): The Adapter Pattern
 
 Production systems rarely talk only to interfaces we designed ourselves. Payment SDKs, storage clients, mail providers, and third-party APIs all arrive with their own method names, error models, and data shapes. The trouble begins when those external details leak through the domain.
 
@@ -29,13 +29,21 @@ This is post 6 in the Design Patterns 101 series.
 
 In this post, we'll use the Adapter pattern as a thin translation layer at the boundary. The aim is to let the domain speak in its own contract while the adapter absorbs SDK-specific calls, types, and exceptions.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem Adapter solves
-- Define a domain interface, then wrap external calls
-- Object Adapter vs Class Adapter
-- Adapter and test doubles
-- Signs an Adapter has gone wrong
+- The problem Adapter solves?
+- Define a domain interface, then wrap external calls?
+- Object Adapter vs Class Adapter?
+
+## Big Picture
+
+![design patterns 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 6 flow overview*
+
+This picture places The Adapter Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Adapter Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ When external library calls scatter through the domain, every library tweak shak
 > An Adapter is a *thin coat* at the boundary.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
-*The Adapter keeps the domain on its own contract while infrastructure-specific calls stay behind the boundary.*
 
 ## Key Terms
 
@@ -206,17 +211,29 @@ Check these points before and after introducing an Adapter.
 
 Adapter is the *thin coat* at the boundary. The next post moves to inter-object notification — the Observer pattern.
 
+## Answering the Opening Questions
+
+- **The problem Adapter solves?**
+  - The article treats The Adapter Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Define a domain interface, then wrap external calls?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Object Adapter vs Class Adapter?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
-- [The Strategy Pattern](./05-strategy-pattern.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): The Strategy Pattern](./05-strategy-pattern.md)
 - **The Adapter Pattern (current)**
-- Observer Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

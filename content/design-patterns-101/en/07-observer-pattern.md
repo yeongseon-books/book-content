@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 7
-title: The Observer Pattern
+title: "Design Patterns 101 (7/10): The Observer Pattern"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How the Observer pattern turns direct calls into notifications 
 last_reviewed: '2026-05-15'
 ---
 
-# The Observer Pattern
+# Design Patterns 101 (7/10): The Observer Pattern
 
 Code hardens quickly when one object directly calls every downstream action. A submitted order sends mail, posts to Slack, reserves inventory, and maybe queues analytics. As those side effects grow, the original object spends more time coordinating neighbors than doing its own work.
 
@@ -29,13 +29,21 @@ This is post 7 in the Design Patterns 101 series.
 
 In this post, we'll look at Observer as a way to turn direct calls into notifications. The goal is to let a publisher announce what happened while subscribers decide whether and how to react.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem Observer solves (tight coupling)
-- Subject, Observer, subscribe, notify
-- Synchronous vs asynchronous notification
-- The link to domain events
-- What to watch for when scaling to pub/sub
+- The problem Observer solves (tight coupling)?
+- Subject, Observer, subscribe, notify?
+- Synchronous vs asynchronous notification?
+
+## Big Picture
+
+![design patterns 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 7 flow overview*
+
+This picture places The Observer Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Observer Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ If A *directly calls* B, C, and D when it changes, A knows all three. Observer t
 > Observer dissolves coupling into *notification*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
-*Observer separates publication from reaction so a publisher can announce change without knowing which listeners will respond.*
 
 ## Key Terms
 
@@ -201,17 +206,29 @@ Use this checklist when deciding whether Observer is improving the design.
 
 Observer dissolves coupling into notification. The next post moves to object creation — Factory and Dependency Injection.
 
+## Answering the Opening Questions
+
+- **The problem Observer solves (tight coupling)?**
+  - The article treats The Observer Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Subject, Observer, subscribe, notify?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Synchronous vs asynchronous notification?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
-- [The Strategy Pattern](./05-strategy-pattern.md)
-- [The Adapter Pattern](./06-adapter-pattern.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): The Strategy Pattern](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): The Adapter Pattern](./06-adapter-pattern.md)
 - **The Observer Pattern (current)**
 - Factory and Dependency Injection (upcoming)
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

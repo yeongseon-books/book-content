@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Observer Pattern</title>
+<title>Design Patterns 101 (7/10): The Observer Pattern</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>The Observer Pattern</h1>
+<h1>Design Patterns 101 (7/10): The Observer Pattern</h1>
 <p>Code hardens quickly when one object directly calls every downstream action. A submitted order sends mail, posts to Slack, reserves inventory, and maybe queues analytics. As those side effects grow, the original object spends more time coordinating neighbors than doing its own work.</p>
 <p>This is post 7 in the Design Patterns 101 series.</p>
 <p>In this post, we'll look at Observer as a way to turn direct calls into notifications. The goal is to let a publisher announce what happened while subscribers decide whether and how to react.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem Observer solves (tight coupling)</li>
-<li>Subject, Observer, subscribe, notify</li>
-<li>Synchronous vs asynchronous notification</li>
-<li>The link to domain events</li>
-<li>What to watch for when scaling to pub/sub</li>
+<li>The problem Observer solves (tight coupling)?</li>
+<li>Subject, Observer, subscribe, notify?</li>
+<li>Synchronous vs asynchronous notification?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 7 flow overview</em></p>
+<p>This picture places The Observer Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Observer Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If A <em>directly calls</em> B, C, and D when it changes, A knows all three. Observer turns those calls into <em>notifications</em>, so A no longer needs to know who is listening.</p>
 <blockquote>
 <p>Observer dissolves coupling into <em>notification</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png"><br>
-<em>Observer separates publication from reaction so a publisher can announce change without knowing which listeners will respond.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Subject</strong>: the publisher of changes.</li>
@@ -191,13 +194,23 @@ def unsubscribe(bus, topic, fn):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Observer dissolves coupling into notification. The next post moves to object creation — Factory and Dependency Injection.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">The Adapter Pattern</a></li>
+<li><strong>The problem Observer solves (tight coupling)?</strong></li>
+<li>The article treats The Observer Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Subject, Observer, subscribe, notify?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Synchronous vs asynchronous notification?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Design Patterns 101 (2/10): Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Design Patterns 101 (3/10): Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Design Patterns 101 (4/10): Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">Design Patterns 101 (5/10): The Strategy Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">Design Patterns 101 (6/10): The Adapter Pattern</a></li>
 <li><strong>The Observer Pattern (current)</strong></li>
 <li>Factory and Dependency Injection (upcoming)</li>
 <li>Avoiding Pattern Overuse (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Strategy Pattern</title>
+<title>Design Patterns 101 (5/10): The Strategy Pattern</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>The Strategy Pattern</h1>
+<h1>Design Patterns 101 (5/10): The Strategy Pattern</h1>
 <p>Code tilts toward conditionals when the same job can be done in several ways. It starts with one <code>if kind == ...</code>, then grows as options multiply and policy diverges. After a while, every new case means reopening existing code and retesting the whole branch tree.</p>
 <p>This is post 5 in the Design Patterns 101 series.</p>
 <p>In this post, we'll look at Strategy as a way to turn algorithms into swappable units that a context can receive from the outside. In Python, that often means using a function before reaching for a class hierarchy.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The problem Strategy solves (branch explosion)</li>
-<li>Strategy and the Open/Closed Principle</li>
-<li>Class Strategy vs function Strategy</li>
-<li>Runtime swapping and testing</li>
-<li>When Strategy is overkill</li>
+<li>The problem Strategy solves (branch explosion)?</li>
+<li>Strategy and the Open/Closed Principle?</li>
+<li>Class Strategy vs function Strategy?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="design patterns 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>design patterns 101 chapter 5 flow overview</em></p>
+<p>This picture places The Strategy Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Strategy Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Branching algorithms with if/elif means editing existing code every time a new option appears. Strategy turns those branches into <em>swappable objects</em> — open for extension, closed for modification (OCP).</p>
 <blockquote>
 <p>Strategy is OCP made visible in code.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>Strategy works when the context stays ignorant of algorithm internals and concrete behavior can swap in at the edge.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Context</strong>: the object that uses a Strategy.</li>
@@ -197,14 +200,24 @@ print(order.total([10000], 2))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Strategy is OCP made visible. The next post zooms in on the structural pattern for compatibility — Adapter.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><strong>The problem Strategy solves (branch explosion)?</strong></li>
+<li>The article treats The Strategy Pattern as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Strategy and the Open/Closed Principle?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Class Strategy vs function Strategy?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">Design Patterns 101 (1/10): What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Design Patterns 101 (2/10): Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Design Patterns 101 (3/10): Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Design Patterns 101 (4/10): Behavioral Patterns</a></li>
 <li><strong>The Strategy Pattern (current)</strong></li>
-<li>Adapter Pattern (upcoming)</li>
-<li>Observer Pattern (upcoming)</li>
+<li>The Adapter Pattern (upcoming)</li>
+<li>The Observer Pattern (upcoming)</li>
 <li>Factory and Dependency Injection (upcoming)</li>
 <li>Avoiding Pattern Overuse (upcoming)</li>
 <li>Pythonic Patterns (upcoming)</li>

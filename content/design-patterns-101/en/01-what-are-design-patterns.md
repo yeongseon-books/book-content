@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 1
-title: What Are Design Patterns?
+title: "Design Patterns 101 (1/10): What Are Design Patterns?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A practical introduction to design patterns, the GoF families, 
 last_reviewed: '2026-05-15'
 ---
 
-# What Are Design Patterns?
+# Design Patterns 101 (1/10): What Are Design Patterns?
 
 When people first learn design patterns, they usually start by memorizing the names. Strategy, Adapter, and Observer stand out quickly. In production code, though, the value does not show up as trivia. It shows up when the same design problem keeps returning.
 
@@ -29,13 +29,21 @@ This is the first post in the Design Patterns 101 series.
 
 In this post, we'll treat design patterns not as an answer catalog but as shared vocabulary for recurring design problems. The goal is to understand the problem shape, the solution shape, and the tradeoffs that come with the pattern name.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- A working definition of a design pattern
-- The GoF classification of 23 patterns
-- The real problems patterns try to solve
-- A sane order to learn them in
-- The moments where patterns hurt instead of help
+- A working definition of a design pattern?
+- The GoF classification of 23 patterns?
+- The real problems patterns try to solve?
+
+## Big Picture
+
+![design patterns 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 1 flow overview*
+
+This picture places What Are Design Patterns? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Are Design Patterns? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Patterns are vocabulary, not answers. The biggest payoff is that "let's pull thi
 > Patterns shine in conversation before they shine in code.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
-*A pattern becomes useful when the name brings back the problem shape, the solution shape, and the tradeoffs together.*
 
 ## Key Terms
 
@@ -179,17 +184,29 @@ Use this quick pass before you declare that a piece of code “needs a pattern.�
 
 Patterns are vocabulary. From the next article on we tour the 23 GoF patterns in three groups — Creational, Structural, and Behavioral.
 
+## Answering the Opening Questions
+
+- **A working definition of a design pattern?**
+  - The article treats What Are Design Patterns? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The GoF classification of 23 patterns?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The real problems patterns try to solve?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Are Design Patterns? (current)**
 - Creational Patterns (upcoming)
 - Structural Patterns (upcoming)
 - Behavioral Patterns (upcoming)
-- Strategy Pattern (upcoming)
-- Adapter Pattern (upcoming)
-- Observer Pattern (upcoming)
+- The Strategy Pattern (upcoming)
+- The Adapter Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
-- How Not to Overuse Patterns (upcoming)
+- Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

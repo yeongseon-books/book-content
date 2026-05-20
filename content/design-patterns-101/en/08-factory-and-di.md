@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 8
-title: Factory and Dependency Injection
+title: "Design Patterns 101 (8/10): Factory and Dependency Injection"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How Factory and Dependency Injection separate assembly from use
 last_reviewed: '2026-05-15'
 ---
 
-# Factory and Dependency Injection
+# Design Patterns 101 (8/10): Factory and Dependency Injection
 
 Object creation and object composition eventually collapse into one practical question: who builds this thing, where is it wired together, and who passes it in? When domain code starts creating its own repositories, mailers, or event buses, usage and assembly get tangled together.
 
@@ -29,13 +29,21 @@ This is post 8 in the Design Patterns 101 series.
 
 In this post, we'll look at Factory and Dependency Injection as two parts of the same move. Assembly should happen at an outside entry point, while domain code should receive collaborators and focus on using them.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The cost of scattered creation responsibility
-- The role of the Factory
-- The thinking behind Dependency Injection
-- What the Composition Root is
-- When a DI container starts to earn its keep
+- The cost of scattered creation responsibility?
+- The role of the Factory?
+- The thinking behind Dependency Injection?
+
+## Big Picture
+
+![design patterns 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 8 flow overview*
+
+This picture places Factory and Dependency Injection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Factory and Dependency Injection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ When the domain creates its own dependencies, it learns *how to make* them. Fact
 > Separating "use" from "assembly" makes testing and substitution easy.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
-*Factory and DI keep assembly in one place so services can focus on using collaborators instead of constructing them.*
 
 ## Key Terms
 
@@ -200,17 +205,29 @@ Use this pass to see whether assembly is really outside the domain.
 
 Factory and DI separate "assembly" from "use". The next post turns the lens on the *cost* of patterns — how to avoid overuse.
 
+## Answering the Opening Questions
+
+- **The cost of scattered creation responsibility?**
+  - The article treats Factory and Dependency Injection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The role of the Factory?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The thinking behind Dependency Injection?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
-- [Behavioral Patterns](./04-behavioral-patterns.md)
-- [The Strategy Pattern](./05-strategy-pattern.md)
-- [The Adapter Pattern](./06-adapter-pattern.md)
-- [The Observer Pattern](./07-observer-pattern.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
+- [Design Patterns 101 (4/10): Behavioral Patterns](./04-behavioral-patterns.md)
+- [Design Patterns 101 (5/10): The Strategy Pattern](./05-strategy-pattern.md)
+- [Design Patterns 101 (6/10): The Adapter Pattern](./06-adapter-pattern.md)
+- [Design Patterns 101 (7/10): The Observer Pattern](./07-observer-pattern.md)
 - **Factory and Dependency Injection (current)**
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References

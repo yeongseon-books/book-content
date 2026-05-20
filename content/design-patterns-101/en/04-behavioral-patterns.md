@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 4
-title: Behavioral Patterns
+title: "Design Patterns 101 (4/10): Behavioral Patterns"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How behavioral patterns turn branching, notifications, requests
 last_reviewed: '2026-05-15'
 ---
 
-# Behavioral Patterns
+# Design Patterns 101 (4/10): Behavioral Patterns
 
 Splitting objects well is not enough when the hard part is how they collaborate. Who notifies whom, which algorithm gets selected, how a request becomes queueable, and where state transitions live all shape the cost of change. In real systems, those flow decisions are often where complexity hides.
 
@@ -29,13 +29,21 @@ This is post 4 in the Design Patterns 101 series.
 
 In this post, we'll use behavioral patterns as a shared language for object cooperation. The key move is to turn scattered flow into named structures so that algorithms, notifications, requests, and states are easier to test and reason about.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem behavioral patterns solve
-- Strategy, Observer, Command
-- State and Iterator
-- Treating flow as *data*
-- How to choose the right pattern
+- The problem behavioral patterns solve?
+- Strategy, Observer, Command?
+- State and Iterator?
+
+## Big Picture
+
+![design patterns 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
+
+*design patterns 101 chapter 4 flow overview*
+
+This picture places Behavioral Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Behavioral Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Cooperation between objects quickly hardens into piles of if/elif. Behavioral pa
 > Turn flow into objects and the flow becomes testable.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
-*Behavioral patterns organize cooperation by separating algorithms, notifications, requests, states, and traversal into named structures.*
 
 ## Key Terms
 
@@ -220,17 +225,29 @@ Use this pass to check whether a behavioral refactor is earning its keep.
 
 Behavior expressed as objects reduces branching and makes cooperation visible. The next post zooms in on the most practical behavioral pattern — Strategy.
 
+## Answering the Opening Questions
+
+- **The problem behavioral patterns solve?**
+  - The article treats Behavioral Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Strategy, Observer, Command?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **State and Iterator?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Creational Patterns](./02-creational-patterns.md)
-- [Structural Patterns](./03-structural-patterns.md)
+## In this series
+
+- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [Design Patterns 101 (3/10): Structural Patterns](./03-structural-patterns.md)
 - **Behavioral Patterns (current)**
-- Strategy Pattern (upcoming)
-- Adapter Pattern (upcoming)
-- Observer Pattern (upcoming)
+- The Strategy Pattern (upcoming)
+- The Adapter Pattern (upcoming)
+- The Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
 - Avoiding Pattern Overuse (upcoming)
 - Pythonic Patterns (upcoming)
+
 <!-- toc:end -->
 
 ## References
