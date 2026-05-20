@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:02:13+00:00
+Generated: 2026-05-20T12:03:14+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **8**
-- Series at or above 5 issues: **6**
-- Total issues: **72**
-  - BadImg: **72**
+- Series with any issue: **7**
+- Series at or above 5 issues: **5**
+- Total issues: **56**
+  - BadImg: **56**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,26 +41,13 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
-| 2 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 3 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 4 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 5 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 6 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 7 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 8 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## open-source-101 — Total 16
-
-- BadImg=16 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png:1` — PNG height 67px <= 100px (size=625x67)
-- `assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.ko.png:1` — PNG height 67px <= 100px (size=588x67)
-- `assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png:1` — PNG height 67px <= 100px (size=728x67)
-- `assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png:1` — PNG height 67px <= 100px (size=666x67)
-- `assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png:1` — PNG height 67px <= 100px (size=885x67)
-- ... 11 more
+| 1 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 2 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 3 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 4 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 5 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 6 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 7 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## data-science-101 — Total 12
 
