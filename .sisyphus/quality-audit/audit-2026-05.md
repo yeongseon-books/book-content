@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:56:03+00:00
+Generated: 2026-05-20T11:56:23+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **22**
+- Series with any issue: **21**
 - Series at or above 5 issues: **17**
-- Total issues: **182**
-  - BadImg: **182**
+- Total issues: **180**
+  - BadImg: **180**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -60,9 +60,8 @@ Warnings:
 | 17 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 18 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 19 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 20 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 21 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 22 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 20 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 21 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -287,14 +286,6 @@ Warnings:
 - `assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1148x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1148x67)
-
-## azure-aks-101 — Total 2
-
-- BadImg=2 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-aks-101/03/03-01-today-s-flow.en.png:1` — PNG height 67px <= 100px (size=1384x67)
-- `assets/azure-aks-101/03/03-01-today-s-flow.ko.png:1` — PNG height 67px <= 100px (size=1384x67)
 
 ## azure-functions-101 — Total 2
 
