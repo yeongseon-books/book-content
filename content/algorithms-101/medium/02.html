@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Time and Space Complexity</title>
+<title>Algorithms 101 (2/10): Time and Space Complexity</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Time and Space Complexity</h1>
-<blockquote>
-<p>Algorithms 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Algorithms 101 (2/10): Time and Space Complexity</h1>
 <p><strong>Core question</strong>: How can we predict whether an algorithm will be fast enough before writing the code?</p>
+<p>Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.</p>
+<p>This is post 2 in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Time and Space Complexity?</li>
+<li>Which signal should the example or diagram make visible for Time and Space Complexity?</li>
+<li>What failure should be prevented first when Time and Space Complexity reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="algorithms 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.en.png"></p>
+<p><em>algorithms 101 chapter 2 flow overview</em></p>
+<p>This picture places Time and Space Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Big-O is an upper bound, Big-Omega a lower bound, Big-Theta a tight bound. Most engineering work uses Big-O for the worst case. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.</p>
+<p>The core of Time and Space Complexity is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The meaning of Big-O, Big-Omega, and Big-Theta</li>
@@ -222,8 +227,18 @@ for i in range(10**6):
 <h2>Wrap-Up and Next Steps</h2>
 <p>Asymptotic analysis is the language we use to argue about performance. Big-O for upper bound, Omega for lower, Theta for tight. Recognise the common cost classes and combine them with input size to predict whether code will scale.</p>
 <p>The next article applies this vocabulary to search algorithms, where the difference between O(n) and O(log n) is the difference between scanning a million items and looking at twenty.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><strong>What boundary should you inspect first when applying Time and Space Complexity?</strong></li>
+<li>The article treats Time and Space Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Time and Space Complexity?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Time and Space Complexity reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">Algorithms 101 (1/10): What Is an Algorithm?</a></li>
 <li><strong>Time and Space Complexity (current)</strong></li>
 <li>Search Algorithms (upcoming)</li>
 <li>Sorting Algorithms (upcoming)</li>

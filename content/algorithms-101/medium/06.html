@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dynamic Programming</title>
+<title>Algorithms 101 (6/10): Dynamic Programming</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Dynamic Programming</h1>
-<blockquote>
-<p>Algorithms 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Algorithms 101 (6/10): Dynamic Programming</h1>
 <p><strong>Core question</strong>: Why do we keep recomputing the same subproblems, and how can we recognise that pattern in the wild?</p>
+<p>Dynamic programming (DP) applies when the same subproblems repeat and the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation.</p>
+<p>This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Dynamic Programming?</li>
+<li>Which signal should the example or diagram make visible for Dynamic Programming?</li>
+<li>What failure should be prevented first when Dynamic Programming reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="algorithms 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png"></p>
+<p><em>algorithms 101 chapter 6 flow overview</em></p>
+<p>This picture places Dynamic Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Dynamic programming (DP) applies when (1) the same subproblems repeat and (2) the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation. DP feels hard not because of the algorithm but because state design is a skill — one that grows by writing classic problems with your own hands.</p>
+<p>The core of Dynamic Programming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The two conditions DP needs: overlapping subproblems and optimal substructure</li>
@@ -243,12 +248,22 @@ print(lcs(&quot;ABCBDAB&quot;, &quot;BDCABC&quot;))   # 4
 <h2>Wrap-Up and Next Steps</h2>
 <p>DP starts from "do not solve the same subproblem twice." It applies whenever the same subproblems repeat and parts compose into a whole. State definition is almost the entire solution, and starting top-down then refining to bottom-up is usually the smoothest path to learn it.</p>
 <p>The next article covers greedy algorithms — when greedy actually works (exchange arguments, matroid intuition), classic problems, and cases where what looks greedy actually requires DP.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><strong>What boundary should you inspect first when applying Dynamic Programming?</strong></li>
+<li>The article treats Dynamic Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Dynamic Programming?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Dynamic Programming reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">Algorithms 101 (1/10): What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Algorithms 101 (2/10): Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Algorithms 101 (3/10): Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Algorithms 101 (4/10): Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Algorithms 101 (5/10): Recursion and Divide and Conquer</a></li>
 <li><strong>Dynamic Programming (current)</strong></li>
 <li>Greedy Algorithms (upcoming)</li>
 <li>Graph Algorithms (upcoming)</li>

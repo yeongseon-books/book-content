@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 7
-title: 그리디 알고리즘
+title: "Algorithms 101 (7/10): 그리디 알고리즘"
 status: publish-ready
 targets:
   tistory: true
@@ -21,16 +21,25 @@ seo_description: 그리디 알고리즘이 옳을 때의 조건, 교환 논증, 
 last_reviewed: '2026-05-12'
 ---
 
-# 그리디 알고리즘
+# Algorithms 101 (7/10): 그리디 알고리즘
 
 지금 당장 가장 좋아 보이는 선택을 계속 고르면 정말 전체 최적해에 도달할까요? 그리고 어떤 문제에서는 왜 그 방식이 조용히 실패할까요? 이 글은 Algorithms 101 시리즈의 일곱 번째 글입니다. 여기서는 그리디가 통하는 조건, 정당화 방법, 그리고 DP로 돌아서야 하는 경계선을 다룹니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 그리디 알고리즘이 옳으려면 어떤 두 조건이 필요할까요?
 - 교환 논증은 그리디 선택을 어떻게 정당화할까요?
 - 활동 선택, 거스름돈, Huffman coding은 무엇을 보여 줄까요?
-- 겉보기에는 그리디 같지만 실제로는 DP가 필요한 문제는 어떻게 구별할까요?
+
+## 큰 그림
+
+![Algorithms 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/07/07-01-big-picture.ko.png)
+
+*Algorithms 101 7장 흐름 개요*
+
+이 그림에서는 그리디 알고리즘를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 그리디 알고리즘의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -231,17 +240,29 @@ print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
 
 다음 글에서는 그래프 알고리즘을 다룹니다. BFS와 DFS의 차이, 다익스트라 최단 경로, 최소 신장 트리까지 보면서 그래프가 왜 시스템 사고의 공용 언어인지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **그리디 알고리즘이 옳으려면 어떤 두 조건이 필요할까요?**
+  - 본문의 기준은 그리디 알고리즘를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **교환 논증은 그리디 선택을 어떻게 정당화할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **활동 선택, 거스름돈, Huffman coding은 무엇을 보여 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-is-an-algorithm.md)
-- [시간 복잡도와 공간 복잡도](./02-time-and-space-complexity.md)
-- [탐색 알고리즘](./03-search-algorithms.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
-- [재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
-- [동적 계획법](./06-dynamic-programming.md)
+## 시리즈 목차
+
+- [Algorithms 101 (1/10): 알고리즘이란 무엇인가?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): 시간 복잡도와 공간 복잡도](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): 탐색 알고리즘](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): 동적 계획법](./06-dynamic-programming.md)
 - **그리디 알고리즘 (현재 글)**
 - 그래프 알고리즘 (예정)
 - 문자열 알고리즘 기초 (예정)
 - 알고리즘 문제 풀이 전략 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

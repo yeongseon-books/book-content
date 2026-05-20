@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Search Algorithms</title>
+<title>Algorithms 101 (3/10): Search Algorithms</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Search Algorithms</h1>
-<blockquote>
-<p>Algorithms 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Algorithms 101 (3/10): Search Algorithms</h1>
 <p><strong>Core question</strong>: Given a million sorted integers, is there anything better than scanning from the start to find a target?</p>
+<p>Search algorithms locate a value inside a collection. With unsorted data, linear scan at O(n) is the only option. With sorted data, binary search discards half the candidates each step, reaching the answer in O(log n). One precondition — sortedness — changes the algorithmic class.</p>
+<p>This is post 3 in the Algorithms 101 series. Here we cover linear search, binary search, Python's <code>bisect</code>, and the broader idea of parametric search.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Search Algorithms?</li>
+<li>Which signal should the example or diagram make visible for Search Algorithms?</li>
+<li>What failure should be prevented first when Search Algorithms reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="algorithms 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.en.png"></p>
+<p><em>algorithms 101 chapter 3 flow overview</em></p>
+<p>This picture places Search Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Search algorithms locate a value inside a collection. With unsorted data, linear scan at O(n) is the only option. With sorted data, binary search discards half the candidates each step, reaching the answer in O(log n). One precondition — sortedness — changes the algorithmic class. Python's <code>bisect</code> module provides a tested implementation, and the binary-search idea generalises to parametric search: searching the answer itself when it is monotone.</p>
+<p>The core of Search Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The cost difference between linear and binary search</li>
@@ -258,9 +263,19 @@ print(max_cut_length([802, 743, 457, 539], 11))   # 200
 <h2>Wrap-Up and Next Steps</h2>
 <p>Search cost depends on whether the data has structure. With sortedness, binary search reduces O(n) to O(log n), and the same idea generalises to parametric search. Memorise the lower/upper bound templates and prefer <code>bisect</code> for routine work.</p>
 <p>The next article covers sorting algorithms — the trade-offs of mergesort, quicksort, and heapsort, and why Python's <code>sorted</code> uses Timsort.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
+<li><strong>What boundary should you inspect first when applying Search Algorithms?</strong></li>
+<li>The article treats Search Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Search Algorithms?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Search Algorithms reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">Algorithms 101 (1/10): What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Algorithms 101 (2/10): Time and Space Complexity</a></li>
 <li><strong>Search Algorithms (current)</strong></li>
 <li>Sorting Algorithms (upcoming)</li>
 <li>Recursion and Divide and Conquer (upcoming)</li>

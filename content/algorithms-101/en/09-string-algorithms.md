@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 9
-title: String Algorithm Basics
+title: "Algorithms 101 (9/10): String Algorithm Basics"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: The cost of naive matching, the intuition behind KMP's failure 
 last_reviewed: '2026-05-04'
 ---
 
-# String Algorithm Basics
+# Algorithms 101 (9/10): String Algorithm Basics
 
 **Core question**: Finding a pattern inside text sounds simple — so why are there so many algorithms for it?
 
 Almost every piece of software does string matching, but the naive comparison can be O(nm). KMP uses a failure function so it never re-examines the same character, getting O(n+m). Tries and regex engines introduce a different kind of trade-off: convenience vs cost awareness.
 
 This is post 9 in the Algorithms 101 series. Here we cover naive matching, KMP, trie-based lookups, and the cost pitfalls that show up in production regex.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying String Algorithm Basics?
+- Which signal should the example or diagram make visible for String Algorithm Basics?
+- What failure should be prevented first when String Algorithm Basics reaches a real system?
+
+## Big Picture
+
+![algorithms 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.en.png)
+
+*algorithms 101 chapter 9 flow overview*
+
+This picture places String Algorithm Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of String Algorithm Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -257,17 +273,29 @@ String algorithms balance simplicity against explosive cost. Naive matching, KMP
 
 The next and final article in this series gathers algorithm problem-solving strategies — how to map problems to patterns, how to organise your thinking, and what it really means to be good at algorithms in interviews and in production.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying String Algorithm Basics?**
+  - The article treats String Algorithm Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for String Algorithm Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when String Algorithm Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming](./06-dynamic-programming.md)
-- [Greedy Algorithms](./07-greedy-algorithms.md)
-- [Graph Algorithms](./08-graph-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): Dynamic Programming](./06-dynamic-programming.md)
+- [Algorithms 101 (7/10): Greedy Algorithms](./07-greedy-algorithms.md)
+- [Algorithms 101 (8/10): Graph Algorithms](./08-graph-algorithms.md)
 - **String Algorithm Basics (current)**
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

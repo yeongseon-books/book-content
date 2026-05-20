@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 7
-title: Greedy Algorithms
+title: "Algorithms 101 (7/10): Greedy Algorithms"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: When greedy algorithms are correct, exchange-argument proofs, c
 last_reviewed: '2026-05-04'
 ---
 
-# Greedy Algorithms
+# Algorithms 101 (7/10): Greedy Algorithms
 
 **Core question**: If we always pick what looks best right now, does that really lead to the global optimum? And why does it work on some problems and quietly fail on others?
 
 A greedy algorithm makes the locally best choice at every step and never reconsiders it. To be correct, two properties must hold: the greedy-choice property and optimal substructure. The standard tool for proving both is the exchange argument.
 
 This is post 7 in the Algorithms 101 series. Here we cover when greedy algorithms are correct, how to justify them, and where greedy-looking problems quietly turn into DP.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Greedy Algorithms?
+- Which signal should the example or diagram make visible for Greedy Algorithms?
+- What failure should be prevented first when Greedy Algorithms reaches a real system?
+
+## Big Picture
+
+![algorithms 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/07/07-01-big-picture.en.png)
+
+*algorithms 101 chapter 7 flow overview*
+
+This picture places Greedy Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Greedy Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -235,17 +251,29 @@ Greedy is the algorithm of simplicity and speed, but it carries a heavier burden
 
 The next article covers graph algorithms: the difference between BFS and DFS, Dijkstra's shortest paths, and minimum spanning trees. Graphs are where greedy and DP meet most frequently.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Greedy Algorithms?**
+  - The article treats Greedy Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Greedy Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Greedy Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming](./06-dynamic-programming.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): Dynamic Programming](./06-dynamic-programming.md)
 - **Greedy Algorithms (current)**
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

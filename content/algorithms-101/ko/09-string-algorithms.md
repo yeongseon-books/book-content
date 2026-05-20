@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 9
-title: 문자열 알고리즘 기초
+title: "Algorithms 101 (9/10): 문자열 알고리즘 기초"
 status: publish-ready
 targets:
   tistory: true
@@ -21,16 +21,25 @@ seo_description: 단순 매칭의 비용, KMP 실패 함수의 직관, 트라이
 last_reviewed: '2026-05-12'
 ---
 
-# 문자열 알고리즘 기초
+# Algorithms 101 (9/10): 문자열 알고리즘 기초
 
 문자열 안에서 패턴 하나 찾는 일이 단순해 보이는데, 왜 알고리즘이 그렇게 많을까요? 이 글은 Algorithms 101 시리즈의 아홉 번째 글입니다. 여기서는 단순 매칭, KMP, 트라이, 그리고 실무 정규식의 비용 감각을 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 단순 매칭은 왜 최악에 O(nm)까지 갈까요?
 - KMP의 실패 함수는 어떤 직관으로 이해해야 할까요?
 - 트라이는 어떤 문제에서 특히 강할까요?
-- 정규식은 왜 편리하면서도 ReDoS 같은 위험을 만들까요?
+
+## 큰 그림
+
+![Algorithms 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.ko.png)
+
+*Algorithms 101 9장 흐름 개요*
+
+이 그림에서는 문자열 알고리즘 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 문자열 알고리즘 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -253,17 +262,29 @@ print(f"regex: {time.perf_counter() - t:.3f}s")
 
 다음 글이자 마지막 글에서는 알고리즘 문제 풀이 전략을 정리합니다. 문제를 패턴에 연결하고, 사고를 조직하고, 면접과 실무에서 "알고리즘을 잘한다"는 것이 무엇인지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **단순 매칭은 왜 최악에 O(nm)까지 갈까요?**
+  - 본문의 기준은 문자열 알고리즘 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **KMP의 실패 함수는 어떤 직관으로 이해해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **트라이는 어떤 문제에서 특히 강할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-is-an-algorithm.md)
-- [시간 복잡도와 공간 복잡도](./02-time-and-space-complexity.md)
-- [탐색 알고리즘](./03-search-algorithms.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
-- [재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
-- [동적 계획법](./06-dynamic-programming.md)
-- [그리디 알고리즘](./07-greedy-algorithms.md)
-- [그래프 알고리즘](./08-graph-algorithms.md)
+## 시리즈 목차
+
+- [Algorithms 101 (1/10): 알고리즘이란 무엇인가?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): 시간 복잡도와 공간 복잡도](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): 탐색 알고리즘](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms 101 (6/10): 동적 계획법](./06-dynamic-programming.md)
+- [Algorithms 101 (7/10): 그리디 알고리즘](./07-greedy-algorithms.md)
+- [Algorithms 101 (8/10): 그래프 알고리즘](./08-graph-algorithms.md)
 - **문자열 알고리즘 기초 (현재 글)**
 - 알고리즘 문제 풀이 전략 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

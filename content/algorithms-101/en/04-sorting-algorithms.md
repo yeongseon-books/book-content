@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 4
-title: Sorting Algorithms
+title: "Algorithms 101 (4/10): Sorting Algorithms"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: Why comparison sorting is bounded by O(n log n), the trade-offs
 last_reviewed: '2026-05-04'
 ---
 
-# Sorting Algorithms
+# Algorithms 101 (4/10): Sorting Algorithms
 
 **Core question**: Why is Python's `sorted` so consistently fast, and what does it do that a textbook quicksort does not?
 
 Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour.
 
 This is post 4 in the Algorithms 101 series. Here we cover the trade-offs among textbook sorting algorithms and why Timsort wins so often in production code.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sorting Algorithms?
+- Which signal should the example or diagram make visible for Sorting Algorithms?
+- What failure should be prevented first when Sorting Algorithms reaches a real system?
+
+## Big Picture
+
+![algorithms 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.en.png)
+
+*algorithms 101 chapter 4 flow overview*
+
+This picture places Sorting Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sorting Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -250,10 +266,21 @@ Within the same asymptotic envelope, sorts differ by stability, memory, and adap
 
 The next article covers recursion and divide and conquer — call stacks, recurrences, and the path from divide and conquer toward dynamic programming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sorting Algorithms?**
+  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sorting Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
 - **Sorting Algorithms (current)**
 - Recursion and Divide and Conquer (upcoming)
 - Dynamic Programming (upcoming)
@@ -261,6 +288,7 @@ The next article covers recursion and divide and conquer — call stacks, recurr
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

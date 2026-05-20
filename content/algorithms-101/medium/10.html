@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Algorithm Problem-Solving Strategies</title>
+<title>Algorithms 101 (10/10): Algorithm Problem-Solving Strategies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Algorithm Problem-Solving Strategies</h1>
-<blockquote>
-<p>Algorithms 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Algorithms 101 (10/10): Algorithm Problem-Solving Strategies</h1>
 <p><strong>Core question</strong>: Does being good at algorithms mean memorising lots of solutions, or having a thinking procedure that decomposes new problems?</p>
+<p>Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox, but the real leverage comes from the procedure you use to choose among them.</p>
+<p>This is the final post in the Algorithms 101 series. Here we wrap up the series with a practical thinking procedure for reading constraints, choosing tools, and verifying an approach before coding.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Algorithm Problem-Solving Strategies?</li>
+<li>Which signal should the example or diagram make visible for Algorithm Problem-Solving Strategies?</li>
+<li>What failure should be prevented first when Algorithm Problem-Solving Strategies reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="algorithms 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/10/10-01-big-picture.en.png"></p>
+<p><em>algorithms 101 chapter 10 flow overview</em></p>
+<p>This picture places Algorithm Problem-Solving Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox. When you meet a new problem, you narrow which tool fits by reading the input size, structure, and constraints. Senior engineers are not separated from others by the number of solutions they have memorised; they are separated by the consistency of their thinking procedure. This article makes that procedure explicit while wrapping up the series.</p>
+<p>The core of Algorithm Problem-Solving Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The standard thinking procedure to apply to any algorithm problem</li>
@@ -235,16 +240,26 @@ assert max_subarray([]) == 0
 <h2>Wrap-Up and Next Steps</h2>
 <p>The essence of studying algorithms is not the volume of solutions but the consistency of the procedure. Estimating complexity from input size, narrowing tools from signals, verifying on small examples, and translating to code — that five-step loop works the same in interviews and in production.</p>
 <p>This concludes the Algorithms 101 series. Natural next steps include advanced data structures (tree/heap/hash variants), advanced graphs (flows, matching, SCC), or domain applications (search engines, recommender systems, compilers). The thinking procedure you built here transfers directly to all of them.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/06-dynamic-programming.md">Dynamic Programming</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/07-greedy-algorithms.md">Greedy Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/08-graph-algorithms.md">Graph Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/09-string-algorithms.md">String Algorithm Basics</a></li>
+<li><strong>What boundary should you inspect first when applying Algorithm Problem-Solving Strategies?</strong></li>
+<li>The article treats Algorithm Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Algorithm Problem-Solving Strategies?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Algorithm Problem-Solving Strategies reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">Algorithms 101 (1/10): What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Algorithms 101 (2/10): Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Algorithms 101 (3/10): Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Algorithms 101 (4/10): Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Algorithms 101 (5/10): Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/06-dynamic-programming.md">Algorithms 101 (6/10): Dynamic Programming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/07-greedy-algorithms.md">Algorithms 101 (7/10): Greedy Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/08-graph-algorithms.md">Algorithms 101 (8/10): Graph Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/09-string-algorithms.md">Algorithms 101 (9/10): String Algorithm Basics</a></li>
 <li><strong>Algorithm Problem-Solving Strategies (current)</strong></li>
 </ul>
 <h2>References</h2>

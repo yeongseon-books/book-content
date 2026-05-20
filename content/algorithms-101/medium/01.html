@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is an Algorithm?</title>
+<title>Algorithms 101 (1/10): What Is an Algorithm?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is an Algorithm?</h1>
-<blockquote>
-<p>Algorithms 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
+<h1>Algorithms 101 (1/10): What Is an Algorithm?</h1>
 <p><strong>Core question</strong>: Why does a "good algorithm" matter so much when modern hardware is fast enough to run almost anything?</p>
+<p>An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records.</p>
+<p>This is the first post in the Algorithms 101 series. Here we define what an algorithm is, how it differs from a program, and which core terms the rest of the series will build on.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is an Algorithm??</li>
+<li>Which signal should the example or diagram make visible for What Is an Algorithm??</li>
+<li>What failure should be prevented first when What Is an Algorithm? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="algorithms 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.en.png"></p>
+<p><em>algorithms 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is an Algorithm? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records. This article maps the vocabulary the entire series will use.</p>
+<p>The core of What Is an Algorithm? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The three properties an algorithm must satisfy</li>
@@ -213,6 +218,16 @@ print(f&quot;binary : {time.perf_counter() - t:.4f}s&quot;)
 <h2>Wrap-Up and Next Steps</h2>
 <p>An algorithm is defined by correctness, finiteness, and efficiency. It is the abstract recipe behind every program, and it is what determines whether a system holds under load. Pseudocode is the design language; specific code is the implementation detail.</p>
 <p>The next article introduces time and space complexity, the formal vocabulary used to compare algorithms. Big-O, Big-Omega, and Big-Theta will give us shared terms for the rest of the series.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is an Algorithm??</strong></li>
+<li>The article treats What Is an Algorithm? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is an Algorithm??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is an Algorithm? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is an Algorithm? (current)</strong></li>
 <li>Time and Space Complexity (upcoming)</li>

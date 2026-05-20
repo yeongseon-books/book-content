@@ -1,7 +1,7 @@
 ---
 series: algorithms-101
 episode: 6
-title: Dynamic Programming
+title: "Algorithms 101 (6/10): Dynamic Programming"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: The two conditions for dynamic programming, memoization vs tabu
 last_reviewed: '2026-05-04'
 ---
 
-# Dynamic Programming
+# Algorithms 101 (6/10): Dynamic Programming
 
 **Core question**: Why do we keep recomputing the same subproblems, and how can we recognise that pattern in the wild?
 
 Dynamic programming (DP) applies when the same subproblems repeat and the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation.
 
 This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dynamic Programming?
+- Which signal should the example or diagram make visible for Dynamic Programming?
+- What failure should be prevented first when Dynamic Programming reaches a real system?
+
+## Big Picture
+
+![algorithms 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png)
+
+*algorithms 101 chapter 6 flow overview*
+
+This picture places Dynamic Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dynamic Programming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -233,17 +249,29 @@ DP starts from "do not solve the same subproblem twice." It applies whenever the
 
 The next article covers greedy algorithms — when greedy actually works (exchange arguments, matroid intuition), classic problems, and cases where what looks greedy actually requires DP.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dynamic Programming?**
+  - The article treats Dynamic Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dynamic Programming?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dynamic Programming reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an Algorithm?](./01-what-is-an-algorithm.md)
-- [Time and Space Complexity](./02-time-and-space-complexity.md)
-- [Search Algorithms](./03-search-algorithms.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+## In this series
+
+- [Algorithms 101 (1/10): What Is an Algorithm?](./01-what-is-an-algorithm.md)
+- [Algorithms 101 (2/10): Time and Space Complexity](./02-time-and-space-complexity.md)
+- [Algorithms 101 (3/10): Search Algorithms](./03-search-algorithms.md)
+- [Algorithms 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
 - **Dynamic Programming (current)**
 - Greedy Algorithms (upcoming)
 - Graph Algorithms (upcoming)
 - String Algorithm Basics (upcoming)
 - Algorithm Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References
