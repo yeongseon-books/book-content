@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 3
-title: Optional and Union
+title: "Type Hints in Python 101 (3/10): Optional and Union"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Learn how to use Optional and Union type hints in Python to han
 last_reviewed: '2026-05-04'
 ---
 
-# Optional and Union
+# Type Hints in Python 101 (3/10): Optional and Union
 
 This is post 3 in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you tell the type checker that a value might be `None` or could be one of several different types?
 
 > In real-world code, functions often return `None` to signal "not found," and parameters accept multiple types for flexibility. Without explicit annotations, these patterns become invisible traps — a `None` return value that crashes three function calls later, or a parameter that silently accepts the wrong type. `Optional` and `Union` make these contracts explicit so the type checker can enforce them.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Optional and Union?
+- Which signal should the example or diagram make visible for Optional and Union?
+- What failure should be prevented first when Optional and Union reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/03/03-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 3 flow overview*
+
+This picture places Optional and Union inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Optional and Union is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -88,7 +100,6 @@ def find_user(user_id: int) -> dict:
         return None  # type says dict, but returns None
     return {"id": user_id, "name": "Alice"}
 
-
 user = find_user(0)
 print(user["name"])  # Runtime: TypeError
 ```
@@ -100,7 +111,6 @@ def find_user(user_id: int) -> dict[str, str | int] | None:
     if user_id == 0:
         return None
     return {"id": user_id, "name": "Alice"}
-
 
 user = find_user(0)
 if user is not None:
@@ -114,12 +124,10 @@ if user is not None:
 ```python
 from typing import Optional
 
-
 def find_by_name(name: str) -> Optional[str]:
     """Returns the email if found, None otherwise."""
     users = {"Alice": "alice@example.com", "Bob": "bob@example.com"}
     return users.get(name)
-
 
 email = find_by_name("Alice")
 # email: Optional[str] — must check before using
@@ -137,7 +145,6 @@ def find_by_name(name: str) -> str | None:
     users = {"Alice": "alice@example.com"}
     return users.get(name)
 
-
 def process(value: int | str) -> str:
     return str(value)
 ```
@@ -152,7 +159,6 @@ def format_id(value: int | str) -> str:
     if isinstance(value, int):
         return f"ID-{value:06d}"
     return f"UUID-{value}"
-
 
 print(format_id(42))          # ID-000042
 print(format_id("abc-123"))   # UUID-abc-123
@@ -175,7 +181,6 @@ def process(value: str | int | None) -> str:
     # Pattern 3: After eliminating other types, only str remains
     return value.upper()
 
-
 def safe_len(text: str | None) -> int:
     # Pattern 4: Early return for None
     if text is None:
@@ -191,7 +196,6 @@ def greet(name: str, title: str | None = None) -> str:
     if title is not None:
         return f"Hello, {title} {name}!"
     return f"Hello, {name}!"
-
 
 print(greet("Alice"))              # Hello, Alice!
 print(greet("Alice", "Dr."))      # Hello, Dr. Alice!
@@ -252,17 +256,29 @@ They also keep Union types narrow. A function that accepts `int | str | float | 
 
 In the next article, we will explore function type hints in depth — including `Callable`, `*args`, `**kwargs`, and overload patterns.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Optional and Union?**
+  - The article treats Optional and Union as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Optional and Union?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Optional and Union reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
 - **Optional and Union (current)**
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Function Type Hints (upcoming)
+- TypedDict and dataclass (upcoming)
+- Protocol and Structural Typing (upcoming)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

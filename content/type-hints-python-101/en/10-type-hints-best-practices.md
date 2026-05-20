@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 10
-title: Type Hint Best Practices
+title: "Type Hints in Python 101 (10/10): Type Hint Best Practices"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: Practical guidelines for applying type hints effectively with g
 last_reviewed: '2026-05-17'
 ---
 
-# Type Hint Best Practices
+# Type Hints in Python 101 (10/10): Type Hint Best Practices
 
 Type hints do not improve code just because there are more of them. But if the important signatures stay vague, the static checks from the previous article and the runtime boundaries from Pydantic never get enough structure to help. The real question is where to harden first.
 
 This is the final post in the Type Hints in Python 101 series. In this article, we will take one loose `order_service.py` module and run a full hardening pass on it: replacing `Any`, making return types explicit, narrowing unions with helper functions, and verifying the result with a checker so the advice ends as runnable code rather than placeholders.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Type Hint Best Practices?
+- Which signal should the example or diagram make visible for Type Hint Best Practices?
+- What failure should be prevented first when Type Hint Best Practices reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 10 flow overview*
+
+This picture places Type Hint Best Practices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Type Hint Best Practices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -71,7 +87,6 @@ Checker passes + team rules recorded
 ```python
 from typing import Any
 
-
 def process_order(payload: Any) -> Any:
     order_id = payload.get("order_id")
     user = payload.get("user")
@@ -82,7 +97,6 @@ def process_order(payload: Any) -> Any:
 class OrderPayload(TypedDict):
     order_id: int | str
     user: dict[str, str | None]
-
 
 def process_order(payload: OrderPayload) -> dict[str, str]:
     order_id = parse_order_id(payload["order_id"])
@@ -102,16 +116,13 @@ This entire article uses a single `order_service.py` example.
 # order_service.py
 from typing import Any
 
-
 def find_user(user_id):
     if user_id == 1:
         return {"id": 1, "email": "buyer@example.com", "is_active": True}
     return None
 
-
 def get_config() -> Any:
     return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
-
 
 class OrderService:
     def create_order(self, payload):
@@ -140,30 +151,25 @@ In practice, signatures matter more than local variables because they define wha
 ```python
 from typing import TypedDict
 
-
 class UserRecord(TypedDict):
     id: int
     email: str
     is_active: bool
-
 
 class OrderItem(TypedDict):
     name: str
     price: int
     quantity: int
 
-
 class OrderPayload(TypedDict):
     order_id: int | str
     user_id: int
     items: list[OrderItem]
 
-
 def find_user(user_id: int) -> UserRecord | None:
     if user_id == 1:
         return {"id": 1, "email": "buyer@example.com", "is_active": True}
     return None
-
 
 def get_config() -> dict[str, str | int | bool]:
     return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
@@ -182,24 +188,20 @@ The next job is not to annotate every intermediate variable. It is to isolate th
 ```python
 from typing import TypedDict
 
-
 class UserRecord(TypedDict):
     id: int
     email: str
     is_active: bool
-
 
 class OrderItem(TypedDict):
     name: str
     price: int
     quantity: int
 
-
 class OrderPayload(TypedDict):
     order_id: int | str
     user_id: int
     items: list[OrderItem]
-
 
 class OrderSummary(TypedDict):
     order_id: str
@@ -207,16 +209,13 @@ class OrderSummary(TypedDict):
     currency: str
     total: int
 
-
 def find_user(user_id: int) -> UserRecord | None:
     if user_id == 1:
         return {"id": 1, "email": "buyer@example.com", "is_active": True}
     return None
 
-
 def get_config() -> dict[str, str | int | bool]:
     return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
-
 
 def parse_order_id(order_id: int | str) -> int:
     if isinstance(order_id, int):
@@ -224,7 +223,6 @@ def parse_order_id(order_id: int | str) -> int:
     if order_id.isdigit():
         return int(order_id)
     raise ValueError("order_id must be an int or numeric string")
-
 
 def require_user_email(user: UserRecord | None) -> str:
     if user is None:
@@ -245,24 +243,20 @@ Notice what changed compared with the old placeholder style.
 ```python
 from typing import TypedDict
 
-
 class UserRecord(TypedDict):
     id: int
     email: str
     is_active: bool
-
 
 class OrderItem(TypedDict):
     name: str
     price: int
     quantity: int
 
-
 class OrderPayload(TypedDict):
     order_id: int | str
     user_id: int
     items: list[OrderItem]
-
 
 class OrderSummary(TypedDict):
     order_id: str
@@ -270,16 +264,13 @@ class OrderSummary(TypedDict):
     currency: str
     total: int
 
-
 def find_user(user_id: int) -> UserRecord | None:
     if user_id == 1:
         return {"id": 1, "email": "buyer@example.com", "is_active": True}
     return None
 
-
 def get_config() -> dict[str, str | int | bool]:
     return {"currency": "KRW", "retry_limit": 3, "sandbox": False}
-
 
 def parse_order_id(order_id: int | str) -> int:
     if isinstance(order_id, int):
@@ -288,14 +279,12 @@ def parse_order_id(order_id: int | str) -> int:
         return int(order_id)
     raise ValueError("order_id must be an int or numeric string")
 
-
 def require_user_email(user: UserRecord | None) -> str:
     if user is None:
         raise LookupError("user not found")
     if not user["is_active"]:
         raise ValueError("inactive user cannot create orders")
     return user["email"]
-
 
 class OrderService:
     def create_order(self, payload: OrderPayload) -> OrderSummary:
@@ -406,17 +395,29 @@ The best type-hint practices are not about annotating everything equally. They a
 
 This series covered the full working arc: basic annotations, unions, structured data, generics, static checking, runtime validation, and finally how to apply those tools as an operating habit in a real codebase.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Type Hint Best Practices?**
+  - The article treats Type Hint Best Practices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Type Hint Best Practices?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Type Hint Best Practices reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): Function Type Hints](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict and dataclass](./05-typeddict-and-dataclass.md)
+- [Type Hints in Python 101 (6/10): Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
+- [Type Hints in Python 101 (7/10): Understanding Generics](./07-generic.md)
+- [Type Hints in Python 101 (8/10): Using mypy and pyright](./08-mypy-and-pyright.md)
+- [Type Hints in Python 101 (9/10): Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
 - **Type Hint Best Practices (current)**
+
 <!-- toc:end -->
 
 ## References

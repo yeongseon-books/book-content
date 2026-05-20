@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding Generics</title>
+<title>Type Hints in Python 101 (7/10): Understanding Generics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Understanding Generics</h1>
+<h1>Type Hints in Python 101 (7/10): Understanding Generics</h1>
 <p>Reusable Python code often fails at exactly one point: you can make it accept many types, but you accidentally erase the relationship between the input type and the output type. <code>Any</code> makes the code flexible but blind.</p>
 <p>This is post 7 in the Type Hints in Python 101 series. In this article, we will use <code>TypeVar</code> and <code>Generic</code> to preserve those type relationships, then look at where Generics help in real service code and where they become unnecessary abstraction.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Understanding Generics?</li>
+<li>Which signal should the example or diagram make visible for Understanding Generics?</li>
+<li>What failure should be prevented first when Understanding Generics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Type Hints in Python 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Type Hints in Python 101 chapter 7 flow overview</em></p>
+<p>This picture places Understanding Generics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Understanding Generics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>TypeVar definition and usage</li>
@@ -81,8 +94,6 @@
                       │
                return type = int
 </code></pre>
-<p><img alt="How Generic preserves the input-output type relationship" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>How Generic preserves the input-output type relationship</em></p>
 <h2>Key Concepts</h2>
 <p><strong>TypeVar</strong><br>
 - Description: Declares a type variable for generic functions and classes</p>
@@ -187,7 +198,7 @@ add(1.0, 2.5)   # OK — float
 </code></pre>
 <p>Constraints list the exact allowed types. Unlike bounds, subtype relationships do not apply.</p>
 <p><strong>Step 5: Python 3.12 Type Parameter Syntax</strong></p>
-<pre><code class="language-python"># Python 3.12+
+<pre><code class="language-python"># example: Python 3.12+ type parameter syntax
 def first[T](items: list[T]) -&gt; T:
     return items[0]
 
@@ -282,17 +293,27 @@ def first_item(page: Page[T]) -&gt; T:
 <h2>Summary and Next Steps</h2>
 <p>Generics parameterize types so a single function or class works across multiple types while preserving type relationships. TypeVar declares type variables, Generic provides the base class, and bounds/constraints limit the allowed types. Python 3.12 simplifies the syntax further.</p>
 <p>In the next article, we will cover mypy and pyright — the tools that actually verify all these type hints.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
+<li><strong>What boundary should you inspect first when applying Understanding Generics?</strong></li>
+<li>The article treats Understanding Generics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Understanding Generics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Understanding Generics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">Type Hints in Python 101 (1/10): What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Type Hints in Python 101 (2/10): Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Type Hints in Python 101 (3/10): Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Type Hints in Python 101 (4/10): Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">Type Hints in Python 101 (5/10): TypedDict and dataclass</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Type Hints in Python 101 (6/10): Protocol and Structural Typing</a></li>
 <li><strong>Understanding Generics (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+<li>Using mypy and pyright (upcoming)</li>
+<li>Pydantic and Type Hints (upcoming)</li>
+<li>Type Hint Best Practices (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

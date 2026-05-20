@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Basic Types and Collection Types</title>
+<title>Type Hints in Python 101 (2/10): Basic Types and Collection Types</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Basic Types and Collection Types</h1>
+<h1>Type Hints in Python 101 (2/10): Basic Types and Collection Types</h1>
 <p>This is post 2 in the Type Hints in Python 101 series.</p>
 <blockquote>
 <p>Type Hints in Python 101 Series (2/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: How do you annotate containers like lists and dictionaries so the type checker knows what is inside them?</p>
 <blockquote>
 <p>Annotating a function parameter as <code>list</code> tells the type checker it is a list — but not what the list contains. A <code>list[int]</code> is fundamentally different from a <code>list[str]</code> when it comes to the operations you can perform on its elements. This article covers Python's basic scalar types and how to parameterize collection types for precise type checking.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Basic Types and Collection Types?</li>
+<li>Which signal should the example or diagram make visible for Basic Types and Collection Types?</li>
+<li>What failure should be prevented first when Basic Types and Collection Types reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Type Hints in Python 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.en.png"></p>
+<p><em>Type Hints in Python 101 chapter 2 flow overview</em></p>
+<p>This picture places Basic Types and Collection Types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Basic Types and Collection Types is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Basic scalar types: <code>int</code>, <code>str</code>, <code>float</code>, <code>bool</code>, <code>bytes</code>, <code>None</code></li>
@@ -232,17 +241,27 @@ scores: UserScores = {
 <h2>Summary and Next Steps</h2>
 <p>Basic types (<code>int</code>, <code>str</code>, <code>float</code>, <code>bool</code>) and parameterized collections (<code>list[T]</code>, <code>dict[K, V]</code>, <code>tuple[T, ...]</code>, <code>set[T]</code>) form the foundation of Python type annotations. Always parameterize collections to give the type checker visibility into element types. Use type aliases for complex nested structures.</p>
 <p>In the next article, we will explore <code>Optional</code> and <code>Union</code> types for handling values that might be missing or could be one of several types.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
+<li><strong>What boundary should you inspect first when applying Basic Types and Collection Types?</strong></li>
+<li>The article treats Basic Types and Collection Types as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Basic Types and Collection Types?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Basic Types and Collection Types reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">Type Hints in Python 101 (1/10): What Are Python Type Hints?</a></li>
 <li><strong>Basic Types and Collection Types (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+<li>Optional and Union (upcoming)</li>
+<li>Function Type Hints (upcoming)</li>
+<li>TypedDict and dataclass (upcoming)</li>
+<li>Protocol and Structural Typing (upcoming)</li>
+<li>Understanding Generics (upcoming)</li>
+<li>Using mypy and pyright (upcoming)</li>
+<li>Pydantic and Type Hints (upcoming)</li>
+<li>Type Hint Best Practices (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 2
-title: 기본 타입과 collection 타입
+title: "Type Hints in Python 101 (2/10): 기본 타입과 collection 타입"
 status: content-ready
 targets:
   tistory: true
@@ -21,20 +21,27 @@ seo_description: int, str부터 list, dict, tuple까지 Python 타입 힌트의 
 last_reviewed: '2026-05-12'
 ---
 
-# 기본 타입과 collection 타입
+# Type Hints in Python 101 (2/10): 기본 타입과 collection 타입
 
 타입 힌트를 처음 붙일 때 가장 많이 나오는 질문은 단순합니다. `name: str`은 알겠는데, 리스트와 딕셔너리 안에 무엇이 들어가는지는 어떻게 적어야 할까요? 바로 이 지점부터 타입 힌트가 문서 수준을 넘어 실제 오류 방지 도구로 바뀝니다.
 
 이 글은 Type Hints (Python) 101 시리즈의 2번째 글입니다. 여기서는 기본 스칼라 타입과 컬렉션 타입을 어떻게 표현하는지, 그리고 컨테이너 안쪽 타입까지 적어야 하는 이유를 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?
 - `list`, `dict`, `tuple`, `set`은 왜 원소 타입까지 붙여야 할까요?
 - 고정 길이 튜플과 가변 길이 튜플은 어떻게 다를까요?
-- 중첩된 자료구조는 어떤 방식으로 읽기 좋게 표현할까요?
 
-> 컬렉션 타입 힌트의 핵심은 컨테이너의 종류가 아니라, 그 안에 무엇이 들어가는지를 명시하는 데 있습니다.
+## 큰 그림
+
+![Type Hints in Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.ko.png)
+
+*Type Hints in Python 101 2장 흐름 개요*
+
+이 그림에서는 기본 타입과 collection 타입를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 기본 타입과 collection 타입의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -109,7 +116,6 @@ matrix: list[list[int]] = [
     [4, 5, 6],
 ]
 
-
 def get_active_users(users: list[str]) -> set[str]:
     return set(users)
 ```
@@ -125,7 +131,6 @@ config: dict[str, str | int | bool] = {
     "port": 8080,
     "debug": True,
 }
-
 
 def get_headers() -> dict[str, str]:
     return {"Content-Type": "application/json"}
@@ -154,10 +159,8 @@ empty: tuple[()] = ()
 UserScores = dict[str, list[int]]
 Config = dict[str, str | int | bool | list[str]]
 
-
 def aggregate_scores(data: UserScores) -> dict[str, float]:
     return {name: sum(scores) / len(scores) for name, scores in data.items()}
-
 
 scores: UserScores = {
     "Alice": [95, 87, 92],
@@ -219,17 +222,29 @@ scores: UserScores = {
 
 다음 글에서는 값이 없을 수도 있거나 여러 타입 중 하나일 수 있는 상황을 표현하는 `Optional`과 `Union`을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **`int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?**
+  - 본문의 기준은 기본 타입과 collection 타입를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`list`, `dict`, `tuple`, `set`은 왜 원소 타입까지 붙여야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **고정 길이 튜플과 가변 길이 튜플은 어떻게 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Python type hint란 무엇인가?](./01-what-is-type-hint.md)
+## 시리즈 목차
+
+- [Type Hints in Python 101 (1/10): Python type hint란 무엇인가?](./01-what-is-type-hint.md)
 - **기본 타입과 collection 타입 (현재 글)**
-- [Optional과 Union](./03-optional-and-union.md)
-- [함수 타입 힌트](./04-function-type-hints.md)
-- [TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol과 structural typing](./06-protocol-and-structural-typing.md)
-- [Generic 이해하기](./07-generic.md)
-- [mypy와 pyright 사용하기](./08-mypy-and-pyright.md)
-- [Pydantic과 타입 힌트](./09-pydantic-and-type-hints.md)
-- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
+- Optional과 Union (예정)
+- 함수 타입 힌트 (예정)
+- TypedDict와 dataclass (예정)
+- Protocol과 structural typing (예정)
+- Generic 이해하기 (예정)
+- mypy와 pyright 사용하기 (예정)
+- Pydantic과 타입 힌트 (예정)
+- 타입 힌트를 잘 쓰는 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

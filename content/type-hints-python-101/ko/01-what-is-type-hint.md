@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 1
-title: Python type hint란 무엇인가?
+title: "Type Hints in Python 101 (1/10): Python type hint란 무엇인가?"
 status: content-ready
 targets:
   tistory: true
@@ -21,20 +21,27 @@ seo_description: Python 타입 힌트의 개념, 등장 배경, 기본 문법과
 last_reviewed: '2026-05-12'
 ---
 
-# Python type hint란 무엇인가?
+# Type Hints in Python 101 (1/10): Python type hint란 무엇인가?
 
 작은 스크립트에서는 `data`, `value`, `result` 같은 이름만으로도 버틸 수 있습니다. 하지만 코드가 길어지고 함수가 여러 파일을 오가기 시작하면, 호출자가 무엇을 넘겨야 하고 무엇을 돌려받는지 시그니처만 보고 알 수 있어야 합니다.
 
 이 글은 Type Hints (Python) 101 시리즈의 첫 번째 글입니다. 여기서는 타입 힌트가 무엇이고, Python의 동적 타이핑과 어떻게 공존하며, 왜 실무에서 빠르게 가치가 드러나는지부터 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 타입 힌트는 정적 타입 언어의 타입 선언과 무엇이 다를까요?
 - PEP 484가 해결하려던 문제는 무엇이었을까요?
 - 변수, 매개변수, 반환값에 어떤 문법으로 타입을 붙일까요?
-- Python 런타임은 타입 힌트를 어떻게 다루고, mypy나 pyright는 무엇을 검사할까요?
 
-> 타입 힌트는 Python을 정적 타입 언어로 바꾸는 기능이 아니라, 동적 언어 코드에 검증 가능한 계약을 추가하는 장치입니다.
+## 큰 그림
+
+![Type Hints in Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.ko.png)
+
+*Type Hints in Python 101 1장 흐름 개요*
+
+이 그림에서는 Python type hint란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Python type hint란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -94,7 +101,6 @@ def calculate_total(prices: list[int], tax_rate: float) -> int:
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
-
 result = greet("Alice")  # OK
 # greet(42)  # mypy 오류: Argument 1 has incompatible type "int"
 ```
@@ -135,7 +141,6 @@ class User:
     def greet(self) -> str:
         return f"Hi, I'm {self.name}."
 
-
 user = User("Alice", 30)
 print(user.greet())
 ```
@@ -153,7 +158,6 @@ mypy app.py
 # app.py
 def add(a: int, b: int) -> int:
     return a + b
-
 
 add("hello", "world")  # mypy: Argument 1 has incompatible type "str"
 ```
@@ -212,17 +216,29 @@ add("hello", "world")  # mypy: Argument 1 has incompatible type "str"
 
 다음 글에서는 `int`, `str`, `bool` 같은 기본 타입과 `list`, `dict`, `tuple`, `set` 같은 컬렉션 타입을 어떻게 정확하게 적는지 자세히 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **타입 힌트는 정적 타입 언어의 타입 선언과 무엇이 다를까요?**
+  - 본문의 기준은 Python type hint란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **PEP 484가 해결하려던 문제는 무엇이었을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **변수, 매개변수, 반환값에 어떤 문법으로 타입을 붙일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **Python type hint란 무엇인가? (현재 글)**
-- [기본 타입과 collection 타입](./02-basic-and-collection-types.md)
-- [Optional과 Union](./03-optional-and-union.md)
-- [함수 타입 힌트](./04-function-type-hints.md)
-- [TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol과 structural typing](./06-protocol-and-structural-typing.md)
-- [Generic 이해하기](./07-generic.md)
-- [mypy와 pyright 사용하기](./08-mypy-and-pyright.md)
-- [Pydantic과 타입 힌트](./09-pydantic-and-type-hints.md)
-- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
+- 기본 타입과 collection 타입 (예정)
+- Optional과 Union (예정)
+- 함수 타입 힌트 (예정)
+- TypedDict와 dataclass (예정)
+- Protocol과 structural typing (예정)
+- Generic 이해하기 (예정)
+- mypy와 pyright 사용하기 (예정)
+- Pydantic과 타입 힌트 (예정)
+- 타입 힌트를 잘 쓰는 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 9
-title: Pydantic and Type Hints
+title: "Type Hints in Python 101 (9/10): Pydantic and Type Hints"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: Use Pydantic BaseModel for runtime data validation and serializ
 last_reviewed: '2026-05-17'
 ---
 
-# Pydantic and Type Hints
+# Type Hints in Python 101 (9/10): Pydantic and Type Hints
 
 Static type checking protects the person writing the code. Real services also need protection from the data entering the system. A malformed email, an underage signup, or mismatched password fields are runtime boundary problems, not mypy problems.
 
 This is post 9 in the Type Hints in Python 101 series. In this article, we will build one continuous `CreateUserRequest` → FastAPI endpoint → `UserResponse` workflow so you can see how Pydantic turns type hints into runtime validation, how a bad request becomes a 422 response, and how the corrected request becomes a successful response.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Pydantic and Type Hints?
+- Which signal should the example or diagram make visible for Pydantic and Type Hints?
+- What failure should be prevented first when Pydantic and Type Hints reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 9 flow overview*
+
+This picture places Pydantic and Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pydantic and Type Hints is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -102,14 +118,12 @@ This article keeps one signup API example all the way through.
 ```python
 from pydantic import BaseModel
 
-
 class CreateUserRequest(BaseModel):
     username: str
     email: str
     age: int
     password: str
     password_confirm: str
-
 
 class UserResponse(BaseModel):
     id: int
@@ -124,7 +138,6 @@ At this stage the API shape is visible, but the boundary rules are still too loo
 
 ```python
 from pydantic import BaseModel, EmailStr, Field
-
 
 class CreateUserRequest(BaseModel):
     username: str = Field(min_length=3, max_length=20)
@@ -145,7 +158,6 @@ Now the boundary rules are concrete.
 
 ```python
 from pydantic import BaseModel, EmailStr, Field, field_validator
-
 
 class CreateUserRequest(BaseModel):
     username: str = Field(min_length=3, max_length=20)
@@ -174,7 +186,6 @@ That is a good example of a field validator: one input, one rule set, optional n
 
 ```python
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-
 
 class CreateUserRequest(BaseModel):
     username: str = Field(min_length=3, max_length=20)
@@ -208,7 +219,6 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 app = FastAPI()
 
-
 class CreateUserRequest(BaseModel):
     username: str = Field(min_length=3, max_length=20)
     email: EmailStr
@@ -230,13 +240,11 @@ class CreateUserRequest(BaseModel):
             raise ValueError("password_confirm must match password")
         return self
 
-
 class UserResponse(BaseModel):
     id: int
     username: str
     email: EmailStr
     age: int
-
 
 @app.post("/users", response_model=UserResponse, status_code=201)
 def create_user(request: CreateUserRequest) -> UserResponse:
@@ -395,17 +403,29 @@ Pydantic turns type hints into runtime validation contracts, but the real lesson
 
 In the final article, we will turn the series into an operating guide for applying type hints across a real codebase.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Pydantic and Type Hints?**
+  - The article treats Pydantic and Type Hints as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Pydantic and Type Hints?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Pydantic and Type Hints reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): Function Type Hints](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict and dataclass](./05-typeddict-and-dataclass.md)
+- [Type Hints in Python 101 (6/10): Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
+- [Type Hints in Python 101 (7/10): Understanding Generics](./07-generic.md)
+- [Type Hints in Python 101 (8/10): Using mypy and pyright](./08-mypy-and-pyright.md)
 - **Pydantic and Type Hints (current)**
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Optional and Union</title>
+<title>Type Hints in Python 101 (3/10): Optional and Union</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Optional and Union</h1>
+<h1>Type Hints in Python 101 (3/10): Optional and Union</h1>
 <p>This is post 3 in the Type Hints in Python 101 series.</p>
 <blockquote>
 <p>Type Hints in Python 101 Series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: How do you tell the type checker that a value might be <code>None</code> or could be one of several different types?</p>
 <blockquote>
 <p>In real-world code, functions often return <code>None</code> to signal "not found," and parameters accept multiple types for flexibility. Without explicit annotations, these patterns become invisible traps — a <code>None</code> return value that crashes three function calls later, or a parameter that silently accepts the wrong type. <code>Optional</code> and <code>Union</code> make these contracts explicit so the type checker can enforce them.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Optional and Union?</li>
+<li>Which signal should the example or diagram make visible for Optional and Union?</li>
+<li>What failure should be prevented first when Optional and Union reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Type Hints in Python 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/03/03-01-big-picture.en.png"></p>
+<p><em>Type Hints in Python 101 chapter 3 flow overview</em></p>
+<p>This picture places Optional and Union inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Optional and Union is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li><code>Optional[T]</code> for values that might be <code>None</code></li>
@@ -249,17 +258,27 @@ print(greet(&quot;Alice&quot;, &quot;Dr.&quot;))      # Hello, Dr. Alice!
 <h2>Summary and Next Steps</h2>
 <p><code>Optional[T]</code> annotates values that might be <code>None</code>, and <code>Union[T1, T2]</code> annotates values that could be one of several types. Type narrowing with <code>isinstance</code> and <code>is None</code> lets the type checker verify that you handle all cases. The Python 3.10+ pipe syntax (<code>X | Y</code>) provides a cleaner alternative to <code>Union</code> and <code>Optional</code> imports.</p>
 <p>In the next article, we will explore function type hints in depth — including <code>Callable</code>, <code>*args</code>, <code>**kwargs</code>, and overload patterns.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
+<li><strong>What boundary should you inspect first when applying Optional and Union?</strong></li>
+<li>The article treats Optional and Union as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Optional and Union?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Optional and Union reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">Type Hints in Python 101 (1/10): What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Type Hints in Python 101 (2/10): Basic Types and Collection Types</a></li>
 <li><strong>Optional and Union (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/06-protocol-and-structural-typing.md">Protocol and Structural Typing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+<li>Function Type Hints (upcoming)</li>
+<li>TypedDict and dataclass (upcoming)</li>
+<li>Protocol and Structural Typing (upcoming)</li>
+<li>Understanding Generics (upcoming)</li>
+<li>Using mypy and pyright (upcoming)</li>
+<li>Pydantic and Type Hints (upcoming)</li>
+<li>Type Hint Best Practices (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

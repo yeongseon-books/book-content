@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 8
-title: Using mypy and pyright
+title: "Type Hints in Python 101 (8/10): Using mypy and pyright"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: Set up mypy and pyright for Python projects with gradual adopti
 last_reviewed: '2026-05-17'
 ---
 
-# Using mypy and pyright
+# Type Hints in Python 101 (8/10): Using mypy and pyright
 
 Writing type hints is only half the job. If nobody runs a checker, a wrong return type or a missing `None` guard can sit quietly in the repository until runtime finally exposes it.
 
 This is post 8 in the Type Hints in Python 101 series. In this article, we will follow one small repository from broken code to mypy output, pyright output, stricter configuration, and finally a CI gate so the same workflow stays enforceable after the first local fix.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Using mypy and pyright?
+- Which signal should the example or diagram make visible for Using mypy and pyright?
+- What failure should be prevented first when Using mypy and pyright reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
+
+*Type Hints in Python 101 chapter 8 flow overview*
+
+This picture places Using mypy and pyright inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Using mypy and pyright is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ Python does not enforce type hints at runtime. A function can declare `-> str` a
 
 mypy and pyright both do that, but the useful operational question is bigger than tool choice. You need one example that fails, gets fixed, becomes stricter, and then gets enforced in CI. Otherwise the article stops at installation commands instead of giving readers a runnable workflow.
 
-![Type-check feedback loop from local editing to the CI gate](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
-
-*Type-check feedback loop from local editing to the CI gate*
-
 ## Key Concepts
 
 | Term | Description |
@@ -61,7 +73,6 @@ mypy and pyright both do that, but the useful operational question is bigger tha
 ```python
 def normalize_user_id(raw_user_id: str) -> int:
     return raw_user_id
-
 
 def build_greeting(name: str | None) -> str:
     return "Hello, " + name.upper()
@@ -97,20 +108,16 @@ typecheck-demo/
 # src/accounts.py
 from typing import TypedDict
 
-
 class UserRow(TypedDict):
     id: int
     email: str
     display_name: str | None
 
-
 def normalize_user_id(raw_user_id: str) -> int:
     return raw_user_id
 
-
 def build_greeting(user: UserRow) -> str:
     return "Hello, " + user["display_name"].upper()
-
 
 def list_admin_emails(rows: list[UserRow]) -> list[str]:
     return [row["email"] for row in rows if row["id"] in {1, 2, 3}]
@@ -159,23 +166,19 @@ pyright catches the same two bugs but formats them differently. That is why many
 # src/accounts.py
 from typing import TypedDict
 
-
 class UserRow(TypedDict):
     id: int
     email: str
     display_name: str | None
 
-
 def normalize_user_id(raw_user_id: str) -> int:
     return int(raw_user_id)
-
 
 def build_greeting(user: UserRow) -> str:
     display_name = user["display_name"]
     if display_name is None:
         return "Hello, anonymous"
     return "Hello, " + display_name.upper()
-
 
 def list_admin_emails(rows: list[UserRow]) -> list[str]:
     return [row["email"] for row in rows if row["id"] in {1, 2, 3}]
@@ -296,7 +299,6 @@ Once checkers are in place, the next failure mode is noise. A few lightweight ru
 ```python
 from third_party_sdk import build_client
 
-
 client = build_client()  # type: ignore[no-untyped-call]  # SDK v2 still has no type stubs
 ```
 
@@ -352,17 +354,29 @@ mypy and pyright matter when they participate in one continuous workflow: a brok
 
 In the next article, we will move from static verification to runtime validation with Pydantic.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Using mypy and pyright?**
+  - The article treats Using mypy and pyright as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Using mypy and pyright?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Using mypy and pyright reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): Function Type Hints](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict and dataclass](./05-typeddict-and-dataclass.md)
+- [Type Hints in Python 101 (6/10): Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
+- [Type Hints in Python 101 (7/10): Understanding Generics](./07-generic.md)
 - **Using mypy and pyright (current)**
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

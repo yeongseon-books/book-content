@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 1
-title: What Are Python Type Hints?
+title: "Type Hints in Python 101 (1/10): What Are Python Type Hints?"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Learn what Python type hints are, why they matter, and how to s
 last_reviewed: '2026-05-04'
 ---
 
-# What Are Python Type Hints?
+# Type Hints in Python 101 (1/10): What Are Python Type Hints?
 
 This is the first post in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (1/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: Can Python code be both dynamically typed and statically verified at the same time?
 
 > Python is dynamically typed — variables can hold any value, and types are checked at runtime. This flexibility is powerful but makes it harder to catch bugs early. Type hints, introduced in PEP 484, let you annotate expected types without changing how Python runs. Static analysis tools then verify these annotations before your code ever executes. This article introduces what type hints are, why they matter, and how to start using them.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Are Python Type Hints??
+- Which signal should the example or diagram make visible for What Are Python Type Hints??
+- What failure should be prevented first when What Are Python Type Hints? reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 1 flow overview*
+
+This picture places What Are Python Type Hints? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Are Python Type Hints? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -104,7 +116,6 @@ def calculate_total(prices: list[int], tax_rate: float) -> int:
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
-
 result = greet("Alice")  # OK
 # greet(42)  # mypy error: Argument 1 has incompatible type "int"
 ```
@@ -145,7 +156,6 @@ class User:
     def greet(self) -> str:
         return f"Hi, I'm {self.name}."
 
-
 user = User("Alice", 30)
 print(user.greet())
 ```
@@ -163,7 +173,6 @@ mypy app.py
 # app.py
 def add(a: int, b: int) -> int:
     return a + b
-
 
 add("hello", "world")  # mypy: Argument 1 has incompatible type "str"
 ```
@@ -223,17 +232,29 @@ Type hints are optional annotations that describe expected types in Python code.
 
 In the next article, we will explore basic types and collection types in detail, including `list`, `dict`, `tuple`, and `set` with their type parameters.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Are Python Type Hints??**
+  - The article treats What Are Python Type Hints? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Are Python Type Hints??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Are Python Type Hints? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Are Python Type Hints? (current)**
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Basic Types and Collection Types (upcoming)
+- Optional and Union (upcoming)
+- Function Type Hints (upcoming)
+- TypedDict and dataclass (upcoming)
+- Protocol and Structural Typing (upcoming)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

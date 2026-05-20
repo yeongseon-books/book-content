@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 4
-title: Function Type Hints
+title: "Type Hints in Python 101 (4/10): Function Type Hints"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Learn how to annotate functions as values with Callable, type *
 last_reviewed: '2026-05-04'
 ---
 
-# Function Type Hints
+# Type Hints in Python 101 (4/10): Function Type Hints
 
 This is post 4 in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you annotate a parameter that accepts a function, or describe a decorator's type signature?
 
 > Python treats functions as first-class objects. You can pass them as arguments, return them from other functions, and store them in variables. But how do you tell the type checker what kind of function is expected? `Callable` describes function signatures as types, `@overload` handles functions with multiple valid signatures, and `ParamSpec` preserves decorator signatures. This article covers these advanced function-level type hints.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Function Type Hints?
+- Which signal should the example or diagram make visible for Function Type Hints?
+- What failure should be prevented first when Function Type Hints reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/04/04-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 4 flow overview*
+
+This picture places Function Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Function Type Hints is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -98,7 +110,6 @@ from typing import TypeVar
 
 T = TypeVar("T")
 
-
 def retry(func: Callable[[], T], attempts: int) -> T:
     for i in range(attempts):
         try:
@@ -116,14 +127,11 @@ def retry(func: Callable[[], T], attempts: int) -> T:
 ```python
 from collections.abc import Callable
 
-
 def apply_operation(values: list[int], op: Callable[[int], int]) -> list[int]:
     return [op(v) for v in values]
 
-
 def double(x: int) -> int:
     return x * 2
-
 
 result = apply_operation([1, 2, 3], double)  # [2, 4, 6]
 result = apply_operation([1, 2, 3], lambda x: x + 1)  # [2, 3, 4]
@@ -140,7 +148,6 @@ def log_call(*args: str, **kwargs: int) -> None:
     for key, value in kwargs.items():
         print(f"{key}={value}")  # value: int
 
-
 log_call("hello", "world", retries=3, timeout=30)
 ```
 
@@ -151,20 +158,16 @@ When you annotate `*args: str`, each individual argument is `str`. Similarly, `*
 ```python
 from typing import overload
 
-
 @overload
 def parse_value(raw: str) -> dict[str, str]: ...
 
-
 @overload
 def parse_value(raw: bytes) -> dict[str, bytes]: ...
-
 
 def parse_value(raw: str | bytes) -> dict[str, str] | dict[str, bytes]:
     if isinstance(raw, str):
         return {"data": raw}
     return {b"data": raw}
-
 
 text_result = parse_value("hello")    # dict[str, str]
 bytes_result = parse_value(b"hello")  # dict[str, bytes]
@@ -182,7 +185,6 @@ from typing import ParamSpec, TypeVar
 P = ParamSpec("P")
 T = TypeVar("T")
 
-
 def log_calls(func: Callable[P, T]) -> Callable[P, T]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
@@ -190,11 +192,9 @@ def log_calls(func: Callable[P, T]) -> Callable[P, T]:
         return func(*args, **kwargs)
     return wrapper
 
-
 @log_calls
 def add(a: int, b: int) -> int:
     return a + b
-
 
 result = add(1, 2)  # Type checker knows: (int, int) -> int
 ```
@@ -206,7 +206,6 @@ result = add(1, 2)  # Type checker knows: (int, int) -> int
 ```python
 from collections.abc import Callable
 from typing import Any
-
 
 # No arguments, returns str
 factory: Callable[[], str] = lambda: "hello"
@@ -270,17 +269,29 @@ They use `@overload` judiciously. It is powerful for functions that genuinely re
 
 In the next article, we will explore `TypedDict` and `dataclass` for typing structured data with named fields.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Function Type Hints?**
+  - The article treats Function Type Hints as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Function Type Hints?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Function Type Hints reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
 - **Function Type Hints (current)**
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- TypedDict and dataclass (upcoming)
+- Protocol and Structural Typing (upcoming)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

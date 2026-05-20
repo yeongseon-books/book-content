@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 6
-title: Protocol과 structural typing
+title: "Type Hints in Python 101 (6/10): Protocol과 structural typing"
 status: content-ready
 targets:
   tistory: true
@@ -21,20 +21,27 @@ seo_description: Protocol로 상속 없이 인터페이스를 정의하고 struc
 last_reviewed: '2026-05-15'
 ---
 
-# Protocol과 structural typing
+# Type Hints in Python 101 (6/10): Protocol과 structural typing
 
 Python은 오래전부터 덕 타이핑을 써 왔습니다. `close()`가 있으면 닫을 수 있는 객체로 취급하고, `render()`가 있으면 렌더링 가능한 객체로 취급합니다. 그런데 전통적인 추상 베이스 클래스는 여전히 명시적 상속을 요구합니다.
 
 이 글은 Type Hints (Python) 101 시리즈의 6번째 글입니다. 여기서는 `Protocol`로 "이 메서드가 있으면 충분하다"는 계약을 어떻게 적는지, 그리고 그것이 structural typing과 어떻게 연결되는지 살펴봅니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 상속 없이 인터페이스 계약을 적을 수 있을까요?
 - ABC와 Protocol은 무엇이 다를까요?
 - 속성만으로도 Protocol을 만족시킬 수 있을까요?
-- 런타임 `isinstance()` 검사가 필요하면 어떻게 해야 할까요?
 
-> Protocol은 Python의 덕 타이핑 철학을 정적 타입 시스템 안으로 가져오는 장치입니다.
+## 큰 그림
+
+![Type Hints in Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Type Hints in Python 101 6장 흐름 개요*
+
+이 그림에서는 Protocol과 structural typing를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Protocol과 structural typing의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -54,10 +61,6 @@ class Closeable(Protocol):     class FileHandler:
                  (상속 필요 없음)
 ```
 
-![Protocol과 ABC가 계약을 해석하는 방식](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Protocol과 ABC가 계약을 해석하는 방식*
-
 ## 핵심 용어
 
 | 용어 | 설명 |
@@ -73,16 +76,13 @@ class Closeable(Protocol):     class FileHandler:
 ```python
 from abc import ABC, abstractmethod
 
-
 class Closeable(ABC):
     @abstractmethod
     def close(self) -> None: ...
 
-
 class FileHandler(Closeable):  # 상속 필요
     def close(self) -> None:
         print("closed")
-
 
 def cleanup(resource: Closeable) -> None:
     resource.close()
@@ -91,19 +91,15 @@ def cleanup(resource: Closeable) -> None:
 ```python
 from typing import Protocol
 
-
 class Closeable(Protocol):
     def close(self) -> None: ...
-
 
 class FileHandler:  # 상속 불필요
     def close(self) -> None:
         print("closed")
 
-
 def cleanup(resource: Closeable) -> None:
     resource.close()
-
 
 cleanup(FileHandler())  # OK
 ```
@@ -115,24 +111,19 @@ cleanup(FileHandler())  # OK
 ```python
 from typing import Protocol
 
-
 class Renderable(Protocol):
     def render(self) -> str: ...
-
 
 class HtmlWidget:
     def render(self) -> str:
         return "<div>Hello</div>"
 
-
 class JsonResponse:
     def render(self) -> str:
         return '{"message": "hello"}'
 
-
 def display(item: Renderable) -> None:
     print(item.render())
-
 
 display(HtmlWidget())     # OK
 display(JsonResponse())   # OK
@@ -145,25 +136,20 @@ display(JsonResponse())   # OK
 ```python
 from typing import Protocol
 
-
 class Named(Protocol):
     name: str
-
 
 class User:
     def __init__(self, name: str) -> None:
         self.name = name
-
 
 class Product:
     def __init__(self, name: str, price: int) -> None:
         self.name = name
         self.price = price
 
-
 def greet(entity: Named) -> str:
     return f"Hello, {entity.name}!"
-
 
 greet(User("Alice"))             # OK
 greet(Product("Book", 25))       # OK
@@ -176,11 +162,9 @@ greet(Product("Book", 25))       # OK
 ```python
 from typing import Protocol, runtime_checkable
 
-
 @runtime_checkable
 class Sizeable(Protocol):
     def __len__(self) -> int: ...
-
 
 print(isinstance([1, 2, 3], Sizeable))   # True
 print(isinstance("hello", Sizeable))     # True
@@ -194,18 +178,14 @@ print(isinstance(42, Sizeable))          # False
 ```python
 from typing import Protocol
 
-
 class Readable(Protocol):
     def read(self) -> str: ...
-
 
 class Writable(Protocol):
     def write(self, data: str) -> None: ...
 
-
 class ReadWritable(Readable, Writable, Protocol):
     ...
-
 
 class FileHandler:
     def read(self) -> str:
@@ -214,11 +194,9 @@ class FileHandler:
     def write(self, data: str) -> None:
         print(f"Writing: {data}")
 
-
 def process(stream: ReadWritable) -> None:
     content = stream.read()
     stream.write(content.upper())
-
 
 process(FileHandler())  # OK
 ```
@@ -229,7 +207,6 @@ process(FileHandler())  # OK
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-
 # 모든 구현 클래스를 직접 관리하고, 공통 구현도 주고 싶을 때
 class BasePlugin(ABC):
     @abstractmethod
@@ -237,7 +214,6 @@ class BasePlugin(ABC):
 
     def log(self) -> None:
         print(f"Running {self.__class__.__name__}")
-
 
 # 외부 클래스도 구조만 맞으면 받으려 할 때
 class Executable(Protocol):
@@ -255,11 +231,9 @@ class Executable(Protocol):
 ```python
 from typing import Protocol
 
-
 class StorageBackend(Protocol):
     def save(self, path: str, data: bytes) -> None: ...
     def open(self, path: str) -> bytes: ...
-
 
 def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
     storage.save(path, data)
@@ -327,17 +301,29 @@ def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
 
 다음 글에서는 타입 관계를 입력과 출력 사이에 그대로 보존하는 Generic을 다루겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **상속 없이 인터페이스 계약을 적을 수 있을까요?**
+  - 본문의 기준은 Protocol과 structural typing를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **ABC와 Protocol은 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **속성만으로도 Protocol을 만족시킬 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Python type hint란 무엇인가?](./01-what-is-type-hint.md)
-- [기본 타입과 collection 타입](./02-basic-and-collection-types.md)
-- [Optional과 Union](./03-optional-and-union.md)
-- [함수 타입 힌트](./04-function-type-hints.md)
-- [TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
+## 시리즈 목차
+
+- [Type Hints in Python 101 (1/10): Python type hint란 무엇인가?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): 기본 타입과 collection 타입](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional과 Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): 함수 타입 힌트](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict와 dataclass](./05-typeddict-and-dataclass.md)
 - **Protocol과 structural typing (현재 글)**
-- [Generic 이해하기](./07-generic.md)
-- [mypy와 pyright 사용하기](./08-mypy-and-pyright.md)
-- [Pydantic과 타입 힌트](./09-pydantic-and-type-hints.md)
-- [타입 힌트를 잘 쓰는 기준](./10-type-hints-best-practices.md)
+- Generic 이해하기 (예정)
+- mypy와 pyright 사용하기 (예정)
+- Pydantic과 타입 힌트 (예정)
+- 타입 힌트를 잘 쓰는 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

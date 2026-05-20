@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Protocol and Structural Typing</title>
+<title>Type Hints in Python 101 (6/10): Protocol and Structural Typing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Protocol and Structural Typing</h1>
+<h1>Type Hints in Python 101 (6/10): Protocol and Structural Typing</h1>
 <p>Python has always leaned on duck typing. If an object has <code>close()</code>, we close it. If it has <code>render()</code>, we render it. The friction starts when you want that flexibility to survive code review and CI, not just runtime.</p>
 <p>This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how <code>Protocol</code> captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Protocol and Structural Typing?</li>
+<li>Which signal should the example or diagram make visible for Protocol and Structural Typing?</li>
+<li>What failure should be prevented first when Protocol and Structural Typing reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Type Hints in Python 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Type Hints in Python 101 chapter 6 flow overview</em></p>
+<p>This picture places Protocol and Structural Typing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Protocol and Structural Typing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Protocol definition and structural typing principles</li>
@@ -81,8 +94,6 @@
         └──── structural match ──────────────┘
               (no inheritance needed)
 </code></pre>
-<p><img alt="How Protocol and ABC evaluate compatibility" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>How Protocol and ABC evaluate compatibility</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Protocol</strong><br>
 - Description: A class that defines required methods/attributes without requiring inheritance</p>
@@ -299,17 +310,27 @@ def publish_report(storage: StorageBackend, path: str, data: bytes) -&gt; bytes:
 <h2>Summary and Next Steps</h2>
 <p>Protocol enables structural typing in Python's static type system. Classes satisfy a Protocol by having the right methods — no inheritance required. This aligns with Python's duck typing philosophy while providing full static type checking. Use Protocol for flexible interfaces and ABC when shared implementation is needed.</p>
 <p>In the next article, we will explore Generics — parameterizing types with type variables for reusable, type-safe code.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">What Are Python Type Hints?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Basic Types and Collection Types</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Optional and Union</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Function Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">TypedDict and dataclass</a></li>
+<li><strong>What boundary should you inspect first when applying Protocol and Structural Typing?</strong></li>
+<li>The article treats Protocol and Structural Typing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Protocol and Structural Typing?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Protocol and Structural Typing reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/01-what-is-type-hint.md">Type Hints in Python 101 (1/10): What Are Python Type Hints?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/02-basic-and-collection-types.md">Type Hints in Python 101 (2/10): Basic Types and Collection Types</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/03-optional-and-union.md">Type Hints in Python 101 (3/10): Optional and Union</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/04-function-type-hints.md">Type Hints in Python 101 (4/10): Function Type Hints</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/05-typeddict-and-dataclass.md">Type Hints in Python 101 (5/10): TypedDict and dataclass</a></li>
 <li><strong>Protocol and Structural Typing (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/07-generic.md">Understanding Generics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/08-mypy-and-pyright.md">Using mypy and pyright</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/09-pydantic-and-type-hints.md">Pydantic and Type Hints</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/type-hints-python-101/en/10-type-hints-best-practices.md">Type Hint Best Practices</a></li>
+<li>Understanding Generics (upcoming)</li>
+<li>Using mypy and pyright (upcoming)</li>
+<li>Pydantic and Type Hints (upcoming)</li>
+<li>Type Hint Best Practices (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 6
-title: Protocol and Structural Typing
+title: "Type Hints in Python 101 (6/10): Protocol and Structural Typing"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: Define interfaces without inheritance using Protocol and struct
 last_reviewed: '2026-05-15'
 ---
 
-# Protocol and Structural Typing
+# Type Hints in Python 101 (6/10): Protocol and Structural Typing
 
 Python has always leaned on duck typing. If an object has `close()`, we close it. If it has `render()`, we render it. The friction starts when you want that flexibility to survive code review and CI, not just runtime.
 
 This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how `Protocol` captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Protocol and Structural Typing?
+- Which signal should the example or diagram make visible for Protocol and Structural Typing?
+- What failure should be prevented first when Protocol and Structural Typing reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
+
+*Type Hints in Python 101 chapter 6 flow overview*
+
+This picture places Protocol and Structural Typing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Protocol and Structural Typing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -56,10 +72,6 @@ class Closeable(Protocol):     class FileHandler:
               (no inheritance needed)
 ```
 
-![How Protocol and ABC evaluate compatibility](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
-
-*How Protocol and ABC evaluate compatibility*
-
 ## Key Concepts
 
 | Term | Description |
@@ -77,16 +89,13 @@ class Closeable(Protocol):     class FileHandler:
 ```python
 from abc import ABC, abstractmethod
 
-
 class Closeable(ABC):
     @abstractmethod
     def close(self) -> None: ...
 
-
 class FileHandler(Closeable):  # Must inherit
     def close(self) -> None:
         print("closed")
-
 
 def cleanup(resource: Closeable) -> None:
     resource.close()
@@ -97,19 +106,15 @@ def cleanup(resource: Closeable) -> None:
 ```python
 from typing import Protocol
 
-
 class Closeable(Protocol):
     def close(self) -> None: ...
-
 
 class FileHandler:  # No inheritance needed
     def close(self) -> None:
         print("closed")
 
-
 def cleanup(resource: Closeable) -> None:
     resource.close()
-
 
 cleanup(FileHandler())  # OK — structural match
 ```
@@ -121,24 +126,19 @@ cleanup(FileHandler())  # OK — structural match
 ```python
 from typing import Protocol
 
-
 class Renderable(Protocol):
     def render(self) -> str: ...
-
 
 class HtmlWidget:
     def render(self) -> str:
         return "<div>Hello</div>"
 
-
 class JsonResponse:
     def render(self) -> str:
         return '{"message": "hello"}'
 
-
 def display(item: Renderable) -> None:
     print(item.render())
-
 
 display(HtmlWidget())     # OK
 display(JsonResponse())   # OK — both have render() -> str
@@ -151,25 +151,20 @@ Neither `HtmlWidget` nor `JsonResponse` inherits from `Renderable`. They are com
 ```python
 from typing import Protocol
 
-
 class Named(Protocol):
     name: str
-
 
 class User:
     def __init__(self, name: str) -> None:
         self.name = name
-
 
 class Product:
     def __init__(self, name: str, price: int) -> None:
         self.name = name
         self.price = price
 
-
 def greet(entity: Named) -> str:
     return f"Hello, {entity.name}!"
-
 
 greet(User("Alice"))             # OK
 greet(Product("Book", 25))       # OK — has name: str
@@ -180,11 +175,9 @@ greet(Product("Book", 25))       # OK — has name: str
 ```python
 from typing import Protocol, runtime_checkable
 
-
 @runtime_checkable
 class Sizeable(Protocol):
     def __len__(self) -> int: ...
-
 
 print(isinstance([1, 2, 3], Sizeable))   # True
 print(isinstance("hello", Sizeable))     # True
@@ -198,18 +191,14 @@ print(isinstance(42, Sizeable))          # False
 ```python
 from typing import Protocol
 
-
 class Readable(Protocol):
     def read(self) -> str: ...
-
 
 class Writable(Protocol):
     def write(self, data: str) -> None: ...
 
-
 class ReadWritable(Readable, Writable, Protocol):
     ...
-
 
 class FileHandler:
     def read(self) -> str:
@@ -218,11 +207,9 @@ class FileHandler:
     def write(self, data: str) -> None:
         print(f"Writing: {data}")
 
-
 def process(stream: ReadWritable) -> None:
     content = stream.read()
     stream.write(content.upper())
-
 
 process(FileHandler())  # OK — has both read and write
 ```
@@ -233,7 +220,6 @@ process(FileHandler())  # OK — has both read and write
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-
 # Use ABC when: you own all implementing classes and want to enforce a contract
 class BasePlugin(ABC):
     @abstractmethod
@@ -241,7 +227,6 @@ class BasePlugin(ABC):
 
     def log(self) -> None:  # Shared implementation
         print(f"Running {self.__class__.__name__}")
-
 
 # Use Protocol when: you want structural compatibility with external classes
 class Executable(Protocol):
@@ -259,11 +244,9 @@ For example, if the upload flow only needs `save()` and `open()`, define a `Stor
 ```python
 from typing import Protocol
 
-
 class StorageBackend(Protocol):
     def save(self, path: str, data: bytes) -> None: ...
     def open(self, path: str) -> bytes: ...
-
 
 def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
     storage.save(path, data)
@@ -332,17 +315,29 @@ Protocol enables structural typing in Python's static type system. Classes satis
 
 In the next article, we will explore Generics — parameterizing types with type variables for reusable, type-safe code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Protocol and Structural Typing?**
+  - The article treats Protocol and Structural Typing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Protocol and Structural Typing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Protocol and Structural Typing reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
-- [TypedDict and dataclass](./05-typeddict-and-dataclass.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): Function Type Hints](./04-function-type-hints.md)
+- [Type Hints in Python 101 (5/10): TypedDict and dataclass](./05-typeddict-and-dataclass.md)
 - **Protocol and Structural Typing (current)**
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References

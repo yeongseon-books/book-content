@@ -1,7 +1,7 @@
 ---
 series: type-hints-python-101
 episode: 5
-title: TypedDict and dataclass
+title: "Type Hints in Python 101 (5/10): TypedDict and dataclass"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Use TypedDict for typed dictionaries and dataclass for structur
 last_reviewed: '2026-05-04'
 ---
 
-# TypedDict and dataclass
+# Type Hints in Python 101 (5/10): TypedDict and dataclass
 
 This is post 5 in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (5/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you give a dictionary named, typed keys — or define a lightweight class with automatic `__init__`, `__repr__`, and type annotations?
 
 > Dictionaries are everywhere in Python — API responses, config files, database rows. But `dict[str, Any]` tells the type checker nothing about which keys exist or what their values are. `TypedDict` solves this by defining expected keys and their types. For richer data models, `dataclass` generates boilerplate methods while keeping full type support. This article covers both tools and when to use each.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying TypedDict and dataclass?
+- Which signal should the example or diagram make visible for TypedDict and dataclass?
+- What failure should be prevented first when TypedDict and dataclass reaches a real system?
+
+## Big Picture
+
+![Type Hints in Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.en.png)
+
+*Type Hints in Python 101 chapter 5 flow overview*
+
+This picture places TypedDict and dataclass inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of TypedDict and dataclass is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -83,7 +95,6 @@ TypedDict                        dataclass
 def create_user(name: str, age: int) -> dict[str, object]:
     return {"name": name, "age": age}
 
-
 user = create_user("Alice", 30)
 print(user["nmae"])  # KeyError at runtime — no static check
 ```
@@ -93,15 +104,12 @@ print(user["nmae"])  # KeyError at runtime — no static check
 ```python
 from typing import TypedDict
 
-
 class User(TypedDict):
     name: str
     age: int
 
-
 def create_user(name: str, age: int) -> User:
     return {"name": name, "age": age}
-
 
 user = create_user("Alice", 30)
 # user["nmae"]  # mypy error: TypedDict "User" has no key "nmae"
@@ -114,12 +122,10 @@ user = create_user("Alice", 30)
 ```python
 from typing import TypedDict
 
-
 class UserProfile(TypedDict):
     name: str
     age: int
     email: str
-
 
 # Correct usage
 profile: UserProfile = {"name": "Alice", "age": 30, "email": "alice@example.com"}
@@ -135,16 +141,13 @@ TypedDict is a regular `dict` at runtime. The type annotations only exist for th
 ```python
 from typing import TypedDict
 
-
 class UserProfile(TypedDict):
     name: str
     age: int
 
-
 class ExtendedProfile(UserProfile, total=False):
     bio: str
     website: str
-
 
 # bio and website are optional
 profile: ExtendedProfile = {"name": "Alice", "age": 30}
@@ -161,13 +164,11 @@ profile_full: ExtendedProfile = {
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Product:
     name: str
     price: int
     quantity: int = 0
-
 
 product = Product(name="Python Book", price=35)
 print(product)          # Product(name='Python Book', price=35, quantity=0)
@@ -182,12 +183,10 @@ print(product == Product("Python Book", 35, 0))  # True
 ```python
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
-
 
 point = Point(1.0, 2.0)
 # point.x = 3.0  # FrozenInstanceError — immutable
@@ -200,14 +199,12 @@ Frozen dataclasses are hashable and can be used as dictionary keys or set elemen
 ```python
 from dataclasses import dataclass, field
 
-
 @dataclass
 class Order:
     customer: str
     items: list[str] = field(default_factory=list)
     total: int = 0
     _internal: str = field(default="", repr=False, compare=False)
-
 
 order = Order(customer="Alice")
 order.items.append("Python Book")
@@ -269,17 +266,29 @@ TypedDict adds type safety to dictionaries by defining expected keys and value t
 
 In the next article, we will explore Protocol and structural typing — defining interfaces without inheritance.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying TypedDict and dataclass?**
+  - The article treats TypedDict and dataclass as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for TypedDict and dataclass?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when TypedDict and dataclass reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Python Type Hints?](./01-what-is-type-hint.md)
-- [Basic Types and Collection Types](./02-basic-and-collection-types.md)
-- [Optional and Union](./03-optional-and-union.md)
-- [Function Type Hints](./04-function-type-hints.md)
+## In this series
+
+- [Type Hints in Python 101 (1/10): What Are Python Type Hints?](./01-what-is-type-hint.md)
+- [Type Hints in Python 101 (2/10): Basic Types and Collection Types](./02-basic-and-collection-types.md)
+- [Type Hints in Python 101 (3/10): Optional and Union](./03-optional-and-union.md)
+- [Type Hints in Python 101 (4/10): Function Type Hints](./04-function-type-hints.md)
 - **TypedDict and dataclass (current)**
-- [Protocol and Structural Typing](./06-protocol-and-structural-typing.md)
-- [Understanding Generics](./07-generic.md)
-- [Using mypy and pyright](./08-mypy-and-pyright.md)
-- [Pydantic and Type Hints](./09-pydantic-and-type-hints.md)
-- [Type Hint Best Practices](./10-type-hints-best-practices.md)
+- Protocol and Structural Typing (upcoming)
+- Understanding Generics (upcoming)
+- Using mypy and pyright (upcoming)
+- Pydantic and Type Hints (upcoming)
+- Type Hint Best Practices (upcoming)
+
 <!-- toc:end -->
 
 ## References
