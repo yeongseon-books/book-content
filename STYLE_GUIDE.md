@@ -30,16 +30,90 @@
 
 ```text
 1. Title (H1)
-2. Intro (왜 이 글이 필요한가) — 시리즈 인트로 한 문장 포함
-3. Mental Model (개념 모델 / 그림)
-4. Main Explanation
-5. Practical Example (코드)
-6. Common Mistakes / Checklist
+2. Intro hook (독자가 겪는 문제 상황) — 시리즈 인트로 한 문장 포함
+3. Opening questions (`## 먼저 던지는 질문` / `## Questions to Keep in Mind`)
+4. Big Picture (짧은 다이어그램 + 한 줄 caption + 2-4문장 해설)
+5. Main Explanation (핵심 개념마다 concrete anchor 포함)
+6. Practical Example / Common Mistakes / Checklist
 7. Summary
-8. Series TOC block (`<!-- toc:begin --> ... <!-- toc:end -->`)
-9. References (`## 참고 자료` / `## References`)
-10. Tag line (`Tags: A, B, C, D`) — 마지막 줄
+8. Return to opening questions (`## 처음 질문으로 돌아가기` / `## Answering the Opening Questions`)
+9. Series TOC block (`<!-- toc:begin --> ... <!-- toc:end -->`)
+10. References (`## 참고 자료` / `## References`)
+11. Tag line (`Tags: A, B, C, D`) — 마지막 줄
 ```
+
+### 1.0 Question Loop 구조 (new / major rewrite standard)
+
+신규 글과 대규모 리라이트 글은 **Question Loop** 구조를 우선 적용한다. 기존 글 전체에 즉시 강제하지 않고, 품질 개선 작업에서 점진적으로 맞춘다.
+
+목표는 단순한 학습 목표 나열이 아니다. 글 초반에 독자가 품고 읽을 질문을 만들고, 본문에서 큰 그림·개념·예시로 답을 쌓은 뒤, 본문 마지막에서 질문별 답을 명시적으로 회수한다.
+
+**표준 흐름**
+
+```text
+Hook
+→ Series intro line
+→ 먼저 던지는 질문 / Questions to Keep in Mind
+→ 큰 그림 / Big Picture
+→ 핵심 개념 + concrete anchor
+→ 실무에서 헷갈리는 지점 / checklist
+→ 정리
+→ 처음 질문으로 돌아가기 / Answering the Opening Questions
+→ Series TOC
+→ References
+→ Tags
+```
+
+**질문 규칙**
+
+- 질문은 2-3개를 권장하고, 많아도 4개를 넘기지 않는다.
+- 질문은 독자의 실제 혼란, 판단, 장애 상황에서 나온다. 단순 정의형 질문만 나열하지 않는다.
+- ko 질문은 번역투 의문문을 피하고 자연스러운 실무 상황형으로 쓴다.
+  - 좋음: `로컬에서는 됐는데 배포 후 함수가 깨어나지 않을 때 어디부터 봐야 할까요?`
+  - 피함: `왜 우리는 Trigger를 이해해야 할까요?`
+- en은 `Questions to Keep in Mind`처럼 질문형을 자연스럽게 사용할 수 있다.
+- 마지막 `처음 질문으로 돌아가기` / `Answering the Opening Questions` 섹션에서 질문과 답이 1:1로 대응되어야 한다.
+
+**큰 그림 규칙**
+
+- `## 큰 그림` / `## Big Picture`에는 다이어그램 1개를 우선 둔다.
+- 캡션은 visible italic caption 한 줄로 쓴다.
+- 그림 해설은 2-4문장으로 제한한다.
+- 그림은 구조, 흐름, 경계, 책임 분리 중 하나를 보여준다. 단순 요약 문장 3개를 박스로 만든 그림은 피한다.
+- 긴 설명은 큰 그림 아래가 아니라 다음 개념 섹션에서 한다.
+
+**Concrete anchor 규칙**
+
+핵심 개념은 설명만으로 끝내지 않는다. 각 핵심 개념에는 독자가 손으로 실행하거나, 눈으로 비교하거나, 상황에 대입해 확인할 수 있는 concrete anchor를 하나 이상 둔다.
+
+허용되는 anchor:
+
+- 실행 가능한 코드 예제
+- 구조/흐름/경계를 보여주는 다이어그램
+- 표 또는 decision table
+- before/after 비교
+- 로그/에러 메시지 예시
+- 요청/응답 예시
+- CLI 실행 결과
+- 설정 파일 조각
+- 작은 숫자 예제 또는 계산 표
+
+그림과 코드를 모든 개념에 억지로 넣지 않는다. 개념을 가장 짧고 정확하게 이해시키는 표현 방식을 고른다.
+
+**질문 회수 규칙**
+
+- 본문 마지막의 질문 회수 섹션은 새 개념을 추가하는 곳이 아니다.
+- 처음 질문에 대해 본문에서 이미 만든 판단 기준을 압축해 답한다.
+- 답변은 짧게 쓰되, “그래서 답이 무엇인가”가 한눈에 보여야 한다.
+
+**제목 규칙**
+
+- 시리즈 글은 가능하면 `{Series Short Title} ({N}/{Total}): {Article Title}` 형식을 사용한다.
+  - ko 예: `App Service 101 (1/6): App Service는 무엇일까요?`
+  - en 예: `App Service 101 (1/6): What Is App Service?`
+- H1과 front matter `title`은 일치해야 한다.
+- `seo_title`은 길이 제한 때문에 시리즈 prefix를 생략한 짧은 제목으로 둘 수 있다.
+- 도입부에는 현재 글이 몇 번째인지 밝히되, 다음 글 링크는 넣지 않는다. 다음 글 예고 문장은 본문 끝에 둘 수 있고, 실제 이동 링크는 Series TOC에 맡긴다.
 
 ### 1.1 Series intro line (mandatory)
 
@@ -165,21 +239,23 @@ Program.cs
 - **권장**: 6,000자 전후
 - Deep Dive 챕터: 8,000-15,000자 ([§4](#4-deep-dive-글-추가-규칙) 참조)
 
-### 권장 섹션 구조 (11개)
+### 권장 섹션 구조 — Question Loop
 
-다음 11개 섹션을 순서대로 포함하는 것을 표준으로 한다. 글의 성격에 따라 일부 섹션은 합치거나 생략할 수 있지만, **"이 글에서 배울 것", "왜 중요한가", "자주 하는 실수", "정리", "다음 글"** 다섯은 반드시 포함한다.
+다음 흐름을 표준으로 한다. 글의 성격에 따라 일부 섹션은 합치거나 생략할 수 있지만, 신규 글과 대규모 리라이트 글은 **opening questions, big picture, concrete anchors, question return** 네 가지를 갖춰야 한다.
 
-1. **이 글에서 배울 것** — 글을 읽고 나면 이해하게 될 것을 bullet 3개로
-2. **왜 중요한가** — 정의가 아니라 독자가 겪을 문제 상황에서 시작
-3. **Mental Model** — 머릿속에 남길 비유나 모델 (1-2 문단)
-4. **핵심 개념** — 1-2개의 핵심 개념 설명 + self-contained 코드
-5. **Before / After** 또는 구체적 예시 — 변경 전후 비교로 효과를 가시화
-6. **단계별 실습** — Step 1, 2, 3 형식으로 따라할 수 있는 실습
-7. **자주 하는 실수** — 3-5개의 흔한 함정과 회피법
+1. **Hook** — 정의가 아니라 독자가 겪을 문제 상황에서 시작
+2. **Series intro line** — 현재 글이 시리즈의 몇 번째 글인지 안내. 도입부에 다음 글 링크는 넣지 않음
+3. **먼저 던지는 질문 / Questions to Keep in Mind** — 독자가 답을 찾으며 읽을 질문 2-3개
+4. **큰 그림 / Big Picture** — 다이어그램 1개 + 한 줄 caption + 2-4문장 해설
+5. **핵심 개념** — 각 개념마다 concrete anchor 포함
+6. **실습 또는 구체 예시** — 글의 성격에 맞게 코드, 표, 로그, 요청/응답, CLI 출력, before/after 등을 사용
+7. **자주 하는 실수 / 헷갈리는 지점** — 3-5개의 흔한 함정과 회피법
 8. **실무에서는 이렇게 생각한다** — 트레이드오프, 팀 협업 시 고려사항
 9. **체크리스트** — 독자가 스스로 점검할 수 있는 checkbox 리스트
-10. **연습 문제** — 1-3개의 작은 문제 (선택)
-11. **정리 + 다음 글** — 5줄 요약 + 다음 글로의 bridge
+10. **정리** — 3-5줄 요약
+11. **처음 질문으로 돌아가기 / Answering the Opening Questions** — 처음 질문에 대한 답을 1:1로 회수
+
+다음 글 예고는 본문 끝 bridge 문장으로만 둔다. 실제 다음 글 링크는 `<!-- toc:begin -->` 시리즈 TOC가 담당한다.
 
 ### 코드 요건
 

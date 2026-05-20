@@ -33,16 +33,68 @@
 ```text
 1. H1 제목 (SEO 키워드 포함)
 2. Series intro line (H1 직후 도입 단락 안에 한 문장 — 표준 템플릿 STYLE_GUIDE §1.1)
-3. 이 글에서 다룰 문제
-4. 한 문장 결론 / 멘탈 모델
+3. 먼저 던지는 질문 / Questions to Keep in Mind
+4. 큰 그림 / Big Picture (다이어그램 1개 + caption + 짧은 해설)
 5. 배경 설명 (이 글 하나로 충분한 최소 맥락)
-6. 핵심 그림 (다이어그램)
-7. 본문 설명 (개념 → 예제 → 해석)
-8. 실무에서 헷갈리는 지점 / 체크리스트
-9. 시리즈 TOC block (<!-- toc:begin --> ... <!-- toc:end -->)
-10. 참고 자료 (## 참고 자료 / ## References)
-11. Tags: A, B, C, D (마지막 줄)
+6. 본문 설명 (개념 → concrete anchor → 해석)
+7. 실무에서 헷갈리는 지점 / 체크리스트
+8. 정리
+9. 처음 질문으로 돌아가기 / Answering the Opening Questions
+10. 시리즈 TOC block (<!-- toc:begin --> ... <!-- toc:end -->)
+11. 참고 자료 (## 참고 자료 / ## References)
+12. Tags: A, B, C, D (마지막 줄)
 ```
+
+### Question Loop opening / closing
+
+블로그 글은 검색 또는 공유 링크로 한 편만 들어온 독자가 읽는다. 따라서 초반 질문과 마지막 답이 같은 글 안에서 닫혀야 한다.
+
+**초반 질문**
+
+- ko 섹션명: `## 먼저 던지는 질문`
+- en 섹션명: `## Questions to Keep in Mind`
+- 질문은 2-3개를 권장한다.
+- 질문은 독자의 실제 혼란, 판단, 장애 상황에서 나온다.
+- ko 질문은 번역투 의문문을 피하고 자연스러운 상황형으로 쓴다.
+
+```markdown
+## 먼저 던지는 질문
+
+- 함수 코드는 하나인데, 실제 실행은 어디서 시작될까요?
+- Trigger는 단순한 함수 호출과 무엇이 다를까요?
+- 장애가 났을 때 코드, 설정, 플랫폼 중 어디부터 봐야 할까요?
+```
+
+**마지막 답 회수**
+
+- ko 섹션명: `## 처음 질문으로 돌아가기`
+- en 섹션명: `## Answering the Opening Questions`
+- 처음 질문과 답은 1:1로 대응한다.
+- 새 개념을 추가하지 말고 본문에서 만든 판단 기준을 압축해 답한다.
+
+```markdown
+## 처음 질문으로 돌아가기
+
+- 함수 코드는 하나인데, 실제 실행은 어디서 시작될까요?
+  - 실행은 함수 코드 안에서 시작되지 않습니다. 런타임이 이벤트를 감지하고 Trigger 계약에 따라 함수를 호출합니다.
+```
+
+### Big Picture and concrete anchors
+
+`## 큰 그림` / `## Big Picture` 섹션은 본문에 들어가기 전 지도를 주는 곳이다.
+
+- 다이어그램은 1개를 우선 둔다.
+- visible italic caption은 한 줄로 쓴다.
+- 그림 해설은 2-4문장으로 제한한다.
+- 그림은 구조, 흐름, 경계, 책임 분리 중 하나를 보여준다.
+
+핵심 개념은 설명만으로 끝내지 않는다. 각 개념에는 코드, 다이어그램, 표, before/after, 로그, 요청/응답, CLI 출력, 설정 예시, 작은 숫자 예제 중 글의 성격에 맞는 concrete anchor를 하나 이상 둔다. 그림과 코드를 모든 개념에 억지로 넣지 않는다.
+
+### Series navigation
+
+시리즈 글의 H1/front matter `title`은 가능하면 `{Series Short Title} ({N}/{Total}): {Article Title}` 형식을 사용한다. SEO 길이 제한이 걸리면 `seo_title`에서 시리즈 prefix를 생략할 수 있다.
+
+도입부에는 현재 글이 몇 번째인지 밝히되, 다음 글 링크는 넣지 않는다. 다음 글 예고 문장은 본문 끝에 둘 수 있으며, 실제 이동 링크는 Series TOC block에 맡긴다.
 
 ### Series intro line (mandatory)
 

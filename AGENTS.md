@@ -40,7 +40,7 @@
 
 Every source post (`ko/*.md`, `en/*.md`) MUST have, top to bottom:
 
-1. **H1 title** (`# Title`) — front matter `title`과 일치
+1. **H1 title** (`# Title`) — front matter `title`과 일치. 시리즈 글은 가능하면 `{Series Short Title} ({N}/{Total}): {Article Title}` 형식을 사용한다.
 2. **Series intro line** — H1 직후 도입 단락 안에 한 문장 (`이 글은 {시리즈 표시명} 시리즈의 {첫 번째 / N번째 / 마지막} 글입니다.`)
 3. **Body** (sections, code, images)
 4. **Series TOC block** (`<!-- toc:begin -->` / `<!-- toc:end -->`)
@@ -48,6 +48,18 @@ Every source post (`ko/*.md`, `en/*.md`) MUST have, top to bottom:
 6. **Tag line** as the very last line: `Tags: A, B, C, D`
 
 상세 TOC rules, medium artifact rules, A-grade post structure, series intro 표준 템플릿은 [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) §1 / §1.1 참조.
+
+## Question Loop Body Standard
+
+신규 글과 대규모 리라이트 글은 Question Loop 구조를 우선 적용한다. 기존 글 전체에 즉시 강제하지 않고, 품질 개선 시 점진 적용한다.
+
+1. **Hook** — 독자가 겪는 문제 상황으로 시작한다.
+2. **Series intro** — 현재 글이 시리즈의 몇 번째 글인지 밝힌다. 도입부에 다음 글 링크는 넣지 않는다.
+3. **Opening questions** — ko는 `## 먼저 던지는 질문`, en은 `## Questions to Keep in Mind`를 사용한다. 질문은 2-3개를 권장하고, 마지막 답변과 1:1로 대응시킨다.
+4. **Big picture** — 짧은 다이어그램 1개, visible caption 1줄, 해설 2-4문장으로 구조·흐름·경계 중 하나를 보여준다.
+5. **Concept sections** — 핵심 개념은 설명만으로 끝내지 않는다. 코드, 다이어그램, 표, before/after, 로그, 요청/응답, CLI 출력, 설정 예시 등 글의 성격에 맞는 concrete anchor를 하나 이상 둔다.
+6. **Return to questions** — ko는 `## 처음 질문으로 돌아가기`, en은 `## Answering the Opening Questions`를 본문 마지막에 둔다. 새 개념을 추가하지 말고 본문에서 만든 답을 압축해 회수한다.
+7. **TOC / References / Tags** — 이후 순서는 기존 mandatory order를 따른다.
 
 ## Series TOC Rules
 
