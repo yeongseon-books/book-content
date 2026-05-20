@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cryptography and Hashing</title>
+<title>Information Security 101 (3/10): Cryptography and Hashing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Cryptography and Hashing</h1>
+<h1>Information Security 101 (3/10): Cryptography and Hashing</h1>
 <blockquote>
 <p>Information Security 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: If "encryption equals safety" is not true, what should we use where?</p>
 <blockquote>
 <p>Encryption and hashing do different jobs. A strong algorithm used wrongly is the same as no algorithm — sometimes worse.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 3 in the Information Security 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Cryptography and Hashing?</li>
+<li>Which signal should the example or diagram make visible for Cryptography and Hashing?</li>
+<li>What failure should be prevented first when Cryptography and Hashing reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="information security 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/03/03-01-big-picture.en.png"></p>
+<p><em>information security 101 chapter 3 flow overview</em></p>
+<p>This picture places Cryptography and Hashing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cryptography and Hashing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Symmetric encryption (AES-GCM) and asymmetric encryption (RSA/ECC)</li>
@@ -188,17 +197,27 @@ print(secrets.token_urlsafe(32))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Encryption and hashing do different jobs. Next we look at how these tools combine on the network — TLS and certificates.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What Is Information Security?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><strong>What boundary should you inspect first when applying Cryptography and Hashing?</strong></li>
+<li>The article treats Cryptography and Hashing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Cryptography and Hashing?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Cryptography and Hashing reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">Information Security 101 (1/10): What Is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Information Security 101 (2/10): Authentication and Authorization</a></li>
 <li><strong>Cryptography and Hashing (current)</strong></li>
-<li>TLS and certificates (upcoming)</li>
-<li>web security basics (upcoming)</li>
-<li>SQL injection and XSS (upcoming)</li>
-<li>secret management (upcoming)</li>
-<li>least privilege (upcoming)</li>
-<li>logging and audit (upcoming)</li>
-<li>security incident response (upcoming)</li>
+<li>TLS and Certificates (upcoming)</li>
+<li>Web Security Basics (upcoming)</li>
+<li>SQL Injection and XSS (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

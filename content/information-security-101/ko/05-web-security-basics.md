@@ -1,5 +1,5 @@
 ---
-title: 웹 보안 기초
+title: "Information Security 101 (5/10): 웹 보안 기초"
 series: information-security-101
 episode: 5
 language: ko
@@ -21,23 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: 동일 출처 정책, CORS, CSP, 쿠키 플래그를 웹 보안 관점에서 정리합니다.
 ---
 
-# 웹 보안 기초
+# Information Security 101 (5/10): 웹 보안 기초
 
 웹 보안을 처음 공부할 때는 CORS, CSP, 쿠키, CSRF, XSS가 서로 다른 주제처럼 보입니다. 하지만 브라우저 관점에서 보면 대부분은 같은 질문으로 모입니다. “이 요청과 이 스크립트는 어느 출처에서 왔는가?” 출처 개념이 머릿속에 잡히면 그 뒤의 규칙들이 한 줄로 이어집니다.
 
 이 글은 Information Security 101 시리즈의 5번째 글입니다.
 
-## 이 글에서 다룰 문제
-
-브라우저는 기본적으로 모든 것을 허용하지 않습니다. 오히려 같은 출처를 기본 단위로 삼아 경계를 만들고, 교차 출처 접근은 명시적으로 허용할 때만 열어 줍니다.
-
-> 출처가 브라우저 보안의 경계이며, CORS와 CSP와 쿠키 정책은 그 경계를 다루는 규칙입니다.
+## 먼저 던지는 질문
 
 - 동일 출처 정책은 정확히 무엇을 뜻할까요?
 - CORS는 무엇을 허용하고 무엇을 허용하지 않을까요?
 - CSP는 왜 XSS 피해를 줄이는 데 중요할까요?
-- Secure, HttpOnly, SameSite 쿠키 플래그는 어떻게 같이 움직일까요?
-- CSRF는 왜 세션 기반 서비스에서 반복해서 문제를 만들까요?
+
+## 큰 그림
+
+![Information Security 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.ko.png)
+
+*Information Security 101 5장 흐름 개요*
+
+이 그림에서는 웹 보안 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 웹 보안 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -192,17 +196,29 @@ CSP는 nonce나 hash 기반으로 점진적으로 도입합니다. 인증된 API
 
 웹 보안의 큰 축은 출처와 쿠키입니다. 브라우저가 어디를 경계로 삼는지 이해하면 CORS, CSP, CSRF 방어가 한 흐름으로 정리됩니다. 다음 글에서는 코드 수준에서 가장 유명한 두 취약점인 SQL 인젝션과 XSS를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **동일 출처 정책은 정확히 무엇을 뜻할까요?**
+  - 본문의 기준은 웹 보안 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **CORS는 무엇을 허용하고 무엇을 허용하지 않을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **CSP는 왜 XSS 피해를 줄이는 데 중요할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [정보보안이란 무엇인가?](./01-what-is-information-security.md)
-- [인증과 인가](./02-authentication-and-authorization.md)
-- [암호화와 해시](./03-cryptography-and-hash.md)
-- [TLS와 인증서](./04-tls-and-certificates.md)
+## 시리즈 목차
+
+- [Information Security 101 (1/10): 정보보안이란 무엇인가?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): 인증과 인가](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): 암호화와 해시](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS와 인증서](./04-tls-and-certificates.md)
 - **웹 보안 기초 (현재 글)**
 - SQL 인젝션과 XSS (예정)
 - 비밀 정보 관리 (예정)
 - 권한 최소화 (예정)
 - 로그와 감사 (예정)
 - 보안 사고 대응 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

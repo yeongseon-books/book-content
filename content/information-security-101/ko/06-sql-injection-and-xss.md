@@ -1,5 +1,5 @@
 ---
-title: SQL 인젝션과 XSS
+title: "Information Security 101 (6/10): SQL 인젝션과 XSS"
 series: information-security-101
 episode: 6
 language: ko
@@ -21,23 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: SQL 인젝션과 XSS의 원인, 방어 원칙, 실전 코드를 짧게 정리합니다.
 ---
 
-# SQL 인젝션과 XSS
+# Information Security 101 (6/10): SQL 인젝션과 XSS
 
 보안 입문자가 가장 먼저 듣는 취약점 이름 두 개를 고르라면 아마 SQL 인젝션과 XSS일 것입니다. 오래된 취약점인데도 계속 반복되는 이유는 단순합니다. 새 프레임워크가 나와도 뿌리는 거의 같기 때문입니다. 입력값이 데이터로 남아야 할 자리에 코드처럼 해석되는 순간 문제가 시작됩니다.
 
 이 글은 Information Security 101 시리즈의 6번째 글입니다.
 
-## 이 글에서 다룰 문제
-
-SQL 인젝션과 XSS는 서로 다른 계층에서 발생하지만 핵심 원리는 같습니다. 사용자 입력을 코드처럼 실행되게 두지 않고, 입력은 데이터로, 출력은 문맥에 맞게 처리해야 합니다.
-
-> 입력은 데이터로 다루고, 출력은 렌더링되는 문맥에 맞게 인코딩해야 합니다.
+## 먼저 던지는 질문
 
 - SQL 인젝션은 정확히 어떤 메커니즘으로 발생할까요?
 - ORM을 쓰면 정말 안전해질까요?
 - Reflected, Stored, DOM 기반 XSS는 어디서 갈릴까요?
-- 출력 인코딩은 왜 문맥별로 달라져야 할까요?
-- 입력 검증과 출력 인코딩 중 무엇이 우선일까요?
+
+## 큰 그림
+
+![Information Security 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.ko.png)
+
+*Information Security 101 6장 흐름 개요*
+
+이 그림에서는 SQL 인젝션과 XSS를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> SQL 인젝션과 XSS의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -186,17 +190,29 @@ document.body.appendChild(node);
 
 SQL 인젝션과 XSS는 모두 입력 처리 일관성이 무너질 때 생깁니다. 입력을 코드로 해석시키지 않는 원칙만 분명해도 새로운 프레임워크에서도 같은 방식으로 방어할 수 있습니다. 다음 글에서는 코드 밖의 설정 영역으로 넘어가 비밀 정보 관리를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **SQL 인젝션은 정확히 어떤 메커니즘으로 발생할까요?**
+  - 본문의 기준은 SQL 인젝션과 XSS를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **ORM을 쓰면 정말 안전해질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Reflected, Stored, DOM 기반 XSS는 어디서 갈릴까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [정보보안이란 무엇인가?](./01-what-is-information-security.md)
-- [인증과 인가](./02-authentication-and-authorization.md)
-- [암호화와 해시](./03-cryptography-and-hash.md)
-- [TLS와 인증서](./04-tls-and-certificates.md)
-- [웹 보안 기초](./05-web-security-basics.md)
+## 시리즈 목차
+
+- [Information Security 101 (1/10): 정보보안이란 무엇인가?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): 인증과 인가](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): 암호화와 해시](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS와 인증서](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): 웹 보안 기초](./05-web-security-basics.md)
 - **SQL 인젝션과 XSS (현재 글)**
 - 비밀 정보 관리 (예정)
 - 권한 최소화 (예정)
 - 로그와 감사 (예정)
 - 보안 사고 대응 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

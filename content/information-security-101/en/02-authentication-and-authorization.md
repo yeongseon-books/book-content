@@ -1,7 +1,7 @@
 ---
 series: information-security-101
 episode: 2
-title: Authentication and Authorization
+title: "Information Security 101 (2/10): Authentication and Authorization"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: We cover authentication vs authorization, passwords and MFA, se
 last_reviewed: '2026-05-04'
 ---
 
-# Authentication and Authorization
+# Information Security 101 (2/10): Authentication and Authorization
 
 > Information Security 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Is "who are you" the same question as "what are you allowed to do"?
 
 > Authentication is about identity. Authorization is about permission. Mix them up and half of your security collapses.
 
-<!-- a-grade-intro:end -->
-
 This is post 2 in the Information Security 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Authentication and Authorization?
+- Which signal should the example or diagram make visible for Authentication and Authorization?
+- What failure should be prevented first when Authentication and Authorization reaches a real system?
+
+## Big Picture
+
+![information security 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/02/02-01-big-picture.en.png)
+
+*information security 101 chapter 2 flow overview*
+
+This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -191,17 +203,29 @@ Almost every web/mobile app uses OIDC (the identity standard on top of OAuth) an
 
 Authentication and authorization are the two largest doors in security. Next we cover the foundation of data protection — cryptography and hashing.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Authentication and Authorization?**
+  - The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Authentication and Authorization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Authentication and Authorization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Information Security?](./01-what-is-information-security.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
 - **Authentication and Authorization (current)**
-- cryptography and hashing (upcoming)
-- TLS and certificates (upcoming)
-- web security basics (upcoming)
-- SQL injection and XSS (upcoming)
-- secret management (upcoming)
-- least privilege (upcoming)
-- logging and audit (upcoming)
-- security incident response (upcoming)
+- Cryptography and Hashing (upcoming)
+- TLS and Certificates (upcoming)
+- Web Security Basics (upcoming)
+- SQL Injection and XSS (upcoming)
+- Secret Management (upcoming)
+- Least Privilege (upcoming)
+- Logging and Audit (upcoming)
+- Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

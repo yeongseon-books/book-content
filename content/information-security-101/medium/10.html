@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Incident Response</title>
+<title>Information Security 101 (10/10): Incident Response</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Incident Response</h1>
+<h1>Information Security 101 (10/10): Incident Response</h1>
 <blockquote>
 <p>Information Security 101 series (10/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: When an incident hits, do we know what to do in the first minute?</p>
 <blockquote>
 <p>The quality of response is set in peacetime. Procedures invented during an incident are not procedures.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the final post in the Information Security 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Incident Response?</li>
+<li>Which signal should the example or diagram make visible for Incident Response?</li>
+<li>What failure should be prevented first when Incident Response reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="information security 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/10/10-01-big-picture.en.png"></p>
+<p><em>information security 101 chapter 10 flow overview</em></p>
+<p>This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Incident Response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The NIST IR cycle (Prepare, Detect, Contain, Eradicate, Recover, Lessons)</li>
@@ -189,16 +198,26 @@ Measure: MTTD, MTTR, accuracy of external comms
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Incident response is preparation made visible. This closes the Information Security 101 series — from CIA to incident response, the core arc covered. Next steps to consider: threat modeling, cloud security, and compliance frameworks (SOC2, ISO 27001).</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Web Security Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/06-sql-injection-and-xss.md">SQL Injection and XSS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/07-secret-management.md">Secret Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/08-least-privilege.md">Least Privilege</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/09-logging-and-audit.md">Logging and Audit</a></li>
+<li><strong>What boundary should you inspect first when applying Incident Response?</strong></li>
+<li>The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Incident Response?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Incident Response reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">Information Security 101 (1/10): What Is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Information Security 101 (2/10): Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Information Security 101 (3/10): Cryptography and Hashing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">Information Security 101 (4/10): TLS and Certificates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Information Security 101 (5/10): Web Security Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/06-sql-injection-and-xss.md">Information Security 101 (6/10): SQL Injection and XSS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/07-secret-management.md">Information Security 101 (7/10): Secret Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/08-least-privilege.md">Information Security 101 (8/10): Least Privilege</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/09-logging-and-audit.md">Information Security 101 (9/10): Logging and Audit</a></li>
 <li><strong>Incident Response (current)</strong></li>
 </ul>
 <h2>References</h2>

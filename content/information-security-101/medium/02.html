@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Authentication and Authorization</title>
+<title>Information Security 101 (2/10): Authentication and Authorization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Authentication and Authorization</h1>
+<h1>Information Security 101 (2/10): Authentication and Authorization</h1>
 <blockquote>
 <p>Information Security 101 series (2/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Is "who are you" the same question as "what are you allowed to do"?</p>
 <blockquote>
 <p>Authentication is about identity. Authorization is about permission. Mix them up and half of your security collapses.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 2 in the Information Security 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Authentication and Authorization?</li>
+<li>Which signal should the example or diagram make visible for Authentication and Authorization?</li>
+<li>What failure should be prevented first when Authentication and Authorization reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="information security 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/02/02-01-big-picture.en.png"></p>
+<p><em>information security 101 chapter 2 flow overview</em></p>
+<p>This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and difference between authentication and authorization</li>
@@ -184,17 +193,27 @@ print(can(&quot;user&quot;, &quot;delete&quot;))   # False
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Authentication and authorization are the two largest doors in security. Next we cover the foundation of data protection — cryptography and hashing.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What Is Information Security?</a></li>
+<li><strong>What boundary should you inspect first when applying Authentication and Authorization?</strong></li>
+<li>The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Authentication and Authorization?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Authentication and Authorization reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">Information Security 101 (1/10): What Is Information Security?</a></li>
 <li><strong>Authentication and Authorization (current)</strong></li>
-<li>cryptography and hashing (upcoming)</li>
-<li>TLS and certificates (upcoming)</li>
-<li>web security basics (upcoming)</li>
-<li>SQL injection and XSS (upcoming)</li>
-<li>secret management (upcoming)</li>
-<li>least privilege (upcoming)</li>
-<li>logging and audit (upcoming)</li>
-<li>security incident response (upcoming)</li>
+<li>Cryptography and Hashing (upcoming)</li>
+<li>TLS and Certificates (upcoming)</li>
+<li>Web Security Basics (upcoming)</li>
+<li>SQL Injection and XSS (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

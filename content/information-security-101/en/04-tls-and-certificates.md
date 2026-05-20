@@ -1,7 +1,7 @@
 ---
 series: information-security-101
 episode: 4
-title: TLS and Certificates
+title: "Information Security 101 (4/10): TLS and Certificates"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: A short, code-first walk through the TLS 1.3 handshake, X.509 c
 last_reviewed: '2026-05-04'
 ---
 
-# TLS and Certificates
+# Information Security 101 (4/10): TLS and Certificates
 
 > Information Security 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What does the browser padlock actually guarantee?
 
 > TLS bundles three things — secrecy, integrity, and origin. Drop one and the padlock starts lying.
 
-<!-- a-grade-intro:end -->
-
 This is post 4 in the Information Security 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying TLS and Certificates?
+- Which signal should the example or diagram make visible for TLS and Certificates?
+- What failure should be prevented first when TLS and Certificates reaches a real system?
+
+## Big Picture
+
+![information security 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/04/04-01-big-picture.en.png)
+
+*information security 101 chapter 4 flow overview*
+
+This picture places TLS and Certificates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of TLS and Certificates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -189,10 +201,21 @@ Let's Encrypt plus cert-manager renews 90-day certs automatically in Kubernetes.
 
 TLS bundles secrecy, integrity, and origin. Next we look at security on top of that protected web — web security basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying TLS and Certificates?**
+  - The article treats TLS and Certificates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for TLS and Certificates?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when TLS and Certificates reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Information Security?](./01-what-is-information-security.md)
-- [Authentication and Authorization](./02-authentication-and-authorization.md)
-- [Cryptography and Hashes](./03-cryptography-and-hash.md)
+## In this series
+
+- [Information Security 101 (1/10): What Is Information Security?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): Authentication and Authorization](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): Cryptography and Hashing](./03-cryptography-and-hash.md)
 - **TLS and Certificates (current)**
 - Web Security Basics (upcoming)
 - SQL Injection and XSS (upcoming)
@@ -200,6 +223,7 @@ TLS bundles secrecy, integrity, and origin. Next we look at security on top of t
 - Least Privilege (upcoming)
 - Logging and Audit (upcoming)
 - Incident Response (upcoming)
+
 <!-- toc:end -->
 
 ## References

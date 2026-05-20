@@ -1,5 +1,5 @@
 ---
-title: 로그와 감사
+title: "Information Security 101 (9/10): 로그와 감사"
 series: information-security-101
 episode: 9
 language: ko
@@ -21,23 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: 보안 로그와 감사 추적, SIEM, 보존 정책의 핵심을 짧게 정리합니다.
 ---
 
-# 로그와 감사
+# Information Security 101 (9/10): 로그와 감사
 
 모든 사고를 예방할 수는 없습니다. 그래서 중요한 것은 “무슨 일이 일어났는지 언제 알 수 있는가”입니다. 로그가 없거나 형식이 제각각이면 시스템은 침해를 당하고도 그 사실을 모를 수 있습니다. 운영 로그와 보안 로그, 감사 로그를 구분하고, 무엇을 절대 남기면 안 되는지 정리하는 일은 보안 대응의 출발점입니다.
 
 이 글은 Information Security 101 시리즈의 9번째 글입니다.
 
-## 이 글에서 다룰 문제
-
-로그는 단순한 디버깅 출력이 아닙니다. 특히 보안 관점에서는 누가 언제 무엇을 했는지, 그 기록이 훼손되지 않았는지, 규칙 기반 분석이 가능한 형식인지가 핵심입니다.
-
-> 로그는 시스템의 기억이며, 기억이 없는 시스템은 침해를 당해도 스스로 알지 못합니다.
+## 먼저 던지는 질문
 
 - 운영 로그와 보안 로그는 어떻게 다를까요?
 - 무엇을 기록해야 하고 무엇은 절대 기록하면 안 될까요?
 - 감사 로그는 왜 따로 둔 저장소와 불변성이 필요할까요?
-- SIEM은 어떤 역할을 할까요?
-- 로그 보존 정책은 왜 규정 준수와 연결될까요?
+
+## 큰 그림
+
+![Information Security 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/09/09-01-big-picture.ko.png)
+
+*Information Security 101 9장 흐름 개요*
+
+이 그림에서는 로그와 감사를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 로그와 감사의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -186,17 +190,29 @@ Kubernetes는 audit policy로 API 서버 호출을 기록합니다. AWS는 Cloud
 
 로그는 사고를 눈에 보이게 만드는 장치입니다. 구조화, 불변성, 경보 규칙이 갖춰져야 탐지가 대응으로 이어집니다. 마지막 글에서는 사고를 실제로 목격했을 때 무엇을 해야 하는지, 보안 사고 대응을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **운영 로그와 보안 로그는 어떻게 다를까요?**
+  - 본문의 기준은 로그와 감사를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **무엇을 기록해야 하고 무엇은 절대 기록하면 안 될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **감사 로그는 왜 따로 둔 저장소와 불변성이 필요할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [정보보안이란 무엇인가?](./01-what-is-information-security.md)
-- [인증과 인가](./02-authentication-and-authorization.md)
-- [암호화와 해시](./03-cryptography-and-hash.md)
-- [TLS와 인증서](./04-tls-and-certificates.md)
-- [웹 보안 기초](./05-web-security-basics.md)
-- [SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
-- [비밀 정보 관리](./07-secret-management.md)
-- [권한 최소화](./08-least-privilege.md)
+## 시리즈 목차
+
+- [Information Security 101 (1/10): 정보보안이란 무엇인가?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): 인증과 인가](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): 암호화와 해시](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS와 인증서](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): 웹 보안 기초](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): 비밀 정보 관리](./07-secret-management.md)
+- [Information Security 101 (8/10): 권한 최소화](./08-least-privilege.md)
 - **로그와 감사 (현재 글)**
 - 보안 사고 대응 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

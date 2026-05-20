@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Web Security Basics</title>
+<title>Information Security 101 (5/10): Web Security Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Web Security Basics</h1>
+<h1>Information Security 101 (5/10): Web Security Basics</h1>
 <blockquote>
 <p>Information Security 101 series (5/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: How does the browser protect us from other origins?</p>
 <blockquote>
 <p>Browser security revolves around the concept of origin. Once origin clicks, CORS, CSP, and cookies all line up.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 5 in the Information Security 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Web Security Basics?</li>
+<li>Which signal should the example or diagram make visible for Web Security Basics?</li>
+<li>What failure should be prevented first when Web Security Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="information security 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.en.png"></p>
+<p><em>information security 101 chapter 5 flow overview</em></p>
+<p>This picture places Web Security Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Web Security Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The exact definition of same-origin policy</li>
@@ -189,11 +198,21 @@ def render(name):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The big arc of web security is origin and cookies. Next we look at the two famous code-level vulnerabilities — SQL Injection and XSS.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><strong>What boundary should you inspect first when applying Web Security Basics?</strong></li>
+<li>The article treats Web Security Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Web Security Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Web Security Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">Information Security 101 (1/10): What Is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Information Security 101 (2/10): Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Information Security 101 (3/10): Cryptography and Hashing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">Information Security 101 (4/10): TLS and Certificates</a></li>
 <li><strong>Web Security Basics (current)</strong></li>
 <li>SQL Injection and XSS (upcoming)</li>
 <li>Secret Management (upcoming)</li>

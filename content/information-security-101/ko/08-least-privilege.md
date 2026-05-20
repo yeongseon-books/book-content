@@ -1,5 +1,5 @@
 ---
-title: 권한 최소화
+title: "Information Security 101 (8/10): 권한 최소화"
 series: information-security-101
 episode: 8
 language: ko
@@ -21,23 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: IAM 정책, RBAC, 제로 트러스트로 권한 범위를 줄이는 방법을 정리합니다.
 ---
 
-# 권한 최소화
+# Information Security 101 (8/10): 권한 최소화
 
 보안 사고를 완전히 막을 수는 없습니다. 대신 사고가 났을 때 얼마나 멀리 번지는지는 설계로 줄일 수 있습니다. 그 중심에 있는 원칙이 권한 최소화입니다. 편하다는 이유로 과한 권한을 열어 두면 평소에는 아무 일도 없어 보이지만, 침해가 발생하는 순간 그 편의가 그대로 폭발 반경이 됩니다.
 
 이 글은 Information Security 101 시리즈의 8번째 글입니다.
 
-## 이 글에서 다룰 문제
-
-권한 최소화는 “권한을 적게 주자”는 구호가 아닙니다. 누가 어떤 작업을 위해 얼마 동안 어떤 자원에 접근할 수 있는지 명시적으로 제한하는 설계 원칙입니다.
-
-> 권한은 영구 지급되는 자산이 아니라, 일을 위해 잠깐 빌려 주는 권리입니다.
+## 먼저 던지는 질문
 
 - 권한 최소화 원칙은 정확히 무엇을 뜻할까요?
 - IAM 정책에서 허용과 거부는 어떻게 설계해야 할까요?
 - RBAC, ABAC, ReBAC는 언제 갈릴까요?
-- 제로 트러스트는 실무에서 어떤 운영 습관으로 나타날까요?
-- 사람 권한과 시스템 권한은 왜 분리해야 할까요?
+
+## 큰 그림
+
+![Information Security 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/08/08-01-big-picture.ko.png)
+
+*Information Security 101 8장 흐름 개요*
+
+이 그림에서는 권한 최소화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 권한 최소화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -189,17 +193,29 @@ AWS는 SCP, IAM, 리소스 정책, Permission Boundary를 겹겹이 씁니다. K
 
 권한 최소화는 사고의 비용을 줄이는 가장 현실적인 원칙입니다. 침해를 완전히 막지 못해도 어디까지 번질지는 설계로 줄일 수 있습니다. 다음 글에서는 그 사고를 어떻게 감지할 것인지, 로그와 감사를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **권한 최소화 원칙은 정확히 무엇을 뜻할까요?**
+  - 본문의 기준은 권한 최소화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **IAM 정책에서 허용과 거부는 어떻게 설계해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **RBAC, ABAC, ReBAC는 언제 갈릴까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [정보보안이란 무엇인가?](./01-what-is-information-security.md)
-- [인증과 인가](./02-authentication-and-authorization.md)
-- [암호화와 해시](./03-cryptography-and-hash.md)
-- [TLS와 인증서](./04-tls-and-certificates.md)
-- [웹 보안 기초](./05-web-security-basics.md)
-- [SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
-- [비밀 정보 관리](./07-secret-management.md)
+## 시리즈 목차
+
+- [Information Security 101 (1/10): 정보보안이란 무엇인가?](./01-what-is-information-security.md)
+- [Information Security 101 (2/10): 인증과 인가](./02-authentication-and-authorization.md)
+- [Information Security 101 (3/10): 암호화와 해시](./03-cryptography-and-hash.md)
+- [Information Security 101 (4/10): TLS와 인증서](./04-tls-and-certificates.md)
+- [Information Security 101 (5/10): 웹 보안 기초](./05-web-security-basics.md)
+- [Information Security 101 (6/10): SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
+- [Information Security 101 (7/10): 비밀 정보 관리](./07-secret-management.md)
 - **권한 최소화 (현재 글)**
 - 로그와 감사 (예정)
 - 보안 사고 대응 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Information Security?</title>
+<title>Information Security 101 (1/10): What Is Information Security?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Is Information Security?</h1>
+<h1>Information Security 101 (1/10): What Is Information Security?</h1>
 <blockquote>
 <p>Information Security 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Is security the work of "blocking" or the work of "deciding"?</p>
 <blockquote>
 <p>Security is not the work of reducing threats to zero — it is the work of knowing the threats and deciding how much you can absorb.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the first post in the Information Security 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Information Security??</li>
+<li>Which signal should the example or diagram make visible for What Is Information Security??</li>
+<li>What failure should be prevented first when What Is Information Security? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="information security 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.en.png"></p>
+<p><em>information security 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Information Security? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Information Security? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of information security and the CIA triad (confidentiality, integrity, availability)</li>
@@ -184,17 +193,27 @@ print(risk_score(3, 5))   # 15
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The starting point of information security is not control technology — it is the question "what are we protecting and why." Next we cover the most common control: authentication and authorization.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Information Security??</strong></li>
+<li>The article treats What Is Information Security? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Information Security??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Information Security? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Information Security? (current)</strong></li>
-<li>authentication and authorization (upcoming)</li>
-<li>cryptography and hashing (upcoming)</li>
-<li>TLS and certificates (upcoming)</li>
-<li>web security basics (upcoming)</li>
-<li>SQL injection and XSS (upcoming)</li>
-<li>secret management (upcoming)</li>
-<li>least privilege (upcoming)</li>
-<li>logging and audit (upcoming)</li>
-<li>security incident response (upcoming)</li>
+<li>Authentication and Authorization (upcoming)</li>
+<li>Cryptography and Hashing (upcoming)</li>
+<li>TLS and Certificates (upcoming)</li>
+<li>Web Security Basics (upcoming)</li>
+<li>SQL Injection and XSS (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
