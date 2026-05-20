@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Separation of Concerns</title>
+<title>Software Design 101 (2/10): Separation of Concerns</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Separation of Concerns</h1>
+<h1>Software Design 101 (2/10): Separation of Concerns</h1>
 <p>A request handler that parses input, validates rules, writes to the database, sends notifications, and shapes the HTTP response may still work today. The problem is how expensive tomorrow's small change becomes.</p>
 <p>This is post 2 in the Software Design 101 series.</p>
 <p>In this post, we look at separation of concerns as a way to split code by reasons to change. The goal is not more files. The goal is keeping pricing, persistence, and communication from shaking each other every time one of them moves.</p>
 <blockquote>
 <p>When one module changes for more than one reason, it already does too much.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Separation of Concerns?</li>
+<li>Which signal should the example or diagram make visible for Separation of Concerns?</li>
+<li>What failure should be prevented first when Separation of Concerns reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 2 flow overview</em></p>
+<p>This picture places Separation of Concerns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Separation of Concerns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Separation is not a cost; it is a gift of options.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>How separating UI, domain, and infrastructure concerns gives each concern its own pace of change</em></p>
 <p>Three concerns separated, three independent timelines.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -199,8 +210,18 @@ to_response()        -&gt; output
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Separation of concerns is the starting point of all design. Next: the unit of separation — modules and boundaries.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><strong>What boundary should you inspect first when applying Separation of Concerns?</strong></li>
+<li>The article treats Separation of Concerns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Separation of Concerns?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Separation of Concerns reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
 <li><strong>Separation of Concerns (current)</strong></li>
 <li>Modules and Boundaries (upcoming)</li>
 <li>Dependency Direction (upcoming)</li>

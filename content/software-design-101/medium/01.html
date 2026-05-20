@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Software Design?</title>
+<title>Software Design 101 (1/10): What Is Software Design?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>What Is Software Design?</h1>
+<h1>Software Design 101 (1/10): What Is Software Design?</h1>
 <p>Changing one line is easy. Changing a feature without dragging half the code base with it is where software design starts to matter.</p>
 <p>This is the first post in the Software Design 101 series.</p>
 <p>In this post, we treat software design not as code prettiness but as a bundle of decisions that determines the cost of the next change. The working question is simple: what signals tell you that a structure will stay changeable six months from now?</p>
 <blockquote>
 <p>Good code makes one line easier to read; good design makes the whole code base easier to change.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Software Design??</li>
+<li>Which signal should the example or diagram make visible for What Is Software Design??</li>
+<li>What failure should be prevented first when What Is Software Design? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Software Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Software Design? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Design debt always charges interest.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>How requirements become design decisions and eventually turn into change cost</em></p>
 <p>Design determines change cost.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -182,6 +193,16 @@ Test scope: domain only / domain+DB / full regression
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Design decides the cost of the next change. Next we start with the most fundamental tool: separation of concerns.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Software Design??</strong></li>
+<li>The article treats What Is Software Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Software Design??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Software Design? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Software Design? (current)</strong></li>
 <li>Separation of Concerns (upcoming)</li>

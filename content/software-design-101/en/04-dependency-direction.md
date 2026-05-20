@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 4
-title: Dependency Direction
+title: "Software Design 101 (4/10): Dependency Direction"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How to control the direction of dependencies to lower change co
 last_reviewed: '2026-05-15'
 ---
 
-# Dependency Direction
+# Software Design 101 (4/10): Dependency Direction
 
 The expensive part of a dependency is not the line of code that imports something. It is the direction of the arrow and who now has to absorb future change.
 
@@ -30,6 +30,22 @@ This is post 4 in the Software Design 101 series.
 In this post, we look at dependency direction as the mechanism that keeps a stable core from depending on volatile details. DIP and ports-and-adapters matter because they buy freedom where vendors, databases, and SDKs churn fastest.
 
 > Stable code should define what it needs; volatile code should adapt to it.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dependency Direction?
+- Which signal should the example or diagram make visible for Dependency Direction?
+- What failure should be prevented first when Dependency Direction reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 4 flow overview*
+
+This picture places Dependency Direction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dependency Direction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Code is a graph. Where the arrows point determines whether a change in one place
 > Stable things must not depend on volatile things.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
-*Dependency direction stays healthy when the stable core defines the port and volatile adapters implement it*
 
 Details point toward the core.
 
@@ -217,17 +230,29 @@ DIP shines around payments, notifications, and third-party SaaS integrations. Ve
 
 Once direction is right, the cost of change drops. Next up we look at the tools that hold that direction in place — interfaces and abstraction.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dependency Direction?**
+  - The article treats Dependency Direction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dependency Direction?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dependency Direction reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
 - **Dependency Direction (current)**
 - Interfaces and Abstraction (upcoming)
 - Layered Architecture (upcoming)
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -241,6 +266,5 @@ Once direction is right, the cost of change drops. Next up we look at the tools 
 
 - [typing — Support for type hints](https://docs.python.org/3/library/typing.html)
 - [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
-
 
 Tags: Computer Science, SoftwareDesign, Dependencies, DIP, Inversion, Architecture

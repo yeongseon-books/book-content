@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 7
-title: Data Flow Design
+title: "Software Design 101 (7/10): Data Flow Design"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How to make the direction of data flow explicit, build small tr
 last_reviewed: '2026-05-15'
 ---
 
-# Data Flow Design
+# Software Design 101 (7/10): Data Flow Design
 
 Data flow becomes painful when values change silently in the middle of the request and no one can explain where the mutation happened. That is a design problem long before it becomes a debugging problem.
 
@@ -30,6 +30,22 @@ This is post 7 in the Software Design 101 series.
 In this post, we design the path from input to output so each transformation step stays visible. The goal is to make data move one way, keep side effects at the edge, and make debugging a step-by-step question instead of a scavenger hunt.
 
 > Data gets easier to trust when you can point to where it came from, how it changed, and where it is going next.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Flow Design?
+- Which signal should the example or diagram make visible for Data Flow Design?
+- What failure should be prevented first when Data Flow Design reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 7 flow overview*
+
+This picture places Data Flow Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Flow Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Most bugs appear when data changes in unexpected places. A single direction make
 > Good code keeps a short distance between input and output.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
-*A one-way data pipeline makes each transformation step visible from input to output*
 
 Each step is small and just hands off to the next.
 
@@ -214,17 +227,29 @@ ETL jobs, request processing pipelines, unidirectional UI flows like React — d
 
 Once the flow is visible, change is no longer scary. Next up we look at the design that limits how far that change can spread — reducing change impact.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Flow Design?**
+  - The article treats Data Flow Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Flow Design?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Flow Design reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
-- [Layered Architecture](./06-layered-architecture.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): Layered Architecture](./06-layered-architecture.md)
 - **Data Flow Design (current)**
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -238,6 +263,5 @@ Once the flow is visible, change is no longer scary. Next up we look at the desi
 
 - [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
 - [typing.NamedTuple](https://docs.python.org/3/library/typing.html#typing.NamedTuple)
-
 
 Tags: Computer Science, SoftwareDesign, DataFlow, Pipelines, Immutability, FunctionalDesign

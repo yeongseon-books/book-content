@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 6
-title: 계층 아키텍처
+title: "Software Design 101 (6/10): 계층 아키텍처"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 계층 아키텍처의 구성, 허용된 의존 방향, 부패 
 last_reviewed: '2026-05-15'
 ---
 
-# 계층 아키텍처
+# Software Design 101 (6/10): 계층 아키텍처
 
 라우터에서 요청을 받고, 그 안에서 바로 검증하고, 비즈니스 규칙을 처리하고, 데이터베이스까지 두드리는 코드는 처음에는 빠르게 완성됩니다. 하지만 채널이 하나 더 늘거나 저장 방식이 바뀌는 순간 책임이 한곳에 엉켜 있었다는 사실이 바로 드러납니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 계층 아키텍처를 왜 쓰는지, presentation·application·domain·infrastructure를 어떤 기준으로 나누는지, 허용되는 의존성 방향은 무엇인지, 외부 모델이 도메인으로 그대로 새지 않게 막는 부패 방지 계층은 어디에 필요한지 살펴봅니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 계층을 왜 나누고, 무엇을 기준으로 나눌까요?
 - 각 계층은 어떤 책임을 가져야 할까요?
 - 의존성은 어떤 방향으로만 흘러야 할까요?
-- 작은 시스템에도 계층이 왜 도움이 될까요?
-- 부패 방지 계층은 어느 지점에서 특히 필요할까요?
 
-> 같은 이유로 바뀌는 코드는 같은 계층에 두고, 다른 속도로 바뀌는 코드는 같은 상자에 두지 않는 편이 좋습니다.
+## 큰 그림
+
+![Software Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Software Design 101 6장 흐름 개요*
+
+이 그림에서는 계층 아키텍처를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 계층 아키텍처의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ UI, 비즈니스 규칙, 인프라는 바뀌는 이유도 속도도 다릅니다
 이 셋을 한 계층에 섞으면 외부 변화가 내부 규칙까지 밀고 들어옵니다. 계층 아키텍처는 이 변동성 차이를 구조로 분리하는 방식입니다. 책임이 잘 나뉘면 웹 프레임워크를 바꾸더라도 도메인 규칙은 그대로 남기기 쉬워집니다.
 
 ## 전체 그림
-
-![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
-*표현 계층과 애플리케이션 계층, 도메인, 인프라가 서로 다른 속도로 바뀌도록 나뉜 구조*
 
 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다. 바깥 채널과 저장소는 도메인을 향해 붙지만, 도메인은 바깥 세부를 모르는 편이 좋습니다.
 
@@ -209,17 +212,29 @@ infra lines: ORM call, SQL, SDK
 
 다음 글에서는 계층 사이를 오가는 데이터 자체를 어떻게 설계할지, 데이터 흐름 설계를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **계층을 왜 나누고, 무엇을 기준으로 나눌까요?**
+  - 본문의 기준은 계층 아키텍처를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **각 계층은 어떤 책임을 가져야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **의존성은 어떤 방향으로만 흘러야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
-- [관심사 분리](./02-separation-of-concerns.md)
-- [모듈과 경계](./03-modules-and-boundaries.md)
-- [의존성 방향](./04-dependency-direction.md)
-- [인터페이스와 추상화](./05-interfaces-and-abstraction.md)
+## 시리즈 목차
+
+- [Software Design 101 (1/10): 소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): 모듈과 경계](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): 의존성 방향](./04-dependency-direction.md)
+- [Software Design 101 (5/10): 인터페이스와 추상화](./05-interfaces-and-abstraction.md)
 - **계층 아키텍처 (현재 글)**
 - 데이터 흐름 설계 (예정)
 - 변경 영향 줄이기 (예정)
 - 설계 원칙 모음 (예정)
 - 작은 프로젝트로 설계 연습 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -233,6 +248,5 @@ infra lines: ORM call, SQL, SDK
 
 - [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
 - [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
-
 
 Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture

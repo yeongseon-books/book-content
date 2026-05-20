@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 10
-title: Practicing Design with a Small Project
+title: "Software Design 101 (10/10): Practicing Design with a Small Project"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Build a tiny URL shortener and apply every design tool from thi
 last_reviewed: '2026-05-15'
 ---
 
-# Practicing Design with a Small Project
+# Software Design 101 (10/10): Practicing Design with a Small Project
 
 A small project is where design habits either become real or stay theoretical. If you cannot keep the seams clean in a URL shortener, they will not stay clean in a larger system either.
 
@@ -30,6 +30,22 @@ This is the final post in the Software Design 101 series.
 In this post, we pull the whole toolkit together in one small Python service: domain rules, ports, adapters, layering, and one-way data flow. The goal is not framework ceremony. The goal is seeing how these design ideas cooperate when the code is still small enough to hold in your head.
 
 > A small code base is the best place to practice putting the domain in the center and the changing details at the edge.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Practicing Design with a Small Project?
+- Which signal should the example or diagram make visible for Practicing Design with a Small Project?
+- What failure should be prevented first when Practicing Design with a Small Project reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 10 flow overview*
+
+This picture places Practicing Design with a Small Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Practicing Design with a Small Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ The same principles work in small code. The mini-project here is small but it is
 > Good habits get built in small systems.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.en.png)
-*The URL shortener example brings presentation, use case, domain, ports, and adapters together in one flow*
 
 Domain → port → adapter → infrastructure.
 
@@ -240,17 +253,29 @@ The same pattern scales straight into bigger systems — payments, auth, notific
 
 This is the end of the series. Put the domain in the center, surround it with ports, block the outside with adapters, and let data flow in one direction — that one sentence is the whole game. On the next system you build, take that sentence as the starting point.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Practicing Design with a Small Project?**
+  - The article treats Practicing Design with a Small Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Practicing Design with a Small Project?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Practicing Design with a Small Project reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
-- [Layered Architecture](./06-layered-architecture.md)
-- [Data Flow Design](./07-data-flow-design.md)
-- [Reducing Change Impact](./08-reducing-change-impact.md)
-- [Design Principles](./09-design-principles.md)
-- **Small Design Practice (current)**
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): Layered Architecture](./06-layered-architecture.md)
+- [Software Design 101 (7/10): Data Flow Design](./07-data-flow-design.md)
+- [Software Design 101 (8/10): Reducing Change Impact](./08-reducing-change-impact.md)
+- [Software Design 101 (9/10): Design Principles](./09-design-principles.md)
+- **Practicing Design with a Small Project (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -265,6 +290,5 @@ This is the end of the series. Put the domain in the center, surround it with po
 - [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
 - [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
-
 
 Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture

@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 6
-title: Layered Architecture
+title: "Software Design 101 (6/10): Layered Architecture"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: How layered architecture is structured, what dependency directi
 last_reviewed: '2026-05-15'
 ---
 
-# Layered Architecture
+# Software Design 101 (6/10): Layered Architecture
 
 Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.
 
@@ -30,6 +30,22 @@ This is post 6 in the Software Design 101 series.
 In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.
 
 > Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Layered Architecture?
+- Which signal should the example or diagram make visible for Layered Architecture?
+- What failure should be prevented first when Layered Architecture reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 6 flow overview*
+
+This picture places Layered Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Layered Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Layers separate units of change. The UI, the domain, and the infrastructure all 
 > Group together what changes for the same reason.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
-*Layered architecture protects the stable domain by isolating presentation, application flow, and infrastructure details*
 
 The domain is the stable core that nothing points away from.
 
@@ -215,17 +228,29 @@ Most backends are essentially layered already. A common split is router → serv
 
 Layers absorb the shock of change. Next up we look at the data that moves between them — how to design the flow.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Layered Architecture?**
+  - The article treats Layered Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Layered Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Layered Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
 - **Layered Architecture (current)**
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -239,6 +264,5 @@ Layers absorb the shock of change. Next up we look at the data that moves betwee
 
 - [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
 - [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
-
 
 Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture

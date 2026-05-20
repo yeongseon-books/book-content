@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dependency Direction</title>
+<title>Software Design 101 (4/10): Dependency Direction</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Dependency Direction</h1>
+<h1>Software Design 101 (4/10): Dependency Direction</h1>
 <p>The expensive part of a dependency is not the line of code that imports something. It is the direction of the arrow and who now has to absorb future change.</p>
 <p>This is post 4 in the Software Design 101 series.</p>
 <p>In this post, we look at dependency direction as the mechanism that keeps a stable core from depending on volatile details. DIP and ports-and-adapters matter because they buy freedom where vendors, databases, and SDKs churn fastest.</p>
 <blockquote>
 <p>Stable code should define what it needs; volatile code should adapt to it.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Dependency Direction?</li>
+<li>Which signal should the example or diagram make visible for Dependency Direction?</li>
+<li>What failure should be prevented first when Dependency Direction reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 4 flow overview</em></p>
+<p>This picture places Dependency Direction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Dependency Direction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Stable things must not depend on volatile things.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>Dependency direction stays healthy when the stable core defines the port and volatile adapters implement it</em></p>
 <p>Details point toward the core.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -201,17 +212,27 @@ infra  -&gt; domain          # expected direction
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once direction is right, the cost of change drops. Next up we look at the tools that hold that direction in place — interfaces and abstraction.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
+<li><strong>What boundary should you inspect first when applying Dependency Direction?</strong></li>
+<li>The article treats Dependency Direction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Dependency Direction?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Dependency Direction reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Software Design 101 (2/10): Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Software Design 101 (3/10): Modules and Boundaries</a></li>
 <li><strong>Dependency Direction (current)</strong></li>
 <li>Interfaces and Abstraction (upcoming)</li>
 <li>Layered Architecture (upcoming)</li>
 <li>Data Flow Design (upcoming)</li>
 <li>Reducing Change Impact (upcoming)</li>
 <li>Design Principles (upcoming)</li>
-<li>Small Design Practice (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

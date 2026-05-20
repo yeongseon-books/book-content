@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 3
-title: 모듈과 경계
+title: "Software Design 101 (3/10): 모듈과 경계"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 모듈의 정의, 좋은 경계의 조건, 공개 API와 캡슐
 last_reviewed: '2026-05-15'
 ---
 
-# 모듈과 경계
+# Software Design 101 (3/10): 모듈과 경계
 
 모듈을 나눴다고 해도 외부에서 내부 구조를 전부 알아야만 쓸 수 있다면 경계는 사실상 없는 것과 비슷합니다. 좋은 모듈은 기능을 숨기는 것이 아니라, 내부 복잡도를 안으로 가두고 외부에는 작은 약속만 드러냅니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 모듈을 어떻게 정의해야 하는지, 왜 깊은 모듈이 얕은 모듈보다 강한지, 공개 API는 얼마나 작아야 하는지, 변경이 잦은 결정을 내부에 숨긴다는 것이 무슨 뜻인지 정리합니다. 경계가 좋다는 말이 실무에서 무엇을 의미하는지도 함께 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 좋은 모듈 경계는 어떤 조건을 갖춰야 할까요?
 - 깊은 모듈과 얕은 모듈은 무엇이 다를까요?
 - 공개 API는 어디까지 드러내야 할까요?
-- 내부 자료구조를 그대로 노출하면 왜 문제가 될까요?
-- 패키지 구조만 봐도 경계 품질을 짐작할 수 있을까요?
 
-> 좋은 경계는 외부 호출자가 내부를 몰라도 되게 만듭니다.
+## 큰 그림
+
+![Software Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.ko.png)
+
+*Software Design 101 3장 흐름 개요*
+
+이 그림에서는 모듈과 경계를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 모듈과 경계의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 실무에서 진짜 차이는 API의 표면적에서 드러납니다. 함수 열 개를 공개하는 모듈은 호출자에게 그 열 개의 관계를 모두 이해하라고 요구합니다. 반대로 공개 진입점 하나가 내부 복잡도를 흡수하면 호출자는 적게 알고도 많은 일을 할 수 있습니다.
 
 ## 전체 그림
-
-![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.ko.png)
-*작은 공개 표면 뒤에 내부 복잡도를 숨기는 깊은 모듈의 형태*
 
 좋은 모듈은 표면이 작고 내부가 깊습니다. 외부에는 간단한 약속만 보이지만, 내부에서는 의미 있는 일을 많이 처리합니다.
 
@@ -201,9 +204,20 @@ __all__ = [
 
 다음 글에서는 이 경계를 실제로 더 강하게 만드는 도구, 의존성 방향을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **좋은 모듈 경계는 어떤 조건을 갖춰야 할까요?**
+  - 본문의 기준은 모듈과 경계를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **깊은 모듈과 얕은 모듈은 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **공개 API는 어디까지 드러내야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
-- [관심사 분리](./02-separation-of-concerns.md)
+## 시리즈 목차
+
+- [Software Design 101 (1/10): 소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
 - **모듈과 경계 (현재 글)**
 - 의존성 방향 (예정)
 - 인터페이스와 추상화 (예정)
@@ -212,6 +226,7 @@ __all__ = [
 - 변경 영향 줄이기 (예정)
 - 설계 원칙 모음 (예정)
 - 작은 프로젝트로 설계 연습 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -225,6 +240,5 @@ __all__ = [
 
 - [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
 - [Python Reference — import statement](https://docs.python.org/3/reference/simple_stmts.html#import)
-
 
 Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign

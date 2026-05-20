@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Reducing Change Impact</title>
+<title>Software Design 101 (8/10): Reducing Change Impact</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Reducing Change Impact</h1>
+<h1>Software Design 101 (8/10): Reducing Change Impact</h1>
 <p>A change feels scary when one new branch, one schema update, or one pricing tweak can rattle the whole system. Good design does not stop change. It narrows the blast radius.</p>
 <p>This is post 8 in the Software Design 101 series.</p>
 <p>In this post, we connect the open/closed principle with expand-contract and feature flags. The aim is to make live changes observable, reversible, and small enough to ship without turning every deployment into a cliff edge.</p>
 <blockquote>
 <p>The safest evolution path is usually: expand, compare, migrate, and only then clean up.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Reducing Change Impact?</li>
+<li>Which signal should the example or diagram make visible for Reducing Change Impact?</li>
+<li>What failure should be prevented first when Reducing Change Impact reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 8 flow overview</em></p>
+<p>This picture places Reducing Change Impact inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Reducing Change Impact is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Code is good when it is good at being changed.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>Expand-contract keeps live changes safe by adding a new path, comparing it, migrating traffic, and cleaning up</em></p>
 <p>Expand → switch → contract.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -193,17 +204,27 @@ Switch-over rule: zero drift logs and regression suite pass
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Good design makes change unscary. Next up we look at the principles that compress this thinking — a tour of design principles.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Data Flow Design</a></li>
+<li><strong>What boundary should you inspect first when applying Reducing Change Impact?</strong></li>
+<li>The article treats Reducing Change Impact as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Reducing Change Impact?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Reducing Change Impact reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Software Design 101 (2/10): Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Software Design 101 (3/10): Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Software Design 101 (4/10): Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Software Design 101 (5/10): Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Software Design 101 (6/10): Layered Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Software Design 101 (7/10): Data Flow Design</a></li>
 <li><strong>Reducing Change Impact (current)</strong></li>
 <li>Design Principles (upcoming)</li>
-<li>Small Design Practice (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

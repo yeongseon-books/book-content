@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Design Principles</title>
+<title>Software Design 101 (9/10): Design Principles</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Design Principles</h1>
+<h1>Software Design 101 (9/10): Design Principles</h1>
 <p>Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.</p>
 <p>This is post 9 in the Software Design 101 series.</p>
 <p>In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.</p>
 <blockquote>
 <p>Principles earn their keep when they turn vague discomfort into a concrete next move.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Design Principles?</li>
+<li>Which signal should the example or diagram make visible for Design Principles?</li>
+<li>What failure should be prevented first when Design Principles reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 9 flow overview</em></p>
+<p>This picture places Design Principles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Design Principles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Principles make you ask "why?"</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>Design principles are most useful when they translate a code smell into a refactoring direction</em></p>
 <p>Smell → principle → refactor.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -181,17 +192,27 @@ domain imports DB -&gt; DIP
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Principles are guides. In the final episode we apply every tool from this series — to a small project.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Data Flow Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/08-reducing-change-impact.md">Reducing Change Impact</a></li>
+<li><strong>What boundary should you inspect first when applying Design Principles?</strong></li>
+<li>The article treats Design Principles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Design Principles?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Design Principles reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Software Design 101 (2/10): Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Software Design 101 (3/10): Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Software Design 101 (4/10): Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Software Design 101 (5/10): Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Software Design 101 (6/10): Layered Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Software Design 101 (7/10): Data Flow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/08-reducing-change-impact.md">Software Design 101 (8/10): Reducing Change Impact</a></li>
 <li><strong>Design Principles (current)</strong></li>
-<li>Small Design Practice (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

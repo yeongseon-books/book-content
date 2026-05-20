@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Layered Architecture</title>
+<title>Software Design 101 (6/10): Layered Architecture</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Layered Architecture</h1>
+<h1>Software Design 101 (6/10): Layered Architecture</h1>
 <p>Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.</p>
 <p>This is post 6 in the Software Design 101 series.</p>
 <p>In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.</p>
 <blockquote>
 <p>Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Layered Architecture?</li>
+<li>Which signal should the example or diagram make visible for Layered Architecture?</li>
+<li>What failure should be prevented first when Layered Architecture reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 6 flow overview</em></p>
+<p>This picture places Layered Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Layered Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Group together what changes for the same reason.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>Layered architecture protects the stable domain by isolating presentation, application flow, and infrastructure details</em></p>
 <p>The domain is the stable core that nothing points away from.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -199,17 +210,27 @@ infra lines: ORM call, SQL, SDK
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Layers absorb the shock of change. Next up we look at the data that moves between them — how to design the flow.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
+<li><strong>What boundary should you inspect first when applying Layered Architecture?</strong></li>
+<li>The article treats Layered Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Layered Architecture?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Layered Architecture reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Software Design 101 (2/10): Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Software Design 101 (3/10): Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Software Design 101 (4/10): Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Software Design 101 (5/10): Interfaces and Abstraction</a></li>
 <li><strong>Layered Architecture (current)</strong></li>
 <li>Data Flow Design (upcoming)</li>
 <li>Reducing Change Impact (upcoming)</li>
 <li>Design Principles (upcoming)</li>
-<li>Small Design Practice (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

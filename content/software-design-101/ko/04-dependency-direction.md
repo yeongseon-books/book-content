@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 4
-title: 의존성 방향
+title: "Software Design 101 (4/10): 의존성 방향"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 의존성의 방향을 통제해 변경 비용을 낮추는 방
 last_reviewed: '2026-05-15'
 ---
 
-# 의존성 방향
+# Software Design 101 (4/10): 의존성 방향
 
 도메인 규칙을 고치려는데 데이터베이스 드라이버와 외부 SDK까지 함께 따라오면 변경 비용은 빠르게 커집니다. 모듈 사이 연결 자체보다 더 중요한 것은 그 화살표가 어디를 향하느냐입니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 의존성이 결합도와 어떻게 이어지는지, 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분하는지, DIP와 포트·어댑터 패턴이 왜 실무에서 자주 쓰이는지 정리합니다. 설계에서 “방향”이 왜 자유를 사는 문제인지도 함께 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 의존성 방향은 왜 변경 비용을 크게 좌우할까요?
 - 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?
 - 도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?
-- 포트와 어댑터는 DIP를 코드로 어떻게 표현할까요?
-- 의존성 역전을 모든 곳에 적용하면 왜 오히려 과할 수 있을까요?
 
-> 화살표가 향하는 쪽이 변경 비용을 부담합니다. 안정적인 코어는 변동이 큰 세부를 알지 않는 편이 좋습니다.
+## 큰 그림
+
+![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
+
+*Software Design 101 4장 흐름 개요*
+
+이 그림에서는 의존성 방향를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 의존성 방향의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 데이터베이스, HTTP 클라이언트, 외부 SaaS는 자주 바뀌는 편입니다. 반대로 도메인 규칙은 비교적 오래 유지됩니다. 그래서 안정적인 것과 변동이 큰 것을 같은 방향으로 묶어 두면, 덜 바뀌어야 할 코드가 더 자주 흔들립니다.
 
 ## 전체 그림
-
-![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
-*안정적인 도메인 쪽에서 포트를 정의하고 변동이 큰 어댑터가 이를 구현하는 의존성 방향*
 
 핵심 아이디어는 간단합니다. 세부 구현이 코어를 향하게 하고, 코어는 자신이 필요한 모양만 추상으로 선언합니다. 그러면 구현 교체가 코어를 직접 흔들지 않습니다.
 
@@ -211,10 +214,21 @@ infra  -> domain          # 기대하는 방향
 
 다음 글에서는 이 방향을 더 안정적으로 붙잡아 두는 수단, 인터페이스와 추상화를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **의존성 방향은 왜 변경 비용을 크게 좌우할까요?**
+  - 본문의 기준은 의존성 방향를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
-- [관심사 분리](./02-separation-of-concerns.md)
-- [모듈과 경계](./03-modules-and-boundaries.md)
+## 시리즈 목차
+
+- [Software Design 101 (1/10): 소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): 모듈과 경계](./03-modules-and-boundaries.md)
 - **의존성 방향 (현재 글)**
 - 인터페이스와 추상화 (예정)
 - 계층 아키텍처 (예정)
@@ -222,6 +236,7 @@ infra  -> domain          # 기대하는 방향
 - 변경 영향 줄이기 (예정)
 - 설계 원칙 모음 (예정)
 - 작은 프로젝트로 설계 연습 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -235,6 +250,5 @@ infra  -> domain          # 기대하는 방향
 
 - [typing — Support for type hints](https://docs.python.org/3/library/typing.html)
 - [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
-
 
 Tags: Computer Science, SoftwareDesign, Dependencies, DIP, Inversion, Architecture

@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 3
-title: Modules and Boundaries
+title: "Software Design 101 (3/10): Modules and Boundaries"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Define a module, design small public APIs, hide volatile decisi
 last_reviewed: '2026-05-15'
 ---
 
-# Modules and Boundaries
+# Software Design 101 (3/10): Modules and Boundaries
 
 A code base can have many files and still have weak module boundaries. If callers must understand the internals to use a module safely, the boundary is mostly theater.
 
@@ -30,6 +30,22 @@ This is post 3 in the Software Design 101 series.
 In this post, we focus on deep modules, small public surfaces, and information hiding. The practical question is how to keep internal changes inside the module instead of leaking them into every caller.
 
 > A strong boundary lets the caller know less while still getting more useful work done.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Modules and Boundaries?
+- Which signal should the example or diagram make visible for Modules and Boundaries?
+- What failure should be prevented first when Modules and Boundaries reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 3 flow overview*
+
+This picture places Modules and Boundaries inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Modules and Boundaries is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Module boundaries are walls that contain change. Good walls keep changes on one 
 > A good boundary permits ignorance.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
-*A deep module keeps a small public surface while hiding rich internal behavior behind it*
 
 Small surface, deep interior.
 
@@ -207,9 +220,20 @@ Great libraries (e.g., `requests`) have a tiny surface and a deep interior. Easy
 
 Good boundaries contain change. Next we look at another weapon a boundary carries: dependency direction.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Modules and Boundaries?**
+  - The article treats Modules and Boundaries as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Modules and Boundaries?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Modules and Boundaries reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
 - **Modules and Boundaries (current)**
 - Dependency Direction (upcoming)
 - Interfaces and Abstraction (upcoming)
@@ -218,6 +242,7 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
 - Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -231,6 +256,5 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 
 - [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
 - [Python Reference — import statement](https://docs.python.org/3/reference/simple_stmts.html#import)
-
 
 Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign

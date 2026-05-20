@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Flow Design</title>
+<title>Software Design 101 (7/10): Data Flow Design</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Data Flow Design</h1>
+<h1>Software Design 101 (7/10): Data Flow Design</h1>
 <p>Data flow becomes painful when values change silently in the middle of the request and no one can explain where the mutation happened. That is a design problem long before it becomes a debugging problem.</p>
 <p>This is post 7 in the Software Design 101 series.</p>
 <p>In this post, we design the path from input to output so each transformation step stays visible. The goal is to make data move one way, keep side effects at the edge, and make debugging a step-by-step question instead of a scavenger hunt.</p>
 <blockquote>
 <p>Data gets easier to trust when you can point to where it came from, how it changed, and where it is going next.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Flow Design?</li>
+<li>Which signal should the example or diagram make visible for Data Flow Design?</li>
+<li>What failure should be prevented first when Data Flow Design reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software design 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>software design 101 chapter 7 flow overview</em></p>
+<p>This picture places Data Flow Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Flow Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Good code keeps a short distance between input and output.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png"><br>
-<em>A one-way data pipeline makes each transformation step visible from input to output</em></p>
 <p>Each step is small and just hands off to the next.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -198,17 +209,27 @@ class User:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once the flow is visible, change is no longer scary. Next up we look at the design that limits how far that change can spread — reducing change impact.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
+<li><strong>What boundary should you inspect first when applying Data Flow Design?</strong></li>
+<li>The article treats Data Flow Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Flow Design?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Flow Design reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">Software Design 101 (1/10): What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Software Design 101 (2/10): Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Software Design 101 (3/10): Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Software Design 101 (4/10): Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Software Design 101 (5/10): Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Software Design 101 (6/10): Layered Architecture</a></li>
 <li><strong>Data Flow Design (current)</strong></li>
 <li>Reducing Change Impact (upcoming)</li>
 <li>Design Principles (upcoming)</li>
-<li>Small Design Practice (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

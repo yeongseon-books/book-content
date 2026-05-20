@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 8
-title: Reducing Change Impact
+title: "Software Design 101 (8/10): Reducing Change Impact"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Design that keeps a single change from shaking the whole system
 last_reviewed: '2026-05-15'
 ---
 
-# Reducing Change Impact
+# Software Design 101 (8/10): Reducing Change Impact
 
 A change feels scary when one new branch, one schema update, or one pricing tweak can rattle the whole system. Good design does not stop change. It narrows the blast radius.
 
@@ -30,6 +30,22 @@ This is post 8 in the Software Design 101 series.
 In this post, we connect the open/closed principle with expand-contract and feature flags. The aim is to make live changes observable, reversible, and small enough to ship without turning every deployment into a cliff edge.
 
 > The safest evolution path is usually: expand, compare, migrate, and only then clean up.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Reducing Change Impact?
+- Which signal should the example or diagram make visible for Reducing Change Impact?
+- What failure should be prevented first when Reducing Change Impact reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 8 flow overview*
+
+This picture places Reducing Change Impact inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Reducing Change Impact is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Most systems are not built well from the start. They are built to change well. T
 > Code is good when it is good at being changed.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
-*Expand-contract keeps live changes safe by adding a new path, comparing it, migrating traffic, and cleaning up*
 
 Expand → switch → contract.
 
@@ -209,17 +222,29 @@ Schema migrations, API v1→v2 swaps, rewriting pricing or discount logic, repla
 
 Good design makes change unscary. Next up we look at the principles that compress this thinking — a tour of design principles.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Reducing Change Impact?**
+  - The article treats Reducing Change Impact as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Reducing Change Impact?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Reducing Change Impact reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
-- [Layered Architecture](./06-layered-architecture.md)
-- [Data Flow Design](./07-data-flow-design.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): Layered Architecture](./06-layered-architecture.md)
+- [Software Design 101 (7/10): Data Flow Design](./07-data-flow-design.md)
 - **Reducing Change Impact (current)**
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -233,6 +258,5 @@ Good design makes change unscary. Next up we look at the principles that compres
 
 - [logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
 - [enum — Support for enumerations](https://docs.python.org/3/library/enum.html)
-
 
 Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring

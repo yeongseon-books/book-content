@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 10
-title: 작은 프로젝트로 설계 연습
+title: "Software Design 101 (10/10): 작은 프로젝트로 설계 연습"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: URL 단축기 프로젝트로 시리즈의 모든 설계 도구
 last_reviewed: '2026-05-15'
 ---
 
-# 작은 프로젝트로 설계 연습
+# Software Design 101 (10/10): 작은 프로젝트로 설계 연습
 
 시리즈 전체를 읽고 나면 가장 자연스럽게 남는 질문은 이것입니다. “그래서 이걸 실제 코드에 어떻게 한꺼번에 적용하지?” 개념을 따로따로 이해하는 것과 작은 프로젝트 하나를 끝까지 설계하는 것은 확실히 다른 일입니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 아주 작은 URL 단축기 예제를 통해 관심사 분리, 의존성 방향, 계층, 데이터 흐름, 포트와 어댑터를 한곳에 모아 봅니다. 목표는 거대한 프레임워크를 만드는 것이 아니라, 작은 코드에서도 설계 습관이 어떻게 자리 잡는지 감각을 얻는 것입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 작은 프로젝트는 어디서부터 설계를 시작해야 할까요?
 - 왜 도메인부터 쓰는 편이 좋을까요?
 - 저장소와 키 생성 같은 인프라 세부를 어떻게 막아 둘 수 있을까요?
-- 작은 코드에서도 포트와 어댑터가 왜 의미가 있을까요?
-- 시리즈에서 다룬 도구들이 한 흐름 안에서 어떻게 연결될까요?
 
-> 작은 프로젝트라도 도메인을 중심에 두고 바깥 세부를 가장자리로 밀어내면 구조는 훨씬 오래 버팁니다.
+## 큰 그림
+
+![Software Design 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Software Design 101 10장 흐름 개요*
+
+이 그림에서는 작은 프로젝트로 설계 연습를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 작은 프로젝트로 설계 연습의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 URL 단축기는 예제가 작으면서도 설계 요소가 고르게 들어 있습니다. 도메인 규칙, 키 생성 정책, 저장소, HTTP 표현 계층, 데이터 흐름을 모두 볼 수 있기 때문에 시리즈의 도구를 한 번에 연결하기 좋습니다.
 
 ## 전체 그림
-
-![전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
-*URL 단축기 예제에서 표현 계층과 유스케이스, 도메인, 포트, 어댑터가 협력하는 전체 구조*
 
 도메인은 가운데 있고, 포트가 필요한 모양을 정의하며, 어댑터가 그 바깥 구현을 맡습니다. 표현 계층은 이 흐름을 호출만 합니다.
 
@@ -234,17 +237,29 @@ curl -X POST http://localhost:5000/   -H "Content-Type: application/json"   -d '
 
 이 글로 Software Design 101 시리즈를 마칩니다. 다음 시스템을 만들 때는 거대한 설계 문서보다 먼저, 무엇을 중심에 둘지와 무엇을 가장자리로 밀어낼지부터 떠올려 보시면 좋겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **작은 프로젝트는 어디서부터 설계를 시작해야 할까요?**
+  - 본문의 기준은 작은 프로젝트로 설계 연습를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **왜 도메인부터 쓰는 편이 좋을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **저장소와 키 생성 같은 인프라 세부를 어떻게 막아 둘 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
-- [관심사 분리](./02-separation-of-concerns.md)
-- [모듈과 경계](./03-modules-and-boundaries.md)
-- [의존성 방향](./04-dependency-direction.md)
-- [인터페이스와 추상화](./05-interfaces-and-abstraction.md)
-- [계층 아키텍처](./06-layered-architecture.md)
-- [데이터 흐름 설계](./07-data-flow-design.md)
-- [변경 영향 줄이기](./08-reducing-change-impact.md)
-- [설계 원칙 모음](./09-design-principles.md)
+## 시리즈 목차
+
+- [Software Design 101 (1/10): 소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): 관심사 분리](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): 모듈과 경계](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): 의존성 방향](./04-dependency-direction.md)
+- [Software Design 101 (5/10): 인터페이스와 추상화](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): 계층 아키텍처](./06-layered-architecture.md)
+- [Software Design 101 (7/10): 데이터 흐름 설계](./07-data-flow-design.md)
+- [Software Design 101 (8/10): 변경 영향 줄이기](./08-reducing-change-impact.md)
+- [Software Design 101 (9/10): 설계 원칙 모음](./09-design-principles.md)
 - **작은 프로젝트로 설계 연습 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -259,6 +274,5 @@ curl -X POST http://localhost:5000/   -H "Content-Type: application/json"   -d '
 - [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
 - [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
-
 
 Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture

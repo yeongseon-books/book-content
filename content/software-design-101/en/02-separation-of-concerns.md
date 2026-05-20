@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 2
-title: Separation of Concerns
+title: "Software Design 101 (2/10): Separation of Concerns"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Define separation of concerns, distinguish coupling and cohesio
 last_reviewed: '2026-05-15'
 ---
 
-# Separation of Concerns
+# Software Design 101 (2/10): Separation of Concerns
 
 A request handler that parses input, validates rules, writes to the database, sends notifications, and shapes the HTTP response may still work today. The problem is how expensive tomorrow's small change becomes.
 
@@ -30,6 +30,22 @@ This is post 2 in the Software Design 101 series.
 In this post, we look at separation of concerns as a way to split code by reasons to change. The goal is not more files. The goal is keeping pricing, persistence, and communication from shaking each other every time one of them moves.
 
 > When one module changes for more than one reason, it already does too much.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Separation of Concerns?
+- Which signal should the example or diagram make visible for Separation of Concerns?
+- What failure should be prevented first when Separation of Concerns reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 2 flow overview*
+
+This picture places Separation of Concerns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Separation of Concerns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ When concerns blend together you must understand everything to change one thing.
 > Separation is not a cost; it is a gift of options.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
-*How separating UI, domain, and infrastructure concerns gives each concern its own pace of change*
 
 Three concerns separated, three independent timelines.
 
@@ -215,8 +228,19 @@ Strong teams add lints that forbid external imports inside domain packages. Boun
 
 Separation of concerns is the starting point of all design. Next: the unit of separation — modules and boundaries.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Separation of Concerns?**
+  - The article treats Separation of Concerns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Separation of Concerns?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Separation of Concerns reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
 - **Separation of Concerns (current)**
 - Modules and Boundaries (upcoming)
 - Dependency Direction (upcoming)
@@ -226,6 +250,7 @@ Separation of concerns is the starting point of all design. Next: the unit of se
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
 - Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -239,6 +264,5 @@ Separation of concerns is the starting point of all design. Next: the unit of se
 
 - [functools — Higher-order functions and operations on callable objects](https://docs.python.org/3/library/functools.html)
 - [Logging Cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
-
 
 Tags: Computer Science, SoftwareDesign, SeparationOfConcerns, Modularity, Cohesion, Coupling

@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 5
-title: Interfaces and Abstraction
+title: "Software Design 101 (5/10): Interfaces and Abstraction"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: What separates a good interface, how to set the right level of 
 last_reviewed: '2026-05-15'
 ---
 
-# Interfaces and Abstraction
+# Software Design 101 (5/10): Interfaces and Abstraction
 
 Interface design usually breaks long before the implementation does. You can see it the moment the caller needs to know too much about channels, protocols, or internal branching.
 
@@ -30,6 +30,22 @@ This is post 5 in the Software Design 101 series.
 In this post, we treat interfaces as contracts written in the caller's language. The focus is on abstraction level, polymorphism, and the signals that tell you when a contract is leaking implementation detail.
 
 > A good interface speaks in user intent and stays stable while implementations change underneath.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Interfaces and Abstraction?
+- Which signal should the example or diagram make visible for Interfaces and Abstraction?
+- What failure should be prevented first when Interfaces and Abstraction reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 5 flow overview*
+
+This picture places Interfaces and Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Interfaces and Abstraction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ An interface is a promise. When the promise is small and clear, both sides stay 
 > Write interfaces in the user's language, not the implementer's.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
-*A good interface lets callers depend on one contract while multiple implementations sit behind it*
 
 The caller knows one shape; multiple implementations sit behind it.
 
@@ -210,17 +223,29 @@ Payment gateways, repositories, notification channels — all places where a cle
 
 A good interface is a unit of freedom. Next up we look at how interfaces compose into structure — layered architecture.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Interfaces and Abstraction?**
+  - The article treats Interfaces and Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Interfaces and Abstraction?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Interfaces and Abstraction reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
 - **Interfaces and Abstraction (current)**
 - Layered Architecture (upcoming)
 - Data Flow Design (upcoming)
 - Reducing Change Impact (upcoming)
 - Design Principles (upcoming)
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -234,6 +259,5 @@ A good interface is a unit of freedom. Next up we look at how interfaces compose
 
 - [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
-
 
 Tags: Computer Science, SoftwareDesign, Interfaces, Abstraction, LSP, Polymorphism

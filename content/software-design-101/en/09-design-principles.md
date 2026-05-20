@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 9
-title: Design Principles
+title: "Software Design 101 (9/10): Design Principles"
 status: content-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A tour of SOLID, KISS, YAGNI, DRY, and the Law of Demeter, with
 last_reviewed: '2026-05-15'
 ---
 
-# Design Principles
+# Software Design 101 (9/10): Design Principles
 
 Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.
 
@@ -30,6 +30,22 @@ This is post 9 in the Software Design 101 series.
 In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.
 
 > Principles earn their keep when they turn vague discomfort into a concrete next move.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Design Principles?
+- Which signal should the example or diagram make visible for Design Principles?
+- What failure should be prevented first when Design Principles reaches a real system?
+
+## Big Picture
+
+![software design 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
+
+*software design 101 chapter 9 flow overview*
+
+This picture places Design Principles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Design Principles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Principles are diagnostic tools, not commandments. When the code smells, they po
 > Principles make you ask "why?"
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
-*Design principles are most useful when they translate a code smell into a refactoring direction*
 
 Smell → principle → refactor.
 
@@ -192,17 +205,29 @@ Principles become a shared vocabulary in code review. Saying "this looks like an
 
 Principles are guides. In the final episode we apply every tool from this series — to a small project.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Design Principles?**
+  - The article treats Design Principles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Design Principles?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Design Principles reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Design?](./01-what-is-software-design.md)
-- [Separation of Concerns](./02-separation-of-concerns.md)
-- [Modules and Boundaries](./03-modules-and-boundaries.md)
-- [Dependency Direction](./04-dependency-direction.md)
-- [Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
-- [Layered Architecture](./06-layered-architecture.md)
-- [Data Flow Design](./07-data-flow-design.md)
-- [Reducing Change Impact](./08-reducing-change-impact.md)
+## In this series
+
+- [Software Design 101 (1/10): What Is Software Design?](./01-what-is-software-design.md)
+- [Software Design 101 (2/10): Separation of Concerns](./02-separation-of-concerns.md)
+- [Software Design 101 (3/10): Modules and Boundaries](./03-modules-and-boundaries.md)
+- [Software Design 101 (4/10): Dependency Direction](./04-dependency-direction.md)
+- [Software Design 101 (5/10): Interfaces and Abstraction](./05-interfaces-and-abstraction.md)
+- [Software Design 101 (6/10): Layered Architecture](./06-layered-architecture.md)
+- [Software Design 101 (7/10): Data Flow Design](./07-data-flow-design.md)
+- [Software Design 101 (8/10): Reducing Change Impact](./08-reducing-change-impact.md)
 - **Design Principles (current)**
-- Small Design Practice (upcoming)
+- Practicing Design with a Small Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -216,6 +241,5 @@ Principles are guides. In the final episode we apply every tool from this series
 
 - [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
 - [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
-
 
 Tags: Computer Science, SoftwareDesign, SOLID, KISS, YAGNI, Principles
