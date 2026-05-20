@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 7
-title: Volume
+title: "Kubernetes 101 (7/10): Volume"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes Volumes, PVCs, StorageClasses, a
 last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Kubernetes 101 (7/10): Volume
 
 Containers are easy to replace because their local filesystem is disposable. That convenience becomes a liability the moment your workload owns state that cannot disappear on the next reschedule.
 
@@ -30,23 +30,27 @@ Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into o
 
 > Kubernetes can restart a Pod for you. It preserves data only when you attach the right storage contract outside the Pod.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- *emptyDir* vs *PV/PVC*
-- The role of *StorageClass*
-- *Dynamic provisioning*
-- *Access modes*
-- The *backup* angle
+- emptyDir* vs *PV/PVC?
+- The role of *StorageClass?
+- Dynamic provisioning?
+
+## Big Picture
+
+![kubernetes 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 7 flow overview*
+
+This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require* a *Volume*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
-*PVC and StorageClass separate Pod lifetime from data lifetime so state can survive rescheduling and replacement.*
-
 
 ## Key Terms
 
@@ -181,17 +185,29 @@ A *StatefulSet* automatically creates *one PVC per Pod*, and tools like *Velero*
 
 State is solved. The next post covers *matching Pod count to load* with *HPA*.
 
+## Answering the Opening Questions
+
+- **emptyDir* vs *PV/PVC?**
+  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The role of *StorageClass?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Dynamic provisioning?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
 - **Volume (current)**
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

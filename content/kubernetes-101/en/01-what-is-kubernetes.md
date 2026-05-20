@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 1
-title: What is Kubernetes?
+title: "Kubernetes 101 (1/10): What is Kubernetes?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly overview of Kubernetes — container orches
 last_reviewed: '2026-05-15'
 ---
 
-# What is Kubernetes?
+# Kubernetes 101 (1/10): What is Kubernetes?
 
 A few `docker run` commands feel manageable when the system is small. The moment the service grows into dozens of containers across several nodes, that confidence usually breaks first. Someone has to decide placement, recover failures, and keep versions aligned while the system keeps moving.
 
@@ -30,23 +30,27 @@ Here, we will frame Kubernetes as an orchestrator that continuously pushes the c
 
 > Kubernetes is most useful when you stop thinking in terms of “start this container now” and start thinking in terms of “keep the cluster in this desired state over time.”
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The meaning of *orchestration*
-- *Control plane* vs *worker nodes*
-- The *desired state* model
-- Where *kubectl* fits
-- *When* to adopt it
+- The meaning of *orchestration?
+- Control plane* vs *worker nodes?
+- The *desired state* model?
+
+## Big Picture
+
+![kubernetes 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 1 flow overview*
+
+This picture places What is Kubernetes? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is Kubernetes? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 A handful of containers fits on *Compose*. From *dozens* upward, an *orchestrator* is a *survival requirement*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
-*This control-flow view shows how `kubectl` talks to the API server and lets the control plane drive scheduling toward the desired state.*
-
 
 ## Key Terms
 
@@ -180,7 +184,18 @@ kubectl cluster-info
 
 The *big picture* of orchestration is in place. The next post covers the *smallest unit*: the *Pod*.
 
+## Answering the Opening Questions
+
+- **The meaning of *orchestration?**
+  - The article treats What is Kubernetes? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Control plane* vs *worker nodes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *desired state* model?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is Kubernetes? (current)**
 - Pod (upcoming)
 - Deployment (upcoming)
@@ -191,6 +206,7 @@ The *big picture* of orchestration is in place. The next post covers the *smalle
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

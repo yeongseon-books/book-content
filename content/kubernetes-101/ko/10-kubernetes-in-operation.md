@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 10
-title: 운영 관점의 Kubernetes
+title: "Kubernetes 101 (10/10): 운영 관점의 Kubernetes"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 프로브, RBAC, 관측성, GitOps로 보는 Kubernetes 운영 
 last_reviewed: '2026-05-15'
 ---
 
-# 운영 관점의 Kubernetes
+# Kubernetes 101 (10/10): 운영 관점의 Kubernetes
 
 클러스터가 떠 있다는 사실과 운영 가능하다는 사실은 다릅니다. 파드가 실행 중이어도 준비되지 않은 상태로 트래픽을 받을 수 있고, 로그가 쌓여도 누가 볼 수 있는지 정리가 안 돼 있을 수 있으며, 장애가 나도 대응 절차가 없으면 복구는 매번 사람 기억에 의존하게 됩니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 Kubernetes 운영을 기능 목록이 아니라 probes, 접근 권한, 네트워크 경계, 관측성, GitOps, 런북이 함께 맞물려야 성립하는 운영 모델로 정리하겠습니다.
 
-## 이 글에서 다룰 문제
-
-> Kubernetes 운영은 클러스터를 띄우는 일에서 끝나지 않고, 트래픽 수용 조건과 권한 경계, 관측 데이터, 변경 절차, 장애 대응 문서를 함께 갖춰야 비로소 완성됩니다.
+## 먼저 던지는 질문
 
 - liveness, readiness, startup probe는 어떤 역할을 나눌까요?
 - RBAC와 NetworkPolicy는 왜 운영의 기본 경계일까요?
 - 메트릭, 로그, 트레이스는 왜 함께 봐야 할까요?
-- GitOps는 수동 `kubectl` 운영과 무엇이 다를까요?
-- 런북은 왜 문서가 아니라 운영 도구일까요?
+
+## 큰 그림
+
+![Kubernetes 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Kubernetes 101 10장 흐름 개요*
+
+이 그림에서는 운영 관점의 Kubernetes를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 운영 관점의 Kubernetes의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -45,10 +51,6 @@ last_reviewed: '2026-05-15'
 Kubernetes는 많은 자동화를 제공하지만, 운영 감각까지 자동으로 주지는 않습니다. probe를 어떻게 나눌지, 권한을 어디까지 열지, 어떤 지표를 모으고 어떤 절차로 배포를 되돌릴지까지 정해야 비로소 신뢰할 수 있는 서비스가 됩니다.
 
 ## 한눈에 보는 구조
-
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
-*운영 관점에서는 probe, 관측성, 런북, GitOps가 따로가 아니라 하나의 대응 체계로 연결됩니다.*
-
 
 이 그림은 운영이 단일 기능이 아니라 연결된 체계라는 점을 보여 줍니다. probe는 트래픽과 재시작 조건을 만들고, 관측성은 상태를 읽게 하며, 런북과 GitOps는 대응과 변경 절차를 반복 가능하게 만듭니다.
 
@@ -200,17 +202,29 @@ kubectl get networkpolicy -n web
 
 여기까지가 Kubernetes 101 시리즈입니다. 다음 단계에서는 더 깊은 운영성과 플랫폼 선택 문제를 다른 시리즈에서 이어 볼 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **liveness, readiness, startup probe는 어떤 역할을 나눌까요?**
+  - 본문의 기준은 운영 관점의 Kubernetes를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **RBAC와 NetworkPolicy는 왜 운영의 기본 경계일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **메트릭, 로그, 트레이스는 왜 함께 봐야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap과 Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
-- [HPA](./08-hpa.md)
-- [Helm](./09-helm.md)
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
 - **운영 관점의 Kubernetes (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

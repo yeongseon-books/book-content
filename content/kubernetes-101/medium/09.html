@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Helm</title>
+<title>Kubernetes 101 (9/10): Helm</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Helm</h1>
+<h1>Kubernetes 101 (9/10): Helm</h1>
 <p>Kubernetes YAML usually starts tidy and then multiplies across environments. Before long, the real problem is no longer writing manifests but keeping the right differences in the right places without copying entire files forever.</p>
 <p>This is post 9 in the Kubernetes 101 series.</p>
 <p>Here, we will frame Helm as a repeatable deployment unit that separates shared structure from environment-specific values and gives you install, upgrade, and rollback workflows that are easier to reason about.</p>
 <blockquote>
 <p>Helm becomes valuable when the chart expresses the common contract and the values file is the only place where environments diverge.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>the layout of a <em>Chart</em></li>
-<li>how <em>values.yaml</em> works</li>
-<li><em>install / upgrade / rollback</em></li>
-<li><em>repositories</em> and <em>dependencies</em></li>
-<li>the role of <em>helm template</em></li>
+<li>the layout of a *Chart?</li>
+<li>how <em>values.yaml</em> works?</li>
+<li>install / upgrade / rollback?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 9 flow overview</em></p>
+<p>This picture places Helm inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Helm is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Per-environment copies</em> create <em>drift</em>. <em>Helm</em> lets you reuse the <em>same template</em> and only swap <em>values</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>Helm renders shared templates with environment-specific values so you can keep one deployment shape across many environments.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Chart</strong>: the <em>package unit</em> of <em>Helm</em>.</li>
@@ -174,15 +177,25 @@ helm history web
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>With a deploy unit in hand, the final piece is the <em>operations view</em>. Next post is <em>Kubernetes in Operation</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Volume</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/08-hpa.md">HPA</a></li>
+<li><strong>the layout of a *Chart?</strong></li>
+<li>The article treats Helm as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>how <em>values.yaml</em> works?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>install / upgrade / rollback?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Kubernetes 101 (3/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Kubernetes 101 (4/10): Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Kubernetes 101 (5/10): Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">Kubernetes 101 (6/10): ConfigMap and Secret</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Kubernetes 101 (7/10): Volume</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/08-hpa.md">Kubernetes 101 (8/10): HPA</a></li>
 <li><strong>Helm (current)</strong></li>
 <li>Kubernetes in Operation (upcoming)</li>
 </ul>

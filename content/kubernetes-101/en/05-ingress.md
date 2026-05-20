@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 5
-title: Ingress
+title: "Kubernetes 101 (5/10): Ingress"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes Ingress — host and path routin
 last_reviewed: '2026-05-15'
 ---
 
-# Ingress
+# Kubernetes 101 (5/10): Ingress
 
 Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.
 
@@ -30,23 +30,27 @@ Here, we will separate the declarative Ingress rule from the controller that enf
 
 > Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Splitting *Ingress* and *IngressController*
-- *Host / path* routing
-- *TLS termination*
-- Relation to the *external LoadBalancer*
-- *Gateway API* in one line
+- Splitting *Ingress* and *IngressController?
+- Host / path* routing?
+- TLS termination?
+
+## Big Picture
+
+![kubernetes 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 5 flow overview*
+
+This picture places Ingress inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Ingress is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything into a *single entry*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
-*Ingress keeps one external entry point while the controller fans HTTP traffic out to multiple Services by host and path.*
-
 
 ## Key Terms
 
@@ -187,17 +191,29 @@ curl -sk -H 'Host: example.com' https://<ingress-address>/api
 
 With routing in place, the next step is *separating config and secrets*. The next post covers *ConfigMap and Secret*.
 
+## Answering the Opening Questions
+
+- **Splitting *Ingress* and *IngressController?**
+  - The article treats Ingress as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Host / path* routing?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **TLS termination?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
 - **Ingress (current)**
 - ConfigMap and Secret (upcoming)
 - Volume (upcoming)
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

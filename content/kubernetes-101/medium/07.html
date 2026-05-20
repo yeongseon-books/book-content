@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Volume</title>
+<title>Kubernetes 101 (7/10): Volume</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Volume</h1>
+<h1>Kubernetes 101 (7/10): Volume</h1>
 <p>Containers are easy to replace because their local filesystem is disposable. That convenience becomes a liability the moment your workload owns state that cannot disappear on the next reschedule.</p>
 <p>This is post 7 in the Kubernetes 101 series.</p>
 <p>Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into one storage model so you can separate Pod lifetime from data lifetime before stateful workloads become fragile.</p>
 <blockquote>
 <p>Kubernetes can restart a Pod for you. It preserves data only when you attach the right storage contract outside the Pod.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>emptyDir</em> vs <em>PV/PVC</em></li>
-<li>The role of <em>StorageClass</em></li>
-<li><em>Dynamic provisioning</em></li>
-<li><em>Access modes</em></li>
-<li>The <em>backup</em> angle</li>
+<li>emptyDir<em> vs </em>PV/PVC?</li>
+<li>The role of *StorageClass?</li>
+<li>Dynamic provisioning?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 7 flow overview</em></p>
+<p>This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A container's filesystem <em>vanishes</em> with the <em>Pod</em>. Stateful workloads <em>require</em> a <em>Volume</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png"><br>
-<em>PVC and StorageClass separate Pod lifetime from data lifetime so state can survive rescheduling and replacement.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Volume</strong>: storage <em>shared/persisted</em> inside a Pod.</li>
@@ -179,13 +182,23 @@ kubectl get pv
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>State is solved. The next post covers <em>matching Pod count to load</em> with <em>HPA</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
+<li><strong>emptyDir<em> vs </em>PV/PVC?</strong></li>
+<li>The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The role of *StorageClass?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Dynamic provisioning?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Kubernetes 101 (3/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Kubernetes 101 (4/10): Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Kubernetes 101 (5/10): Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">Kubernetes 101 (6/10): ConfigMap and Secret</a></li>
 <li><strong>Volume (current)</strong></li>
 <li>HPA (upcoming)</li>
 <li>Helm (upcoming)</li>

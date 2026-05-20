@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>ConfigMap and Secret</title>
+<title>Kubernetes 101 (6/10): ConfigMap and Secret</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>ConfigMap and Secret</h1>
+<h1>Kubernetes 101 (6/10): ConfigMap and Secret</h1>
 <p>It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.</p>
 <p>This is post 6 in the Kubernetes 101 series.</p>
 <p>Here, we will use ConfigMap and Secret to split environment-specific values from the image and connect that split to injection methods, restart behavior, and external secret managers.</p>
 <blockquote>
 <p>Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Splitting <em>ConfigMap</em> and <em>Secret</em></li>
-<li><em>Env vars</em> vs <em>file mounts</em></li>
-<li>The <em>base64</em> fact and the <em>encryption gap</em></li>
-<li>Integrating an <em>external secret manager</em></li>
-<li><em>Restart on change</em></li>
+<li>Splitting <em>ConfigMap</em> and *Secret?</li>
+<li>Env vars<em> vs </em>file mounts?</li>
+<li>The <em>base64</em> fact and the *encryption gap?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 6 flow overview</em></p>
+<p>This picture places ConfigMap and Secret inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of ConfigMap and Secret is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Pulling <em>environment differences</em> out of the image is what makes things <em>reproducible</em>. <em>Secrets</em> must be tracked <em>separately</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>ConfigMap and Secret can both enter the same Pod, but they intentionally represent different operational and security boundaries.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ConfigMap</strong>: a bundle of <em>non-secret key/value</em>.</li>
@@ -186,12 +189,22 @@ kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Config is solved. The next post covers persisting <em>state data</em> with <em>Volumes</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><strong>Splitting <em>ConfigMap</em> and *Secret?</strong></li>
+<li>The article treats ConfigMap and Secret as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Env vars<em> vs </em>file mounts?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <em>base64</em> fact and the *encryption gap?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Kubernetes 101 (3/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Kubernetes 101 (4/10): Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Kubernetes 101 (5/10): Ingress</a></li>
 <li><strong>ConfigMap and Secret (current)</strong></li>
 <li>Volume (upcoming)</li>
 <li>HPA (upcoming)</li>

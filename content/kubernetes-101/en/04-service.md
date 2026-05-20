@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 4
-title: Service
+title: "Kubernetes 101 (4/10): Service"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes Services — ClusterIP, NodePort
 last_reviewed: '2026-05-15'
 ---
 
-# Service
+# Kubernetes 101 (4/10): Service
 
 Once several Pods are running, their IP addresses stop being a stable integration surface. Pods restart, move, and get recreated, but callers still need one name and one contract that keeps working.
 
@@ -30,23 +30,27 @@ Here, we will look at Service as the networking contract that hides changing Pod
 
 > A Service is the answer to “how do I keep calling this workload after the Pods behind it change?”
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The problem a *Service* solves
-- *ClusterIP / NodePort / LoadBalancer*
-- How *selectors* match
-- The *cluster DNS*
-- *Headless Service*
+- The problem a *Service* solves?
+- ClusterIP / NodePort / LoadBalancer?
+- How *selectors* match?
+
+## Big Picture
+
+![kubernetes 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 4 flow overview*
+
+This picture places Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Service is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 For *microservices* to call each other by *name*, a *Service* is mandatory.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
-*Service stabilizes calling patterns by placing one virtual IP and DNS name in front of a changing Pod set.*
-
 
 ## Key Terms
 
@@ -179,10 +183,21 @@ kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.def
 
 Internal traffic is solved. The next post covers *Ingress*, which splits *external HTTP* by *path*.
 
+## Answering the Opening Questions
+
+- **The problem a *Service* solves?**
+  - The article treats Service as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **ClusterIP / NodePort / LoadBalancer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How *selectors* match?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
 - **Service (current)**
 - Ingress (upcoming)
 - ConfigMap and Secret (upcoming)
@@ -190,6 +205,7 @@ Internal traffic is solved. The next post covers *Ingress*, which splits *extern
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

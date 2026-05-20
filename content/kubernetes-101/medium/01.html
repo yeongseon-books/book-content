@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is Kubernetes?</title>
+<title>Kubernetes 101 (1/10): What is Kubernetes?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What is Kubernetes?</h1>
+<h1>Kubernetes 101 (1/10): What is Kubernetes?</h1>
 <p>A few <code>docker run</code> commands feel manageable when the system is small. The moment the service grows into dozens of containers across several nodes, that confidence usually breaks first. Someone has to decide placement, recover failures, and keep versions aligned while the system keeps moving.</p>
 <p>This is the first post in the Kubernetes 101 series.</p>
 <p>Here, we will frame Kubernetes as an orchestrator that continuously pushes the cluster toward the state you declared, not as a command launcher that starts containers one by one.</p>
 <blockquote>
 <p>Kubernetes is most useful when you stop thinking in terms of “start this container now” and start thinking in terms of “keep the cluster in this desired state over time.”</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The meaning of <em>orchestration</em></li>
-<li><em>Control plane</em> vs <em>worker nodes</em></li>
-<li>The <em>desired state</em> model</li>
-<li>Where <em>kubectl</em> fits</li>
-<li><em>When</em> to adopt it</li>
+<li>The meaning of *orchestration?</li>
+<li>Control plane<em> vs </em>worker nodes?</li>
+<li>The <em>desired state</em> model?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 1 flow overview</em></p>
+<p>This picture places What is Kubernetes? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is Kubernetes? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A handful of containers fits on <em>Compose</em>. From <em>dozens</em> upward, an <em>orchestrator</em> is a <em>survival requirement</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>This control-flow view shows how <code>kubectl</code> talks to the API server and lets the control plane drive scheduling toward the desired state.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>cluster</strong>: a <em>control plane + worker nodes</em> bundle.</li>
@@ -178,6 +181,16 @@ kubectl cluster-info
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The <em>big picture</em> of orchestration is in place. The next post covers the <em>smallest unit</em>: the <em>Pod</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The meaning of *orchestration?</strong></li>
+<li>The article treats What is Kubernetes? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Control plane<em> vs </em>worker nodes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <em>desired state</em> model?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is Kubernetes? (current)</strong></li>
 <li>Pod (upcoming)</li>

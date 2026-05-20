@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deployment</title>
+<title>Kubernetes 101 (3/10): Deployment</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Deployment</h1>
+<h1>Kubernetes 101 (3/10): Deployment</h1>
 <p>A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.</p>
 <p>This is post 3 in the Kubernetes 101 series.</p>
 <p>Here, we will treat Deployment as the default stateless workload controller that keeps replica count stable, rolls new versions gradually, and gives you a rollback path when a release goes wrong.</p>
 <blockquote>
 <p>Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Deployment</em> and <em>ReplicaSet</em> relationship</li>
-<li>The meaning of <em>replicas</em></li>
-<li>The <em>RollingUpdate</em> strategy</li>
-<li>The <em>rollout</em> command</li>
-<li>The <em>rollback</em> flow</li>
+<li>Deployment<em> and </em>ReplicaSet* relationship?</li>
+<li>The meaning of *replicas?</li>
+<li>The <em>RollingUpdate</em> strategy?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 3 flow overview</em></p>
+<p>This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Zero-downtime deploy</em> and <em>self-healing</em> are the <em>biggest reasons</em> to adopt <em>Kubernetes</em>. The object that owns them is the <em>Deployment</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>Deployment uses ReplicaSets to keep the target Pod count stable while swapping versions in a controlled rollout sequence.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>deployment</strong>: declares the <em>desired state</em> of a <em>Pod set</em>.</li>
@@ -180,9 +183,19 @@ kubectl rollout history deployment/web
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Even with <em>Pods</em> up, <em>external access</em> needs an <em>address</em>. The next post covers the <em>Service</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><strong>Deployment<em> and </em>ReplicaSet* relationship?</strong></li>
+<li>The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The meaning of *replicas?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <em>RollingUpdate</em> strategy?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
 <li><strong>Deployment (current)</strong></li>
 <li>Service (upcoming)</li>
 <li>Ingress (upcoming)</li>

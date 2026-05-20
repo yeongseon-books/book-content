@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Ingress</title>
+<title>Kubernetes 101 (5/10): Ingress</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Ingress</h1>
+<h1>Kubernetes 101 (5/10): Ingress</h1>
 <p>Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.</p>
 <p>This is post 5 in the Kubernetes 101 series.</p>
 <p>Here, we will separate the declarative Ingress rule from the controller that enforces it, then use that split to reason about host routing, path routing, and TLS termination.</p>
 <blockquote>
 <p>Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Splitting <em>Ingress</em> and <em>IngressController</em></li>
-<li><em>Host / path</em> routing</li>
-<li><em>TLS termination</em></li>
-<li>Relation to the <em>external LoadBalancer</em></li>
-<li><em>Gateway API</em> in one line</li>
+<li>Splitting <em>Ingress</em> and *IngressController?</li>
+<li>Host / path* routing?</li>
+<li>TLS termination?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 5 flow overview</em></p>
+<p>This picture places Ingress inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Ingress is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A <em>LoadBalancer Service per app</em> explodes <em>cost</em>. <em>Ingress</em> collapses everything into a <em>single entry</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>Ingress keeps one external entry point while the controller fans HTTP traffic out to multiple Services by host and path.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Ingress</strong>: an <em>L7 routing rule</em> object.</li>
@@ -185,11 +188,21 @@ curl -sk -H 'Host: example.com' https://&lt;ingress-address&gt;/api
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>With routing in place, the next step is <em>separating config and secrets</em>. The next post covers <em>ConfigMap and Secret</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><strong>Splitting <em>Ingress</em> and *IngressController?</strong></li>
+<li>The article treats Ingress as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Host / path* routing?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>TLS termination?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Kubernetes 101 (3/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Kubernetes 101 (4/10): Service</a></li>
 <li><strong>Ingress (current)</strong></li>
 <li>ConfigMap and Secret (upcoming)</li>
 <li>Volume (upcoming)</li>

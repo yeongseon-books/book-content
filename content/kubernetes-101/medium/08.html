@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HPA</title>
+<title>Kubernetes 101 (8/10): HPA</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>HPA</h1>
+<h1>Kubernetes 101 (8/10): HPA</h1>
 <p>Traffic rarely stays flat. If humans resize replicas by hand, they react too late during spikes and waste money during quiet periods. Autoscaling helps, but only if the metrics and resource requests underneath it are trustworthy.</p>
 <p>This is post 8 in the Kubernetes 101 series.</p>
 <p>Here, we will treat HPA as a control loop that adjusts Deployment replica count from metrics, then connect that loop to requests, metrics-server, and node-level capacity limits.</p>
 <blockquote>
 <p>HPA is only as good as the metrics it can trust and the cluster capacity that can satisfy the scaling decision.</p>
 </blockquote>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>where <em>HPA</em> fits</li>
-<li>why <em>metrics-server</em> matters</li>
-<li><em>CPU/memory</em> targets</li>
-<li><em>custom metrics</em></li>
-<li>relationship with <em>VPA / Cluster Autoscaler</em></li>
+<li>where <em>HPA</em> fits?</li>
+<li>why <em>metrics-server</em> matters?</li>
+<li>CPU/memory* targets?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="kubernetes 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>kubernetes 101 chapter 8 flow overview</em></p>
+<p>This picture places HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of HPA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Manual scaling</em> causes <em>lag</em> and <em>over-provisioning</em>. <em>Autoscaling</em> protects both <em>cost</em> and <em>availability</em>.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>HPA reads metrics and changes the Deployment replica target; the Deployment still owns the actual Pod creation and replacement work.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>HPA</strong>: scales <em>Pod count</em> <em>automatically</em>.</li>
@@ -189,14 +192,24 @@ kubectl describe hpa web
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>With autoscaling in place, you need a <em>repeatable deploy unit</em>. The next post is <em>Helm</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">ConfigMap and Secret</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Volume</a></li>
+<li><strong>where <em>HPA</em> fits?</strong></li>
+<li>The article treats HPA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>why <em>metrics-server</em> matters?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>CPU/memory* targets?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">Kubernetes 101 (1/10): What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Kubernetes 101 (2/10): Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Kubernetes 101 (3/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Kubernetes 101 (4/10): Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Kubernetes 101 (5/10): Ingress</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/06-configmap-and-secret.md">Kubernetes 101 (6/10): ConfigMap and Secret</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/07-volume.md">Kubernetes 101 (7/10): Volume</a></li>
 <li><strong>HPA (current)</strong></li>
 <li>Helm (upcoming)</li>
 <li>Kubernetes in Operation (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 7
-title: Volume
+title: "Kubernetes 101 (7/10): Volume"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: Volume과 PVC, StorageClass가 상태 데이터를 분리하는
 last_reviewed: '2026-05-15'
 ---
 
-# Volume
+# Kubernetes 101 (7/10): Volume
 
 컨테이너는 가볍고 교체가 쉽다는 장점이 있습니다. 하지만 그 장점은 동시에 컨테이너 파일시스템이 영구 저장소가 아니라는 뜻이기도 합니다. 파드가 다시 스케줄되거나 새 컨테이너로 교체되면, 그 안에만 저장한 데이터는 함께 사라집니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 Volume을 단순히 디스크를 붙이는 기능이 아니라, 파드의 수명과 데이터의 수명을 분리해 stateful 워크로드를 운영 가능하게 만드는 저장소 모델로 정리하겠습니다.
 
-## 이 글에서 다룰 문제
-
-> Kubernetes의 저장소 모델은 컨테이너 내부 파일시스템에 상태를 두지 않고, PVC와 StorageClass를 통해 파드 바깥의 영속 저장소를 연결하는 방식으로 설계됩니다.
+## 먼저 던지는 질문
 
 - 파드가 재시작되면 컨테이너 파일시스템은 왜 사라질까요?
 - `emptyDir`와 PVC는 어떤 순간에 갈라질까요?
 - StorageClass는 단순 옵션이 아니라 무엇을 결정할까요?
-- PVC만 있으면 백업도 해결됐다고 보면 왜 위험할까요?
-- stateful 워크로드에서 가장 먼저 조심해야 할 점은 무엇일까요?
+
+## 큰 그림
+
+![Kubernetes 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Kubernetes 101 7장 흐름 개요*
+
+이 그림에서는 Volume를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Volume의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -45,10 +51,6 @@ last_reviewed: '2026-05-15'
 초보자가 자주 하는 실수도 여기서 나옵니다. 파드가 다시 살아났으니 데이터도 남아 있을 것이라고 기대하는 것입니다. Kubernetes는 프로세스를 다시 띄우는 일에는 강하지만, 데이터 보존은 별도의 스토리지 계층을 제대로 연결했을 때만 가능합니다.
 
 ## 한눈에 보는 구조
-
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
-*PVC와 StorageClass를 거치면 파드 수명과 데이터 수명을 분리한 저장소 모델이 만들어집니다.*
-
 
 애플리케이션은 보통 PVC를 통해 저장소를 요청하고, StorageClass는 어떤 종류의 디스크를 어떤 방식으로 만들지 결정합니다. 이 흐름을 이해하면 애플리케이션이 원하는 것과 클러스터가 실제로 제공하는 것이 분리되어 보입니다.
 
@@ -193,17 +195,29 @@ kubectl get pv
 
 다음 글에서는 저장소가 아니라 트래픽 변화에 따라 파드 수를 자동으로 조절하는 방법, HPA를 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **파드가 재시작되면 컨테이너 파일시스템은 왜 사라질까요?**
+  - 본문의 기준은 Volume를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`emptyDir`와 PVC는 어떤 순간에 갈라질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **StorageClass는 단순 옵션이 아니라 무엇을 결정할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap과 Secret](./06-configmap-and-secret.md)
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
 - **Volume (현재 글)**
 - HPA (예정)
 - Helm (예정)
 - 운영 관점의 Kubernetes (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

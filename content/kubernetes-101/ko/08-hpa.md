@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 8
-title: HPA
+title: "Kubernetes 101 (8/10): HPA"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: HPA와 metrics-server, 요청량 기반 파드 자동 조절의
 last_reviewed: '2026-05-15'
 ---
 
-# HPA
+# Kubernetes 101 (8/10): HPA
 
 트래픽은 하루 종일 일정하지 않습니다. 어떤 시간에는 요청이 몰리고, 어떤 시간에는 거의 비어 있습니다. 이런 변화를 운영자가 수동으로 따라가면 대응은 늘 늦고, 넉넉하게 파드를 띄워 두면 비용이 계속 낭비됩니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 HPA를 단순히 CPU가 높으면 파드를 늘리는 기능이 아니라, 메트릭을 기준으로 Deployment의 원하는 개수를 자동 조절하는 운영 자동화 계층이라는 관점에서 정리하겠습니다.
 
-## 이 글에서 다룰 문제
-
-> HPA는 메트릭을 읽어 Deployment의 replica 수를 자동으로 바꾸며, 이 자동화의 품질은 requests 설정과 메트릭 신뢰도에 크게 좌우됩니다.
+## 먼저 던지는 질문
 
 - 트래픽이 바뀔 때마다 사람이 직접 파드 수를 조절하면 왜 느리고 비싸질까요?
 - HPA는 어떤 지표를 보고 스케일 아웃과 스케일 인을 결정할까요?
 - resource requests가 없으면 왜 제대로 동작하지 않을까요?
-- metrics-server와 커스텀 지표는 어떤 순서로 이해하는 편이 좋을까요?
-- HPA와 Cluster Autoscaler는 왜 함께 봐야 할까요?
+
+## 큰 그림
+
+![Kubernetes 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Kubernetes 101 8장 흐름 개요*
+
+이 그림에서는 HPA를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> HPA의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -45,10 +51,6 @@ last_reviewed: '2026-05-15'
 HPA는 이 문제를 메트릭 기반 자동화로 줄입니다. 다만 자동화라고 해서 무조건 똑똑한 것은 아닙니다. 기준 지표가 부정확하면 엉뚱한 결정을 내릴 수 있고, 파드를 늘려도 노드가 부족하면 실제 스케일은 진행되지 않습니다. 그래서 HPA는 메트릭과 클러스터 용량을 함께 봐야 합니다.
 
 ## 한눈에 보는 구조
-
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)
-*HPA는 메트릭을 읽어 Deployment의 desired replicas를 조정하고, 실제 파드 생성은 다시 Deployment가 맡습니다.*
-
 
 HPA는 파드를 직접 만들고 지우기보다 Deployment의 원하는 개수를 조정합니다. 즉, 자동 스케일링의 판단 계층이라고 보는 편이 더 정확합니다. 뒤의 실제 파드 생성과 유지 작업은 여전히 Deployment가 맡습니다.
 
@@ -203,17 +205,29 @@ kubectl describe hpa web
 
 다음 글에서는 이렇게 늘고 줄어드는 워크로드를 더 반복 가능하게 배포하기 위한 패키징 단위, Helm을 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **트래픽이 바뀔 때마다 사람이 직접 파드 수를 조절하면 왜 느리고 비싸질까요?**
+  - 본문의 기준은 HPA를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **HPA는 어떤 지표를 보고 스케일 아웃과 스케일 인을 결정할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **resource requests가 없으면 왜 제대로 동작하지 않을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap과 Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap과 Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
 - **HPA (현재 글)**
 - Helm (예정)
 - 운영 관점의 Kubernetes (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

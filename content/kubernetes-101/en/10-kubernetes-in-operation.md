@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 10
-title: Kubernetes in Operation
+title: "Kubernetes 101 (10/10): Kubernetes in Operation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of operating Kubernetes covering probe
 last_reviewed: '2026-05-15'
 ---
 
-# Kubernetes in Operation
+# Kubernetes 101 (10/10): Kubernetes in Operation
 
 A running cluster is not the same thing as an operable one. You can have healthy-looking Pods and still lack safe traffic gates, clear permissions, useful telemetry, and a repeatable incident path when something breaks at night.
 
@@ -30,23 +30,27 @@ Here, we will connect probes, RBAC, network boundaries, observability, GitOps, a
 
 > Kubernetes operations become reliable only when traffic rules, permissions, telemetry, and change procedures reinforce each other.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- *liveness/readiness/startup* probes
-- *RBAC* and *NetworkPolicy*
-- *metrics/logs/traces*
-- *capacity planning* and *GitOps*
-- the shape of a *runbook*
+- liveness/readiness/startup* probes?
+- RBAC* and *NetworkPolicy?
+- metrics/logs/traces?
+
+## Big Picture
+
+![kubernetes 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 10 flow overview*
+
+This picture places Kubernetes in Operation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Kubernetes in Operation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Functionally working* and *staying up overnight without issues* are different. *Operability* is *service trust*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
-*Operations become repeatable only when probes, telemetry, runbooks, and GitOps all feed the same response system.*
-
 
 ## Key Terms
 
@@ -188,17 +192,29 @@ kubectl get networkpolicy -n web
 
 That wraps the *Kubernetes 101* series. Next, the *Serverless* and *SRE* series go deeper into *operability*.
 
+## Answering the Opening Questions
+
+- **liveness/readiness/startup* probes?**
+  - The article treats Kubernetes in Operation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **RBAC* and *NetworkPolicy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **metrics/logs/traces?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
-- [ConfigMap and Secret](./06-configmap-and-secret.md)
-- [Volume](./07-volume.md)
-- [HPA](./08-hpa.md)
-- [Helm](./09-helm.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
+- [Kubernetes 101 (6/10): ConfigMap and Secret](./06-configmap-and-secret.md)
+- [Kubernetes 101 (7/10): Volume](./07-volume.md)
+- [Kubernetes 101 (8/10): HPA](./08-hpa.md)
+- [Kubernetes 101 (9/10): Helm](./09-helm.md)
 - **Kubernetes in Operation (current)**
+
 <!-- toc:end -->
 
 ## References

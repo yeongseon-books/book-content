@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 6
-title: ConfigMap and Secret
+title: "Kubernetes 101 (6/10): ConfigMap and Secret"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes ConfigMap and Secret — splitti
 last_reviewed: '2026-05-15'
 ---
 
-# ConfigMap and Secret
+# Kubernetes 101 (6/10): ConfigMap and Secret
 
 It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.
 
@@ -30,23 +30,27 @@ Here, we will use ConfigMap and Secret to split environment-specific values from
 
 > Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Splitting *ConfigMap* and *Secret*
-- *Env vars* vs *file mounts*
-- The *base64* fact and the *encryption gap*
-- Integrating an *external secret manager*
-- *Restart on change*
+- Splitting *ConfigMap* and *Secret?
+- Env vars* vs *file mounts?
+- The *base64* fact and the *encryption gap?
+
+## Big Picture
+
+![kubernetes 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 6 flow overview*
+
+This picture places ConfigMap and Secret inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ConfigMap and Secret is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Pulling *environment differences* out of the image is what makes things *reproducible*. *Secrets* must be tracked *separately*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
-*ConfigMap and Secret can both enter the same Pod, but they intentionally represent different operational and security boundaries.*
-
 
 ## Key Terms
 
@@ -188,17 +192,29 @@ The *External Secrets Operator* keeps *Vault / AWS Secrets Manager* as the *sour
 
 Config is solved. The next post covers persisting *state data* with *Volumes*.
 
+## Answering the Opening Questions
+
+- **Splitting *ConfigMap* and *Secret?**
+  - The article treats ConfigMap and Secret as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Env vars* vs *file mounts?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *base64* fact and the *encryption gap?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
 - **ConfigMap and Secret (current)**
 - Volume (upcoming)
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

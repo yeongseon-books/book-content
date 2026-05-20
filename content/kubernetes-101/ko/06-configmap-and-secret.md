@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 6
-title: ConfigMap과 Secret
+title: "Kubernetes 101 (6/10): ConfigMap과 Secret"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: ConfigMap과 Secret으로 설정과 비밀 값을 분리하는 
 last_reviewed: '2026-05-15'
 ---
 
-# ConfigMap과 Secret
+# Kubernetes 101 (6/10): ConfigMap과 Secret
 
 컨테이너 이미지를 처음 만들 때는 설정값과 비밀번호를 같이 넣어도 금방 동작합니다. 하지만 환경이 늘어나고 팀이 커지면 그 방식은 빠르게 한계에 닿습니다. 같은 이미지를 개발과 운영에서 재사용하기 어렵고, 민감한 값이 이미지나 Git에 남는 위험도 커집니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 ConfigMap과 Secret을 단순한 키/값 저장소가 아니라, 이미지를 환경별 차이와 민감한 값에서 분리하기 위한 기본 운영 도구라는 관점에서 정리하겠습니다.
 
-## 이 글에서 다룰 문제
-
-> ConfigMap은 일반 설정을, Secret은 민감한 값을 파드 바깥에서 관리해 주입하게 함으로써 이미지를 환경에 덜 묶고 보안 경계를 분리합니다.
+## 먼저 던지는 질문
 
 - 이미지 안에 설정과 비밀번호를 같이 넣으면 왜 운영이 어려워질까요?
 - ConfigMap과 Secret은 무엇이 다르고 어디서 나뉠까요?
 - 환경 변수 주입과 파일 마운트는 언제 다르게 선택할까요?
-- Secret이 base64라는 사실은 왜 암호화와 같지 않을까요?
-- 값이 바뀐 뒤 재시작이 필요한 이유는 무엇일까요?
+
+## 큰 그림
+
+![Kubernetes 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Kubernetes 101 6장 흐름 개요*
+
+이 그림에서는 ConfigMap과 Secret를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> ConfigMap과 Secret의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -45,10 +51,6 @@ last_reviewed: '2026-05-15'
 민감한 값은 더 엄격하게 다뤄야 합니다. 데이터베이스 비밀번호, API 토큰, 인증서 같은 값이 이미지나 Git에 평문으로 남으면 배포 편의성보다 훨씬 큰 리스크를 떠안게 됩니다. ConfigMap과 Secret을 구분하는 이유는 단순한 기능 차이가 아니라 운영 책임을 나누기 위해서입니다.
 
 ## 한눈에 보는 구조
-
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
-*ConfigMap과 Secret은 같은 파드로 들어가더라도 일반 설정과 민감한 값을 다른 운영 경계로 다루게 합니다.*
-
 
 ConfigMap과 Secret은 모두 파드 안으로 들어갈 수 있지만, 같은 방식으로 다뤄도 된다는 뜻은 아닙니다. 주입 방식과 접근 제어, 변경 반영 전략까지 같이 봐야 실제 운영 모델이 완성됩니다.
 
@@ -200,17 +202,29 @@ kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
 
 다음 글에서는 설정값이 아니라 실제 데이터를 오래 보존하는 방법을 보겠습니다. 주제는 Volume입니다.
 
+## 처음 질문으로 돌아가기
+
+- **이미지 안에 설정과 비밀번호를 같이 넣으면 왜 운영이 어려워질까요?**
+  - 본문의 기준은 ConfigMap과 Secret를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **ConfigMap과 Secret은 무엇이 다르고 어디서 나뉠까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **환경 변수 주입과 파일 마운트는 언제 다르게 선택할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
-- [Deployment](./03-deployment.md)
-- [Service](./04-service.md)
-- [Ingress](./05-ingress.md)
+## 시리즈 목차
+
+- [Kubernetes 101 (1/10): Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
+- [Kubernetes 101 (3/10): Deployment](./03-deployment.md)
+- [Kubernetes 101 (4/10): Service](./04-service.md)
+- [Kubernetes 101 (5/10): Ingress](./05-ingress.md)
 - **ConfigMap과 Secret (현재 글)**
 - Volume (예정)
 - HPA (예정)
 - Helm (예정)
 - 운영 관점의 Kubernetes (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

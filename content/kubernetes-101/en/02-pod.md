@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 2
-title: Pod
+title: "Kubernetes 101 (2/10): Pod"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes Pods — what they are, how they
 last_reviewed: '2026-05-15'
 ---
 
-# Pod
+# Kubernetes 101 (2/10): Pod
 
 The first thing that confuses many Docker users is that Kubernetes does not treat the container itself as the base unit. That design choice looks odd until you hit the real operational problems: shared networking, helper processes, startup ordering, and the fact that several containers sometimes have to live and die together.
 
@@ -30,23 +30,27 @@ Here, we will define a Pod as the smallest deployable execution bundle in Kubern
 
 > A Pod is not a prettier name for one container. It is the boundary Kubernetes uses when scheduling, networking, and replacing a unit of work.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The definition of a *Pod*
-- How it differs from a *container*
-- The *sidecar* pattern
-- The *lifecycle* phases
-- *Why* you should not create one directly
+- The definition of a *Pod?
+- How it differs from a *container?
+- The *sidecar* pattern?
+
+## Big Picture
+
+![kubernetes 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 2 flow overview*
+
+This picture places Pod inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pod is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Every workload* eventually runs *on a Pod*. You must understand the *Pod model* before higher-level objects make sense.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
-*A Pod groups the app container, sidecars, shared storage, and shared networking into one scheduled execution unit.*
-
 
 ## Key Terms
 
@@ -177,8 +181,19 @@ kubectl logs web
 
 With *Pods* understood, the next step is the *Deployment*, which owns *restarts and rolling updates*.
 
+## Answering the Opening Questions
+
+- **The definition of a *Pod?**
+  - The article treats Pod as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How it differs from a *container?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *sidecar* pattern?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
 - **Pod (current)**
 - Deployment (upcoming)
 - Service (upcoming)
@@ -188,6 +203,7 @@ With *Pods* understood, the next step is the *Deployment*, which owns *restarts 
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: kubernetes-101
 episode: 3
-title: Deployment
+title: "Kubernetes 101 (3/10): Deployment"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner guide to Kubernetes Deployments — ReplicaSet manag
 last_reviewed: '2026-05-15'
 ---
 
-# Deployment
+# Kubernetes 101 (3/10): Deployment
 
 A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.
 
@@ -30,23 +30,27 @@ Here, we will treat Deployment as the default stateless workload controller that
 
 > Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- *Deployment* and *ReplicaSet* relationship
-- The meaning of *replicas*
-- The *RollingUpdate* strategy
-- The *rollout* command
-- The *rollback* flow
+- Deployment* and *ReplicaSet* relationship?
+- The meaning of *replicas?
+- The *RollingUpdate* strategy?
+
+## Big Picture
+
+![kubernetes 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
+
+*kubernetes 101 chapter 3 flow overview*
+
+This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 *Zero-downtime deploy* and *self-healing* are the *biggest reasons* to adopt *Kubernetes*. The object that owns them is the *Deployment*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
-*Deployment uses ReplicaSets to keep the target Pod count stable while swapping versions in a controlled rollout sequence.*
-
 
 ## Key Terms
 
@@ -182,9 +186,20 @@ kubectl rollout history deployment/web
 
 Even with *Pods* up, *external access* needs an *address*. The next post covers the *Service*.
 
+## Answering the Opening Questions
+
+- **Deployment* and *ReplicaSet* relationship?**
+  - The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The meaning of *replicas?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *RollingUpdate* strategy?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Kubernetes?](./01-what-is-kubernetes.md)
-- [Pod](./02-pod.md)
+## In this series
+
+- [Kubernetes 101 (1/10): What is Kubernetes?](./01-what-is-kubernetes.md)
+- [Kubernetes 101 (2/10): Pod](./02-pod.md)
 - **Deployment (current)**
 - Service (upcoming)
 - Ingress (upcoming)
@@ -193,6 +208,7 @@ Even with *Pods* up, *external access* needs an *address*. The next post covers 
 - HPA (upcoming)
 - Helm (upcoming)
 - Kubernetes in Operation (upcoming)
+
 <!-- toc:end -->
 
 ## References
