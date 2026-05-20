@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Images and Containers</title>
+<title>Docker 101 (2/10): Images and Containers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Images and Containers</h1>
+<h1>Docker 101 (2/10): Images and Containers</h1>
 <p>The first serious confusion in Docker usually appears between images and containers. Teams pull an image, change files inside a running container, restart it, and then wonder why the change disappeared. The failure is not mysterious; it comes from mixing up a deployable artifact with a disposable runtime instance.</p>
 <p>Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.</p>
 <p>This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>lifecycle</em> of <em>images</em> and <em>containers</em></li>
-<li><em>Layers</em> and <em>copy-on-write</em></li>
-<li>The <em>ten commands</em> you actually use</li>
-<li>How to <em>look inside</em> a container</li>
-<li>Five common pitfalls</li>
+<li>The <em>lifecycle</em> of <em>images</em> and *containers?</li>
+<li>Layers<em> and </em>copy-on-write?</li>
+<li>The <em>ten commands</em> you actually use?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 2 flow overview</em></p>
+<p>This picture places Images and Containers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Images and Containers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If you do not understand how containers behave, <em>debugging becomes luck</em>. Knowing layers and lifecycle makes <em>80% of issues</em> <em>predictable</em>.</p>
 <blockquote>
 <p><em>Half of "non-reproducible" bugs come from </em>misunderstanding container state<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Immutable image flowing into a mutable container lifecycle from run to stop to removal" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>An immutable image becomes a mutable container instance that can be created, run, stopped, and removed without changing the source artifact</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Layer</strong>: a <em>read-only filesystem slice</em> inside an image.</li>
@@ -160,8 +163,18 @@ docker image rm nginx:1.27
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Separating images and containers is the <em>fundamentals</em> of Docker. Next we <em>build images with Dockerfile</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><strong>The <em>lifecycle</em> of <em>images</em> and *containers?</strong></li>
+<li>The article treats Images and Containers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Layers<em> and </em>copy-on-write?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <em>ten commands</em> you actually use?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
 <li><strong>Images and Containers (current)</strong></li>
 <li>Writing a Dockerfile (upcoming)</li>
 <li>Volumes and Networks (upcoming)</li>

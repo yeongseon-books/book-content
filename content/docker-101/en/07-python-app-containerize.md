@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 7
-title: Containerizing a Python App
+title: "Docker 101 (7/10): Containerizing a Python App"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Containerize a FastAPI app to production grade with Dockerfile,
 last_reviewed: '2026-05-15'
 ---
 
-# Containerizing a Python App
+# Docker 101 (7/10): Containerizing a Python App
 
 A Python app running inside a container is not the same thing as a production-ready Python container. The difference shows up when the process receives SIGTERM during deployment, when healthchecks ask whether the app is really ready, and when a compromised process should not be running as root.
 
@@ -28,13 +28,21 @@ Those details are easy to skip because the app still starts without them. They o
 
 This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Containerizing *FastAPI + uvicorn*
-- *Signal handling at PID 1* (SIGTERM)
-- Adding a *healthcheck*
-- *Non-root user* and permissions
-- Five common pitfalls
+- Containerizing *FastAPI + uvicorn?
+- Signal handling at PID 1* (SIGTERM)?
+- Adding a *healthcheck?
+
+## Big Picture
+
+![docker 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 7 flow overview*
+
+This picture places Containerizing a Python App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Containerizing a Python App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ This is post 7 in the Docker 101 series. It turns a simple FastAPI example into 
 > *PID 1 in a container needs to be a *small init* or a process with *correct signal handling*.*
 
 ## Concept at a Glance
-
-![Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
-
-*A production-grade Python container includes PID 1 handling, an honest healthcheck, and graceful shutdown behavior*
 
 ## Key Terms
 
@@ -184,17 +188,29 @@ In real deployments, *Gunicorn + Uvicorn worker*, *prometheus-fastapi-instrument
 
 The real difficulty of Python containers is *signals and healthcheck*. Next, we run *with a database*.
 
+## Answering the Opening Questions
+
+- **Containerizing *FastAPI + uvicorn?**
+  - The article treats Containerizing a Python App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Signal handling at PID 1* (SIGTERM)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Adding a *healthcheck?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [Environment Variables and Configuration](./06-env-and-config.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): Environment Variables and Configuration](./06-env-and-config.md)
 - **Containerizing a Python App (current)**
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

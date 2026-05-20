@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 4
-title: Volume과 Network
+title: "Docker 101 (4/10): Volume과 Network"
 status: publish-ready
 targets:
   tistory: true
@@ -20,22 +20,29 @@ seo_description: volume과 network로 데이터 영속성과 컨테이너 통신
 last_reviewed: '2026-05-15'
 ---
 
-# Volume과 Network
+# Docker 101 (4/10): Volume과 Network
 
 컨테이너를 한두 개 실행할 때는 모든 것이 단순해 보입니다. 그런데 실제 애플리케이션은 금방 두 가지 문제를 만납니다. 하나는 데이터를 어디에 둘 것인가이고, 다른 하나는 컨테이너끼리 어떻게 통신하게 만들 것인가입니다. 이 두 문제를 제대로 다루지 못하면 재시작 한 번에 데이터가 사라지거나, 서비스가 서로를 찾지 못하는 일이 생깁니다.
 
 Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. volume은 상태의 수명을 결정하고, network는 컨테이너 간 통신 경로를 결정합니다. 결국 이 둘은 컨테이너 운영의 가장 기본적인 인프라입니다.
 
 이 글은 Docker 101 시리즈의 4번째 글입니다. 여기서는 volume과 bind mount, user-defined bridge를 어떤 기준으로 선택해야 하는지, 그리고 데이터 영속성과 컨테이너 간 통신을 어떻게 검증해야 하는지 정리합니다.
-## 이 글에서 다룰 문제
+
+## 먼저 던지는 질문
 
 - volume, bind mount, tmpfs는 각각 언제 써야 할까요?
 - 컨테이너 데이터는 왜 기본적으로 휘발된다고 봐야 할까요?
 - 브리지 네트워크는 어떻게 컨테이너 이름 기반 통신을 가능하게 할까요?
-- 기본 bridge와 user-defined bridge는 무엇이 다를까요?
-- volume 백업은 왜 초반부터 습관으로 가져가야 할까요?
 
-> volume은 데이터의 수명을 정의하고, network는 컨테이너 사이의 길을 정의합니다. 이 둘을 분리해서 생각해야 상태와 통신이 뒤섞여 생기는 운영 사고를 줄일 수 있습니다.
+## 큰 그림
+
+![Docker 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
+
+*Docker 101 4장 흐름 개요*
+
+이 그림에서는 Volume과 Network를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Volume과 Network의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -44,10 +51,6 @@ Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. v
 특히 입문 단계에서는 컨테이너를 하나의 서버처럼 보고, 그 안에 파일을 저장하거나 `localhost`로 다른 컨테이너에 접근하려는 실수를 많이 합니다. 그러나 컨테이너는 버릴 수 있는 실행 단위이고, 통신도 명시적으로 연결해 주어야 합니다.
 
 ## 한눈에 보는 개념
-
-![호스트 디스크와 Docker volume, 브리지 네트워크가 컨테이너를 연결하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
-
-*영속 데이터는 volume으로 분리하고 컨테이너 간 통신은 브리지 네트워크로 연결하는 기본 구조*
 
 ## 핵심 용어
 
@@ -181,10 +184,21 @@ Kubernetes로 가더라도 개념은 크게 바뀌지 않습니다. volume은 Pe
 
 다음 글에서는 Docker Compose를 살펴보겠습니다. 지금까지 개별 명령으로 다룬 컨테이너, 네트워크, 볼륨을 하나의 YAML로 묶어 반복 가능한 환경으로 만드는 단계입니다.
 
+## 처음 질문으로 돌아가기
+
+- **volume, bind mount, tmpfs는 각각 언제 써야 할까요?**
+  - 본문의 기준은 Volume과 Network를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **컨테이너 데이터는 왜 기본적으로 휘발된다고 봐야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **브리지 네트워크는 어떻게 컨테이너 이름 기반 통신을 가능하게 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Docker란 무엇인가?](./01-what-is-docker.md)
-- [Image와 Container](./02-image-and-container.md)
-- [Dockerfile 작성하기](./03-dockerfile.md)
+## 시리즈 목차
+
+- [Docker 101 (1/10): Docker란 무엇인가?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Image와 Container](./02-image-and-container.md)
+- [Docker 101 (3/10): Dockerfile 작성하기](./03-dockerfile.md)
 - **Volume과 Network (현재 글)**
 - Docker Compose (예정)
 - 환경변수와 설정 (예정)
@@ -192,6 +206,7 @@ Kubernetes로 가더라도 개념은 크게 바뀌지 않습니다. volume은 Pe
 - 데이터베이스와 함께 실행하기 (예정)
 - Image 최적화 (예정)
 - 배포용 Docker 구성 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

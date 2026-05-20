@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Writing a Dockerfile</title>
+<title>Docker 101 (3/10): Writing a Dockerfile</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Writing a Dockerfile</h1>
+<h1>Docker 101 (3/10): Writing a Dockerfile</h1>
 <p>A Dockerfile is easy to underestimate because it looks like a short text file with a few instructions. In practice, it decides whether your team gets fast, repeatable builds or slow, noisy rebuilds that waste CI time and hide security mistakes inside oversized images.</p>
 <p>The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.</p>
 <p>This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, <code>.dockerignore</code>, and non-root execution.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What <em>FROM / RUN / COPY / CMD</em> mean</li>
-<li>An <em>ordering strategy</em> for the <em>layer cache</em></li>
-<li>The importance of <em>.dockerignore</em></li>
-<li>Running as a <em>non-root user</em></li>
-<li>Five common pitfalls</li>
+<li>What <em>FROM / RUN / COPY / CMD</em> mean?</li>
+<li>An <em>ordering strategy</em> for the *layer cache?</li>
+<li>The importance of *.dockerignore?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 3 flow overview</em></p>
+<p>This picture places Writing a Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Writing a Dockerfile is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>One ordering choice</em> turns a build from <em>5 minutes into 30 seconds</em>. A good Dockerfile <em>visibly</em> changes team productivity.</p>
 <blockquote>
 <p><em>Slow builds are a </em>quiet cost<em>. At 50 builds a day, you lose </em>hundreds of hours per year<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>A cache-friendly Dockerfile keeps low-change dependency steps above high-change application code</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>FROM</strong>: pick a <em>base image</em>.</li>
@@ -171,9 +174,19 @@ docker history myapp:1.0
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A good Dockerfile <em>saves your team time every day</em>. Next, <em>volumes and networks</em> for data and communication.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><strong>What <em>FROM / RUN / COPY / CMD</em> mean?</strong></li>
+<li>The article treats Writing a Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>An <em>ordering strategy</em> for the *layer cache?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The importance of *.dockerignore?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
 <li><strong>Writing a Dockerfile (current)</strong></li>
 <li>Volumes and Networks (upcoming)</li>
 <li>Docker Compose (upcoming)</li>

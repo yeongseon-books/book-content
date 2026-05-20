@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Docker Compose</title>
+<title>Docker 101 (5/10): Docker Compose</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Docker Compose</h1>
+<h1>Docker 101 (5/10): Docker Compose</h1>
 <p>A few <code>docker run</code> commands are manageable when you have only one service. The moment you need a web app, a database, a cache, and maybe a worker, that command-line memory game stops scaling. Teams start depending on tribal knowledge instead of a reproducible environment definition.</p>
 <p>Compose matters because it turns that memory into a checked-in declaration. Services, ports, volumes, healthchecks, and optional profiles become reviewable configuration instead of setup folklore.</p>
 <p>This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what <code>depends_on</code> can and cannot guarantee, and which verification steps tell you the stack is actually ready.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Defining <em>services / networks / volumes</em></li>
-<li><em>depends_on</em> and healthchecks</li>
-<li><em>profiles</em> for <em>selective execution</em></li>
-<li><em>.env</em> files and variable interpolation</li>
-<li>Five common pitfalls</li>
+<li>Defining *services / networks / volumes?</li>
+<li>depends_on* and healthchecks?</li>
+<li>profiles<em> for </em>selective execution?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 5 flow overview</em></p>
+<p>This picture places Docker Compose inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Docker Compose is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>New-hire setup finishes in <em>under five minutes</em>. The <em>README setup section</em> simply disappears.</p>
 <blockquote>
 <p><em>Compose is the shortest path to </em>environment-as-code<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="One Compose file declaring web, database, and cache services on a shared network" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Compose turns a multi-container environment into one reviewable declaration of services, networks, volumes, and health checks</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Service</strong>: a <em>group of containers</em> from one image.</li>
@@ -183,11 +186,21 @@ docker compose down -v         # also remove volumes
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Compose is your team's <em>first piece of infrastructure as code</em>. Next, the patterns of <em>environment variables and configuration</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
+<li><strong>Defining *services / networks / volumes?</strong></li>
+<li>The article treats Docker Compose as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>depends_on* and healthchecks?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>profiles<em> for </em>selective execution?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Docker 101 (3/10): Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Docker 101 (4/10): Volumes and Networks</a></li>
 <li><strong>Docker Compose (current)</strong></li>
 <li>Environment Variables and Configuration (upcoming)</li>
 <li>Containerizing a Python App (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 8
-title: 데이터베이스와 함께 실행하기
+title: "Docker 101 (8/10): 데이터베이스와 함께 실행하기"
 status: publish-ready
 targets:
   tistory: true
@@ -20,22 +20,29 @@ seo_description: FastAPI와 PostgreSQL을 Compose로 함께 띄우는 운영 기
 last_reviewed: '2026-05-15'
 ---
 
-# 데이터베이스와 함께 실행하기
+# Docker 101 (8/10): 데이터베이스와 함께 실행하기
 
 애플리케이션 컨테이너만 잘 만들었다고 해서 실제 서비스 구성이 끝난 것은 아닙니다. 대부분의 애플리케이션은 결국 데이터베이스와 함께 움직입니다. 문제는 여기서부터 훨씬 현실적이 됩니다. 앱이 먼저 떠 버리면 DB가 아직 준비되지 않아 실패하고, 스키마 변경이 자동화되지 않으면 배포마다 사람이 개입해야 하며, 시드 데이터가 중복으로 들어가면 환경이 점점 더 지저분해집니다.
 
 그래서 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 중요합니다. 데이터의 영속성, 준비 상태 확인, 그리고 마이그레이션 자동화입니다. 이 세 가지가 맞물려야 로컬 개발, CI, 운영 전환이 부드러워집니다.
 
 이 글은 Docker 101 시리즈의 8번째 글입니다. 여기서는 앱과 PostgreSQL을 함께 띄울 때 persistence·readiness·migration이라는 세 리듬을 어떻게 맞춰야 하는지, 그리고 migration과 seed를 어떤 순서로 검증해야 하는지 정리합니다.
-## 이 글에서 다룰 문제
+
+## 먼저 던지는 질문
 
 - Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?
 - healthcheck와 시작 순서는 어떻게 연결해야 할까요?
 - Alembic migration은 어떤 방식으로 자동화하는 편이 좋을까요?
-- seed 데이터는 왜 idempotent해야 할까요?
-- 앱과 DB를 함께 돌릴 때 가장 자주 하는 실수는 무엇일까요?
 
-> DB 컨테이너 운영의 핵심은 persistence, readiness, migration이라는 세 가지 리듬을 안정적으로 맞추는 데 있습니다. 이 세 박자가 어긋나면 앱과 DB 경계에서 대부분의 사고가 발생합니다.
+## 큰 그림
+
+![Docker 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Docker 101 8장 흐름 개요*
+
+이 그림에서는 데이터베이스와 함께 실행하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터베이스와 함께 실행하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -44,10 +51,6 @@ last_reviewed: '2026-05-15'
 특히 새 환경을 만들 때마다 수동 SQL을 실행하거나, 웹 컨테이너가 뜰 때마다 migration을 함께 돌리는 방식은 시간이 지나면 반드시 문제를 만듭니다. 마이그레이션은 자동이어야 하고, 가능하면 단일 실행자로 분리되어야 합니다.
 
 ## 한눈에 보는 개념
-
-![데이터베이스 readiness 뒤 migration이 실행되고 그 다음 웹 앱이 시작되는 순서](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
-
-*PostgreSQL이 준비된 뒤 migration 컨테이너가 스키마를 맞추고 마지막에 앱이 올라오는 시작 순서*
 
 ## 핵심 용어
 
@@ -216,17 +219,29 @@ docker compose exec db pg_dump -U postgres app > app.sql
 
 다음 글에서는 이미지 최적화를 다룹니다. 이제 구성이 안정되었으니, 빌드 시간과 이미지 크기를 줄여 개발 속도와 배포 효율을 함께 끌어올릴 차례입니다.
 
+## 처음 질문으로 돌아가기
+
+- **Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?**
+  - 본문의 기준은 데이터베이스와 함께 실행하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **healthcheck와 시작 순서는 어떻게 연결해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Alembic migration은 어떤 방식으로 자동화하는 편이 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Docker란 무엇인가?](./01-what-is-docker.md)
-- [Image와 Container](./02-image-and-container.md)
-- [Dockerfile 작성하기](./03-dockerfile.md)
-- [Volume과 Network](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [환경변수와 설정](./06-env-and-config.md)
-- [Python 앱 컨테이너화](./07-python-app-containerize.md)
+## 시리즈 목차
+
+- [Docker 101 (1/10): Docker란 무엇인가?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Image와 Container](./02-image-and-container.md)
+- [Docker 101 (3/10): Dockerfile 작성하기](./03-dockerfile.md)
+- [Docker 101 (4/10): Volume과 Network](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): 환경변수와 설정](./06-env-and-config.md)
+- [Docker 101 (7/10): Python 앱 컨테이너화](./07-python-app-containerize.md)
 - **데이터베이스와 함께 실행하기 (현재 글)**
 - Image 최적화 (예정)
 - 배포용 Docker 구성 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

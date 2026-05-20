@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 5
-title: Docker Compose
+title: "Docker 101 (5/10): Docker Compose"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Define and run multi-container environments from a single YAML 
 last_reviewed: '2026-05-15'
 ---
 
-# Docker Compose
+# Docker 101 (5/10): Docker Compose
 
 A few `docker run` commands are manageable when you have only one service. The moment you need a web app, a database, a cache, and maybe a worker, that command-line memory game stops scaling. Teams start depending on tribal knowledge instead of a reproducible environment definition.
 
@@ -28,13 +28,21 @@ Compose matters because it turns that memory into a checked-in declaration. Serv
 
 This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Defining *services / networks / volumes*
-- *depends_on* and healthchecks
-- *profiles* for *selective execution*
-- *.env* files and variable interpolation
-- Five common pitfalls
+- Defining *services / networks / volumes?
+- depends_on* and healthchecks?
+- profiles* for *selective execution?
+
+## Big Picture
+
+![docker 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 5 flow overview*
+
+This picture places Docker Compose inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Docker Compose is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ New-hire setup finishes in *under five minutes*. The *README setup section* simp
 > *Compose is the shortest path to *environment-as-code*.*
 
 ## Concept at a Glance
-
-![One Compose file declaring web, database, and cache services on a shared network](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
-
-*Compose turns a multi-container environment into one reviewable declaration of services, networks, volumes, and health checks*
 
 ## Key Terms
 
@@ -185,17 +189,29 @@ Most companies' *local dev environments* run on Compose. CI also uses it for *in
 
 Compose is your team's *first piece of infrastructure as code*. Next, the patterns of *environment variables and configuration*.
 
+## Answering the Opening Questions
+
+- **Defining *services / networks / volumes?**
+  - The article treats Docker Compose as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **depends_on* and healthchecks?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **profiles* for *selective execution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
 - **Docker Compose (current)**
 - Environment Variables and Configuration (upcoming)
 - Containerizing a Python App (upcoming)
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

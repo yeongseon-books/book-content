@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 8
-title: Running with a Database
+title: "Docker 101 (8/10): Running with a Database"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Run PostgreSQL and FastAPI together with Compose, including hea
 last_reviewed: '2026-05-15'
 ---
 
-# Running with a Database
+# Docker 101 (8/10): Running with a Database
 
 The app-database boundary is where container demos turn into real systems. A web container can start successfully while the database is still warming up, migrations can lag behind the runtime schema, and seed data can quietly stop being repeatable once several environments exist.
 
@@ -28,13 +28,21 @@ That is why a dependable database setup has a rhythm: persist the data, wait for
 
 This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Running *PostgreSQL with Compose*
-- *Healthchecks* and *startup order*
-- Automating *Alembic migrations*
-- *Seed data* patterns
-- Five common pitfalls
+- Running *PostgreSQL with Compose?
+- Healthchecks* and *startup order?
+- Automating *Alembic migrations?
+
+## Big Picture
+
+![docker 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 8 flow overview*
+
+This picture places Running with a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Running with a Database is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ If the app starts *before* the DB is ready, you get *cold-start incidents*. If m
 > *The app-DB seam is the *most common incident site* and the *biggest automation opportunity*.*
 
 ## Concept at a Glance
-
-![Database readiness gating migrations before the web application starts serving traffic](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)
-
-*PostgreSQL becomes healthy first, migrations run once, and only then does the web app start against the expected schema*
 
 ## Key Terms
 
@@ -191,17 +195,29 @@ Real deployments use *managed DBs* like RDS / Cloud SQL, but local and CI conver
 
 A clean app-DB seam drops *team setup cost* toward *zero*. Next, *image optimization* makes builds and pulls fast.
 
+## Answering the Opening Questions
+
+- **Running *PostgreSQL with Compose?**
+  - The article treats Running with a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Healthchecks* and *startup order?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Automating *Alembic migrations?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [Environment Variables and Configuration](./06-env-and-config.md)
-- [Containerizing a Python App](./07-python-app-containerize.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): Environment Variables and Configuration](./06-env-and-config.md)
+- [Docker 101 (7/10): Containerizing a Python App](./07-python-app-containerize.md)
 - **Running with a Database (current)**
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

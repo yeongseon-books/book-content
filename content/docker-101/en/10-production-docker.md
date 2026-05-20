@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 10
-title: Production-Ready Docker
+title: "Docker 101 (10/10): Production-Ready Docker"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A capstone covering image tags, signed registries, runtime secu
 last_reviewed: '2026-05-15'
 ---
 
-# Production-Ready Docker
+# Docker 101 (10/10): Production-Ready Docker
 
 Production is where every shortcut from the earlier chapters becomes visible at once. A vague tag policy makes rollback harder, an oversized image carries extra attack surface, and a runtime that still writes logs to local files becomes painful the moment you need consistent collection.
 
@@ -28,13 +28,21 @@ That is why production readiness is not one Docker flag. It is the alignment of 
 
 This is the final post in the Docker 101 series. It ties the earlier image, runtime, configuration, and optimization topics into a production checklist you can actually use for tagging, signing, hardening, and observing a deployed container.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- An *image tag policy* (semver + sha)
-- *Registries* and *signed images*
-- *Runtime security* (read-only, capabilities)
-- Standard *logging / metrics*
-- Five common pitfalls
+- An *image tag policy* (semver + sha)?
+- Registries* and *signed images?
+- Runtime security* (read-only, capabilities)?
+
+## Big Picture
+
+![docker 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 10 flow overview*
+
+This picture places Production-Ready Docker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Production-Ready Docker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ Every prior decision is *validated together in production*. One weak link makes 
 > *Production is a *system, not a checklist*. Everything must work *at the same time*.*
 
 ## Concept at a Glance
-
-![Production container flow from build and signing to least-privilege runtime, logs, and metrics](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png)
-
-*A production image is built, signed, pushed, then run with minimal privileges and standard observability channels*
 
 ## Key Terms
 
@@ -174,17 +178,29 @@ Most production runs on *Kubernetes*, and the five practices above translate *di
 
 If you followed along, you can handle *95% of Docker* in the wild. From here, learn *Kubernetes 101* for *container orchestration* and *SRE 101* for *operational reliability*.
 
+## Answering the Opening Questions
+
+- **An *image tag policy* (semver + sha)?**
+  - The article treats Production-Ready Docker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Registries* and *signed images?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Runtime security* (read-only, capabilities)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [Environment Variables and Configuration](./06-env-and-config.md)
-- [Containerizing a Python App](./07-python-app-containerize.md)
-- [Running with a Database](./08-database-with-app.md)
-- [Image Optimization](./09-image-optimization.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): Environment Variables and Configuration](./06-env-and-config.md)
+- [Docker 101 (7/10): Containerizing a Python App](./07-python-app-containerize.md)
+- [Docker 101 (8/10): Running with a Database](./08-database-with-app.md)
+- [Docker 101 (9/10): Image Optimization](./09-image-optimization.md)
 - **Production-Ready Docker (current)**
+
 <!-- toc:end -->
 
 ## References

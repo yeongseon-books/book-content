@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Production-Ready Docker</title>
+<title>Docker 101 (10/10): Production-Ready Docker</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Production-Ready Docker</h1>
+<h1>Docker 101 (10/10): Production-Ready Docker</h1>
 <p>Production is where every shortcut from the earlier chapters becomes visible at once. A vague tag policy makes rollback harder, an oversized image carries extra attack surface, and a runtime that still writes logs to local files becomes painful the moment you need consistent collection.</p>
 <p>That is why production readiness is not one Docker flag. It is the alignment of image identity, registry trust, runtime permissions, health signals, and observability channels into one operating standard.</p>
 <p>This is the final post in the Docker 101 series. It ties the earlier image, runtime, configuration, and optimization topics into a production checklist you can actually use for tagging, signing, hardening, and observing a deployed container.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>An <em>image tag policy</em> (semver + sha)</li>
-<li><em>Registries</em> and <em>signed images</em></li>
-<li><em>Runtime security</em> (read-only, capabilities)</li>
-<li>Standard <em>logging / metrics</em></li>
-<li>Five common pitfalls</li>
+<li>An <em>image tag policy</em> (semver + sha)?</li>
+<li>Registries<em> and </em>signed images?</li>
+<li>Runtime security* (read-only, capabilities)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 10 flow overview</em></p>
+<p>This picture places Production-Ready Docker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Production-Ready Docker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Every prior decision is <em>validated together in production</em>. One weak link makes the <em>whole chain weak</em>.</p>
 <blockquote>
 <p><em>Production is a </em>system, not a checklist<em>. Everything must work </em>at the same time<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Production container flow from build and signing to least-privilege runtime, logs, and metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>A production image is built, signed, pushed, then run with minimal privileges and standard observability channels</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Tag policy</strong>: <code>semver</code> + <code>git sha</code> dual tagging.</li>
@@ -176,16 +179,26 @@ Instrumentator().instrument(app).expose(app, endpoint=&quot;/metrics&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>If you followed along, you can handle <em>95% of Docker</em> in the wild. From here, learn <em>Kubernetes 101</em> for <em>container orchestration</em> and <em>SRE 101</em> for <em>operational reliability</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Containerizing a Python App</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/08-database-with-app.md">Running with a Database</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/09-image-optimization.md">Image Optimization</a></li>
+<li><strong>An <em>image tag policy</em> (semver + sha)?</strong></li>
+<li>The article treats Production-Ready Docker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Registries<em> and </em>signed images?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Runtime security* (read-only, capabilities)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Docker 101 (3/10): Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Docker 101 (4/10): Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker 101 (5/10): Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Docker 101 (6/10): Environment Variables and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Docker 101 (7/10): Containerizing a Python App</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/08-database-with-app.md">Docker 101 (8/10): Running with a Database</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/09-image-optimization.md">Docker 101 (9/10): Image Optimization</a></li>
 <li><strong>Production-Ready Docker (current)</strong></li>
 </ul>
 <h2>References</h2>

@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 9
-title: Image Optimization
+title: "Docker 101 (9/10): Image Optimization"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Multi-stage builds, BuildKit cache mounts, and slim or distrole
 last_reviewed: '2026-05-15'
 ---
 
-# Image Optimization
+# Docker 101 (9/10): Image Optimization
 
 Image optimization is often presented as an aesthetic preference for smaller numbers. In practice, image size changes deploy time, registry traffic, cache hit rates, and the number of unnecessary packages that become part of your attack surface.
 
@@ -28,13 +28,21 @@ The important point is that optimization is rarely one trick. Base image choice,
 
 This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- *Multi-stage builds* to split *build vs runtime*
-- *BuildKit cache mounts* to *speed rebuilds*
-- Comparing *slim / alpine / distroless*
-- *Combining layers* and *cleanup*
-- Five common pitfalls
+- Multi-stage builds* to split *build vs runtime?
+- BuildKit cache mounts* to *speed rebuilds?
+- Comparing *slim / alpine / distroless?
+
+## Big Picture
+
+![docker 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 9 flow overview*
+
+This picture places Image Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Image Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ Smaller images shorten *pull time = deploy time*. Cleaner images also reduce the
 > *A 1 GB image costs *one minute per deploy* and *100 points of security score*.*
 
 ## Concept at a Glance
-
-![Multi-stage build separating builder and runtime stages to produce a smaller final image](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)
-
-*Builder-only tools stay out of the runtime image so build speed, image size, and attack surface all improve together*
 
 ## Key Terms
 
@@ -169,17 +173,29 @@ Build systems combine *BuildKit* with *registry caches* (e.g., GHA cache) to kee
 
 Small images lift *team velocity* and *security* at once. Next, the full *production deploy* configuration.
 
+## Answering the Opening Questions
+
+- **Multi-stage builds* to split *build vs runtime?**
+  - The article treats Image Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **BuildKit cache mounts* to *speed rebuilds?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Comparing *slim / alpine / distroless?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [Environment Variables and Configuration](./06-env-and-config.md)
-- [Containerizing a Python App](./07-python-app-containerize.md)
-- [Running with a Database](./08-database-with-app.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): Environment Variables and Configuration](./06-env-and-config.md)
+- [Docker 101 (7/10): Containerizing a Python App](./07-python-app-containerize.md)
+- [Docker 101 (8/10): Running with a Database](./08-database-with-app.md)
 - **Image Optimization (current)**
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

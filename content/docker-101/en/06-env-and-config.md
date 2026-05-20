@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 6
-title: Environment Variables and Configuration
+title: "Docker 101 (6/10): Environment Variables and Configuration"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Inject environment variables, separate config files, and extern
 last_reviewed: '2026-05-15'
 ---
 
-# Environment Variables and Configuration
+# Docker 101 (6/10): Environment Variables and Configuration
 
 Configuration is where reproducibility quietly breaks. If a team builds one image for development, another for staging, and yet another for production, it no longer has one deployable artifact. It has several environment-specific snowflakes that only look similar.
 
@@ -28,13 +28,21 @@ The better model is simpler: keep the image immutable and move environment-speci
 
 This is post 6 in the Docker 101 series. It covers the contract between image and environment, including `ENV` vs `ARG`, runtime injection patterns, secret externalization, and the startup checks that keep missing variables from becoming late incidents.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between *ENV* and *ARG*
-- Splitting *env vars / config files / secrets*
-- Wiring *Compose* to *external secret tools*
-- Patterns for *defaults and validation*
-- Five common pitfalls
+- The difference between *ENV* and *ARG?
+- Splitting *env vars / config files / secrets?
+- Wiring *Compose* to *external secret tools?
+
+## Big Picture
+
+![docker 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 6 flow overview*
+
+This picture places Environment Variables and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Environment Variables and Configuration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ The *same image* must flow from *dev to staging to prod* unchanged for *reproduc
 > *Images are build artifacts; environments are *runtime context*.*
 
 ## Concept at a Glance
-
-![A single immutable image receiving environment-specific variables and secrets at runtime](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)
-
-*The image stays fixed while development, staging, and production inject different runtime configuration and secrets*
 
 ## Key Terms
 
@@ -164,17 +168,29 @@ Mature teams let *Vault / Doppler / 1Password* be the *runtime secret provider* 
 
 Configuration discipline is half of *production stability*. Next, we turn a *Python app* into a *complete container*.
 
+## Answering the Opening Questions
+
+- **The difference between *ENV* and *ARG?**
+  - The article treats Environment Variables and Configuration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Splitting *env vars / config files / secrets?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Wiring *Compose* to *external secret tools?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
-- [Volumes and Networks](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
+- [Docker 101 (4/10): Volumes and Networks](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
 - **Environment Variables and Configuration (current)**
 - Containerizing a Python App (upcoming)
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

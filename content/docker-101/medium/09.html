@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Image Optimization</title>
+<title>Docker 101 (9/10): Image Optimization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Image Optimization</h1>
+<h1>Docker 101 (9/10): Image Optimization</h1>
 <p>Image optimization is often presented as an aesthetic preference for smaller numbers. In practice, image size changes deploy time, registry traffic, cache hit rates, and the number of unnecessary packages that become part of your attack surface.</p>
 <p>The important point is that optimization is rarely one trick. Base image choice, multi-stage separation, and BuildKit cache reuse work together. If you optimize only one of them, the result is usually smaller than it should be.</p>
 <p>This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Multi-stage builds</em> to split <em>build vs runtime</em></li>
-<li><em>BuildKit cache mounts</em> to <em>speed rebuilds</em></li>
-<li>Comparing <em>slim / alpine / distroless</em></li>
-<li><em>Combining layers</em> and <em>cleanup</em></li>
-<li>Five common pitfalls</li>
+<li>Multi-stage builds<em> to split </em>build vs runtime?</li>
+<li>BuildKit cache mounts<em> to </em>speed rebuilds?</li>
+<li>Comparing *slim / alpine / distroless?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 9 flow overview</em></p>
+<p>This picture places Image Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Image Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Smaller images shorten <em>pull time = deploy time</em>. Cleaner images also reduce the <em>attack surface</em>.</p>
 <blockquote>
 <p><em>A 1 GB image costs </em>one minute per deploy<em> and </em>100 points of security score<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Multi-stage build separating builder and runtime stages to produce a smaller final image" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>Builder-only tools stay out of the runtime image so build speed, image size, and attack surface all improve together</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Multistage</strong>: multiple <em>FROM</em> statements with only the <em>final image</em> shipped.</li>
@@ -171,15 +174,25 @@ gcr.io/distroless/python3-debian12  ~50 MB (no shell)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Small images lift <em>team velocity</em> and <em>security</em> at once. Next, the full <em>production deploy</em> configuration.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Containerizing a Python App</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/08-database-with-app.md">Running with a Database</a></li>
+<li><strong>Multi-stage builds<em> to split </em>build vs runtime?</strong></li>
+<li>The article treats Image Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>BuildKit cache mounts<em> to </em>speed rebuilds?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Comparing *slim / alpine / distroless?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Docker 101 (3/10): Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Docker 101 (4/10): Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker 101 (5/10): Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Docker 101 (6/10): Environment Variables and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Docker 101 (7/10): Containerizing a Python App</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/08-database-with-app.md">Docker 101 (8/10): Running with a Database</a></li>
 <li><strong>Image Optimization (current)</strong></li>
 <li>Production-Ready Docker (upcoming)</li>
 </ul>

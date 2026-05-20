@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Containerizing a Python App</title>
+<title>Docker 101 (7/10): Containerizing a Python App</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Containerizing a Python App</h1>
+<h1>Docker 101 (7/10): Containerizing a Python App</h1>
 <p>A Python app running inside a container is not the same thing as a production-ready Python container. The difference shows up when the process receives SIGTERM during deployment, when healthchecks ask whether the app is really ready, and when a compromised process should not be running as root.</p>
 <p>Those details are easy to skip because the app still starts without them. They only become visible when a deployment drains live traffic, a container hangs on shutdown, or an orchestrator keeps restarting something that looked healthy on a laptop.</p>
 <p>This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Containerizing <em>FastAPI + uvicorn</em></li>
-<li><em>Signal handling at PID 1</em> (SIGTERM)</li>
-<li>Adding a <em>healthcheck</em></li>
-<li><em>Non-root user</em> and permissions</li>
-<li>Five common pitfalls</li>
+<li>Containerizing *FastAPI + uvicorn?</li>
+<li>Signal handling at PID 1* (SIGTERM)?</li>
+<li>Adding a *healthcheck?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 7 flow overview</em></p>
+<p>This picture places Containerizing a Python App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Containerizing a Python App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Python in a container</em> often <em>fails to receive SIGTERM</em>, breaking <em>graceful shutdown</em>. This is a common cause of <em>deploy incidents</em>.</p>
 <blockquote>
 <p><em>PID 1 in a container needs to be a </em>small init<em> or a process with </em>correct signal handling<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>A production-grade Python container includes PID 1 handling, an honest healthcheck, and graceful shutdown behavior</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PID 1</strong>: the <em>first process</em> in a container.</li>
@@ -186,13 +189,23 @@ docker logs api | tail
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The real difficulty of Python containers is <em>signals and healthcheck</em>. Next, we run <em>with a database</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
+<li><strong>Containerizing *FastAPI + uvicorn?</strong></li>
+<li>The article treats Containerizing a Python App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Signal handling at PID 1* (SIGTERM)?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Adding a *healthcheck?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Docker 101 (3/10): Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Docker 101 (4/10): Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker 101 (5/10): Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Docker 101 (6/10): Environment Variables and Configuration</a></li>
 <li><strong>Containerizing a Python App (current)</strong></li>
 <li>Running with a Database (upcoming)</li>
 <li>Image Optimization (upcoming)</li>

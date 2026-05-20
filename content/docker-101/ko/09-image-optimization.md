@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 9
-title: Image 최적화
+title: "Docker 101 (9/10): Image 최적화"
 status: publish-ready
 targets:
   tistory: true
@@ -20,22 +20,29 @@ seo_description: 멀티스테이지와 BuildKit으로 이미지 크기와 빌드
 last_reviewed: '2026-05-15'
 ---
 
-# Image 최적화
+# Docker 101 (9/10): Image 최적화
 
 같은 애플리케이션인데 어떤 이미지는 1GB가 넘고, 어떤 이미지는 100MB도 되지 않는 경우가 있습니다. 처음에는 단순히 "작을수록 좋다" 정도로 이해하기 쉽지만, 실제로는 배포 시간, CI 속도, 보안 표면, 디버깅 방식까지 함께 달라집니다. 이미지 크기는 미적 취향이 아니라 운영 지표에 가깝습니다.
 
 좋은 최적화는 한 가지 트릭으로 끝나지 않습니다. 베이스 이미지 선택, 멀티스테이지 빌드, 캐시 전략이 함께 맞물려야 효과가 큽니다. 이 글에서는 그 세 가지를 한 번에 묶어 보겠습니다.
 
 이 글은 Docker 101 시리즈의 9번째 글입니다. 여기서는 이미지 크기와 빌드 시간이 왜 팀 속도와 보안에 직접 연결되는지 보고, 멀티스테이지 빌드·BuildKit 캐시·베이스 이미지 선택을 함께 설계하는 방법을 살펴봅니다.
-## 이 글에서 다룰 문제
+
+## 먼저 던지는 질문
 
 - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?
 - BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요?
 - slim, alpine, distroless는 각각 어떤 trade-off가 있을까요?
-- layer 결합과 캐시 정리는 왜 이미지 크기에 직접 영향을 줄까요?
-- 이미지 최적화에서 흔히 하는 오해는 무엇일까요?
 
-> 이미지 최적화는 한 줄짜리 요령이 아니라 베이스 이미지 선택, 멀티스테이지 분리, 캐시 활용을 함께 설계하는 일입니다. 세 가지를 같이 적용해야 빌드 시간과 이미지 크기에서 눈에 띄는 차이가 납니다.
+## 큰 그림
+
+![Docker 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Docker 101 9장 흐름 개요*
+
+이 그림에서는 Image 최적화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Image 최적화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -44,10 +51,6 @@ last_reviewed: '2026-05-15'
 반대로 빌드 도구와 캐시 파일, 필요 없는 레이어가 그대로 남아 있는 이미지는 느리고 무겁고 위험합니다. 특히 팀 규모가 커질수록 "한 번 빌드할 때 몇 초 더 걸리는가"가 아니라 "하루에 전체 팀이 몇 시간을 잃는가"로 봐야 합니다.
 
 ## 한눈에 보는 개념
-
-![builder 단계와 runtime 단계를 분리해 가벼운 최종 이미지를 만드는 멀티스테이지 흐름](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
-
-*빌드 도구는 builder 단계에 남기고 runtime 단계에는 실행에 필요한 산출물만 남기는 멀티스테이지 전략*
 
 ## 핵심 용어
 
@@ -194,17 +197,29 @@ docker history myapp:opt
 
 다음 글에서는 시리즈 마지막으로 프로덕션용 Docker 구성을 정리합니다. 이제 이미지를 효율적으로 만들 수 있으니, 실제 운영에 올릴 때 태그, 서명, 로그, 메트릭, 런타임 보안을 어떻게 맞출지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?**
+  - 본문의 기준은 Image 최적화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **slim, alpine, distroless는 각각 어떤 trade-off가 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Docker란 무엇인가?](./01-what-is-docker.md)
-- [Image와 Container](./02-image-and-container.md)
-- [Dockerfile 작성하기](./03-dockerfile.md)
-- [Volume과 Network](./04-volume-and-network.md)
-- [Docker Compose](./05-docker-compose.md)
-- [환경변수와 설정](./06-env-and-config.md)
-- [Python 앱 컨테이너화](./07-python-app-containerize.md)
-- [데이터베이스와 함께 실행하기](./08-database-with-app.md)
+## 시리즈 목차
+
+- [Docker 101 (1/10): Docker란 무엇인가?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Image와 Container](./02-image-and-container.md)
+- [Docker 101 (3/10): Dockerfile 작성하기](./03-dockerfile.md)
+- [Docker 101 (4/10): Volume과 Network](./04-volume-and-network.md)
+- [Docker 101 (5/10): Docker Compose](./05-docker-compose.md)
+- [Docker 101 (6/10): 환경변수와 설정](./06-env-and-config.md)
+- [Docker 101 (7/10): Python 앱 컨테이너화](./07-python-app-containerize.md)
+- [Docker 101 (8/10): 데이터베이스와 함께 실행하기](./08-database-with-app.md)
 - **Image 최적화 (현재 글)**
 - 배포용 Docker 구성 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

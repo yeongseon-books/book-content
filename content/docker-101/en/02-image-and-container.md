@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 2
-title: Images and Containers
+title: "Docker 101 (2/10): Images and Containers"
 status: publish-ready
 targets:
   tistory: false
@@ -20,20 +20,29 @@ seo_description: Image and container lifecycle, layer model, and the ten command
 last_reviewed: '2026-05-15'
 ---
 
-# Images and Containers
+# Docker 101 (2/10): Images and Containers
 
 The first serious confusion in Docker usually appears between images and containers. Teams pull an image, change files inside a running container, restart it, and then wonder why the change disappeared. The failure is not mysterious; it comes from mixing up a deployable artifact with a disposable runtime instance.
 
 Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.
 
 This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
-## What you will learn
 
-- The *lifecycle* of *images* and *containers*
-- *Layers* and *copy-on-write*
-- The *ten commands* you actually use
-- How to *look inside* a container
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- The *lifecycle* of *images* and *containers?
+- Layers* and *copy-on-write?
+- The *ten commands* you actually use?
+
+## Big Picture
+
+![docker 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 2 flow overview*
+
+This picture places Images and Containers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Images and Containers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +51,6 @@ If you do not understand how containers behave, *debugging becomes luck*. Knowin
 > *Half of "non-reproducible" bugs come from *misunderstanding container state*.*
 
 ## Concept at a Glance
-
-![Immutable image flowing into a mutable container lifecycle from run to stop to removal](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
-
-*An immutable image becomes a mutable container instance that can be created, run, stopped, and removed without changing the source artifact*
 
 ## Key Terms
 
@@ -157,8 +162,19 @@ CI systems build with *digest pins* for reproducibility, and operations correlat
 
 Separating images and containers is the *fundamentals* of Docker. Next we *build images with Dockerfile*.
 
+## Answering the Opening Questions
+
+- **The *lifecycle* of *images* and *containers?**
+  - The article treats Images and Containers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Layers* and *copy-on-write?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *ten commands* you actually use?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
 - **Images and Containers (current)**
 - Writing a Dockerfile (upcoming)
 - Volumes and Networks (upcoming)
@@ -168,6 +184,7 @@ Separating images and containers is the *fundamentals* of Docker. Next we *build
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

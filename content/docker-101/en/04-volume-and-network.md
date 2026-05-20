@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 4
-title: Volumes and Networks
+title: "Docker 101 (4/10): Volumes and Networks"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How volumes, bind mounts, and networks let containers persist d
 last_reviewed: '2026-05-15'
 ---
 
-# Volumes and Networks
+# Docker 101 (4/10): Volumes and Networks
 
 Running one container is the easy part. The real operational questions begin as soon as you need data to survive a restart and one container to reach another container without guessing IP addresses. Those two requirements show up almost immediately in real applications.
 
@@ -28,13 +28,21 @@ Docker gives you separate tools for the two problems on purpose. Volumes control
 
 This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between *volume / bind mount / tmpfs*
-- *Bridge / host / none* network modes
-- Communicating *by container name*
-- A *backup pattern* for volumes
-- Five common pitfalls
+- The difference between *volume / bind mount / tmpfs?
+- Bridge / host / none* network modes?
+- Communicating *by container name?
+
+## Big Picture
+
+![docker 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 4 flow overview*
+
+This picture places Volumes and Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Volumes and Networks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -43,10 +51,6 @@ This is post 4 in the Docker 101 series. It focuses on when to use named volumes
 > *The moment *state leaks* into a stateless container, an incident begins.*
 
 ## Concept at a Glance
-
-![Host storage, Docker volumes, and a bridge network connecting containers for data and service discovery](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
-
-*Persistent data lives outside the container while a bridge network provides name-based communication between services*
 
 ## Key Terms
 
@@ -156,10 +160,21 @@ Orchestrators (e.g., Kubernetes) extend the same ideas with *PersistentVolume* a
 
 Data and networking are the *pillars* of container ops. Next, *Docker Compose* runs many containers *at once*.
 
+## Answering the Opening Questions
+
+- **The difference between *volume / bind mount / tmpfs?**
+  - The article treats Volumes and Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Bridge / host / none* network modes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Communicating *by container name?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
-- [Writing a Dockerfile](./03-dockerfile.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
+- [Docker 101 (3/10): Writing a Dockerfile](./03-dockerfile.md)
 - **Volumes and Networks (current)**
 - Docker Compose (upcoming)
 - Environment Variables and Configuration (upcoming)
@@ -167,6 +182,7 @@ Data and networking are the *pillars* of container ops. Next, *Docker Compose* r
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

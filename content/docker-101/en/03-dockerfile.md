@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 3
-title: Writing a Dockerfile
+title: "Docker 101 (3/10): Writing a Dockerfile"
 status: publish-ready
 targets:
   tistory: false
@@ -20,20 +20,29 @@ seo_description: FROM, RUN, COPY, and CMD plus layer-cache friendly ordering for
 last_reviewed: '2026-05-15'
 ---
 
-# Writing a Dockerfile
+# Docker 101 (3/10): Writing a Dockerfile
 
 A Dockerfile is easy to underestimate because it looks like a short text file with a few instructions. In practice, it decides whether your team gets fast, repeatable builds or slow, noisy rebuilds that waste CI time and hide security mistakes inside oversized images.
 
 The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.
 
 This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
-## What you will learn
 
-- What *FROM / RUN / COPY / CMD* mean
-- An *ordering strategy* for the *layer cache*
-- The importance of *.dockerignore*
-- Running as a *non-root user*
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- What *FROM / RUN / COPY / CMD* mean?
+- An *ordering strategy* for the *layer cache?
+- The importance of *.dockerignore?
+
+## Big Picture
+
+![docker 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 3 flow overview*
+
+This picture places Writing a Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing a Dockerfile is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +51,6 @@ This is post 3 in the Docker 101 series. It explains the role of the core Docker
 > *Slow builds are a *quiet cost*. At 50 builds a day, you lose *hundreds of hours per year*.*
 
 ## Concept at a Glance
-
-![Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
-
-*A cache-friendly Dockerfile keeps low-change dependency steps above high-change application code*
 
 ## Key Terms
 
@@ -168,9 +173,20 @@ Mature teams use *multi-stage builds* and *BuildKit cache mounts* to cut build t
 
 A good Dockerfile *saves your team time every day*. Next, *volumes and networks* for data and communication.
 
+## Answering the Opening Questions
+
+- **What *FROM / RUN / COPY / CMD* mean?**
+  - The article treats Writing a Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **An *ordering strategy* for the *layer cache?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The importance of *.dockerignore?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Docker?](./01-what-is-docker.md)
-- [Images and Containers](./02-image-and-container.md)
+## In this series
+
+- [Docker 101 (1/10): What Is Docker?](./01-what-is-docker.md)
+- [Docker 101 (2/10): Images and Containers](./02-image-and-container.md)
 - **Writing a Dockerfile (current)**
 - Volumes and Networks (upcoming)
 - Docker Compose (upcoming)
@@ -179,6 +195,7 @@ A good Dockerfile *saves your team time every day*. Next, *volumes and networks*
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References

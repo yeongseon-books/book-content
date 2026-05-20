@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Running with a Database</title>
+<title>Docker 101 (8/10): Running with a Database</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Running with a Database</h1>
+<h1>Docker 101 (8/10): Running with a Database</h1>
 <p>The app-database boundary is where container demos turn into real systems. A web container can start successfully while the database is still warming up, migrations can lag behind the runtime schema, and seed data can quietly stop being repeatable once several environments exist.</p>
 <p>That is why a dependable database setup has a rhythm: persist the data, wait for honest readiness, then apply migrations in a controlled place before the application begins serving traffic.</p>
 <p>This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Running <em>PostgreSQL with Compose</em></li>
-<li><em>Healthchecks</em> and <em>startup order</em></li>
-<li>Automating <em>Alembic migrations</em></li>
-<li><em>Seed data</em> patterns</li>
-<li>Five common pitfalls</li>
+<li>Running *PostgreSQL with Compose?</li>
+<li>Healthchecks<em> and </em>startup order?</li>
+<li>Automating *Alembic migrations?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="docker 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>docker 101 chapter 8 flow overview</em></p>
+<p>This picture places Running with a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Running with a Database is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If the app starts <em>before</em> the DB is ready, you get <em>cold-start incidents</em>. If migrations are <em>not automated</em>, deployments become <em>manual</em>.</p>
 <blockquote>
 <p><em>The app-DB seam is the </em>most common incident site<em> and the </em>biggest automation opportunity<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Database readiness gating migrations before the web application starts serving traffic" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>PostgreSQL becomes healthy first, migrations run once, and only then does the web app start against the expected schema</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Migration</strong>: schema <em>versioning</em>.</li>
@@ -191,14 +194,24 @@ curl http://localhost:8000/users
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A clean app-DB seam drops <em>team setup cost</em> toward <em>zero</em>. Next, <em>image optimization</em> makes builds and pulls fast.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Volumes and Networks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker Compose</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Environment Variables and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Containerizing a Python App</a></li>
+<li><strong>Running *PostgreSQL with Compose?</strong></li>
+<li>The article treats Running with a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Healthchecks<em> and </em>startup order?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Automating *Alembic migrations?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">Docker 101 (1/10): What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Docker 101 (2/10): Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Docker 101 (3/10): Writing a Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/04-volume-and-network.md">Docker 101 (4/10): Volumes and Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/05-docker-compose.md">Docker 101 (5/10): Docker Compose</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/06-env-and-config.md">Docker 101 (6/10): Environment Variables and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/07-python-app-containerize.md">Docker 101 (7/10): Containerizing a Python App</a></li>
 <li><strong>Running with a Database (current)</strong></li>
 <li>Image Optimization (upcoming)</li>
 <li>Production-Ready Docker (upcoming)</li>

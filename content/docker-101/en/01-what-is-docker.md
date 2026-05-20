@@ -1,7 +1,7 @@
 ---
 series: docker-101
 episode: 1
-title: What Is Docker?
+title: "Docker 101 (1/10): What Is Docker?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,20 +20,29 @@ seo_description: Containers vs virtual machines and what Docker actually does, i
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Docker?
+# Docker 101 (1/10): What Is Docker?
 
 Docker usually gets introduced as a convenience tool for developers. That framing is not wrong, but it is too small. What teams actually buy with Docker is reproducibility: the ability to move one runnable artifact across a laptop, CI, staging, and production without rewriting the environment story each time.
 
 When that reproducibility is missing, debugging turns vague very quickly. You stop asking whether the code is wrong and start asking whether Python, OpenSSL, libc, or a forgotten package version changed under your feet. Docker is valuable because it makes that ambiguity much smaller.
 
 This is the first post in the Docker 101 series. It sets the mental model for the rest of the series by clarifying what Docker is, how containers differ from virtual machines, and what you should verify when you run your first container.
-## What you will learn
 
-- The difference between *containers* and *virtual machines*
-- The *environment-drift* problem Docker solves
-- The big picture of *image / container / registry*
-- Run your first container
-- Five common pitfalls
+## Questions to Keep in Mind
+
+- The difference between *containers* and *virtual machines?
+- The *environment-drift* problem Docker solves?
+- The big picture of *image / container / registry?
+
+## Big Picture
+
+![docker 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
+
+*docker 101 chapter 1 flow overview*
+
+This picture places What Is Docker? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Docker? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +51,6 @@ This is the first post in the Docker 101 series. It sets the mental model for th
 > *Environment problems are not a *skill issue*; they are a *design issue*.*
 
 ## Concept at a Glance
-
-![Code and dependencies bundled into one image that runs the same container across laptop, CI, and server](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
-
-*One image packages code and dependencies so the same container can run across local development, CI, and servers*
 
 ## Key Terms
 
@@ -152,7 +157,18 @@ Most organizations operate on the assumption that *a service equals a container*
 
 Docker is the fastest way to kill *environment drift*. Next we look deeper into *images and containers*.
 
+## Answering the Opening Questions
+
+- **The difference between *containers* and *virtual machines?**
+  - The article treats What Is Docker? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *environment-drift* problem Docker solves?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The big picture of *image / container / registry?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Docker? (current)**
 - Images and Containers (upcoming)
 - Writing a Dockerfile (upcoming)
@@ -163,6 +179,7 @@ Docker is the fastest way to kill *environment drift*. Next we look deeper into 
 - Running with a Database (upcoming)
 - Image Optimization (upcoming)
 - Production-Ready Docker (upcoming)
+
 <!-- toc:end -->
 
 ## References
