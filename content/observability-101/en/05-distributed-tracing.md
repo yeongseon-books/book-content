@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 5
-title: Distributed Tracing Basics
+title: "Observability 101 (5/10): Distributed Tracing Basics"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Spans, traces, context propagation, and your first OpenTelemetr
 last_reviewed: '2026-05-15'
 ---
 
-# Distributed Tracing Basics
+# Observability 101 (5/10): Distributed Tracing Basics
 
 Metrics can tell you a request got slower, and logs can tell you a timeout happened somewhere. But once one request crosses several services, that still leaves the central question unanswered: where did the time go?
 
 Distributed tracing answers that by breaking one request into spans, preserving parent-child relationships, and carrying context across service boundaries.
 
 This is post 5 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Distributed Tracing Basics?
+- Which signal should the example or diagram make visible for Distributed Tracing Basics?
+- What failure should be prevented first when Distributed Tracing Basics reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 5 flow overview*
+
+This picture places Distributed Tracing Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Distributed Tracing Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ In a microservice world, finding the cause of a *slow request* with logs and met
 > *Debugging a distributed system without tracing is *walking a maze blindfolded*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)
-*One request becomes a trace tree whose spans show where latency accumulated across services and storage.*
 
 ## Key Terms
 
@@ -172,17 +185,29 @@ OpenTelemetry → *Tempo / Jaeger / Honeycomb*, then Grafana shows *trace ↔ lo
 
 When traces flow, *the flow becomes visible*. Next: *dashboard design*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Distributed Tracing Basics?**
+  - The article treats Distributed Tracing Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Distributed Tracing Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Distributed Tracing Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
 - **Distributed Tracing Basics (current)**
 - Dashboard Design (upcoming)
 - Alerts and On-Call (upcoming)
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

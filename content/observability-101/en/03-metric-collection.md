@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 3
-title: Collecting and Visualizing Metrics
+title: "Observability 101 (3/10): Collecting and Visualizing Metrics"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Build your first metric pipeline with the Prometheus pull model
 last_reviewed: '2026-05-15'
 ---
 
-# Collecting and Visualizing Metrics
+# Observability 101 (3/10): Collecting and Visualizing Metrics
 
 It is easy to say metrics matter and still have no reliable path from application code to a graph an engineer can trust. A number in memory is not observability yet. Someone has to expose it, scrape it, store it, and query it correctly.
 
 Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.
 
 This is post 3 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Collecting and Visualizing Metrics?
+- Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?
+- What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 3 flow overview*
+
+This picture places Collecting and Visualizing Metrics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Collecting and Visualizing Metrics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 > *What you do not measure *does not exist*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
-*The first metric pipeline: the app exposes metrics, Prometheus scrapes them, and Grafana turns stored time series into questions.*
 
 ## Key Terms
 
@@ -172,9 +185,20 @@ Most companies start with *Prometheus + Grafana* and grow into *Thanos / Mimir* 
 
 Once metrics flow, *the system speaks in graphs*. Next: *structured logging*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Collecting and Visualizing Metrics?**
+  - The article treats Collecting and Visualizing Metrics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
 - **Collecting and Visualizing Metrics (current)**
 - Structured Logging (upcoming)
 - Distributed Tracing Basics (upcoming)
@@ -183,6 +207,7 @@ Once metrics flow, *the system speaks in graphs*. Next: *structured logging*.
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

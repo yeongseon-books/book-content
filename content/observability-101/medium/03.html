@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Collecting and Visualizing Metrics</title>
+<title>Observability 101 (3/10): Collecting and Visualizing Metrics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Collecting and Visualizing Metrics</h1>
+<h1>Observability 101 (3/10): Collecting and Visualizing Metrics</h1>
 <p>It is easy to say metrics matter and still have no reliable path from application code to a graph an engineer can trust. A number in memory is not observability yet. Someone has to expose it, scrape it, store it, and query it correctly.</p>
 <p>Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.</p>
 <p>This is post 3 in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Pull</em> vs <em>push</em> models</li>
-<li><em>Exporters</em> and the <code>/metrics</code> endpoint</li>
-<li>A one-line <em>Prometheus</em> config</li>
-<li>Your first <em>Grafana</em> dashboard</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying Collecting and Visualizing Metrics?</li>
+<li>Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?</li>
+<li>What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 3 flow overview</em></p>
+<p>This picture places Collecting and Visualizing Metrics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Collecting and Visualizing Metrics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How does a metric get collected and turned into a graph?</li>
+<li>What is the difference between pull and push collection models?</li>
+<li>What role does the <code>/metrics</code> endpoint play?</li>
+<li>How does PromQL turn raw metrics into operational questions?</li>
+<li>What should a good first dashboard show?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>A metric pipeline is the <em>starting line</em> of all observability. The moment the first byte flows, the system <em>starts talking</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>What you do not measure </em>does not exist<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>The first metric pipeline: the app exposes metrics, Prometheus scrapes them, and Grafana turns stored time series into questions.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Exporter</strong>: a component that <em>exposes metrics over HTTP</em>.</li>
@@ -169,9 +180,19 @@ curl -s http://localhost:9090/api/v1/targets | grep '&quot;health&quot;:&quot;up
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once metrics flow, <em>the system speaks in graphs</em>. Next: <em>structured logging</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><strong>What boundary should you inspect first when applying Collecting and Visualizing Metrics?</strong></li>
+<li>The article treats Collecting and Visualizing Metrics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Observability 101 (2/10): Metrics, Logs, and Traces</a></li>
 <li><strong>Collecting and Visualizing Metrics (current)</strong></li>
 <li>Structured Logging (upcoming)</li>
 <li>Distributed Tracing Basics (upcoming)</li>

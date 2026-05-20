@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 10
-title: A Production-Ready Observability Stack
+title: "Observability 101 (10/10): A Production-Ready Observability Stack"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Build a workable first observability stack with OpenTelemetry, 
 last_reviewed: '2026-05-15'
 ---
 
-# A Production-Ready Observability Stack
+# Observability 101 (10/10): A Production-Ready Observability Stack
 
 The most common small-team mistake is waiting for the perfect observability stack. The perfect mix of features, cost, and future-proofing never arrives, and the team delays the first usable setup for too long.
 
 A good first stack is less about completeness and more about operability. Collection should be standardized, the three signals should meet in one place, and the team should be able to replace parts later without rewriting the application.
 
 This is the final post in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying A Production-Ready Observability Stack?
+- Which signal should the example or diagram make visible for A Production-Ready Observability Stack?
+- What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 10 flow overview*
+
+This picture places A Production-Ready Observability Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of A Production-Ready Observability Stack is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ There is no *perfect* stack for a small team. The best stack is *operable* and *
 > *The perfect stack *will not arrive tomorrow*. Build the operable one *today*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
-*A practical small-team stack: OpenTelemetry standardizes collection, Prometheus/Loki/Tempo store the three signals, and Grafana brings them back together.*
 
 ## Key Terms
 
@@ -176,17 +189,29 @@ Small teams start with *OTel + LGTM (Loki/Grafana/Tempo/Mimir)*. As they scale, 
 
 A small team's first stack must be *replaceable*. From here: *incident response*, *capacity planning*, *cost FinOps*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying A Production-Ready Observability Stack?**
+  - The article treats A Production-Ready Observability Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for A Production-Ready Observability Stack?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
-- [Alerts and On-Call](./07-alert-and-oncall.md)
-- [SLI and SLO Basics](./08-sli-and-slo.md)
-- [Cost and Cardinality](./09-cost-and-cardinality.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
+- [Observability 101 (7/10): Alerts and On-Call](./07-alert-and-oncall.md)
+- [Observability 101 (8/10): SLI and SLO Basics](./08-sli-and-slo.md)
+- [Observability 101 (9/10): Cost and Cardinality](./09-cost-and-cardinality.md)
 - **A Production-Ready Observability Stack (current)**
+
 <!-- toc:end -->
 
 ## References

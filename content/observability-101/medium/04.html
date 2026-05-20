@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Structured Logging</title>
+<title>Observability 101 (4/10): Structured Logging</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Structured Logging</h1>
+<h1>Observability 101 (4/10): Structured Logging</h1>
 <p>Many incident reviews reveal the same problem: logs existed, but the team still could not answer the first two questions quickly. Which request failed, and what was different about it? Free-form lines are readable, but they are poor query surfaces.</p>
 <p>Structured logging fixes that by turning log lines into data with fields you can filter, aggregate, and join with traces.</p>
 <p>This is post 4 in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li><em>Unstructured</em> vs <em>structured</em> logs</li>
-<li><em>Log levels</em> and when to use them</li>
-<li>Propagating <em>context</em> (request_id, user_id)</li>
-<li>Emitting <em>JSON</em> with Python <code>logging</code></li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying Structured Logging?</li>
+<li>Which signal should the example or diagram make visible for Structured Logging?</li>
+<li>What failure should be prevented first when Structured Logging reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 4 flow overview</em></p>
+<p>This picture places Structured Logging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Structured Logging is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why do free-form logs hit a limit so quickly in production?</li>
+<li>What changes when logs become structured data?</li>
+<li>How should you choose between log levels?</li>
+<li>How should a per-request correlation ID flow through the system?</li>
+<li>How should you handle sensitive data in logs?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>To find the responsible line <em>within five minutes</em> of an incident, logs must be <em>queryable</em>. The age of <code>print</code> is over.</p>
@@ -71,8 +84,6 @@
 <p><em>A log is </em>data<em>, not prose.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>Application events become one-line JSON records, flow to a log backend, and come back as field-based queries during incident response.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Level</strong>: DEBUG / INFO / WARNING / ERROR / CRITICAL.</li>
@@ -171,10 +182,20 @@ grep '&quot;lvl&quot;: &quot;ERROR&quot;' app.log | grep '&quot;rid&quot;: &quot
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once logs are <em>data</em>, <em>queries</em> begin. Next: <em>distributed tracing</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><strong>What boundary should you inspect first when applying Structured Logging?</strong></li>
+<li>The article treats Structured Logging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Structured Logging?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Structured Logging reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Observability 101 (2/10): Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Observability 101 (3/10): Collecting and Visualizing Metrics</a></li>
 <li><strong>Structured Logging (current)</strong></li>
 <li>Distributed Tracing Basics (upcoming)</li>
 <li>Dashboard Design (upcoming)</li>

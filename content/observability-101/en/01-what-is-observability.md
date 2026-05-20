@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 1
-title: What Is Observability?
+title: "Observability 101 (1/10): What Is Observability?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Monitoring versus observability, the three pillars (metrics, lo
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Observability?
+# Observability 101 (1/10): What Is Observability?
 
 Production systems rarely fail in a dramatic way. Checkout gets slower, a small slice of requests starts timing out, and logs leave only a few clues. You can see the symptom, but not the mechanism, and that gap is what makes incident response expensive.
 
 Observability is what closes that gap. It is the difference between watching a known threshold and being able to infer the inside of a system from the outside when the failure mode is new.
 
 This is the first post in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Observability??
+- Which signal should the example or diagram make visible for What Is Observability??
+- What failure should be prevented first when What Is Observability? reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 1 flow overview*
+
+This picture places What Is Observability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Observability? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ Production systems break in *unpredictable ways*. Pre-built dashboards cannot ex
 > *Dashboards are *answers*; observability is *questions*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
-*The baseline observability loop: one application emits metrics, logs, and traces, and each signal answers a different operational question.*
 
 ## Key Terms
 
@@ -177,7 +190,18 @@ Most SRE teams treat the *three pillars* as their *minimum signal set* and then 
 
 Observability is the discipline of *asking inside from outside*. Next we look deeper into *the three pillars*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Observability??**
+  - The article treats What Is Observability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Observability??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Observability? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Observability? (current)**
 - Metrics, Logs, and Traces (upcoming)
 - Collecting and Visualizing Metrics (upcoming)
@@ -188,6 +212,7 @@ Observability is the discipline of *asking inside from outside*. Next we look de
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

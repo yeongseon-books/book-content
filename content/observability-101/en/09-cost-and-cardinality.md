@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 9
-title: Cost and Cardinality
+title: "Observability 101 (9/10): Cost and Cardinality"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: How cardinality explosions, retention tiers, and sampling decis
 last_reviewed: '2026-05-15'
 ---
 
-# Cost and Cardinality
+# Observability 101 (9/10): Cost and Cardinality
 
 Observability rarely looks expensive at the beginning. A few counters, a few logs, a bit of tracing, and the bill seems harmless. Then one month later the cost curve changes shape and nobody can explain why.
 
 The answer is usually structural, not accidental: too many unique labels, too much retention, and too little sampling discipline.
 
 This is post 9 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cost and Cardinality?
+- Which signal should the example or diagram make visible for Cost and Cardinality?
+- What failure should be prevented first when Cost and Cardinality reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 9 flow overview*
+
+This picture places Cost and Cardinality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cost and Cardinality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ In young companies the *#1 line on the AWS bill* is often *observability*. When 
 > *If you do not know the cost of measurement, *measurement becomes the enemy*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
-*Observability cost is largely determined by label combinations, log volume, and how aggressively trace volume is sampled and retained.*
 
 ## Key Terms
 
@@ -172,17 +185,29 @@ Most companies combine *team cardinality budgets*, *retention tiers*, and *tail 
 
 Without cost awareness, *observability becomes the enemy*. Next: *a production-ready stack*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost and Cardinality?**
+  - The article treats Cost and Cardinality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost and Cardinality?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost and Cardinality reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
-- [Alerts and On-Call](./07-alert-and-oncall.md)
-- [SLI and SLO Basics](./08-sli-and-slo.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
+- [Observability 101 (7/10): Alerts and On-Call](./07-alert-and-oncall.md)
+- [Observability 101 (8/10): SLI and SLO Basics](./08-sli-and-slo.md)
 - **Cost and Cardinality (current)**
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

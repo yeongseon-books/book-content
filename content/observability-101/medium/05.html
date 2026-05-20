@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Distributed Tracing Basics</title>
+<title>Observability 101 (5/10): Distributed Tracing Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Distributed Tracing Basics</h1>
+<h1>Observability 101 (5/10): Distributed Tracing Basics</h1>
 <p>Metrics can tell you a request got slower, and logs can tell you a timeout happened somewhere. But once one request crosses several services, that still leaves the central question unanswered: where did the time go?</p>
 <p>Distributed tracing answers that by breaking one request into spans, preserving parent-child relationships, and carrying context across service boundaries.</p>
 <p>This is post 5 in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of <em>span</em> and <em>trace</em></li>
-<li>What <em>context propagation</em> means</li>
-<li><em>Sampling</em> strategies</li>
-<li>Your first trace with <em>OpenTelemetry</em></li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying Distributed Tracing Basics?</li>
+<li>Which signal should the example or diagram make visible for Distributed Tracing Basics?</li>
+<li>What failure should be prevented first when Distributed Tracing Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 5 flow overview</em></p>
+<p>This picture places Distributed Tracing Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Distributed Tracing Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is a span, and what is a trace?</li>
+<li>Why does context propagation matter when a request crosses services?</li>
+<li>Why is sampling central to cost control?</li>
+<li>How do you build your first trace with OpenTelemetry?</li>
+<li>What is hardest about operating without distributed tracing?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>In a microservice world, finding the cause of a <em>slow request</em> with logs and metrics alone is <em>impossible</em>. Tracing is the <em>only answer</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>Debugging a distributed system without tracing is </em>walking a maze blindfolded<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>One request becomes a trace tree whose spans show where latency accumulated across services and storage.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Trace</strong>: the <em>whole flow</em> of one request.</li>
@@ -169,11 +180,21 @@ handle_request  2450ms
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>When traces flow, <em>the flow becomes visible</em>. Next: <em>dashboard design</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><strong>What boundary should you inspect first when applying Distributed Tracing Basics?</strong></li>
+<li>The article treats Distributed Tracing Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Distributed Tracing Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Distributed Tracing Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Observability 101 (2/10): Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Observability 101 (3/10): Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Observability 101 (4/10): Structured Logging</a></li>
 <li><strong>Distributed Tracing Basics (current)</strong></li>
 <li>Dashboard Design (upcoming)</li>
 <li>Alerts and On-Call (upcoming)</li>

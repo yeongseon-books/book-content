@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 8
-title: SLI and SLO Basics
+title: "Observability 101 (8/10): SLI and SLO Basics"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Define SLIs, set SLO targets, and use the error budget to make 
 last_reviewed: '2026-05-15'
 ---
 
-# SLI and SLO Basics
+# Observability 101 (8/10): SLI and SLO Basics
 
 Reliability conversations often go in circles because each side is speaking from instinct. One team says the service is fine, another says it is already risky, and nobody has a shared threshold for when feature work should slow down.
 
 SLIs and SLOs solve that by turning service quality into a number, a target, and a budget the team can spend or protect.
 
 This is post 8 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying SLI and SLO Basics?
+- Which signal should the example or diagram make visible for SLI and SLO Basics?
+- What failure should be prevented first when SLI and SLO Basics reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 8 flow overview*
+
+This picture places SLI and SLO Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SLI and SLO Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ This is post 8 in the Observability 101 series.
 > *An SLO is *the shared language between engineers and the business*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png)
-*Measured reliability becomes an SLI, the target becomes an SLO, and the remaining room for failure becomes an error budget that alerts can track.*
 
 ## Key Terms
 
@@ -166,17 +179,29 @@ Most companies start with *availability + latency* SLOs and use them as the *cri
 
 SLOs are a *shared language*. Next: *cost and cardinality*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying SLI and SLO Basics?**
+  - The article treats SLI and SLO Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for SLI and SLO Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when SLI and SLO Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
-- [Alerts and On-Call](./07-alert-and-oncall.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
+- [Observability 101 (7/10): Alerts and On-Call](./07-alert-and-oncall.md)
 - **SLI and SLO Basics (current)**
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

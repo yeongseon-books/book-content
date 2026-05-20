@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Observability?</title>
+<title>Observability 101 (1/10): What Is Observability?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>What Is Observability?</h1>
+<h1>Observability 101 (1/10): What Is Observability?</h1>
 <p>Production systems rarely fail in a dramatic way. Checkout gets slower, a small slice of requests starts timing out, and logs leave only a few clues. You can see the symptom, but not the mechanism, and that gap is what makes incident response expensive.</p>
 <p>Observability is what closes that gap. It is the difference between watching a known threshold and being able to infer the inside of a system from the outside when the failure mode is new.</p>
 <p>This is the first post in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The difference between <em>monitoring</em> and <em>observability</em></li>
-<li>The three pillars: <em>metrics, logs, traces</em></li>
-<li><em>Known unknowns</em> vs <em>unknown unknowns</em></li>
-<li>Five steps to your first signals</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying What Is Observability??</li>
+<li>Which signal should the example or diagram make visible for What Is Observability??</li>
+<li>What failure should be prevented first when What Is Observability? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Observability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Observability? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How is observability different from monitoring?</li>
+<li>What question does each signal — metrics, logs, and traces — answer?</li>
+<li>Why do you need to read the three signals together?</li>
+<li>Why is <code>trace_id</code> the connective tissue of observability?</li>
+<li>Where should a small service start when adding its first signals?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Production systems break in <em>unpredictable ways</em>. Pre-built dashboards cannot explain <em>failures you have never seen</em>. Observability gives you a system you can <em>ask questions of</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>Dashboards are </em>answers<em>; observability is </em>questions<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>The baseline observability loop: one application emits metrics, logs, and traces, and each signal answers a different operational question.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a <em>number</em> that changes over time. Example: requests per second.</li>
@@ -173,6 +184,16 @@ grep '&quot;trace_id&quot;: &quot;abc-123&quot;' app.log
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Observability is the discipline of <em>asking inside from outside</em>. Next we look deeper into <em>the three pillars</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Observability??</strong></li>
+<li>The article treats What Is Observability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Observability??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Observability? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Observability? (current)</strong></li>
 <li>Metrics, Logs, and Traces (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 2
-title: Metrics, Logs, and Traces
+title: "Observability 101 (2/10): Metrics, Logs, and Traces"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: How metrics, logs, and traces differ, and when to reach for eac
 last_reviewed: '2026-05-15'
 ---
 
-# Metrics, Logs, and Traces
+# Observability 101 (2/10): Metrics, Logs, and Traces
 
 Many teams say they use all three signals, but still send every question to the same place. Everything becomes a log search, or everything gets flattened into dashboards. That is where cost grows faster than understanding.
 
 The real skill is not collecting more signals. It is choosing the right one for the question in front of you.
 
 This is post 2 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Metrics, Logs, and Traces?
+- Which signal should the example or diagram make visible for Metrics, Logs, and Traces?
+- What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 2 flow overview*
+
+This picture places Metrics, Logs, and Traces inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Metrics, Logs, and Traces is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -43,9 +59,6 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 > *One right signal beats *ten wrong dashboards*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
-*A simple decision model: route each operational question to the signal that answers it with the least cost and ambiguity.*
 
 ## Key Terms
 
@@ -181,8 +194,19 @@ Most teams use a three-step pattern: *metrics for alerts*, *logs for debugging*,
 
 The three signals are tools with *different boundaries*. Next we look at *collecting and visualizing metrics*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Metrics, Logs, and Traces?**
+  - The article treats Metrics, Logs, and Traces as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Metrics, Logs, and Traces?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
 - **Metrics, Logs, and Traces (current)**
 - Collecting and Visualizing Metrics (upcoming)
 - Structured Logging (upcoming)
@@ -192,6 +216,7 @@ The three signals are tools with *different boundaries*. Next we look at *collec
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:20:51+00:00
+Generated: 2026-05-20T11:21:11+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`

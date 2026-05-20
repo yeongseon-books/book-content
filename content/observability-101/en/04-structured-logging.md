@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 4
-title: Structured Logging
+title: "Observability 101 (4/10): Structured Logging"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Replace print with JSON logs that carry level and context, so p
 last_reviewed: '2026-05-15'
 ---
 
-# Structured Logging
+# Observability 101 (4/10): Structured Logging
 
 Many incident reviews reveal the same problem: logs existed, but the team still could not answer the first two questions quickly. Which request failed, and what was different about it? Free-form lines are readable, but they are poor query surfaces.
 
 Structured logging fixes that by turning log lines into data with fields you can filter, aggregate, and join with traces.
 
 This is post 4 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Structured Logging?
+- Which signal should the example or diagram make visible for Structured Logging?
+- What failure should be prevented first when Structured Logging reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 4 flow overview*
+
+This picture places Structured Logging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Structured Logging is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ To find the responsible line *within five minutes* of an incident, logs must be 
 > *A log is *data*, not prose.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)
-*Application events become one-line JSON records, flow to a log backend, and come back as field-based queries during incident response.*
 
 ## Key Terms
 
@@ -176,10 +189,21 @@ Most teams ship *JSON logs → Loki or ELK → Grafana / Kibana*. The correlatio
 
 Once logs are *data*, *queries* begin. Next: *distributed tracing*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Structured Logging?**
+  - The article treats Structured Logging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Structured Logging?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Structured Logging reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
 - **Structured Logging (current)**
 - Distributed Tracing Basics (upcoming)
 - Dashboard Design (upcoming)
@@ -187,6 +211,7 @@ Once logs are *data*, *queries* begin. Next: *distributed tracing*.
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

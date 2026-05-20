@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Metrics, Logs, and Traces</title>
+<title>Observability 101 (2/10): Metrics, Logs, and Traces</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Metrics, Logs, and Traces</h1>
+<h1>Observability 101 (2/10): Metrics, Logs, and Traces</h1>
 <p>Many teams say they use all three signals, but still send every question to the same place. Everything becomes a log search, or everything gets flattened into dashboards. That is where cost grows faster than understanding.</p>
 <p>The real skill is not collecting more signals. It is choosing the right one for the question in front of you.</p>
 <p>This is post 2 in the Observability 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Metrics, Logs, and Traces?</li>
+<li>Which signal should the example or diagram make visible for Metrics, Logs, and Traces?</li>
+<li>What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 2 flow overview</em></p>
+<p>This picture places Metrics, Logs, and Traces inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Metrics, Logs, and Traces is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>question domain</em> of each signal</li>
@@ -71,8 +84,6 @@
 <p><em>One right signal beats </em>ten wrong dashboards<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>A simple decision model: route each operational question to the signal that answers it with the least cost and ambiguity.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Counter / Gauge / Histogram</strong>: the three <em>shapes</em> of metrics.</li>
@@ -176,8 +187,18 @@ trace: checkout → payment-gateway span p95 2.4s
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The three signals are tools with <em>different boundaries</em>. Next we look at <em>collecting and visualizing metrics</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><strong>What boundary should you inspect first when applying Metrics, Logs, and Traces?</strong></li>
+<li>The article treats Metrics, Logs, and Traces as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Metrics, Logs, and Traces?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
 <li><strong>Metrics, Logs, and Traces (current)</strong></li>
 <li>Collecting and Visualizing Metrics (upcoming)</li>
 <li>Structured Logging (upcoming)</li>

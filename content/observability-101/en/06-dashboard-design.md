@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 6
-title: Dashboard Design
+title: "Observability 101 (6/10): Dashboard Design"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: USE and RED patterns and how to choose panels that answer quest
 last_reviewed: '2026-05-15'
 ---
 
-# Dashboard Design
+# Observability 101 (6/10): Dashboard Design
 
 Large dashboards often look impressive right until an incident starts. The screen is full, but the first person on call still does not know where to look, what changed first, or whether the problem is user-facing or internal.
 
 Good dashboard design fixes that. The first screen should compress the system into a small number of questions that lead directly to the next action.
 
 This is post 6 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dashboard Design?
+- Which signal should the example or diagram make visible for Dashboard Design?
+- What failure should be prevented first when Dashboard Design reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 6 flow overview*
+
+This picture places Dashboard Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dashboard Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ Most dashboards are *decoration*. If you do not know *where to look* during an i
 > *A dashboard is a *tool that answers*. If it does not answer, delete it.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
-*The first dashboard screen should route the operator from a question to RED, USE, and the golden signals in a predictable order.*
 
 ## Key Terms
 
@@ -170,17 +183,29 @@ The most consulted *Service Overview* dashboard collapses into 6 *RED + USE* pan
 
 Question-driven dashboards change *decision speed*. Next: *alerts and on-call*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dashboard Design?**
+  - The article treats Dashboard Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dashboard Design?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dashboard Design reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
 - **Dashboard Design (current)**
 - Alerts and On-Call (upcoming)
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

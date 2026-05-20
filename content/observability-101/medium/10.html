@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>A Production-Ready Observability Stack</title>
+<title>Observability 101 (10/10): A Production-Ready Observability Stack</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>A Production-Ready Observability Stack</h1>
+<h1>Observability 101 (10/10): A Production-Ready Observability Stack</h1>
 <p>The most common small-team mistake is waiting for the perfect observability stack. The perfect mix of features, cost, and future-proofing never arrives, and the team delays the first usable setup for too long.</p>
 <p>A good first stack is less about completeness and more about operability. Collection should be standardized, the three signals should meet in one place, and the team should be able to replace parts later without rewriting the application.</p>
 <p>This is the final post in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The simple flow <em>collect → store → query</em></li>
-<li>An open-source <em>baseline stack</em></li>
-<li><em>Correlation</em> on one screen</li>
-<li>Five <em>operator SLOs</em></li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying A Production-Ready Observability Stack?</li>
+<li>Which signal should the example or diagram make visible for A Production-Ready Observability Stack?</li>
+<li>What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 10 flow overview</em></p>
+<p>This picture places A Production-Ready Observability Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of A Production-Ready Observability Stack is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What does the minimum viable observability stack for a small team look like?</li>
+<li>Why is it better to put the OpenTelemetry Collector at the center?</li>
+<li>What do you need to connect metrics, logs, and traces on one screen?</li>
+<li>Why should operators define service-level objectives for the observability stack itself?</li>
+<li>What should you evaluate when you want practical choices without deep vendor lock-in?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>There is no <em>perfect</em> stack for a small team. The best stack is <em>operable</em> and <em>replaceable</em>. Avoid lock-in and start <em>today</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>The perfect stack </em>will not arrive tomorrow<em>. Build the operable one </em>today<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png"><br>
-<em>A practical small-team stack: OpenTelemetry standardizes collection, Prometheus/Loki/Tempo store the three signals, and Grafana brings them back together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Collector</strong>: a gateway that <em>receives and routes</em> signals.</li>
@@ -173,16 +184,26 @@ curl -s http://localhost:3000/api/health
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A small team's first stack must be <em>replaceable</em>. From here: <em>incident response</em>, <em>capacity planning</em>, <em>cost FinOps</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Alerts and On-Call</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/08-sli-and-slo.md">SLI and SLO Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/09-cost-and-cardinality.md">Cost and Cardinality</a></li>
+<li><strong>What boundary should you inspect first when applying A Production-Ready Observability Stack?</strong></li>
+<li>The article treats A Production-Ready Observability Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for A Production-Ready Observability Stack?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Observability 101 (2/10): Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Observability 101 (3/10): Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Observability 101 (4/10): Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Observability 101 (5/10): Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Observability 101 (6/10): Dashboard Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Observability 101 (7/10): Alerts and On-Call</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/08-sli-and-slo.md">Observability 101 (8/10): SLI and SLO Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/09-cost-and-cardinality.md">Observability 101 (9/10): Cost and Cardinality</a></li>
 <li><strong>A Production-Ready Observability Stack (current)</strong></li>
 </ul>
 <h2>References</h2>

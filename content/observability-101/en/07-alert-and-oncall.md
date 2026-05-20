@@ -1,7 +1,7 @@
 ---
 series: observability-101
 episode: 7
-title: Alerts and On-Call
+title: "Observability 101 (7/10): Alerts and On-Call"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: What makes an alert worth a 3am page, how to avoid alert fatigu
 last_reviewed: '2026-05-15'
 ---
 
-# Alerts and On-Call
+# Observability 101 (7/10): Alerts and On-Call
 
 More alerts do not make a system safer by default. Once the team stops trusting the pager, even the alert that matters most arrives already discounted.
 
 That is why alerting design is partly a technical problem and partly a human one. It spends sleep, focus, and trust, so it must be tied to user impact and clear action.
 
 This is post 7 in the Observability 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Alerts and On-Call?
+- Which signal should the example or diagram make visible for Alerts and On-Call?
+- What failure should be prevented first when Alerts and On-Call reaches a real system?
+
+## Big Picture
+
+![observability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png)
+
+*observability 101 chapter 7 flow overview*
+
+This picture places Alerts and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Alerts and On-Call is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,9 +59,6 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 > *Alerts have a *wake-up cost*. If you do not know it, you go *bankrupt*.*
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png)
-*A metric condition becomes an alert rule, then routes either to a pager or to a lower-urgency coordination channel.*
 
 ## Key Terms
 
@@ -173,17 +186,29 @@ Most teams put *symptom-based alerts (SLO breaches)* first and *cause-based aler
 
 Good alerts *protect sleep*. Next: *SLI and SLO basics*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Alerts and On-Call?**
+  - The article treats Alerts and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Alerts and On-Call?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Alerts and On-Call reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Observability?](./01-what-is-observability.md)
-- [Metrics, Logs, and Traces](./02-metric-log-trace.md)
-- [Collecting and Visualizing Metrics](./03-metric-collection.md)
-- [Structured Logging](./04-structured-logging.md)
-- [Distributed Tracing Basics](./05-distributed-tracing.md)
-- [Dashboard Design](./06-dashboard-design.md)
+## In this series
+
+- [Observability 101 (1/10): What Is Observability?](./01-what-is-observability.md)
+- [Observability 101 (2/10): Metrics, Logs, and Traces](./02-metric-log-trace.md)
+- [Observability 101 (3/10): Collecting and Visualizing Metrics](./03-metric-collection.md)
+- [Observability 101 (4/10): Structured Logging](./04-structured-logging.md)
+- [Observability 101 (5/10): Distributed Tracing Basics](./05-distributed-tracing.md)
+- [Observability 101 (6/10): Dashboard Design](./06-dashboard-design.md)
 - **Alerts and On-Call (current)**
 - SLI and SLO Basics (upcoming)
 - Cost and Cardinality (upcoming)
 - A Production-Ready Observability Stack (upcoming)
+
 <!-- toc:end -->
 
 ## References

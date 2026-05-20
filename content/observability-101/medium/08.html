@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SLI and SLO Basics</title>
+<title>Observability 101 (8/10): SLI and SLO Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>SLI and SLO Basics</h1>
+<h1>Observability 101 (8/10): SLI and SLO Basics</h1>
 <p>Reliability conversations often go in circles because each side is speaking from instinct. One team says the service is fine, another says it is already risky, and nobody has a shared threshold for when feature work should slow down.</p>
 <p>SLIs and SLOs solve that by turning service quality into a number, a target, and a budget the team can spend or protect.</p>
 <p>This is post 8 in the Observability 101 series.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of <em>SLI</em> ("good / total")</li>
-<li>The <em>language</em> an <em>SLO</em> creates</li>
-<li>The meaning of <em>error budget</em></li>
-<li><em>Burn-rate</em> alerts</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying SLI and SLO Basics?</li>
+<li>Which signal should the example or diagram make visible for SLI and SLO Basics?</li>
+<li>What failure should be prevented first when SLI and SLO Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="observability 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>observability 101 chapter 8 flow overview</em></p>
+<p>This picture places SLI and SLO Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of SLI and SLO Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What does an SLI measure, and how should you measure it?</li>
+<li>What kind of promise does an SLO create?</li>
+<li>Why does the error budget become the balance point between feature delivery and reliability work?</li>
+<li>What kinds of conditions do burn-rate alerts catch early?</li>
+<li>Why should you separate internal metrics from user-facing metrics?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>"Stable" is <em>subjective</em>. 99.9% is <em>agreement</em>. With SLOs, the <em>features vs reliability</em> fight is settled <em>with data</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>An SLO is </em>the shared language between engineers and the business<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>Measured reliability becomes an SLI, the target becomes an SLO, and the remaining room for failure becomes an error budget that alerts can track.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SLI</strong>: a <em>measurable ratio</em> (e.g., success rate).</li>
@@ -163,14 +174,24 @@ decision: keep routine deploys, hold risky changes
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>SLOs are a <em>shared language</em>. Next: <em>cost and cardinality</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Alerts and On-Call</a></li>
+<li><strong>What boundary should you inspect first when applying SLI and SLO Basics?</strong></li>
+<li>The article treats SLI and SLO Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for SLI and SLO Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when SLI and SLO Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">Observability 101 (1/10): What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Observability 101 (2/10): Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Observability 101 (3/10): Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Observability 101 (4/10): Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Observability 101 (5/10): Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Observability 101 (6/10): Dashboard Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Observability 101 (7/10): Alerts and On-Call</a></li>
 <li><strong>SLI and SLO Basics (current)</strong></li>
 <li>Cost and Cardinality (upcoming)</li>
 <li>A Production-Ready Observability Stack (upcoming)</li>
