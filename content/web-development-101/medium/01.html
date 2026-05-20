@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>How the Web Works</title>
+<title>Web Development 101 (1/10): How the Web Works</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>How the Web Works</h1>
+<h1>Web Development 101 (1/10): How the Web Works</h1>
 <p>When a page loads slowly or fails entirely, the hardest part for a new developer is often not the bug itself but knowing which layer to inspect first. A mistyped domain, a TLS problem, a slow application server, and a browser rendering stall can all feel like the same symptom: “the site does not load.”</p>
 <p>This is the first post in the Web Development 101 series. Here we build the full URL-to-pixels mental model so later topics like HTML, APIs, authentication, deployment, and caching all fit into one continuous request path.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The full path from URL to pixels on the screen</li>
-<li>The role of DNS, HTTP, and the browser renderer</li>
-<li>Where the client ends and the server begins</li>
-<li>How to observe a real network request</li>
-<li>A map of this whole series</li>
+<li>The full path from URL to pixels on the screen?</li>
+<li>The role of DNS, HTTP, and the browser renderer?</li>
+<li>Where the client ends and the server begins?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 1 flow overview</em></p>
+<p>This picture places How the Web Works inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of How the Web Works is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Web developers must see the <em>whole picture</em>. Knowing one layer well lets you build, but it does not let you debug. Once the five-step flow is in your head, every tool finds its place.</p>
 <blockquote>
 <p>The web runs on <em>agreed protocols</em>, not magic.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>A compact map of the path from a typed URL to visible pixels.</em></p>
 <p>Read this figure from left to right: a user action becomes a browser task, DNS resolves the host, the server responds over HTTP, and only then does the browser render what you can see. Later chapters simply zoom into one part of this same end-to-end path.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -175,6 +178,16 @@ print(title)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The web is a <em>concert of protocols</em>. Next, we look at the three things the browser actually downloads — HTML, CSS, and JavaScript.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The full path from URL to pixels on the screen?</strong></li>
+<li>The article treats How the Web Works as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The role of DNS, HTTP, and the browser renderer?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where the client ends and the server begins?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>How the Web Works (current)</strong></li>
 <li>HTML, CSS, and JavaScript (upcoming)</li>

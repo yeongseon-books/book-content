@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 1
-title: How the Web Works
+title: "Web Development 101 (1/10): How the Web Works"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: What really happens when you type a URL and hit Enter — DNS, 
 last_reviewed: '2026-05-15'
 ---
 
-# How the Web Works
+# Web Development 101 (1/10): How the Web Works
 
 When a page loads slowly or fails entirely, the hardest part for a new developer is often not the bug itself but knowing which layer to inspect first. A mistyped domain, a TLS problem, a slow application server, and a browser rendering stall can all feel like the same symptom: “the site does not load.”
 
 This is the first post in the Web Development 101 series. Here we build the full URL-to-pixels mental model so later topics like HTML, APIs, authentication, deployment, and caching all fit into one continuous request path.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The full path from URL to pixels on the screen
-- The role of DNS, HTTP, and the browser renderer
-- Where the client ends and the server begins
-- How to observe a real network request
-- A map of this whole series
+- The full path from URL to pixels on the screen?
+- The role of DNS, HTTP, and the browser renderer?
+- Where the client ends and the server begins?
+
+## Big Picture
+
+![web development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 1 flow overview*
+
+This picture places How the Web Works inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of How the Web Works is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Web developers must see the *whole picture*. Knowing one layer well lets you bui
 > The web runs on *agreed protocols*, not magic.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
-
-*A compact map of the path from a typed URL to visible pixels.*
 
 Read this figure from left to right: a user action becomes a browser task, DNS resolves the host, the server responds over HTTP, and only then does the browser render what you can see. Later chapters simply zoom into one part of this same end-to-end path.
 
@@ -186,7 +190,18 @@ When something breaks, the first question is *which step*: DNS, TLS, server, or 
 
 The web is a *concert of protocols*. Next, we look at the three things the browser actually downloads — HTML, CSS, and JavaScript.
 
+## Answering the Opening Questions
+
+- **The full path from URL to pixels on the screen?**
+  - The article treats How the Web Works as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The role of DNS, HTTP, and the browser renderer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where the client ends and the server begins?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **How the Web Works (current)**
 - HTML, CSS, and JavaScript (upcoming)
 - The Browser and the DOM (upcoming)
@@ -197,6 +212,7 @@ The web is a *concert of protocols*. Next, we look at the three things the brows
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

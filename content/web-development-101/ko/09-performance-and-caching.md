@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 9
-title: 성능과 캐싱
+title: "Web Development 101 (9/10): 성능과 캐싱"
 status: publish-ready
 targets:
   tistory: true
@@ -21,23 +21,27 @@ seo_description: 측정, HTTP 캐시, CDN, 지연 로딩, DB 인덱스로 성능
 last_reviewed: '2026-05-15'
 ---
 
-# 성능과 캐싱
+# Web Development 101 (9/10): 성능과 캐싱
 
 서비스가 느리다는 말은 흔하지만, 어디가 느린지는 생각보다 자주 흐립니다. 서버가 느린지, 브라우저가 느린지, 이미지가 큰지, 데이터베이스 조회가 많은지, 캐시가 전혀 없는지 구분하지 않으면 최적화는 방향을 잃습니다. 성능은 감각보다 측정과 구조가 먼저입니다.
 
 이 글은 Web Development 101 시리즈의 아홉 번째 글입니다. 여기서는 측정의 출발점, HTTP 캐시와 CDN, lazy loading과 code splitting, 데이터베이스 인덱스와 N+1 문제를 함께 보며 느린 웹앱을 빠르게 만드는 기본 원칙을 정리하겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 느린 페이지를 만나면 어디서부터 봐야 할까요?
 - 브라우저 캐시와 CDN은 각각 어떤 역할을 할까요?
 - lazy loading은 무엇을 늦추고 왜 유용할까요?
-- 데이터베이스 인덱스는 어떤 상황에서 큰 차이를 만들까요?
-- 캐시는 왜 TTL과 무효화 전략을 함께 가져야 할까요?
 
-> 성능 최적화는 더 빠르게 만드는 작업이 아니라 같은 일을 덜 자주, 더 가까운 곳에서 하게 만드는 작업입니다.
+## 큰 그림
+
+![Web Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Web Development 101 9장 흐름 개요*
+
+이 그림에서는 성능과 캐싱를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 성능과 캐싱의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 성능은 측정부터 시작하는가
 
@@ -46,10 +50,6 @@ last_reviewed: '2026-05-15'
 그래서 성능 작업의 첫 단계는 늘 측정입니다. 브라우저 기준 지표와 서버 기준 지표를 함께 보고, 어느 층에서 시간이 쓰이는지 확인해야 다음 결정이 맞아집니다.
 
 ## 한눈에 보는 개념 지도
-
-![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
-
-*사용자와 가장 가까운 캐시부터 데이터베이스까지 성능 계층을 한눈에 묶은 그림입니다.*
 
 같은 데이터를 더 가까운 계층에서 더 적게 계산할수록 응답은 빨라집니다. 그래서 브라우저 캐시, CDN, 애플리케이션 캐시, 데이터베이스 최적화는 경쟁 관계가 아니라 서로 다른 층의 협업입니다.
 
@@ -205,17 +205,29 @@ posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_
 
 성능은 감으로 고치는 분야가 아닙니다. 측정하고, 캐시하고, 줄이고, 늦추는 방식으로 같은 일을 더 적게 하게 만들어야 합니다. 다음 글에서는 이 시리즈에서 배운 개념을 하나로 묶어 작은 웹앱을 끝까지 만들어 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **느린 페이지를 만나면 어디서부터 봐야 할까요?**
+  - 본문의 기준은 성능과 캐싱를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **브라우저 캐시와 CDN은 각각 어떤 역할을 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **lazy loading은 무엇을 늦추고 왜 유용할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
-- [HTML, CSS, JavaScript](./02-html-css-javascript.md)
-- [브라우저와 DOM](./03-browser-and-dom.md)
-- [HTTP와 API](./04-http-and-api.md)
-- [Frontend와 Backend](./05-frontend-and-backend.md)
-- [인증과 세션](./06-auth-and-sessions.md)
-- [데이터베이스 연결](./07-connecting-to-database.md)
-- [배포](./08-deployment.md)
+## 시리즈 목차
+
+- [Web Development 101 (1/10): 웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): 브라우저와 DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP와 API](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend와 Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): 인증과 세션](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): 데이터베이스 연결](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): 배포](./08-deployment.md)
 - **성능과 캐싱 (현재 글)**
 - 작은 웹앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

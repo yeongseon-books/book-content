@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deployment</title>
+<title>Web Development 101 (8/10): Deployment</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Deployment</h1>
+<h1>Web Development 101 (8/10): Deployment</h1>
 <p>“Works on my laptop” usually means the application is still missing part of its operating model. Once code leaves a personal machine, configuration, secrets, repeatable builds, health checks, and rollback paths all become part of the feature.</p>
 <p>This is post 8 in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Splitting dev / staging / production environments</li>
-<li>Managing environment variables and secrets</li>
-<li>The meaning of build and artifact</li>
-<li>The difference between PaaS and IaaS</li>
-<li>A basic CI/CD pipeline</li>
+<li>Splitting dev / staging / production environments?</li>
+<li>Managing environment variables and secrets?</li>
+<li>The meaning of build and artifact?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 8 flow overview</em></p>
+<p>This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Manual deploys cause weekly accidents. Automated deploys change <em>team velocity</em> itself. Once you internalize the flow, every platform feels familiar.</p>
 <blockquote>
 <p>Deployment is <em>habit</em>, not <em>feature</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>A release flow where source code becomes one artifact that moves across environments.</em></p>
 <p>The point of this picture is repeatability. If the artifact changes per environment, you are no longer promoting the same release through a pipeline—you are rebuilding the product under different conditions and hoping the results match.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -180,14 +183,24 @@ def health(): return {&quot;status&quot;: &quot;ok&quot;}, 200
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Deployment is <em>a habit</em>. Next, when the deployed app is <em>slow</em>, what do we look at? Performance and caching.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Authentication and Sessions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Connecting to a Database</a></li>
+<li><strong>Splitting dev / staging / production environments?</strong></li>
+<li>The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Managing environment variables and secrets?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The meaning of build and artifact?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">Web Development 101 (1/10): How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">Web Development 101 (2/10): HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">Web Development 101 (3/10): The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">Web Development 101 (4/10): HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Web Development 101 (5/10): Frontend and Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Web Development 101 (6/10): Authentication and Sessions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Web Development 101 (7/10): Connecting to a Database</a></li>
 <li><strong>Deployment (current)</strong></li>
 <li>Performance and Caching (upcoming)</li>
 <li>Building a Small Web App (upcoming)</li>

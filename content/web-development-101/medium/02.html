@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HTML, CSS, and JavaScript</title>
+<title>Web Development 101 (2/10): HTML, CSS, and JavaScript</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>HTML, CSS, and JavaScript</h1>
+<h1>Web Development 101 (2/10): HTML, CSS, and JavaScript</h1>
 <p>At first glance, splitting one page across three languages can feel like unnecessary ceremony. In practice, though, every production frontend becomes easier to debug once you can answer three separate questions: what is the structure, what controls the visual result, and what changes behavior after the page loads.</p>
 <p>This is post 2 in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The <em>structure</em> HTML draws</li>
-<li>The <em>style</em> CSS applies</li>
-<li>The <em>behavior</em> JavaScript adds</li>
-<li>How the three work together</li>
-<li>The flexibility separation creates</li>
+<li>The <em>structure</em> HTML draws?</li>
+<li>The <em>style</em> CSS applies?</li>
+<li>The <em>behavior</em> JavaScript adds?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 2 flow overview</em></p>
+<p>This picture places HTML, CSS, and JavaScript inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of HTML, CSS, and JavaScript is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When all three live in one file, fixing one line breaks another. <em>Separation</em> is the starting point of teamwork and maintenance — designers touch CSS, frontend engineers touch JS, content owners touch HTML.</p>
 <blockquote>
 <p>Good web code keeps roles separate.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>A responsibility map for structure, style, and behavior on one page.</em></p>
 <p>The point of this figure is not that three files are trendy. It is that one visible page is easier to change when structure, visual rules, and runtime behavior can move independently.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -177,8 +180,18 @@ document.getElementById(&quot;say&quot;).addEventListener(&quot;click&quot;, () 
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Three languages model the principle of <em>separation of concerns</em>. Next, we look at how the browser turns HTML into a tree (the DOM).</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><strong>The <em>structure</em> HTML draws?</strong></li>
+<li>The article treats HTML, CSS, and JavaScript as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The <em>style</em> CSS applies?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <em>behavior</em> JavaScript adds?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">Web Development 101 (1/10): How the Web Works</a></li>
 <li><strong>HTML, CSS, and JavaScript (current)</strong></li>
 <li>The Browser and the DOM (upcoming)</li>
 <li>HTTP and APIs (upcoming)</li>

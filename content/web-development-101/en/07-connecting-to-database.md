@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 7
-title: Connecting to a Database
+title: "Web Development 101 (7/10): Connecting to a Database"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: SQL basics, ORMs, and connection pools — how a web app talks 
 last_reviewed: '2026-05-15'
 ---
 
-# Connecting to a Database
+# Web Development 101 (7/10): Connecting to a Database
 
 A web app can feel complete while everything still lives in process memory, right up until the first restart, the first concurrent write, or the first report that data disappeared. Durable storage changes how you design correctness, concurrency, and performance.
 
 This is post 7 in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Why we need a database in the first place
-- The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)
-- What an ORM is and when to use it
-- Connections and connection pools
-- The meaning of a transaction
+- Why we need a database in the first place?
+- The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?
+- What an ORM is and when to use it?
+
+## Big Picture
+
+![web development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 7 flow overview*
+
+This picture places Connecting to a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Connecting to a Database is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Almost all *state* in a web app lives in the database. Mishandle the connection 
 > The database is *the keeper of truth*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
-
-*A high-level view of an app talking to a database through a reusable connection pool.*
 
 The app does not just “use SQL.” It opens or borrows a connection, issues work, and often needs to bundle multiple statements into one transaction. That lifecycle matters as much as the query text itself.
 
@@ -208,17 +212,29 @@ Most web backends pair PostgreSQL or MySQL with an ORM. Under traffic, *read rep
 
 The DB is *the keeper of truth*. Next, we ship our app to the world — deployment.
 
+## Answering the Opening Questions
+
+- **Why we need a database in the first place?**
+  - The article treats Connecting to a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What an ORM is and when to use it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
 - **Connecting to a Database (current)**
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

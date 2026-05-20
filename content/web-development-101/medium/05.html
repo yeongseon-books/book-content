@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Frontend and Backend</title>
+<title>Web Development 101 (5/10): Frontend and Backend</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Frontend and Backend</h1>
+<h1>Web Development 101 (5/10): Frontend and Backend</h1>
 <p>New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.</p>
 <p>This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How responsibility splits between frontend and backend</li>
-<li>SPA (Single Page App) vs SSR (Server-Side Rendering)</li>
-<li>How the API contract bridges the two worlds</li>
-<li>Tradeoffs when the same logic could live on either side</li>
-<li>The picture a full-stack engineer holds in mind</li>
+<li>How responsibility splits between frontend and backend?</li>
+<li>SPA (Single Page App) vs SSR (Server-Side Rendering)?</li>
+<li>How the API contract bridges the two worlds?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 5 flow overview</em></p>
+<p>This picture places Frontend and Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Frontend and Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Even when one person writes both sides, blurring the <em>boundary of responsibility</em> rots the code fast. The boundary is not a <em>physical line</em> — it is a <em>promise about who owns what</em>.</p>
 <blockquote>
 <p>Good systems have <em>clear boundaries</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>A boundary map for user experience, server logic, and persistent data.</em></p>
 <p>This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -188,11 +191,21 @@ SSR: server returns fully built HTML on every request
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Boundaries are <em>promises about responsibility</em>. Next, we layer <em>authentication and sessions</em> on top of that boundary.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><strong>How responsibility splits between frontend and backend?</strong></li>
+<li>The article treats Frontend and Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>SPA (Single Page App) vs SSR (Server-Side Rendering)?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How the API contract bridges the two worlds?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">Web Development 101 (1/10): How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">Web Development 101 (2/10): HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">Web Development 101 (3/10): The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">Web Development 101 (4/10): HTTP and APIs</a></li>
 <li><strong>Frontend and Backend (current)</strong></li>
 <li>Authentication and Sessions (upcoming)</li>
 <li>Connecting to a Database (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 4
-title: HTTP and APIs
+title: "Web Development 101 (4/10): HTTP and APIs"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: The shape of HTTP requests and responses — methods, status co
 last_reviewed: '2026-05-15'
 ---
 
-# HTTP and APIs
+# Web Development 101 (4/10): HTTP and APIs
 
 Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.
 
 This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The shape of HTTP requests and responses
-- Methods (GET/POST/PUT/DELETE) and status codes
-- The role of headers
-- Calling and parsing JSON APIs
-- The difference between an API and a page request
+- The shape of HTTP requests and responses?
+- Methods (GET/POST/PUT/DELETE) and status codes?
+- The role of headers?
+
+## Big Picture
+
+![web development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 4 flow overview*
+
+This picture places HTTP and APIs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of HTTP and APIs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Half of web work is *building and reading HTTP messages*. If you cannot picture 
 > HTTP is *a protocol made of plain text*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
-
-*The smallest useful picture of an HTTP request and response contract.*
 
 Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.
 
@@ -185,10 +189,21 @@ Most mobile and web apps talk to servers as *JSON over HTTP*. GraphQL and gRPC a
 
 HTTP is *a contract made of plain text*. Next, we look at the two sides of that contract — Frontend and Backend.
 
+## Answering the Opening Questions
+
+- **The shape of HTTP requests and responses?**
+  - The article treats HTTP and APIs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Methods (GET/POST/PUT/DELETE) and status codes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of headers?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
 - **HTTP and APIs (current)**
 - Frontend and Backend (upcoming)
 - Authentication and Sessions (upcoming)
@@ -196,6 +211,7 @@ HTTP is *a contract made of plain text*. Next, we look at the two sides of that 
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

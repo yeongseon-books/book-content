@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 10
-title: 작은 웹앱 만들기
+title: "Web Development 101 (10/10): 작은 웹앱 만들기"
 status: publish-ready
 targets:
   tistory: true
@@ -21,23 +21,27 @@ seo_description: Flask, HTML, SQLite, 배포를 묶어 작은 Todo 앱을 만드
 last_reviewed: '2026-05-15'
 ---
 
-# 작은 웹앱 만들기
+# Web Development 101 (10/10): 작은 웹앱 만들기
 
 시리즈를 따라오며 웹의 흐름, 브라우저, HTTP, Frontend와 Backend, 인증, 데이터베이스, 배포, 성능까지 각각 따로 보았습니다. 이제는 이 조각들을 하나의 앱 안에 묶어 볼 차례입니다. 지식은 작은 결과물을 직접 만들어 볼 때 비로소 자기 것이 됩니다.
 
 이 글은 Web Development 101 시리즈의 마지막 글입니다. 여기서는 Todo 앱 하나를 만들면서 HTML, Flask, SQLite, 환경 변수, 헬스 체크, 컨테이너 실행까지 한 흐름으로 연결하겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 앞선 아홉 개 개념은 한 앱 안에서 어떻게 연결될까요?
 - 작은 풀스택 프로젝트는 어떤 폴더 구조로 시작하면 좋을까요?
 - Frontend, Backend, 데이터베이스는 어떤 API 계약으로 묶일까요?
-- 로컬 실행과 컨테이너 실행은 어떻게 같은 설정을 공유할까요?
-- 작은 앱을 끝까지 만드는 경험이 왜 중요한가요?
 
-> 작은 앱 하나를 끝까지 만들어 보는 경험은 웹 개발의 개별 개념을 실제 시스템으로 묶어 줍니다.
+## 큰 그림
+
+![Web Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Web Development 101 10장 흐름 개요*
+
+이 그림에서는 작은 웹앱 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 작은 웹앱 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 마지막 글이 중요한가
 
@@ -46,10 +50,6 @@ last_reviewed: '2026-05-15'
 또한 작은 앱은 전체 흐름을 빠르게 반복하게 해 줍니다. 큰 프레임워크부터 잡는 것보다, 작지만 끝까지 가는 앱을 먼저 만드는 편이 훨씬 강한 학습이 됩니다.
 
 ## 한눈에 보는 개념 지도
-
-![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
-
-*브라우저, Flask API, SQLite가 하나의 작은 Todo 앱으로 연결되는 전체 구조입니다.*
 
 이 마지막 그림은 시리즈에서 배운 개념이 하나의 수직 슬라이스로 만나는 장면입니다. 사용자가 폼을 제출하면 브라우저가 API를 호출하고, 서버는 데이터베이스를 갱신한 뒤 다시 화면이 읽을 수 있는 JSON을 돌려줍니다.
 
@@ -244,17 +244,29 @@ docker build -t todo-app . && docker run -p 8000:8000 -v $PWD/data:/data todo-ap
 
 이것으로 Web Development 101 시리즈를 마칩니다. 작은 앱 하나를 처음부터 끝까지 만들어 보면서 웹의 기본 층을 모두 한 번 연결했습니다. 다음 단계는 깊이입니다. Frontend Development 101, Backend Development 101, Database 101 같은 후속 시리즈로 한 층씩 더 깊게 들어갈 수 있습니다. 하지만 가장 좋은 다음 책은 새 앱 하나를 직접 더 만드는 일입니다.
 
+## 처음 질문으로 돌아가기
+
+- **앞선 아홉 개 개념은 한 앱 안에서 어떻게 연결될까요?**
+  - 본문의 기준은 작은 웹앱 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **작은 풀스택 프로젝트는 어떤 폴더 구조로 시작하면 좋을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Frontend, Backend, 데이터베이스는 어떤 API 계약으로 묶일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
-- [HTML, CSS, JavaScript](./02-html-css-javascript.md)
-- [브라우저와 DOM](./03-browser-and-dom.md)
-- [HTTP와 API](./04-http-and-api.md)
-- [Frontend와 Backend](./05-frontend-and-backend.md)
-- [인증과 세션](./06-auth-and-sessions.md)
-- [데이터베이스 연결](./07-connecting-to-database.md)
-- [배포](./08-deployment.md)
-- [성능과 캐싱](./09-performance-and-caching.md)
+## 시리즈 목차
+
+- [Web Development 101 (1/10): 웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): 브라우저와 DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP와 API](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend와 Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): 인증과 세션](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): 데이터베이스 연결](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): 배포](./08-deployment.md)
+- [Web Development 101 (9/10): 성능과 캐싱](./09-performance-and-caching.md)
 - **작은 웹앱 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

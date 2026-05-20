@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 6
-title: Authentication and Sessions
+title: "Web Development 101 (6/10): Authentication and Sessions"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: Cookies, sessions, JWT, and OAuth — the four ways servers rem
 last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Sessions
+# Web Development 101 (6/10): Authentication and Sessions
 
 HTTP does not remember who you are between requests, but real products absolutely need memory: who signed in, what permissions they have, and whether this request should be trusted. That gap is where many early security mistakes happen.
 
 This is post 6 in the Web Development 101 series. Here we connect cookies, sessions, JWTs, and OAuth into one practical model so login stops looking like a black box and starts looking like a set of explicit trade-offs.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between authentication and authorization
-- How cookies and sessions actually work
-- The structure of a JWT (token-based auth)
-- The OAuth flow for third-party login
-- Common security mistakes and defenses
+- The difference between authentication and authorization?
+- How cookies and sessions actually work?
+- The structure of a JWT (token-based auth)?
+
+## Big Picture
+
+![web development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 6 flow overview*
+
+This picture places Authentication and Sessions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Authentication and Sessions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Almost every app has login. A weak design lets *account takeover* happen in one 
 > Auth is not a *feature* — it is *foundation*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
-
-*The default login flow where a session id survives across requests through a cookie.*
 
 The key idea in this picture is that the password should not travel on every request. One successful login creates an identifier, and the browser replays that identifier so the server can recover user context safely.
 
@@ -189,17 +193,29 @@ Web apps use *session cookies* with CSRF tokens. Mobile, SPA, and microservice s
 
 Auth is *foundation*. Next, we look at the database connection that makes user data *permanent*.
 
+## Answering the Opening Questions
+
+- **The difference between authentication and authorization?**
+  - The article treats Authentication and Sessions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How cookies and sessions actually work?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The structure of a JWT (token-based auth)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
 - **Authentication and Sessions (current)**
 - Connecting to a Database (upcoming)
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

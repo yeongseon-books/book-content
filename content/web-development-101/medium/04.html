@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HTTP and APIs</title>
+<title>Web Development 101 (4/10): HTTP and APIs</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>HTTP and APIs</h1>
+<h1>Web Development 101 (4/10): HTTP and APIs</h1>
 <p>Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.</p>
 <p>This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The shape of HTTP requests and responses</li>
-<li>Methods (GET/POST/PUT/DELETE) and status codes</li>
-<li>The role of headers</li>
-<li>Calling and parsing JSON APIs</li>
-<li>The difference between an API and a page request</li>
+<li>The shape of HTTP requests and responses?</li>
+<li>Methods (GET/POST/PUT/DELETE) and status codes?</li>
+<li>The role of headers?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 4 flow overview</em></p>
+<p>This picture places HTTP and APIs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of HTTP and APIs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Half of web work is <em>building and reading HTTP messages</em>. If you cannot picture the message, debugging becomes guesswork. Learn it once and it transfers to every framework.</p>
 <blockquote>
 <p>HTTP is <em>a protocol made of plain text</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>The smallest useful picture of an HTTP request and response contract.</em></p>
 <p>Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -179,10 +182,20 @@ for url in [&quot;https://httpbin.org/status/200&quot;, &quot;https://httpbin.or
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>HTTP is <em>a contract made of plain text</em>. Next, we look at the two sides of that contract — Frontend and Backend.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><strong>The shape of HTTP requests and responses?</strong></li>
+<li>The article treats HTTP and APIs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Methods (GET/POST/PUT/DELETE) and status codes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The role of headers?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">Web Development 101 (1/10): How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">Web Development 101 (2/10): HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">Web Development 101 (3/10): The Browser and the DOM</a></li>
 <li><strong>HTTP and APIs (current)</strong></li>
 <li>Frontend and Backend (upcoming)</li>
 <li>Authentication and Sessions (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 5
-title: Frontend and Backend
+title: "Web Development 101 (5/10): Frontend and Backend"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: Where the frontend ends and the backend begins — SPA, SSR, an
 last_reviewed: '2026-05-15'
 ---
 
-# Frontend and Backend
+# Web Development 101 (5/10): Frontend and Backend
 
 New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.
 
 This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How responsibility splits between frontend and backend
-- SPA (Single Page App) vs SSR (Server-Side Rendering)
-- How the API contract bridges the two worlds
-- Tradeoffs when the same logic could live on either side
-- The picture a full-stack engineer holds in mind
+- How responsibility splits between frontend and backend?
+- SPA (Single Page App) vs SSR (Server-Side Rendering)?
+- How the API contract bridges the two worlds?
+
+## Big Picture
+
+![web development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 5 flow overview*
+
+This picture places Frontend and Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Frontend and Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Even when one person writes both sides, blurring the *boundary of responsibility
 > Good systems have *clear boundaries*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*A boundary map for user experience, server logic, and persistent data.*
 
 This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.
 
@@ -195,17 +199,29 @@ Startups often start with SPA + REST API. Content sites prefer SSR (Next.js, Rem
 
 Boundaries are *promises about responsibility*. Next, we layer *authentication and sessions* on top of that boundary.
 
+## Answering the Opening Questions
+
+- **How responsibility splits between frontend and backend?**
+  - The article treats Frontend and Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **SPA (Single Page App) vs SSR (Server-Side Rendering)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How the API contract bridges the two worlds?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
 - **Frontend and Backend (current)**
 - Authentication and Sessions (upcoming)
 - Connecting to a Database (upcoming)
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

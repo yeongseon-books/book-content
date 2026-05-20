@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 10
-title: Building a Small Web App
+title: "Web Development 101 (10/10): Building a Small Web App"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: Tying it all together — Flask, HTML, SQLite, and deployment i
 last_reviewed: '2026-05-15'
 ---
 
-# Building a Small Web App
+# Web Development 101 (10/10): Building a Small Web App
 
 Concepts feel separate until you force them to cooperate inside one real project. A tiny app is where routing, templates, APIs, persistence, configuration, health checks, and deployment suddenly become one continuous engineering story instead of ten isolated lessons.
 
 This is the final post in the Web Development 101 series. Here we turn the series into a working Todo app so the core layers of web development can be practiced end to end in one small but complete system.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- See every concept from the series live *in one app*
-- A folder layout for a small full-stack project
-- The full build-and-deploy flow end to end
-- A map of what to learn next
-- A retrospective on the whole series
+- See every concept from the series live *in one app?
+- A folder layout for a small full-stack project?
+- The full build-and-deploy flow end to end?
+
+## Big Picture
+
+![web development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 10 flow overview*
+
+This picture places Building a Small Web App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Small Web App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Knowledge sets only when you *make something small*. One small full-stack app te
 > Build *small* and go *all the way through*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
-
-*The end-to-end shape of the Todo app built in this capstone chapter.*
 
 This final figure is the whole series compressed into one vertical slice. The browser submits input, Flask accepts and stores it, SQLite persists it, and the same data comes back through JSON for rendering.
 
@@ -230,17 +234,29 @@ This little app can grow into a *blog, a budget tracker, a notebook, a chatbot*.
 
 That is *Web Development 101*. Next steps are depth — Frontend Development 101, Backend Development 101, and Database 101 take you one layer deeper. The best next book is the *next app you build*.
 
+## Answering the Opening Questions
+
+- **See every concept from the series live *in one app?**
+  - The article treats Building a Small Web App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **A folder layout for a small full-stack project?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The full build-and-deploy flow end to end?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
-- [Connecting to a Database](./07-connecting-to-database.md)
-- [Deployment](./08-deployment.md)
-- [Performance and Caching](./09-performance-and-caching.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): Connecting to a Database](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): Deployment](./08-deployment.md)
+- [Web Development 101 (9/10): Performance and Caching](./09-performance-and-caching.md)
 - **Building a Small Web App (current)**
+
 <!-- toc:end -->
 
 ## References

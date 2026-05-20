@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 2
-title: HTML, CSS, and JavaScript
+title: "Web Development 101 (2/10): HTML, CSS, and JavaScript"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: The three pillars of every web page — structure, style, and b
 last_reviewed: '2026-05-15'
 ---
 
-# HTML, CSS, and JavaScript
+# Web Development 101 (2/10): HTML, CSS, and JavaScript
 
 At first glance, splitting one page across three languages can feel like unnecessary ceremony. In practice, though, every production frontend becomes easier to debug once you can answer three separate questions: what is the structure, what controls the visual result, and what changes behavior after the page loads.
 
 This is post 2 in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The *structure* HTML draws
-- The *style* CSS applies
-- The *behavior* JavaScript adds
-- How the three work together
-- The flexibility separation creates
+- The *structure* HTML draws?
+- The *style* CSS applies?
+- The *behavior* JavaScript adds?
+
+## Big Picture
+
+![web development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 2 flow overview*
+
+This picture places HTML, CSS, and JavaScript inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of HTML, CSS, and JavaScript is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ When all three live in one file, fixing one line breaks another. *Separation* is
 > Good web code keeps roles separate.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png)
-
-*A responsibility map for structure, style, and behavior on one page.*
 
 The point of this figure is not that three files are trendy. It is that one visible page is easier to change when structure, visual rules, and runtime behavior can move independently.
 
@@ -187,8 +191,19 @@ Even huge sites reduce to these three languages. React and Vue are tools that ul
 
 Three languages model the principle of *separation of concerns*. Next, we look at how the browser turns HTML into a tree (the DOM).
 
+## Answering the Opening Questions
+
+- **The *structure* HTML draws?**
+  - The article treats HTML, CSS, and JavaScript as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The *style* CSS applies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The *behavior* JavaScript adds?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
 - **HTML, CSS, and JavaScript (current)**
 - The Browser and the DOM (upcoming)
 - HTTP and APIs (upcoming)
@@ -198,6 +213,7 @@ Three languages model the principle of *separation of concerns*. Next, we look a
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 7
-title: 데이터베이스 연결
+title: "Web Development 101 (7/10): 데이터베이스 연결"
 status: publish-ready
 targets:
   tistory: true
@@ -21,23 +21,27 @@ seo_description: SQL, ORM, 연결 풀, 트랜잭션으로 데이터베이스 연
 last_reviewed: '2026-05-15'
 ---
 
-# 데이터베이스 연결
+# Web Development 101 (7/10): 데이터베이스 연결
 
 웹앱은 화면만으로 끝나지 않습니다. 사용자 정보, 게시글, 주문, 결제 기록처럼 남아야 하는 데이터는 결국 데이터베이스에 들어갑니다. 서버가 메모리만 믿고 있으면 프로세스가 재시작되는 순간 상태가 사라집니다. 그래서 웹앱에서 데이터베이스 연결은 거의 항상 핵심 경로입니다.
 
 이 글은 Web Development 101 시리즈의 일곱 번째 글입니다. 여기서는 SQL의 기본 작업, ORM의 역할, 연결과 연결 풀, 트랜잭션이 왜 필요한지 정리하면서 웹앱이 데이터를 오래 보관하는 방식을 살펴보겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 웹앱은 왜 파일이 아니라 데이터베이스를 쓸까요?
 - SQL의 네 가지 기본 작업은 무엇일까요?
 - ORM은 어디서 편하고 어디서 한계가 생길까요?
-- 연결 풀은 왜 필요할까요?
-- 트랜잭션은 어떤 상황에서 꼭 필요할까요?
 
-> 데이터베이스는 진실의 저장소이고, 연결 풀과 트랜잭션은 그 저장소를 안전하게 다루는 기본 장치입니다.
+## 큰 그림
+
+![Web Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Web Development 101 7장 흐름 개요*
+
+이 그림에서는 데이터베이스 연결를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터베이스 연결의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -46,10 +50,6 @@ last_reviewed: '2026-05-15'
 이 지식은 오래 갑니다. Python에서 SQLite를 다루든, PostgreSQL과 SQLAlchemy를 쓰든, Java나 Go로 옮기든 기본 원리는 크게 달라지지 않습니다. SQL, 연결, 트랜잭션, 인덱스라는 바닥 구조는 계속 남습니다.
 
 ## 한눈에 보는 개념 지도
-
-![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
-
-*웹앱이 연결 풀을 거쳐 데이터베이스와 대화하는 기본 구조를 요약한 그림입니다.*
 
 애플리케이션은 요청마다 데이터를 읽고 쓰지만 연결 자체는 비싼 자원입니다. 그래서 연결 풀을 두고, 여러 SQL 작업이 하나의 비즈니스 작업이면 트랜잭션으로 묶습니다.
 
@@ -218,17 +218,29 @@ except Exception:
 
 데이터베이스는 웹앱의 진실을 오래 보관하는 저장소입니다. SQL, 연결, 연결 풀, 트랜잭션 감각이 있어야 기능이 늘어나도 데이터가 버텨 줍니다. 다음 글에서는 이렇게 만든 앱을 실제 환경에 올리는 배포를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **웹앱은 왜 파일이 아니라 데이터베이스를 쓸까요?**
+  - 본문의 기준은 데이터베이스 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **SQL의 네 가지 기본 작업은 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **ORM은 어디서 편하고 어디서 한계가 생길까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
-- [HTML, CSS, JavaScript](./02-html-css-javascript.md)
-- [브라우저와 DOM](./03-browser-and-dom.md)
-- [HTTP와 API](./04-http-and-api.md)
-- [Frontend와 Backend](./05-frontend-and-backend.md)
-- [인증과 세션](./06-auth-and-sessions.md)
+## 시리즈 목차
+
+- [Web Development 101 (1/10): 웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): 브라우저와 DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP와 API](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend와 Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): 인증과 세션](./06-auth-and-sessions.md)
 - **데이터베이스 연결 (현재 글)**
 - 배포 (예정)
 - 성능과 캐싱 (예정)
 - 작은 웹앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

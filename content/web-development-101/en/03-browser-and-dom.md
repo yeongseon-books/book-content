@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 3
-title: The Browser and the DOM
+title: "Web Development 101 (3/10): The Browser and the DOM"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: How the browser turns HTML into a moving page — DOM tree, the
 last_reviewed: '2026-05-15'
 ---
 
-# The Browser and the DOM
+# Web Development 101 (3/10): The Browser and the DOM
 
 A browser does much more than print HTML on the screen. It parses text into a tree, calculates styles, decides layout, paints pixels, and keeps the page interactive through the event loop. If that pipeline feels vague, performance bugs and UI glitches are hard to reason about.
 
 This is post 3 in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What the DOM is and how it gets built
-- The stages of the rendering pipeline
-- How JavaScript manipulates the DOM
-- The basics of events and the event loop
-- Patterns that ruin performance
+- What the DOM is and how it gets built?
+- The stages of the rendering pipeline?
+- How JavaScript manipulates the DOM?
+
+## Big Picture
+
+![web development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 3 flow overview*
+
+This picture places The Browser and the DOM inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Browser and the DOM is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ Without a mental model of the DOM, you will never understand *why your page is s
 > The browser is *a machine for drawing the DOM*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.en.png)
-
-*A summary of the browser pipeline from HTML parsing to layout and paint.*
 
 The browser does not jump from HTML text straight to pixels. It builds internal structures first, and DOM updates can force part of that pipeline to run again, which is why UI work and performance are tightly connected.
 
@@ -180,9 +184,20 @@ React and Vue use a *Virtual DOM* to batch real DOM calls into one update. Infin
 
 The browser is *a machine for drawing the DOM*. Next, we look at the bridge between client and server: HTTP and APIs.
 
+## Answering the Opening Questions
+
+- **What the DOM is and how it gets built?**
+  - The article treats The Browser and the DOM as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The stages of the rendering pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How JavaScript manipulates the DOM?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
 - **The Browser and the DOM (current)**
 - HTTP and APIs (upcoming)
 - Frontend and Backend (upcoming)
@@ -191,6 +206,7 @@ The browser is *a machine for drawing the DOM*. Next, we look at the bridge betw
 - Deployment (upcoming)
 - Performance and Caching (upcoming)
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

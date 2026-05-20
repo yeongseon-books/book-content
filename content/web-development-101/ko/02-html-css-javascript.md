@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 2
-title: HTML, CSS, JavaScript
+title: "Web Development 101 (2/10): HTML, CSS, JavaScript"
 status: publish-ready
 targets:
   tistory: true
@@ -21,23 +21,27 @@ seo_description: HTML, CSS, JavaScript가 구조, 스타일, 동작을 어떻게
 last_reviewed: '2026-05-15'
 ---
 
-# HTML, CSS, JavaScript
+# Web Development 101 (2/10): HTML, CSS, JavaScript
 
 웹 페이지를 처음 만들 때는 세 언어가 왜 따로 존재하는지 잘 와닿지 않습니다. 화면 하나를 만들 뿐인데 구조용 언어, 스타일용 언어, 동작용 언어가 따로 있다는 사실이 오히려 번거롭게 보이기도 합니다. 하지만 규모가 조금만 커져도 이 분리가 왜 중요한지 금방 드러납니다.
 
 이 글은 Web Development 101 시리즈의 두 번째 글입니다. 여기서는 HTML, CSS, JavaScript가 각각 무엇을 맡고, 왜 세 층을 분리하는 편이 유지보수와 협업에 유리한지 정리하겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 웹 페이지는 왜 세 가지 언어로 나뉠까요?
 - HTML, CSS, JavaScript는 각각 무엇을 책임질까요?
 - 세 언어가 함께 동작할 때 어떤 연결 지점이 생길까요?
-- 코드가 한 파일에 뒤섞이면 어떤 문제가 커질까요?
-- 브라우저 DevTools에서 이 세 층을 어떻게 읽을 수 있을까요?
 
-> 좋은 웹 코드는 구조, 스타일, 동작을 분리해 각 층의 변경 비용을 낮춥니다.
+## 큰 그림
+
+![Web Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
+
+*Web Development 101 2장 흐름 개요*
+
+이 그림에서는 HTML, CSS, JavaScript를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> HTML, CSS, JavaScript의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 구분이 중요한가
 
@@ -46,10 +50,6 @@ last_reviewed: '2026-05-15'
 이 분리는 단지 미적인 취향이 아닙니다. 디자이너는 CSS를, 프론트엔드 엔지니어는 JavaScript를, 콘텐츠 담당자는 HTML을 주로 다룹니다. 역할이 나뉘어야 변경 범위가 좁아지고, 캐시 전략도 단순해지고, 코드 리뷰도 훨씬 쉬워집니다.
 
 ## 한눈에 보는 개념 지도
-
-![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
-
-*구조, 스타일, 동작이 한 페이지를 함께 만드는 책임 분리를 보여 주는 그림입니다.*
 
 이 그림에서 중요한 점은 세 언어가 같은 페이지를 만들더라도 같은 문제를 해결하지는 않는다는 사실입니다. HTML은 구조를, CSS는 시각 규칙을, JavaScript는 사용자 반응을 맡으므로 수정 범위를 분리할 수 있습니다.
 
@@ -201,8 +201,19 @@ React나 Vue 같은 프레임워크를 써도 브라우저가 받는 것은 HTML
 
 HTML, CSS, JavaScript는 관심사를 분리하는 가장 기본적인 훈련입니다. 구조, 스타일, 동작을 나눠 생각할 수 있어야 브라우저가 화면을 어떻게 그리는지도 자연스럽게 이해됩니다. 다음 글에서는 브라우저가 HTML을 DOM 트리로 바꾸는 과정을 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **웹 페이지는 왜 세 가지 언어로 나뉠까요?**
+  - 본문의 기준은 HTML, CSS, JavaScript를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **HTML, CSS, JavaScript는 각각 무엇을 책임질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **세 언어가 함께 동작할 때 어떤 연결 지점이 생길까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
+## 시리즈 목차
+
+- [Web Development 101 (1/10): 웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
 - **HTML, CSS, JavaScript (현재 글)**
 - 브라우저와 DOM (예정)
 - HTTP와 API (예정)
@@ -212,6 +223,7 @@ HTML, CSS, JavaScript는 관심사를 분리하는 가장 기본적인 훈련입
 - 배포 (예정)
 - 성능과 캐싱 (예정)
 - 작은 웹앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

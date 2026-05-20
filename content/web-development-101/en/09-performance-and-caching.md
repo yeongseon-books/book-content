@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 9
-title: Performance and Caching
+title: "Web Development 101 (9/10): Performance and Caching"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,27 @@ seo_description: HTTP cache, CDNs, lazy loading, and DB indexes — four tools t
 last_reviewed: '2026-05-15'
 ---
 
-# Performance and Caching
+# Web Development 101 (9/10): Performance and Caching
 
 When a page feels slow, the biggest risk is fixing the wrong layer first. The bottleneck might be the browser, the network, a missing cache, or an expensive database query. Without a measurement-first model, “optimization” easily becomes random code movement.
 
 This is post 9 in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Basic performance measurement (browser and server)
-- HTTP cache headers (Cache-Control, ETag)
-- The role of a CDN
-- Lazy loading and code splitting
-- DB indexes and the N+1 problem
+- Basic performance measurement (browser and server)?
+- HTTP cache headers (Cache-Control, ETag)?
+- The role of a CDN?
+
+## Big Picture
+
+![web development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
+
+*web development 101 chapter 9 flow overview*
+
+This picture places Performance and Caching inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Performance and Caching is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -42,10 +50,6 @@ A fast site is *money* — conversion, search rank, and user satisfaction all sc
 > Performance starts with *measuring*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
-
-*A layered cache picture from the user edge down to the database.*
 
 Performance work gets easier once you see each cache as a separate distance-reduction tool. The browser, CDN, application cache, and database are not interchangeable; they remove different kinds of repeated work.
 
@@ -191,17 +195,29 @@ Browser → CDN → app cache (Redis) → DB — this *four-layer cache* underpi
 
 Performance starts with *measurement*. In the final post we tie everything together and build a small web app.
 
+## Answering the Opening Questions
+
+- **Basic performance measurement (browser and server)?**
+  - The article treats Performance and Caching as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **HTTP cache headers (Cache-Control, ETag)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The role of a CDN?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [How the Web Works](./01-how-the-web-works.md)
-- [HTML, CSS, and JavaScript](./02-html-css-javascript.md)
-- [The Browser and the DOM](./03-browser-and-dom.md)
-- [HTTP and APIs](./04-http-and-api.md)
-- [Frontend and Backend](./05-frontend-and-backend.md)
-- [Authentication and Sessions](./06-auth-and-sessions.md)
-- [Connecting to a Database](./07-connecting-to-database.md)
-- [Deployment](./08-deployment.md)
+## In this series
+
+- [Web Development 101 (1/10): How the Web Works](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, and JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): The Browser and the DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP and APIs](./04-http-and-api.md)
+- [Web Development 101 (5/10): Frontend and Backend](./05-frontend-and-backend.md)
+- [Web Development 101 (6/10): Authentication and Sessions](./06-auth-and-sessions.md)
+- [Web Development 101 (7/10): Connecting to a Database](./07-connecting-to-database.md)
+- [Web Development 101 (8/10): Deployment](./08-deployment.md)
 - **Performance and Caching (current)**
 - Building a Small Web App (upcoming)
+
 <!-- toc:end -->
 
 ## References

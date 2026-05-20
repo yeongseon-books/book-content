@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building a Small Web App</title>
+<title>Web Development 101 (10/10): Building a Small Web App</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Building a Small Web App</h1>
+<h1>Web Development 101 (10/10): Building a Small Web App</h1>
 <p>Concepts feel separate until you force them to cooperate inside one real project. A tiny app is where routing, templates, APIs, persistence, configuration, health checks, and deployment suddenly become one continuous engineering story instead of ten isolated lessons.</p>
 <p>This is the final post in the Web Development 101 series. Here we turn the series into a working Todo app so the core layers of web development can be practiced end to end in one small but complete system.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>See every concept from the series live <em>in one app</em></li>
-<li>A folder layout for a small full-stack project</li>
-<li>The full build-and-deploy flow end to end</li>
-<li>A map of what to learn next</li>
-<li>A retrospective on the whole series</li>
+<li>See every concept from the series live *in one app?</li>
+<li>A folder layout for a small full-stack project?</li>
+<li>The full build-and-deploy flow end to end?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="web development 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>web development 101 chapter 10 flow overview</em></p>
+<p>This picture places Building a Small Web App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building a Small Web App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Knowledge sets only when you <em>make something small</em>. One small full-stack app teaches more than five books. The Todo app you build here becomes the skeleton of <em>every project that follows</em>.</p>
 <blockquote>
 <p>Build <em>small</em> and go <em>all the way through</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>The end-to-end shape of the Todo app built in this capstone chapter.</em></p>
 <p>This final figure is the whole series compressed into one vertical slice. The browser submits input, Flask accepts and stores it, SQLite persists it, and the same data comes back through JSON for rendering.</p>
 <p><strong>What to verify yourself</strong></p>
 <ul>
@@ -222,16 +225,26 @@ CMD [&quot;gunicorn&quot;, &quot;-b&quot;, &quot;0.0.0.0:8000&quot;, &quot;app:a
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>That is <em>Web Development 101</em>. Next steps are depth — Frontend Development 101, Backend Development 101, and Database 101 take you one layer deeper. The best next book is the <em>next app you build</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Authentication and Sessions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Connecting to a Database</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/08-deployment.md">Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/09-performance-and-caching.md">Performance and Caching</a></li>
+<li><strong>See every concept from the series live *in one app?</strong></li>
+<li>The article treats Building a Small Web App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>A folder layout for a small full-stack project?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The full build-and-deploy flow end to end?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">Web Development 101 (1/10): How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">Web Development 101 (2/10): HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">Web Development 101 (3/10): The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">Web Development 101 (4/10): HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Web Development 101 (5/10): Frontend and Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Web Development 101 (6/10): Authentication and Sessions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Web Development 101 (7/10): Connecting to a Database</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/08-deployment.md">Web Development 101 (8/10): Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/09-performance-and-caching.md">Web Development 101 (9/10): Performance and Caching</a></li>
 <li><strong>Building a Small Web App (current)</strong></li>
 </ul>
 <h2>References</h2>

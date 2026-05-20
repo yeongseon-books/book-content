@@ -1,7 +1,7 @@
 ---
 series: web-development-101
 episode: 5
-title: Frontend와 Backend
+title: "Web Development 101 (5/10): Frontend와 Backend"
 status: publish-ready
 targets:
   tistory: true
@@ -21,23 +21,27 @@ seo_description: Frontend와 Backend의 책임, SPA와 SSR, API 계약의 의미
 last_reviewed: '2026-05-15'
 ---
 
-# Frontend와 Backend
+# Web Development 101 (5/10): Frontend와 Backend
 
 웹 개발을 배우다 보면 Frontend와 Backend를 서로 다른 기술 묶음처럼만 보기 쉽습니다. 하지만 실무에서 더 중요한 것은 도구 이름이 아니라 책임 경계입니다. 누가 데이터를 보여 주고, 누가 저장하고, 누가 권한을 검증하는지 구분되지 않으면 작은 서비스도 금방 지저분해집니다.
 
 이 글은 Web Development 101 시리즈의 다섯 번째 글입니다. 여기서는 Frontend와 Backend의 역할을 나눠 보고, SPA와 SSR이 어떤 차이를 가지는지, 두 세계를 잇는 API 계약이 왜 중요한지 정리하겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Frontend와 Backend의 일은 어디서 갈릴까요?
 - 데이터의 진실은 어느 쪽이 가져야 할까요?
 - SPA와 SSR은 무엇이 다를까요?
-- API 계약은 두 영역 사이에서 어떤 역할을 할까요?
-- 같은 로직을 어느 쪽에 둘지 판단하는 기준은 무엇일까요?
 
-> 사용자 경험은 Frontend가 만들고, 데이터의 진실은 Backend가 지킵니다.
+## 큰 그림
+
+![Web Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
+
+*Web Development 101 5장 흐름 개요*
+
+이 그림에서는 Frontend와 Backend를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Frontend와 Backend의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 경계가 중요한가
 
@@ -46,10 +50,6 @@ last_reviewed: '2026-05-15'
 이 경계는 물리적인 선이 아니라 소유권에 대한 약속입니다. 무엇을 저장할지, 무엇을 노출할지, 어느 쪽이 최종 판단권을 가질지 먼저 정해야 시스템이 커져도 버틸 수 있습니다.
 
 ## 한눈에 보는 개념 지도
-
-![한눈에 보는 개념 지도](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
-
-*사용자 경험, 서버 로직, 데이터 저장소가 어떤 경계로 연결되는지 보여 주는 그림입니다.*
 
 이 그림은 데이터가 보통 데이터베이스에서 시작해 Backend를 거쳐 Frontend로 올라오고, 최종적으로 사용자 경험으로 표현된다는 점을 강조합니다. 화면에 보이는 값과 시스템의 기준 데이터가 늘 같은 위치에 있는 것은 아닙니다.
 
@@ -207,17 +207,29 @@ SSR: 서버가 매 요청마다 완성된 HTML을 돌려줍니다.
 
 Frontend와 Backend의 경계는 기술 분류표가 아니라 책임 약속입니다. 이 약속이 선명해야 데이터, 보안, 사용자 경험이 제자리를 찾습니다. 다음 글에서는 이 경계 위에 로그인과 사용자 기억을 얹는 인증과 세션을 다루겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **Frontend와 Backend의 일은 어디서 갈릴까요?**
+  - 본문의 기준은 Frontend와 Backend를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **데이터의 진실은 어느 쪽이 가져야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **SPA와 SSR은 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
-- [HTML, CSS, JavaScript](./02-html-css-javascript.md)
-- [브라우저와 DOM](./03-browser-and-dom.md)
-- [HTTP와 API](./04-http-and-api.md)
+## 시리즈 목차
+
+- [Web Development 101 (1/10): 웹은 어떻게 동작하는가?](./01-how-the-web-works.md)
+- [Web Development 101 (2/10): HTML, CSS, JavaScript](./02-html-css-javascript.md)
+- [Web Development 101 (3/10): 브라우저와 DOM](./03-browser-and-dom.md)
+- [Web Development 101 (4/10): HTTP와 API](./04-http-and-api.md)
 - **Frontend와 Backend (현재 글)**
 - 인증과 세션 (예정)
 - 데이터베이스 연결 (예정)
 - 배포 (예정)
 - 성능과 캐싱 (예정)
 - 작은 웹앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
