@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Writing Good API Documentation</title>
+<title>API Design 101 (10/10): Writing Good API Documentation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Writing Good API Documentation</h1>
+<h1>API Design 101 (10/10): Writing Good API Documentation</h1>
 <p>APIs often get abandoned not because they lack features, but because the path to the first successful call is too long. Inside a company, experienced teammates can fill the gaps verbally. External users do not have that safety net, so documentation quality becomes adoption speed.</p>
 <p>This is the final post in the API Design 101 series.</p>
 <p>Here, we treat documentation as the full adoption path rather than as a reference dump. Getting Started, scenario tutorials, example-rich reference pages, changelogs, and SDK guidance all need to support the same journey.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The five axes of documentation</li>
-<li>Reaching the first call in <em>under five minutes</em></li>
-<li>The weight of examples</li>
-<li>The role of changelogs and SDKs</li>
-<li>How docs grow over time</li>
+<li>The five axes of documentation?</li>
+<li>Reaching the first call in *under five minutes?</li>
+<li>The weight of examples?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 10 flow overview</em></p>
+<p>This picture places Writing Good API Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Writing Good API Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Documentation drives <em>adoption</em> more than the API itself. The same endpoint can take five minutes to call — or half a day — depending on the docs.</p>
 <blockquote>
 <p>Documentation is <em>part of the product</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png"><br>
-<em>Good API documentation guides the reader from the first successful call through scenarios, reference detail, change tracking, and tools.</em></p>
 <p>That means strong reference pages are necessary but not sufficient. Users also need a visible starting point, runnable examples, and a reliable way to see what changed after they integrate.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -84,12 +87,12 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (reference only)</strong></p>
-<pre><code>- /users (GET, POST, ...)
+<pre><code class="language-text">- /users (GET, POST, ...)
 - /orders (GET, POST, ...)
 </code></pre>
 <p>The names alone don't tell you what to do.</p>
 <p><strong>After (all five axes)</strong></p>
-<pre><code>1. Getting Started — first call in five minutes
+<pre><code class="language-text">1. Getting Started — first call in five minutes
 2. Tutorials — checkout flow, sign-up flow
 3. Reference — every endpoint
 4. Changelog — versioned changes
@@ -106,10 +109,14 @@
      -H &quot;Authorization: Bearer &lt;YOUR_KEY&gt;&quot;
    ```
 3. Seeing `{&quot;status&quot;: &quot;ok&quot;}` means success.
-</code></pre>
-<p>The <em>five-minute rule</em> — the user must have <em>something working</em> in five minutes.</p>
-<h3>Step 2 — Tutorial (scenario-driven)</h3>
-<pre><code class="language-markdown"># Accept Your First Payment
+```text
+
+The *five-minute rule* — the user must have *something working* in five minutes.
+
+### Step 2 — Tutorial (scenario-driven)
+
+```markdown
+# Accept Your First Payment
 
 1. Create a customer (POST /v1/customers)
 2. Create a payment intent (POST /v1/payment_intents)
@@ -131,7 +138,7 @@ Response (201):
 <p><strong>email.duplicate</strong><br>
 - status: 409<br>
 - meaning: email already registered</p>
-<pre><code>
+<pre><code class="language-text">
 Every reference page needs *examples + an error table*.
 
 ### Step 4 — Changelog
@@ -200,16 +207,26 @@ print(c.users.get(42))
 </ol>
 <h2>Wrap-up and Series Conclusion</h2>
 <p>An API is the <em>sum</em> of its contracts, behaviors, and documentation. We started in episode 1 with <em>the contract</em> — and worked through REST, resources, methods, schemas, pagination, errors, OpenAPI, and versioning — finishing with <em>documentation</em>. Before moving on, build a small API end-to-end yourself. That is the deepest learning.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">Designing Error Responses</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/08-openapi-and-swagger.md">OpenAPI and Swagger</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/09-api-versioning.md">API Versioning</a></li>
+<li><strong>The five axes of documentation?</strong></li>
+<li>The article treats Writing Good API Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Reaching the first call in *under five minutes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The weight of examples?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">API Design 101 (4/10): HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">API Design 101 (5/10): Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">API Design 101 (6/10): Pagination and Filtering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">API Design 101 (7/10): Designing Error Responses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/08-openapi-and-swagger.md">API Design 101 (8/10): OpenAPI and Swagger</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/09-api-versioning.md">API Design 101 (9/10): API Versioning</a></li>
 <li><strong>Writing Good API Documentation (current)</strong></li>
 </ul>
 <h2>References</h2>

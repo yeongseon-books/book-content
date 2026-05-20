@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is an API?</title>
+<title>API Design 101 (1/10): What Is an API?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Is an API?</h1>
+<h1>API Design 101 (1/10): What Is an API?</h1>
 <p>Teams rarely get into trouble because the server code is impossible to change. They get into trouble because clients and servers are guessing at the contract in different ways, and a small backend tweak turns into a visible outage.</p>
 <p>This is the first post in the API Design 101 series.</p>
 <p>Here, we frame an API as a long-lived external contract rather than a bag of functions or URLs. That mental model is what makes the later topics—REST, resources, status codes, schemas, and documentation—fit together instead of feeling like isolated rules.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition and kinds of APIs</li>
-<li>Five conditions for a "good API"</li>
-<li>Library API vs web API</li>
-<li>The contract between client and server</li>
-<li>A map of the whole series</li>
+<li>The definition and kinds of APIs?</li>
+<li>Five conditions for a "good API"?</li>
+<li>Library API vs web API?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is an API? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is an API? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>An API is the <em>face</em> of a system. The internals can change freely as long as the API stays stable; if the API moves, every internal tweak becomes an external storm.</p>
 <blockquote>
 <p>An API should look more like a <em>promise that does not change</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>The client talks to the API contract, not to the server's internal implementation.</em></p>
 <p>That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -181,6 +184,16 @@ assert r.json() == {&quot;status&quot;: &quot;ok&quot;}
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>An API is a <em>contract</em>. The next post moves to its most common shape — REST basics.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The definition and kinds of APIs?</strong></li>
+<li>The article treats What Is an API? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Five conditions for a "good API"?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Library API vs web API?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is an API? (current)</strong></li>
 <li>REST Basics (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 10
-title: Writing Good API Documentation
+title: "API Design 101 (10/10): Writing Good API Documentation"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A practical guide to API docs that get adopted — Getting Star
 last_reviewed: '2026-05-15'
 ---
 
-# Writing Good API Documentation
+# API Design 101 (10/10): Writing Good API Documentation
 
 APIs often get abandoned not because they lack features, but because the path to the first successful call is too long. Inside a company, experienced teammates can fill the gaps verbally. External users do not have that safety net, so documentation quality becomes adoption speed.
 
@@ -29,13 +29,21 @@ This is the final post in the API Design 101 series.
 
 Here, we treat documentation as the full adoption path rather than as a reference dump. Getting Started, scenario tutorials, example-rich reference pages, changelogs, and SDK guidance all need to support the same journey.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The five axes of documentation
-- Reaching the first call in *under five minutes*
-- The weight of examples
-- The role of changelogs and SDKs
-- How docs grow over time
+- The five axes of documentation?
+- Reaching the first call in *under five minutes?
+- The weight of examples?
+
+## Big Picture
+
+![api design 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 10 flow overview*
+
+This picture places Writing Good API Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Writing Good API Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ Documentation drives *adoption* more than the API itself. The same endpoint can 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
-*Good API documentation guides the reader from the first successful call through scenarios, reference detail, change tracking, and tools.*
-
 That means strong reference pages are necessary but not sufficient. Users also need a visible starting point, runnable examples, and a reliable way to see what changed after they integrate.
-
 
 ## Key Terms
 
@@ -206,17 +210,29 @@ Stripe and Twilio set the *gold standard* — their five axes are consistent and
 
 An API is the *sum* of its contracts, behaviors, and documentation. We started in episode 1 with *the contract* — and worked through REST, resources, methods, schemas, pagination, errors, OpenAPI, and versioning — finishing with *documentation*. Before moving on, build a small API end-to-end yourself. That is the deepest learning.
 
+## Answering the Opening Questions
+
+- **The five axes of documentation?**
+  - The article treats Writing Good API Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Reaching the first call in *under five minutes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The weight of examples?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
-- [Pagination and Filtering](./06-pagination-and-filtering.md)
-- [Designing Error Responses](./07-error-response-design.md)
-- [OpenAPI and Swagger](./08-openapi-and-swagger.md)
-- [API Versioning](./09-api-versioning.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination and Filtering](./06-pagination-and-filtering.md)
+- [API Design 101 (7/10): Designing Error Responses](./07-error-response-design.md)
+- [API Design 101 (8/10): OpenAPI and Swagger](./08-openapi-and-swagger.md)
+- [API Design 101 (9/10): API Versioning](./09-api-versioning.md)
 - **Writing Good API Documentation (current)**
+
 <!-- toc:end -->
 
 ## References

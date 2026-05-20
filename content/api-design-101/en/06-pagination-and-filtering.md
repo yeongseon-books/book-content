@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 6
-title: Pagination and Filtering
+title: "API Design 101 (6/10): Pagination and Filtering"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Practical patterns for paginating, sorting, filtering, and sear
 last_reviewed: '2026-05-15'
 ---
 
-# Pagination and Filtering
+# API Design 101 (6/10): Pagination and Filtering
 
 List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.
 
@@ -29,13 +29,21 @@ This is post 6 in the API Design 101 series.
 
 Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The limits of offset / limit pagination
-- Cursor-based pagination
-- Sorting, filtering, and searching
-- Response metadata and link headers
-- Performance traps in large result sets
+- The limits of offset / limit pagination?
+- Cursor-based pagination?
+- Sorting, filtering, and searching?
+
+## Big Picture
+
+![api design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 6 flow overview*
+
+This picture places Pagination and Filtering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pagination and Filtering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ Bad pagination produces slow queries *and* duplicates *and* gaps — at the same
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
-*A cursor is an opaque token that tells the client where the next page should continue.*
-
 The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.
-
 
 ## Key Terms
 
@@ -187,17 +191,29 @@ GitHub returns next/prev URLs in the `Link` header. Fast-moving data — Twitter
 
 Pagination sits at the intersection of *performance and correctness*. The next episode tackles a topic every API hits — designing error responses.
 
+## Answering the Opening Questions
+
+- **The limits of offset / limit pagination?**
+  - The article treats Pagination and Filtering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Cursor-based pagination?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Sorting, filtering, and searching?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
 - **Pagination and Filtering (current)**
 - Designing Error Responses (upcoming)
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

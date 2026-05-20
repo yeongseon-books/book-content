@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 2
-title: REST Basics
+title: "API Design 101 (2/10): REST Basics"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A junior backend engineer's guide to the six REST constraints a
 last_reviewed: '2026-05-15'
 ---
 
-# REST Basics
+# API Design 101 (2/10): REST Basics
 
 Two APIs can both look "REST-ish" in screenshots and still feel completely different in production. The difference is usually not the path shape alone. It is whether the client can predict what each call means without re-learning the rules every time.
 
@@ -29,13 +29,21 @@ This is post 2 in the API Design 101 series.
 
 Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The definition and history of REST
-- The six architectural constraints
-- Resource-centric thinking
-- The intuition behind HTTP method mapping
-- What looks like REST but is not (RPC over HTTP)
+- The definition and history of REST?
+- The six architectural constraints?
+- Resource-centric thinking?
+
+## Big Picture
+
+![api design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 2 flow overview*
+
+This picture places REST Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of REST Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ REST is the most common API style. Follow it well and your API becomes *predicta
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
-*In REST, the URL identifies the resource and the HTTP method expresses the action on it.*
-
 A client should be able to read `GET /users/42` and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.
-
 
 ## Key Terms
 
@@ -194,8 +198,19 @@ GitHub, Stripe, GitLab — most public APIs are *mostly REST*. Pure HATEOAS is r
 
 REST is the *sum of six constraints*. The next episode dives into the heart of those constraints — resource design.
 
+## Answering the Opening Questions
+
+- **The definition and history of REST?**
+  - The article treats REST Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The six architectural constraints?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Resource-centric thinking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
 - **REST Basics (current)**
 - Resource Design (upcoming)
 - HTTP Methods and Status Codes (upcoming)
@@ -205,6 +220,7 @@ REST is the *sum of six constraints*. The next episode dives into the heart of t
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

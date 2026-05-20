@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 7
-title: Designing Error Responses
+title: "API Design 101 (7/10): Designing Error Responses"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A practical guide to error responses for REST APIs — RFC 7807
 last_reviewed: '2026-05-15'
 ---
 
-# Designing Error Responses
+# API Design 101 (7/10): Designing Error Responses
 
 Success responses can stay quiet for a long time even when they are mediocre. Error responses cannot. The moment they drift, support tickets multiply, client exception logic forks, and logs stop telling one coherent story.
 
@@ -29,13 +29,21 @@ This is post 7 in the API Design 101 series.
 
 Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The four parts of an error response
-- RFC 7807 `application/problem+json`
-- How to express validation errors
-- Separating human messages from machine codes
-- Balancing security and debuggability
+- The four parts of an error response?
+- RFC 7807 `application/problem+json`?
+- How to express validation errors?
+
+## Big Picture
+
+![api design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 7 flow overview*
+
+This picture places Designing Error Responses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Designing Error Responses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ There is one success path and *hundreds of error paths*. If the shape is inconsi
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
-*Input errors, authorization failures, and internal faults all branch into the same envelope shape with different status and detail fields.*
-
 That stable shape lets clients keep one parser and branch cleanly on `status`, `code`, and `errors[]` instead of reverse-engineering a different payload for each endpoint.
-
 
 ## Key Terms
 
@@ -208,17 +212,29 @@ Stripe's error object (`type`, `code`, `param`, `message`) has become the de fac
 
 Error responses are the API's *second face*. The next episode brings every promise into one place — OpenAPI and Swagger.
 
+## Answering the Opening Questions
+
+- **The four parts of an error response?**
+  - The article treats Designing Error Responses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **RFC 7807 `application/problem+json`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to express validation errors?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
-- [Request and Response Schemas](./05-request-and-response-schema.md)
-- [Pagination and Filtering](./06-pagination-and-filtering.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- [API Design 101 (5/10): Request and Response Schemas](./05-request-and-response-schema.md)
+- [API Design 101 (6/10): Pagination and Filtering](./06-pagination-and-filtering.md)
 - **Designing Error Responses (current)**
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

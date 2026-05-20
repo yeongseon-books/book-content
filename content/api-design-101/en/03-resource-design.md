@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 3
-title: Resource Design
+title: "API Design 101 (3/10): Resource Design"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A practical guide to modeling REST resources — naming, plural
 last_reviewed: '2026-05-15'
 ---
 
-# Resource Design
+# API Design 101 (3/10): Resource Design
 
 Public URLs usually outlive the database tables and controller names that inspired them. A sloppy path chosen in week one can still be sitting in SDKs, logs, dashboards, and customer code a year later.
 
@@ -29,13 +29,21 @@ This is post 3 in the API Design 101 series.
 
 Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How to draw resource boundaries
-- Rules for nouns, plurals, and hierarchy
-- Modeling sub-resources
-- Choosing and exposing identifiers
-- Anti-patterns that keep coming back
+- How to draw resource boundaries?
+- Rules for nouns, plurals, and hierarchy?
+- Modeling sub-resources?
+
+## Big Picture
+
+![api design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 3 flow overview*
+
+This picture places Resource Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Resource Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ Once a URL is public, it is *expensive to change*. A bad resource model warps ev
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
-*The URL shape shows the path from collection to item to sub-resource.*
-
 When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.
-
 
 ## Key Terms
 
@@ -186,9 +190,20 @@ GitHub's `/repos/{owner}/{repo}/issues/{number}` is the canonical example of nou
 
 Resources define the shape of your API. The next episode turns to *what actions* live on those resources — HTTP methods and status codes.
 
+## Answering the Opening Questions
+
+- **How to draw resource boundaries?**
+  - The article treats Resource Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Rules for nouns, plurals, and hierarchy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Modeling sub-resources?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
 - **Resource Design (current)**
 - HTTP Methods and Status Codes (upcoming)
 - Request and Response Schemas (upcoming)
@@ -197,6 +212,7 @@ Resources define the shape of your API. The next episode turns to *what actions*
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

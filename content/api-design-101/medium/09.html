@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>API Versioning</title>
+<title>API Design 101 (9/10): API Versioning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>API Versioning</h1>
+<h1>API Design 101 (9/10): API Versioning</h1>
 <p>Running an API for a long time teaches the same lesson repeatedly: the hard part is not changing the contract, but changing it without breaking trust. A field tweak that feels minor to the backend can still be a production incident for clients that upgrade months later.</p>
 <p>This is post 9 in the API Design 101 series.</p>
 <p>Here, we treat versioning as change-management discipline rather than just <code>/v1</code> syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Distinguishing breaking from non-breaking changes</li>
-<li>URL versioning vs header versioning</li>
-<li>Compatibility policy (semver, calver)</li>
-<li>Deprecation notices and sunsetting</li>
-<li>The cost of running multiple versions</li>
+<li>Distinguishing breaking from non-breaking changes?</li>
+<li>URL versioning vs header versioning?</li>
+<li>Compatibility policy (semver, calver)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 9 flow overview</em></p>
+<p>This picture places API Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of API Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>External clients depend on your API. One break stops <em>dozens or hundreds</em> of clients at once. Good versioning gives you the <em>freedom to change</em> — but only with discipline.</p>
 <blockquote>
 <p>Compatibility is not free.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>Older versions do not disappear instantly. They move through deprecation notices toward a clearly announced sunset date.</em></p>
 <p>That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -87,7 +90,7 @@
 <pre><code class="language-text">PATCH /users/42  → response date format changes one day
 </code></pre>
 <p><strong>After (explicit version)</strong></p>
-<pre><code>PATCH /v2/users/42
+<pre><code class="language-text">PATCH /v2/users/42
 Sunset: Wed, 31 Jan 2027 23:59:59 GMT  (set on v1 responses)
 </code></pre>
 <h2>Hands-on: Five Versioning Steps</h2>
@@ -131,7 +134,7 @@ def v1(uid):
 </code></pre>
 <p>Standard headers send a <em>quiet notice</em> — paired with release notes.</p>
 <p><strong>Step 5 — Sunset procedure</strong></p>
-<pre><code>1. Ship the new version + start sending Deprecation
+<pre><code class="language-text">1. Ship the new version + start sending Deprecation
 2. Monitor usage (identify clients)
 3. Announce sunset 6-12 months out by email
 4. Simulate 410 Gone for 30 days before sunset
@@ -183,15 +186,25 @@ def v1(uid):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Versioning reconciles <em>contracts</em> with <em>change</em>. The final episode turns to making all those promises <em>readable</em> — writing good API documentation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">Designing Error Responses</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/08-openapi-and-swagger.md">OpenAPI and Swagger</a></li>
+<li><strong>Distinguishing breaking from non-breaking changes?</strong></li>
+<li>The article treats API Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>URL versioning vs header versioning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Compatibility policy (semver, calver)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">API Design 101 (4/10): HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">API Design 101 (5/10): Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">API Design 101 (6/10): Pagination and Filtering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">API Design 101 (7/10): Designing Error Responses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/08-openapi-and-swagger.md">API Design 101 (8/10): OpenAPI and Swagger</a></li>
 <li><strong>API Versioning (current)</strong></li>
 <li>Writing Good API Documentation (upcoming)</li>
 </ul>

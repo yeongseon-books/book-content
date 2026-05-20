@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 5
-title: Request and Response Schemas
+title: "API Design 101 (5/10): Request and Response Schemas"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A junior backend engineer's guide to JSON schemas, content type
 last_reviewed: '2026-05-15'
 ---
 
-# Request and Response Schemas
+# API Design 101 (5/10): Request and Response Schemas
 
 At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.
 
@@ -29,13 +29,21 @@ This is post 5 in the API Design 101 series.
 
 Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- JSON and content types
-- Field naming conventions
-- Where and how to validate
-- Handling dates, time zones, and numbers
-- Stability principles for response schemas
+- JSON and content types?
+- Field naming conventions?
+- Where and how to validate?
+
+## Big Picture
+
+![api design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 5 flow overview*
+
+This picture places Request and Response Schemas inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Request and Response Schemas is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ If schemas wobble, *everything* on the client wobbles. Good schemas are *readabl
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
-*Validate at the boundary on the way in, and serialize into a stable response shape on the way out.*
-
 That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.
-
 
 ## Key Terms
 
@@ -194,17 +198,29 @@ Large APIs converge on *snake_case*, ISO 8601, and integer minor-unit currency (
 
 Schemas are the grammar of data. The next episode tackles a topic that no list endpoint can avoid — pagination and filtering.
 
+## Answering the Opening Questions
+
+- **JSON and content types?**
+  - The article treats Request and Response Schemas as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Field naming conventions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where and how to validate?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
-- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
+- [API Design 101 (4/10): HTTP Methods and Status Codes](./04-http-methods-and-status.md)
 - **Request and Response Schemas (current)**
 - Pagination and Filtering (upcoming)
 - Designing Error Responses (upcoming)
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

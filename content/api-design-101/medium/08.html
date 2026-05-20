@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>OpenAPI and Swagger</title>
+<title>API Design 101 (8/10): OpenAPI and Swagger</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>OpenAPI and Swagger</h1>
+<h1>API Design 101 (8/10): OpenAPI and Swagger</h1>
 <p>Once documentation starts lagging behind the code, teams quietly stop trusting it. They probe the API directly, SDKs fall out of sync, and review conversations move away from the contract that callers are supposed to rely on.</p>
 <p>This is post 8 in the API Design 101 series.</p>
 <p>Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The structure of the OpenAPI 3 spec</li>
-<li>Swagger UI and Redoc</li>
-<li>Code-first vs schema-first</li>
-<li>Generating client SDKs</li>
-<li>Preventing spec drift</li>
+<li>The structure of the OpenAPI 3 spec?</li>
+<li>Swagger UI and Redoc?</li>
+<li>Code-first vs schema-first?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 8 flow overview</em></p>
+<p>This picture places OpenAPI and Swagger inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of OpenAPI and Swagger is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A single spec file produces <em>docs + validation + client code + mock server</em>. Hand-written docs <em>always</em> drift from code — automation is the answer.</p>
 <blockquote>
 <p>Keep one <em>single source of truth</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>One OpenAPI spec can drive documentation, request validation, SDK generation, and mock behavior at the same time.</em></p>
 <p>The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -84,7 +87,7 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (hand-written docs)</strong></p>
-<pre><code>README.md &quot;GET /users/{id} returns user. id is integer.&quot;
+<pre><code class="language-text">README.md &quot;GET /users/{id} returns user. id is integer.&quot;
 </code></pre>
 <p><strong>After (slice of OpenAPI)</strong></p>
 <pre><code class="language-yaml">paths:
@@ -196,14 +199,24 @@ openapi-generator-cli generate \
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>OpenAPI is the API's <em>protocol, documentation, and code</em> in one. The next episode looks at the discipline of <em>changing</em> a contract — versioning.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">Designing Error Responses</a></li>
+<li><strong>The structure of the OpenAPI 3 spec?</strong></li>
+<li>The article treats OpenAPI and Swagger as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Swagger UI and Redoc?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Code-first vs schema-first?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">API Design 101 (4/10): HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">API Design 101 (5/10): Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">API Design 101 (6/10): Pagination and Filtering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">API Design 101 (7/10): Designing Error Responses</a></li>
 <li><strong>OpenAPI and Swagger (current)</strong></li>
 <li>API Versioning (upcoming)</li>
 <li>Writing Good API Documentation (upcoming)</li>

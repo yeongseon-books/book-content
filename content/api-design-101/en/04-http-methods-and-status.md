@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 4
-title: HTTP Methods and Status Codes
+title: "API Design 101 (4/10): HTTP Methods and Status Codes"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: A backend junior's reference for picking GET/POST/PUT/PATCH/DEL
 last_reviewed: '2026-05-15'
 ---
 
-# HTTP Methods and Status Codes
+# API Design 101 (4/10): HTTP Methods and Status Codes
 
 Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.
 
@@ -29,13 +29,21 @@ This is post 4 in the API Design 101 series.
 
 Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The meaning of GET / POST / PUT / PATCH / DELETE
-- Safe vs idempotent operations
-- The 2xx / 3xx / 4xx / 5xx families
-- The twelve status codes you will use most
-- A method × status mapping table
+- The meaning of GET / POST / PUT / PATCH / DELETE?
+- Safe vs idempotent operations?
+- The 2xx / 3xx / 4xx / 5xx families?
+
+## Big Picture
+
+![api design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 4 flow overview*
+
+This picture places HTTP Methods and Status Codes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of HTTP Methods and Status Codes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,9 +52,6 @@ Methods and status codes drive the *branching logic* on the client. Return the w
 > A status code is not a *number*. It is a *contract*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
-*The HTTP method expresses intent, and the status code expresses the outcome.*
 
 Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.
 
@@ -210,10 +215,21 @@ Look at GitHub's responses — method × status reads almost like a textbook: 20
 
 Methods and status codes are a pair. The next episode looks at the data flowing between them — request and response schemas.
 
+## Answering the Opening Questions
+
+- **The meaning of GET / POST / PUT / PATCH / DELETE?**
+  - The article treats HTTP Methods and Status Codes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Safe vs idempotent operations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The 2xx / 3xx / 4xx / 5xx families?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is an API?](./01-what-is-an-api.md)
-- [REST Basics](./02-rest-basics.md)
-- [Resource Design](./03-resource-design.md)
+## In this series
+
+- [API Design 101 (1/10): What Is an API?](./01-what-is-an-api.md)
+- [API Design 101 (2/10): REST Basics](./02-rest-basics.md)
+- [API Design 101 (3/10): Resource Design](./03-resource-design.md)
 - **HTTP Methods and Status Codes (current)**
 - Request and Response Schemas (upcoming)
 - Pagination and Filtering (upcoming)
@@ -221,6 +237,7 @@ Methods and status codes are a pair. The next episode looks at the data flowing 
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

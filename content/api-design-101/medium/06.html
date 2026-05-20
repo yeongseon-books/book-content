@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Pagination and Filtering</title>
+<title>API Design 101 (6/10): Pagination and Filtering</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Pagination and Filtering</h1>
+<h1>API Design 101 (6/10): Pagination and Filtering</h1>
 <p>List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.</p>
 <p>This is post 6 in the API Design 101 series.</p>
 <p>Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The limits of offset / limit pagination</li>
-<li>Cursor-based pagination</li>
-<li>Sorting, filtering, and searching</li>
-<li>Response metadata and link headers</li>
-<li>Performance traps in large result sets</li>
+<li>The limits of offset / limit pagination?</li>
+<li>Cursor-based pagination?</li>
+<li>Sorting, filtering, and searching?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 6 flow overview</em></p>
+<p>This picture places Pagination and Filtering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Pagination and Filtering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Bad pagination produces slow queries <em>and</em> duplicates <em>and</em> gaps — at the same time. And once it ships, it is hard to change. Be intentional from day one.</p>
 <blockquote>
 <p>Large collections must travel in <em>chunks</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png"><br>
-<em>A cursor is an opaque token that tells the client where the next page should continue.</em></p>
 <p>The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -178,12 +181,22 @@ GET /orders?created_at__gte=2026-01-01
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Pagination sits at the intersection of <em>performance and correctness</em>. The next episode tackles a topic every API hits — designing error responses.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
+<li><strong>The limits of offset / limit pagination?</strong></li>
+<li>The article treats Pagination and Filtering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Cursor-based pagination?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Sorting, filtering, and searching?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">API Design 101 (4/10): HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">API Design 101 (5/10): Request and Response Schemas</a></li>
 <li><strong>Pagination and Filtering (current)</strong></li>
 <li>Designing Error Responses (upcoming)</li>
 <li>OpenAPI and Swagger (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Request and Response Schemas</title>
+<title>API Design 101 (5/10): Request and Response Schemas</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Request and Response Schemas</h1>
+<h1>API Design 101 (5/10): Request and Response Schemas</h1>
 <p>At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.</p>
 <p>This is post 5 in the API Design 101 series.</p>
 <p>Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>JSON and content types</li>
-<li>Field naming conventions</li>
-<li>Where and how to validate</li>
-<li>Handling dates, time zones, and numbers</li>
-<li>Stability principles for response schemas</li>
+<li>JSON and content types?</li>
+<li>Field naming conventions?</li>
+<li>Where and how to validate?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 5 flow overview</em></p>
+<p>This picture places Request and Response Schemas inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Request and Response Schemas is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If schemas wobble, <em>everything</em> on the client wobbles. Good schemas are <em>readable</em> and <em>evolvable</em>. Validating at the boundary keeps the inner code <em>clean</em>.</p>
 <blockquote>
 <p>A schema is the <em>grammar</em> of your data.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png"><br>
-<em>Validate at the boundary on the way in, and serialize into a stable response shape on the way out.</em></p>
 <p>That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -184,11 +187,21 @@ currency = &quot;USD&quot;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Schemas are the grammar of data. The next episode tackles a topic that no list endpoint can avoid — pagination and filtering.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><strong>JSON and content types?</strong></li>
+<li>The article treats Request and Response Schemas as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Field naming conventions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where and how to validate?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">API Design 101 (4/10): HTTP Methods and Status Codes</a></li>
 <li><strong>Request and Response Schemas (current)</strong></li>
 <li>Pagination and Filtering (upcoming)</li>
 <li>Designing Error Responses (upcoming)</li>

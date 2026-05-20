@@ -1,7 +1,7 @@
 ---
 series: api-design-101
 episode: 1
-title: What Is an API?
+title: "API Design 101 (1/10): What Is an API?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: The definition of an API, what role it plays, and the condition
 last_reviewed: '2026-05-15'
 ---
 
-# What Is an API?
+# API Design 101 (1/10): What Is an API?
 
 Teams rarely get into trouble because the server code is impossible to change. They get into trouble because clients and servers are guessing at the contract in different ways, and a small backend tweak turns into a visible outage.
 
@@ -29,13 +29,21 @@ This is the first post in the API Design 101 series.
 
 Here, we frame an API as a long-lived external contract rather than a bag of functions or URLs. That mental model is what makes the later topics—REST, resources, status codes, schemas, and documentation—fit together instead of feeling like isolated rules.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The definition and kinds of APIs
-- Five conditions for a "good API"
-- Library API vs web API
-- The contract between client and server
-- A map of the whole series
+- The definition and kinds of APIs?
+- Five conditions for a "good API"?
+- Library API vs web API?
+
+## Big Picture
+
+![api design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
+
+*api design 101 chapter 1 flow overview*
+
+This picture places What Is an API? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is an API? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,11 +53,7 @@ An API is the *face* of a system. The internals can change freely as long as the
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
-*The client talks to the API contract, not to the server's internal implementation.*
-
 That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.
-
 
 ## Key Terms
 
@@ -191,7 +195,18 @@ GitHub's REST API, Stripe's API, Google Maps API — all *documented contracts*.
 
 An API is a *contract*. The next post moves to its most common shape — REST basics.
 
+## Answering the Opening Questions
+
+- **The definition and kinds of APIs?**
+  - The article treats What Is an API? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Five conditions for a "good API"?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Library API vs web API?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is an API? (current)**
 - REST Basics (upcoming)
 - Resource Design (upcoming)
@@ -202,6 +217,7 @@ An API is a *contract*. The next post moves to its most common shape — REST ba
 - OpenAPI and Swagger (upcoming)
 - API Versioning (upcoming)
 - Writing Good API Documentation (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HTTP Methods and Status Codes</title>
+<title>API Design 101 (4/10): HTTP Methods and Status Codes</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>HTTP Methods and Status Codes</h1>
+<h1>API Design 101 (4/10): HTTP Methods and Status Codes</h1>
 <p>Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.</p>
 <p>This is post 4 in the API Design 101 series.</p>
 <p>Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The meaning of GET / POST / PUT / PATCH / DELETE</li>
-<li>Safe vs idempotent operations</li>
-<li>The 2xx / 3xx / 4xx / 5xx families</li>
-<li>The twelve status codes you will use most</li>
-<li>A method × status mapping table</li>
+<li>The meaning of GET / POST / PUT / PATCH / DELETE?</li>
+<li>Safe vs idempotent operations?</li>
+<li>The 2xx / 3xx / 4xx / 5xx families?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 4 flow overview</em></p>
+<p>This picture places HTTP Methods and Status Codes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of HTTP Methods and Status Codes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Methods and status codes drive the <em>branching logic</em> on the client. Return the wrong code and the client cannot even tell whether retrying is safe. This pair determines how <em>predictable</em> your API is.</p>
 <blockquote>
 <p>A status code is not a <em>number</em>. It is a <em>contract</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>The HTTP method expresses intent, and the status code expresses the outcome.</em></p>
 <p>Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -201,10 +204,20 @@ def create():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Methods and status codes are a pair. The next episode looks at the data flowing between them — request and response schemas.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><strong>The meaning of GET / POST / PUT / PATCH / DELETE?</strong></li>
+<li>The article treats HTTP Methods and Status Codes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Safe vs idempotent operations?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The 2xx / 3xx / 4xx / 5xx families?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">API Design 101 (2/10): REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">API Design 101 (3/10): Resource Design</a></li>
 <li><strong>HTTP Methods and Status Codes (current)</strong></li>
 <li>Request and Response Schemas (upcoming)</li>
 <li>Pagination and Filtering (upcoming)</li>

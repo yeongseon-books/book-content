@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>REST Basics</title>
+<title>API Design 101 (2/10): REST Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>REST Basics</h1>
+<h1>API Design 101 (2/10): REST Basics</h1>
 <p>Two APIs can both look "REST-ish" in screenshots and still feel completely different in production. The difference is usually not the path shape alone. It is whether the client can predict what each call means without re-learning the rules every time.</p>
 <p>This is post 2 in the API Design 101 series.</p>
 <p>Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition and history of REST</li>
-<li>The six architectural constraints</li>
-<li>Resource-centric thinking</li>
-<li>The intuition behind HTTP method mapping</li>
-<li>What looks like REST but is not (RPC over HTTP)</li>
+<li>The definition and history of REST?</li>
+<li>The six architectural constraints?</li>
+<li>Resource-centric thinking?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="api design 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>api design 101 chapter 2 flow overview</em></p>
+<p>This picture places REST Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of REST Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>REST is the most common API style. Follow it well and your API becomes <em>predictable</em>; follow it poorly and it becomes <em>something I have seen before but cannot quite recognize</em>. Internalize the core and every later episode becomes easier.</p>
 <blockquote>
 <p>Understand <em>why</em> the rule exists, not only the rule.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>In REST, the URL identifies the resource and the HTTP method expresses the action on it.</em></p>
 <p>A client should be able to read <code>GET /users/42</code> and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -183,8 +186,18 @@ def article():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>REST is the <em>sum of six constraints</em>. The next episode dives into the heart of those constraints — resource design.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><strong>The definition and history of REST?</strong></li>
+<li>The article treats REST Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The six architectural constraints?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Resource-centric thinking?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">API Design 101 (1/10): What Is an API?</a></li>
 <li><strong>REST Basics (current)</strong></li>
 <li>Resource Design (upcoming)</li>
 <li>HTTP Methods and Status Codes (upcoming)</li>
