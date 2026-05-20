@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Retry and error handling — making API calls reliable</title>
+<title>LLM API Production 101 (5/6): Retry and error handling — making API calls reliable</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,24 @@
 </style>
 </head>
 <body>
-<h1>Retry and error handling — making API calls reliable</h1>
-<blockquote>
-<p>LLM API Production 101 (5/6)</p>
-</blockquote>
+<h1>LLM API Production 101 (5/6): Retry and error handling — making API calls reliable</h1>
 <p>Once an LLM API call sits on a production path, failure stops being an exception in the human sense. It becomes part of the runtime. Networks stall. Providers slow down. Requests hit time limits. A client process can lose connectivity at the wrong moment. The real question is not whether failures happen. It is whether the application reacts to them predictably.</p>
 <p>One of the most common mistakes is retrying everything. Teams catch a broad exception, sleep, try again, and call that resilience. The problem is that not all failures are temporary. Authentication problems are not fixed by waiting two seconds. Invalid request payloads are not fixed by a second attempt. Schema-validation failures are not fixed just because the same call was repeated three times.</p>
 <p>That is why retries work only when they begin with error classification. A retry policy is not “try again when something goes wrong.” It is “retry only the failures that are likely to be transient, with bounded backoff and explicit stop conditions.” In this post, we will use <code>tenacity</code> to build that policy around a Groq API call.</p>
 <p>This is the fifth post in the LLM API Production 101 series. Here we focus on error classification and bounded retry policies for reliable API calls.</p>
-<p>The main idea is simple: <strong>a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification</strong>.</p>
-<p><img alt="Retry and error handling: making API calls reliable" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png"></p>
-<h2><em>Retry and error handling: making API calls reliable</em></h2>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Which LLM API errors are safe to retry, and which must never be retried?</li>
-<li>Why must exponential backoff and jitter always travel together?</li>
-<li>What is the right retry unit when a streaming response errors mid-flight?</li>
-<li>How do you cap retries so they don't explode token spend?</li>
-<li>How do you prevent duplicate calls when an LLM API has no idempotency key?</li>
+<li>Why should API failures not share one retry policy?</li>
+<li>Which failures are retryable, and which should fail fast?</li>
+<li>After final failure, how should user messages and internal logs differ?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Retry and error handling: making API calls reliable" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png"></p>
+<p><em>Retry and error handling: making API calls reliable</em></p>
+<p>This picture treats retry as a limited recovery strategy built on error classification. Retrying only helps when the failure has a realistic chance of changing on the next attempt.</p>
+<blockquote>
+<p>Retry is useful only after the system knows which failures can recover by trying again.</p>
+</blockquote>
 <h2>Runtime setup</h2>
 <p>The examples assume Python 3.10 or later with <code>groq</code> and <code>tenacity</code> installed.</p>
 <pre><code class="language-bash">python3 -m venv .venv
@@ -267,14 +266,29 @@ Retries do not eliminate failure. They shape failure.</p>
 <li>[ ] Added a guard that caps token spend across retry attempts</li>
 <li>[ ] Propagated a correlation ID across every retry of the same request</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why should API failures not share one retry policy?</strong><br>
+  Authentication, input, rate limit, network, and provider failures have different recovery paths, so one policy hides the real cause.</p>
+</li>
+<li>
+<p><strong>Which failures are retryable, and which should fail fast?</strong><br>
+  Transient network errors and some 429/5xx failures are retry candidates; bad keys, bad model ids, and invalid request schemas usually need a fix instead.</p>
+</li>
+<li>
+<p><strong>After final failure, how should user messages and internal logs differ?</strong><br>
+  Users need a short actionable message; internal logs need classification, provider response, attempt count, and correlation id.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/01-structured-output.md">Structured output — JSON mode and response schemas</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/02-tool-calling.md">Tool calling — connecting functions to the model</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/03-streaming-in-depth.md">Streaming in depth — chunk handling and error recovery</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/04-caching-strategies.md">Caching strategies — reducing cost and latency</a></li>
-<li><strong>Retry and error handling — making API calls reliable (current)</strong></li>
-<li>Rate limit management — patterns for staying within limits (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/01-structured-output.md">LLM API Production 101 (1/6): Structured output — JSON mode and response schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/02-tool-calling.md">LLM API Production 101 (2/6): Tool calling — connecting functions to the model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/03-streaming-in-depth.md">LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/04-caching-strategies.md">LLM API Production 101 (4/6): Caching strategies — reducing cost and latency</a></li>
+<li><strong>LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (current)</strong></li>
+<li>LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

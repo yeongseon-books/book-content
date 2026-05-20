@@ -14,13 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Tool calling — connecting functions to the model
+title: "LLM API Production 101 (2/6): Tool calling — connecting functions to the model"
 seo_description: Implement a secure tool-calling loop that connects LLMs to application functions while maintaining control over execution and permissions.
 ---
 
-# Tool calling — connecting functions to the model
-
-> LLM API Production 101 (2/6)
+# LLM API Production 101 (2/6): Tool calling — connecting functions to the model
 
 Once structured output is working, the next request usually arrives quickly: the model should not stop at answering the user, it should connect to application functions. A customer asks about an order, and you want the model to trigger `get_order_status()`. Someone asks about exchange rates, and you want the model to call an internal lookup. A scheduling request should lead to a calendar action instead of a paragraph about calendars.
 
@@ -34,18 +32,21 @@ This is the second post in the LLM API Production 101 series. Here we focus on c
 
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
+## Questions to Keep in Mind
+
+- Is tool calling model autonomy, or an execution boundary designed by the application?
+- What should you validate in the `tools` definition and the returned `tool_calls`?
+- What guardrails close the function-execution loop safely in production?
+
+## Big Picture
+
 ![Tool calling: connecting functions to the model](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
 
 *Tool calling: connecting functions to the model*
----
 
-## Questions this chapter answers
+This picture shows tool calling as a structured execution request, not direct model control over your code. The model chooses within the contract; the application validates and executes inside its own boundary.
 
-- How is tool calling different from function calling, and does the LLM actually run functions?
-- How should you write tool definitions (name, description, parameters) so the model picks the right one?
-- How do you reduce wrong-tool selection when many tools are exposed?
-- How do you build a multi-turn loop that feeds tool results back to the model?
-- How do you recover the response when a tool call fails or times out?
+> Tool calling is not model autonomy; it is an application-owned execution boundary.
 
 ## Runtime setup
 
@@ -414,15 +415,26 @@ Structured output gave us a contract for data. Tool calling extends that contrac
 - [ ] Standardized error payloads so the model can explain failures to the user
 - [ ] Added a guard (max call count) against repeated or infinite tool calls
 
+## Answering the Opening Questions
+
+- **Is tool calling model autonomy, or an execution boundary designed by the application?**
+  Tool calling is an application-defined execution boundary: the model can request only the tools and parameters the app exposes.
+
+- **What should you validate in the `tools` definition and the returned `tool_calls`?**
+  Validate tool names, descriptions, and parameter schemas on the input side, then validate the returned name and arguments before routing.
+
+- **What guardrails close the function-execution loop safely in production?**
+  Use allowlists, input validation, timeouts, structured errors, and result reinjection so the loop ends safely.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- **Tool calling — connecting functions to the model (current)**
-- Streaming in depth — chunk handling and error recovery (upcoming)
-- Caching strategies — reducing cost and latency (upcoming)
-- Retry and error handling — making API calls reliable (upcoming)
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- **LLM API Production 101 (2/6): Tool calling — connecting functions to the model (current)**
+- LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery (upcoming)
+- LLM API Production 101 (4/6): Caching strategies — reducing cost and latency (upcoming)
+- LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (upcoming)
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 

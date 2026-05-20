@@ -14,13 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Streaming in depth — chunk handling and error recovery
+title: "LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery"
 seo_description: Master LLM streaming by treating responses as partial state, enforcing inactivity timeouts, and preserving output during connection failures.
 ---
 
-# Streaming in depth — chunk handling and error recovery
-
-> LLM API Production 101 (3/6)
+# LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery
 
 Streaming looks flashy in a demo, but in production it is really a protocol problem. Showing the first token quickly makes an application feel alive and reduces abandonment on long answers. That part is obvious. What is less obvious is that `stream=True` changes the failure model. Chunks may arrive without text, the connection may go quiet before it ends, the stream may fail after partial output has already been shown, and the final metadata may never arrive.
 
@@ -32,18 +30,21 @@ This is the third post in the LLM API Production 101 series. Here we focus on ch
 
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
+## Questions to Keep in Mind
+
+- Why should streaming be treated as a session with partial state instead of one final string?
+- How should empty chunks and mid-stream failures be represented?
+- After a streaming failure, what should be preserved and what should be rebuilt?
+
+## Big Picture
+
 ![Streaming in depth: chunk handling and error recovery](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
 
 *Streaming in depth: chunk handling and error recovery*
----
 
-## Questions this chapter answers
+This picture treats a stream as accumulated session state. When a failure happens mid-response, the application needs to know what arrived, what ended cleanly, and what still needs recovery.
 
-- What does streaming change at the HTTP layer compared to a regular response?
-- How do Server-Sent Events (SSE) differ from chunked transfer, and which do LLM APIs actually use?
-- How do you safely accumulate and persist a partial response if the stream drops mid-flight?
-- When should you buffer token-level chunks into word-level units before rendering?
-- Where does usage data come from on a streaming response, and how do you aggregate it?
+> A stream is not one late string; it is partial state that can succeed, fail, or remain incomplete.
 
 ## Runtime setup
 
@@ -351,15 +352,26 @@ Structured output and tool calling made the response boundary more explicit. Str
 - [ ] Captured usage data at stream close and fed it into cost metrics
 - [ ] Branched separately on mid-stream tool calls and error chunks
 
+## Answering the Opening Questions
+
+- **Why should streaming be treated as a session with partial state instead of one final string?**
+  A streamed response is built from many chunks, so the app needs state for accumulated text, finish signals, and failure state.
+
+- **How should empty chunks and mid-stream failures be represented?**
+  Empty chunks can be normal protocol events; failures should preserve partial output and error context instead of pretending no response happened.
+
+- **After a streaming failure, what should be preserved and what should be rebuilt?**
+  Keep partial output and correlation data, then rebuild the next request and user-facing recovery path carefully to avoid duplicated output.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- [Tool calling — connecting functions to the model](./02-tool-calling.md)
-- **Streaming in depth — chunk handling and error recovery (current)**
-- Caching strategies — reducing cost and latency (upcoming)
-- Retry and error handling — making API calls reliable (upcoming)
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [LLM API Production 101 (2/6): Tool calling — connecting functions to the model](./02-tool-calling.md)
+- **LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery (current)**
+- LLM API Production 101 (4/6): Caching strategies — reducing cost and latency (upcoming)
+- LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (upcoming)
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 

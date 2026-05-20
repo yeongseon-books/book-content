@@ -14,13 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Retry and error handling — making API calls reliable
+title: "LLM API Production 101 (5/6): Retry and error handling — making API calls reliable"
 seo_description: Build reliable LLM applications by implementing an error classification system and bounded retry policies using exponential backoff and jitter.
 ---
 
-# Retry and error handling — making API calls reliable
-
-> LLM API Production 101 (5/6)
+# LLM API Production 101 (5/6): Retry and error handling — making API calls reliable
 
 Once an LLM API call sits on a production path, failure stops being an exception in the human sense. It becomes part of the runtime. Networks stall. Providers slow down. Requests hit time limits. A client process can lose connectivity at the wrong moment. The real question is not whether failures happen. It is whether the application reacts to them predictably.
 
@@ -30,20 +28,21 @@ That is why retries work only when they begin with error classification. A retry
 
 This is the fifth post in the LLM API Production 101 series. Here we focus on error classification and bounded retry policies for reliable API calls.
 
-The main idea is simple: **a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification**.
+## Questions to Keep in Mind
+
+- Why should API failures not share one retry policy?
+- Which failures are retryable, and which should fail fast?
+- After final failure, how should user messages and internal logs differ?
+
+## Big Picture
 
 ![Retry and error handling: making API calls reliable](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
 
 *Retry and error handling: making API calls reliable*
----
 
-## Questions this chapter answers
+This picture treats retry as a limited recovery strategy built on error classification. Retrying only helps when the failure has a realistic chance of changing on the next attempt.
 
-- Which LLM API errors are safe to retry, and which must never be retried?
-- Why must exponential backoff and jitter always travel together?
-- What is the right retry unit when a streaming response errors mid-flight?
-- How do you cap retries so they don't explode token spend?
-- How do you prevent duplicate calls when an LLM API has no idempotency key?
+> Retry is useful only after the system knows which failures can recover by trying again.
 
 ## Runtime setup
 
@@ -300,15 +299,26 @@ Caching reduced repeated work. Retries smooth over temporary failure. The final 
 - [ ] Added a guard that caps token spend across retry attempts
 - [ ] Propagated a correlation ID across every retry of the same request
 
+## Answering the Opening Questions
+
+- **Why should API failures not share one retry policy?**
+  Authentication, input, rate limit, network, and provider failures have different recovery paths, so one policy hides the real cause.
+
+- **Which failures are retryable, and which should fail fast?**
+  Transient network errors and some 429/5xx failures are retry candidates; bad keys, bad model ids, and invalid request schemas usually need a fix instead.
+
+- **After final failure, how should user messages and internal logs differ?**
+  Users need a short actionable message; internal logs need classification, provider response, attempt count, and correlation id.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- [Tool calling — connecting functions to the model](./02-tool-calling.md)
-- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
-- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
-- **Retry and error handling — making API calls reliable (current)**
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [LLM API Production 101 (2/6): Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+- [LLM API Production 101 (4/6): Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+- **LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (current)**
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 

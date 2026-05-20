@@ -14,13 +14,11 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Caching strategies — reducing cost and latency
+title: "LLM API Production 101 (4/6): Caching strategies — reducing cost and latency"
 seo_description: Reduce LLM API costs and latency by implementing a robust request-hash caching strategy with TTL-based expiration and stable key generation.
 ---
 
-# Caching strategies — reducing cost and latency
-
-> LLM API Production 101 (4/6)
+# LLM API Production 101 (4/6): Caching strategies — reducing cost and latency
 
 Once an LLM feature reaches production traffic, the first thing that often looks expensive is not the model choice by itself. It is repetition. The same question comes in again, the same system prompt is sent again, the same context is serialized again, and the same answer is generated again. At that point, teams often jump straight to prompt trimming or model switching. Sometimes that is necessary. Often, the cheaper fix is much simpler: stop recomputing work you already paid for.
 
@@ -30,20 +28,21 @@ This post builds the smallest useful cache for an LLM API path: an in-memory cac
 
 This is the fourth post in the LLM API Production 101 series. Here we focus on request-hash caching strategies that reduce both cost and latency.
 
-The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a contract for when a request should not be recomputed**.
+## Questions to Keep in Mind
+
+- Why is an LLM cache a request-identity contract rather than just a response store?
+- What belongs in a cache key besides the prompt text?
+- Which paths should avoid caching even when calls are expensive?
+
+## Big Picture
 
 ![Caching strategies: reducing cost and latency](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
 
 *Caching strategies: reducing cost and latency*
----
 
-## Questions this chapter answers
+This picture treats caching as a contract for deciding when two requests are truly the same work. The cache key must include the values that can change the meaning of the answer.
 
-- How is caching an LLM response fundamentally different from caching an HTTP response?
-- Where do provider-side prompt caches and application caches divide responsibility?
-- How do you incorporate the system prompt, user input, and model version into the cache key?
-- When should you reach for a semantic cache (embedding similarity), and what are the risks?
-- How do you measure the tradeoff between hit rate and response freshness?
+> An LLM cache is safe only when the cache key preserves the meaning of the request.
 
 ## Runtime setup
 
@@ -359,15 +358,26 @@ The earlier posts focused on response shape and execution flow. Caching adds a n
 - [ ] Set thresholds and a fallback path before enabling semantic caching
 - [ ] Tracked hit rate, saved tokens, and miss latency as production metrics
 
+## Answering the Opening Questions
+
+- **Why is an LLM cache a request-identity contract rather than just a response store?**
+  Caching only works safely when the application can prove two requests mean the same work, so identity comes before storage.
+
+- **What belongs in a cache key besides the prompt text?**
+  Include prompt text, model, generation options, system policy, schema version, and other values that affect output meaning.
+
+- **Which paths should avoid caching even when calls are expensive?**
+  Avoid caching permission-sensitive, freshness-critical, or safety-sensitive paths where a stale answer is more expensive than a fresh call.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Structured output — JSON mode and response schemas](./01-structured-output.md)
-- [Tool calling — connecting functions to the model](./02-tool-calling.md)
-- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
-- **Caching strategies — reducing cost and latency (current)**
-- Retry and error handling — making API calls reliable (upcoming)
-- Rate limit management — patterns for staying within limits (upcoming)
+- [LLM API Production 101 (1/6): Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [LLM API Production 101 (2/6): Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [LLM API Production 101 (3/6): Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+- **LLM API Production 101 (4/6): Caching strategies — reducing cost and latency (current)**
+- LLM API Production 101 (5/6): Retry and error handling — making API calls reliable (upcoming)
+- LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
 
