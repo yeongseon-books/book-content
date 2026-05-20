@@ -1,327 +1,21 @@
 {
-  "generated_at": "2026-05-20T12:03:14+00:00",
+  "generated_at": "2026-05-20T12:03:34+00:00",
   "series_count": 92,
-  "problem_series_count": 7,
-  "series_with_5_plus": 5,
+  "problem_series_count": 6,
+  "series_with_5_plus": 4,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 56,
+    "BadImg": 44,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 56
+    "all": 44
   },
   "results": [
-    {
-      "series": "data-science-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 12
-      },
-      "total": 12,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 702,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 652,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 1014,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 858,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 1118,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 988,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 974,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 801,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 791,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 698,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 702,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 652,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 1014,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 858,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 1118,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 988,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 974,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 801,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 791,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 698,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1225,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/data-science-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1104,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
     {
       "series": "llm-apps-ops-101",
       "counts": {
@@ -1940,6 +1634,20 @@
     },
     {
       "series": "containers-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "data-science-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

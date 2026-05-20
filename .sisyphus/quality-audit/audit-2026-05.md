@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:03:14+00:00
+Generated: 2026-05-20T12:03:34+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **7**
-- Series at or above 5 issues: **5**
-- Total issues: **56**
-  - BadImg: **56**
+- Series with any issue: **6**
+- Series at or above 5 issues: **4**
+- Total issues: **44**
+  - BadImg: **44**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,25 +41,12 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 2 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 3 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 4 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 5 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 6 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 7 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## data-science-101 — Total 12
-
-- BadImg=12 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/data-science-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=702x67)
-- `assets/data-science-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=652x67)
-- `assets/data-science-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1014x67)
-- `assets/data-science-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=858x67)
-- `assets/data-science-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1118x67)
-- ... 7 more
+| 1 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 2 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 3 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 4 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 5 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 6 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## llm-apps-ops-101 — Total 12
 
