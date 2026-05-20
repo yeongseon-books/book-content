@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Streaming — handling real-time output</title>
+<title>LangChain 101 (5/6): Streaming — handling real-time output</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Streaming — handling real-time output</h1>
+<h1>LangChain 101 (5/6): Streaming — handling real-time output</h1>
 <p>Long model responses feel slow even when total latency is acceptable. Streaming changes that experience by letting the same chain surface useful output before the full response is finished.</p>
 <p>This is the fifth post in the LangChain 101 series. It covers <code>stream()</code>, <code>astream()</code>, and the practical patterns for delivering partial output to users.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How does the return shape change when you switch from <code>invoke()</code> to <code>stream()</code></li>
-<li>What is the practical difference between chain streaming and model-only streaming</li>
-<li>When do you need <code>astream()</code> or <code>astream_events()</code> instead of plain <code>stream()</code></li>
-<li>How should streamed output be forwarded to a UI or API response</li>
+<li>How do <code>stream()</code> and <code>astream()</code> change user experience and server structure?</li>
+<li>When collecting chunks, how should empty chunks and mid-stream errors be handled?</li>
+<li>Where should a FastAPI streaming endpoint handle backpressure and exceptions?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture shows model output moving through the chain as small chunks instead of one final response. Streaming changes not only output timing but also error handling and server boundaries.</p>
 <blockquote>
 <p>Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
@@ -84,20 +85,6 @@ chain = (
 for chunk in chain.stream({&quot;topic&quot;: &quot;astream&quot;}):
     print(chunk, end=&quot;&quot;, flush=True)
 </code></pre>
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-When an LLM generates a long response, waiting for the full text before displaying anything makes the experience feel slow. Streaming sends tokens to the output as they are generated. That is what you see in ChatGPT or Claude when text appears character by character.</p>
-<p>In LangChain, streaming starts with <code>stream()</code>. Chain construction is identical to <code>invoke()</code> — only the call method changes.</p>
-<p>Topics:</p>
-<ul>
-<li>using <code>stream()</code> with an LLM and a chain</li>
-<li>async streaming with <code>astream()</code></li>
-<li>collecting streamed output into a string</li>
-<li>a practical FastAPI streaming endpoint</li>
-<li><code>astream_events()</code> for fine-grained event control</li>
-</ul>
-<hr>
 <h2>Basic streaming</h2>
 <p><img alt="Direct model and chain streaming comparison" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-01-basic-streaming.en.png"></p>
 <p><em>Direct model and chain streaming comparison</em><br>
@@ -328,6 +315,21 @@ asyncio.run(main())
 <h2>Conclusion</h2>
 <p>Streaming in LangChain requires one change: replace <code>invoke()</code> with <code>stream()</code> or <code>astream()</code>. Chain structure stays the same. With FastAPI, <code>StreamingResponse</code> delivers the output to clients in real time.</p>
 <p>The final post assembles all the components covered in this series into one complete chain.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>How do <code>stream()</code> and <code>astream()</code> change user experience and server structure?</strong><br>
+<code>stream()</code> returns a synchronous iterator of partial output, while <code>astream()</code> fits async servers. Both reduce time to first visible token.</p>
+</li>
+<li>
+<p><strong>When collecting chunks, how should empty chunks and mid-stream errors be handled?</strong><br>
+  Empty chunks can be normal protocol events, and mid-stream errors should preserve partial output plus error context.</p>
+</li>
+<li>
+<p><strong>Where should a FastAPI streaming endpoint handle backpressure and exceptions?</strong><br>
+  Handle cancellation, slow clients, and provider exceptions at the generator or async-generator boundary so connection cleanup and logging stay separate.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>

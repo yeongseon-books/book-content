@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Putting it together — a complete chain in one file</title>
+<title>LangChain 101 (6/6): Putting it together — a complete chain in one file</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Putting it together — a complete chain in one file</h1>
+<h1>LangChain 101 (6/6): Putting it together — a complete chain in one file</h1>
 <p>By the time you reach a real LangChain application, the challenge is no longer understanding each component in isolation. The real work is keeping indexing, retrieval, prompting, tool use, and output delivery separate enough that one integrated chain still stays debuggable.</p>
 <p>This is the final post in the LangChain 101 series. It assembles the earlier pieces into one executable RAG chain without losing the boundaries that make the system maintainable.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do the Runnables from the previous posts combine into one executable RAG chain</li>
-<li>Where is the boundary between indexing, retrieval, prompting, and generation</li>
-<li>What does the full data flow look like once streaming is added</li>
-<li>Which component should you replace first when adapting the example to a real project</li>
+<li>How should one RAG chain separate document indexing from query execution?</li>
+<li>What guard can run before the model call when retrieval returns nothing useful?</li>
+<li>What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture connects document indexing, retrieval, prompt assembly, model calls, and streaming output into one RAG application. The practical goal is to keep each boundary visible even when the demo fits in one file.</p>
 <blockquote>
 <p>The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
@@ -84,18 +85,6 @@ chain = ({&quot;context&quot;: retriever | (lambda docs: docs[0].page_content), 
 
 print(chain.invoke(&quot;What is LCEL?&quot;))
 </code></pre>
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.</p>
-<p>Topics:</p>
-<ul>
-<li>document chunking → embedding → FAISS index</li>
-<li>assembling a RAG chain with streaming output</li>
-<li>multi-turn RAG with conversation history</li>
-<li>a self-contained application in one file</li>
-</ul>
-<hr>
 <h2>Document indexing pipeline</h2>
 <p><img alt="From document chunking to index build" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-document-indexing-pipeline.en.png"></p>
 <p><em>From document chunking to index build</em></p>
@@ -449,6 +438,21 @@ if __name__ == &quot;__main__&quot;:
 <h2>Conclusion</h2>
 <p>This series covered the LangChain API from first principles: LCEL and the Runnable interface, prompt templates, Retrievers, Tool Calling, Streaming, and a full RAG chain. Each component implements the same interface, which is why they compose cleanly with <code>|</code>.</p>
 <p>The next series, ai-app-patterns-101, applies these components to real application patterns: chatbots, document Q&amp;A, agents, and workflow automation.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>How should one RAG chain separate document indexing from query execution?</strong><br>
+  Indexing prepares documents and builds the VectorStore; query execution uses a user question to retrieve context and call the model. Their inputs and failures should stay separate.</p>
+</li>
+<li>
+<p><strong>What guard can run before the model call when retrieval returns nothing useful?</strong><br>
+  If retrieval returns nothing useful, the chain can stop with a no-evidence path or ask the user to narrow the question before calling the model.</p>
+</li>
+<li>
+<p><strong>What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?</strong><br>
+  Record document version, retrieval settings, top_k results, prompt inputs, streaming state, and chat-history keys so debugging boundaries remain clear.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>

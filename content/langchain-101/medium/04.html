@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Tool calling — connecting external tools</title>
+<title>LangChain 101 (4/6): Tool calling — connecting external tools</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Tool calling — connecting external tools</h1>
+<h1>LangChain 101 (4/6): Tool calling — connecting external tools</h1>
 <p>As soon as an LLM needs current data, calculations, or side effects, prompt engineering stops being enough. Tool calling is the handoff point where the model chooses what should run and the application decides how safely to run it.</p>
 <p>This is the fourth post in the LangChain 101 series. It shows how tool metadata, execution loops, and result reinjection turn model output into real function calls.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How is tool calling different from a normal prompt-only chain</li>
-<li>What execution contract do <code>@tool</code> and type hints expose to the model</li>
-<li>After <code>bind_tools()</code>, what loop is still the application's responsibility</li>
-<li>How do you make tool usage more reliable instead of leaving it to chance</li>
+<li>Does <code>bind_tools()</code> give the model execution power, or define a call format?</li>
+<li>What must be validated before a tool call becomes a real function call?</li>
+<li>What failures should a dispatcher prevent when several tools are available?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture shows the model producing a tool-call request inside an allowed schema while the application validates and executes it. LangChain tool calling still keeps execution authority on the application side.</p>
 <blockquote>
 <p>Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
@@ -89,20 +90,6 @@ print(response.tool_calls)
 </code></pre>
 <!-- injected-output:end -->
 
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.</p>
-<p>This post covers defining tools with the <code>@tool</code> decorator, connecting them to an LLM with <code>bind_tools()</code>, and handling tool results in a simple loop.</p>
-<p>Topics:</p>
-<ul>
-<li>defining tools with <code>@tool</code></li>
-<li>connecting tools to an LLM with <code>bind_tools()</code></li>
-<li>a minimal tool-call loop</li>
-<li>a multi-tool example</li>
-<li>what to watch out for</li>
-</ul>
-<hr>
 <h2>Defining tools</h2>
 <p><img alt="Function definition into tool metadata" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-defining-tools.en.png"></p>
 <p><em>Function definition into tool metadata</em><br>
@@ -412,6 +399,21 @@ def run_with_tools_safe(question: str) -&gt; str:
 <h2>Conclusion</h2>
 <p>The tool-calling loop has three moving parts: define tools with <code>@tool</code>, connect them with <code>bind_tools()</code>, and feed results back as <code>ToolMessage</code>. The loop runs until the LLM stops requesting tools.</p>
 <p>The next post covers streaming — receiving LLM output token by token as it is generated.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Does <code>bind_tools()</code> give the model execution power, or define a call format?</strong><br>
+<code>bind_tools()</code> defines the names and argument schemas the model may request; it does not hand over unrestricted execution power.</p>
+</li>
+<li>
+<p><strong>What must be validated before a tool call becomes a real function call?</strong><br>
+  Validate tool name, argument schema, required values, allowed ranges, and user permissions before invoking the function.</p>
+</li>
+<li>
+<p><strong>What failures should a dispatcher prevent when several tools are available?</strong><br>
+  A dispatcher should block unknown tools, invalid arguments, duplicate execution, long-running calls, and unstructured errors.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>

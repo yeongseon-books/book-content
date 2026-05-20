@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Retriever — document search and context injection</title>
+<title>LangChain 101 (3/6): Retriever — document search and context injection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Retriever — document search and context injection</h1>
+<h1>LangChain 101 (3/6): Retriever — document search and context injection</h1>
 <p>RAG quality is often decided before the model writes a single token. If retrieval brings back the wrong chunks, prompt tuning rarely saves the answer, so the search boundary deserves attention first.</p>
 <p>This is the third post in the LangChain 101 series. It covers Retrievers, VectorStores, and the basic pattern for injecting retrieved context into an LLM prompt.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why does LangChain separate a Retriever from the underlying VectorStore</li>
-<li>What input and output contract does <code>as_retriever()</code> expose inside a chain</li>
-<li>How should retrieved documents be formatted before they enter the prompt</li>
-<li>How much of RAG quality is determined before the LLM is even called</li>
+<li>How does a Retriever turn VectorStore results into LLM context?</li>
+<li>When retrieval is empty or wrong, what should you inspect before blaming the model?</li>
+<li>What metadata must be saved and reloaded with a VectorStore?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture shows a user question passing through a retriever into relevant document chunks, which then become prompt context. In a RAG chain, model quality cannot be judged until the retrieval boundary is visible.</p>
 <blockquote>
 <p>A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -87,20 +88,6 @@ print(retriever.invoke(&quot;What does a Retriever do?&quot;)[0].page_content)
 </code></pre>
 <!-- injected-output:end -->
 
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-A Retriever accepts a query and returns a list of relevant documents. LangChain defines the Retriever interface around a single method: <code>get_relevant_documents(query)</code>. Whatever search system sits behind it — FAISS, Chroma, Elasticsearch — the chain uses it the same way.</p>
-<p>This post builds a FAISS-based Retriever, connects it to a prompt, and assembles the basic form of a RAG pattern.</p>
-<p>Topics:</p>
-<ul>
-<li>creating a FAISS VectorStore and Retriever</li>
-<li><code>as_retriever()</code> and its search parameters</li>
-<li>connecting a Retriever to a chain</li>
-<li>injecting retrieved documents as context</li>
-<li>combining multiple documents into one context string</li>
-</ul>
-<hr>
 <h2>Creating a FAISS VectorStore</h2>
 <p><img alt="Documents turning into a vector index" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png"></p>
 <p><em>Documents turning into a vector index</em><br>
@@ -327,6 +314,21 @@ result: FAISS is a high-speed vector search library developed at Facebook AI Res
 <h2>Conclusion</h2>
 <p>The Retriever interface abstracts whatever search system sits behind it. The <code>context: retriever | format_docs, question: RunnablePassthrough()</code> pattern is the standard structure for RAG chains in LangChain.</p>
 <p>The next post covers Tool Calling — how an LLM can call external functions and incorporate their results into its response.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>How does a Retriever turn VectorStore results into LLM context?</strong><br>
+  A Retriever returns Documents from the VectorStore and passes them as context text or document objects that the chain can consume.</p>
+</li>
+<li>
+<p><strong>When retrieval is empty or wrong, what should you inspect before blaming the model?</strong><br>
+  Inspect the embedding model, query text, top_k, filters, and retrieved source text before blaming the LLM. Bad context produces bad answers.</p>
+</li>
+<li>
+<p><strong>What metadata must be saved and reloaded with a VectorStore?</strong><br>
+  Persist document ids, source text, metadata, embedding model, index version, and storage paths so reloaded results remain interpretable.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>

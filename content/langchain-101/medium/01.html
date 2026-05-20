@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LangChain introduction — LCEL and the Runnable interface</title>
+<title>LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>LangChain introduction — LCEL and the Runnable interface</h1>
+<h1>LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface</h1>
 <p>LangChain gets easier once you stop treating it as a pile of abstractions and start treating it as a pipeline library. Most real applications still do the same three things—shape input, call a model, and normalize output—and this post starts with the contract that makes those steps composable.</p>
 <p>This is the first post in the LangChain 101 series. It explains LCEL and the Runnable interface as the execution model behind a basic LangChain pipeline.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why does LCEL exist, and what glue code does it remove</li>
-<li>What contract does the Runnable interface give every component</li>
-<li>When should you use <code>invoke()</code>, <code>batch()</code>, and <code>stream()</code></li>
-<li>What actually flows through a chain connected with <code>|</code></li>
+<li>What common contract lets LCEL connect prompts, models, and parsers?</li>
+<li>What data shape moves through each step of <code>prompt | llm | parser</code>?</li>
+<li>When should the same chain use <code>invoke()</code>, <code>batch()</code>, or <code>stream()</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture follows an input dictionary through a prompt, model, and parser until the application receives a plain string. The key is that each step shares the Runnable contract, so the same execution methods work across the chain.</p>
 <blockquote>
 <p>In LangChain, most components become interchangeable once their input and output shapes line up.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
@@ -87,20 +88,6 @@ print(chain.invoke({&quot;topic&quot;: &quot;LCEL&quot;}))
 </code></pre>
 <!-- injected-output:end -->
 
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-LangChain throws a lot of terminology at you before the code makes sense: LCEL, Runnable, Chain, Pipe. This post cuts through that by focusing on what LCEL (LangChain Expression Language) and the Runnable interface actually are and why the library is structured around them.</p>
-<p>This series covers LangChain as an API — how to use its components. Application-level patterns such as chatbots, RAG, and agents are in a separate series (ai-app-patterns-101).</p>
-<p>Topics:</p>
-<ul>
-<li>the problem LangChain addresses</li>
-<li>the Runnable interface: <code>invoke()</code>, <code>batch()</code>, <code>stream()</code></li>
-<li>building a chain with the LCEL pipe operator <code>|</code></li>
-<li>running the simplest possible chain</li>
-<li>why this structure is worth learning</li>
-</ul>
-<hr>
 <h2>The problem LangChain addresses</h2>
 <p><img alt="Repeated glue code and LCEL abstraction flow" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-01-the-problem-langchain-addresses.en.png"></p>
 <p><em>Repeated glue code and LCEL abstraction flow</em><br>
@@ -349,6 +336,21 @@ for topic_dict, result in zip(topics, results):
 <h2>Conclusion</h2>
 <p>LCEL and the Runnable interface reduce LLM application plumbing to a sequence of composable components connected by <code>|</code>. Every component exposes <code>invoke</code>, <code>batch</code>, and <code>stream</code> consistently, so any component can replace any other component that accepts the same input type.</p>
 <p>The next post goes deeper into <code>ChatPromptTemplate</code> and builds a more realistic chain with system messages, conditional formatting, and output parsing variants.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What common contract lets LCEL connect prompts, models, and parsers?</strong><br>
+  LCEL treats each component as a Runnable and composes steps whose input and output shapes line up.</p>
+</li>
+<li>
+<p><strong>What data shape moves through each step of <code>prompt | llm | parser</code>?</strong><br>
+  The prompt turns a dictionary into messages, the model returns an AIMessage, and the parser normalizes that into an application-friendly value.</p>
+</li>
+<li>
+<p><strong>When should the same chain use <code>invoke()</code>, <code>batch()</code>, or <code>stream()</code>?</strong><br>
+  Use <code>invoke()</code> for one request, <code>batch()</code> for many inputs through the same chain, and <code>stream()</code> when the user should see partial output.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>LangChain introduction — LCEL and the Runnable interface (current)</strong></li>

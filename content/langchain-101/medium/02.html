@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prompt and LLM chain — assembling your first chain</title>
+<title>LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Prompt and LLM chain — assembling your first chain</h1>
+<h1>LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain</h1>
 <p>Once LCEL makes sense, the next question is where the real chain logic actually lives. In practice, that usually means prompt construction, output parsing, and the small input-shaping decisions that determine whether the rest of the pipeline stays readable.</p>
 <p>This is the second post in the LangChain 101 series. It shows how prompt templates, parsers, and passthrough steps turn LCEL basics into a practical first chain.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do <code>system</code> and <code>human</code> messages divide responsibility in <code>ChatPromptTemplate</code></li>
-<li>How should you model prompts that need multiple input variables</li>
-<li>When is <code>StrOutputParser</code> enough, and when do you need structured parsing</li>
-<li>How do you forward part of the input unchanged through a chain</li>
+<li>How is ChatPromptTemplate different from plain string formatting?</li>
+<li>How do multiple prompt variables and parsers change chain input and output shapes?</li>
+<li>Which failures should fallback hide, and which failures should remain visible?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png"></p>
+<p><em>The flow at a glance</em></p>
+<p>This picture shows user input becoming prompt messages, then passing through the model and parser into a final value. The first chain is not just about shorter code; it is about making each input and output boundary explicit.</p>
 <blockquote>
 <p>A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
@@ -89,19 +90,6 @@ print(chain.invoke({&quot;audience&quot;: &quot;junior backend engineers&quot;, 
 </code></pre>
 <!-- injected-output:end -->
 
-<h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png"></p>
-<p><em>The flow at a glance</em><br>
-Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.</p>
-<p>Topics:</p>
-<ul>
-<li>the message roles in <code>ChatPromptTemplate</code></li>
-<li>building prompts with multiple variables</li>
-<li>choosing between <code>StrOutputParser</code> and <code>JsonOutputParser</code></li>
-<li>using <code>RunnablePassthrough</code> to forward inputs unchanged</li>
-<li>testing a completed chain</li>
-</ul>
-<hr>
 <h2>ChatPromptTemplate structure</h2>
 <p><img alt="System human ai message roles" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png"></p>
 <p><em>System human ai message roles</em><br>
@@ -364,8 +352,10 @@ Python uses a `try`-`except` block to handle exceptions. The basic syntax is as 
 ```python
 try:
     # Code that might raise an exception
+    pass
 except ExceptionType:
     # Code to handle the exception
+    pass
 ```
 
 Here's an example:
@@ -433,6 +423,21 @@ In this example, the `divide` function raises a `ZeroDivisionError` if the divis
 <h2>Conclusion</h2>
 <p>You can now build prompt templates with multiple variables, select the right output parser for the job, and pass inputs unchanged when a chain step needs earlier data.</p>
 <p>The next post connects a Retriever to a chain and uses retrieved document chunks as context for the LLM.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>How is ChatPromptTemplate different from plain string formatting?</strong><br>
+  ChatPromptTemplate builds role-aware messages, not just one formatted string, and keeps variable handling inside the chain boundary.</p>
+</li>
+<li>
+<p><strong>How do multiple prompt variables and parsers change chain input and output shapes?</strong><br>
+  Input becomes a dictionary with multiple keys, while the parser turns the model response object into a string, JSON value, or another application type.</p>
+</li>
+<li>
+<p><strong>Which failures should fallback hide, and which failures should remain visible?</strong><br>
+  Fallback can mask transient provider failures, but contract errors and parser failures should stay visible in logs.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en/01-lcel-runnable-basics.md">LangChain introduction — LCEL and the Runnable interface</a></li>

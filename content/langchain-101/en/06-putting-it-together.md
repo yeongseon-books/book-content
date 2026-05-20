@@ -1,5 +1,5 @@
 ---
-title: Putting it together — a complete chain in one file
+title: "LangChain 101 (6/6): Putting it together — a complete chain in one file"
 series: langchain-101
 episode: 6
 language: en
@@ -19,24 +19,28 @@ seo_description: The integrated chain is not a new abstraction; it is the same R
   from earlier posts lined up in input-output order.
 ---
 
-# Putting it together — a complete chain in one file
+# LangChain 101 (6/6): Putting it together — a complete chain in one file
 
 By the time you reach a real LangChain application, the challenge is no longer understanding each component in isolation. The real work is keeping indexing, retrieval, prompting, tool use, and output delivery separate enough that one integrated chain still stays debuggable.
 
 This is the final post in the LangChain 101 series. It assembles the earlier pieces into one executable RAG chain without losing the boundaries that make the system maintainable.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do the Runnables from the previous posts combine into one executable RAG chain
-- Where is the boundary between indexing, retrieval, prompting, and generation
-- What does the full data flow look like once streaming is added
-- Which component should you replace first when adapting the example to a real project
+- How should one RAG chain separate document indexing from query execution?
+- What guard can run before the model call when retrieval returns nothing useful?
+- What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?
+
+## Big Picture
+
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
+
+*The flow at a glance*
+
+This picture connects document indexing, retrieval, prompt assembly, model calls, and streaming output into one RAG application. The practical goal is to keep each boundary visible even when the demo fits in one file.
 
 > The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
 ## Minimal runnable example
 
 ```python
@@ -55,22 +59,6 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 
 print(chain.invoke("What is LCEL?"))
 ```
-
-## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling, and Streaming individually. This post assembles them into one executable application: index documents, search by query, generate an answer, and stream the output.
-
-Topics:
-
-- document chunking → embedding → FAISS index
-- assembling a RAG chain with streaming output
-- multi-turn RAG with conversation history
-- a self-contained application in one file
-
----
 
 ## Document indexing pipeline
 
@@ -469,15 +457,26 @@ This series covered the LangChain API from first principles: LCEL and the Runnab
 
 The next series, ai-app-patterns-101, applies these components to real application patterns: chatbots, document Q&A, agents, and workflow automation.
 
+## Answering the Opening Questions
+
+- **How should one RAG chain separate document indexing from query execution?**
+  Indexing prepares documents and builds the VectorStore; query execution uses a user question to retrieve context and call the model. Their inputs and failures should stay separate.
+
+- **What guard can run before the model call when retrieval returns nothing useful?**
+  If retrieval returns nothing useful, the chain can stop with a no-evidence path or ask the user to narrow the question before calling the model.
+
+- **What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?**
+  Record document version, retrieval settings, top_k results, prompt inputs, streaming state, and chat-history keys so debugging boundaries remain clear.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- [Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
-- [Retriever — document search and context injection](./03-retriever.md)
-- [Tool calling — connecting external tools](./04-tool-calling.md)
-- [Streaming — handling real-time output](./05-streaming.md)
-- **Putting it together — a complete chain in one file (current)**
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- [LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
+- [LangChain 101 (3/6): Retriever — document search and context injection](./03-retriever.md)
+- [LangChain 101 (4/6): Tool calling — connecting external tools](./04-tool-calling.md)
+- [LangChain 101 (5/6): Streaming — handling real-time output](./05-streaming.md)
+- **LangChain 101 (6/6): Putting it together — a complete chain in one file (current)**
 
 <!-- toc:end -->
 

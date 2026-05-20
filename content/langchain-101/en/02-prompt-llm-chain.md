@@ -1,5 +1,5 @@
 ---
-title: Prompt and LLM chain — assembling your first chain
+title: "LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain"
 series: langchain-101
 episode: 2
 language: en
@@ -19,24 +19,28 @@ seo_description: A prompt chain is not string concatenation with extra steps; it
   a typed conversion from app inputs into model-ready messages.
 ---
 
-# Prompt and LLM chain — assembling your first chain
+# LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain
 
 Once LCEL makes sense, the next question is where the real chain logic actually lives. In practice, that usually means prompt construction, output parsing, and the small input-shaping decisions that determine whether the rest of the pipeline stays readable.
 
 This is the second post in the LangChain 101 series. It shows how prompt templates, parsers, and passthrough steps turn LCEL basics into a practical first chain.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do `system` and `human` messages divide responsibility in `ChatPromptTemplate`
-- How should you model prompts that need multiple input variables
-- When is `StrOutputParser` enough, and when do you need structured parsing
-- How do you forward part of the input unchanged through a chain
+- How is ChatPromptTemplate different from plain string formatting?
+- How do multiple prompt variables and parsers change chain input and output shapes?
+- Which failures should fallback hide, and which failures should remain visible?
+
+## Big Picture
+
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
+
+*The flow at a glance*
+
+This picture shows user input becoming prompt messages, then passing through the model and parser into a final value. The first chain is not just about shorter code; it is about making each input and output boundary explicit.
 
 > A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
 ## Minimal runnable example
 
 ```python
@@ -61,23 +65,6 @@ print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemp
     In the context of OpenAI's API, a PromptTemplate is a pre-defined template used to generate human-like responses by providing a framework for constructing input prompts. By using a PromptTemplate, developers can create a structure for their input, including placeholders for specific information that can be filled in at runtime. This approach enables the model to generate more accurate and relevant responses by leveraging the context provided in the template.
 
 <!-- injected-output:end -->
-
-## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-Post 1 established the LCEL structure. This post builds on it with the patterns that appear most often in real code: multi-variable prompt templates, output parser selection, and passing values through a chain unchanged.
-
-Topics:
-
-- the message roles in `ChatPromptTemplate`
-- building prompts with multiple variables
-- choosing between `StrOutputParser` and `JsonOutputParser`
-- using `RunnablePassthrough` to forward inputs unchanged
-- testing a completed chain
-
----
 
 ## ChatPromptTemplate structure
 
@@ -454,15 +441,26 @@ You can now build prompt templates with multiple variables, select the right out
 
 The next post connects a Retriever to a chain and uses retrieved document chunks as context for the LLM.
 
+## Answering the Opening Questions
+
+- **How is ChatPromptTemplate different from plain string formatting?**
+  ChatPromptTemplate builds role-aware messages, not just one formatted string, and keeps variable handling inside the chain boundary.
+
+- **How do multiple prompt variables and parsers change chain input and output shapes?**
+  Input becomes a dictionary with multiple keys, while the parser turns the model response object into a string, JSON value, or another application type.
+
+- **Which failures should fallback hide, and which failures should remain visible?**
+  Fallback can mask transient provider failures, but contract errors and parser failures should stay visible in logs.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- **Prompt and LLM chain — assembling your first chain (current)**
-- Retriever — document search and context injection (upcoming)
-- Tool calling — connecting external tools (upcoming)
-- Streaming — handling real-time output (upcoming)
-- Putting it together — a complete chain in one file (upcoming)
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- **LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain (current)**
+- LangChain 101 (3/6): Retriever — document search and context injection (upcoming)
+- LangChain 101 (4/6): Tool calling — connecting external tools (upcoming)
+- LangChain 101 (5/6): Streaming — handling real-time output (upcoming)
+- LangChain 101 (6/6): Putting it together — a complete chain in one file (upcoming)
 
 <!-- toc:end -->
 

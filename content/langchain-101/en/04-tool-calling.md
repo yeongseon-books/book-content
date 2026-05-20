@@ -1,5 +1,5 @@
 ---
-title: Tool calling — connecting external tools
+title: "LangChain 101 (4/6): Tool calling — connecting external tools"
 series: langchain-101
 episode: 4
 language: en
@@ -19,24 +19,28 @@ seo_description: Tool calling works when the model stops pretending to do the wo
   itself and starts choosing which real function should do it.
 ---
 
-# Tool calling — connecting external tools
+# LangChain 101 (4/6): Tool calling — connecting external tools
 
 As soon as an LLM needs current data, calculations, or side effects, prompt engineering stops being enough. Tool calling is the handoff point where the model chooses what should run and the application decides how safely to run it.
 
 This is the fourth post in the LangChain 101 series. It shows how tool metadata, execution loops, and result reinjection turn model output into real function calls.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How is tool calling different from a normal prompt-only chain
-- What execution contract do `@tool` and type hints expose to the model
-- After `bind_tools()`, what loop is still the application's responsibility
-- How do you make tool usage more reliable instead of leaving it to chance
+- Does `bind_tools()` give the model execution power, or define a call format?
+- What must be validated before a tool call becomes a real function call?
+- What failures should a dispatcher prevent when several tools are available?
+
+## Big Picture
+
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
+
+*The flow at a glance*
+
+This picture shows the model producing a tool-call request inside an allowed schema while the application validates and executes it. LangChain tool calling still keeps execution authority on the application side.
 
 > Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
 ## Minimal runnable example
 
 ```python
@@ -61,25 +65,6 @@ print(response.tool_calls)
     [{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '0r7b2zrqg', 'type': 'tool_call'}]
 
 <!-- injected-output:end -->
-
-## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-LLMs generate text. Calculation, weather lookup, database queries — those require external tools. Tool calling is the pattern where the LLM produces a structured request ("call this function with these arguments"), the application executes the actual function, and the result goes back to the LLM.
-
-This post covers defining tools with the `@tool` decorator, connecting them to an LLM with `bind_tools()`, and handling tool results in a simple loop.
-
-Topics:
-
-- defining tools with `@tool`
-- connecting tools to an LLM with `bind_tools()`
-- a minimal tool-call loop
-- a multi-tool example
-- what to watch out for
-
----
 
 ## Defining tools
 
@@ -437,15 +422,26 @@ The tool-calling loop has three moving parts: define tools with `@tool`, connect
 
 The next post covers streaming — receiving LLM output token by token as it is generated.
 
+## Answering the Opening Questions
+
+- **Does `bind_tools()` give the model execution power, or define a call format?**
+  `bind_tools()` defines the names and argument schemas the model may request; it does not hand over unrestricted execution power.
+
+- **What must be validated before a tool call becomes a real function call?**
+  Validate tool name, argument schema, required values, allowed ranges, and user permissions before invoking the function.
+
+- **What failures should a dispatcher prevent when several tools are available?**
+  A dispatcher should block unknown tools, invalid arguments, duplicate execution, long-running calls, and unstructured errors.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
-- [Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
-- [Retriever — document search and context injection](./03-retriever.md)
-- **Tool calling — connecting external tools (current)**
-- Streaming — handling real-time output (upcoming)
-- Putting it together — a complete chain in one file (upcoming)
+- [LangChain 101 (1/6): LangChain introduction — LCEL and the Runnable interface](./01-lcel-runnable-basics.md)
+- [LangChain 101 (2/6): Prompt and LLM chain — assembling your first chain](./02-prompt-llm-chain.md)
+- [LangChain 101 (3/6): Retriever — document search and context injection](./03-retriever.md)
+- **LangChain 101 (4/6): Tool calling — connecting external tools (current)**
+- LangChain 101 (5/6): Streaming — handling real-time output (upcoming)
+- LangChain 101 (6/6): Putting it together — a complete chain in one file (upcoming)
 
 <!-- toc:end -->
 
