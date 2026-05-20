@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Replication</title>
+<title>Distributed Systems 101 (5/10): Replication</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Replication</h1>
+<h1>Distributed Systems 101 (5/10): Replication</h1>
 <p>Copying data sounds easy until you ask the operational questions that follow. Which copy is authoritative? How long can replicas trail? What is acceptable to lose after a crash? The answers are not implementation details; they are the promises your system makes.</p>
 <p>This is post 5 in the Distributed Systems 101 series.</p>
 <p>Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why we replicate, what kinds exist, and the tradeoffs</li>
-<li>The leader-follower, multi-leader, and leaderless models</li>
-<li>Sync vs async replication and the risk of data loss</li>
-<li>Quorum reads and writes and the meaning of R+W&gt;N</li>
-<li>How to measure and handle replication lag</li>
+<li>Why we replicate, what kinds exist, and the tradeoffs?</li>
+<li>The leader-follower, multi-leader, and leaderless models?</li>
+<li>Sync vs async replication and the risk of data loss?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 5 flow overview</em></p>
+<p>This picture places Replication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Replication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Replication is the lowest layer in any distributed data system. The choices here shape what you saw in episode 4 (consistency) and what you will see in episode 6 (consensus). The answer to "why does my DB behave this way?" is usually in the replication settings.</p>
 <blockquote>
 <p>Replication settings are the exchange rate between safety and speed.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Comparison of common replication topologies" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Comparison of common replication topologies</em></p>
 <p>These three topologies cover more than ninety percent of real systems.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -184,17 +187,27 @@ print(&quot;replication lag rows:&quot;, lag())
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Replication is the foundation of distributed data. Next we look at the algorithm by which nodes agree on what the next value is — consensus and Raft.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><strong>Why we replicate, what kinds exist, and the tradeoffs?</strong></li>
+<li>The article treats Replication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The leader-follower, multi-leader, and leaderless models?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Sync vs async replication and the risk of data loss?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">Distributed Systems 101 (1/10): What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Distributed Systems 101 (2/10): Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">Distributed Systems 101 (3/10): RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Distributed Systems 101 (4/10): Consistency and CAP</a></li>
 <li><strong>Replication (current)</strong></li>
-<li>consensus and Raft (upcoming)</li>
-<li>leader election (upcoming)</li>
-<li>message queues and event sourcing (upcoming)</li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>Consensus and Raft (upcoming)</li>
+<li>Leader Election (upcoming)</li>
+<li>Message Queues and Event Sourcing (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

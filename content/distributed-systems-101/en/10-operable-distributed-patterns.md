@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 10
-title: Patterns for Operable Distributed Systems
+title: "Distributed Systems 101 (10/10): Patterns for Operable Distributed Systems"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We tie together the patterns that make a distributed system ope
 last_reviewed: '2026-05-15'
 ---
 
-# Patterns for Operable Distributed Systems
+# Distributed Systems 101 (10/10): Patterns for Operable Distributed Systems
 
 The final question is not how to eliminate failure. It is how to keep one slow dependency from turning into a full-system outage, and how to give operators enough signals to react before users start telling you first.
 
@@ -29,13 +29,21 @@ This is the final post in the Distributed Systems 101 series.
 
 Here we gather the patterns that turn distributed-system theory into day-two operations: timeout budgets, circuit breaking, load shedding, and observability tied back to SLOs.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- How to isolate failure with bulkheads
-- How to break cascade failures with a circuit breaker
-- How to safely refuse load with backpressure
-- The right combination of timeout, retry, and jitter
-- Why observability (metrics, logs, traces) is part of operations
+- How to isolate failure with bulkheads?
+- How to break cascade failures with a circuit breaker?
+- How to safely refuse load with backpressure?
+
+## Big Picture
+
+![distributed systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 10 flow overview*
+
+This picture places Patterns for Operable Distributed Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Patterns for Operable Distributed Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ The tools we covered so far — replication, consensus, queues, transactions —
 > Good operational patterns turn "expected failures" into ordinary events.
 
 ## Concept at a Glance
-
-![Timeout, breaker, bulkhead, and backpressure boundaries](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
-
-*Timeout, breaker, bulkhead, and backpressure boundaries*
 
 At every call boundary, combine timeout, breaker, bulkhead, and backpressure so a single failure does not spread.
 
@@ -209,17 +213,29 @@ The same patterns repeat in Netflix Hystrix (historically), resilience4j, retry 
 
 Every tool in distributed systems eventually converges on operability. One sentence to capture the whole series: "Failures are common, and good systems make them ordinary." Recommended next: secure-by-design, observability, and SRE series.
 
+## Answering the Opening Questions
+
+- **How to isolate failure with bulkheads?**
+  - The article treats Patterns for Operable Distributed Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to break cascade failures with a circuit breaker?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to safely refuse load with backpressure?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
-- [Consensus and Raft](./06-consensus-and-raft.md)
-- [Leader Election](./07-leader-election.md)
-- [Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
-- [Distributed Transactions](./09-distributed-transaction.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
+- [Distributed Systems 101 (6/10): Consensus and Raft](./06-consensus-and-raft.md)
+- [Distributed Systems 101 (7/10): Leader Election](./07-leader-election.md)
+- [Distributed Systems 101 (8/10): Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
+- [Distributed Systems 101 (9/10): Distributed Transactions](./09-distributed-transaction.md)
 - **Patterns for Operable Distributed Systems (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 1
-title: What Is a Distributed System?
+title: "Distributed Systems 101 (1/10): What Is a Distributed System?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We frame distributed systems around three axes that bend single
 last_reviewed: '2026-05-15'
 ---
 
-# What Is a Distributed System?
+# Distributed Systems 101 (1/10): What Is a Distributed System?
 
 The moment one service calls another service, or one database replica trails another, you are already outside the world where local intuition works. The code may look familiar, but latency, partial failure, and independent clocks quietly change the contract underneath it.
 
@@ -29,13 +29,21 @@ This is the first post in the Distributed Systems 101 series.
 
 Here we build the mental model for the rest of the series: a distributed system is not "many computers" in the abstract, but a system whose core behavior is shaped by latency, failure, and coordination.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The definition of a distributed system and how it really differs from a single machine
-- The meaning of the three axes: latency, failure, and coordination
-- Lessons from the eight fallacies of distributed computing
-- A typical topology of a distributed system
-- The big picture this series will cover
+- The definition of a distributed system and how it really differs from a single machine?
+- The meaning of the three axes: latency, failure, and coordination?
+- Lessons from the eight fallacies of distributed computing?
+
+## Big Picture
+
+![distributed systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 1 flow overview*
+
+This picture places What Is a Distributed System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Distributed System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ Almost every service you build today is effectively a distributed system. A sing
 > Distributed systems live exactly where the assumptions of a single-machine program break.
 
 ## Concept at a Glance
-
-![Core distributed-system topology and failure points](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
-
-*Core distributed-system topology and failure points*
 
 Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.
 
@@ -193,17 +197,29 @@ Every web backend is effectively a distributed system. An RDBMS with a replica p
 
 Distributed systems differ from single-machine programs along three axes: latency, failure, and coordination. Next, we model failure itself (crash, omission, Byzantine) so we can reason about it precisely.
 
+## Answering the Opening Questions
+
+- **The definition of a distributed system and how it really differs from a single machine?**
+  - The article treats What Is a Distributed System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The meaning of the three axes: latency, failure, and coordination?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Lessons from the eight fallacies of distributed computing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Distributed System? (current)**
-- failure models (upcoming)
-- RPC and message passing (upcoming)
-- consistency and CAP (upcoming)
-- replication (upcoming)
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Failure Models (upcoming)
+- RPC and Message Passing (upcoming)
+- Consistency and CAP (upcoming)
+- Replication (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

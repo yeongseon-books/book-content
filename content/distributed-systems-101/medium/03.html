@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>RPC and Message Passing</title>
+<title>Distributed Systems 101 (3/10): RPC and Message Passing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>RPC and Message Passing</h1>
+<h1>Distributed Systems 101 (3/10): RPC and Message Passing</h1>
 <p>Once a system is split into services, the next hard question is no longer "what code should I write?" but "how should these parts talk?" The answer determines whether latency piles up in a synchronous chain or gets absorbed behind a queue boundary.</p>
 <p>This is post 3 in the Distributed Systems 101 series.</p>
 <p>Here we compare RPC and message passing as two different contracts: one optimized for immediate answers, the other for decoupling time, failure, and load.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definitions and differences of RPC and message passing</li>
-<li>Synchronous vs asynchronous, request/response vs publish/subscribe</li>
-<li>Strengths and weaknesses of each model and where each fits</li>
-<li>What "function-like" RPC quietly hides</li>
-<li>Patterns for blending the two</li>
+<li>The definitions and differences of RPC and message passing?</li>
+<li>Synchronous vs asynchronous, request/response vs publish/subscribe?</li>
+<li>Strengths and weaknesses of each model and where each fits?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 3 flow overview</em></p>
+<p>This picture places RPC and Message Passing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of RPC and Message Passing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Once you split services, the next decision is "how do they talk?" That decision drives latency budgets, blast radius, and operational complexity. Picking poorly creates RPC chains that take down the whole system when one node slows, or message flows you cannot trace.</p>
 <blockquote>
 <p>The communication model decides system coupling.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="RPC and message-passing communication models" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>RPC and message-passing communication models</em></p>
 <p>RPC is a two-way contract. Message passing is a one-way flow with an intermediary store.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -193,17 +196,27 @@ def consume(msg):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>RPC and message passing trade off sync/async, coupling, and resilience. Next we tackle the biggest tradeoff that appears the moment data lives on multiple nodes: consistency and CAP.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><strong>The definitions and differences of RPC and message passing?</strong></li>
+<li>The article treats RPC and Message Passing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Synchronous vs asynchronous, request/response vs publish/subscribe?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Strengths and weaknesses of each model and where each fits?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">Distributed Systems 101 (1/10): What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Distributed Systems 101 (2/10): Failure Models</a></li>
 <li><strong>RPC and Message Passing (current)</strong></li>
-<li>consistency and CAP (upcoming)</li>
-<li>replication (upcoming)</li>
-<li>consensus and Raft (upcoming)</li>
-<li>leader election (upcoming)</li>
-<li>message queues and event sourcing (upcoming)</li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>Consistency and CAP (upcoming)</li>
+<li>Replication (upcoming)</li>
+<li>Consensus and Raft (upcoming)</li>
+<li>Leader Election (upcoming)</li>
+<li>Message Queues and Event Sourcing (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

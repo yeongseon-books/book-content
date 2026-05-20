@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 6
-title: Consensus and Raft
+title: "Distributed Systems 101 (6/10): Consensus and Raft"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Consensus is the hardest problem in distributed systems. We wal
 last_reviewed: '2026-05-15'
 ---
 
-# Consensus and Raft
+# Distributed Systems 101 (6/10): Consensus and Raft
 
 It is easy to say "the cluster should agree." It is much harder to make that sentence survive crashes, lost messages, and a leader that disappears in the middle of a write. Consensus is where distributed systems stop being intuitive and start being disciplined.
 
@@ -29,13 +29,21 @@ This is post 6 in the Distributed Systems 101 series.
 
 Here we use Raft to make the consensus problem concrete: terms, logs, quorums, and the exact point where a value becomes durable enough to trust.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The definition of the consensus problem and its safety/liveness properties
-- The three roles in Raft (leader, follower, candidate)
-- The meaning of term, log, index, and commit
-- Why a majority (quorum) is required
-- A one-line comparison of Paxos and Raft
+- The definition of the consensus problem and its safety/liveness properties?
+- The three roles in Raft (leader, follower, candidate)?
+- The meaning of term, log, index, and commit?
+
+## Big Picture
+
+![distributed systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 6 flow overview*
+
+This picture places Consensus and Raft inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Consensus and Raft is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ A consensus algorithm sits at the heart of etcd, ZooKeeper, Consul, and Cockroac
 > Consensus is the value of agreement in a distributed system.
 
 ## Concept at a Glance
-
-![Leader-centered log replication in Raft](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
-
-*Leader-centered log replication in Raft*
 
 A single leader receives the log and replicates it to followers. Only entries received by a majority count as committed.
 
@@ -194,17 +198,29 @@ etcd (the Kubernetes data store), Consul, ZooKeeper (ZAB, a Paxos variant), Cock
 
 Consensus is the hardest problem in distributed systems, and Raft is its human-friendly form. In the next post we cover the larger picture of choosing a leader on top of consensus — leader election.
 
+## Answering the Opening Questions
+
+- **The definition of the consensus problem and its safety/liveness properties?**
+  - The article treats Consensus and Raft as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The three roles in Raft (leader, follower, candidate)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of term, log, index, and commit?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
 - **Consensus and Raft (current)**
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

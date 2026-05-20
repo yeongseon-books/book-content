@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 2
-title: Failure Models
+title: "Distributed Systems 101 (2/10): Failure Models"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We classify the ways nodes and networks break in a distributed 
 last_reviewed: '2026-05-15'
 ---
 
-# Failure Models
+# Distributed Systems 101 (2/10): Failure Models
 
 When an incident channel says "the service is down," that sentence hides several very different realities. A node may be dead, the network may be dropping packets, or the node may simply be so slow that every peer mistakes it for dead.
 
@@ -29,13 +29,21 @@ This is post 2 in the Distributed Systems 101 series.
 
 Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What a failure model is and why we model failure
-- The differences between crash, omission, timing, and Byzantine
-- Why network partition deserves its own category
-- Why timeouts are only an approximation of failure detection
-- Which models real systems pick
+- What a failure model is and why we model failure?
+- The differences between crash, omission, timing, and Byzantine?
+- Why network partition deserves its own category?
+
+## Big Picture
+
+![distributed systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 2 flow overview*
+
+This picture places Failure Models inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Failure Models is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ If your algorithm does not state how nodes break, you cannot reason about its co
 > A failure model is the price tag of an algorithm.
 
 ## Concept at a Glance
-
-![Failure-model spectrum from crash to Byzantine](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
-
-*Failure-model spectrum from crash to Byzantine*
 
 The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.
 
@@ -185,17 +189,29 @@ Most internet services assume crash + partition (CFT). Finance and blockchain as
 
 The failure model is the first design decision; it sets the algorithm and the operational cost. Next we look at how nodes exchange messages on top of these models — RPC and message passing.
 
+## Answering the Opening Questions
+
+- **What a failure model is and why we model failure?**
+  - The article treats Failure Models as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The differences between crash, omission, timing, and Byzantine?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why network partition deserves its own category?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
 - **Failure Models (current)**
-- RPC and message passing (upcoming)
-- consistency and CAP (upcoming)
-- replication (upcoming)
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- RPC and Message Passing (upcoming)
+- Consistency and CAP (upcoming)
+- Replication (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

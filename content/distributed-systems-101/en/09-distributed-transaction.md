@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 9
-title: Distributed Transactions
+title: "Distributed Systems 101 (9/10): Distributed Transactions"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We cover the difficulty of distributed transactions and the pra
 last_reviewed: '2026-05-15'
 ---
 
-# Distributed Transactions
+# Distributed Systems 101 (9/10): Distributed Transactions
 
 The painful part of a distributed transaction is not the success path where every service behaves. It is the partial-failure path where one side committed, another side timed out, and the business still expects a single answer.
 
@@ -29,13 +29,21 @@ This is post 9 in the Distributed Systems 101 series.
 
 Here we compare the heavyweight answer of 2PC with the more common production answers: Saga, outbox relay, and idempotent recovery.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The difference between a single-node and a distributed transaction
-- How 2-phase commit works and where it falls short
-- The core of Saga — compensating transactions
-- Why idempotency is the foundation of distributed transactions
-- The outbox pattern you will see in real systems
+- The difference between a single-node and a distributed transaction?
+- How 2-phase commit works and where it falls short?
+- The core of Saga — compensating transactions?
+
+## Big Picture
+
+![distributed systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 9 flow overview*
+
+This picture places Distributed Transactions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Distributed Transactions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ As microservices and multi-store architectures grow, "two systems in one transac
 > A distributed transaction is the design of "recoverable inconsistency," not an imitation of ACID.
 
 ## Concept at a Glance
-
-![Coordinator and participant flow in 2PC](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
-
-*Coordinator and participant flow in 2PC*
 
 The coordinator sends prepare to both, and only commits when both answer yes. That is 2PC.
 
@@ -210,17 +214,29 @@ XA/2PC still appears in RDBMS clusters and some brokers. Saga is the standard pa
 
 Distributed transactions are not about imitating ACID — they are about designing for "eventual agreement." In the final post we tie all the tools together into patterns for operable distributed systems.
 
+## Answering the Opening Questions
+
+- **The difference between a single-node and a distributed transaction?**
+  - The article treats Distributed Transactions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How 2-phase commit works and where it falls short?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The core of Saga — compensating transactions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
-- [Consensus and Raft](./06-consensus-and-raft.md)
-- [Leader Election](./07-leader-election.md)
-- [Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
+- [Distributed Systems 101 (6/10): Consensus and Raft](./06-consensus-and-raft.md)
+- [Distributed Systems 101 (7/10): Leader Election](./07-leader-election.md)
+- [Distributed Systems 101 (8/10): Message Queues and Event Sourcing](./08-message-queue-and-event-sourcing.md)
 - **Distributed Transactions (current)**
-- patterns for operable distributed systems (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

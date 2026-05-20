@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Message Queues and Event Sourcing</title>
+<title>Distributed Systems 101 (8/10): Message Queues and Event Sourcing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Message Queues and Event Sourcing</h1>
+<h1>Distributed Systems 101 (8/10): Message Queues and Event Sourcing</h1>
 <p>Direct calls force every participant to be healthy at the same moment. Queues and logs change that rule: one side can finish now, the other can catch up later, and the system can still preserve a trustworthy history.</p>
 <p>This is post 8 in the Distributed Systems 101 series.</p>
 <p>Here we use queues, offsets, and event logs to show how distributed systems turn time and replay into design tools rather than accidental side effects.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The decoupling and guarantees that a message queue provides</li>
-<li>The meaning of at-most-once, at-least-once, and exactly-once</li>
-<li>The definition of event sourcing and its relationship to CQRS</li>
-<li>Why Kafka is a log, not a broker</li>
-<li>The core ideas of consumer groups, partitions, and offsets</li>
+<li>The decoupling and guarantees that a message queue provides?</li>
+<li>The meaning of at-most-once, at-least-once, and exactly-once?</li>
+<li>The definition of event sourcing and its relationship to CQRS?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 8 flow overview</em></p>
+<p>This picture places Message Queues and Event Sourcing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Message Queues and Event Sourcing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Direct service-to-service calls strongly couple availability and latency. Put a queue in between and one side staying up does not depend on the other. Event sourcing goes one step further by defining state as the sum of events, making history and replay possible.</p>
 <blockquote>
 <p>Queues separate time. Events separate truth.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Producer-consumer decoupling through a message queue" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Producer-consumer decoupling through a message queue</em></p>
 <p>Producers write to the queue and consumers read at their own pace. A single message can be processed by several consumers.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -197,17 +200,27 @@ def project(event):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Queues and event sourcing are tools that handle time in distributed systems. Next we look at the difficulty of transactions across multiple nodes — distributed transactions — and the practical solutions that exist.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Consensus and Raft</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/07-leader-election.md">Leader Election</a></li>
+<li><strong>The decoupling and guarantees that a message queue provides?</strong></li>
+<li>The article treats Message Queues and Event Sourcing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The meaning of at-most-once, at-least-once, and exactly-once?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The definition of event sourcing and its relationship to CQRS?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">Distributed Systems 101 (1/10): What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Distributed Systems 101 (2/10): Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">Distributed Systems 101 (3/10): RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Distributed Systems 101 (4/10): Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Distributed Systems 101 (5/10): Replication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Distributed Systems 101 (6/10): Consensus and Raft</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/07-leader-election.md">Distributed Systems 101 (7/10): Leader Election</a></li>
 <li><strong>Message Queues and Event Sourcing (current)</strong></li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

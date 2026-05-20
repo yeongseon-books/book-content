@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Leader Election</title>
+<title>Distributed Systems 101 (7/10): Leader Election</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Leader Election</h1>
+<h1>Distributed Systems 101 (7/10): Leader Election</h1>
 <p>The dangerous moment in leader election is not the happy path where one node wins. It is the messy moment where the old leader wakes up late, still thinks it owns the world, and tries to write after a new leader has already taken over.</p>
 <p>This is post 7 in the Distributed Systems 101 series.</p>
 <p>Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why leader election is needed and what its safety conditions are</li>
-<li>The roles of lease and heartbeat</li>
-<li>How to use a fencing token to block an old leader</li>
-<li>Split-brain scenarios and how to prevent them</li>
-<li>Practical patterns for electing a leader with etcd or ZooKeeper</li>
+<li>Why leader election is needed and what its safety conditions are?</li>
+<li>The roles of lease and heartbeat?</li>
+<li>How to use a fencing token to block an old leader?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 7 flow overview</em></p>
+<p>This picture places Leader Election inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Leader Election is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Many distributed-system bugs happen the moment "there are two leaders." When two leaders write to the same resource at the same time, data breaks. A correct election guarantees that only one leader holds authority at any point in time.</p>
 <blockquote>
 <p>A good election is the promise that "there is no moment with two leaders."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Lease-based leader election and heartbeat renewal" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Lease-based leader election and heartbeat renewal</em></p>
 <p>Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -189,17 +192,27 @@ def write(token, data):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Leader election is the work of keeping the promise of "one leader at a time" with leases and fencing. In the next post we look at tools that distribute work without a leader at all — message queues and event sourcing.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Consensus and Raft</a></li>
+<li><strong>Why leader election is needed and what its safety conditions are?</strong></li>
+<li>The article treats Leader Election as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The roles of lease and heartbeat?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to use a fencing token to block an old leader?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">Distributed Systems 101 (1/10): What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Distributed Systems 101 (2/10): Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">Distributed Systems 101 (3/10): RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Distributed Systems 101 (4/10): Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Distributed Systems 101 (5/10): Replication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Distributed Systems 101 (6/10): Consensus and Raft</a></li>
 <li><strong>Leader Election (current)</strong></li>
-<li>message queues and event sourcing (upcoming)</li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>Message Queues and Event Sourcing (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

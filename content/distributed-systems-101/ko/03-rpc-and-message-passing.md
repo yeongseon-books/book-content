@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 3
-title: RPC와 메시지 전달
+title: "Distributed Systems 101 (3/10): RPC와 메시지 전달"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 분산 시스템의 핵심인 RPC와 메시지 전달의 차이
 last_reviewed: '2026-05-15'
 ---
 
-# RPC와 메시지 전달
+# Distributed Systems 101 (3/10): RPC와 메시지 전달
 
 서비스를 나누고 나면 다음 질문은 거의 항상 같습니다. "이 둘은 어떻게 말하게 할 것인가?" 응답을 기다리는 RPC를 쓸지, 큐를 사이에 둔 비동기 흐름을 쓸지에 따라 지연 예산과 장애 전파 범위가 완전히 달라집니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 RPC와 메시지 전달을 각각 하나의 통신 계약으로 보고, 어느 경계에서 어떤 방식을 택해야 하는지 선택 기준을 세웁니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - RPC와 메시지 전달은 각각 무엇이며 어떻게 다를까요?
 - 동기와 비동기, 요청-응답과 발행-구독은 어디서 갈릴까요?
 - 두 모델은 각각 어떤 장단점이 있고 어디에 어울릴까요?
-- 함수 호출처럼 보이는 RPC가 실제로는 무엇을 숨기고 있을까요?
-- 두 모델을 함께 섞어 쓸 때 어떤 패턴이 필요할까요?
 
-> RPC는 동기 함수 호출의 직관을 따르고, 메시지 전달은 비동기 우편함의 직관을 따릅니다. 이 한 가지 직관 차이가 지연, 결합도, 회복력의 큰 차이를 만듭니다.
+## 큰 그림
+
+![Distributed Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
+
+*Distributed Systems 101 3장 흐름 개요*
+
+이 그림에서는 RPC와 메시지 전달를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> RPC와 메시지 전달의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,10 +52,6 @@ last_reviewed: '2026-05-15'
 > 통신 모델은 시스템의 결합도를 결정합니다.
 
 ## 한눈에 보는 개념
-
-![RPC와 메시지 전달의 통신 모델 비교](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
-
-*RPC와 메시지 전달의 통신 모델 비교*
 
 RPC는 양방향 계약이고, 메시지 전달은 중간 저장소를 둔 단방향 흐름입니다.
 
@@ -207,17 +209,29 @@ def consume(msg):
 
 RPC와 메시지 전달은 동기와 비동기, 결합도와 회복력을 서로 다르게 교환하는 두 모델입니다. 다음 글에서는 데이터가 여러 노드에 놓이는 순간 바로 등장하는 가장 큰 트레이드오프, 일관성과 CAP를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **RPC와 메시지 전달은 각각 무엇이며 어떻게 다를까요?**
+  - 본문의 기준은 RPC와 메시지 전달를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **동기와 비동기, 요청-응답과 발행-구독은 어디서 갈릴까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **두 모델은 각각 어떤 장단점이 있고 어디에 어울릴까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)
-- [failure model](./02-failure-model.md)
-- **RPC와 message passing (현재 글)**
-- consistency와 CAP (예정)
-- replication (예정)
-- consensus와 Raft (예정)
-- leader election (예정)
-- message queue와 event sourcing (예정)
-- distributed transaction (예정)
+## 시리즈 목차
+
+- [Distributed Systems 101 (1/10): 분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): 장애 모델](./02-failure-model.md)
+- **RPC와 메시지 전달 (현재 글)**
+- 일관성과 CAP (예정)
+- 복제 (예정)
+- 합의와 Raft (예정)
+- 리더 선출 (예정)
+- 메시지 큐와 이벤트 소싱 (예정)
+- 분산 트랜잭션 (예정)
 - 운영 가능한 분산 시스템 패턴 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

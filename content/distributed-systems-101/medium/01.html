@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Distributed System?</title>
+<title>Distributed Systems 101 (1/10): What Is a Distributed System?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>What Is a Distributed System?</h1>
+<h1>Distributed Systems 101 (1/10): What Is a Distributed System?</h1>
 <p>The moment one service calls another service, or one database replica trails another, you are already outside the world where local intuition works. The code may look familiar, but latency, partial failure, and independent clocks quietly change the contract underneath it.</p>
 <p>This is the first post in the Distributed Systems 101 series.</p>
 <p>Here we build the mental model for the rest of the series: a distributed system is not "many computers" in the abstract, but a system whose core behavior is shaped by latency, failure, and coordination.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of a distributed system and how it really differs from a single machine</li>
-<li>The meaning of the three axes: latency, failure, and coordination</li>
-<li>Lessons from the eight fallacies of distributed computing</li>
-<li>A typical topology of a distributed system</li>
-<li>The big picture this series will cover</li>
+<li>The definition of a distributed system and how it really differs from a single machine?</li>
+<li>The meaning of the three axes: latency, failure, and coordination?</li>
+<li>Lessons from the eight fallacies of distributed computing?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Distributed System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Distributed System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Almost every service you build today is effectively a distributed system. A single database with a replica is distributed. Two microservices talking are distributed. Code written with single-machine intuition (instant response, always success, one clock) breaks the moment it sees production traffic.</p>
 <blockquote>
 <p>Distributed systems live exactly where the assumptions of a single-machine program break.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Core distributed-system topology and failure points" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Core distributed-system topology and failure points</em></p>
 <p>Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -179,17 +182,27 @@ print(&quot;server time:&quot;, time.time())
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Distributed systems differ from single-machine programs along three axes: latency, failure, and coordination. Next, we model failure itself (crash, omission, Byzantine) so we can reason about it precisely.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The definition of a distributed system and how it really differs from a single machine?</strong></li>
+<li>The article treats What Is a Distributed System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The meaning of the three axes: latency, failure, and coordination?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Lessons from the eight fallacies of distributed computing?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Distributed System? (current)</strong></li>
-<li>failure models (upcoming)</li>
-<li>RPC and message passing (upcoming)</li>
-<li>consistency and CAP (upcoming)</li>
-<li>replication (upcoming)</li>
-<li>consensus and Raft (upcoming)</li>
-<li>leader election (upcoming)</li>
-<li>message queues and event sourcing (upcoming)</li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>Failure Models (upcoming)</li>
+<li>RPC and Message Passing (upcoming)</li>
+<li>Consistency and CAP (upcoming)</li>
+<li>Replication (upcoming)</li>
+<li>Consensus and Raft (upcoming)</li>
+<li>Leader Election (upcoming)</li>
+<li>Message Queues and Event Sourcing (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

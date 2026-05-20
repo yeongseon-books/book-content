@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 4
-title: Consistency and CAP
+title: "Distributed Systems 101 (4/10): Consistency and CAP"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We map the consistency spectrum, the CAP theorem, and PACELC so
 last_reviewed: '2026-05-15'
 ---
 
-# Consistency and CAP
+# Distributed Systems 101 (4/10): Consistency and CAP
 
 The instant one value exists in more than one place, "read the latest version" stops being a trivial promise. Now the answer depends on replica lag, partition policy, and how much waiting you are willing to buy with user-facing latency.
 
@@ -29,13 +29,21 @@ This is post 4 in the Distributed Systems 101 series.
 
 Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tradeoff into a concrete design vocabulary.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The many meanings of consistency (different from the C in transactions)
-- The spectrum from linearizable to sequential to causal to eventual
-- The CAP theorem and the misunderstandings around it
-- What PACELC adds to CAP
-- Where real databases sit on the spectrum
+- The many meanings of consistency (different from the C in transactions)?
+- The spectrum from linearizable to sequential to causal to eventual?
+- The CAP theorem and the misunderstandings around it?
+
+## Big Picture
+
+![distributed systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 4 flow overview*
+
+This picture places Consistency and CAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Consistency and CAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ A one-line difference like "this DB is strongly consistent" or "eventual" reshap
 > A consistency model is data's social contract.
 
 ## Concept at a Glance
-
-![Consistency spectrum from linearizable to eventual](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
-
-*Consistency spectrum from linearizable to eventual*
 
 Toward the left is intuitive but expensive. Toward the right is cheap and available but further from intuition.
 
@@ -189,17 +193,29 @@ Spanner, etcd, and ZooKeeper aim near linearizability (CP). DynamoDB, Cassandra,
 
 The consistency model is the most important tradeoff axis once data is distributed. Next we look at the direct cause behind that choice — the kinds of replication and the sync vs async tradeoff.
 
+## Answering the Opening Questions
+
+- **The many meanings of consistency (different from the C in transactions)?**
+  - The article treats Consistency and CAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The spectrum from linearizable to sequential to causal to eventual?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The CAP theorem and the misunderstandings around it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
 - **Consistency and CAP (current)**
-- replication (upcoming)
-- consensus and Raft (upcoming)
-- leader election (upcoming)
-- message queues and event sourcing (upcoming)
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Replication (upcoming)
+- Consensus and Raft (upcoming)
+- Leader Election (upcoming)
+- Message Queues and Event Sourcing (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

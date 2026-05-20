@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Failure Models</title>
+<title>Distributed Systems 101 (2/10): Failure Models</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Failure Models</h1>
+<h1>Distributed Systems 101 (2/10): Failure Models</h1>
 <p>When an incident channel says "the service is down," that sentence hides several very different realities. A node may be dead, the network may be dropping packets, or the node may simply be so slow that every peer mistakes it for dead.</p>
 <p>This is post 2 in the Distributed Systems 101 series.</p>
 <p>Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What a failure model is and why we model failure</li>
-<li>The differences between crash, omission, timing, and Byzantine</li>
-<li>Why network partition deserves its own category</li>
-<li>Why timeouts are only an approximation of failure detection</li>
-<li>Which models real systems pick</li>
+<li>What a failure model is and why we model failure?</li>
+<li>The differences between crash, omission, timing, and Byzantine?</li>
+<li>Why network partition deserves its own category?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="distributed systems 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>distributed systems 101 chapter 2 flow overview</em></p>
+<p>This picture places Failure Models inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Failure Models is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>If your algorithm does not state how nodes break, you cannot reason about its correctness or its cost. Raft, Paxos, and BFT algorithms differ because they assume different failure models. Without this vocabulary you cannot read papers or docs.</p>
 <blockquote>
 <p>A failure model is the price tag of an algorithm.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Failure-model spectrum from crash to Byzantine" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Failure-model spectrum from crash to Byzantine</em></p>
 <p>The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -175,17 +178,27 @@ sudo iptables -F
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The failure model is the first design decision; it sets the algorithm and the operational cost. Next we look at how nodes exchange messages on top of these models — RPC and message passing.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><strong>What a failure model is and why we model failure?</strong></li>
+<li>The article treats Failure Models as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The differences between crash, omission, timing, and Byzantine?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why network partition deserves its own category?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">Distributed Systems 101 (1/10): What Is a Distributed System?</a></li>
 <li><strong>Failure Models (current)</strong></li>
-<li>RPC and message passing (upcoming)</li>
-<li>consistency and CAP (upcoming)</li>
-<li>replication (upcoming)</li>
-<li>consensus and Raft (upcoming)</li>
-<li>leader election (upcoming)</li>
-<li>message queues and event sourcing (upcoming)</li>
-<li>distributed transactions (upcoming)</li>
-<li>patterns for operable distributed systems (upcoming)</li>
+<li>RPC and Message Passing (upcoming)</li>
+<li>Consistency and CAP (upcoming)</li>
+<li>Replication (upcoming)</li>
+<li>Consensus and Raft (upcoming)</li>
+<li>Leader Election (upcoming)</li>
+<li>Message Queues and Event Sourcing (upcoming)</li>
+<li>Distributed Transactions (upcoming)</li>
+<li>Patterns for Operable Distributed Systems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

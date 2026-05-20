@@ -1,7 +1,7 @@
 ---
 series: distributed-systems-101
 episode: 8
-title: Message Queues and Event Sourcing
+title: "Distributed Systems 101 (8/10): Message Queues and Event Sourcing"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: We cover how message queues and event sourcing decouple distrib
 last_reviewed: '2026-05-15'
 ---
 
-# Message Queues and Event Sourcing
+# Distributed Systems 101 (8/10): Message Queues and Event Sourcing
 
 Direct calls force every participant to be healthy at the same moment. Queues and logs change that rule: one side can finish now, the other can catch up later, and the system can still preserve a trustworthy history.
 
@@ -29,13 +29,21 @@ This is post 8 in the Distributed Systems 101 series.
 
 Here we use queues, offsets, and event logs to show how distributed systems turn time and replay into design tools rather than accidental side effects.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- The decoupling and guarantees that a message queue provides
-- The meaning of at-most-once, at-least-once, and exactly-once
-- The definition of event sourcing and its relationship to CQRS
-- Why Kafka is a log, not a broker
-- The core ideas of consumer groups, partitions, and offsets
+- The decoupling and guarantees that a message queue provides?
+- The meaning of at-most-once, at-least-once, and exactly-once?
+- The definition of event sourcing and its relationship to CQRS?
+
+## Big Picture
+
+![distributed systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
+
+*distributed systems 101 chapter 8 flow overview*
+
+This picture places Message Queues and Event Sourcing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Message Queues and Event Sourcing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -44,10 +52,6 @@ Direct service-to-service calls strongly couple availability and latency. Put a 
 > Queues separate time. Events separate truth.
 
 ## Concept at a Glance
-
-![Producer-consumer decoupling through a message queue](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
-
-*Producer-consumer decoupling through a message queue*
 
 Producers write to the queue and consumers read at their own pace. A single message can be processed by several consumers.
 
@@ -209,17 +213,29 @@ Kafka is the most widely used streaming backbone, a distributed append-only log.
 
 Queues and event sourcing are tools that handle time in distributed systems. Next we look at the difficulty of transactions across multiple nodes — distributed transactions — and the practical solutions that exist.
 
+## Answering the Opening Questions
+
+- **The decoupling and guarantees that a message queue provides?**
+  - The article treats Message Queues and Event Sourcing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The meaning of at-most-once, at-least-once, and exactly-once?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The definition of event sourcing and its relationship to CQRS?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Distributed System?](./01-what-is-a-distributed-system.md)
-- [Failure Models](./02-failure-model.md)
-- [RPC and Message Passing](./03-rpc-and-message-passing.md)
-- [Consistency and CAP](./04-consistency-and-cap.md)
-- [Replication](./05-replication.md)
-- [Consensus and Raft](./06-consensus-and-raft.md)
-- [Leader Election](./07-leader-election.md)
+## In this series
+
+- [Distributed Systems 101 (1/10): What Is a Distributed System?](./01-what-is-a-distributed-system.md)
+- [Distributed Systems 101 (2/10): Failure Models](./02-failure-model.md)
+- [Distributed Systems 101 (3/10): RPC and Message Passing](./03-rpc-and-message-passing.md)
+- [Distributed Systems 101 (4/10): Consistency and CAP](./04-consistency-and-cap.md)
+- [Distributed Systems 101 (5/10): Replication](./05-replication.md)
+- [Distributed Systems 101 (6/10): Consensus and Raft](./06-consensus-and-raft.md)
+- [Distributed Systems 101 (7/10): Leader Election](./07-leader-election.md)
 - **Message Queues and Event Sourcing (current)**
-- distributed transactions (upcoming)
-- patterns for operable distributed systems (upcoming)
+- Distributed Transactions (upcoming)
+- Patterns for Operable Distributed Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References
