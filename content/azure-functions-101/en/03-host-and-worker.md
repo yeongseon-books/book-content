@@ -49,7 +49,7 @@ This picture places Host and Worker — Who Actually Runs Your Functions? inside
 
 > The core of Host and Worker — Who Actually Runs Your Functions? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — two processes
+## Host and worker as two processes
 
 A traditional web framework usually does everything inside a single process. Loading code, handling HTTP, calling the database, building the response — all in one chunk.
 

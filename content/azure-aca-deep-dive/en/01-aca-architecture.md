@@ -58,7 +58,7 @@ This picture places ACA architecture — what Microsoft layered on a hidden Kube
 
 > The core of ACA architecture — what Microsoft layered on a hidden Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — one Container Apps environment
+## One Container Apps environment
 
 This is the map for the whole series.
 Every later post expands one box from this picture.

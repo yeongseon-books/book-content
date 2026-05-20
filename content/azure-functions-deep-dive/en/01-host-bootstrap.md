@@ -47,7 +47,7 @@ This picture places Host Bootstrap — Following `WebJobsScriptHostService` insi
 
 > The core of Host Bootstrap — Following `WebJobsScriptHostService` is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — one Azure Functions host instance
+## One Azure Functions host instance
 
 This is the map for the rest of the series.
 Each later part zooms into one box from this picture.
@@ -57,7 +57,7 @@ This post stays on host bootstrap only. The rest of the boxes are pinned in the 
 
 ---
 
-## The big picture — host bootstrap in 4 stages
+## Host bootstrap in 4 stages
 
 It looks complicated, but host bootstrap really compresses down to these four stages:
 

@@ -63,7 +63,7 @@ This picture places Scaling Internals — Scale Controller, ScaleMonitor, and Wh
 
 > The core of Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — where scaling decisions are made
+## Where scaling decisions are made
 
 Before we touch any code, here's the whole thing in one diagram.
 

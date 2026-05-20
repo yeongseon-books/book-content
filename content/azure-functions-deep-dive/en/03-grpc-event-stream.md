@@ -55,7 +55,7 @@ This picture places The gRPC Event Stream — What Do the Host and Worker Actual
 
 > The core of The gRPC Event Stream — What Do the Host and Worker Actually Exchange? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — one single stream
+## One host-worker event stream
 
 Let's start with the punchline. Host-worker communication in Azure Functions is **one gRPC service, one RPC**.
 

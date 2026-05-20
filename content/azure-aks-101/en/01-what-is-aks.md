@@ -42,7 +42,7 @@ This picture places What is Azure Kubernetes Service? — what managed Kubernete
 
 > The core of What is Azure Kubernetes Service? — what managed Kubernetes actually gives you is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — one AKS cluster at a glance
+## One AKS cluster at a glance
 
 This is the map for the whole series.
 Each later post zooms into one part of the picture.

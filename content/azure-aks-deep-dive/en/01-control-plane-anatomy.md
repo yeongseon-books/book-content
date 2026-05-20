@@ -64,7 +64,7 @@ This picture places Control plane anatomy — what AKS hides from you inside an 
 
 > The core of Control plane anatomy — what AKS hides from you is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — AKS control vs data plane
+## AKS control vs data plane
 
 This diagram is the map for the whole series.
 Later parts zoom into one box at a time.

@@ -61,7 +61,7 @@ App Service takes your code (or a zip) and turns it into a web app with ingress,
 
 > Another analogy: if AKS is "driving your own car," ACA is "calling a taxi." You pick the destination (image) and a few preferences (scale rules, ingress); the cluster stays out of sight.
 
-## The big picture — one ACA environment at a glance
+## One ACA environment at a glance
 
 This diagram is the map for the whole series. Later posts zoom into each box.
 

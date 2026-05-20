@@ -58,7 +58,7 @@ If your mental shortcut has been “Functions = autoscale,” this is where that
 
 ---
 
-## Big picture
+## Plan comparison at a glance
 
 Now put the differences on one table.
 

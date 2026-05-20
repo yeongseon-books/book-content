@@ -67,7 +67,7 @@ This picture places App Service platform architecture — Front-End, Worker, Fil
 
 > The core of App Service platform architecture — Front-End, Worker, File Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — one request through App Service
+## One request through App Service
 
 This is the map for the rest of the series.
 Each later episode zooms into one of these boxes.

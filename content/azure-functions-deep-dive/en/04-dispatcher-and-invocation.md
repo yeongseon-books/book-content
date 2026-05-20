@@ -57,7 +57,7 @@ This picture places Dispatcher and Invocation — How a Function Call Reaches th
 
 > The core of Dispatcher and Invocation — How a Function Call Reaches the Worker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
-## The big picture — from trigger to worker
+## From trigger to worker
 
 Let's start by drawing the entire path of a single invocation in one diagram.
 

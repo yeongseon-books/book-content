@@ -72,13 +72,13 @@
 <blockquote>
 <p>The core of Host Bootstrap — Following <code>WebJobsScriptHostService</code> is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<h2>The big picture — one Azure Functions host instance</h2>
+<h2>One Azure Functions host instance</h2>
 <p>This is the map for the rest of the series.<br>
 Each later part zooms into one box from this picture.<br>
 Get the layout in your head first; the code paths land more cleanly after that.</p>
 <p>This post stays on host bootstrap only. The rest of the boxes are pinned in the series TOC below; here the job is to make the bootstrap boundary itself explicit.</p>
 <hr>
-<h2>The big picture — host bootstrap in 4 stages</h2>
+<h2>Host bootstrap in 4 stages</h2>
 <p>It looks complicated, but host bootstrap really compresses down to these four stages:</p>
 <p><img alt="Four-stage host bootstrap flow" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/01/01-02-the-big-picture-host-bootstrap-in-4-stag.en.png"></p>
 <p><em>Four-stage host bootstrap flow</em><br>
