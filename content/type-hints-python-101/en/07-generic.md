@@ -201,7 +201,7 @@ Constraints list the exact allowed types. Unlike bounds, subtype relationships d
 ### Step 5: Python 3.12 Type Parameter Syntax
 
 ```python
-# Python 3.12+
+# example: Python 3.12+ type parameter syntax
 def first[T](items: list[T]) -> T:
     return items[0]
 

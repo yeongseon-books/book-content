@@ -28,7 +28,7 @@
 2. `content/<series>/medium/`은 `.sisyphus/medium/to-medium.py`가 생성하는 산출물이므로 직접 수정하지 않는다.
 3. 경로는 hardcode하지 말고 `series.yaml`의 `path:` 필드를 기준으로 해석한다.
 4. 시리즈 카탈로그의 단일 출처는 [`series.yaml`](./series.yaml)이다. 인간이 읽는 요약은 [`SERIES.md`](./SERIES.md).
-5. 시리즈 순서는 카테고리별 학습 커리큘럼 순서를 따른다. 순서를 변경할 때는 `series.yaml`과 프로필 README(`yeongseon-books/.github/profile/README.md`) 두 곳을 반드시 함께 맞춘다. `SERIES.md`는 `scripts/build_series_index.py`가 `series.yaml` 순서대로 자동 생성한다.
+5. 시리즈 순서는 카테고리별 학습 커리큘럼 순서를 따른다. 순서를 변경할 때는 `series.yaml`과 조직 프로필 README(`yeongseon-books/.github` repo의 `profile/README.md`, 보통 sibling checkout `../.github/profile/README.md`) 두 곳을 반드시 함께 맞춘다. 해당 checkout이 없으면 별도 repo 기준으로 확인하고 임의로 생략하지 않는다. `SERIES.md`는 `scripts/build_series_index.py`가 `series.yaml` 순서대로 자동 생성한다.
 
 ## Before Editing Content
 
@@ -95,7 +95,7 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 - 영어 글은 senior-engineer Medium voice, no AI slop.
 - Tone: ko는 `~입니다` register, en은 professional blog tone.
 - No emoji (use text `Pass`/`Fail`).
-- All user-facing code is Python (FastAPI / Flask).
+- Application-level user-facing implementation code is Python (FastAPI / Flask). Shell, YAML, JSON, Dockerfile, and CLI snippets are allowed when they are commands, configuration, or verification steps rather than the main application implementation.
 
 ## Image Conventions
 
@@ -117,6 +117,7 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 - eBook exporter만 예외: bundle을 self-contained로 만들기 위해 public URL을 로컬 `assets/...` 경로로 역재작성한다 (`series.yaml`의 `meta.asset_base_url` 기준).
 - 동기화: `scripts/sync_assets.py`로 `book-content/assets/` → `book-public-assets/assets/`를 미러링한다. 새 이미지를 추가한 글은 sync → public commit/push → Pages 배포 확인 순서를 지킨다.
 - 상세 정책은 [`ASSET_POLICY.md`](./ASSET_POLICY.md) 참조.
+
 ## When Adding a New Post
 
 1. `ko/<NN>-<slug>.md` + `en/<NN>-<slug>.md` 작성 (front matter 포함)
