@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 7
-title: Test Coverage
+title: "Testing 101 (7/10): Test Coverage"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Line, branch, and function coverage explained, how to measure w
 last_reviewed: '2026-05-04'
 ---
 
-# Test Coverage
+# Testing 101 (7/10): Test Coverage
 
 Ask a team how much they tested, and someone will usually answer with a percentage. That number is useful—but only up to the point where people start mistaking execution for verification. A line can run without the test proving anything meaningful about it.
 
@@ -29,6 +29,22 @@ Coverage helps when it reveals blind spots. It hurts when it becomes a vanity me
 This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run `pytest-cov`, and focus on how to turn a report into better decisions rather than prettier dashboards.
 
 > Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Test Coverage?
+- Which signal should the example or diagram make visible for Test Coverage?
+- What failure should be prevented first when Test Coverage reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 7 flow overview*
+
+This picture places Test Coverage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Test Coverage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ If you do not know *where tests reach*, incidents happen in the *blind spots*. A
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Line coverage**: ratio of *executed lines / total lines*.
@@ -181,17 +194,29 @@ Most teams aim for *70\~85% on production code*. Core domain stays *high*; adapt
 
 Coverage is a *health signal*, not *health itself*. The next post covers *regression tests* — making sure the same bug *does not come back*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Test Coverage?**
+  - The article treats Test Coverage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Test Coverage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Test Coverage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Double](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
 - **Test Coverage (current)**
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

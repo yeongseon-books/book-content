@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 5
-title: Test Double
+title: "Testing 101 (5/10): Test Double"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A clear walkthrough of Stub, Fake, Spy, Mock, and Dummy — wha
 last_reviewed: '2026-05-04'
 ---
 
-# Test Double
+# Testing 101 (5/10): Test Double
 
 The moment you start writing unit tests seriously, real dependencies show up: email delivery, payment APIs, clocks, databases, queues. Calling all of them for every test makes the suite slow, noisy, and hard to trust. Replacing them is necessary. Replacing them carelessly is how false confidence starts.
 
@@ -29,6 +29,22 @@ The moment you start writing unit tests seriously, real dependencies show up: em
 This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.
 
 > A good double reduces external cost without distorting the contract you are trying to verify.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Test Double?
+- Which signal should the example or diagram make visible for Test Double?
+- What failure should be prevented first when Test Double reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 5 flow overview*
+
+This picture places Test Double inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Test Double is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -45,9 +61,6 @@ Tests must be *fast and deterministic*. Calling a real payment API is *slow and 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms (Meszaros' five)
 
 - **Dummy**: a placeholder object that is *only passed around*.
@@ -189,17 +202,29 @@ Most unit tests get by with just *Stubs and Fakes*. *Mocks* are reserved for cas
 
 Test doubles *tame external dependencies*. The next post zooms into the two most common kinds — *Mock and Stub*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Test Double?**
+  - The article treats Test Double as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Test Double?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Test Double reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
 - **Test Double (current)**
 - Mock and Stub (upcoming)
 - Test Coverage (upcoming)
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

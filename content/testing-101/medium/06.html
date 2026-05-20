@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Mock and Stub</title>
+<title>Testing 101 (6/10): Mock and Stub</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Mock and Stub</h1>
+<h1>Testing 101 (6/10): Mock and Stub</h1>
 <p>After learning the broader test-double family, many engineers still blur together <em>Mock</em> and <em>Stub</em>. That confusion is costly because it changes what the test is actually proving. A result-focused test can quietly turn into an interaction-focused test, and a once-flexible suite becomes brittle during refactoring.</p>
 <p>The distinction is smaller than a new tool and bigger than a naming preference: it is a choice about whether the core signal is the system’s output or the dependency call itself.</p>
 <p>This is post 6 in the Testing 101 series. Here we use <code>unittest.mock</code> to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.</p>
 <blockquote>
 <p>Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Mock and Stub?</li>
+<li>Which signal should the example or diagram make visible for Mock and Stub?</li>
+<li>What failure should be prevented first when Mock and Stub reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 6 flow overview</em></p>
+<p>This picture places Mock and Stub inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Mock and Stub is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>A good test tells you <em>"what broke"</em> in <em>one line</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>State verification</strong>: verifying the SUT's <em>final state or return value</em>.</li>
@@ -187,12 +198,22 @@ def test_patch_function():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Mock and Stub are <em>tools with different goals</em>. The next post measures <em>how much you tested</em> — <em>test coverage</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Double</a></li>
+<li><strong>What boundary should you inspect first when applying Mock and Stub?</strong></li>
+<li>The article treats Mock and Stub as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Mock and Stub?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Mock and Stub reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Testing 101 (3/10): Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">Testing 101 (4/10): E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Testing 101 (5/10): Test Double</a></li>
 <li><strong>Mock and Stub (current)</strong></li>
 <li>Test Coverage (upcoming)</li>
 <li>Regression Test (upcoming)</li>

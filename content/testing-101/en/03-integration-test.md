@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 3
-title: Integration Test
+title: "Testing 101 (3/10): Integration Test"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Definition and hands-on for integration tests that exercise mul
 last_reviewed: '2026-05-04'
 ---
 
-# Integration Test
+# Testing 101 (3/10): Integration Test
 
 A fully green unit-test suite can still leave you staring at a production 500. The reason is simple: most incidents do not live *inside* one function. They live at the seams where HTTP handlers, services, repositories, and databases have to agree on shape, timing, and state.
 
@@ -29,6 +29,22 @@ Integration tests exist to exercise those seams on purpose. They cost more than 
 This is post 3 in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.
 
 > Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Integration Test?
+- Which signal should the example or diagram make visible for Integration Test?
+- What failure should be prevented first when Integration Test reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 3 flow overview*
+
+This picture places Integration Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Integration Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Most bugs live at *the seams* — DB schema, API contracts, authorization checks
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Integration test**: a test that exercises *two or more components* *together*.
@@ -210,9 +223,20 @@ Most backend teams stand up a *real DB* with combinations like *Postgres + testc
 
 Integration tests show what happens *when parts are connected*. The next post climbs further up to *E2E tests* that include the user-facing screen.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Integration Test?**
+  - The article treats Integration Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Integration Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Integration Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
 - **Integration Test (current)**
 - E2E Test (upcoming)
 - Test Double (upcoming)
@@ -221,6 +245,7 @@ Integration tests show what happens *when parts are connected*. The next post cl
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

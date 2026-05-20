@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Integration Test</title>
+<title>Testing 101 (3/10): Integration Test</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Integration Test</h1>
+<h1>Testing 101 (3/10): Integration Test</h1>
 <p>A fully green unit-test suite can still leave you staring at a production 500. The reason is simple: most incidents do not live <em>inside</em> one function. They live at the seams where HTTP handlers, services, repositories, and databases have to agree on shape, timing, and state.</p>
 <p>Integration tests exist to exercise those seams on purpose. They cost more than unit tests, but they catch the exact kinds of contract drift that only appear once components start touching each other.</p>
 <p>This is post 3 in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.</p>
 <blockquote>
 <p>Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Integration Test?</li>
+<li>Which signal should the example or diagram make visible for Integration Test?</li>
+<li>What failure should be prevented first when Integration Test reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 3 flow overview</em></p>
+<p>This picture places Integration Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Integration Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Unit tests look at <em>parts</em>; integration tests look at <em>the assembly</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Integration test</strong>: a test that exercises <em>two or more components</em> <em>together</em>.</li>
@@ -207,9 +218,19 @@ pytest -m slow         # nightly
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Integration tests show what happens <em>when parts are connected</em>. The next post climbs further up to <em>E2E tests</em> that include the user-facing screen.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><strong>What boundary should you inspect first when applying Integration Test?</strong></li>
+<li>The article treats Integration Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Integration Test?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Integration Test reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
 <li><strong>Integration Test (current)</strong></li>
 <li>E2E Test (upcoming)</li>
 <li>Test Double (upcoming)</li>

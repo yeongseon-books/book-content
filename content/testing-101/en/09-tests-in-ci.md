@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 9
-title: Running Tests in CI
+title: "Testing 101 (9/10): Running Tests in CI"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Automate tests with GitHub Actions and speed them up using matr
 last_reviewed: '2026-05-04'
 ---
 
-# Running Tests in CI
+# Testing 101 (9/10): Running Tests in CI
 
 A local green run is useful, but it is still only one machine, one dependency cache, and one engineer’s environment. Teams get into trouble when they treat that as sufficient evidence for everyone else, especially once multiple Python versions, operating systems, or contributors are involved.
 
@@ -29,6 +29,22 @@ Continuous Integration exists to turn “works on my laptop” into a shared sta
 This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.
 
 > CI is where personal confidence becomes organizational evidence.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Running Tests in CI?
+- Which signal should the example or diagram make visible for Running Tests in CI?
+- What failure should be prevented first when Running Tests in CI reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 9 flow overview*
+
+This picture places Running Tests in CI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Running Tests in CI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Local environments *differ from person to person*. *CI* validates *every PR* in 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **CI**: *Continuous Integration*. *Auto-validate* every commit.
@@ -185,17 +198,29 @@ Large teams *split* their suites into a *unit job* (1-2 minutes), an *integratio
 
 CI is *the safety net for the whole team*. In the next post we tie everything together into a *test strategy*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Running Tests in CI?**
+  - The article treats Running Tests in CI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Running Tests in CI?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Running Tests in CI reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Doubles](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
-- [Test Coverage](./07-test-coverage.md)
-- [Regression Test](./08-regression-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
+- [Testing 101 (7/10): Test Coverage](./07-test-coverage.md)
+- [Testing 101 (8/10): Regression Test](./08-regression-test.md)
 - **Running Tests in CI (current)**
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

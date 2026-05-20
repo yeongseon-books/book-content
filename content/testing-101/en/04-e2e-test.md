@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 4
-title: E2E Test
+title: "Testing 101 (4/10): E2E Test"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Definition of end-to-end tests that verify user scenarios in a 
 last_reviewed: '2026-05-04'
 ---
 
-# E2E Test
+# Testing 101 (4/10): E2E Test
 
 It is entirely possible for the UI team to say the page renders, the backend team to say the API returns 200, and the database team to say persistence is healthy—while users still cannot log in. End-to-end tests exist for that exact gap between local confidence and real user success.
 
@@ -29,6 +29,22 @@ They are expensive because they run through the most surface area: browser, fron
 This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.
 
 > E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying E2E Test?
+- Which signal should the example or diagram make visible for E2E Test?
+- What failure should be prevented first when E2E Test reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 4 flow overview*
+
+This picture places E2E Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of E2E Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ A passing E2E test means *frontend, backend, and DB work together*. It is the *m
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **E2E (end-to-end)**: the full flow from *user start to result*.
@@ -191,10 +204,21 @@ Most teams keep only *5\~20 critical scenarios* as E2E. *Playwright/Cypress* are
 
 E2E is the *most realistic* signal. From the next post we cover *test doubles* for handling external dependencies.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying E2E Test?**
+  - The article treats E2E Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for E2E Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when E2E Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
 - **E2E Test (current)**
 - Test Double (upcoming)
 - Mock and Stub (upcoming)
@@ -202,6 +226,7 @@ E2E is the *most realistic* signal. From the next post we cover *test doubles* f
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

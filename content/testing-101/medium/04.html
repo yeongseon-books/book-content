@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>E2E Test</title>
+<title>Testing 101 (4/10): E2E Test</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>E2E Test</h1>
+<h1>Testing 101 (4/10): E2E Test</h1>
 <p>It is entirely possible for the UI team to say the page renders, the backend team to say the API returns 200, and the database team to say persistence is healthy—while users still cannot log in. End-to-end tests exist for that exact gap between local confidence and real user success.</p>
 <p>They are expensive because they run through the most surface area: browser, frontend, backend, and storage. That cost is precisely why they need to be selective and operationally disciplined.</p>
 <p>This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.</p>
 <blockquote>
 <p>E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying E2E Test?</li>
+<li>Which signal should the example or diagram make visible for E2E Test?</li>
+<li>What failure should be prevented first when E2E Test reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 4 flow overview</em></p>
+<p>This picture places E2E Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of E2E Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>E2E is the <em>user's point of view</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>E2E (end-to-end)</strong>: the full flow from <em>user start to result</em>.</li>
@@ -190,10 +201,20 @@ def test_login_with_page_object(page):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>E2E is the <em>most realistic</em> signal. From the next post we cover <em>test doubles</em> for handling external dependencies.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><strong>What boundary should you inspect first when applying E2E Test?</strong></li>
+<li>The article treats E2E Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for E2E Test?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when E2E Test reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Testing 101 (3/10): Integration Test</a></li>
 <li><strong>E2E Test (current)</strong></li>
 <li>Test Double (upcoming)</li>
 <li>Mock and Stub (upcoming)</li>

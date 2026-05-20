@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Unit Test</title>
+<title>Testing 101 (2/10): Unit Test</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Unit Test</h1>
+<h1>Testing 101 (2/10): Unit Test</h1>
 <p>When people first hear “unit test,” they often agree on the word <em>test</em> but not on the word <em>unit</em>. Is the unit a function, a method, a class, or a whole module? If that boundary stays fuzzy, tests quickly become too large, too slow, and too vague to diagnose.</p>
 <p>Unit testing is mostly an exercise in shrinking the problem. Remove external dependencies, isolate one behavior, and get feedback in seconds instead of minutes.</p>
 <p>This is post 2 in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core <code>pytest</code> features, and show what makes a unit test genuinely useful in a growing codebase.</p>
 <blockquote>
 <p>A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Unit Test?</li>
+<li>Which signal should the example or diagram make visible for Unit Test?</li>
+<li>What failure should be prevented first when Unit Test reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 2 flow overview</em></p>
+<p>This picture places Unit Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Unit Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Many fast unit tests are the <em>foundation of the whole strategy</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Unit</strong>: a <em>minimal piece</em> such as a single function, method, or class.</li>
@@ -193,8 +204,18 @@ def test_with_fixture(base_price: int):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Unit tests are <em>small, fast, and free of external dependencies</em>. The next post climbs one step up to <em>integration tests</em>, which verify several modules together.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><strong>What boundary should you inspect first when applying Unit Test?</strong></li>
+<li>The article treats Unit Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Unit Test?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Unit Test reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
 <li><strong>Unit Test (current)</strong></li>
 <li>Integration Test (upcoming)</li>
 <li>E2E Test (upcoming)</li>

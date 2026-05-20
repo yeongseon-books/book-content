@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 6
-title: Mock and Stub
+title: "Testing 101 (6/10): Mock and Stub"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A clear separation of Stub and Mock through unittest.mock examp
 last_reviewed: '2026-05-04'
 ---
 
-# Mock and Stub
+# Testing 101 (6/10): Mock and Stub
 
 After learning the broader test-double family, many engineers still blur together *Mock* and *Stub*. That confusion is costly because it changes what the test is actually proving. A result-focused test can quietly turn into an interaction-focused test, and a once-flexible suite becomes brittle during refactoring.
 
@@ -29,6 +29,22 @@ The distinction is smaller than a new tool and bigger than a naming preference: 
 This is post 6 in the Testing 101 series. Here we use `unittest.mock` to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.
 
 > Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Mock and Stub?
+- Which signal should the example or diagram make visible for Mock and Stub?
+- What failure should be prevented first when Mock and Stub reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 6 flow overview*
+
+This picture places Mock and Stub inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Mock and Stub is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Confusing Mock and Stub leads to *over-mocking* and *brittle tests*. Knowing the
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **State verification**: verifying the SUT's *final state or return value*.
@@ -188,17 +201,29 @@ In most new tests, *Stubs/Fakes come first*, and Mocks appear only where *the in
 
 Mock and Stub are *tools with different goals*. The next post measures *how much you tested* — *test coverage*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Mock and Stub?**
+  - The article treats Mock and Stub as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Mock and Stub?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Mock and Stub reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Double](./05-test-double.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
 - **Mock and Stub (current)**
 - Test Coverage (upcoming)
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 2
-title: Unit Test
+title: "Testing 101 (2/10): Unit Test"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Definition of a unit test, the AAA pattern, pytest fixtures and
 last_reviewed: '2026-05-04'
 ---
 
-# Unit Test
+# Testing 101 (2/10): Unit Test
 
 When people first hear “unit test,” they often agree on the word *test* but not on the word *unit*. Is the unit a function, a method, a class, or a whole module? If that boundary stays fuzzy, tests quickly become too large, too slow, and too vague to diagnose.
 
@@ -29,6 +29,22 @@ Unit testing is mostly an exercise in shrinking the problem. Remove external dep
 This is post 2 in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core `pytest` features, and show what makes a unit test genuinely useful in a growing codebase.
 
 > A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Unit Test?
+- Which signal should the example or diagram make visible for Unit Test?
+- What failure should be prevented first when Unit Test reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 2 flow overview*
+
+This picture places Unit Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Unit Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Unit tests are *the base of the pyramid*. Because they are fast, *thousands* of 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Unit**: a *minimal piece* such as a single function, method, or class.
@@ -194,8 +207,19 @@ Core domain logic (pricing, authorization, state machines) is *always* covered b
 
 Unit tests are *small, fast, and free of external dependencies*. The next post climbs one step up to *integration tests*, which verify several modules together.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Unit Test?**
+  - The article treats Unit Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Unit Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Unit Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Testing?](./01-what-is-testing.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
 - **Unit Test (current)**
 - Integration Test (upcoming)
 - E2E Test (upcoming)
@@ -205,6 +229,7 @@ Unit tests are *small, fast, and free of external dependencies*. The next post c
 - Regression Test (upcoming)
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

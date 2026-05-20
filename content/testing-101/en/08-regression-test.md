@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 8
-title: Regression Test
+title: "Testing 101 (8/10): Regression Test"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to write and operate regression tests so the same bug never
 last_reviewed: '2026-05-04'
 ---
 
-# Regression Test
+# Testing 101 (8/10): Regression Test
 
 A bug is rarely expensive only once. The real cost comes when the same failure returns months later, after the original context has faded and a different engineer has to reconstruct why the system was fragile in the first place. Software does not remember fixes unless you encode the lesson.
 
@@ -29,6 +29,22 @@ Regression tests are that encoded lesson. They turn a bug report into a failing 
 This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.
 
 > A regression test is a bug report that learned how to execute itself.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Regression Test?
+- Which signal should the example or diagram make visible for Regression Test?
+- What failure should be prevented first when Regression Test reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 8 flow overview*
+
+This picture places Regression Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Regression Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Software has *no memory*. A bug fixed once can be *reintroduced by the next cont
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Regression**: a *previously fixed behavior* that *breaks again*.
@@ -177,17 +190,29 @@ Most teams enforce the *issue -> repro test -> fix* flow through their *default 
 
 Regression tests are *the team's memory*. In the next post we move all of these tests onto *CI that runs them automatically*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Regression Test?**
+  - The article treats Regression Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Regression Test?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Regression Test reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Doubles](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
-- [Test Coverage](./07-test-coverage.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
+- [Testing 101 (7/10): Test Coverage](./07-test-coverage.md)
 - **Regression Test (current)**
 - Running Tests in CI (upcoming)
 - Building a Test Strategy (upcoming)
+
 <!-- toc:end -->
 
 ## References

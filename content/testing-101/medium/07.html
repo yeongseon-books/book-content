@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Test Coverage</title>
+<title>Testing 101 (7/10): Test Coverage</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Test Coverage</h1>
+<h1>Testing 101 (7/10): Test Coverage</h1>
 <p>Ask a team how much they tested, and someone will usually answer with a percentage. That number is useful—but only up to the point where people start mistaking execution for verification. A line can run without the test proving anything meaningful about it.</p>
 <p>Coverage helps when it reveals blind spots. It hurts when it becomes a vanity metric that rewards shallow tests and distracts from risky branches or exception paths.</p>
 <p>This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run <code>pytest-cov</code>, and focus on how to turn a report into better decisions rather than prettier dashboards.</p>
 <blockquote>
 <p>Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Test Coverage?</li>
+<li>Which signal should the example or diagram make visible for Test Coverage?</li>
+<li>What failure should be prevented first when Test Coverage reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 7 flow overview</em></p>
+<p>This picture places Test Coverage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Test Coverage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>Coverage is a <em>compass</em>, not a <em>map</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Line coverage</strong>: ratio of <em>executed lines / total lines</em>.</li>
@@ -174,13 +185,23 @@ fail_under = 80
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Coverage is a <em>health signal</em>, not <em>health itself</em>. The next post covers <em>regression tests</em> — making sure the same bug <em>does not come back</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Double</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
+<li><strong>What boundary should you inspect first when applying Test Coverage?</strong></li>
+<li>The article treats Test Coverage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Test Coverage?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Test Coverage reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Testing 101 (3/10): Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">Testing 101 (4/10): E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Testing 101 (5/10): Test Double</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Testing 101 (6/10): Mock and Stub</a></li>
 <li><strong>Test Coverage (current)</strong></li>
 <li>Regression Test (upcoming)</li>
 <li>Running Tests in CI (upcoming)</li>

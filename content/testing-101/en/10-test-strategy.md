@@ -1,7 +1,7 @@
 ---
 series: testing-101
 episode: 10
-title: Building a Test Strategy
+title: "Testing 101 (10/10): Building a Test Strategy"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How to build a test strategy that fits your team using the test
 last_reviewed: '2026-05-04'
 ---
 
-# Building a Test Strategy
+# Testing 101 (10/10): Building a Test Strategy
 
 A team can accumulate a large number of tests and still operate poorly. If every screen gets an E2E scenario, every helper gets a unit test, and CI stretches to half an hour, the suite starts protecting itself more than it protects the product. At that point, the missing piece is not effort. It is strategy.
 
@@ -29,6 +29,22 @@ Strategy is how a team decides where to spend testing cost: which flows deserve 
 This is the final post in the Testing 101 series. Here we connect the earlier layers into one operating model and focus on how to keep test investment aligned with risk, team speed, and maintenance reality.
 
 > Test strategy is not about proving you test a lot. It is about proving you spend testing effort where failure would hurt most.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Building a Test Strategy?
+- Which signal should the example or diagram make visible for Building a Test Strategy?
+- What failure should be prevented first when Building a Test Strategy reaches a real system?
+
+## Big Picture
+
+![testing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png)
+
+*testing 101 chapter 10 flow overview*
+
+This picture places Building a Test Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Test Strategy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -46,9 +62,6 @@ Tests are *not free*. They cost time to write, to run, and to fix. A strategy-le
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 ## Key Terms
 
 - **Test pyramid**: a distribution model with *many unit / fewer integration / even fewer E2E* tests.
@@ -179,17 +192,29 @@ Mature teams record their *target distribution* and *flaky budget* in an *Engine
 
 Test strategy is not *technique* but *decision-making*. With this we close out Testing 101 — next, in *DevOps 101* and *Observability 101*, we extend quality work into *post-deployment*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Building a Test Strategy?**
+  - The article treats Building a Test Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Building a Test Strategy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Building a Test Strategy reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is testing?](./01-what-is-testing.md)
-- [Unit Test](./02-unit-test.md)
-- [Integration Test](./03-integration-test.md)
-- [E2E Test](./04-e2e-test.md)
-- [Test Doubles](./05-test-double.md)
-- [Mock and Stub](./06-mock-and-stub.md)
-- [Test Coverage](./07-test-coverage.md)
-- [Regression Test](./08-regression-test.md)
-- [Running Tests in CI](./09-tests-in-ci.md)
+## In this series
+
+- [Testing 101 (1/10): What Is Testing?](./01-what-is-testing.md)
+- [Testing 101 (2/10): Unit Test](./02-unit-test.md)
+- [Testing 101 (3/10): Integration Test](./03-integration-test.md)
+- [Testing 101 (4/10): E2E Test](./04-e2e-test.md)
+- [Testing 101 (5/10): Test Double](./05-test-double.md)
+- [Testing 101 (6/10): Mock and Stub](./06-mock-and-stub.md)
+- [Testing 101 (7/10): Test Coverage](./07-test-coverage.md)
+- [Testing 101 (8/10): Regression Test](./08-regression-test.md)
+- [Testing 101 (9/10): Running Tests in CI](./09-tests-in-ci.md)
 - **Building a Test Strategy (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Regression Test</title>
+<title>Testing 101 (8/10): Regression Test</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Regression Test</h1>
+<h1>Testing 101 (8/10): Regression Test</h1>
 <p>A bug is rarely expensive only once. The real cost comes when the same failure returns months later, after the original context has faded and a different engineer has to reconstruct why the system was fragile in the first place. Software does not remember fixes unless you encode the lesson.</p>
 <p>Regression tests are that encoded lesson. They turn a bug report into a failing example, then keep the example around so the same path cannot silently break again.</p>
 <p>This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.</p>
 <blockquote>
 <p>A regression test is a bug report that learned how to execute itself.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Regression Test?</li>
+<li>Which signal should the example or diagram make visible for Regression Test?</li>
+<li>What failure should be prevented first when Regression Test reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 8 flow overview</em></p>
+<p>This picture places Regression Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Regression Test is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>A team without regression tests fixes <em>the same bug forever</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Regression</strong>: a <em>previously fixed behavior</em> that <em>breaks again</em>.</li>
@@ -176,14 +187,24 @@ git commit -m &quot;fix(cart): reject negative price (PROJ-1234)&quot;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Regression tests are <em>the team's memory</em>. In the next post we move all of these tests onto <em>CI that runs them automatically</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What is testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Doubles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Test Coverage</a></li>
+<li><strong>What boundary should you inspect first when applying Regression Test?</strong></li>
+<li>The article treats Regression Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Regression Test?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Regression Test reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Testing 101 (3/10): Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">Testing 101 (4/10): E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Testing 101 (5/10): Test Double</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Testing 101 (6/10): Mock and Stub</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Testing 101 (7/10): Test Coverage</a></li>
 <li><strong>Regression Test (current)</strong></li>
 <li>Running Tests in CI (upcoming)</li>
 <li>Building a Test Strategy (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building a Test Strategy</title>
+<title>Testing 101 (10/10): Building a Test Strategy</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Building a Test Strategy</h1>
+<h1>Testing 101 (10/10): Building a Test Strategy</h1>
 <p>A team can accumulate a large number of tests and still operate poorly. If every screen gets an E2E scenario, every helper gets a unit test, and CI stretches to half an hour, the suite starts protecting itself more than it protects the product. At that point, the missing piece is not effort. It is strategy.</p>
 <p>Strategy is how a team decides where to spend testing cost: which flows deserve E2E coverage, which contracts belong in integration tests, and which logic should be guarded by fast unit tests that run on every change.</p>
 <p>This is the final post in the Testing 101 series. Here we connect the earlier layers into one operating model and focus on how to keep test investment aligned with risk, team speed, and maintenance reality.</p>
 <blockquote>
 <p>Test strategy is not about proving you test a lot. It is about proving you spend testing effort where failure would hurt most.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Building a Test Strategy?</li>
+<li>Which signal should the example or diagram make visible for Building a Test Strategy?</li>
+<li>What failure should be prevented first when Building a Test Strategy reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="testing 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>testing 101 chapter 10 flow overview</em></p>
+<p>This picture places Building a Test Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building a Test Strategy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p>A good strategy <em>catches bugs while protecting development speed</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Test pyramid</strong>: a distribution model with <em>many unit / fewer integration / even fewer E2E</em> tests.</li>
@@ -177,16 +188,26 @@ def test_payment_response_schema():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Test strategy is not <em>technique</em> but <em>decision-making</em>. With this we close out Testing 101 — next, in <em>DevOps 101</em> and <em>Observability 101</em>, we extend quality work into <em>post-deployment</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What is testing?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Doubles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Test Coverage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/08-regression-test.md">Regression Test</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/09-tests-in-ci.md">Running Tests in CI</a></li>
+<li><strong>What boundary should you inspect first when applying Building a Test Strategy?</strong></li>
+<li>The article treats Building a Test Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Building a Test Strategy?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Building a Test Strategy reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">Testing 101 (1/10): What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Testing 101 (2/10): Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Testing 101 (3/10): Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">Testing 101 (4/10): E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Testing 101 (5/10): Test Double</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Testing 101 (6/10): Mock and Stub</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Testing 101 (7/10): Test Coverage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/08-regression-test.md">Testing 101 (8/10): Regression Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/09-tests-in-ci.md">Testing 101 (9/10): Running Tests in CI</a></li>
 <li><strong>Building a Test Strategy (current)</strong></li>
 </ul>
 <h2>References</h2>
