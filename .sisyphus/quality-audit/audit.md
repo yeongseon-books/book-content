@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:54:03+00:00
+Generated: 2026-05-20T11:54:23+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **28**
-- Series at or above 5 issues: **21**
-- Total issues: **214**
-  - BadImg: **214**
+- Series with any issue: **27**
+- Series at or above 5 issues: **20**
+- Total issues: **206**
+  - BadImg: **206**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -56,19 +56,18 @@ Warnings:
 | 13 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 14 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 15 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 16 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 17 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 18 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 19 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 20 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 21 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 22 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 23 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 24 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 25 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 26 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 27 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 28 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 16 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 17 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 18 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 19 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 20 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 21 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 22 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 23 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 24 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 25 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 26 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 27 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -248,18 +247,6 @@ Warnings:
 - `assets/software-design-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/07/07-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=811x67)
-- ... 3 more
-
-## sql-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/sql-101/02/02-01-select-evaluation-flow.en.png:1` — PNG height 67px <= 100px (size=1231x67)
-- `assets/sql-101/02/02-01-select-evaluation-flow.ko.png:1` — PNG height 67px <= 100px (size=1231x67)
-- `assets/sql-101/05/05-01-aggregation-flow.en.png:1` — PNG height 67px <= 100px (size=1021x67)
-- `assets/sql-101/05/05-01-aggregation-flow.ko.png:1` — PNG height 67px <= 100px (size=1021x67)
-- `assets/sql-101/07/07-01-window-calculation-flow.en.png:1` — PNG height 88px <= 100px (size=1026x88)
 - ... 3 more
 
 ## machine-learning-101 — Total 6
