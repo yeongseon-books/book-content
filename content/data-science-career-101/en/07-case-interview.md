@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 7
-title: The Case Interview
+title: "Data Science Career 101 (7/10): The Case Interview"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of a structured frame for the case int
 last_reviewed: '2026-05-14'
 ---
 
-# The Case Interview
+# Data Science Career 101 (7/10): The Case Interview
 
 Case interviews often feel abstract because they do not offer the comforting shape of a coding problem. There is no obvious schema, no single query to write, and no algorithm name to anchor on. That makes many candidates answer too quickly and confuse brainstorming with structured reasoning.
 
@@ -28,15 +28,21 @@ What interviewers usually want instead is a visible thinking process. Can you cl
 
 This is post 7 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does a case interview actually test in a data candidate?
 - Why should clarification come before analysis?
 - How do you choose a north star metric and supporting metrics?
-- What makes a hypothesis set balanced rather than narrow?
-- How do you end with a recommendation instead of an open loop?
 
-> The goal in a case interview is not to sound creative first. It is to show that you can turn ambiguity into a decision path.
+## Big Picture
+
+![data science career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 7 flow overview*
+
+This picture places The Case Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Case Interview is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ As data roles become more embedded in product and business teams, the ability to
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
-
-*A case interview answer moves from clarification to metrics, hypotheses, data, and decision*
 ## Key Terms
 
 - **product sense**: Sense of product impact.
@@ -156,17 +159,29 @@ Strong case answers move in a reliable sequence: clarify the scope, anchor on a 
 
 The next post turns from interviews to the first 90 days after you land the job.
 
+## Answering the Opening Questions
+
+- **What does a case interview actually test in a data candidate?**
+  - The article treats The Case Interview as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should clarification come before analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose a north star metric and supporting metrics?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
 - **The Case Interview (current)**
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

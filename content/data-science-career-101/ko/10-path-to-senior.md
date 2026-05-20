@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 10
-title: 시니어 데이터 직무로 가는 길
+title: "Data Science Career 101 (10/10): 시니어 데이터 직무로 가는 길"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 시니어 데이터 전문가로 도약하기 위해 필요한 
 last_reviewed: '2026-05-14'
 ---
 
-# 시니어 데이터 직무로 가는 길
+# Data Science Career 101 (10/10): 시니어 데이터 직무로 가는 길
 
 시니어로 성장한다는 말을 들으면 많은 사람이 먼저 기술 난도를 떠올립니다. 더 어려운 모델을 다루고, 더 복잡한 파이프라인을 만들고, 더 빨리 문제를 해결하는 모습이 시니어의 전부처럼 보이기 쉽습니다. 물론 그런 역량도 중요하지만, 실제로는 거기서부터 차이가 시작되지는 않습니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 시니어 데이터 직무가 무엇이 다른지 설명합니다.
-- 문제 정의 능력이 왜 시니어의 핵심 역량인지 정리합니다.
-- 영향 측정을 어떻게 계획해야 설득력이 생기는지 짚습니다.
-- 멘토링과 동료 증폭이 왜 중요해지는지 살펴봅니다.
-- 시스템 관점과 의사결정 기록이 왜 시니어 행동으로 이어지는지 설명합니다.
+- 시니어 데이터 직무가 무엇이 다른지 설명합니다?
+- 문제 정의 능력이 왜 시니어의 핵심 역량인지 정리합니다?
+- 영향 측정을 어떻게 계획해야 설득력이 생기는지 짚습니다?
 
-> 시니어는 더 많은 티켓을 처리하는 사람이 아니라, 더 좋은 문제를 정의하고 그 결과를 측정하며 동료의 성과까지 증폭시키는 사람입니다.
+## 큰 그림
+
+![Data Science Career 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Data Science Career 101 10장 흐름 개요*
+
+이 그림에서는 시니어 데이터 직무로 가는 길를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 시니어 데이터 직무로 가는 길의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -54,9 +60,6 @@ last_reviewed: '2026-05-14'
 
 ## 한눈에 보는 개념
 
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
-
-*주니어에서 시니어, 리드로 갈수록 문제 정의와 영향 범위가 확장되는 성장 구조*
 이 흐름은 단순 승진 사다리가 아니라 관점의 확장을 뜻합니다. 주니어가 자신의 작업을 안정적으로 끝내는 데 집중한다면, 시니어는 문제 선정과 영향 측정, 동료 성장, 시스템 전체를 함께 봅니다.
 
 ## 핵심 용어
@@ -165,17 +168,29 @@ Write the "problem", not the "symptom".
 
 이 시리즈는 여기서 마무리됩니다. 데이터 커리어는 기술, 도메인, 사람, 그리고 문제를 보는 관점이 함께 쌓이면서 길이 만들어집니다.
 
+## 처음 질문으로 돌아가기
+
+- **시니어 데이터 직무가 무엇이 다른지 설명합니다?**
+  - 본문의 기준은 시니어 데이터 직무로 가는 길를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **문제 정의 능력이 왜 시니어의 핵심 역량인지 정리합니다?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **영향 측정을 어떻게 계획해야 설득력이 생기는지 짚습니다?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [데이터 직무란 무엇인가](./01-what-is-data-career.md)
-- [분석가 vs 사이언티스트 vs 엔지니어](./02-analyst-scientist-engineer.md)
-- [학습 경로 설계](./03-learning-path.md)
-- [데이터 포트폴리오](./04-data-portfolio.md)
-- [SQL과 분석 인터뷰](./05-sql-and-analytics-interview.md)
-- [ML 인터뷰](./06-ml-interview.md)
-- [케이스 인터뷰](./07-case-interview.md)
-- [첫 직장 적응](./08-first-job.md)
-- [도메인 전문성 쌓기](./09-domain-expertise.md)
+## 시리즈 목차
+
+- [Data Science Career 101 (1/10): 데이터 직무란 무엇인가](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): 분석가 vs 사이언티스트 vs 엔지니어](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): 학습 경로 설계](./03-learning-path.md)
+- [Data Science Career 101 (4/10): 데이터 포트폴리오](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL과 분석 인터뷰](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): ML 인터뷰](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): 케이스 인터뷰](./07-case-interview.md)
+- [Data Science Career 101 (8/10): 첫 직장 적응](./08-first-job.md)
+- [Data Science Career 101 (9/10): 도메인 전문성 쌓기](./09-domain-expertise.md)
 - **시니어 데이터 직무로 가는 길 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

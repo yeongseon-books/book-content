@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 8
-title: Settling into the First Data Job
+title: "Data Science Career 101 (8/10): Settling into the First Data Job"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Navigate your first 90 days in a data role with practical advic
 last_reviewed: '2026-05-14'
 ---
 
-# Settling into the First Data Job
+# Data Science Career 101 (8/10): Settling into the First Data Job
 
 The first data job often creates pressure in the wrong place. New hires feel they need to prove technical strength immediately, so they rush into tickets, dashboards, or model ideas before they have learned how the data flows, who owns which decisions, or what the team actually values.
 
@@ -28,15 +28,21 @@ That usually slows the ramp instead of accelerating it. In the first 90 days, th
 
 This is post 8 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How should you think about the first 30, 60, and 90 days in a data role?
 - What should you listen for and document before trying to move fast?
 - Why is a data map one of the most useful early artifacts?
-- What qualifies as a good quick win in a new team?
-- Why does documentation change how quickly trust accumulates?
 
-> The first 90 days are not about looking impressive. They are about reading the terrain—data, people, ownership, and decision patterns—well enough to create useful trust.
+## Big Picture
+
+![data science career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 8 flow overview*
+
+This picture places Settling into the First Data Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Settling into the First Data Job is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ If you learn the context well, even small improvements land with more credibilit
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
-
-*The first 90 days work best when data mapping, stakeholder learning, wins, and documentation reinforce each other*
 ## Key Terms
 
 - **data map**: Inventory of data sources.
@@ -154,17 +157,29 @@ The best first-quarter outcome is usually not a giant project. It is a combinati
 
 The next post looks at domain expertise, which is often the hidden multiplier behind that trust.
 
+## Answering the Opening Questions
+
+- **How should you think about the first 30, 60, and 90 days in a data role?**
+  - The article treats Settling into the First Data Job as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What should you listen for and document before trying to move fast?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is a data map one of the most useful early artifacts?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
-- [The Case Interview](./07-case-interview.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): The Case Interview](./07-case-interview.md)
 - **Settling into the First Data Job (current)**
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

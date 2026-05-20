@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 9
-title: Building Domain Expertise
+title: "Data Science Career 101 (9/10): Building Domain Expertise"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Strengthen your impact as a data professional by building domai
 last_reviewed: '2026-05-14'
 ---
 
-# Building Domain Expertise
+# Data Science Career 101 (9/10): Building Domain Expertise
 
 At some point in a data career, technical competence stops being the main differentiator. Two people can write the same query or build the same dashboard, but one of them will ask a much better follow-up question because they understand the business language, the decision context, and the operational reality behind the metric.
 
@@ -28,15 +28,21 @@ That is domain expertise. It is easy to postpone because there is always another
 
 This is post 9 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does domain expertise change the quality of data work so much?
 - How should you start learning the vocabulary and KPI structure of an industry?
 - Why does field observation improve metric interpretation?
-- What is the role of external industry study?
-- How do you turn domain learning into a repeatable loop instead of an occasional side task?
 
-> Technical skill helps you process data. Domain expertise helps you ask the right question about what that data means.
+## Big Picture
+
+![data science career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 9 flow overview*
+
+This picture places Building Domain Expertise inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building Domain Expertise is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ You cannot reliably interpret retention, fraud, churn, utilization, or margin if
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
-
-*Domain expertise compounds through vocabulary, metrics, field exposure, and review loops*
 ## Key Terms
 
 - **domain**: An industry or business area.
@@ -156,17 +159,29 @@ Domain expertise grows slowly, but it compounds hard. A stronger glossary leads 
 
 The next post closes the series by looking at what changes as you grow from junior execution toward senior impact.
 
+## Answering the Opening Questions
+
+- **Why does domain expertise change the quality of data work so much?**
+  - The article treats Building Domain Expertise as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you start learning the vocabulary and KPI structure of an industry?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does field observation improve metric interpretation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
-- [The Case Interview](./07-case-interview.md)
-- [Settling into the First Data Job](./08-first-job.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): The Case Interview](./07-case-interview.md)
+- [Data Science Career 101 (8/10): Settling into the First Data Job](./08-first-job.md)
 - **Building Domain Expertise (current)**
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 5
-title: SQL and Analytics Interviews
+title: "Data Science Career 101 (5/10): SQL and Analytics Interviews"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of patterns for SQL and analytics inte
 last_reviewed: '2026-05-14'
 ---
 
-# SQL and Analytics Interviews
+# Data Science Career 101 (5/10): SQL and Analytics Interviews
 
 Many candidates prepare for SQL interviews as if they were grammar exams. They memorize JOIN types, aggregation syntax, and window functions, but they still struggle once the interviewer asks, “What exactly are you counting?” or “How would you explain this result to a product manager?”
 
@@ -28,15 +28,21 @@ That gap exists because SQL interviews are usually reasoning interviews in disgu
 
 This is post 5 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What do SQL and analytics interviews actually evaluate beyond syntax?
 - How should you break a business question into query steps?
 - What are the recurring patterns around JOINs, aggregation, windows, and funnels?
-- Why does metric definition often matter more than the final number?
-- What makes a one-sentence interpretation strong enough to sound analytical rather than mechanical?
 
-> The core skill in a SQL interview is not typing fast. It is turning a vague question into a readable query, then turning the output into a defensible interpretation.
+## Big Picture
+
+![data science career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 5 flow overview*
+
+This picture places SQL and Analytics Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQL and Analytics Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ They are also watching how you define the metric, whether you surface assumption
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
-
-*The SQL interview loop from question framing to query output to interpretation*
 ## Key Terms
 
 - **JOIN**: Combining tables.
@@ -166,17 +169,29 @@ The strongest answers in SQL interviews feel structured before they feel clever.
 
 The next post applies the same problem-first thinking to machine learning interviews.
 
+## Answering the Opening Questions
+
+- **What do SQL and analytics interviews actually evaluate beyond syntax?**
+  - The article treats SQL and Analytics Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you break a business question into query steps?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What are the recurring patterns around JOINs, aggregation, windows, and funnels?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
 - **SQL and Analytics Interviews (current)**
 - The ML Interview (upcoming)
 - The Case Interview (upcoming)
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

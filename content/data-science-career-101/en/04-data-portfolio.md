@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 4
-title: The Data Portfolio
+title: "Data Science Career 101 (4/10): The Data Portfolio"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to build a high-impact data science portfolio that de
 last_reviewed: '2026-05-14'
 ---
 
-# The Data Portfolio
+# Data Science Career 101 (4/10): The Data Portfolio
 
 One of the fastest ways to weaken a data portfolio is to mistake code volume for proof of ability. Repositories full of notebooks and model files can still leave a hiring manager unconvinced if they never make the problem, the decision process, or the result easy to read.
 
@@ -28,15 +28,21 @@ Strong portfolios do something simpler and harder: they show a problem worth sol
 
 This is post 4 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What mix of projects gives a beginner portfolio better signal?
 - Why do code-only repositories usually feel weak in interviews?
 - What should a strong README explain first?
-- Why does reproducibility matter so much in data work?
-- How much visualization and documentation is enough before it turns noisy?
 
-> A good data portfolio is not a collection of notebooks. It is a record of problem framing, analysis, results, and reproducibility that another person can evaluate quickly.
+## Big Picture
+
+![data science career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 4 flow overview*
+
+This picture places The Data Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Data Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ If they can quickly understand the question, the data source, the method, the co
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
-
-*A portfolio becomes credible when problem framing, results, and reproducibility stay connected*
 ## Key Terms
 
 - **portfolio**: A curated set of best work.
@@ -162,10 +165,21 @@ The strongest beginner portfolio is usually not the flashiest one. It is the one
 
 The next post moves from portfolio evidence to interview execution by focusing on SQL and analytics interview patterns.
 
+## Answering the Opening Questions
+
+- **What mix of projects gives a beginner portfolio better signal?**
+  - The article treats The Data Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do code-only repositories usually feel weak in interviews?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should a strong README explain first?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
 - **The Data Portfolio (current)**
 - SQL and Analytics Interviews (upcoming)
 - The ML Interview (upcoming)
@@ -173,6 +187,7 @@ The next post moves from portfolio evidence to interview execution by focusing o
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

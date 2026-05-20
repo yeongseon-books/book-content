@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 10
-title: The Path to Senior in Data
+title: "Data Science Career 101 (10/10): The Path to Senior in Data"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Explore the critical transition from junior to senior data prof
 last_reviewed: '2026-05-14'
 ---
 
-# The Path to Senior in Data
+# Data Science Career 101 (10/10): The Path to Senior in Data
 
 When people picture senior growth, they often start with harder technical problems. That matters, but it is not the full shift. Plenty of people can build a sophisticated model or clean up a difficult query. The more meaningful change is in what they notice, what they prioritize, and how much larger their impact becomes than the task directly in front of them.
 
@@ -28,15 +28,21 @@ Senior data work usually means better problem definition, better measurement, mo
 
 This is the final post in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What actually makes a senior data role feel different from a junior one?
 - Why is problem definition such a strong signal of seniority?
 - How do measurement plans make proposals more credible?
-- Why do mentoring and decision records matter more over time?
-- What changes when you start looking at the entire system instead of one local task?
 
-> Senior growth is less about doing more work yourself and more about choosing better problems, proving impact, and increasing the effectiveness of the whole system around you.
+## Big Picture
+
+![data science career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 10 flow overview*
+
+This picture places The Path to Senior in Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Path to Senior in Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ Two people with similar technical skill can have very different impact depending
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
-
-*As scope widens from junior to senior and lead, problem choice and impact measurement matter more*
 ## Key Terms
 
 - **scope**: Range of responsibility.
@@ -153,17 +156,29 @@ This series ends here, but the main idea should stay simple: a data career grows
 
 Moving toward seniority means using those ingredients to create wider and more durable impact than your own task list alone would suggest.
 
+## Answering the Opening Questions
+
+- **What actually makes a senior data role feel different from a junior one?**
+  - The article treats The Path to Senior in Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is problem definition such a strong signal of seniority?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do measurement plans make proposals more credible?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
-- [The ML Interview](./06-ml-interview.md)
-- [The Case Interview](./07-case-interview.md)
-- [Settling into the First Data Job](./08-first-job.md)
-- [Building Domain Expertise](./09-domain-expertise.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+- [Data Science Career 101 (6/10): The ML Interview](./06-ml-interview.md)
+- [Data Science Career 101 (7/10): The Case Interview](./07-case-interview.md)
+- [Data Science Career 101 (8/10): Settling into the First Data Job](./08-first-job.md)
+- [Data Science Career 101 (9/10): Building Domain Expertise](./09-domain-expertise.md)
 - **The Path to Senior in Data (current)**
+
 <!-- toc:end -->
 
 ## References

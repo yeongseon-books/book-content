@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 1
-title: What Is a Data Career
+title: "Data Science Career 101 (1/10): What Is a Data Career"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Identify core data roles including analyst, scientist, and engi
 last_reviewed: '2026-05-14'
 ---
 
-# What Is a Data Career
+# Data Science Career 101 (1/10): What Is a Data Career
 
 When people first look into data careers, the landscape often feels flatter than it really is. Job boards list analyst, scientist, engineer, analytics engineer, and ML engineer side by side, but they rarely explain which questions each role owns or what kind of evidence each role is expected to produce.
 
@@ -28,15 +28,21 @@ That ambiguity matters early. If you cannot tell whether a team mainly values bu
 
 This is the first post in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What roles are usually grouped together when people say “data career”?
 - Why is it safer to distinguish data jobs by responsibility and deliverable than by title alone?
 - What do analyst, scientist, engineer, ML engineer, and analytics engineer each optimize for?
-- How do company size and team structure change the role boundaries?
-- What is the simplest starting point for deciding which path fits you best?
 
-> A data career is not one statistics-heavy job. It is a family of roles that turn questions into data work, and then turn that work into decisions, product change, or reliable infrastructure.
+## Big Picture
+
+![data science career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 1 flow overview*
+
+This picture places What Is a Data Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Data Career is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ An analyst may be asked to define a metric and explain a drop in conversion. A s
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
-
-*A basic map of data work flowing from question to data to analysis to product change*
 ## Key Terms
 
 - **data analyst**: Decision support specialist.
@@ -150,7 +153,18 @@ The first useful mental shift is to stop treating “data” as a single job fam
 
 The next post compares analyst, scientist, and engineer directly so you can see those differences in a more concrete side-by-side format.
 
+## Answering the Opening Questions
+
+- **What roles are usually grouped together when people say “data career”?**
+  - The article treats What Is a Data Career as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is it safer to distinguish data jobs by responsibility and deliverable than by title alone?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What do analyst, scientist, engineer, ML engineer, and analytics engineer each optimize for?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Data Career (current)**
 - Analyst vs Scientist vs Engineer (upcoming)
 - Designing the Learning Path (upcoming)
@@ -161,6 +175,7 @@ The next post compares analyst, scientist, and engineer directly so you can see 
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

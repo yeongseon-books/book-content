@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 2
-title: Analyst vs Scientist vs Engineer
+title: "Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Compare the responsibilities and technical requirements of data
 last_reviewed: '2026-05-14'
 ---
 
-# Analyst vs Scientist vs Engineer
+# Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer
 
 The most common early-career confusion in data work is not “Which language should I learn first?” but “What job am I actually preparing for?” Analyst, scientist, and engineer often appear in the same team, use overlapping tools, and are all expected to be comfortable with data, so the boundaries can look blurry from the outside.
 
@@ -28,15 +28,21 @@ The overlap is real, but the center of gravity is different. Each role is hired 
 
 This is post 2 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What goal sits at the center of analyst, scientist, and engineer work?
 - What deliverables most clearly reveal the difference between the three roles?
 - Why do similar tools still lead to very different day-to-day jobs?
-- How do success metrics and collaboration patterns change by role?
-- What should you use as the fallback distinction when one person covers more than one title?
 
-> The safest way to separate these roles is not by tool name but by purpose, deliverable, and the metric that proves the work mattered.
+## Big Picture
+
+![data science career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 2 flow overview*
+
+This picture places Analyst vs Scientist vs Engineer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Analyst vs Scientist vs Engineer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ Someone aiming for analytics may need much stronger metric interpretation and da
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
-
-*Analyst, scientist, and engineer roles anchored on decisions, hypotheses, and pipelines*
 ## Key Terms
 
 - **decision support**: Driving decisions with data.
@@ -160,8 +163,19 @@ These roles are not competitors as much as complementary specialists in the same
 
 The next post turns that role distinction into a concrete beginner learning path.
 
+## Answering the Opening Questions
+
+- **What goal sits at the center of analyst, scientist, and engineer work?**
+  - The article treats Analyst vs Scientist vs Engineer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What deliverables most clearly reveal the difference between the three roles?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do similar tools still lead to very different day-to-day jobs?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
 - **Analyst vs Scientist vs Engineer (current)**
 - Designing the Learning Path (upcoming)
 - The Data Portfolio (upcoming)
@@ -171,6 +185,7 @@ The next post turns that role distinction into a concrete beginner learning path
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

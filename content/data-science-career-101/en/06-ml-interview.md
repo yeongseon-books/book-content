@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 6
-title: The ML Interview
+title: "Data Science Career 101 (6/10): The ML Interview"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Prepare for machine learning interviews by mastering core model
 last_reviewed: '2026-05-14'
 ---
 
-# The ML Interview
+# Data Science Career 101 (6/10): The ML Interview
 
 Many candidates prepare for ML interviews by collecting model names and metric definitions. That is necessary, but it is not what makes an answer convincing. The hard part starts when the interviewer asks why a metric fits the business cost structure, what kind of leakage might exist, or how the model would be monitored after deployment.
 
@@ -28,15 +28,21 @@ That is why strong ML interview answers sound less like a glossary and more like
 
 This is post 6 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What topics do ML interviews usually cover besides algorithm basics?
 - How should you explain model choice in a way that reflects real trade-offs?
 - Why can metric selection not be separated from the problem definition?
-- Which operational traps are worth surfacing early in an answer?
-- What changes when you answer from a system-design perspective instead of a model-only perspective?
 
-> Good ML interview answers do not stop at naming a model. They connect problem framing, evaluation, production risks, and monitoring into one operating story.
+## Big Picture
+
+![data science career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 6 flow overview*
+
+This picture places The ML Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The ML Interview is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ Interviewers want to hear how you reason under constraints: data size, interpret
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
-
-*An ML interview answer should connect problem framing, evaluation, and deployment concerns*
 ## Key Terms
 
 - **bias-variance**: The balance between underfit and overfit.
@@ -155,17 +158,29 @@ The most useful preparation move is to build a repeatable answer structure: defi
 
 The next post shifts from model judgment to product and business judgment through the case interview format.
 
+## Answering the Opening Questions
+
+- **What topics do ML interviews usually cover besides algorithm basics?**
+  - The article treats The ML Interview as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you explain model choice in a way that reflects real trade-offs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why can metric selection not be separated from the problem definition?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
-- [Designing the Learning Path](./03-learning-path.md)
-- [The Data Portfolio](./04-data-portfolio.md)
-- [SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+- [Data Science Career 101 (3/10): Designing the Learning Path](./03-learning-path.md)
+- [Data Science Career 101 (4/10): The Data Portfolio](./04-data-portfolio.md)
+- [Data Science Career 101 (5/10): SQL and Analytics Interviews](./05-sql-and-analytics-interview.md)
 - **The ML Interview (current)**
 - The Case Interview (upcoming)
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References

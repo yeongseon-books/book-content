@@ -1,7 +1,7 @@
 ---
 series: data-science-career-101
 episode: 3
-title: Designing the Learning Path
+title: "Data Science Career 101 (3/10): Designing the Learning Path"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of a 12-week learning roadmap for data
 last_reviewed: '2026-05-14'
 ---
 
-# Designing the Learning Path
+# Data Science Career 101 (3/10): Designing the Learning Path
 
 Many beginners do not fail because they study too little. They fail because they study in a way that never compounds. A course here, a notebook there, a few SQL exercises over the weekend—effort accumulates, but the path does not, so it becomes hard to tell what is foundational and what is optional.
 
@@ -28,15 +28,21 @@ In data work, sequence matters. If you jump into modeling before you are comfort
 
 This is post 3 in the Data Science Career 101 series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What should a beginner learn first, and what can wait?
 - Why is a 12-week roadmap a more useful frame than a loose reading list?
 - What outcomes should each four-week phase produce?
-- Why do weekly artifacts matter more than passive study hours?
-- How does a simple retro keep the plan sustainable?
 
-> A strong learning path is not a list of resources. It is an order of operations that turns fundamentals into analysis, analysis into modeling, and every week into visible evidence of progress.
+## Big Picture
+
+![data science career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
+
+*data science career 101 chapter 3 flow overview*
+
+This picture places Designing the Learning Path inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Designing the Learning Path is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +60,6 @@ An ordered path gives you something more valuable than motivation: it gives you 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
-
-*A staged learning path from fundamentals to analytics, modeling, and product context*
 ## Key Terms
 
 - **fundamentals**: Core building blocks.
@@ -163,9 +166,20 @@ The goal is not to consume the maximum number of resources in 12 weeks. It is to
 
 The next post shows how those artifacts become a portfolio instead of a pile of disconnected exercises.
 
+## Answering the Opening Questions
+
+- **What should a beginner learn first, and what can wait?**
+  - The article treats Designing the Learning Path as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a 12-week roadmap a more useful frame than a loose reading list?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What outcomes should each four-week phase produce?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Data Career](./01-what-is-data-career.md)
-- [Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
+## In this series
+
+- [Data Science Career 101 (1/10): What Is a Data Career](./01-what-is-data-career.md)
+- [Data Science Career 101 (2/10): Analyst vs Scientist vs Engineer](./02-analyst-scientist-engineer.md)
 - **Designing the Learning Path (current)**
 - The Data Portfolio (upcoming)
 - SQL and Analytics Interviews (upcoming)
@@ -174,6 +188,7 @@ The next post shows how those artifacts become a portfolio instead of a pile of 
 - Settling into the First Data Job (upcoming)
 - Building Domain Expertise (upcoming)
 - The Path to Senior in Data (upcoming)
+
 <!-- toc:end -->
 
 ## References
