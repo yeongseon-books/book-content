@@ -1,5 +1,5 @@
 ---
-title: Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
+title: "Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions"
 series: harness-engineering-101
 episode: 4
 language: en
@@ -19,7 +19,7 @@ seo_description: Give an agent freedom and you get creativity along with risk. T
   Constraint Harness is the rule system that declares what actions are allowed and…
 ---
 
-# Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
+# Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
 
 The moment you attach tools and permissions to an agent, the system becomes more useful and more dangerous at the same time. A read-only task can mutate data. A drafting task can become a send operation. A cheap loop can become a runaway bill.
 
@@ -27,21 +27,22 @@ Humans infer boundaries from policy and habit. Agents do not. If a dangerous act
 
 This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- How must a Constraint Harness differ from prompt rules if it is going to limit agent behavior for real?
+- What risks do capability, resource, behavior, and scope constraints each control?
+- What must appear in code and logs for constraints to become an execution contract?
 
-- Why should agent constraints be split into different categories instead of one policy blob?
-- Why is tool whitelisting safer than blacklisting?
-- Why do token, tool-call, and wall-clock caps belong on every task?
-- Where should output policy be validated, and what should happen on violation?
-- Why are data-layer constraints usually stronger than application-layer checks?
+## Big Picture
 
-> Safe agents do not come from well-meaning prompt text. They come from constraints enforced at layers that are hard to bypass.
+![Constraint harness - defining rules, boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
 
-![Constraint harness - defining Rules, Boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
+*Constraint harness - defining rules, boundaries, and forbidden actions*
 
-*Constraint harness - defining Rules, Boundaries, and forbidden actions*
+This picture shows rules, boundaries, and forbidden actions turning into validation points before and after execution. Constraints should not be polite instructions; they should be boundaries the agent cannot actually cross.
+
+> A Constraint Harness does not merely tell the agent “do not do that”; it builds system boundaries that make the action impossible or auditable.
+
 ## Agents Try Everything They Are Allowed To
 
 Give an agent tools and permissions, and it will try them all. If a "analyze customer data" task has database write access, the agent may modify data while analyzing. If "draft an email" has the send tool exposed, it may send the draft as is.
@@ -345,19 +346,28 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 - [ ] Validate outputs automatically and feed policy violations back into retry logic.
 - [ ] Prefer row-level security, scoped views, or equivalent data-layer boundaries for access control.
 
+## Answering the Opening Questions
+
+- **How must a Constraint Harness differ from prompt rules if it is going to limit agent behavior for real?**
+  - Prompt rules are sentences the model is expected to follow. A Constraint Harness must be enforced by code: tool whitelists, permissions, budgets, and policy checks.
+- **What risks do capability, resource, behavior, and scope constraints each control?**
+  - Capability limits tools, resource limits cost and time, behavior limits output and action policy, and scope limits data and permission boundaries.
+- **What must appear in code and logs for constraints to become an execution contract?**
+  - Allow/block decisions, constraint names, failure reasons, and bypass attempts must be visible in code paths and logs.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- **Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)**
-- Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Turning Completion Criteria into Tests (upcoming)
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- **Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)**
+- Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)
+- Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

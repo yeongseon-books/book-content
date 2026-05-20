@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Context Harness — Designing What the Agent Should Know and Not Know</title>
+<title>Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Context Harness — Designing What the Agent Should Know and Not Know</h1>
+<h1>Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</h1>
 <p>Teams often assume context is free: add more chat history, more retrieved documents, more tool schemas, and quality should improve. In production, the opposite is common. Bigger context often means slower, noisier, and harder-to-reproduce behavior.</p>
 <p>An agent does not see one abstract “window.” It sees a contested budget shared by system prompts, task specs, conversation history, retrieved documents, tool schemas, and recent tool outputs.</p>
 <p>This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why does a large context window still feel too small in practice?</li>
-<li>How should system prompts, task specs, history, retrieval, and tool schemas share a token budget?</li>
-<li>When should you use sliding windows, summarization, or selective recall for history?</li>
-<li>Why is retrieval only the first stage of a usable RAG pipeline?</li>
-<li>Which classes of information should be deliberately excluded from context?</li>
+<li>Why is a Context Harness a budget-allocation problem rather than infinite memory?</li>
+<li>By what rule should you decide what the agent sees and what stays hidden?</li>
+<li>As retrieved context grows, how do you preserve precision?</li>
 </ul>
-<blockquote>
-<p>Context quality is decided less by raw length than by density. The real job is putting the right information into the right slots.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Context harness - designing what the agent should know and not know" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png"></p>
 <p><em>Context harness - designing what the agent should know and not know</em></p>
+<p>This picture shows the Context Harness selecting what the agent should see and what should stay hidden. Context gets better not by growing larger, but by placing the evidence needed for the current task accurately.</p>
+<blockquote>
+<p>The goal of a Context Harness is not more information; it is showing the agent only the information needed for the current decision.</p>
+</blockquote>
 <h2>Context Is a Resource</h2>
 <p>An agent's context window is not infinite. GPT-4o has 128k tokens, Claude Sonnet 4 has 200k, Gemini 2.5 Pro has 1M. Big numbers, but in practice never enough. System prompt, conversation history, retrieved documents, tool schemas, and recent tool outputs all compete for the same space.</p>
 <p>A bigger context also makes the model slower, more expensive, and less accurate. Information in the middle is easily ignored ("lost in the middle"), and irrelevant content perturbs reasoning. Context is a resource. Not something to pour in without limit, but something to design.</p>
@@ -304,18 +303,27 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 <li>[ ] Strip secrets, irrelevant tools, contradictory instructions, and stale tool outputs from context assembly.</li>
 <li>[ ] Capture inference-time context snapshots so incidents can be replayed later.</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is a Context Harness a budget-allocation problem rather than infinite memory?</strong></li>
+<li>The context window, token budget, attention, and security boundary are all limited. Mixing useful evidence with irrelevant text makes decisions worse.</li>
+<li><strong>By what rule should you decide what the agent sees and what stays hidden?</strong></li>
+<li>Show evidence, rules, and state needed for the current task. Hide sensitive data, stale noise, and documents unrelated to the decision.</li>
+<li><strong>As retrieved context grows, how do you preserve precision?</strong></li>
+<li>Prefer source quality, freshness, task relevance, and deduplication over raw volume, and keep context snapshots for reproducibility.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><strong>Context Harness — Designing What the Agent Should Know and Not Know (current)</strong></li>
-<li>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
-<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
-<li>Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
-<li>Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
-<li>Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
-<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><strong>Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know (current)</strong></li>
+<li>Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
+<li>Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
+<li>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
+<li>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
+<li>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

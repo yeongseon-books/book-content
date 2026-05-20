@@ -1,5 +1,5 @@
 ---
-title: Harness Engineering이란 무엇인가?
+title: "Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가?"
 series: harness-engineering-101
 episode: 1
 language: ko
@@ -18,31 +18,40 @@ last_reviewed: '2026-05-14'
 seo_description: 좋은 Agent는 좋은 모델만으로 만들어지지 않습니다. 모델이 일할 수 있는 환경, 제약, 도구, 검증 루프를 함께
   설계해야 합니다.
 ---
-# Harness Engineering이란 무엇인가?
+
+# Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가?
 프런티어 모델이 좋아질수록 팀은 같은 기대를 반복합니다. 이제는 정말로 에이전트를 만들 수 있을 것 같고, 더 큰 모델만 쓰면 운영까지 자연스럽게 이어질 것처럼 보입니다. 하지만 실제 프로덕션에서는 같은 모델로도 전혀 다른 결과가 나옵니다.
 차이는 대부분 모델이 아니라 환경입니다. 태스크가 모호하고, 컨텍스트가 지저분하고, 도구 권한이 과하게 열려 있고, 완료 조건과 승인 경계가 비어 있으면 모델은 계속 추측합니다. 추측이 쌓이면 시스템은 금방 비싸고 불안정해집니다.
 실무에서 저는 이 문제를 모델 품질 문제가 아니라 작업 환경 설계 문제로 봅니다. 좋은 에이전트는 좋은 모델에서만 나오지 않습니다. 모델이 일하는 바깥쪽 구조를 설계해야 비로소 신뢰할 수 있는 시스템이 됩니다.
 이 글은 Harness Engineering 101 시리즈의 첫 번째 글입니다.
 이 출발점을 정확히 잡아야 뒤에서 다룰 여덟 가지 harness를 각각의 팁이 아니라 하나의 운영 모델로 읽을 수 있습니다.
-## 이 글에서 다룰 문제
-- 좋은 모델을 써도 에이전트 결과가 불안정해지는 진짜 이유는 무엇일까요?
-- Harness라는 단어를 에이전트 시스템에 적용하면 어떤 멘탈 모델이 생길까요?
-- Harness가 없는 에이전트와 있는 에이전트는 코드와 운영 특성에서 어떻게 달라질까요?
-- 이 시리즈가 다루는 여덟 가지 harness는 각각 어떤 질문에 답할까요?
-- 프레임워크 선택과 Harness Engineering 설계는 왜 다른 층위의 의사결정일까요?
+## 먼저 던지는 질문
+
+- 좋은 모델을 써도 agent가 불안정하다면 먼저 무엇을 의심해야 할까요?
+- Harness를 모델 바깥의 작업 환경으로 보면 설계 질문이 어떻게 바뀔까요?
+- 프레임워크 선택과 Harness Engineering은 왜 같은 층위의 결정이 아닐까요?
+
+## 큰 그림
+
+![Harness Engineering 개념](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.ko.png)
+
+*Harness Engineering 개념*
+
+이 그림에서는 모델 자체가 아니라 task, context, constraint, tool, test 같은 바깥 구조가 agent 실행을 지탱하는 모습을 봅니다. Harness Engineering은 모델을 더 세게 밀어붙이는 일이 아니라 모델이 일할 환경을 설계하는 일입니다.
+
+> 좋은 agent는 모델 안쪽보다 모델 바깥의 작업 환경에서 더 많이 결정됩니다.
+
 ## 왜 이 글이 중요한가
 Harness Engineering을 이해하지 못하면 팀은 계속 모델만 교체합니다. 하지만 같은 입력에 다른 결과가 나오고, 위험한 행동이 자동 실행되고, 무엇이 끝난 상태인지조차 불분명한 문제는 대개 모델 교체로 해결되지 않습니다.
 반대로 harness 관점으로 보면 질문 순서가 바뀝니다. 무엇을 해야 하는지, 무엇을 보여줘야 하는지, 어디까지 허용해야 하는지, 어떻게 끝났다고 판정할지부터 정리하게 됩니다. 그 순간 에이전트는 데모가 아니라 운영 가능한 시스템 후보가 됩니다.
 특히 시리즈 첫 글에서 이 프레임을 잡아 두는 것이 중요합니다. 뒤의 Task, Context, Constraint, Tool, Test, Feedback, Approval, Observability는 개별 트릭이 아니라 하나의 실행 환경을 나눠 본 설계 층위이기 때문입니다.
-## Harness Engineering을 이해하는 가장 좋은 방법: 모델 바깥의 작업 환경을 설계하는 일로 보는 것입니다
+## 핵심 관점
 Harness는 힘을 묶는 장치가 아니라 원하는 방향으로 전달하는 장치에 가깝습니다. 모델 능력이 있어도 그 힘을 태스크, 컨텍스트, 도구, 검증으로 연결하지 못하면 운영 가능한 결과로 바뀌지 않습니다.
 그래서 Harness Engineering은 모델을 바꾸는 기술보다 모델이 일할 수 있는 환경을 정리하는 기술입니다. 모델을 더 똑똑하게 만드는 일보다, 더 덜 망가지게 만드는 일을 먼저 합니다.
 이 관점을 잡으면 실패를 보는 방식도 바뀝니다. 답이 이상할 때 모델 탓으로 끝내지 않고, 어떤 harness가 비어 있었는지 역추적하게 됩니다. 이것이 실제 운영에서 훨씬 유용한 디버깅 방식입니다.
 > 좋은 에이전트는 모델 안쪽보다 모델 바깥쪽에서 더 많이 결정됩니다. Harness Engineering은 그 바깥쪽을 설계하는 일입니다.
 ## 핵심 개념
 좋은 Agent는 좋은 모델만으로 만들어지지 않습니다. 모델이 일할 수 있는 환경, 제약, 도구, 검증 루프를 함께 설계해야 합니다. Harness Engineering은 Agent가 안정적으로 일하도록 환경을 설계하는 일입니다.
-
-![Harness Engineering 개념](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.ko.png)
 
 ### 좋은 모델만으로는 부족합니다
 
@@ -334,19 +343,28 @@ Harness Engineering은 좋은 모델을 고르는 기술이 아니라, 모델이
 이 글에서 가장 먼저 가져가야 할 문장은 단순합니다. 에이전트 품질은 모델 안쪽보다 모델 바깥쪽에서 더 많이 결정됩니다. 태스크, 컨텍스트, 제약, 도구, 검증, 피드백, 승인, 관측성은 부가 옵션이 아니라 운영 환경의 본체입니다.
 다음 글부터는 그 환경을 구성하는 각 harness를 하나씩 분해합니다. 첫 번째 출발점은 Task Harness입니다. 모호한 일을 실행 가능한 작업으로 바꾸지 못하면, 나머지 harness도 설 자리가 없습니다.
 
+## 처음 질문으로 돌아가기
+
+- **좋은 모델을 써도 agent가 불안정하다면 먼저 무엇을 의심해야 할까요?**
+  - 모델 성능보다 task 정의, context, tool 권한, 완료 검증, 승인 경계가 비어 있는지 먼저 봐야 합니다. 같은 모델도 환경이 다르면 전혀 다르게 동작합니다.
+- **Harness를 모델 바깥의 작업 환경으로 보면 설계 질문이 어떻게 바뀔까요?**
+  - 질문이 “어떤 모델을 쓸까”에서 “무엇을 시킬까, 무엇을 보여줄까, 어디까지 허용할까, 어떻게 끝났다고 볼까”로 바뀝니다.
+- **프레임워크 선택과 Harness Engineering은 왜 같은 층위의 결정이 아닐까요?**
+  - 프레임워크는 실행을 도와주는 도구이고 harness는 그 실행이 안전하고 검증 가능하도록 만드는 운영 설계층입니다. 프레임워크를 바꿔도 harness 질문은 남습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **Harness Engineering이란 무엇인가? (현재 글)**
-- Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기 (예정)
-- Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기 (예정)
-- Constraint Harness — 규칙, 경계, 금지 행동 정의하기 (예정)
-- Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (예정)
-- Test Harness — 완료 조건을 테스트로 고정하기 (예정)
-- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
-- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
-- Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- **Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가? (현재 글)**
+- Harness Engineering 101 (2/10): Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기 (예정)
+- Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기 (예정)
+- Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, 금지 행동 정의하기 (예정)
+- Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (예정)
+- Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기 (예정)
+- Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
 

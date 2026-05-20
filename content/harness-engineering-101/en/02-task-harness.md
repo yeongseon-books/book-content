@@ -1,5 +1,5 @@
 ---
-title: Task Harness — Turning Vague Work into Executable Tasks
+title: "Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks"
 series: harness-engineering-101
 episode: 2
 language: en
@@ -19,7 +19,7 @@ seo_description: Give an agent a vague instruction and you get a vague result. T
   Task Harness turns vague work into executable tasks with clear inputs, outputs…
 ---
 
-# Task Harness — Turning Vague Work into Executable Tasks
+# Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks
 
 The fastest way to make an agent expensive is to ask it to do a vague job. Humans respond to ambiguity by asking back. Agents usually respond by filling in the blanks on their own.
 
@@ -27,21 +27,22 @@ Those blanks quickly turn into concrete risk: the wrong data source, the wrong o
 
 This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- What breaks at execution time when a vague goal is handed directly to an agent?
+- What executable unit and completion criteria should a Task Harness translate the goal into?
+- What evidence should a good task spec leave for the next agent run and for human review?
 
-- Why should you separate a business goal from an agent task?
-- Which fields are the minimum for an executable TaskSpec?
-- How do you decide that a task is too large and must be decomposed?
-- How do natural-language completion conditions become machine-checkable criteria?
-- Why should prompts, verifiers, and eval datasets derive from the same TaskSpec?
-
-> Goals tell the business where to go. Tasks tell the agent what to do now. Task Harness is the layer that turns one into the other.
+## Big Picture
 
 ![Task harness - turning vague work into executable tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
 
 *Task harness - turning vague work into executable tasks*
+
+This picture shows a vague request passing through the Task Harness and becoming an executable task with inputs, constraints, and completion criteria. An agent works better when a goal is translated into a task instead of thrown at the model as-is.
+
+> A Task Harness turns “what do we want?” into “what must be executed, and how will completion be proven?”
+
 ## Vague Work Cannot Be Executed
 
 Hand "tidy up our team report" to an agent and the result is not guaranteed. Which report? Where do you fetch it from? Does "tidy up" mean summarize, restructure, or convert format? A human would ask back. An agent does not. It guesses. And it guesses wrong.
@@ -349,19 +350,28 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 - [ ] Send missing fields back as clarifying questions instead of letting the agent guess.
 - [ ] Generate prompts, verifiers, and eval cases from the same TaskSpec.
 
+## Answering the Opening Questions
+
+- **What breaks at execution time when a vague goal is handed directly to an agent?**
+  - The agent invents scope, success criteria, and forbidden actions, which leads to missing work, loops, or premature completion.
+- **What executable unit and completion criteria should a Task Harness translate the goal into?**
+  - It should define the task goal, inputs, allowed scope, output format, completion criteria, and stop conditions for failure.
+- **What evidence should a good task spec leave for the next agent run and for human review?**
+  - The spec should record what was executed, which criteria proved completion, and which inputs and constraints were used so review and reruns are possible.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- **Task Harness — Turning Vague Work into Executable Tasks (current)**
-- Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
-- Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
-- Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Turning Completion Criteria into Tests (upcoming)
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- **Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks (current)**
+- Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
+- Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
+- Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)
+- Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

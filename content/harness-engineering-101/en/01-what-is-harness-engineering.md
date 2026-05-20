@@ -1,5 +1,5 @@
 ---
-title: What Is Harness Engineering?
+title: "Harness Engineering 101 (1/10): What Is Harness Engineering?"
 series: harness-engineering-101
 episode: 1
 language: en
@@ -19,7 +19,7 @@ seo_description: Good agents are not made by good models alone. You must design 
   environment, constraints, tools, and verification loops the model works inside.
 ---
 
-# What Is Harness Engineering?
+# Harness Engineering 101 (1/10): What Is Harness Engineering?
 
 Every frontier-model release triggers the same hope: maybe this is the one that finally makes agents production-ready. In practice, teams using the same model still land in very different places. One team gets a stable operator. Another gets an expensive demo that keeps guessing.
 
@@ -27,21 +27,21 @@ The difference is usually not the model. It is the work environment around the m
 
 This is the first post in the Harness Engineering 101 series. It establishes the operating model for the rest of the series, so Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability read as one system rather than eight isolated tips.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- If an agent stays unstable with a strong model, what should you inspect first?
+- How do design questions change when you treat a harness as the work environment outside the model?
+- Why is framework choice not the same decision layer as Harness Engineering?
 
-- Why do agents still behave unpredictably even when the underlying model is strong?
-- What does the word harness mean when you apply it to an agent system?
-- How does an agent without a harness differ from one with a harness in code and in operations?
-- What questions do the eight harnesses answer across the rest of the series?
-- Why is Harness Engineering a different decision layer from framework choice?
+## Big Picture
 
-> A reliable agent is decided more by the system around the model than by the model alone. Harness Engineering is the work of designing that surrounding system.
+![What is Harness Engineering](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
 
-![What is harness Engineering](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
+*What is Harness Engineering*
 
-*What is harness Engineering*
+This picture shows the surrounding task, context, constraints, tools, and tests supporting agent execution rather than the model alone. Harness Engineering is not pushing the model harder; it is designing the environment the model works inside.
+
+> A good agent is decided more by the work environment around the model than by the model alone.
 
 ## Why this chapter matters
 
@@ -376,19 +376,28 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 - [ ] Keep framework choice separate from harness design documents and reviews.
 - [ ] Use the eight harnesses as a diagnostic map when production behavior drifts.
 
+## Answering the Opening Questions
+
+- **If an agent stays unstable with a strong model, what should you inspect first?**
+  - Inspect task definition, context, tool permissions, completion checks, and approval boundaries before blaming model capability. The same model behaves differently in different environments.
+- **How do design questions change when you treat a harness as the work environment outside the model?**
+  - The questions shift from “which model?” to “what work, what context, what permissions, and what proof of completion?”
+- **Why is framework choice not the same decision layer as Harness Engineering?**
+  - A framework helps execute the system. A harness is the operating design that keeps execution safe and verifiable, so the harness questions remain even when the framework changes.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What Is Harness Engineering? (current)**
-- Task Harness — Turning Vague Work into Executable Tasks (upcoming)
-- Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
-- Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
-- Tool Harness — Designing Safe Tools for Agents (upcoming)
-- Test Harness — Turning Completion Criteria into Tests (upcoming)
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- **Harness Engineering 101 (1/10): What Is Harness Engineering? (current)**
+- Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks (upcoming)
+- Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know (upcoming)
+- Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)
+- Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)
+- Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

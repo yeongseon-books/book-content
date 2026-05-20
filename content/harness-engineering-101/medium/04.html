@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</title>
+<title>Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</h1>
+<h1>Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</h1>
 <p>The moment you attach tools and permissions to an agent, the system becomes more useful and more dangerous at the same time. A read-only task can mutate data. A drafting task can become a send operation. A cheap loop can become a runaway bill.</p>
 <p>Humans infer boundaries from policy and habit. Agents do not. If a dangerous action is visible and unblocked, many models will interpret that as implicit permission.</p>
 <p>This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why should agent constraints be split into different categories instead of one policy blob?</li>
-<li>Why is tool whitelisting safer than blacklisting?</li>
-<li>Why do token, tool-call, and wall-clock caps belong on every task?</li>
-<li>Where should output policy be validated, and what should happen on violation?</li>
-<li>Why are data-layer constraints usually stronger than application-layer checks?</li>
+<li>How must a Constraint Harness differ from prompt rules if it is going to limit agent behavior for real?</li>
+<li>What risks do capability, resource, behavior, and scope constraints each control?</li>
+<li>What must appear in code and logs for constraints to become an execution contract?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Constraint harness - defining rules, boundaries, and forbidden actions" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png"></p>
+<p><em>Constraint harness - defining rules, boundaries, and forbidden actions</em></p>
+<p>This picture shows rules, boundaries, and forbidden actions turning into validation points before and after execution. Constraints should not be polite instructions; they should be boundaries the agent cannot actually cross.</p>
 <blockquote>
-<p>Safe agents do not come from well-meaning prompt text. They come from constraints enforced at layers that are hard to bypass.</p>
+<p>A Constraint Harness does not merely tell the agent “do not do that”; it builds system boundaries that make the action impossible or auditable.</p>
 </blockquote>
-<p><img alt="Constraint harness - defining Rules, Boundaries, and forbidden actions" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png"></p>
-<p><em>Constraint harness - defining Rules, Boundaries, and forbidden actions</em></p>
 <h2>Agents Try Everything They Are Allowed To</h2>
 <p>Give an agent tools and permissions, and it will try them all. If a "analyze customer data" task has database write access, the agent may modify data while analyzing. If "draft an email" has the send tool exposed, it may send the draft as is.</p>
 <p>LLMs assume any action not explicitly forbidden is safe. Humans build boundaries from social norms and common sense. Agents have neither. Explicit constraints are the safety.</p>
@@ -317,18 +316,27 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 <li>[ ] Validate outputs automatically and feed policy violations back into retry logic.</li>
 <li>[ ] Prefer row-level security, scoped views, or equivalent data-layer boundaries for access control.</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How must a Constraint Harness differ from prompt rules if it is going to limit agent behavior for real?</strong></li>
+<li>Prompt rules are sentences the model is expected to follow. A Constraint Harness must be enforced by code: tool whitelists, permissions, budgets, and policy checks.</li>
+<li><strong>What risks do capability, resource, behavior, and scope constraints each control?</strong></li>
+<li>Capability limits tools, resource limits cost and time, behavior limits output and action policy, and scope limits data and permission boundaries.</li>
+<li><strong>What must appear in code and logs for constraints to become an execution contract?</strong></li>
+<li>Allow/block decisions, constraint names, failure reasons, and bypass attempts must be visible in code paths and logs.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What the Agent Should Know and Not Know</a></li>
-<li><strong>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)</strong></li>
-<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
-<li>Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
-<li>Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
-<li>Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
-<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</a></li>
+<li><strong>Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (current)</strong></li>
+<li>Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
+<li>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
+<li>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
+<li>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

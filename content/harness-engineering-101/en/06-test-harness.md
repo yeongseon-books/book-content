@@ -1,5 +1,5 @@
 ---
-title: Test Harness — Turning Completion Criteria into Tests
+title: "Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests"
 series: harness-engineering-101
 episode: 6
 language: en
@@ -19,7 +19,7 @@ seo_description: When an agent says "done", only tests can confirm whether the w
   is actually done.
 ---
 
-# Test Harness — Turning Completion Criteria into Tests
+# Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests
 
 Agent demos usually look fine because the inputs were carefully chosen and the path was obvious to the person who built them. Real users immediately invalidate that comfort by bringing messy requests, partial data, and edge cases you did not rehearse.
 
@@ -27,21 +27,22 @@ That is why “the agent says it is done” is not evidence. Completion must be 
 
 This is post 6 in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- What should a Test Harness turn natural-language completion promises into?
+- What agent failures do unit, trajectory, and end-to-end tests each catch?
+- How should eval datasets and regression checks connect before production?
 
-- What is the same and different between agent testing and traditional software testing?
-- Why should unit, integration, and eval checks exist as separate layers?
-- Where do useful eval examples come from in practice?
-- How do you score agent outputs when there is no single exact string answer?
-- Why must these checks live inside CI instead of manual review habit?
-
-> “Works in the demo” is not proof. A test you can rerun on every change is proof.
+## Big Picture
 
 ![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 
 *Test harness - turning completion criteria into tests*
+
+This picture shows completion criteria becoming tests, eval datasets, and regression checks. A Test Harness turns “it seems to work” into executable evidence that makes agent changes safer.
+
+> A Test Harness matters less because the agent passed once, and more because it proves future changes still meet the same criteria.
+
 ## "It Works" Is Not Evidence
 
 Build an agent and demo it — it works. Open it to real users and within a week it breaks. The difference is input diversity. A demo runs on five well-shaped inputs; production faces thousands of unexpected ones.
@@ -324,19 +325,28 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 - [ ] Use exact checks, heuristics, and judge models together, then recalibrate judges against humans.
 - [ ] Run the suites automatically in CI and block merges on failed thresholds.
 
+## Answering the Opening Questions
+
+- **What should a Test Harness turn natural-language completion promises into?**
+  - It should turn completion promises into executable assertions, rubrics, snapshots, and eval cases.
+- **What agent failures do unit, trajectory, and end-to-end tests each catch?**
+  - Unit tests catch tools and small functions, trajectory tests catch intermediate paths and tool choices, and end-to-end tests catch user-visible completion.
+- **How should eval datasets and regression checks connect before production?**
+  - Put real failures and representative requests into the eval dataset, then run regression checks automatically for code, prompt, and tool changes.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- **Test Harness — Turning Completion Criteria into Tests (current)**
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- **Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (current)**
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

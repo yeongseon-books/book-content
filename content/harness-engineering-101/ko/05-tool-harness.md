@@ -1,5 +1,5 @@
 ---
-title: Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
+title: "Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기"
 series: harness-engineering-101
 episode: 5
 language: ko
@@ -17,31 +17,40 @@ tags:
 last_reviewed: '2026-05-12'
 seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다.
 ---
-# Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
+
+# Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기
 에이전트가 실제 일을 하려면 결국 도구를 써야 합니다. 데이터베이스를 읽고, 파일을 쓰고, API를 호출하고, 코드를 실행하는 순간부터 모델은 텍스트 생성기가 아니라 작업 수행기가 됩니다.
 문제는 바로 이 지점에서 대부분의 사고가 시작된다는 점입니다. 잘못 설계된 도구 하나가 모델 품질보다 더 큰 장애 원인이 되기 쉽습니다. 인터페이스가 모호하면 틀린 인자를 만들고, 부수효과가 숨어 있으면 초안 작성 요청이 실제 발송으로 이어집니다.
 Tool Harness는 단순히 함수 목록을 나열하는 작업이 아닙니다. 에이전트가 올바르게 호출하기 쉬운 인터페이스, 잘못 호출해도 사고가 적은 실행 방식, 실패했을 때 다음 행동을 결정할 수 있는 에러 모델을 설계하는 일입니다.
 이 글은 Harness Engineering 101 시리즈의 5번째 글입니다.
 강한 기능보다 좁고 정직한 인터페이스가 더 중요하다는 점이 이 글의 중심입니다.
-## 이 글에서 다룰 문제
-- 좋은 도구와 나쁜 도구를 가르는 실무적 기준은 무엇일까요?
-- 도구 스키마에는 타입 말고 어떤 의미 정보가 반드시 들어가야 할까요?
-- 에이전트 재시도 환경에서 idempotency가 왜 필수일까요?
-- 도구 에러는 왜 사람이 아니라 에이전트가 바로 행동할 수 있는 형태여야 할까요?
-- 코드 실행, 파일 접근, 셸 호출 같은 위험 도구는 어떤 격리 장치가 필요할까요?
+## 먼저 던지는 질문
+
+- Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?
+- schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?
+- 위험한 tool을 sandbox 안에 넣으려면 어떤 경계가 필요할까요?
+
+## 큰 그림
+
+![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
+
+*Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
+
+이 그림에서는 agent가 tool을 안전하게 고르고 호출하도록 이름, schema, 오류, 권한, sandbox를 설계하는 흐름을 봅니다. 좋은 tool은 똑똑한 모델에게 맡기는 인터페이스가 아니라 실수하기 어려운 작업 표면입니다.
+
+> Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.
+
 ## 왜 이 글이 중요한가
 에이전트의 행동 범위는 결국 도구의 행동 범위입니다. 좋은 프롬프트와 제약을 갖춘 시스템도 도구가 모호하거나 과도한 권한을 갖고 있으면 한 번의 호출로 쉽게 무너집니다.
 두 번째로 중요한 이유는 재시도입니다. 네트워크 오류와 타임아웃이 잦은 환경에서는 같은 도구가 반복 호출되기 쉽고, idempotency가 없으면 곧바로 중복 실행 사고로 이어집니다.
 세 번째 이유는 디버깅 비용입니다. 사람이 읽기에도 모호한 에러 메시지는 에이전트에게는 거의 무의미합니다. 무엇이 실패했고 왜 실패했고 다음에 무엇을 해야 하는지가 드러나야 feedback loop가 제대로 돕니다.
-## Tool Harness를 이해하는 가장 좋은 방법: 에이전트가 올바르게 쓰기 쉬운 작업 표면을 만드는 일로 보는 것입니다
+## 핵심 관점
 사람용 API도 그렇지만, 에이전트용 도구는 더더욱 좋은 기본값과 좁은 책임이 중요합니다. 에이전트는 도구 이름, 설명, 스키마, 에러 메시지에서 거의 모든 판단을 끌어옵니다.
 좋은 Tool Harness는 두 가지를 동시에 달성해야 합니다. 정상 경로에서는 쉽게 쓰이고, 오류 경로에서는 덜 위험해야 합니다. single responsibility, structured output, idempotency, sandboxing이 모두 여기에 연결됩니다.
 도구는 많을수록 좋은 것이 아니라 좁고 정직할수록 좋습니다. 하나의 범용 도구에 옵션을 다 몰아넣는 순간 schema는 약해지고 승인과 검증 경계도 흐려집니다.
 > 에이전트용 도구는 강한 기능보다 좁고 정직한 인터페이스가 더 중요합니다. 잘 쓰기 쉬워야 하고, 잘못 써도 망가지기 어렵게 설계되어야 합니다.
 ## 핵심 개념
 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다. Tool Harness는 Agent가 사용할 도구를 안전하고 예측 가능하게 설계하는 일입니다.
-
-![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
 
 ### 도구는 Agent의 손과 발입니다
 
@@ -313,19 +322,28 @@ Tool Harness는 도구 개수를 늘리는 기술이 아니라, 에이전트가 
 실무에서는 모델보다 도구가 더 자주 사고를 냅니다. 모델은 잘못 생각할 수 있지만, 시스템을 망가뜨리는 것은 결국 그 생각을 실행하는 도구입니다. 그래서 도구 설계는 프롬프트보다 더 보수적이어야 합니다.
 다음 글에서는 Test Harness를 다룹니다. 에이전트가 작업을 끝냈다고 말하는 것과 실제로 끝난 것은 다르기 때문에, 이제 완료 조건을 테스트로 고정해야 합니다.
 
+## 처음 질문으로 돌아가기
+
+- **Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?**
+  - 도구 이름, 설명, 입력 schema, 출력 형식, 오류 메시지가 모두 agent의 선택과 복구를 돕도록 좁고 분명해야 합니다.
+- **schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?**
+  - schema는 잘못된 인자를 줄이고, idempotency는 반복 실행 피해를 줄이며, actionable error는 agent가 다음 조치를 고르게 합니다.
+- **위험한 tool을 sandbox 안에 넣으려면 어떤 경계가 필요할까요?**
+  - 허용 명령, 파일·네트워크 권한, timeout, dry-run, audit log, rollback 가능성을 sandbox 경계로 고정해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
-- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
-- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
-- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
-- **Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
-- Test Harness — 완료 조건을 테스트로 고정하기 (예정)
-- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
-- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
-- Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
+- **Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
+- Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기 (예정)
+- Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
 

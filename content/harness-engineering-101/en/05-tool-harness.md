@@ -1,5 +1,5 @@
 ---
-title: Tool Harness — Designing Safe Tools for Agents
+title: "Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents"
 series: harness-engineering-101
 episode: 5
 language: en
@@ -19,7 +19,7 @@ seo_description: Tools are the hands and feet of an agent. Poorly designed tools
   corrupt data or blow up costs.
 ---
 
-# Tool Harness — Designing Safe Tools for Agents
+# Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents
 
 Once an agent starts reading databases, writing files, calling APIs, or executing code, it stops being only a text generator. It becomes a task runner, and the shape of its tool interface now matters as much as the quality of the model behind it.
 
@@ -27,21 +27,22 @@ Most production incidents in agent systems are not caused by poetic model failur
 
 This is post 5 in the Harness Engineering 101 series. Here we design tool surfaces that are narrow, honest, and difficult to misuse.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- What surface should a Tool Harness create so the agent can use tools correctly?
+- What operational problems do schema design, idempotency, and actionable errors each reduce?
+- What boundaries are needed when dangerous tools must run inside a sandbox?
 
-- What practical rules separate a good agent tool from a dangerous one?
-- What semantic detail belongs in a tool schema beyond plain types?
-- Why is idempotency mandatory in retry-heavy agent environments?
-- What makes a tool error directly actionable by an agent?
-- What isolation layers should protect code execution, file access, and shell tools?
-
-> Strong capability is not enough. Agent tools must be easy to call correctly and hard to misuse disastrously.
+## Big Picture
 
 ![Tool harness - designing safe tools for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
 
 *Tool harness - designing safe tools for agents*
+
+This picture shows tool names, schemas, errors, permissions, and sandboxes designed so the agent can choose and call tools safely. A good tool is not just an interface for a smart model; it is a work surface that is hard to misuse.
+
+> The quality of a Tool Harness is shown not by whether the agent can use a tool, but by whether it is hard to use the tool incorrectly.
+
 ## Tools Are an Agent's Hands and Feet
 
 Tools determine what an agent can do. Without tools, an agent is just a text-generating model. DB queries, file writes, API calls, code execution — all are tools. The agent's range of action is exactly the range of its tools.
@@ -334,19 +335,28 @@ Shell execution, file writes, and unbounded HTTP calls cause production incident
 - [ ] Standardize What/Why/How/retryable in tool errors so agents can recover intelligently.
 - [ ] Require sandboxing for code execution and unrestricted file or network access.
 
+## Answering the Opening Questions
+
+- **What surface should a Tool Harness create so the agent can use tools correctly?**
+  - Names, descriptions, input schemas, output shape, and errors should be narrow and explicit enough to guide selection and recovery.
+- **What operational problems do schema design, idempotency, and actionable errors each reduce?**
+  - Schema design reduces bad arguments, idempotency reduces damage from repeated calls, and actionable errors help the agent choose the next step.
+- **What boundaries are needed when dangerous tools must run inside a sandbox?**
+  - Bound allowed commands, file and network permissions, timeouts, dry-run behavior, audit logs, and rollback paths.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- **Tool Harness — Designing Safe Tools for Agents (current)**
-- Test Harness — Turning Completion Criteria into Tests (upcoming)
-- Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
-- Approval Gates — Designing Where Humans Must Approve (upcoming)
-- Observability — Tracing and Replaying Agent Work (upcoming)
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- **Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (current)**
+- Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)
+- Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)
+- Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)
+- Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

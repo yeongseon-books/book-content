@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Approval Gates — Designing Where Humans Must Approve</title>
+<title>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Approval Gates — Designing Where Humans Must Approve</h1>
+<h1>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve</h1>
 <p>The moment agent automation starts creating real business value, a harder question follows immediately: which actions may flow through automatically, and which actions must stop in front of a human? If you cannot answer that question clearly, the automation reads as latent incident potential.</p>
 <p>Payments, deploys, deletes, and outbound communication are not just another class of output. They are irreversible or high-liability actions. The right question is not “is the model usually right?” but “where does a human decision belong even when the model looks confident?”</p>
 <p>This is post 8 in the Harness Engineering 101 series. It defines Approval Gates as an operating protocol inside the agent loop rather than a vague promise of manual review.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How is an Approval Gate different from generic manual review?</li>
-<li>Which actions should stop for human approval before execution?</li>
-<li>What information makes an approval request easy to decide quickly and correctly?</li>
-<li>Why is dry-run versus commit separation so valuable for risky tools?</li>
-<li>Why does approval logging matter as much as the action itself?</li>
+<li>What decision authority does an Approval Gate structure instead of merely blocking automation?</li>
+<li>Which actions can stay in dry-run, and which require human approval?</li>
+<li>What must approval logs preserve so the decision can be reconstructed later?</li>
 </ul>
-<blockquote>
-<p>The point of an Approval Gate is not to fight automation. It is to restore human accountability exactly where only humans should own the risk.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Approval gates - designing where humans must approve" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png"></p>
 <p><em>Approval gates - designing where humans must approve</em></p>
+<p>This picture shows risky actions pausing at an approval point where a human reviews evidence and approves or rejects the step. An Approval Gate is not just a speed bump; it is the boundary that preserves authorized decisions safely.</p>
+<blockquote>
+<p>The purpose of an Approval Gate is not to abandon automation, but to put human decision authority at irreversible or high-risk actions.</p>
+</blockquote>
 <h2>What Is an Approval Gate?</h2>
 <p><img alt="What is an approval Gate" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-02-what-is-an-approval-gate.en.png"></p>
 <p><em>What is an approval Gate</em><br>
@@ -244,18 +243,27 @@ class ApprovalLog:
 <li>[ ] Record who decided, when, why, and what actually executed in the approval log.</li>
 </ul>
 <p>The next post covers Observability — how to record, trace, and replay agent runs.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What decision authority does an Approval Gate structure instead of merely blocking automation?</strong></li>
+<li>It structures authority for actions that are hard to undo or high-accountability: data changes, external sends, spending, or permission escalation.</li>
+<li><strong>Which actions can stay in dry-run, and which require human approval?</strong></li>
+<li>Reads, suggestions, and previews can often stay in dry-run. Real changes, payments, deletion, and customer-visible actions need human approval.</li>
+<li><strong>What must approval logs preserve so the decision can be reconstructed later?</strong></li>
+<li>Logs should preserve who approved, when, which input, diff, and risk summary they reviewed, and what execution followed approval.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What the Agent Should Know and Not Know</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness — Designing Safe Tools for Agents</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness — Turning Completion Criteria into Tests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
-<li><strong>Approval Gates — Designing Where Humans Must Approve (current)</strong></li>
-<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
+<li><strong>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (current)</strong></li>
+<li>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

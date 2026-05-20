@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Production Harness — Building Operational Environments for Agents</title>
+<title>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Production Harness — Building Operational Environments for Agents</h1>
+<h1>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents</h1>
 <p>Individual harnesses can look solid in isolation and still fail once they are assembled into one production path. A new prompt affects evals. A new tool changes approval rules. A retry path changes traces, paging, and rollback expectations. In production, the integration points cause more incidents than the parts themselves.</p>
 <p>That is why the final step is not “add one more pattern.” It is defining how all prior harnesses move together through request handling, canary rollout, rollback, and on-call response.</p>
 <p>This is the final post in the Harness Engineering 101 series. It binds Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability into one deployable operating stack.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do the previous harnesses fit together inside one request flow?</li>
-<li>Why do systems fail in production even when individual harnesses look fine on paper?</li>
-<li>Why should prompt and tool changes never jump to 100% traffic immediately?</li>
-<li>Why is rollback a minimum operating requirement rather than a nice-to-have feature?</li>
-<li>Why should runbooks and eval suites move with the same version as prompts and tools?</li>
+<li>How does a Production Harness tie the separate harnesses into one deployable operating stack?</li>
+<li>Why must gradual rollout and rollback be part of agent-system design?</li>
+<li>What execution information must a runbook contain for a 3 AM incident?</li>
 </ul>
-<blockquote>
-<p>A production agent is not just a pile of harnesses. It is a versioned operating stack that can be deployed, observed, and rolled back safely.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Production harness - building operational environments for agents" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png"></p>
 <p><em>Production harness - building operational environments for agents</em></p>
+<p>This picture connects task, context, constraints, tools, tests, feedback, approval, and observability into a deployable Production Harness. An operable agent needs the individual harnesses plus rollout, rollback, and on-call procedures as one system.</p>
+<blockquote>
+<p>A Production Harness is not final decoration for an agent; it is the operating stack that lets changes be deployed, rolled back, and explained safely.</p>
+</blockquote>
 <h2>What Is the Production Harness?</h2>
 <p>The Production Harness is the final layer that binds the nine harnesses we have covered into one operable system. No matter how well each individual harness is built, without deployment, rollback, and on-call flow it cannot reach real users safely.</p>
 <pre><code class="language-python">from dataclasses import dataclass
@@ -229,18 +228,27 @@ class HarnessRouter:
 <li>[ ] Keep the on-call runbook in the repo and validate it with regular fire drills.</li>
 </ul>
 <p>This is the final post in the series. Combining the nine harnesses from Harness Engineering 101 with this production layer is what turns "a demo that looks good but breaks in production" into "an agent users trust."</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How does a Production Harness tie the separate harnesses into one deployable operating stack?</strong></li>
+<li>Connect each harness input, output, validation, approval, and observability signal inside the deployment pipeline so they form one operating boundary.</li>
+<li><strong>Why must gradual rollout and rollback be part of agent-system design?</strong></li>
+<li>Agent changes alter probabilistic behavior and external tool effects, so rollout must be gradual and rollback must be immediately available.</li>
+<li><strong>What execution information must a runbook contain for a 3 AM incident?</strong></li>
+<li>The runbook needs recent deployments, feature flags, trace lookup, cost and error signals, approval-bypass checks, rollback commands, and escalation rules.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What the Agent Should Know and Not Know</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness — Designing Safe Tools for Agents</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness — Turning Completion Criteria into Tests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Approval Gates — Designing Where Humans Must Approve</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/09-observability.md">Observability — Tracing and Replaying Agent Work</a></li>
-<li><strong>Production Harness — Building Operational Environments for Agents (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/09-observability.md">Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work</a></li>
+<li><strong>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>

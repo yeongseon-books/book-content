@@ -1,5 +1,5 @@
 ---
-title: Observability — Tracing and Replaying Agent Work
+title: "Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work"
 series: harness-engineering-101
 episode: 9
 language: en
@@ -19,7 +19,7 @@ seo_description: If you cannot see what the agent did, you cannot debug it or im
   it.
 ---
 
-# Observability — Tracing and Replaying Agent Work
+# Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work
 
 Many agent systems still preserve only the final answer string. That is enough to impress someone in a demo and almost useless when an incident starts. Once a real run includes retrieval, tool calls, retries, reflection, approval, and cost controls, the final answer alone is not an explanation.
 
@@ -27,21 +27,22 @@ Operationally, the real requirement is stronger: after a bad run, you must be ab
 
 This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- How should an Observability Harness let you reconstruct an agent run later?
+- What operational questions do traces, replay, and cost-latency dashboards each answer?
+- Which signals deserve alerts that wake a human?
 
-- How do traces and spans represent one agent execution end to end?
-- What inputs and reasoning context must be logged in addition to final output?
-- What makes a run replayable instead of merely inspectable?
-- Why do p95 latency and per-run cost matter more than simple averages?
-- Which anomalies deserve paging and which belong only in dashboards or reports?
-
-> Logging the answer is not enough. Observability begins when you can reconstruct the run, not just read the result.
+## Big Picture
 
 ![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 
 *Observability - tracing and replaying agent work*
+
+This picture shows agent work being recorded as traces, replay data, and cost-latency metrics so the run can be reconstructed later. An Observability Harness stores evidence of why a run unfolded that way, not just the final answer.
+
+> An observable agent can explain not only what it answered, but which input, context, tools, costs, and decisions produced that answer.
+
 ## What Is Observability?
 
 Observability is the ability to reconstruct, from the outside, what an agent did, why it did it, and how. It is not just "leave logs around" — when an incident happens, you must be able to trace and reproduce the decision made at that moment.
@@ -249,19 +250,28 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 
 The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.
 
+## Answering the Opening Questions
+
+- **How should an Observability Harness let you reconstruct an agent run later?**
+  - Tie request id, input, context snapshot, tool calls, intermediate decisions, cost, latency, errors, and final result into one trace.
+- **What operational questions do traces, replay, and cost-latency dashboards each answer?**
+  - Traces answer path questions, replay answers reproducibility questions, and dashboards expose trends and bottlenecks in cost, latency, and errors.
+- **Which signals deserve alerts that wake a human?**
+  - Alerts should fire for user-impacting failure spikes, runaway cost, repeated tool failures, approval bypass attempts, and rollback failures.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
-- [Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
-- [Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
-- **Observability — Tracing and Replaying Agent Work (current)**
-- Production Harness — Building Operational Environments for Agents (upcoming)
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- [Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
+- [Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
+- **Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (current)**
+- Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)
 
 <!-- toc:end -->
 

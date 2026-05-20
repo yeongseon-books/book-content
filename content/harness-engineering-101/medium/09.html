@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Observability — Tracing and Replaying Agent Work</title>
+<title>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Observability — Tracing and Replaying Agent Work</h1>
+<h1>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work</h1>
 <p>Many agent systems still preserve only the final answer string. That is enough to impress someone in a demo and almost useless when an incident starts. Once a real run includes retrieval, tool calls, retries, reflection, approval, and cost controls, the final answer alone is not an explanation.</p>
 <p>Operationally, the real requirement is stronger: after a bad run, you must be able to reconstruct what the agent saw, what it decided, what it called, how long each step took, and where the cost spiked.</p>
 <p>This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do traces and spans represent one agent execution end to end?</li>
-<li>What inputs and reasoning context must be logged in addition to final output?</li>
-<li>What makes a run replayable instead of merely inspectable?</li>
-<li>Why do p95 latency and per-run cost matter more than simple averages?</li>
-<li>Which anomalies deserve paging and which belong only in dashboards or reports?</li>
+<li>How should an Observability Harness let you reconstruct an agent run later?</li>
+<li>What operational questions do traces, replay, and cost-latency dashboards each answer?</li>
+<li>Which signals deserve alerts that wake a human?</li>
 </ul>
-<blockquote>
-<p>Logging the answer is not enough. Observability begins when you can reconstruct the run, not just read the result.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Observability - tracing and replaying agent work" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png"></p>
 <p><em>Observability - tracing and replaying agent work</em></p>
+<p>This picture shows agent work being recorded as traces, replay data, and cost-latency metrics so the run can be reconstructed later. An Observability Harness stores evidence of why a run unfolded that way, not just the final answer.</p>
+<blockquote>
+<p>An observable agent can explain not only what it answered, but which input, context, tools, costs, and decisions produced that answer.</p>
+</blockquote>
 <h2>What Is Observability?</h2>
 <p>Observability is the ability to reconstruct, from the outside, what an agent did, why it did it, and how. It is not just "leave logs around" — when an incident happens, you must be able to trace and reproduce the decision made at that moment.</p>
 <pre><code class="language-python">from dataclasses import dataclass, field
@@ -245,18 +244,27 @@ def aggregate(spans: list[Span]) -&gt; AgentMetrics:
 <li>[ ] Page only on material baseline-relative spikes to avoid alert fatigue.</li>
 </ul>
 <p>The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How should an Observability Harness let you reconstruct an agent run later?</strong></li>
+<li>Tie request id, input, context snapshot, tool calls, intermediate decisions, cost, latency, errors, and final result into one trace.</li>
+<li><strong>What operational questions do traces, replay, and cost-latency dashboards each answer?</strong></li>
+<li>Traces answer path questions, replay answers reproducibility questions, and dashboards expose trends and bottlenecks in cost, latency, and errors.</li>
+<li><strong>Which signals deserve alerts that wake a human?</strong></li>
+<li>Alerts should fire for user-impacting failure spikes, runaway cost, repeated tool failures, approval bypass attempts, and rollback failures.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What the Agent Should Know and Not Know</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness — Designing Safe Tools for Agents</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness — Turning Completion Criteria into Tests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Approval Gates — Designing Where Humans Must Approve</a></li>
-<li><strong>Observability — Tracing and Replaying Agent Work (current)</strong></li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/07-feedback-loop.md">Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/08-approval-gate.md">Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve</a></li>
+<li><strong>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (current)</strong></li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

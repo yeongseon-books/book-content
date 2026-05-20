@@ -1,5 +1,5 @@
 ---
-title: Production Harness — Building Operational Environments for Agents
+title: "Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents"
 series: harness-engineering-101
 episode: 10
 language: en
@@ -19,7 +19,7 @@ seo_description: The Production Harness is the final layer that binds the nine h
   we have covered into one operable system.
 ---
 
-# Production Harness — Building Operational Environments for Agents
+# Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents
 
 Individual harnesses can look solid in isolation and still fail once they are assembled into one production path. A new prompt affects evals. A new tool changes approval rules. A retry path changes traces, paging, and rollback expectations. In production, the integration points cause more incidents than the parts themselves.
 
@@ -27,21 +27,22 @@ That is why the final step is not “add one more pattern.” It is defining how
 
 This is the final post in the Harness Engineering 101 series. It binds Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability into one deployable operating stack.
 
----
+## Questions to Keep in Mind
 
-## Questions this chapter answers
+- How does a Production Harness tie the separate harnesses into one deployable operating stack?
+- Why must gradual rollout and rollback be part of agent-system design?
+- What execution information must a runbook contain for a 3 AM incident?
 
-- How do the previous harnesses fit together inside one request flow?
-- Why do systems fail in production even when individual harnesses look fine on paper?
-- Why should prompt and tool changes never jump to 100% traffic immediately?
-- Why is rollback a minimum operating requirement rather than a nice-to-have feature?
-- Why should runbooks and eval suites move with the same version as prompts and tools?
-
-> A production agent is not just a pile of harnesses. It is a versioned operating stack that can be deployed, observed, and rolled back safely.
+## Big Picture
 
 ![Production harness - building operational environments for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
 
 *Production harness - building operational environments for agents*
+
+This picture connects task, context, constraints, tools, tests, feedback, approval, and observability into a deployable Production Harness. An operable agent needs the individual harnesses plus rollout, rollback, and on-call procedures as one system.
+
+> A Production Harness is not final decoration for an agent; it is the operating stack that lets changes be deployed, rolled back, and explained safely.
+
 ## What Is the Production Harness?
 
 The Production Harness is the final layer that binds the nine harnesses we have covered into one operable system. No matter how well each individual harness is built, without deployment, rollback, and on-call flow it cannot reach real users safely.
@@ -234,19 +235,28 @@ Register this stack with `HarnessRouter`, deploy it 1% → 100% through `CanaryD
 
 This is the final post in the series. Combining the nine harnesses from Harness Engineering 101 with this production layer is what turns "a demo that looks good but breaks in production" into "an agent users trust."
 
+## Answering the Opening Questions
+
+- **How does a Production Harness tie the separate harnesses into one deployable operating stack?**
+  - Connect each harness input, output, validation, approval, and observability signal inside the deployment pipeline so they form one operating boundary.
+- **Why must gradual rollout and rollback be part of agent-system design?**
+  - Agent changes alter probabilistic behavior and external tool effects, so rollout must be gradual and rollback must be immediately available.
+- **What execution information must a runbook contain for a 3 AM incident?**
+  - The runbook needs recent deployments, feature flags, trace lookup, cost and error signals, approval-bypass checks, rollback commands, and escalation rules.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Harness Engineering?](./01-what-is-harness-engineering.md)
-- [Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
-- [Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
-- [Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
-- [Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
-- [Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
-- [Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
-- [Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
-- [Observability — Tracing and Replaying Agent Work](./09-observability.md)
-- **Production Harness — Building Operational Environments for Agents (current)**
+- [Harness Engineering 101 (1/10): What Is Harness Engineering?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents](./05-tool-harness.md)
+- [Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests](./06-test-harness.md)
+- [Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure](./07-feedback-loop.md)
+- [Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve](./08-approval-gate.md)
+- [Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work](./09-observability.md)
+- **Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (current)**
 
 <!-- toc:end -->
 

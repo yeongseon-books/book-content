@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Feedback Loops — Building Structures That Let Agents Recover from Failure</title>
+<title>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Feedback Loops — Building Structures That Let Agents Recover from Failure</h1>
+<h1>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure</h1>
 <p>Agents frequently fail on the first attempt. They choose the wrong tool, pass the wrong arguments, violate an output policy, or claim completion too early. The important distinction is not whether failure exists. It is whether the system can convert failure into a better next attempt.</p>
 <p>Retrying blindly is usually just a cost amplifier. Returning the raw failure to the user is even worse. Productive feedback loops classify failure, choose the right recovery path, and stop before one task turns into an unbounded loop.</p>
 <p>This is post 7 in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why is it wasteful to handle every failure with the same retry logic?</li>
-<li>How do you decide between retry and reflect?</li>
-<li>What information should a reflect message include and exclude?</li>
-<li>How do loops turn into cost incidents if they lack exit conditions?</li>
-<li>What should be stored so the agent avoids repeating the same failure pattern later?</li>
+<li>What input should a Feedback Loop turn failure into instead of treating it as a stop signal?</li>
+<li>Where do simple retry and reflection diverge, and when should each be used?</li>
+<li>What limits and memory must remain inside the loop to prevent infinite retries?</li>
 </ul>
-<blockquote>
-<p>A good agent is not one that never fails. It is one that turns failure into a controlled improvement signal.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Feedback loops - building structures that let agents recover from failure" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png"></p>
 <p><em>Feedback loops - building structures that let agents recover from failure</em></p>
+<p>This picture shows failure being structured into retry or reflection messages that become input for the next attempt. A Feedback Loop is not a device for running the agent forever; it is a control structure that turns failure into a better next action.</p>
+<blockquote>
+<p>A good feedback loop does not merely try again; it makes the next attempt different because the system knows why the previous one failed.</p>
+</blockquote>
 <h2>No Agent Succeeds on the First Try</h2>
 <p>Agents fail often on the first attempt. They call the wrong tool, pass wrong arguments, produce malformed output. How you handle that failure decides production quality.</p>
 <p>The worst pattern is returning the failure to the user as is. The second worst is retrying the same call unchanged. The good pattern is feeding the failure cause back to the agent so the next attempt improves.</p>
@@ -299,18 +298,27 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 <li>[ ] Cap attempts, cumulative cost, and repeated failure patterns together.</li>
 <li>[ ] Escalate unresolved loops to humans and record failure memory for the next run.</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What input should a Feedback Loop turn failure into instead of treating it as a stop signal?</strong></li>
+<li>It should become structured input: failure reason, observed evidence, constraints to change, and actions forbidden on the next attempt.</li>
+<li><strong>Where do simple retry and reflection diverge, and when should each be used?</strong></li>
+<li>Retry fits transient errors where the same action may succeed. Reflection fits bad plans or judgments where the next action must change.</li>
+<li><strong>What limits and memory must remain inside the loop to prevent infinite retries?</strong></li>
+<li>Keep max attempts, cost limits, failure memory, stop conditions, and human-escalation rules inside the loop.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Task Harness — Turning Vague Work into Executable Tasks</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Context Harness — Designing What the Agent Should Know and Not Know</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Tool Harness — Designing Safe Tools for Agents</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Test Harness — Turning Completion Criteria into Tests</a></li>
-<li><strong>Feedback Loops — Building Structures That Let Agents Recover from Failure (current)</strong></li>
-<li>Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
-<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/02-task-harness.md">Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/03-context-harness.md">Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/04-constraint-harness.md">Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/05-tool-harness.md">Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/06-test-harness.md">Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests</a></li>
+<li><strong>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (current)</strong></li>
+<li>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
+<li>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

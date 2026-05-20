@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Task Harness — Turning Vague Work into Executable Tasks</title>
+<title>Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Task Harness — Turning Vague Work into Executable Tasks</h1>
+<h1>Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks</h1>
 <p>The fastest way to make an agent expensive is to ask it to do a vague job. Humans respond to ambiguity by asking back. Agents usually respond by filling in the blanks on their own.</p>
 <p>Those blanks quickly turn into concrete risk: the wrong data source, the wrong output format, the wrong completion bar, or the wrong scope of work. Once that ambiguity reaches tool calls, quality issues become cost incidents.</p>
 <p>This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why should you separate a business goal from an agent task?</li>
-<li>Which fields are the minimum for an executable TaskSpec?</li>
-<li>How do you decide that a task is too large and must be decomposed?</li>
-<li>How do natural-language completion conditions become machine-checkable criteria?</li>
-<li>Why should prompts, verifiers, and eval datasets derive from the same TaskSpec?</li>
+<li>What breaks at execution time when a vague goal is handed directly to an agent?</li>
+<li>What executable unit and completion criteria should a Task Harness translate the goal into?</li>
+<li>What evidence should a good task spec leave for the next agent run and for human review?</li>
 </ul>
-<blockquote>
-<p>Goals tell the business where to go. Tasks tell the agent what to do now. Task Harness is the layer that turns one into the other.</p>
-</blockquote>
+<h2>Big Picture</h2>
 <p><img alt="Task harness - turning vague work into executable tasks" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png"></p>
 <p><em>Task harness - turning vague work into executable tasks</em></p>
+<p>This picture shows a vague request passing through the Task Harness and becoming an executable task with inputs, constraints, and completion criteria. An agent works better when a goal is translated into a task instead of thrown at the model as-is.</p>
+<blockquote>
+<p>A Task Harness turns “what do we want?” into “what must be executed, and how will completion be proven?”</p>
+</blockquote>
 <h2>Vague Work Cannot Be Executed</h2>
 <p>Hand "tidy up our team report" to an agent and the result is not guaranteed. Which report? Where do you fetch it from? Does "tidy up" mean summarize, restructure, or convert format? A human would ask back. An agent does not. It guesses. And it guesses wrong.</p>
 <p>Task Harness is the design that converts vague work into an executable task with explicit inputs, outputs, and completion criteria. Without this conversion, every other harness loses its meaning. Context, Constraint, and Test all start from "what task is this for?"</p>
@@ -324,18 +323,27 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 <li>[ ] Send missing fields back as clarifying questions instead of letting the agent guess.</li>
 <li>[ ] Generate prompts, verifiers, and eval cases from the same TaskSpec.</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What breaks at execution time when a vague goal is handed directly to an agent?</strong></li>
+<li>The agent invents scope, success criteria, and forbidden actions, which leads to missing work, loops, or premature completion.</li>
+<li><strong>What executable unit and completion criteria should a Task Harness translate the goal into?</strong></li>
+<li>It should define the task goal, inputs, allowed scope, output format, completion criteria, and stop conditions for failure.</li>
+<li><strong>What evidence should a good task spec leave for the next agent run and for human review?</strong></li>
+<li>The spec should record what was executed, which criteria proved completion, and which inputs and constraints were used so review and reruns are possible.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
-<li><strong>Task Harness — Turning Vague Work into Executable Tasks (current)</strong></li>
-<li>Context Harness — Designing What the Agent Should Know and Not Know (upcoming)</li>
-<li>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
-<li>Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
-<li>Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
-<li>Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
-<li>Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
-<li>Observability — Tracing and Replaying Agent Work (upcoming)</li>
-<li>Production Harness — Building Operational Environments for Agents (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">Harness Engineering 101 (1/10): What Is Harness Engineering?</a></li>
+<li><strong>Harness Engineering 101 (2/10): Task Harness — Turning Vague Work into Executable Tasks (current)</strong></li>
+<li>Harness Engineering 101 (3/10): Context Harness — Designing What the Agent Should Know and Not Know (upcoming)</li>
+<li>Harness Engineering 101 (4/10): Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions (upcoming)</li>
+<li>Harness Engineering 101 (5/10): Tool Harness — Designing Safe Tools for Agents (upcoming)</li>
+<li>Harness Engineering 101 (6/10): Test Harness — Turning Completion Criteria into Tests (upcoming)</li>
+<li>Harness Engineering 101 (7/10): Feedback Loops — Building Structures That Let Agents Recover from Failure (upcoming)</li>
+<li>Harness Engineering 101 (8/10): Approval Gates — Designing Where Humans Must Approve (upcoming)</li>
+<li>Harness Engineering 101 (9/10): Observability — Tracing and Replaying Agent Work (upcoming)</li>
+<li>Harness Engineering 101 (10/10): Production Harness — Building Operational Environments for Agents (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

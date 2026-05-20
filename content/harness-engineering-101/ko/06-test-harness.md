@@ -1,5 +1,5 @@
 ---
-title: Test Harness — 완료 조건을 테스트로 고정하기
+title: "Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기"
 series: harness-engineering-101
 episode: 6
 language: ko
@@ -17,31 +17,40 @@ tags:
 last_reviewed: '2026-05-14'
 seo_description: Agent가 "끝났습니다"라고 말해도 정말 끝났는지는 테스트가 결정합니다.
 ---
-# Test Harness — 완료 조건을 테스트로 고정하기
+
+# Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기
 에이전트 데모는 대개 잘 동작합니다. 입력이 몇 개 없고, 설계자가 기대한 경로로만 흘러가기 때문입니다. 하지만 실제 사용자 요청이 들어오기 시작하면 그 데모 품질은 놀랄 만큼 빨리 무너집니다.
 문제는 에이전트가 끝났다고 말하는 순간을 그대로 믿기 쉽다는 데 있습니다. 자연어로 된 "완료했습니다"는 증거가 아닙니다. 완료 조건을 자동 검증 가능한 테스트로 바꾸지 않으면 시스템은 매 릴리스마다 조용히 나빠집니다.
 Test Harness는 이 조용한 품질 하락을 막는 층입니다. 무엇을 통과로 볼지 고정하고, 그 기준을 unit, integration, eval로 나눠 반복 실행하게 만듭니다.
 이 글은 Harness Engineering 101 시리즈의 6번째 글입니다.
 에이전트 품질은 느낌이 아니라 반복 가능한 테스트 결과로 관리해야 합니다.
-## 이 글에서 다룰 문제
-- 에이전트 테스트는 전통적인 소프트웨어 테스트와 무엇이 같고 무엇이 다를까요?
-- 왜 unit, integration, eval 세 층을 따로 가져가야 할까요?
-- eval 데이터셋은 어디에서 가져와야 현실적인 품질을 볼 수 있을까요?
-- 정답이 하나가 아닌 에이전트 출력을 어떻게 점수화할 수 있을까요?
-- 테스트를 CI에 연결하지 않으면 어떤 문제가 생길까요?
+## 먼저 던지는 질문
+
+- Test Harness는 완료 조건을 자연어 약속에서 무엇으로 바꿔야 할까요?
+- unit, trajectory, end-to-end 테스트는 각각 어떤 agent 실패를 잡을까요?
+- eval dataset과 regression check는 운영 전에 어떻게 연결되어야 할까요?
+
+## 큰 그림
+
+![Test Harness - 완료 조건을 테스트로 고정하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.ko.png)
+
+*Test Harness - 완료 조건을 테스트로 고정하기*
+
+이 그림에서는 완료 조건이 테스트와 eval dataset, regression check로 바뀌는 흐름을 봅니다. Test Harness는 “잘 된 것 같다”를 실행 가능한 검증으로 바꾸어 agent 변경을 안전하게 만듭니다.
+
+> Test Harness는 agent가 한 번 맞혔다는 사실보다, 다음 변경 뒤에도 같은 기준을 통과하는지 증명하는 구조입니다.
+
 ## 왜 이 글이 중요한가
 Test Harness가 중요한 첫 번째 이유는 증거입니다. 데모에서 몇 번 잘 나온다는 사실은 실제 운영 품질을 보장하지 않습니다. 반복 가능한 체크가 있어야만 변경 전후를 비교할 수 있습니다.
 두 번째 이유는 회귀 방지입니다. 프롬프트, 모델, 도구, 정책 어느 하나가 바뀌어도 품질은 쉽게 흔들립니다. 자동 테스트가 없으면 이 흔들림은 실제 사용자에게 먼저 발견됩니다.
 세 번째 이유는 디버깅 비용입니다. Unit이 없으면 어디가 깨졌는지 찾기 어렵고, eval이 없으면 전체 품질이 좋아졌는지 나빠졌는지 판단할 수 없습니다. 세 층은 서로 대체 관계가 아닙니다.
-## Test Harness를 이해하는 가장 좋은 방법: 완료 조건을 자연어 약속에서 실행 가능한 검증으로 바꾸는 일로 보는 것입니다
+## 핵심 관점
 에이전트는 전통적인 함수보다 비결정성이 크기 때문에 더 엄격한 검증 체계가 필요합니다. 같은 의미를 다른 문장으로 표현할 수 있고, 때로는 작은 프롬프트 변경이 전체 행동을 바꿉니다.
 그래서 Test Harness는 결과를 한 가지 정답 문자열로만 보지 않습니다. 정확 매치가 가능한 부분은 그대로 검사하고, 의미 평가가 필요한 부분은 heuristic과 LLM-as-judge를 섞어 다층적으로 봅니다.
 이 글에서 가장 중요한 일은 완료 조건을 사람이 나중에 읽고 판단하도록 남겨 두지 않고, 시스템이 릴리스마다 반복 실행할 수 있는 형태로 고정하는 것입니다.
 > "잘 동작한다"는 말은 증거가 아닙니다. 자동으로 다시 돌릴 수 있는 테스트만이 증거입니다.
 ## 핵심 개념
 Agent가 "끝났습니다"라고 말해도 정말 끝났는지는 테스트가 결정합니다. Test Harness는 완료 조건을 자동 검증 가능한 테스트로 고정합니다.
-
-![Test Harness - 완료 조건을 테스트로 고정하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.ko.png)
 
 ### "잘 동작합니다"라는 말은 증거가 아닙니다
 
@@ -303,19 +312,28 @@ Test Harness는 에이전트가 끝났다고 말하는 순간을 믿지 않고, 
 중요한 것은 하나의 거대한 테스트가 아니라 세 층의 조합입니다. Unit은 디버깅을 가능하게 만들고, integration은 흐름을 보장하며, eval은 전체 품질 변화를 수치로 보여 줍니다.
 다음 글에서는 Feedback Loop를 다룹니다. 테스트가 실패했을 때 시스템은 그 실패를 사용자에게 그대로 돌려주지 않고, 다음 시도를 더 낫게 만드는 신호로 바꿔야 합니다.
 
+## 처음 질문으로 돌아가기
+
+- **Test Harness는 완료 조건을 자연어 약속에서 무엇으로 바꿔야 할까요?**
+  - 완료 조건을 사람이 읽는 약속에서 자동 실행 가능한 assertion, rubric, snapshot, eval case로 바꿔야 합니다.
+- **unit, trajectory, end-to-end 테스트는 각각 어떤 agent 실패를 잡을까요?**
+  - unit test는 tool과 작은 함수, trajectory test는 중간 경로와 tool 선택, end-to-end test는 사용자 관점의 최종 완료를 잡습니다.
+- **eval dataset과 regression check는 운영 전에 어떻게 연결되어야 할까요?**
+  - 실제 실패와 대표 요청을 eval dataset에 넣고, 코드·prompt·tool 변경마다 regression check가 자동으로 돌도록 연결해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
-- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
-- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
-- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
-- [Tool Harness — Agent가 사용할 도구를 안전하게 설계하기](./05-tool-harness.md)
-- **Test Harness — 완료 조건을 테스트로 고정하기 (현재 글)**
-- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
-- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
-- Observability — Agent 작업을 추적하고 재현하기 (예정)
-- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Harness Engineering 101 (1/10): Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
+- [Harness Engineering 101 (2/10): Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
+- [Harness Engineering 101 (3/10): Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
+- [Harness Engineering 101 (4/10): Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
+- [Harness Engineering 101 (5/10): Tool Harness — Agent가 사용할 도구를 안전하게 설계하기](./05-tool-harness.md)
+- **Harness Engineering 101 (6/10): Test Harness — 완료 조건을 테스트로 고정하기 (현재 글)**
+- Harness Engineering 101 (7/10): Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Harness Engineering 101 (8/10): Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Harness Engineering 101 (9/10): Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Harness Engineering 101 (10/10): Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
 
