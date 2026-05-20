@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 2
-title: 데이터 표현 — bit, byte, integer, floating point
+title: "Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,27 @@ seo_description: 비트와 바이트, 2의 보수, IEEE 754가 실제 버그로 
 last_reviewed: '2026-05-12'
 ---
 
-# 데이터 표현 — bit, byte, integer, floating point
+# Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point
 
 `0.1 + 0.2 == 0.3`이 왜 거짓이 되는지 이해하지 못하면 부동소수점은 늘 억울한 버그처럼 보입니다. 이 글은 Computer Architecture 101 시리즈의 두 번째 글입니다. 여기서는 컴퓨터가 모든 값을 결국 비트 패턴으로 저장한다는 사실에서 출발해, 정수와 부동소수점의 표현 한계가 실제 코드에서 어떻게 드러나는지 보겠습니다.
 
 표현 방식은 언어 문법보다 한 단계 아래에 있지만, 실제 장애는 그 아래층에서 자주 시작됩니다. 정수 오버플로, 금액 계산 오차, 비트마스크 실수는 모두 데이터가 메모리에서 어떻게 생겼는지를 놓쳐서 생깁니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 비트, 바이트, 워드는 각각 무엇일까요?
 - 음수는 왜 2의 보수로 저장할까요?
 - IEEE 754 부동소수점은 어떤 구조를 가질까요?
-- 표현 범위와 정밀도 한계는 실제 코드에서 어떻게 버그가 될까요?
 
-> 모든 값은 메모리 안에서는 결국 비트 패턴이며, 정수와 실수는 서로 다른 규칙으로 그 패턴을 해석합니다.
+## 큰 그림
+
+![Computer Architecture 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.ko.png)
+
+*Computer Architecture 101 2장 흐름 개요*
+
+이 그림에서는 데이터 표현 — bit, byte, integer, floating point를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터 표현 — bit, byte, integer, floating point의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -226,8 +233,19 @@ print(big + small - big)   # 0.0  (the small value is absorbed)
 
 다음 글에서는 이 비트 위에서 실제로 일하는 주체인 CPU와 명령어를 봅니다. ISA가 무엇이고 CPU가 한 사이클에 무엇을 하는지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **비트, 바이트, 워드는 각각 무엇일까요?**
+  - 본문의 기준은 데이터 표현 — bit, byte, integer, floating point를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **음수는 왜 2의 보수로 저장할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **IEEE 754 부동소수점은 어떤 구조를 가질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+## 시리즈 목차
+
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
 - **데이터 표현 — bit, byte, integer, floating point (현재 글)**
 - CPU와 명령어 (예정)
 - 레지스터와 ALU (예정)
@@ -237,6 +255,7 @@ print(big + small - big)   # 0.0  (the small value is absorbed)
 - I/O와 장치 (예정)
 - 병렬성과 멀티코어 (예정)
 - 성능을 이해하는 법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

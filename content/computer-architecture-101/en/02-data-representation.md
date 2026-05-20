@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 2
-title: Data Representation — Bit, Byte, Integer, Floating Point
+title: "Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How computers represent integers with two's complement and real
 last_reviewed: '2026-05-04'
 ---
 
-# Data Representation — Bit, Byte, Integer, Floating Point
+# Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point
 
 > Computer Architecture 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Why is `0.1 + 0.2 == 0.3` false — is that a Python bug, or is the computer telling the truth?
 
 > Computers store everything as bundles of zeros and ones. Integers use two's complement, real numbers use IEEE 754 floating point, and both come with limits on range and precision. This article walks through how those limits show up in real code and how to handle them deliberately.
 
-<!-- a-grade-intro:end -->
-
 This is post 2 in the Computer Architecture 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Representation — Bit, Byte, Integer, Floating Point?
+- Which signal should the example or diagram make visible for Data Representation — Bit, Byte, Integer, Floating Point?
+- What failure should be prevented first when Data Representation — Bit, Byte, Integer, Floating Point reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.en.png)
+
+*computer architecture 101 chapter 2 flow overview*
+
+This picture places Data Representation — Bit, Byte, Integer, Floating Point inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Representation — Bit, Byte, Integer, Floating Point is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -232,8 +244,19 @@ Every value in a computer is a bit pattern. Integers use two's complement, reals
 
 Next we look at what acts on these bits: the CPU and the instruction set. We will see what an ISA is and what the CPU actually does in one cycle.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Representation — Bit, Byte, Integer, Floating Point?**
+  - The article treats Data Representation — Bit, Byte, Integer, Floating Point as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Representation — Bit, Byte, Integer, Floating Point?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Representation — Bit, Byte, Integer, Floating Point reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
 - **Data Representation — Bit, Byte, Integer, Floating Point (current)**
 - CPU and Instructions (upcoming)
 - Registers and the ALU (upcoming)
@@ -243,6 +266,7 @@ Next we look at what acts on these bits: the CPU and the instruction set. We wil
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

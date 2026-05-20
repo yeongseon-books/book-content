@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>CPU and Instructions</title>
+<title>Computer Architecture 101 (3/10): CPU and Instructions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>CPU and Instructions</h1>
+<h1>Computer Architecture 101 (3/10): CPU and Instructions</h1>
+<p>When a hot loop shows up in a profiler, the next useful question is not "what syntax did I write?" but "what instructions did the compiler emit, and how is the CPU stepping through them?" That is the moment when fetch, decode, execute, and branch behavior stop sounding like textbook terms and start explaining real performance.</p>
+<p>This is post 3 in the Computer Architecture 101 series. Here we use x86-64, ARM64, and RISC-V as concrete examples of the ISA contract, then follow one small function down to the instruction stream the CPU actually runs.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying CPU and Instructions?</li>
+<li>Which signal should the example or diagram make visible for CPU and Instructions?</li>
+<li>What failure should be prevented first when CPU and Instructions reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer architecture 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png"></p>
+<p><em>computer architecture 101 chapter 3 flow overview</em></p>
+<p>This picture places CPU and Instructions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Computer Architecture 101 series (3/10)</p>
+<p>The core of CPU and Instructions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a CPU actually do in one cycle, and how does that single cycle connect to the code we write?</p>
-<blockquote>
-<p>The CPU pulls one instruction at a time from memory, decodes it, and executes it. The contract that defines which instructions exist and how they are encoded is called the ISA. x86-64, ARM, and RISC-V are different versions of that contract. This article walks the cycle end to end and shows what your code actually becomes.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the Computer Architecture 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The fetch-decode-execute cycle</li>
@@ -82,24 +85,7 @@
 <blockquote>
 <p>Each cycle the CPU (1) fetches the instruction at the address in PC, (2) decodes its bit pattern, and (3) executes it. PC then moves to the next instruction unless a branch redirects it.</p>
 </blockquote>
-<pre><code class="language-text">            +------ Fetch ------+
-            |                   |
-            |   PC --&gt; Memory   |
-            |        |          |
-            |        v          |
-            |   Instruction     |
-            +---------+---------+
-                      |
-                      v
-            +------ Decode -----+
-            |   opcode + operand|
-            +---------+---------+
-                      |
-                      v
-            +------ Execute ----+
-            | ALU / Mem / Branch|
-            +-------------------+
-</code></pre>
+<p><strong>CPU fetch decode execute</strong></p>
 <h2>Key Terms</h2>
 <p><strong>ISA</strong><br>
 - Description: The contract for the instruction format</p>
@@ -146,86 +132,109 @@ print(&quot;--- add_with_check ---&quot;)
 dis.dis(add_with_check)
 </code></pre>
 <p>A single <code>if</code> becomes a few comparisons, branches, and jumps. The instruction count grows quickly with checks.</p>
-<p><strong>Step 2: Build a tiny fetch-decode-execute simulator</strong></p>
-<pre><code class="language-python">class TinyCPU:
-    &quot;&quot;&quot;Toy CPU: memory, registers, and PC.&quot;&quot;&quot;
-    def __init__(self, program):
-        self.memory = list(program)
-        self.regs = {&quot;R0&quot;: 0, &quot;R1&quot;: 0, &quot;R2&quot;: 0}
-        self.pc = 0
-
-    def step(self):
-        instr = self.memory[self.pc]   # fetch
-        op, *args = instr              # decode
-        if op == &quot;MOV&quot;:
-            self.regs[args[0]] = args[1]
-        elif op == &quot;ADD&quot;:
-            self.regs[args[0]] = self.regs[args[1]] + self.regs[args[2]]
-        elif op == &quot;PRINT&quot;:
-            print(self.regs[args[0]])
-        self.pc += 1                   # advance PC
-
-cpu = TinyCPU([
-    (&quot;MOV&quot;, &quot;R0&quot;, 3),
-    (&quot;MOV&quot;, &quot;R1&quot;, 5),
-    (&quot;ADD&quot;, &quot;R2&quot;, &quot;R0&quot;, &quot;R1&quot;),
-    (&quot;PRINT&quot;, &quot;R2&quot;),
-])
-for _ in range(4):
-    cpu.step()
-</code></pre>
-<p>Every CPU repeats these three steps. Real CPUs do the same thing about 100 million times faster than this simulator.</p>
-<p><strong>Step 3: Add branch instructions</strong></p>
-<pre><code class="language-python">class TinyCPU2(TinyCPU):
-    def step(self):
-        instr = self.memory[self.pc]
-        op, *args = instr
-        if op == &quot;JMP&quot;:
-            self.pc = args[0]          # move PC directly
-            return
-        if op == &quot;JNZ&quot;:                # jump if non-zero
-            if self.regs[args[0]] != 0:
-                self.pc = args[1]
-                return
-        super().step()
-        return
-</code></pre>
-<p>With branches PC no longer just advances by one. This is the entry point for the next article on pipelining and branch prediction.</p>
-<p><strong>Step 4: Categorize instruction types</strong></p>
-<pre><code class="language-python">INSTRUCTION_CATEGORIES = {
-    &quot;Arithmetic/Logic&quot;: [&quot;ADD&quot;, &quot;SUB&quot;, &quot;MUL&quot;, &quot;DIV&quot;, &quot;AND&quot;, &quot;OR&quot;, &quot;XOR&quot;, &quot;SHL&quot;, &quot;SHR&quot;],
-    &quot;Memory&quot;:           [&quot;LOAD&quot;, &quot;STORE&quot;, &quot;MOV&quot;],
-    &quot;Branch&quot;:           [&quot;JMP&quot;, &quot;JNZ&quot;, &quot;JE&quot;, &quot;CALL&quot;, &quot;RET&quot;],
-    &quot;Special&quot;:          [&quot;NOP&quot;, &quot;HLT&quot;, &quot;SYSCALL&quot;],
+<p><strong>Step 2: Compile one loop and read the real x86-64 listing</strong></p>
+<pre><code class="language-c">int count_positive(int *arr, int n) {
+    int s = 0;
+    for (int i = 0; i &lt; n; ++i) {
+        if (arr[i] &gt; 0) s += arr[i];
+    }
+    return s;
 }
-
-for cat, ops in INSTRUCTION_CATEGORIES.items():
-    print(f&quot;{cat}: {', '.join(ops)}&quot;)
 </code></pre>
-<p>Most ISAs offer these four categories. They differ in encoding, count, and per-cycle cost.</p>
-<p><strong>Step 5: Read real compiler output</strong></p>
-<pre><code class="language-text"># C source compiled with gcc -O2 -S (excerpt)
-#
-# int sum_to_n(int n) {
-#     int s = 0;
-#     for (int i = 1; i &lt;= n; i++) s += i;
-#     return s;
-# }
-#
-# The compiler rewrites the loop as n * (n + 1) / 2:
-#
-#   lea     eax, [rdi + 1]
-#   imul    eax, edi
-#   sar     eax, 1
-#   ret
+<pre><code class="language-bash">clang -target x86_64-apple-macos14 -S -O0 -x c count_positive.c -o -
+clang -target x86_64-apple-macos14 -S -O2 -fno-vectorize -fno-slp-vectorize -fno-unroll-loops -x c count_positive.c -o -
 </code></pre>
-<p>A whole loop can collapse into a single multiply. Compilers are very good at instruction reduction; reading their output makes collaboration easy.</p>
+<pre><code class="language-text"># x86-64, -O0 (excerpt)
+movl    $0, -16(%rbp)      # s lives on the stack
+movl    $0, -20(%rbp)      # i lives on the stack
+LBB0_1:
+movl    -20(%rbp), %eax
+cmpl    -12(%rbp), %eax
+jge     LBB0_6
+cmpl    $0, (%rax,%rcx,4)
+jle     LBB0_4
+addl    -16(%rbp), %eax
+movl    %eax, -16(%rbp)
+</code></pre>
+<pre><code class="language-text"># x86-64, -O2 (excerpt)
+testl   %esi, %esi
+jle     LBB0_1
+LBB0_4:
+movl    (%rdi,%rsi,4), %r8d
+testl   %r8d, %r8d
+cmovlel %edx, %r8d
+addl    %r8d, %eax
+incq    %rsi
+cmpq    %rsi, %rcx
+jne     LBB0_4
+</code></pre>
+<p>At <code>-O0</code>, the compiler keeps reloading <code>i</code> and <code>s</code> from stack slots, so the instruction stream shows obvious memory traffic. At <code>-O2</code>, the same logic stays mostly in registers: <code>testl</code> sets condition flags, <code>cmovlel</code> keeps non-positive values out of the sum without another branch, and <code>cmpq</code>/<code>jne</code> drive the loop.</p>
+<p><strong>Step 3: Compare the same logic on ARM64</strong></p>
+<pre><code class="language-bash">clang -target arm64-apple-macos14 -S -O2 -fno-vectorize -fno-slp-vectorize -fno-unroll-loops -x c count_positive.c -o -
+</code></pre>
+<pre><code class="language-text"># ARM64, -O2 (excerpt)
+cmp     w1, #1
+b.lt    LBB0_4
+LBB0_2:
+ldr     w10, [x0], #4
+bic     w10, w10, w10, asr #31
+add     w8, w10, w8
+subs    x9, x9, #1
+b.ne    LBB0_2
+</code></pre>
+<p>The ISA changes, but the contract is recognizably the same. <code>ldr</code> fetches an element, <code>add</code> updates the running sum, <code>subs</code> both subtracts and updates FLAGS, and <code>b.ne</code> consumes those flags for the loop branch. RISC-V would encode the same intent with different instruction names and register conventions, not a different fetch-decode-execute model.</p>
+<p><strong>Step 4: Categorize the instructions you just saw</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>x86-64 example</th>
+<th>ARM64 example</th>
+<th>What it did in the listing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arithmetic / logic</td>
+<td><code>addl</code>, <code>testl</code></td>
+<td><code>add</code>, <code>subs</code>, <code>bic</code></td>
+<td>Update the sum, test sign, update flags</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td><code>movl (%rdi,%rsi,4), %r8d</code></td>
+<td><code>ldr w10, [x0], #4</code></td>
+<td>Load the next array element</td>
+</tr>
+<tr>
+<td>Branch / control flow</td>
+<td><code>jle</code>, <code>jne</code></td>
+<td><code>b.lt</code>, <code>b.ne</code></td>
+<td>Skip work or loop again</td>
+</tr>
+<tr>
+<td>Data movement</td>
+<td><code>movl</code>, <code>cmovlel</code></td>
+<td><code>mov</code></td>
+<td>Move values between registers or from memory</td>
+</tr>
+</tbody>
+</table>
+<p>Most ISAs expose these same broad categories. What changes is the encoding, the register file, and how aggressively a compiler can fuse or reorder them.</p>
+<p><strong>Step 5: Reproduce the disassembly on your own code</strong></p>
+<pre><code class="language-text">1. Write a 5-10 line C, Rust, or Zig function with a branch and a loop.
+2. Compile once with `-O0` and once with `-O2`.
+3. Highlight three things in the output: where the loop counter lives, which instruction sets flags, and which branch consumes them.
+4. If you want fast iteration, Compiler Explorer is a great tool, but use the architecture manuals when you need authoritative instruction semantics.
+</code></pre>
+<p>This is where fetch-decode-execute becomes concrete. You stop imagining a generic CPU and start seeing real loads, compares, branches, and register updates.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Every CPU loops on fetch-decode-execute</li>
 <li>An instruction is opcode plus operands</li>
-<li>Branch instructions change PC directly</li>
-<li>Compilers often rewrite your loop into a much shorter sequence</li>
+<li>Branch instructions change PC directly or choose a different fall-through path</li>
+<li>Optimized code usually keeps hot values in registers and uses fewer memory touches</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <p><strong>"One line equals one instruction"</strong><br>
@@ -268,18 +277,28 @@ for cat, ops in INSTRUCTION_CATEGORIES.items():
 <p>Compare the bytecode of <code>sum(range(n))</code> and <code>n * (n - 1) // 2</code> with <code>dis</code>. Match the instruction counts to the measured times.</p>
 </li>
 <li>
-<p>Extend <code>TinyCPU</code> with <code>SUB</code>, <code>JZ</code> (jump if zero), and <code>HLT</code>. Write a program that sums 1 to 10.</p>
+<p>Compile the same small loop to x86-64 and ARM64. Identify the load, the arithmetic update, and the branch in both listings.</p>
 </li>
 <li>
-<p>On godbolt.org, paste a short function in C or Rust and compare -O0 with -O2 output. Note which optimizations the compiler applied.</p>
+<p>On godbolt.org or with local <code>clang -S</code>, paste a short function in C or Rust and compare <code>-O0</code> with <code>-O2</code> output. Note which values moved from stack slots into registers.</p>
 </li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The CPU is a simple machine: pull one instruction from memory, decode it, run it, repeat. That simplicity sits beneath every abstraction, and serious performance work eventually drops to assembly. Keep the ISA-vs-microarchitecture distinction in mind.</p>
 <p>Next we look at the place where computation actually happens inside the CPU: registers and the ALU. We will see where data sits during execution and how the ALU performs its operations.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><strong>What boundary should you inspect first when applying CPU and Instructions?</strong></li>
+<li>The article treats CPU and Instructions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for CPU and Instructions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when CPU and Instructions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">Computer Architecture 101 (1/10): What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point</a></li>
 <li><strong>CPU and Instructions (current)</strong></li>
 <li>Registers and the ALU (upcoming)</li>
 <li>Memory Organization (upcoming)</li>
@@ -294,7 +313,7 @@ for cat, ops in INSTRUCTION_CATEGORIES.items():
 <li><a href="https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1">Patterson &amp; Hennessy — Computer Organization and Design</a></li>
 <li><a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">Intel 64 and IA-32 Architectures Software Developer's Manual</a></li>
 <li><a href="https://developer.arm.com/documentation">ARM Architecture Reference Manual</a></li>
-<li><a href="https://godbolt.org/">Compiler Explorer (godbolt.org)</a></li>
+<li><a href="https://riscv.org/technical/specifications/">RISC-V Specifications</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Computer Architecture, CPU, Instructions, ISA, Assembly</p>
 </body>

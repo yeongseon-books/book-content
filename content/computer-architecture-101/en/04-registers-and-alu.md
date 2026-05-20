@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 4
-title: Registers and the ALU
+title: "Computer Architecture 101 (4/10): Registers and the ALU"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: How registers and the ALU sit at the heart of every CPU, where 
 last_reviewed: '2026-05-04'
 ---
 
-# Registers and the ALU
+# Computer Architecture 101 (4/10): Registers and the ALU
 
 A loop can look unchanged in source code and still slow down because one more live variable forced the compiler to spill a value to the stack. When that happens, the story is no longer just "the ALU did an add." It is about where values lived, which instruction set FLAGS, and how often execution had to leave the register file.
 
 This is post 4 in the Computer Architecture 101 series. Here we look at registers, FLAGS, and the ALU as the CPU's immediate working set, then use real assembly to show what register pressure and spills look like in practice.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Registers and the ALU?
+- Which signal should the example or diagram make visible for Registers and the ALU?
+- What failure should be prevented first when Registers and the ALU reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
+
+*computer architecture 101 chapter 4 flow overview*
+
+This picture places Registers and the ALU inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Registers and the ALU is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -45,9 +61,6 @@ The number of registers is the number of variables a CPU can hold at once. Too f
 > A register is small storage inside a CPU core: typically a few dozen, each 64 bits wide, and accessible in less than a cycle. The ALU takes two register values as inputs and produces a result in one cycle. All arithmetic and logic happens here.
 
 ### Registers ALU dataflow
-
-![Registers ALU dataflow](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
-*Fast execution happens when live values stay in registers, the ALU produces the next result, and the branch reads fresh FLAGS. Once register pressure forces spill traffic to the stack, the same source loop acquires extra loads and stores.*
 
 ## Key Terms
 
@@ -245,10 +258,21 @@ Registers are the fastest storage the CPU can hold at hand, and the ALU is where
 
 Next we zoom out to the larger landscape of memory: how RAM is addressed and how virtual memory builds on top of it.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Registers and the ALU?**
+  - The article treats Registers and the ALU as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Registers and the ALU?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Registers and the ALU reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
 - **Registers and the ALU (current)**
 - Memory Organization (upcoming)
 - Cache and Locality (upcoming)
@@ -256,6 +280,7 @@ Next we zoom out to the larger landscape of memory: how RAM is addressed and how
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

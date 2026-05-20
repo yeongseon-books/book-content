@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>I/O and Devices</title>
+<title>Computer Architecture 101 (8/10): I/O and Devices</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>I/O and Devices</h1>
+<h1>Computer Architecture 101 (8/10): I/O and Devices</h1>
 <blockquote>
 <p>Computer Architecture 101 series (8/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: A single disk read takes 100,000 times longer than a memory access. What is the CPU doing during that time?</p>
 <blockquote>
 <p>The CPU is fast and devices are slow. Keyboards live at human speed, disks at milliseconds, networks somewhere beyond. Polling, interrupts, and DMA are the mechanisms that bridge the gap, and memory-mapped I/O is how the CPU sees a device as just another set of addresses. This article looks inside, and ties together the starting point for every system call and every async program.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 8 in the Computer Architecture 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying I/O and Devices?</li>
+<li>Which signal should the example or diagram make visible for I/O and Devices?</li>
+<li>What failure should be prevented first when I/O and Devices reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer architecture 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.en.png"></p>
+<p><em>computer architecture 101 chapter 8 flow overview</em></p>
+<p>This picture places I/O and Devices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of I/O and Devices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The speed gap between CPU and devices, and what it implies</li>
@@ -274,14 +283,24 @@ else:
 <h2>Wrap-up and Next Steps</h2>
 <p>Polling, interrupts, and DMA bridge the huge speed gap between CPU and devices. They surface in user code as <code>select</code>, <code>epoll</code>, and <code>async/await</code>, and that is where every async program starts. Looking at the I/O model first is the entry point of system design.</p>
 <p>Next we cross beyond a single core, into parallelism and multicore. We will cover models for cooperating CPUs and the synchronization problems that arise inside them.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Memory Organization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/06-cache-and-locality.md">Cache and Locality</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/07-pipelining.md">Pipelining</a></li>
+<li><strong>What boundary should you inspect first when applying I/O and Devices?</strong></li>
+<li>The article treats I/O and Devices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for I/O and Devices?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when I/O and Devices reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">Computer Architecture 101 (1/10): What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">Computer Architecture 101 (3/10): CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Computer Architecture 101 (4/10): Registers and the ALU</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Computer Architecture 101 (5/10): Memory Organization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/06-cache-and-locality.md">Computer Architecture 101 (6/10): Cache and Locality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/07-pipelining.md">Computer Architecture 101 (7/10): Pipelining</a></li>
 <li><strong>I/O and Devices (current)</strong></li>
 <li>Parallelism and Multicore (upcoming)</li>
 <li>Understanding Performance (upcoming)</li>

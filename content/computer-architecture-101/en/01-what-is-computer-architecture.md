@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 1
-title: What Is Computer Architecture?
+title: "Computer Architecture 101 (1/10): What Is Computer Architecture?"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How computer architecture explains the path from a line of Pyth
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Computer Architecture?
+# Computer Architecture 101 (1/10): What Is Computer Architecture?
 
 > Computer Architecture 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When you write a single line of Python, what actually happens on the transistors below?
 
 > Computer architecture is the abstraction that explains how a program runs on hardware. High-level code is compiled or interpreted into machine instructions, and the CPU pulls those instructions and their data from memory one cycle at a time. This series follows that path end to end and shows where decisions about performance, memory, and concurrency really begin.
 
-<!-- a-grade-intro:end -->
-
 This is the first post in the Computer Architecture 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Computer Architecture??
+- Which signal should the example or diagram make visible for What Is Computer Architecture??
+- What failure should be prevented first when What Is Computer Architecture? reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.en.png)
+
+*computer architecture 101 chapter 1 flow overview*
+
+This picture places What Is Computer Architecture? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Computer Architecture? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -244,7 +256,18 @@ Computer architecture explains how code actually runs on hardware. The von Neuma
 
 The next article starts at the bottom and works back up. We look at how computers represent everything they handle: bits, bytes, integers, and floating point.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Computer Architecture??**
+  - The article treats What Is Computer Architecture? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Computer Architecture??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Computer Architecture? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Computer Architecture? (current)**
 - Data Representation — Bit, Byte, Integer, Floating Point (upcoming)
 - CPU and Instructions (upcoming)
@@ -255,6 +278,7 @@ The next article starts at the bottom and works back up. We look at how computer
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

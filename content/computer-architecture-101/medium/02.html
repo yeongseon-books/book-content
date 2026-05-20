@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Representation — Bit, Byte, Integer, Floating Point</title>
+<title>Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Data Representation — Bit, Byte, Integer, Floating Point</h1>
+<h1>Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point</h1>
 <blockquote>
 <p>Computer Architecture 101 series (2/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Why is <code>0.1 + 0.2 == 0.3</code> false — is that a Python bug, or is the computer telling the truth?</p>
 <blockquote>
 <p>Computers store everything as bundles of zeros and ones. Integers use two's complement, real numbers use IEEE 754 floating point, and both come with limits on range and precision. This article walks through how those limits show up in real code and how to handle them deliberately.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 2 in the Computer Architecture 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Representation — Bit, Byte, Integer, Floating Point?</li>
+<li>Which signal should the example or diagram make visible for Data Representation — Bit, Byte, Integer, Floating Point?</li>
+<li>What failure should be prevented first when Data Representation — Bit, Byte, Integer, Floating Point reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer architecture 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.en.png"></p>
+<p><em>computer architecture 101 chapter 2 flow overview</em></p>
+<p>This picture places Data Representation — Bit, Byte, Integer, Floating Point inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Representation — Bit, Byte, Integer, Floating Point is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definitions of bit, byte, and word</li>
@@ -237,8 +246,18 @@ print(big + small - big)   # 0.0  (the small value is absorbed)
 <h2>Wrap-up and Next Steps</h2>
 <p>Every value in a computer is a bit pattern. Integers use two's complement, reals use IEEE 754, and each has its own range and precision limits. Respecting those limits prevents most of the common bugs; ignoring them hides the worst ones in the most sensitive parts of your system.</p>
 <p>Next we look at what acts on these bits: the CPU and the instruction set. We will see what an ISA is and what the CPU actually does in one cycle.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><strong>What boundary should you inspect first when applying Data Representation — Bit, Byte, Integer, Floating Point?</strong></li>
+<li>The article treats Data Representation — Bit, Byte, Integer, Floating Point as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Representation — Bit, Byte, Integer, Floating Point?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Representation — Bit, Byte, Integer, Floating Point reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">Computer Architecture 101 (1/10): What Is Computer Architecture?</a></li>
 <li><strong>Data Representation — Bit, Byte, Integer, Floating Point (current)</strong></li>
 <li>CPU and Instructions (upcoming)</li>
 <li>Registers and the ALU (upcoming)</li>

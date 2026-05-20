@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cache and Locality</title>
+<title>Computer Architecture 101 (6/10): Cache and Locality</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Cache and Locality</h1>
+<h1>Computer Architecture 101 (6/10): Cache and Locality</h1>
 <blockquote>
 <p>Computer Architecture 101 series (6/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Two pieces of code read the same data the same number of times. One takes 1 second, the other takes 30. What makes that difference?</p>
 <blockquote>
 <p>The speed gap between the CPU and main memory is more than 100x. Caches close that gap, but caches only help if your code respects temporal and spatial locality. This article covers how caches work, the two kinds of locality, and the difference between cache-friendly and cache-hostile code.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 6 in the Computer Architecture 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Cache and Locality?</li>
+<li>Which signal should the example or diagram make visible for Cache and Locality?</li>
+<li>What failure should be prevented first when Cache and Locality reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer architecture 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.en.png"></p>
+<p><em>computer architecture 101 chapter 6 flow overview</em></p>
+<p>This picture places Cache and Locality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cache and Locality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What a cache is and where it sits in the memory hierarchy</li>
@@ -292,12 +301,22 @@ for i in range(N):
 <h2>Wrap-up and Next Steps</h2>
 <p>The cache is the largest device that closes the speed gap between CPU and memory, and its effect depends on whether your code follows locality. The same algorithm can show 10x differences from access pattern alone, and that difference is something you can both measure and design for.</p>
 <p>Next we look at another device that speeds up the CPU itself — the pipeline. We will cover how a CPU appears to finish one instruction per cycle, and why branch prediction was invented.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Memory Organization</a></li>
+<li><strong>What boundary should you inspect first when applying Cache and Locality?</strong></li>
+<li>The article treats Cache and Locality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Cache and Locality?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Cache and Locality reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">Computer Architecture 101 (1/10): What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">Computer Architecture 101 (3/10): CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Computer Architecture 101 (4/10): Registers and the ALU</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Computer Architecture 101 (5/10): Memory Organization</a></li>
 <li><strong>Cache and Locality (current)</strong></li>
 <li>Pipelining (upcoming)</li>
 <li>I/O and Devices (upcoming)</li>

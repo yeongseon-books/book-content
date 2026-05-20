@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 3
-title: CPU and Instructions
+title: "Computer Architecture 101 (3/10): CPU and Instructions"
 status: content-ready
 targets:
   tistory: false
@@ -21,11 +21,27 @@ seo_description: How a CPU runs the fetch-decode-execute cycle, what an ISA defi
 last_reviewed: '2026-05-04'
 ---
 
-# CPU and Instructions
+# Computer Architecture 101 (3/10): CPU and Instructions
 
 When a hot loop shows up in a profiler, the next useful question is not "what syntax did I write?" but "what instructions did the compiler emit, and how is the CPU stepping through them?" That is the moment when fetch, decode, execute, and branch behavior stop sounding like textbook terms and start explaining real performance.
 
 This is post 3 in the Computer Architecture 101 series. Here we use x86-64, ARM64, and RISC-V as concrete examples of the ISA contract, then follow one small function down to the instruction stream the CPU actually runs.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying CPU and Instructions?
+- Which signal should the example or diagram make visible for CPU and Instructions?
+- What failure should be prevented first when CPU and Instructions reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
+
+*computer architecture 101 chapter 3 flow overview*
+
+This picture places CPU and Instructions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of CPU and Instructions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -45,9 +61,6 @@ Performance work eventually reduces to "how many instructions does this code bec
 > Each cycle the CPU (1) fetches the instruction at the address in PC, (2) decodes its bit pattern, and (3) executes it. PC then moves to the next instruction unless a branch redirects it.
 
 ### CPU fetch decode execute
-
-![CPU fetch decode execute](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
-*The CPU does not "run code" abstractly. It keeps moving the PC, fetching bytes, decoding them, and then either computing a result, touching memory, or redirecting control flow.*
 
 ## Key Terms
 
@@ -248,9 +261,20 @@ The CPU is a simple machine: pull one instruction from memory, decode it, run it
 
 Next we look at the place where computation actually happens inside the CPU: registers and the ALU. We will see where data sits during execution and how the ALU performs its operations.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying CPU and Instructions?**
+  - The article treats CPU and Instructions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for CPU and Instructions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when CPU and Instructions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
 - **CPU and Instructions (current)**
 - Registers and the ALU (upcoming)
 - Memory Organization (upcoming)
@@ -259,6 +283,7 @@ Next we look at the place where computation actually happens inside the CPU: reg
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

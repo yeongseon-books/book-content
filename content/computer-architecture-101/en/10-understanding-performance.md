@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 10
-title: Understanding Performance
+title: "Computer Architecture 101 (10/10): Understanding Performance"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: A thinking model for performance analysis — throughput vs lat
 last_reviewed: '2026-05-04'
 ---
 
-# Understanding Performance
+# Computer Architecture 101 (10/10): Understanding Performance
 
 > Computer Architecture 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What does "slow" actually mean? Where, by how much, and how does anyone justify saying a system "needs optimization"?
 
 > Performance problems almost always begin with a guess — "I think the DB is slow," "I think Python is slow." But a senior engineer never changes a line without a measurement. This final article gathers everything we have built up — CPU, memory, cache, I/O, parallelism — into a thinking tool for understanding performance.
 
-<!-- a-grade-intro:end -->
-
 This is the final post in the Computer Architecture 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Performance?
+- Which signal should the example or diagram make visible for Understanding Performance?
+- What failure should be prevented first when Understanding Performance reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.en.png)
+
+*computer architecture 101 chapter 10 flow overview*
+
+This picture places Understanding Performance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Performance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -276,17 +288,29 @@ Performance starts with measurement. Distinguish latency from throughput, watch 
 
 This concludes the Computer Architecture 101 series. The next series builds on it: how the operating system layers its abstractions on top of this hardware. Once you know the architecture, every system call and scheduling choice in an OS looks different.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Performance?**
+  - The article treats Understanding Performance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Performance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Performance reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
-- [Cache and Locality](./06-cache-and-locality.md)
-- [Pipelining](./07-pipelining.md)
-- [I/O and Devices](./08-io-and-devices.md)
-- [Parallelism and Multicore](./09-parallelism-and-multicore.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): Cache and Locality](./06-cache-and-locality.md)
+- [Computer Architecture 101 (7/10): Pipelining](./07-pipelining.md)
+- [Computer Architecture 101 (8/10): I/O and Devices](./08-io-and-devices.md)
+- [Computer Architecture 101 (9/10): Parallelism and Multicore](./09-parallelism-and-multicore.md)
 - **Understanding Performance (current)**
+
 <!-- toc:end -->
 
 ## References

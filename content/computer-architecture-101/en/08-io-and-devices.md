@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 8
-title: I/O and Devices
+title: "Computer Architecture 101 (8/10): I/O and Devices"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How CPUs talk to slow devices through polling, interrupts, and 
 last_reviewed: '2026-05-04'
 ---
 
-# I/O and Devices
+# Computer Architecture 101 (8/10): I/O and Devices
 
 > Computer Architecture 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: A single disk read takes 100,000 times longer than a memory access. What is the CPU doing during that time?
 
 > The CPU is fast and devices are slow. Keyboards live at human speed, disks at milliseconds, networks somewhere beyond. Polling, interrupts, and DMA are the mechanisms that bridge the gap, and memory-mapped I/O is how the CPU sees a device as just another set of addresses. This article looks inside, and ties together the starting point for every system call and every async program.
 
-<!-- a-grade-intro:end -->
-
 This is post 8 in the Computer Architecture 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying I/O and Devices?
+- Which signal should the example or diagram make visible for I/O and Devices?
+- What failure should be prevented first when I/O and Devices reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.en.png)
+
+*computer architecture 101 chapter 8 flow overview*
+
+This picture places I/O and Devices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of I/O and Devices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -269,17 +281,29 @@ Polling, interrupts, and DMA bridge the huge speed gap between CPU and devices. 
 
 Next we cross beyond a single core, into parallelism and multicore. We will cover models for cooperating CPUs and the synchronization problems that arise inside them.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying I/O and Devices?**
+  - The article treats I/O and Devices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for I/O and Devices?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when I/O and Devices reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
-- [Memory Organization](./05-memory-organization.md)
-- [Cache and Locality](./06-cache-and-locality.md)
-- [Pipelining](./07-pipelining.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): Memory Organization](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): Cache and Locality](./06-cache-and-locality.md)
+- [Computer Architecture 101 (7/10): Pipelining](./07-pipelining.md)
 - **I/O and Devices (current)**
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References

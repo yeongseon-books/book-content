@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 7
-title: 파이프라인
+title: "Computer Architecture 101 (7/10): 파이프라인"
 status: publish-ready
 targets:
   tistory: true
@@ -21,20 +21,27 @@ seo_description: 파이프라인과 분기 예측이 CPU 처리량을 어떻게 
 last_reviewed: '2026-05-12'
 ---
 
-# 파이프라인
+# Computer Architecture 101 (7/10): 파이프라인
 
 명령어 하나를 처리하는 데 다섯 단계가 필요하다면, 왜 CPU는 평균적으로 한 사이클에 한 명령어를 끝내는 것처럼 보일까요? 이 글은 Computer Architecture 101 시리즈의 일곱 번째 글입니다. 여기서는 파이프라인이라는 겹쳐 처리하기 기법과, 그 흐름을 자주 깨뜨리는 분기·의존성·메모리 지연을 보겠습니다.
 
 파이프라인은 평균을 빠르게 만듭니다. 하지만 그 평균은 분기 예측 한 번이 틀리는 순간 무너질 수 있습니다. 그래서 핫 루프의 분기 패턴을 이해하는 습관이 생각보다 큰 성능 차이를 만듭니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 파이프라인은 어떻게 처리량을 높일까요?
 - 데이터 해저드와 제어 해저드는 무엇이 다를까요?
 - 분기 예측은 어떤 가정을 바탕으로 동작할까요?
-- 분기 없는 코드가 왜 때때로 더 빠를까요?
 
-> 파이프라인은 명령어 단계를 겹쳐 처리량을 높이지만, 분기와 의존성이 그 흐름을 자주 깨뜨립니다.
+## 큰 그림
+
+![Computer Architecture 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.ko.png)
+
+*Computer Architecture 101 7장 흐름 개요*
+
+이 그림에서는 파이프라인를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 파이프라인의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -251,17 +258,29 @@ print(abs_with_branch(5), abs_branchless(5))
 
 다음 글에서는 CPU 바깥의 느린 세계, 즉 I/O와 장치를 봅니다. 디스크, 네트워크, 키보드 같은 장치가 어떻게 CPU와 연결되고, 왜 비동기 모델이 필요한지 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **파이프라인은 어떻게 처리량을 높일까요?**
+  - 본문의 기준은 파이프라인를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **데이터 해저드와 제어 해저드는 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **분기 예측은 어떤 가정을 바탕으로 동작할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
-- [데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
-- [CPU와 명령어](./03-cpu-and-instructions.md)
-- [레지스터와 ALU](./04-registers-and-alu.md)
-- [메모리 구조](./05-memory-organization.md)
-- [캐시와 지역성](./06-cache-and-locality.md)
+## 시리즈 목차
+
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): 캐시와 지역성](./06-cache-and-locality.md)
 - **파이프라인 (현재 글)**
 - I/O와 장치 (예정)
 - 병렬성과 멀티코어 (예정)
 - 성능을 이해하는 법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

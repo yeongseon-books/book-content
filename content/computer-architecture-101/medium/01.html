@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Computer Architecture?</title>
+<title>Computer Architecture 101 (1/10): What Is Computer Architecture?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Is Computer Architecture?</h1>
+<h1>Computer Architecture 101 (1/10): What Is Computer Architecture?</h1>
 <blockquote>
 <p>Computer Architecture 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: When you write a single line of Python, what actually happens on the transistors below?</p>
 <blockquote>
 <p>Computer architecture is the abstraction that explains how a program runs on hardware. High-level code is compiled or interpreted into machine instructions, and the CPU pulls those instructions and their data from memory one cycle at a time. This series follows that path end to end and shows where decisions about performance, memory, and concurrency really begin.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the first post in the Computer Architecture 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Computer Architecture??</li>
+<li>Which signal should the example or diagram make visible for What Is Computer Architecture??</li>
+<li>What failure should be prevented first when What Is Computer Architecture? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer architecture 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.en.png"></p>
+<p><em>computer architecture 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Computer Architecture? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Computer Architecture? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A working definition of computer architecture</li>
@@ -244,6 +253,16 @@ print(f&quot;Strided (1/16th of work): {time.perf_counter() - start:.2f} s&quot;
 <h2>Wrap-up and Next Steps</h2>
 <p>Computer architecture explains how code actually runs on hardware. The von Neumann model is the starting point and the abstraction stack stretches from language all the way down to transistors. Performance issues almost always live one layer below where you were looking; you need the map to find them.</p>
 <p>The next article starts at the bottom and works back up. We look at how computers represent everything they handle: bits, bytes, integers, and floating point.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Computer Architecture??</strong></li>
+<li>The article treats What Is Computer Architecture? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Computer Architecture??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Computer Architecture? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Computer Architecture? (current)</strong></li>
 <li>Data Representation — Bit, Byte, Integer, Floating Point (upcoming)</li>

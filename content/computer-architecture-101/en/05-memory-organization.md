@@ -1,7 +1,7 @@
 ---
 series: computer-architecture-101
 episode: 5
-title: Memory Organization
+title: "Computer Architecture 101 (5/10): Memory Organization"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How RAM is addressed, what virtual memory is, where the stack a
 last_reviewed: '2026-05-04'
 ---
 
-# Memory Organization
+# Computer Architecture 101 (5/10): Memory Organization
 
 > Computer Architecture 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Two processes can hold different values at the same address `0x400000`, and both run correctly. How is that possible?
 
 > Memory looks like a giant array of addressed bytes, but the memory a process sees is not real RAM. It is a virtual address space that the operating system and the CPU's MMU build together. On top of that space, code, data, stack, and heap each take their assigned region, and every variable lives somewhere inside it. This article draws that map.
 
-<!-- a-grade-intro:end -->
-
 This is post 5 in the Computer Architecture 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Memory Organization?
+- Which signal should the example or diagram make visible for Memory Organization?
+- What failure should be prevented first when Memory Organization reaches a real system?
+
+## Big Picture
+
+![computer architecture 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.en.png)
+
+*computer architecture 101 chapter 5 flow overview*
+
+This picture places Memory Organization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Memory Organization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -235,17 +247,29 @@ Memory looks like a flat byte array, but that flatness is an illusion built by v
 
 Next we look at the cache that sits between memory and the CPU, why it exists, what locality is, and how cache-aware code differs from cache-blind code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Memory Organization?**
+  - The article treats Memory Organization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Memory Organization?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Memory Organization reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Computer Architecture?](./01-what-is-computer-architecture.md)
-- [Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
-- [CPU and Instructions](./03-cpu-and-instructions.md)
-- [Registers and the ALU](./04-registers-and-alu.md)
+## In this series
+
+- [Computer Architecture 101 (1/10): What Is Computer Architecture?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): Data Representation — Bit, Byte, Integer, Floating Point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU and Instructions](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): Registers and the ALU](./04-registers-and-alu.md)
 - **Memory Organization (current)**
 - Cache and Locality (upcoming)
 - Pipelining (upcoming)
 - I/O and Devices (upcoming)
 - Parallelism and Multicore (upcoming)
 - Understanding Performance (upcoming)
+
 <!-- toc:end -->
 
 ## References
