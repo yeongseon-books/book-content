@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:55:03+00:00",
+  "generated_at": "2026-05-20T11:55:24+00:00",
   "series_count": 92,
-  "problem_series_count": 25,
-  "series_with_5_plus": 18,
+  "problem_series_count": 24,
+  "series_with_5_plus": 17,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 195,
+    "BadImg": 190,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 195
+    "all": 190
   },
   "results": [
     {
@@ -4517,156 +4517,6 @@
       }
     },
     {
-      "series": "git-github-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 5
-      },
-      "total": 5,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/01/01-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model.en.png",
-            "width": 1087,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/01/01-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model.ko.png",
-            "width": 1080,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/06/06-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-mental-model.en.png",
-            "width": 828,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/06/06-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-mental-model.ko.png",
-            "width": 735,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/10/10-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 75px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 75,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/01/01-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model.en.png",
-            "width": 1087,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/01/01-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model.ko.png",
-            "width": 1080,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/06/06-01-mental-model.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-mental-model.en.png",
-            "width": 828,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/06/06-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-mental-model.ko.png",
-            "width": 735,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/git-github-101/10/10-01-mental-model.ko.png",
-            "line": 1,
-            "message": "PNG height 75px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-mental-model.ko.png",
-            "width": 1384,
-            "height": 75,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "azure-aca-101",
       "counts": {
         "Synt": 0,
@@ -5842,6 +5692,20 @@
     },
     {
       "series": "functional-programming-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "git-github-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

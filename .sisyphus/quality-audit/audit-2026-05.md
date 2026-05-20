@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:55:03+00:00
+Generated: 2026-05-20T11:55:24+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **25**
-- Series at or above 5 issues: **18**
-- Total issues: **195**
-  - BadImg: **195**
+- Series with any issue: **24**
+- Series at or above 5 issues: **17**
+- Total issues: **190**
+  - BadImg: **190**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -58,14 +58,13 @@ Warnings:
 | 15 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 16 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 17 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 18 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 19 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 20 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 21 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 22 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 23 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 24 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 25 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 18 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 19 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 20 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 21 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 22 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 23 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 24 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -270,17 +269,6 @@ Warnings:
 - `assets/observability-101/04/04-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=799x67)
 - `assets/observability-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1060x67)
 - ... 1 more
-
-## git-github-101 — Total 5
-
-- BadImg=5 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/git-github-101/01/01-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=1087x88)
-- `assets/git-github-101/01/01-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=1080x88)
-- `assets/git-github-101/06/06-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=828x88)
-- `assets/git-github-101/06/06-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=735x88)
-- `assets/git-github-101/10/10-01-mental-model.ko.png:1` — PNG height 75px <= 100px (size=1384x75)
 
 ## azure-aca-101 — Total 4
 
