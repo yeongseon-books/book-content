@@ -1,5 +1,5 @@
 ---
-title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
+title: "LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기"
 series: llm-app-foundations-101
 episode: 4
 language: ko
@@ -17,7 +17,7 @@ tags:
 last_reviewed: '2026-05-15'
 ---
 
-# Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
+# LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
 
 이전 글에서 역할 기반 프롬프트 구조를 잡았다면 곧 다음 질문이 따라옵니다. 같은 모델인데도 어떤 요청은 원하는 형식을 안정적으로 따르고, 어떤 요청은 거의 맞지만 자동화하기에는 애매하게 흔들리는 이유가 무엇일까요. 이 차이는 모델 교체보다 입력 설계의 차이에서 먼저 나오는 경우가 많습니다.
 
@@ -29,13 +29,19 @@ last_reviewed: '2026-05-15'
 
 여기서는 few-shot과 chain-of-thought를 예시 기반 유도와 단계 기반 유도로 나누어 보고, 각각이 언제 효과적인지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- few-shot은 채팅 API 안에서 어떤 방식으로 패턴을 가르칠까요?
-- zero-shot과 few-shot은 같은 작업에서 어떤 차이를 만들까요?
-- 예시 개수보다 예시 품질이 중요한 이유는 무엇일까요?
-- chain-of-thought는 어떤 종류의 실수를 줄이는 데 특히 유리할까요?
-- few-shot과 CoT를 함께 쓰면 무엇이 좋아지고, 어디서 한계가 올까요?
+- few-shot은 무엇을 가르치고 chain-of-thought는 무엇을 가르칠까요?
+- zero-shot, few-shot, CoT 중 언제 어떤 도구를 골라야 할까요?
+- 예시 품질이 나쁘면 왜 오히려 답변을 망칠까요?
+
+## 큰 그림
+
+![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
+
+*예시 기반 유도와 단계적 추론의 전체 그림*
+
+이 그림에서는 답변 형식을 보여 주는 축과 풀이 순서를 보여 주는 축을 나눠 봅니다. few-shot과 CoT는 같은 프롬프트 기법처럼 보여도 안정시키는 대상이 다릅니다.
 
 ## 왜 이 글이 중요한가
 
@@ -54,10 +60,6 @@ few-shot의 본질은 “이런 질문에는 이런 모양으로 답하라”는
 > few-shot은 답변의 모양을 보여 주고, chain-of-thought는 답에 이르는 순서를 보여 줍니다. 좋은 프롬프트는 둘 중 필요한 축을 정확히 고르는 데서 시작합니다.
 
 ## 핵심 개념
-
-![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
-
-*예시 기반 유도와 단계적 추론의 전체 그림*
 
 few-shot prompting은 실제 질문 앞에 모범 질문-답변 쌍을 배치하는 방식입니다. 채팅 API에서는 별도 학습 필드가 아니라 같은 `messages` 배열 안에 `user`와 `assistant` 쌍으로 들어갑니다.
 
@@ -373,15 +375,26 @@ few-shot은 답변 패턴을 예시로 보여 주는 기술이고, chain-of-thou
 
 다음 글에서는 정적인 프롬프트 설계에서 동적인 대화 상태로 넘어갑니다. few-shot 예시는 고정된 문맥이지만, 멀티턴 챗봇의 이력은 계속 변합니다. 그 차이를 이해해야 프롬프트 설계가 진짜 애플리케이션 설계로 넘어갑니다.
 
+## 처음 질문으로 돌아가기
+
+- few-shot은 무엇을 가르치고 chain-of-thought는 무엇을 가르칠까요?
+  - few-shot은 답변의 형식과 판단 패턴을 예시로 가르치고, chain-of-thought는 답에 이르는 중간 순서를 보여 줍니다.
+
+- zero-shot, few-shot, CoT 중 언제 어떤 도구를 골라야 할까요?
+  - 단순 요청은 zero-shot으로 시작하고, 출력 모양이 흔들리면 few-shot을 쓰며, 분해가 필요한 문제에서는 CoT 계열을 검토합니다.
+
+- 예시 품질이 나쁘면 왜 오히려 답변을 망칠까요?
+  - 모델은 예시의 품질까지 따라 하므로, 불완전하거나 대표성이 낮은 예시는 잘못된 형식과 판단 기준을 함께 주입합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
-- [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
-- [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
-- **Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (현재 글)**
-- 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
-- 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- [LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
+- **LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (현재 글)**
+- LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
+- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
 
 <!-- toc:end -->
 

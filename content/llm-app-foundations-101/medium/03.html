@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prompt engineering basics — system, user, and assistant roles</title>
+<title>LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,14 +53,8 @@
 </style>
 </head>
 <body>
-<h1>Prompt engineering basics — system, user, and assistant roles</h1>
-<blockquote>
-<p>LLM App Foundations 101 (3/6)</p>
-</blockquote>
-<p>The diagram below shows the basic flow of role-based prompt construction.</p>
-<p><img alt="Prompt engineering basics: system, user, and assistant roles" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png"></p>
-<p><em>Prompt engineering basics: system, user, and assistant roles</em><br>
-Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the <code>messages</code> array.</p>
+<h1>LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles</h1>
+<p>Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the <code>messages</code> array.</p>
 <p>That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.</p>
 <p>This is the third post in the LLM App Foundations 101 series. Here, we use Groq's <code>llama-3.1-8b-instant</code> to build the core mental model for prompt design with chat completions. We will cover seven things:</p>
 <ul>
@@ -74,14 +68,19 @@ Prompt engineering is often described as clever wording. In application work, th
 </ul>
 <p>The main idea is simple: <strong>good prompts start as structured message roles, not as one long user sentence</strong>.</p>
 <hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How does the model treat <code>system</code>, <code>user</code>, and <code>assistant</code> differently?</li>
-<li>What single experiment shows how a one-line system message changes the answer?</li>
-<li>When is hand-writing assistant messages into history the right pattern?</li>
-<li>How do you decide which constraint belongs in <code>system</code> vs <code>user</code> vs few-shot examples?</li>
-<li>Where does the output quality gap between with/without <code>system</code> show up most clearly?</li>
+<li>What responsibility belongs to <code>system</code>, <code>user</code>, and <code>assistant</code> messages?</li>
+<li>Why is a system message stronger than just writing one more first sentence?</li>
+<li>How do temperature, top_p, and few-shot examples affect answer stability?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Prompt engineering basics: system, user, and assistant roles" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png"></p>
+<p><em>Prompt engineering basics: system, user, and assistant roles</em></p>
+<p>This picture shows prompt engineering as role separation inside the messages array. Policy, current request, and prior assistant output need different slots if the answer should stay stable.</p>
+<blockquote>
+<p>Prompt engineering starts with role boundaries, not nicer wording.</p>
+</blockquote>
 <h2>Why prompt engineering is more than wording</h2>
 <p>In Post 01, one <code>user</code> message was enough to make the first API call. Real applications move beyond that quickly. They need stable behavior across users, consistent output shape, and memory of earlier turns. Once those requirements appear, one free-form user string stops being enough.</p>
 <p>Chat-based LLM APIs solve this with role-tagged messages. That is not cosmetic syntax. It separates operating policy from the current request and from prior conversation state.</p>
@@ -488,14 +487,31 @@ These mistakes show up repeatedly in first-generation LLM apps.</p>
 <li>[ ] You have a test that synthesizes a multi-turn history with hand-crafted assistant messages</li>
 <li>[ ] Format requirements (JSON, table, max length) are written into the system message explicitly</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>What responsibility belongs to <code>system</code>, <code>user</code>, and <code>assistant</code> messages?</li>
+<li>
+<p><code>system</code> carries shared policy and role, <code>user</code> carries the current request, and <code>assistant</code> carries replayed prior answers.</p>
+</li>
+<li>
+<p>Why is a system message stronger than just writing one more first sentence?</p>
+</li>
+<li>
+<p>A system message is part of the higher-priority instruction frame for the request, so it is more stable than another sentence inside the user prompt.</p>
+</li>
+<li>
+<p>How do temperature, top_p, and few-shot examples affect answer stability?</p>
+</li>
+<li>Temperature and top_p control sampling variance, while few-shot examples stabilize the answer shape by showing the pattern to copy.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
-<li><strong>Prompt engineering basics — system, user, and assistant roles (current)</strong></li>
-<li>Few-shot and chain-of-thought — steering better answers (upcoming)</li>
-<li>Managing conversation state — building a multi-turn chatbot (upcoming)</li>
-<li>Handling streaming responses — real-time output (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM App Foundations 101 (1/6): LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</a></li>
+<li><strong>LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (current)</strong></li>
+<li>LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)</li>
+<li>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)</li>
+<li>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

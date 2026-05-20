@@ -1,5 +1,5 @@
 ---
-title: 스트리밍 응답 처리 — 실시간으로 출력 받기
+title: "LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기"
 series: llm-app-foundations-101
 episode: 6
 language: ko
@@ -17,7 +17,7 @@ tags:
 last_reviewed: '2026-05-15'
 ---
 
-# 스트리밍 응답 처리 — 실시간으로 출력 받기
+# LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기
 
 LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는 모델 호출을 일반적인 블로킹 API처럼 다루는 것입니다. 서버는 프롬프트를 보내고, 몇 초 동안 조용히 기다린 뒤, 답변 전체가 끝났을 때 한 번에 돌려줍니다. 기능은 동작하지만 사용자 경험은 필요 이상으로 답답해집니다.
 
@@ -29,13 +29,19 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 
 여기서는 스트리밍을 성능 트릭이 아니라 사용자에게 생성 과정을 드러내는 응답 전달 방식으로 보고, Groq SDK 기준의 기본 패턴을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 스트리밍은 총 생성 시간 대신 무엇을 개선할까요?
-- Groq SDK에서 가장 작은 스트리밍 호출은 어떤 모양일까요?
-- 청크마다 `delta.content`를 안전하게 읽는 패턴은 무엇일까요?
-- 스트리밍과 동기·비동기 모델은 어디서 구분해야 할까요?
-- FastAPI를 통해 브라우저로 릴레이할 때 어떤 종료 신호와 메타데이터를 고려해야 할까요?
+- streaming은 응답을 더 빨리 끝내는 기술일까요, 생성 흐름을 먼저 보여주는 기술일까요?
+- chunk에서 텍스트, 종료 신호, 사용량을 어떻게 읽어야 할까요?
+- FastAPI 같은 서버는 모델 스트림을 사용자에게 어떻게 중계할까요?
+
+## 큰 그림
+
+![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
+
+*스트리밍 응답의 전체 이벤트 흐름*
+
+이 그림에서는 완성된 응답 하나가 아니라 생성 중인 이벤트가 연속해서 도착하는 흐름을 봅니다. 스트리밍은 대기 시간을 없애는 기술이 아니라, 기다리는 동안 진행 상황을 보여 주는 인터페이스입니다.
 
 ## 왜 이 글이 중요한가
 
@@ -54,10 +60,6 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 > 스트리밍의 핵심은 모델을 더 빨리 끝내는 데 있지 않고, 생성 중인 답을 이벤트 흐름으로 드러내어 기다림을 읽을 수 있게 만드는 데 있습니다.
 
 ## 핵심 개념
-
-![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
-
-*스트리밍 응답의 전체 이벤트 흐름*
 
 비스트리밍과 스트리밍의 차이는 총 시간보다 관찰 가능성에 있습니다. 비스트리밍에서는 모든 토큰이 끝난 뒤 최종 payload 하나가 옵니다. 스트리밍에서는 첫 청크가 준비되는 즉시 전송이 시작됩니다.
 
@@ -338,15 +340,26 @@ async def chat_stream(prompt: str) -> StreamingResponse:
 
 이 시리즈는 여기서 기초를 마칩니다. 첫 호출, 토큰, 역할 기반 프롬프트, few-shot 유도, 대화 상태, 스트리밍까지 이해했다면 이제 작은 LLM 앱을 설계하고 설명할 수 있는 기반이 생긴 것입니다. 다음 단계는 구조화 출력, 툴 호출, 더 깊은 스트리밍 운영 패턴, 캐싱과 재시도처럼 프로덕션 쪽 관심사로 넘어가는 일입니다.
 
+## 처음 질문으로 돌아가기
+
+- streaming은 응답을 더 빨리 끝내는 기술일까요, 생성 흐름을 먼저 보여주는 기술일까요?
+  - streaming은 생성을 더 빨리 끝내기보다, 생성 중인 조각을 먼저 전달해 사용자가 진행 상황을 볼 수 있게 만드는 기술입니다.
+
+- chunk에서 텍스트, 종료 신호, 사용량을 어떻게 읽어야 할까요?
+  - 각 chunk에서 delta 텍스트를 누적하고, 종료 신호와 사용량은 provider가 제공하는 마지막 chunk나 별도 집계 경로에서 확인합니다.
+
+- FastAPI 같은 서버는 모델 스트림을 사용자에게 어떻게 중계할까요?
+  - FastAPI는 모델에서 받은 chunk를 `StreamingResponse` 같은 서버 스트림으로 감싸 브라우저나 클라이언트에 다시 흘려보냅니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
-- [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
-- [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
-- [Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
-- [대화 상태 관리 — 멀티턴 챗봇 만들기](./05-conversation-state.md)
-- **스트리밍 응답 처리 — 실시간으로 출력 받기 (현재 글)**
+- [LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
+- [LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
+- [LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기](./05-conversation-state.md)
+- **LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (현재 글)**
 
 <!-- toc:end -->
 

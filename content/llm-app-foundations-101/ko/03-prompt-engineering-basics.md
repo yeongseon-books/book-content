@@ -1,5 +1,5 @@
 ---
-title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
+title: "LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할"
 series: llm-app-foundations-101
 episode: 3
 language: ko
@@ -17,7 +17,7 @@ tags:
 last_reviewed: '2026-05-15'
 ---
 
-# 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
+# LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
 
 프롬프트 엔지니어링은 흔히 말을 그럴듯하게 쓰는 요령처럼 소개됩니다. 하지만 애플리케이션 관점에서는 그 설명이 너무 약합니다. 실전에서 더 중요한 일은 지시를 역할별로 분리하고, 어떤 제약이 공통 정책인지, 어떤 내용이 이번 요청에만 해당하는지, 어떤 이력이 다음 턴으로 넘어가야 하는지를 구조로 고정하는 일입니다.
 
@@ -29,13 +29,19 @@ last_reviewed: '2026-05-15'
 
 여기서는 역할 기반 메시지 배열을 프롬프트의 기본 단위로 보고, 안정적인 입력 구조를 만드는 방법을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- `system`, `user`, `assistant`는 각각 어떤 책임을 가져야 할까요?
-- system 메시지 하나가 실제 출력 품질과 형식을 얼마나 바꿀까요?
-- 멀티턴 이력은 왜 애플리케이션이 직접 `assistant` 메시지로 재구성해야 할까요?
-- `temperature`와 `top_p`는 프롬프트 품질과 어떤 식으로 상호작용할까요?
-- few-shot 예시는 메시지 배열 안에서 어디에 놓아야 가장 읽기 쉬울까요?
+- system, user, assistant 역할은 각각 어떤 책임을 맡을까요?
+- system message는 왜 단순한 첫 문장보다 강한 기준이 될까요?
+- temperature, top_p, few-shot은 답변 안정성에 어떤 영향을 줄까요?
+
+## 큰 그림
+
+![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
+
+*역할 기반 프롬프트 구성의 전체 그림*
+
+이 그림에서는 하나의 프롬프트가 아니라 messages 배열 안의 역할 경계를 봅니다. 정책, 현재 요청, 과거 답변을 나눠야 모델의 응답 기준도 안정됩니다.
 
 ## 왜 이 글이 중요한가
 
@@ -54,10 +60,6 @@ last_reviewed: '2026-05-15'
 > 프롬프트 엔지니어링의 출발점은 멋진 문장이 아니라, 어떤 지시가 어느 역할에 속하는지 명시하는 메시지 구조입니다.
 
 ## 핵심 개념
-
-![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
-
-*역할 기반 프롬프트 구성의 전체 그림*
 
 채팅 프롬프트를 운영 가능한 형태로 만들려면 먼저 세 역할을 분리해야 합니다. `system`은 전체 정책, `user`는 현재 요청, `assistant`는 이전 답변입니다. 이 구조가 없으면 애플리케이션은 매 요청마다 같은 규칙을 중복해서 말하게 되고, 이력도 암묵적으로 기대하게 됩니다.
 
@@ -384,15 +386,26 @@ print(completion.choices[0].message.content)
 
 다음 글에서는 few-shot과 chain-of-thought를 다룹니다. 이번 글이 역할의 분리였다면, 다음 글은 그 위에 예시와 단계적 추론을 얹어 응답 패턴을 더 강하게 유도하는 단계입니다.
 
+## 처음 질문으로 돌아가기
+
+- system, user, assistant 역할은 각각 어떤 책임을 맡을까요?
+  - `system`은 공통 정책과 역할, `user`는 현재 요청, `assistant`는 이전 응답 이력을 맡습니다.
+
+- system message는 왜 단순한 첫 문장보다 강한 기준이 될까요?
+  - system message는 매 요청에서 모델이 먼저 따라야 할 상위 지침으로 들어가므로, user message 안의 일반 문장보다 안정적인 기준이 됩니다.
+
+- temperature, top_p, few-shot은 답변 안정성에 어떤 영향을 줄까요?
+  - temperature와 top_p는 샘플링의 흔들림을 조절하고, few-shot은 원하는 답변 모양을 예시로 고정해 안정성을 높입니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
-- [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
-- **프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (현재 글)**
-- Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
-- 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
-- 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- [LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
+- **LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (현재 글)**
+- LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
+- LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
+- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
 
 <!-- toc:end -->
 

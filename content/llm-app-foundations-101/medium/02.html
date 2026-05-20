@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding tokens — cost, limits, and context windows</title>
+<title>LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,14 +53,12 @@
 </style>
 </head>
 <body>
-<h1>Understanding tokens — cost, limits, and context windows</h1>
+<h1>LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</h1>
 <blockquote>
 <p>LLM App Foundations 101 (2/6)</p>
 </blockquote>
 <p>The diagram below summarizes how raw text becomes tokens and then turns into model budget.</p>
-<p><img alt="Understanding tokens: cost, limits, and context windows" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png"></p>
-<p><em>Understanding tokens: cost, limits, and context windows</em><br>
-When people first connect an LLM API, they usually focus on answer quality. That makes sense at the demo stage. In real applications, though, the first hard constraints show up somewhere else: cost, latency, and length limits. A prompt gets a little longer, and the response slows down. A few more messages are added, and token usage jumps. A large chunk of reference text is attached, and the model starts cutting answers short. The shared unit behind all of those behaviors is the token.</p>
+<p>When people first connect an LLM API, they usually focus on answer quality. That makes sense at the demo stage. In real applications, though, the first hard constraints show up somewhere else: cost, latency, and length limits. A prompt gets a little longer, and the response slows down. A few more messages are added, and token usage jumps. A large chunk of reference text is attached, and the model starts cutting answers short. The shared unit behind all of those behaviors is the token.</p>
 <p>A token is the unit the model uses to read and generate text. Humans think in sentences, paragraphs, and words. Models do not. They process smaller pieces, and those pieces do not map cleanly to words. That is why developers new to LLM systems often misjudge size. A prompt that looks short in plain text can still be expensive. A block of code can consume more tokens than expected. A Korean sentence can fragment differently from an English sentence.</p>
 <p>This is the second post in the LLM App Foundations 101 series. Here, we put token accounting in the center of the mental model. We will cover seven things:</p>
 <ul>
@@ -74,14 +72,19 @@ When people first connect an LLM API, they usually focus on answer quality. That
 </ul>
 <p>The central idea is simple: <strong>LLM applications run on token budgets, not on raw strings</strong>.</p>
 <hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What is a token (not a character, not a word), and why do different models tokenize differently?</li>
-<li>What does each of <code>prompt_tokens</code>, <code>completion_tokens</code>, and <code>total_tokens</code> cost you?</li>
-<li>What is the shortest <code>tiktoken</code> snippet that counts tokens before you call?</li>
-<li>What error appears when you exceed the context window, and how do you prevent it?</li>
-<li>When trimming long input, do you cut from the front, the back, or the middle?</li>
+<li>Why should you treat tokens as budget units instead of word-like pieces?</li>
+<li>What do <code>prompt_tokens</code>, <code>completion_tokens</code>, and <code>total_tokens</code> each tell you?</li>
+<li>Where do the context window, <code>max_tokens</code>, and <code>finish_reason</code> collide?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Understanding tokens: cost, limits, and context windows" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png"></p>
+<p><em>Understanding tokens: cost, limits, and context windows</em></p>
+<p>This picture connects tokens to input size, output size, cost, and context limits. Once tokens become the budget unit, usage fields and length failures become one operational problem.</p>
+<blockquote>
+<p>Tokens are the budget line that connects cost, limits, and response shape.</p>
+</blockquote>
 <h2>What a token actually is</h2>
 <p><img alt="Text split into model token pieces" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png"></p>
 <p><em>Text split into model token pieces</em><br>
@@ -405,14 +408,31 @@ finish_reason=stop
 <li>[ ] You computed the dollar cost of one call as price × token count</li>
 <li>[ ] Your code checks input length before requests that risk exceeding the window</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>Why should you treat tokens as budget units instead of word-like pieces?</li>
+<li>
+<p>Models process and bill around token units, so tokens are the practical budget for input, output, and limits.</p>
+</li>
+<li>
+<p>What do <code>prompt_tokens</code>, <code>completion_tokens</code>, and <code>total_tokens</code> each tell you?</p>
+</li>
+<li>
+<p><code>prompt_tokens</code> measures input, <code>completion_tokens</code> measures generated output, and <code>total_tokens</code> is the whole call budget.</p>
+</li>
+<li>
+<p>Where do the context window, <code>max_tokens</code>, and <code>finish_reason</code> collide?</p>
+</li>
+<li>Input and output share the context window. A large <code>max_tokens</code> does not help if the remaining window is too small, so <code>finish_reason</code> tells you when length ended the generation.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
-<li><strong>Understanding tokens — cost, limits, and context windows (current)</strong></li>
-<li>Prompt engineering basics — system, user, and assistant roles (upcoming)</li>
-<li>Few-shot and chain-of-thought — steering better answers (upcoming)</li>
-<li>Managing conversation state — building a multi-turn chatbot (upcoming)</li>
-<li>Handling streaming responses — real-time output (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM App Foundations 101 (1/6): LLM API first call — sending your first request</a></li>
+<li><strong>LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows (current)</strong></li>
+<li>LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (upcoming)</li>
+<li>LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)</li>
+<li>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)</li>
+<li>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -1,5 +1,5 @@
 ---
-title: Prompt engineering basics — system, user, and assistant roles
+title: "LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles"
 series: llm-app-foundations-101
 episode: 3
 language: en
@@ -18,15 +18,8 @@ last_reviewed: '2026-05-15'
 seo_description: Learn how to structure LLM prompts effectively by separating system, user, and assistant roles to ensure consistent, controllable model behavior.
 ---
 
-# Prompt engineering basics — system, user, and assistant roles
+# LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles
 
-> LLM App Foundations 101 (3/6)
-
-The diagram below shows the basic flow of role-based prompt construction.
-
-![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
-
-*Prompt engineering basics: system, user, and assistant roles*
 Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the `messages` array.
 
 That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.
@@ -45,13 +38,21 @@ The main idea is simple: **good prompts start as structured message roles, not a
 
 ---
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- How does the model treat `system`, `user`, and `assistant` differently?
-- What single experiment shows how a one-line system message changes the answer?
-- When is hand-writing assistant messages into history the right pattern?
-- How do you decide which constraint belongs in `system` vs `user` vs few-shot examples?
-- Where does the output quality gap between with/without `system` show up most clearly?
+- What responsibility belongs to `system`, `user`, and `assistant` messages?
+- Why is a system message stronger than just writing one more first sentence?
+- How do temperature, top_p, and few-shot examples affect answer stability?
+
+## Big Picture
+
+![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
+
+*Prompt engineering basics: system, user, and assistant roles*
+
+This picture shows prompt engineering as role separation inside the messages array. Policy, current request, and prior assistant output need different slots if the answer should stay stable.
+
+> Prompt engineering starts with role boundaries, not nicer wording.
 
 ## Why prompt engineering is more than wording
 
@@ -544,15 +545,26 @@ The next post goes deeper into few-shot prompting and chain-of-thought.
 - [ ] You have a test that synthesizes a multi-turn history with hand-crafted assistant messages
 - [ ] Format requirements (JSON, table, max length) are written into the system message explicitly
 
+## Answering the Opening Questions
+
+- What responsibility belongs to `system`, `user`, and `assistant` messages?
+  - `system` carries shared policy and role, `user` carries the current request, and `assistant` carries replayed prior answers.
+
+- Why is a system message stronger than just writing one more first sentence?
+  - A system message is part of the higher-priority instruction frame for the request, so it is more stable than another sentence inside the user prompt.
+
+- How do temperature, top_p, and few-shot examples affect answer stability?
+  - Temperature and top_p control sampling variance, while few-shot examples stabilize the answer shape by showing the pattern to copy.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- **Prompt engineering basics — system, user, and assistant roles (current)**
-- Few-shot and chain-of-thought — steering better answers (upcoming)
-- Managing conversation state — building a multi-turn chatbot (upcoming)
-- Handling streaming responses — real-time output (upcoming)
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- **LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (current)**
+- LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)
+- LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 

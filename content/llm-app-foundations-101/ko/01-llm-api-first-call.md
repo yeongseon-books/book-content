@@ -1,5 +1,5 @@
 ---
-title: LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
+title: "LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기"
 series: llm-app-foundations-101
 episode: 1
 language: ko
@@ -17,7 +17,7 @@ tags:
 last_reviewed: '2026-05-15'
 ---
 
-# LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
+# LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
 
 LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은 모델 성능이 아닙니다. 내 코드와 모델 서비스 사이에 어떤 계약이 있는지, 그 계약이 어디서 실패하는지, 응답에서 무엇을 읽어야 하는지가 더 먼저 헷갈립니다. 채팅 UI는 이 경계를 감추지만, 런타임에서는 결국 HTTP 요청 하나와 JSON 응답 하나가 전부입니다.
 
@@ -29,13 +29,19 @@ LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은
 
 여기서는 Groq Python SDK로 가장 작은 성공 경로를 만들고, 첫 호출을 운영 가능한 멘탈 모델로 바꾸겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 동작할까요?
-- API 키는 어디서 만들고, 왜 코드가 아니라 환경변수에 둬야 할까요?
-- `client.chat.completions.create()` 응답에서 최소한 무엇을 읽어야 할까요?
-- 동기 호출과 비동기 호출은 코드 구조와 쓰임새가 어떻게 다를까요?
-- 첫 호출이 실패했을 때 인증, 모델 ID, 메시지 형식 중 무엇부터 의심해야 할까요?
+- LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 움직일까요?
+- API 키와 모델 ID, 메시지 형식 중 첫 실패에서 어디부터 봐야 할까요?
+- 응답에서 본문, 사용량, 모델명을 어떻게 읽어야 할까요?
+
+## 큰 그림
+
+![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
+
+*첫 번째 LLM API 호출의 최소 왕복 구조*
+
+이 그림에서는 애플리케이션이 모델 서비스로 요청을 보내고 JSON 응답을 받는 최소 왕복만 봅니다. 인증, 모델 ID, 메시지, 응답 필드는 모두 이 경계 위에서 확인합니다.
 
 ## 왜 이 글이 중요한가
 
@@ -54,10 +60,6 @@ Groq SDK는 편리하지만, 실제 계약을 바꾸지는 않습니다. `client
 > LLM 첫 호출의 핵심은 모델을 부르는 문법이 아니라, 원격 서비스와 맺는 입력·출력 계약을 눈에 보이는 구조로 이해하는 데 있습니다.
 
 ## 핵심 개념
-
-![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
-
-*첫 번째 LLM API 호출의 최소 왕복 구조*
 
 가장 먼저 기억할 문장은 단순합니다. LLM API도 결국 API입니다. 애플리케이션은 모델과 직접 대화하는 것이 아니라, 모델 서비스를 호출합니다. 따라서 요청에는 모델과 입력 메시지가 들어가고, 응답에는 생성 텍스트와 사용량 같은 메타데이터가 들어옵니다.
 
@@ -298,15 +300,26 @@ if __name__ == "__main__":
 
 다음 글에서는 같은 호출을 유지한 채 토큰을 중심에 놓고 보겠습니다. 길이 제한, 비용, 지연 시간은 결국 토큰 예산 문제로 수렴합니다. 첫 호출의 구조를 이해했다면, 이제 그 구조를 숫자로 읽을 차례입니다.
 
+## 처음 질문으로 돌아가기
+
+- LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 움직일까요?
+  - SDK 메서드처럼 보이지만 실제로는 모델 ID와 메시지 배열을 담은 JSON 요청을 보내고, 생성 텍스트와 사용량이 담긴 JSON 응답을 받는 구조입니다.
+
+- API 키와 모델 ID, 메시지 형식 중 첫 실패에서 어디부터 봐야 할까요?
+  - 먼저 인증과 API 키 위치를 확인하고, 그다음 모델 ID와 메시지 배열 형식을 좁혀 가는 편이 안전합니다.
+
+- 응답에서 본문, 사용량, 모델명을 어떻게 읽어야 할까요?
+  - `choices[0].message.content`에서 본문을 읽고, `usage`에서 토큰 사용량을 읽고, `model`에서 실제 응답 모델을 기록합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기 (현재 글)**
-- 토큰 이해하기 — 비용, 한계, 컨텍스트 창 (예정)
-- 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (예정)
-- Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
-- 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
-- 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
+- **LLM App Foundations 101 (1/6): LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기 (현재 글)**
+- LLM App Foundations 101 (2/6): 토큰 이해하기 — 비용, 한계, 컨텍스트 창 (예정)
+- LLM App Foundations 101 (3/6): 프롬프트 엔지니어링 기초 — System·User·Assistant 역할 (예정)
+- LLM App Foundations 101 (4/6): Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기 (예정)
+- LLM App Foundations 101 (5/6): 대화 상태 관리 — 멀티턴 챗봇 만들기 (예정)
+- LLM App Foundations 101 (6/6): 스트리밍 응답 처리 — 실시간으로 출력 받기 (예정)
 
 <!-- toc:end -->
 

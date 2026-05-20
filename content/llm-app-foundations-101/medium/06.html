@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Handling streaming responses — real-time output</title>
+<title>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,14 +53,8 @@
 </style>
 </head>
 <body>
-<h1>Handling streaming responses — real-time output</h1>
-<blockquote>
-<p>LLM App Foundations 101 (6/6)</p>
-</blockquote>
-<p>The diagram below shows the basic event flow of a streamed response.</p>
-<p><img alt="Handling streaming responses: real-time output" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png"></p>
-<p><em>Handling streaming responses: real-time output</em><br>
-One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.</p>
+<h1>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output</h1>
+<p>One of the easiest ways to make an LLM application feel slow is to treat it like an ordinary blocking API call. The server sends a prompt, waits in silence, and only returns once the entire answer is finished. The feature works, but the experience feels worse than it needs to. A user stares at a blank box for several seconds and has no idea whether the model is thinking, the network is stalled, or the app is broken.</p>
 <p>That is the real value of streaming. It does not magically reduce the model's total generation time. What it changes is visibility. The first partial output can reach the user quickly, the UI can start rendering immediately, and long answers stop feeling like dead time. In practice, that difference matters a lot. A five-second wait with no feedback feels suspicious. A five-second wait where text starts appearing after a few hundred milliseconds feels responsive.</p>
 <p>Streaming also changes how you think about the response itself. Without streaming, a completion is one object with one final text field. With streaming, the answer becomes a sequence of chunks. Each chunk may contain new text, metadata, or just a signal that generation is ending. Once you start building chat UIs, drafting tools, or browser-based copilots, that event-oriented model becomes much more natural than waiting for one large string.</p>
 <p>This is the final post in the LLM App Foundations 101 series. Here, we close the series by building that mental model with the Groq Python SDK. We will cover seven things:</p>
@@ -75,14 +69,19 @@ One of the easiest ways to make an LLM application feel slow is to treat it like
 </ul>
 <p>The main idea is simple: <strong>streaming does not make the model smarter or faster, but it makes waiting legible</strong>.</p>
 <hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What is the real mechanism by which streaming reduces perceived latency?</li>
-<li>What is the smallest Groq SDK call that opens a streaming response?</li>
-<li>What is the safe pattern to pull only text tokens out of each chunk?</li>
-<li>Where do synchronous and asynchronous streaming diverge in practice?</li>
-<li>When piping a stream through FastAPI, how do you handle headers and backpressure?</li>
+<li>Does streaming finish the answer sooner, or show the generation flow earlier?</li>
+<li>How do you read text, finish signals, and usage from chunks?</li>
+<li>How does a FastAPI server relay the model stream to a user?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Handling streaming responses: real-time output" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png"></p>
+<p><em>Handling streaming responses: real-time output</em></p>
+<p>This picture shows generation as a stream of events instead of one completed response body. Streaming does not remove the work; it exposes progress while the work is happening.</p>
+<blockquote>
+<p>Streaming exposes generation as a sequence of events, not as a faster final answer.</p>
+</blockquote>
 <h2>Why streaming matters</h2>
 <p>From a backend point of view, blocking calls are attractive. The implementation is easy to explain. Send the request, wait for completion, read the final text, return the result. That is perfectly fine for small scripts and offline jobs.</p>
 <p>The problem shows up at the user boundary. When the application waits for the full answer before sending anything back, the user gets no evidence that progress is happening. The model may already be generating tokens, but the interface remains frozen until the last token arrives.</p>
@@ -424,14 +423,31 @@ async def chat_stream(prompt: str) -&gt; StreamingResponse:
 <li>[ ] You wrote both synchronous and <code>async for</code> versions of the stream consumer</li>
 <li>[ ] Your FastAPI route uses <code>StreamingResponse</code> with explicit <code>media_type</code> and termination</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>Does streaming finish the answer sooner, or show the generation flow earlier?</li>
+<li>
+<p>Streaming mainly shows partial output earlier. The model still generates the answer, but the user sees chunks while generation continues.</p>
+</li>
+<li>
+<p>How do you read text, finish signals, and usage from chunks?</p>
+</li>
+<li>
+<p>Accumulate delta text from chunks, then read finish signals and usage from the final provider-specific chunk or a fallback accounting path.</p>
+</li>
+<li>
+<p>How does a FastAPI server relay the model stream to a user?</p>
+</li>
+<li>FastAPI wraps the upstream model chunks in a server-side stream, such as <code>StreamingResponse</code>, and forwards them to the browser or client.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">Prompt engineering basics — system, user, and assistant roles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">Few-shot and chain-of-thought — steering better answers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/05-conversation-state.md">Managing conversation state — building a multi-turn chatbot</a></li>
-<li><strong>Handling streaming responses — real-time output (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM App Foundations 101 (1/6): LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/05-conversation-state.md">LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot</a></li>
+<li><strong>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>

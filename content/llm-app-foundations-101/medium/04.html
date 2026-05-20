@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Few-shot and chain-of-thought — steering better answers</title>
+<title>LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,14 +53,8 @@
 </style>
 </head>
 <body>
-<h1>Few-shot and chain-of-thought — steering better answers</h1>
-<blockquote>
-<p>LLM App Foundations 101 (4/6)</p>
-</blockquote>
-<p>The diagram below shows how examples and stepwise reasoning steer one request.</p>
-<p><img alt="Few-shot and chain-of-thought: steering better answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png"></p>
-<p><em>Few-shot and chain-of-thought: steering better answers</em><br>
-Post 03 established the basic shape of prompt design: split policy into <code>system</code>, put the current request in <code>user</code>, and replay earlier answers as <code>assistant</code> when you need conversation state. Once that foundation is in place, the next practical question shows up immediately. Why does the same model sometimes follow the format you want very closely, while other times it gives something that feels almost right but not dependable enough to automate?</p>
+<h1>LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers</h1>
+<p>Post 03 established the basic shape of prompt design: split policy into <code>system</code>, put the current request in <code>user</code>, and replay earlier answers as <code>assistant</code> when you need conversation state. Once that foundation is in place, the next practical question shows up immediately. Why does the same model sometimes follow the format you want very closely, while other times it gives something that feels almost right but not dependable enough to automate?</p>
 <p>In application work, two of the first steering tools you reach for are few-shot prompting and chain-of-thought prompting. Few-shot means showing the model one or more examples of the behavior you want. Chain-of-thought means nudging the model to solve the task in intermediate steps instead of jumping straight to the final answer. Neither technique retrains the model. Both are ways to make an already capable model behave more predictably on the request in front of it.</p>
 <p>This is the fourth post in the LLM App Foundations 101 series. Here, we use Groq's <code>llama-3.1-8b-instant</code> to cover both patterns in runnable Python. We will look at seven things:</p>
 <ul>
@@ -74,14 +68,19 @@ Post 03 established the basic shape of prompt design: split policy into <code>sy
 </ul>
 <p>The operating idea is simple: better prompts are often less about clever wording and more about showing the model a clear pattern to follow.</p>
 <hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How does few-shot prompting actually "teach" inside a single chat call?</li>
-<li>When does adding more examples improve output, and when does it just burn tokens?</li>
-<li>How does chain-of-thought differ from "explain your answer" prompting?</li>
-<li>When do zero-shot CoT and few-shot CoT each fit best?</li>
-<li>When do these techniques stop helping, and what should you reach for instead?</li>
+<li>What does few-shot teach, and what does chain-of-thought teach?</li>
+<li>When should you choose zero-shot, few-shot, or CoT?</li>
+<li>Why can weak examples make the answer worse?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Few-shot and chain-of-thought: steering better answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png"></p>
+<p><em>Few-shot and chain-of-thought: steering better answers</em></p>
+<p>This picture separates two steering goals: showing the answer shape and showing the reasoning path. Few-shot and CoT often sit together, but they stabilize different parts of the response.</p>
+<blockquote>
+<p>Few-shot stabilizes the answer shape; chain-of-thought stabilizes the path.</p>
+</blockquote>
 <h2>Few-shot prompting teaches by example inside the messages array</h2>
 <p><img alt="Example pairs steering the final answer" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png"></p>
 <p><em>Example pairs steering the final answer</em><br>
@@ -578,14 +577,31 @@ Few-shot and CoT are powerful, but they are not universal fixes.</p>
 <li>[ ] Multi-step reasoning tasks include an explicit "think step by step" instruction</li>
 <li>[ ] Combined few-shot + CoT calls fit inside the model's context window</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>What does few-shot teach, and what does chain-of-thought teach?</li>
+<li>
+<p>Few-shot teaches the output pattern through examples; chain-of-thought teaches a stepwise path toward the answer.</p>
+</li>
+<li>
+<p>When should you choose zero-shot, few-shot, or CoT?</p>
+</li>
+<li>
+<p>Start with zero-shot, add few-shot when the answer shape drifts, and consider CoT when the task needs decomposition.</p>
+</li>
+<li>
+<p>Why can weak examples make the answer worse?</p>
+</li>
+<li>The model imitates example quality, so weak or unrepresentative examples can inject the wrong format and the wrong decision rule.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">Prompt engineering basics — system, user, and assistant roles</a></li>
-<li><strong>Few-shot and chain-of-thought — steering better answers (current)</strong></li>
-<li>Managing conversation state — building a multi-turn chatbot (upcoming)</li>
-<li>Handling streaming responses — real-time output (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM App Foundations 101 (1/6): LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles</a></li>
+<li><strong>LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (current)</strong></li>
+<li>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)</li>
+<li>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

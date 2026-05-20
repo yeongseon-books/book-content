@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Managing conversation state — building a multi-turn chatbot</title>
+<title>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,14 +53,12 @@
 </style>
 </head>
 <body>
-<h1>Managing conversation state — building a multi-turn chatbot</h1>
+<h1>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot</h1>
 <blockquote>
 <p>LLM App Foundations 101 (5/6)</p>
 </blockquote>
 <p>The diagram below summarizes how message history accumulates across turns.</p>
-<p><img alt="Managing conversation state: building a multi-turn chatbot" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png"></p>
-<p><em>Managing conversation state: building a multi-turn chatbot</em><br>
-One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.</p>
+<p>One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.</p>
 <p>An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.</p>
 <p>This is the fifth post in the LLM App Foundations 101 series. Here, we use Groq's <code>llama-3.1-8b-instant</code> to build that mental model and turn it into runnable Python. We will cover seven things:</p>
 <ul>
@@ -74,14 +72,19 @@ One of the first surprises in chatbot development is how quickly the illusion br
 </ul>
 <p>The main idea is simple: <strong>conversation memory lives in your application layer, not inside the model session</strong>.</p>
 <hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Given that LLM calls are stateless, what constraints does that put on multi-turn design?</li>
-<li>When does full-history, sliding-window, or summary compression each fit best?</li>
-<li>What is the safest way to detect context overflow before the call fails?</li>
-<li>How do you instruct the model on what to keep vs. drop during summary compression?</li>
-<li>What is the minimum set of pieces needed to build a one-file CLI chatbot end to end?</li>
+<li>Does multi-turn memory live inside the model or inside the request?</li>
+<li>When do full history, sliding windows, and summary compression split apart?</li>
+<li>How can you detect context overflow before the request fails?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Managing conversation state: building a multi-turn chatbot" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png"></p>
+<p><em>Managing conversation state: building a multi-turn chatbot</em></p>
+<p>This picture treats conversation memory as replayed message history, not hidden model state. The application owns which turns to send again on each request.</p>
+<blockquote>
+<p>Conversation memory is application state replayed into each request.</p>
+</blockquote>
 <h2>Why LLM calls are stateless</h2>
 <p><img alt="Stateless calls with and without replayed history" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.en.png"></p>
 <p><em>Stateless calls with and without replayed history</em><br>
@@ -454,14 +457,31 @@ if __name__ == &quot;__main__&quot;:
 <li>[ ] Cumulative tokens are checked before each call, with a warning at ~80% of the limit</li>
 <li>[ ] The CLI loop supports <code>/exit</code> and <code>/reset</code> (clear history) commands</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>Does multi-turn memory live inside the model or inside the request?</li>
+<li>
+<p>Memory does not stay inside the model automatically. The app creates the multi-turn effect by replaying prior messages in the next request.</p>
+</li>
+<li>
+<p>When do full history, sliding windows, and summary compression split apart?</p>
+</li>
+<li>
+<p>Full history is simplest for short conversations; sliding windows and summary compression become necessary as cost and context pressure grow.</p>
+</li>
+<li>
+<p>How can you detect context overflow before the request fails?</p>
+</li>
+<li>Estimate the message budget before sending the request, including expected output, so overflow is caught before the API rejects or truncates the call.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM API first call — sending your first request</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">Understanding tokens — cost, limits, and context windows</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">Prompt engineering basics — system, user, and assistant roles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">Few-shot and chain-of-thought — steering better answers</a></li>
-<li><strong>Managing conversation state — building a multi-turn chatbot (current)</strong></li>
-<li>Handling streaming responses — real-time output (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/01-llm-api-first-call.md">LLM App Foundations 101 (1/6): LLM API first call — sending your first request</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/02-understanding-tokens.md">LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/04-few-shot-and-cot.md">LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers</a></li>
+<li><strong>LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (current)</strong></li>
+<li>LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

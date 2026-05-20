@@ -1,5 +1,5 @@
 ---
-title: Managing conversation state — building a multi-turn chatbot
+title: "LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot"
 series: llm-app-foundations-101
 episode: 5
 language: en
@@ -18,15 +18,12 @@ last_reviewed: '2026-05-01'
 seo_description: Build stateful LLM chatbots by managing conversation history through full-replay, sliding-window, and summary-based compression strategies.
 ---
 
-# Managing conversation state — building a multi-turn chatbot
+# LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot
 
 > LLM App Foundations 101 (5/6)
 
 The diagram below summarizes how message history accumulates across turns.
 
-![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
-
-*Managing conversation state: building a multi-turn chatbot*
 One of the first surprises in chatbot development is how quickly the illusion breaks. The first answer looks fine. The second user message refers to the previous turn, and the model suddenly behaves as if the conversation started from zero. That is not a provider bug. It is the default API contract.
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.
@@ -45,13 +42,21 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ---
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Given that LLM calls are stateless, what constraints does that put on multi-turn design?
-- When does full-history, sliding-window, or summary compression each fit best?
-- What is the safest way to detect context overflow before the call fails?
-- How do you instruct the model on what to keep vs. drop during summary compression?
-- What is the minimum set of pieces needed to build a one-file CLI chatbot end to end?
+- Does multi-turn memory live inside the model or inside the request?
+- When do full history, sliding windows, and summary compression split apart?
+- How can you detect context overflow before the request fails?
+
+## Big Picture
+
+![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
+
+*Managing conversation state: building a multi-turn chatbot*
+
+This picture treats conversation memory as replayed message history, not hidden model state. The application owns which turns to send again on each request.
+
+> Conversation memory is application state replayed into each request.
 
 ## Why LLM calls are stateless
 
@@ -484,15 +489,26 @@ If you can answer those clearly, conversation memory stops being magic and becom
 - [ ] Cumulative tokens are checked before each call, with a warning at ~80% of the limit
 - [ ] The CLI loop supports `/exit` and `/reset` (clear history) commands
 
+## Answering the Opening Questions
+
+- Does multi-turn memory live inside the model or inside the request?
+  - Memory does not stay inside the model automatically. The app creates the multi-turn effect by replaying prior messages in the next request.
+
+- When do full history, sliding windows, and summary compression split apart?
+  - Full history is simplest for short conversations; sliding windows and summary compression become necessary as cost and context pressure grow.
+
+- How can you detect context overflow before the request fails?
+  - Estimate the message budget before sending the request, including expected output, so overflow is caught before the API rejects or truncates the call.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM API first call — sending your first request](./01-llm-api-first-call.md)
-- [Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
-- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
-- [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
-- **Managing conversation state — building a multi-turn chatbot (current)**
-- Handling streaming responses — real-time output (upcoming)
+- [LLM App Foundations 101 (1/6): LLM API first call — sending your first request](./01-llm-api-first-call.md)
+- [LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows](./02-understanding-tokens.md)
+- [LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- [LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+- **LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (current)**
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 

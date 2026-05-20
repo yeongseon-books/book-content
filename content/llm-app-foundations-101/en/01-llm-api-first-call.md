@@ -1,5 +1,5 @@
 ---
-title: LLM API first call — sending your first request
+title: "LLM App Foundations 101 (1/6): LLM API first call — sending your first request"
 series: llm-app-foundations-101
 episode: 1
 language: en
@@ -19,15 +19,8 @@ seo_description: '!Authentication rate limit and retry branches The SDK handles 
   headers, JSON serialization, response parsing, and typed errors.'
 ---
 
-# LLM API first call — sending your first request
+# LLM App Foundations 101 (1/6): LLM API first call — sending your first request
 
-> LLM App Foundations 101 (1/6)
-
-The diagram below shows the smallest round trip behind a first LLM API call.
-
-![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
-
-*LLM API first call: sending your first request*
 The first confusing thing about LLM application development is not the model. It is the boundary between your code and the model service. A chat UI makes the whole thing feel magical, but the runtime reality is plain: your application sends an HTTP request and receives a JSON response. That round trip is the foundation.
 
 That is why Post 01 starts here. If you do not understand what goes into the request body, what comes back in the response, and where token usage shows up, every later feature feels blurry.
@@ -48,13 +41,21 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ---
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What request-response shape is an LLM API call, underneath the SDK?
-- How do you provision a Groq API key and keep it out of source code?
-- How do you extract the body, token usage, and model name from `client.chat.completions.create()`?
-- How do synchronous and asynchronous patterns differ in code shape and use case?
-- When the first call fails, do you suspect authentication, the model id, or the message format first?
+- What request-response shape sits underneath the SDK call?
+- When the first call fails, should you inspect authentication, the model id, or the message format first?
+- Where do you read the response body, token usage, and model name?
+
+## Big Picture
+
+![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
+
+*LLM API first call: sending your first request*
+
+This picture keeps the first call down to one round trip: your application sends a JSON-shaped request and receives a structured response. Authentication, model selection, messages, generated text, and usage all live on that boundary.
+
+> The first call is not magic; it is a remote contract you can inspect field by field.
 
 ## What an LLM API is
 
@@ -560,15 +561,26 @@ In the next post, we will stay close to the same API call and zoom in on token a
 - [ ] You printed `choices[0].message.content`, `usage.total_tokens`, and `model` from the response
 - [ ] You ran the same call once synchronously and once asynchronously
 
+## Answering the Opening Questions
+
+- What request-response shape sits underneath the SDK call?
+  - The SDK call wraps a remote API contract: model and messages go out, while generated text, usage, and metadata come back.
+
+- When the first call fails, should you inspect authentication, the model id, or the message format first?
+  - Start with authentication and key placement, then narrow the failure to the model id and message shape.
+
+- Where do you read the response body, token usage, and model name?
+  - Read text from `choices[0].message.content`, token accounting from `usage`, and the actual model from `model`.
+
 <!-- toc:begin -->
 ## In this series
 
-- **LLM API first call — sending your first request (current)**
-- Understanding tokens — cost, limits, and context windows (upcoming)
-- Prompt engineering basics — system, user, and assistant roles (upcoming)
-- Few-shot and chain-of-thought — steering better answers (upcoming)
-- Managing conversation state — building a multi-turn chatbot (upcoming)
-- Handling streaming responses — real-time output (upcoming)
+- **LLM App Foundations 101 (1/6): LLM API first call — sending your first request (current)**
+- LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows (upcoming)
+- LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles (upcoming)
+- LLM App Foundations 101 (4/6): Few-shot and chain-of-thought — steering better answers (upcoming)
+- LLM App Foundations 101 (5/6): Managing conversation state — building a multi-turn chatbot (upcoming)
+- LLM App Foundations 101 (6/6): Handling streaming responses — real-time output (upcoming)
 
 <!-- toc:end -->
 
