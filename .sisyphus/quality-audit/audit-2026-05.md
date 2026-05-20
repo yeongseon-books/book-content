@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:49:49+00:00
+Generated: 2026-05-20T11:50:09+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **36**
-- Series at or above 5 issues: **27**
-- Total issues: **290**
-  - BadImg: **290**
+- Series with any issue: **35**
+- Series at or above 5 issues: **26**
+- Total issues: **282**
+  - BadImg: **282**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -55,28 +55,27 @@ Warnings:
 | 12 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 13 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 14 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 16 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 17 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 18 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 19 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 20 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 21 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 23 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 24 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 25 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 26 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 27 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 28 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 29 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 30 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 31 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 32 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 33 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 34 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 35 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 36 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 15 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 16 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 17 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 18 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 19 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 20 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 22 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 23 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 24 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 25 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 26 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 27 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 28 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 29 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 30 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 31 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 32 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 33 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 34 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 35 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -245,18 +244,6 @@ Warnings:
 - `assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1092x67)
 - `assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=920x67)
 - ... 5 more
-
-## computer-networks-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 78px <= 100px (size=1384x78)
-- `assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 87px <= 100px (size=1384x87)
-- `assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 81px <= 100px (size=1384x81)
-- `assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 88px <= 100px (size=1359x88)
-- `assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 83px <= 100px (size=1384x83)
-- ... 3 more
 
 ## devops-101 — Total 8
 

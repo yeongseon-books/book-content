@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:49:49+00:00",
+  "generated_at": "2026-05-20T11:50:09+00:00",
   "series_count": 92,
-  "problem_series_count": 36,
-  "series_with_5_plus": 27,
+  "problem_series_count": 35,
+  "series_with_5_plus": 26,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 290,
+    "BadImg": 282,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 290
+    "all": 282
   },
   "results": [
     {
@@ -4327,234 +4327,6 @@
       }
     },
     {
-      "series": "computer-networks-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 8,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 78px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 78,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 1384,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 81px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 81,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 1359,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 83px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 83,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 1298,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1250,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1181,
-            "height": 88,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 78px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 78,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 87px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 1384,
-            "height": 87,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 81px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 81,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 1359,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 83px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 1384,
-            "height": 83,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 1298,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1250,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1181,
-            "height": 88,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "devops-101",
       "counts": {
         "Synt": 0,
@@ -8112,6 +7884,20 @@
     },
     {
       "series": "computer-architecture-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "computer-networks-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
