@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Authorization and Permissions</title>
+<title>Secure Coding 101 (4/10): Authorization and Permissions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Authorization and Permissions</h1>
+<h1>Secure Coding 101 (4/10): Authorization and Permissions</h1>
 <p>Logging in does not answer the question that matters most to a secure application: may this user touch this resource right now? Reading another person's order, editing a document, or downloading an internal report all need a separate decision. Broken access control keeps ranking near the top of real-world incident lists because teams often stop at authentication and never finish the authorization model behind it.</p>
 <p>This is post 4 in the Secure Coding 101 series.</p>
 <p>In this chapter, we will treat authorization as a server-side decision over actor, action, and resource, not as a UI rule or a handful of role names. That framing makes RBAC, ABAC, IDOR defense, list filtering, and default-deny behavior fit together cleanly.</p>
 <blockquote>
 <p>Authorization is not a visibility rule. It is a repeated server-side decision over who wants to do what to which resource.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Authorization and Permissions?</li>
+<li>Which signal should the example or diagram make visible for Authorization and Permissions?</li>
+<li>What failure should be prevented first when Authorization and Permissions reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 4 flow overview</em></p>
+<p>This picture places Authorization and Permissions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Authorization and Permissions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Authorize at the </em>resource<em> level, not just the </em>route<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The flow from authentication to resource loading, authorization, and action execution" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>The flow from authentication to resource loading, authorization, and action execution</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>RBAC</strong>: <em>role-based</em> (admin, editor, viewer).</li>
@@ -155,10 +166,20 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once authorization is <em>explicit</em>, incidents stay <em>short</em>. Next we make the <em>resource itself safe</em> — <em>safe data storage</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><strong>What boundary should you inspect first when applying Authorization and Permissions?</strong></li>
+<li>The article treats Authorization and Permissions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Authorization and Permissions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Authorization and Permissions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Secure Coding 101 (2/10): Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Secure Coding 101 (3/10): Authentication and Session</a></li>
 <li><strong>Authorization and Permissions (current)</strong></li>
 <li>Safe Data Storage (upcoming)</li>
 <li>Secret and Key Management (upcoming)</li>

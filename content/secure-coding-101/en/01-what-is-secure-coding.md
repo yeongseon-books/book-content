@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 1
-title: What Is Secure Coding?
+title: "Secure Coding 101 (1/10): What Is Secure Coding?"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical introduction to secure coding — threat modeling, 
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Secure Coding?
+# Secure Coding 101 (1/10): What Is Secure Coding?
 
 A feature can behave exactly as intended in happy-path testing and still fail the first time someone sends hostile input, replays a token, or calls an API out of order. In practice, many security incidents begin not with exotic cryptography failures but with ordinary development shortcuts: trusting a payload too early, logging a secret, or skipping a permission check in one code path.
 
@@ -29,6 +29,22 @@ This is the first post in the Secure Coding 101 series.
 Here, we will treat secure coding not as a final review step but as a development habit that keeps the attack surface small from the first route handler to the final audit log. That mental model matters because the rest of the series builds on it: input validation, authentication, authorization, storage, browser defense, dependency hygiene, and logging only make sense when you see them as one connected system.
 
 > Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Secure Coding??
+- Which signal should the example or diagram make visible for What Is Secure Coding??
+- What failure should be prevented first when What Is Secure Coding? reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 1 flow overview*
+
+This picture places What Is Secure Coding? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Secure Coding? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ Most security incidents are *known patterns* repeated. *Skipped input validation
 
 ## Concept at a Glance
 
-![The basic secure-coding flow across input, auth, storage, and logs](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
-
-*The basic secure-coding flow across input, auth, storage, and logs*
 ## Key Terms
 
 - **Threat model**: a *map* of who attacks, from where, and what they want.
@@ -151,7 +164,18 @@ Most teams begin with a *threat-modeling workshop*. They draw a *data-flow diagr
 
 Secure coding is a *habit*. The next post goes deep on the place that leaks most often: *input validation*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Secure Coding??**
+  - The article treats What Is Secure Coding? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Secure Coding??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Secure Coding? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Secure Coding? (current)**
 - Input Validation (upcoming)
 - Authentication and Session (upcoming)
@@ -162,6 +186,7 @@ Secure coding is a *habit*. The next post goes deep on the place that leaks most
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

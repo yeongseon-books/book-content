@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 3
-title: Authentication and Session
+title: "Secure Coding 101 (3/10): Authentication and Session"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Password hashing, session cookies, JWT trade-offs, MFA, and a f
 last_reviewed: '2026-05-15'
 ---
 
-# Authentication and Session
+# Secure Coding 101 (3/10): Authentication and Session
 
 When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.
 
@@ -29,6 +29,22 @@ This is post 3 in the Secure Coding 101 series.
 Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.
 
 > Authentication proves identity. Session management preserves that proof across requests. Both need explicit failure handling, not just a happy-path login screen.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Authentication and Session?
+- Which signal should the example or diagram make visible for Authentication and Session?
+- What failure should be prevented first when Authentication and Session reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 3 flow overview*
+
+This picture places Authentication and Session inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Authentication and Session is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ When auth leaks, *every permission leaks*. The most common incidents are *weak h
 
 ## Concept at a Glance
 
-![The flow from password verification to session issuance and subsequent requests](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
-
-*The flow from password verification to session issuance and subsequent requests*
 ## Key Terms
 
 - **AuthN**: *who are you* (authentication).
@@ -171,9 +184,20 @@ Most teams hash with *Argon2id* or *bcrypt*, combine *short-lived session cookie
 
 Auth answers *who*. Next we answer *what may they do* — *authorization and permissions*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Authentication and Session?**
+  - The article treats Authentication and Session as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Authentication and Session?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Authentication and Session reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
 - **Authentication and Session (current)**
 - Authorization and Permissions (upcoming)
 - Safe Data Storage (upcoming)
@@ -182,6 +206,7 @@ Auth answers *who*. Next we answer *what may they do* — *authorization and per
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

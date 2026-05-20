@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 8
-title: XSS와 CSRF 방어
+title: "Secure Coding 101 (8/10): XSS와 CSRF 방어"
 status: content-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: Output escaping, CSP, SameSite cookie, CSRF token 그리고 브
 last_reviewed: '2026-05-15'
 ---
 
-# XSS와 CSRF 방어
+# Secure Coding 101 (8/10): XSS와 CSRF 방어
 
 브라우저는 사용자 편의 도구이지만, 동시에 공격자가 가장 자주 노리는 실행 환경이기도 합니다. 댓글 한 줄이 스크립트로 바뀌거나, 사용자가 모르는 사이에 다른 사이트에서 우리 서비스로 상태 변경 요청이 날아가면 기능은 그대로 있어도 신뢰는 무너집니다. XSS와 CSRF는 그 대표적인 두 갈래입니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 브라우저 공격을 입력 정제만으로 보는 대신, 출력 이스케이프와 CSP, 쿠키 정책, CSRF 검증이 함께 돌아가는 방어 체계로 정리하겠습니다. 이 관점을 이해하면 브라우저가 언제 우리 편이고 언제 공격자 도구가 되는지도 더 명확해집니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - XSS는 어떤 종류로 나뉘고 각각 어디서 생길까요?
 - 출력 이스케이프와 CSP는 어떤 역할 분담을 할까요?
 - CSRF는 왜 사용자의 권한을 그대로 악용할 수 있을까요?
-- SameSite 쿠키와 CSRF 토큰은 왜 함께 써야 할까요?
-- `innerHTML` 같은 위험한 DOM API는 왜 기본적으로 금지해야 할까요?
 
-> XSS는 공격자 코드를 우리 페이지에서 실행하게 만들고, CSRF는 사용자의 권한으로 원하지 않은 요청을 보내게 만듭니다.
+## 큰 그림
+
+![Secure Coding 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Secure Coding 101 8장 흐름 개요*
+
+이 그림에서는 XSS와 CSRF 방어를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> XSS와 CSRF 방어의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ XSS 한 번이면 세션 탈취, 화면 변조, 피싱 삽입, 관리자 권한 
 
 ## 한눈에 보는 구조
 
-![출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
-
-*출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름*
 사용자 입력은 저장된 뒤 다시 출력될 수 있고, 그 출력이 브라우저에서 실행될 수도 있습니다. 동시에 브라우저는 다른 사이트에서 보낸 요청에도 쿠키를 자동 첨부할 수 있습니다. 그래서 출력 방어와 요청 출처 검증이 각각 필요합니다.
 
 ## 핵심 용어
@@ -186,17 +189,29 @@ element.textContent = userInput;    // 안전
 
 다음 글에서는 우리가 직접 작성하지 않은 코드에서 시작되는 공급망 위험, 의존성 취약점 관리를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **XSS는 어떤 종류로 나뉘고 각각 어디서 생길까요?**
+  - 본문의 기준은 XSS와 CSRF 방어를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **출력 이스케이프와 CSP는 어떤 역할 분담을 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **CSRF는 왜 사용자의 권한을 그대로 악용할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
-- [입력값 검증](./02-input-validation.md)
-- [인증과 세션](./03-authentication-and-session.md)
-- [인가와 권한](./04-authorization-and-permissions.md)
-- [안전한 데이터 저장](./05-safe-data-storage.md)
-- [Secret과 키 관리](./06-secret-and-key-management.md)
-- [SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
+## 시리즈 목차
+
+- [Secure Coding 101 (1/10): Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): 입력값 검증](./02-input-validation.md)
+- [Secure Coding 101 (3/10): 인증과 세션](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): 인가와 권한](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): 안전한 데이터 저장](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
 - **XSS와 CSRF 방어 (현재 글)**
 - Dependency 취약점 관리 (예정)
 - 안전한 로깅과 감사 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

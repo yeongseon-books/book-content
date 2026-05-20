@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Managing Dependency Vulnerabilities</title>
+<title>Secure Coding 101 (9/10): Managing Dependency Vulnerabilities</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Managing Dependency Vulnerabilities</h1>
+<h1>Secure Coding 101 (9/10): Managing Dependency Vulnerabilities</h1>
 <p>Modern services depend more on external code than on code written directly by the team shipping the feature. HTTP clients, template engines, ORM layers, CLI tooling, and build dependencies all become part of the runtime we are responsible for. When one of them fails, the incident does not belong to a vendor anymore. It belongs to the service that deployed it.</p>
 <p>This is post 9 in the Secure Coding 101 series.</p>
 <p>Here, we will frame dependency management as supply-chain control rather than occasional version cleanup. Lockfiles, SBOMs, SCA gates, and small automated updates all serve one goal: keeping the build reproducible and the incident blast radius knowable.</p>
 <blockquote>
 <p>Dependencies are not attachments around our code. Once deployed, they are part of our codebase and part of our responsibility.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Managing Dependency Vulnerabilities?</li>
+<li>Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?</li>
+<li>What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 9 flow overview</em></p>
+<p>This picture places Managing Dependency Vulnerabilities inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Managing Dependency Vulnerabilities is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Dependencies are </em>assets that will leak someday<em>. Tracking them is the start of defense.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The supply-chain defense flow from manifest to lockfile, SCA, and update PRs" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>The supply-chain defense flow from manifest to lockfile, SCA, and update PRs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SCA</strong>: scanning dependencies for <em>known vulnerabilities</em>.</li>
@@ -149,15 +160,25 @@ updates:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Other people's code is <em>our code</em>. The last post covers <em>safe logging and audit</em>, the evidence that survives an incident.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">SQL Injection and Safe ORM Usage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/08-xss-and-csrf.md">XSS and CSRF Defense</a></li>
+<li><strong>What boundary should you inspect first when applying Managing Dependency Vulnerabilities?</strong></li>
+<li>The article treats Managing Dependency Vulnerabilities as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Secure Coding 101 (2/10): Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Secure Coding 101 (3/10): Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Secure Coding 101 (4/10): Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Secure Coding 101 (5/10): Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secure Coding 101 (6/10): Secret and Key Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/08-xss-and-csrf.md">Secure Coding 101 (8/10): XSS and CSRF Defense</a></li>
 <li><strong>Managing Dependency Vulnerabilities (current)</strong></li>
 <li>Safe Logging and Audit (upcoming)</li>
 </ul>

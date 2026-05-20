@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Secure Coding?</title>
+<title>Secure Coding 101 (1/10): What Is Secure Coding?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>What Is Secure Coding?</h1>
+<h1>Secure Coding 101 (1/10): What Is Secure Coding?</h1>
 <p>A feature can behave exactly as intended in happy-path testing and still fail the first time someone sends hostile input, replays a token, or calls an API out of order. In practice, many security incidents begin not with exotic cryptography failures but with ordinary development shortcuts: trusting a payload too early, logging a secret, or skipping a permission check in one code path.</p>
 <p>This is the first post in the Secure Coding 101 series.</p>
 <p>Here, we will treat secure coding not as a final review step but as a development habit that keeps the attack surface small from the first route handler to the final audit log. That mental model matters because the rest of the series builds on it: input validation, authentication, authorization, storage, browser defense, dependency hygiene, and logging only make sense when you see them as one connected system.</p>
 <blockquote>
 <p>Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Secure Coding??</li>
+<li>Which signal should the example or diagram make visible for What Is Secure Coding??</li>
+<li>What failure should be prevented first when What Is Secure Coding? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Secure Coding? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Secure Coding? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Security is not a </em>coating on top<em> of the feature. It is </em>part of the structure<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The basic secure-coding flow across input, auth, storage, and logs" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The basic secure-coding flow across input, auth, storage, and logs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Threat model</strong>: a <em>map</em> of who attacks, from where, and what they want.</li>
@@ -155,6 +166,16 @@ def render(name: str) -&gt; str:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Secure coding is a <em>habit</em>. The next post goes deep on the place that leaks most often: <em>input validation</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Secure Coding??</strong></li>
+<li>The article treats What Is Secure Coding? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Secure Coding??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Secure Coding? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Secure Coding? (current)</strong></li>
 <li>Input Validation (upcoming)</li>

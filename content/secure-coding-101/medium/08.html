@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>XSS and CSRF Defense</title>
+<title>Secure Coding 101 (8/10): XSS and CSRF Defense</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>XSS and CSRF Defense</h1>
+<h1>Secure Coding 101 (8/10): XSS and CSRF Defense</h1>
 <p>The browser is a convenience layer for legitimate users, but it is also one of the most effective execution environments available to an attacker. A single comment rendered unsafely can become script execution, and a state-changing endpoint that trusts cookies alone can turn a different site into a trigger for actions the user never intended to perform.</p>
 <p>This is post 8 in the Secure Coding 101 series.</p>
 <p>In this chapter, we will treat browser security as a system of output escaping, CSP, cookie policy, and request verification rather than as a single sanitization trick. That framing makes it easier to see when the browser is acting on the application's behalf and when it has effectively become the attacker's tool.</p>
 <blockquote>
 <p>XSS runs attacker-controlled code in our page. CSRF abuses the user's existing authority to send a request they did not mean to send.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying XSS and CSRF Defense?</li>
+<li>Which signal should the example or diagram make visible for XSS and CSRF Defense?</li>
+<li>What failure should be prevented first when XSS and CSRF Defense reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 8 flow overview</em></p>
+<p>This picture places XSS and CSRF Defense inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of XSS and CSRF Defense is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Default rule — </em>escape on output, verify origin on request<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The browser attack path that requires output escaping and CSRF verification" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>The browser attack path that requires output escaping and CSRF verification</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Reflected XSS</strong>: input from the URL <em>echoed straight back</em>.</li>
@@ -168,14 +179,24 @@ Check first:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Browser-side attacks are stopped by <em>fundamentals</em>. Next we tackle the code we <em>did not write</em> — <em>dependency vulnerabilities</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">SQL Injection and Safe ORM Usage</a></li>
+<li><strong>What boundary should you inspect first when applying XSS and CSRF Defense?</strong></li>
+<li>The article treats XSS and CSRF Defense as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for XSS and CSRF Defense?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when XSS and CSRF Defense reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Secure Coding 101 (2/10): Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Secure Coding 101 (3/10): Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Secure Coding 101 (4/10): Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Secure Coding 101 (5/10): Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secure Coding 101 (6/10): Secret and Key Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage</a></li>
 <li><strong>XSS and CSRF Defense (current)</strong></li>
 <li>Managing Dependency Vulnerabilities (upcoming)</li>
 <li>Safe Logging and Audit (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 7
-title: SQL Injection and Safe ORM Usage
+title: "Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Parameterized queries, safe ORM patterns, raw SQL pitfalls, and
 last_reviewed: '2026-05-15'
 ---
 
-# SQL Injection and Safe ORM Usage
+# Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage
 
 SQL injection is old, but it remains expensive because one mistake can hand over not just a page or a user account, but the entire database behind the application. A single f-string in the wrong place can become an authentication bypass, a data dump, and a destructive write path at the same time.
 
@@ -29,6 +29,22 @@ This is post 7 in the Secure Coding 101 series.
 Here, we will treat SQL injection as a structural error in how code combines syntax and data, not as a problem that disappears automatically once an ORM is in place. That distinction is what helps you reason clearly about raw SQL, dynamic identifiers, ORM escape hatches, and database account permissions.
 
 > SQL injection almost always comes from the same root cause: building SQL by string composition instead of sending data as data.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?
+- Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?
+- What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 7 flow overview*
+
+This picture places SQL Injection and Safe ORM Usage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQL Injection and Safe ORM Usage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ A single SQLi exposes the *entire database*. Auth bypass, data exfiltration, and
 
 ## Concept at a Glance
 
-![The difference between string-built SQL and parameterized SQL](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
-
-*The difference between string-built SQL and parameterized SQL*
 ## Key Terms
 
 - **SQL Injection**: input that *changes the meaning* of the SQL.
@@ -164,17 +177,29 @@ Most teams default to the ORM and treat *raw SQL* as the exception. Every raw SQ
 
 A safe DB removes the attacker's *biggest prize*. Next we cover the two browser-side attacks — *XSS and CSRF*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?**
+  - The article treats SQL Injection and Safe ORM Usage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
 - **SQL Injection and Safe ORM Usage (current)**
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

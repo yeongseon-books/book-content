@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Safe Data Storage</title>
+<title>Secure Coding 101 (5/10): Safe Data Storage</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Safe Data Storage</h1>
+<h1>Secure Coding 101 (5/10): Safe Data Storage</h1>
 <p>The moment an application stores sensitive data, it stops being only a feature system and becomes a custody system as well. From the user's perspective, it may be a simple signup flow. From the operator's perspective, it may already include password hashes, address history, export files, and backups that become extremely expensive the moment they leak.</p>
 <p>This is post 5 in the Secure Coding 101 series.</p>
 <p>Here, we will look past the usual shorthand of "turn on disk encryption" and treat storage security as a chain: data classification, transport protection, storage encryption, key separation, and backup handling. That is the level where real incident cost is determined.</p>
 <blockquote>
 <p>Secure storage starts before encryption. First decide what not to collect, then separate what you keep, and finally protect the transport, storage, and backup path as one system.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Safe Data Storage?</li>
+<li>Which signal should the example or diagram make visible for Safe Data Storage?</li>
+<li>What failure should be prevented first when Safe Data Storage reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 5 flow overview</em></p>
+<p>This picture places Safe Data Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Safe Data Storage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Collect less, separate more, lock harder.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The safe storage path across the application, database, and KMS" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>The safe storage path across the application, database, and KMS</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PII</strong>: information that <em>identifies</em> a person.</li>
@@ -150,11 +161,21 @@ gpg --symmetric --cipher-algo AES256 backup.sql
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Encrypted data is useless if the <em>keys leak</em>. Next we look at <em>secret and key management</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><strong>What boundary should you inspect first when applying Safe Data Storage?</strong></li>
+<li>The article treats Safe Data Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Safe Data Storage?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Safe Data Storage reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Secure Coding 101 (2/10): Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Secure Coding 101 (3/10): Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Secure Coding 101 (4/10): Authorization and Permissions</a></li>
 <li><strong>Safe Data Storage (current)</strong></li>
 <li>Secret and Key Management (upcoming)</li>
 <li>SQL Injection and Safe ORM Usage (upcoming)</li>

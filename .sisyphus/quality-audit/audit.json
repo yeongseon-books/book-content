@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:21:49+00:00",
+  "generated_at": "2026-05-20T11:22:08+00:00",
   "series_count": 92,
   "problem_series_count": 58,
   "series_with_5_plus": 43,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 20,
+    "Shrt": 18,
     "NoEn": 0,
-    "all": 552
+    "all": 550
   },
   "results": [
     {
@@ -6104,342 +6104,6 @@
       }
     },
     {
-      "series": "secure-coding-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 2,
-        "NoEn": 0,
-        "BadImg": 10
-      },
-      "total": 12,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/secure-coding-101/en/05-safe-data-storage.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "05-safe-data-storage.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/secure-coding-101/en/09-dependency-vulnerabilities.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "09-dependency-vulnerabilities.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 1092,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.ko.png",
-            "width": 1092,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 920,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 920,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 766,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 766,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 913,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 913,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/secure-coding-101/en/05-safe-data-storage.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "05-safe-data-storage.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          },
-          {
-            "kind": "Shrt",
-            "path": "content/secure-coding-101/en/09-dependency-vulnerabilities.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "09-dependency-vulnerabilities.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 898,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 1092,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.ko.png",
-            "width": 1092,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 920,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 920,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 766,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 766,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 913,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 913,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "linear-algebra-101",
       "counts": {
         "Synt": 0,
@@ -9013,6 +8677,286 @@
             "code": null,
             "image": "09-01-mental-model.ko.png",
             "width": 929,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "secure-coding-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 10
+      },
+      "total": 10,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-concept-at-a-glance.en.png",
+            "width": 898,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-concept-at-a-glance.ko.png",
+            "width": 898,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.en.png",
+            "width": 1092,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.ko.png",
+            "width": 1092,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 920,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.ko.png",
+            "width": 920,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 766,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.ko.png",
+            "width": 766,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.en.png",
+            "width": 913,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.ko.png",
+            "width": 913,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-concept-at-a-glance.en.png",
+            "width": 898,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-concept-at-a-glance.ko.png",
+            "width": 898,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.en.png",
+            "width": 1092,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "03-01-concept-at-a-glance.ko.png",
+            "width": 1092,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 920,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.ko.png",
+            "width": 920,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.en.png",
+            "width": 766,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "06-01-concept-at-a-glance.ko.png",
+            "width": 766,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.en.png",
+            "width": 913,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "09-01-concept-at-a-glance.ko.png",
+            "width": 913,
             "height": 67,
             "repo": null
           }

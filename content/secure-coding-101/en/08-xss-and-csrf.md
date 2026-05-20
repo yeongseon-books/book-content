@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 8
-title: XSS and CSRF Defense
+title: "Secure Coding 101 (8/10): XSS and CSRF Defense"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Output escaping, CSP, SameSite cookies, CSRF tokens, and a five
 last_reviewed: '2026-05-15'
 ---
 
-# XSS and CSRF Defense
+# Secure Coding 101 (8/10): XSS and CSRF Defense
 
 The browser is a convenience layer for legitimate users, but it is also one of the most effective execution environments available to an attacker. A single comment rendered unsafely can become script execution, and a state-changing endpoint that trusts cookies alone can turn a different site into a trigger for actions the user never intended to perform.
 
@@ -29,6 +29,22 @@ This is post 8 in the Secure Coding 101 series.
 In this chapter, we will treat browser security as a system of output escaping, CSP, cookie policy, and request verification rather than as a single sanitization trick. That framing makes it easier to see when the browser is acting on the application's behalf and when it has effectively become the attacker's tool.
 
 > XSS runs attacker-controlled code in our page. CSRF abuses the user's existing authority to send a request they did not mean to send.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying XSS and CSRF Defense?
+- Which signal should the example or diagram make visible for XSS and CSRF Defense?
+- What failure should be prevented first when XSS and CSRF Defense reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 8 flow overview*
+
+This picture places XSS and CSRF Defense inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of XSS and CSRF Defense is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ A single *XSS* can hijack the session. *CSRF* triggers transfers and deletes *wi
 
 ## Concept at a Glance
 
-![The browser attack path that requires output escaping and CSRF verification](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
-
-*The browser attack path that requires output escaping and CSRF verification*
 ## Key Terms
 
 - **Reflected XSS**: input from the URL *echoed straight back*.
@@ -169,17 +182,29 @@ Most teams keep *template auto-escape* on by default. They roll out *CSP* in *re
 
 Browser-side attacks are stopped by *fundamentals*. Next we tackle the code we *did not write* — *dependency vulnerabilities*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying XSS and CSRF Defense?**
+  - The article treats XSS and CSRF Defense as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for XSS and CSRF Defense?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when XSS and CSRF Defense reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
-- [SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
 - **XSS and CSRF Defense (current)**
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

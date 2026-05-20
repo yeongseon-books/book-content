@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 9
-title: Managing Dependency Vulnerabilities
+title: "Secure Coding 101 (9/10): Managing Dependency Vulnerabilities"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: SCA, SBOM, lockfiles, Dependabot, and a five-step playbook for 
 last_reviewed: '2026-05-15'
 ---
 
-# Managing Dependency Vulnerabilities
+# Secure Coding 101 (9/10): Managing Dependency Vulnerabilities
 
 Modern services depend more on external code than on code written directly by the team shipping the feature. HTTP clients, template engines, ORM layers, CLI tooling, and build dependencies all become part of the runtime we are responsible for. When one of them fails, the incident does not belong to a vendor anymore. It belongs to the service that deployed it.
 
@@ -29,6 +29,22 @@ This is post 9 in the Secure Coding 101 series.
 Here, we will frame dependency management as supply-chain control rather than occasional version cleanup. Lockfiles, SBOMs, SCA gates, and small automated updates all serve one goal: keeping the build reproducible and the incident blast radius knowable.
 
 > Dependencies are not attachments around our code. Once deployed, they are part of our codebase and part of our responsibility.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Managing Dependency Vulnerabilities?
+- Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?
+- What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 9 flow overview*
+
+This picture places Managing Dependency Vulnerabilities inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Managing Dependency Vulnerabilities is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ Log4j, event-stream, ua-parser-js — *supply-chain attacks* succeed with *zero 
 
 ## Concept at a Glance
 
-![The supply-chain defense flow from manifest to lockfile, SCA, and update PRs](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
-
-*The supply-chain defense flow from manifest to lockfile, SCA, and update PRs*
 ## Key Terms
 
 - **SCA**: scanning dependencies for *known vulnerabilities*.
@@ -145,17 +158,29 @@ Most teams use *Renovate* or *Dependabot* for *weekly* PRs and put an *SCA gate*
 
 Other people's code is *our code*. The last post covers *safe logging and audit*, the evidence that survives an incident.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Managing Dependency Vulnerabilities?**
+  - The article treats Managing Dependency Vulnerabilities as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
-- [SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
-- [XSS and CSRF Defense](./08-xss-and-csrf.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
+- [Secure Coding 101 (8/10): XSS and CSRF Defense](./08-xss-and-csrf.md)
 - **Managing Dependency Vulnerabilities (current)**
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References

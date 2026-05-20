@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Authentication and Session</title>
+<title>Secure Coding 101 (3/10): Authentication and Session</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Authentication and Session</h1>
+<h1>Secure Coding 101 (3/10): Authentication and Session</h1>
 <p>When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.</p>
 <p>This is post 3 in the Secure Coding 101 series.</p>
 <p>Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.</p>
 <blockquote>
 <p>Authentication proves identity. Session management preserves that proof across requests. Both need explicit failure handling, not just a happy-path login screen.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Authentication and Session?</li>
+<li>Which signal should the example or diagram make visible for Authentication and Session?</li>
+<li>What failure should be prevented first when Authentication and Session reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 3 flow overview</em></p>
+<p>This picture places Authentication and Session inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Authentication and Session is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>Auth is the </em>door<em>. The session is the </em>hallway badge<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The flow from password verification to session issuance and subsequent requests" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>The flow from password verification to session issuance and subsequent requests</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>AuthN</strong>: <em>who are you</em> (authentication).</li>
@@ -170,9 +181,19 @@ First checks:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Auth answers <em>who</em>. Next we answer <em>what may they do</em> — <em>authorization and permissions</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><strong>What boundary should you inspect first when applying Authentication and Session?</strong></li>
+<li>The article treats Authentication and Session as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Authentication and Session?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Authentication and Session reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Secure Coding 101 (2/10): Input Validation</a></li>
 <li><strong>Authentication and Session (current)</strong></li>
 <li>Authorization and Permissions (upcoming)</li>
 <li>Safe Data Storage (upcoming)</li>

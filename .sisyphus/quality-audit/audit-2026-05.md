@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:21:49+00:00
+Generated: 2026-05-20T11:22:08+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **58**
 - Series at or above 5 issues: **43**
-- Total issues: **552**
+- Total issues: **550**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **20**
+  - Shrt: **18**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -57,16 +57,16 @@ Warnings:
 | 14 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 16 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 17 | `secure-coding-101` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 18 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
-| 19 | `probability-101` | 11 | 8 | 0 | 0 | 3 | 0 |
-| 20 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 21 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 22 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 23 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 24 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 25 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 26 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
+| 18 | `probability-101` | 11 | 8 | 0 | 0 | 3 | 0 |
+| 19 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 20 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 21 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 22 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 23 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 24 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 25 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 26 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 27 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
 | 28 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 29 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
@@ -299,22 +299,6 @@ Warnings:
 - `content/azure-aks-deep-dive/en/05-hpa-and-cluster-autoscaler-internals.md:20` — markdown body has 145 lines (< 150)
 - `content/azure-aks-deep-dive/en/06-keda-internals.md:20` — markdown body has 148 lines (< 150)
 
-## secure-coding-101 — Total 12
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=2 NoEn=0
-
-### BadImg
-- `assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=898x67)
-- `assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=898x67)
-- `assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1092x67)
-- `assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1092x67)
-- `assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=920x67)
-- ... 5 more
-
-### Shrt
-- `content/secure-coding-101/en/05-safe-data-storage.md:22` — markdown body has 149 lines (< 150)
-- `content/secure-coding-101/en/09-dependency-vulnerabilities.md:22` — markdown body has 148 lines (< 150)
-
 ## linear-algebra-101 — Total 11
 
 - BadImg=10 Synt=0 BrkLink=0 Shrt=1 NoEn=0
@@ -429,6 +413,18 @@ Warnings:
 - `assets/python-package-101/05/05-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1307x67)
 - `assets/python-package-101/05/05-01-mental-model.ko.png:1` — PNG height 67px <= 100px (size=1245x67)
 - `assets/python-package-101/06/06-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1317x67)
+- ... 5 more
+
+## secure-coding-101 — Total 10
+
+- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=898x67)
+- `assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=898x67)
+- `assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1092x67)
+- `assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1092x67)
+- `assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=920x67)
 - ... 5 more
 
 ## sql-101 — Total 9

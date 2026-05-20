@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 10
-title: Safe Logging and Audit
+title: "Secure Coding 101 (10/10): Safe Logging and Audit"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Sensitive-field masking, audit logs, tamper evidence, retention
 last_reviewed: '2026-05-15'
 ---
 
-# Safe Logging and Audit
+# Secure Coding 101 (10/10): Safe Logging and Audit
 
 When an incident lands, the team's first questions are usually simple: when did it start, who touched the resource, what changed first, and what spread next? If the logs cannot answer those questions, recovery slows down immediately. If the logs answer them by leaking passwords, tokens, or internal secrets, the evidence turns into a second incident.
 
@@ -29,6 +29,22 @@ This is the final post in the Secure Coding 101 series.
 Here, we will treat logging as an evidence system rather than a convenience feature. That means designing for structured search, sensitive-field masking, audit-log separation, append-only storage, and retention rules that keep investigations possible without turning logs into a long-lived liability.
 
 > Logs are evidence and risk at the same time. Safe logging requires precise records, deliberate non-recording of secrets, and storage that resists tampering.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Safe Logging and Audit?
+- Which signal should the example or diagram make visible for Safe Logging and Audit?
+- What failure should be prevented first when Safe Logging and Audit reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 10 flow overview*
+
+This picture places Safe Logging and Audit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Safe Logging and Audit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ The first question in incident response is *when, who, what*. If you cannot answ
 
 ## Concept at a Glance
 
-![The audit flow across structured logs, masking, immutable storage, and SIEM](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
-
-*The audit flow across structured logs, masking, immutable storage, and SIEM*
 ## Key Terms
 
 - **Application log**: ordinary logs for *debugging and operations*.
@@ -164,17 +177,29 @@ Most teams pipe *JSON logs* through a collector (*Fluent Bit*, *Vector*) into *c
 
 That closes *Secure Coding 101*: validation → auth → authz → storage → secrets → DB → browser → dependencies → logging. Avoid the *most common pitfalls* at every step and your system gains *security that buys time*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Safe Logging and Audit?**
+  - The article treats Safe Logging and Audit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Safe Logging and Audit?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Safe Logging and Audit reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
-- [Input Validation](./02-input-validation.md)
-- [Authentication and Session](./03-authentication-and-session.md)
-- [Authorization and Permissions](./04-authorization-and-permissions.md)
-- [Safe Data Storage](./05-safe-data-storage.md)
-- [Secret and Key Management](./06-secret-and-key-management.md)
-- [SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
-- [XSS and CSRF Defense](./08-xss-and-csrf.md)
-- [Managing Dependency Vulnerabilities](./09-dependency-vulnerabilities.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): Input Validation](./02-input-validation.md)
+- [Secure Coding 101 (3/10): Authentication and Session](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): Safe Data Storage](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret and Key Management](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
+- [Secure Coding 101 (8/10): XSS and CSRF Defense](./08-xss-and-csrf.md)
+- [Secure Coding 101 (9/10): Managing Dependency Vulnerabilities](./09-dependency-vulnerabilities.md)
 - **Safe Logging and Audit (current)**
+
 <!-- toc:end -->
 
 ## References

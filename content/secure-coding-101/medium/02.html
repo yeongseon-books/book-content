@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Input Validation</title>
+<title>Secure Coding 101 (2/10): Input Validation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Input Validation</h1>
+<h1>Secure Coding 101 (2/10): Input Validation</h1>
 <p>Most applications first become unstable at the input boundary. A login form, search box, JSON body, file name, or query string may look harmless, but the moment the server trusts it too early, ordinary bugs and attack paths start to overlap. SQL injection, XSS, path traversal, and unsafe deserialization all begin with the same mistake: giving external input more trust than it deserves.</p>
 <p>This is post 2 in the Secure Coding 101 series.</p>
 <p>In this chapter, we will frame validation as a contract that makes the system predictable at every trust boundary, not as a scattered pile of <code>if</code> statements. Once that idea is clear, schema validation, allowlists, normalization, and safe error handling stop feeling like separate tricks and start looking like one coherent design choice.</p>
 <blockquote>
 <p>Input validation is the first security control most systems execute, and the first reliability control they cannot afford to skip.</p>
+</blockquote>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Input Validation?</li>
+<li>Which signal should the example or diagram make visible for Input Validation?</li>
+<li>What failure should be prevented first when Input Validation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="secure coding 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>secure coding 101 chapter 2 flow overview</em></p>
+<p>This picture places Input Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Input Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Questions This Chapter Answers</h2>
 <ul>
@@ -74,8 +87,6 @@
 <p><em>The client is </em>hostile<em>. Validate again on the </em>server<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Input validation split across edge checks, schema validation, and business rules" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Input validation split across edge checks, schema validation, and business rules</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Allowlist</strong>: only <em>what is allowed</em> gets through.</li>
@@ -161,8 +172,18 @@ class CreateUser(BaseModel):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>With validation, behavior becomes <em>predictable</em>. Next we look at <em>who is who</em> — <em>authentication and session</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><strong>What boundary should you inspect first when applying Input Validation?</strong></li>
+<li>The article treats Input Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Input Validation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Input Validation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">Secure Coding 101 (1/10): What Is Secure Coding?</a></li>
 <li><strong>Input Validation (current)</strong></li>
 <li>Authentication and Session (upcoming)</li>
 <li>Authorization and Permissions (upcoming)</li>

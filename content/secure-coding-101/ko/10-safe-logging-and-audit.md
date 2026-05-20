@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 10
-title: 안전한 로깅과 감사
+title: "Secure Coding 101 (10/10): 안전한 로깅과 감사"
 status: content-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 민감정보 마스킹, 감사 로그, 위변조 방지, 보존
 last_reviewed: '2026-05-15'
 ---
 
-# 안전한 로깅과 감사
+# Secure Coding 101 (10/10): 안전한 로깅과 감사
 
 사고가 터졌을 때 팀이 가장 먼저 묻는 질문은 늘 비슷합니다. 언제 시작됐는지, 누가 어떤 요청을 보냈는지, 어떤 자원이 바뀌었는지 알아야 복구가 시작됩니다. 그런데 로그에 비밀번호와 토큰이 남아 있거나, 중요한 이벤트가 섞여 있어서 읽을 수 없거나, 공격자가 로그를 지워 버릴 수 있다면 기록은 증거가 아니라 새로운 위험이 됩니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 로깅을 디버깅 편의 기능으로만 보지 않고, 사고 대응과 감사에 필요한 증거 체계로 정리하겠습니다. 이 관점을 이해하면 왜 민감 필드 마스킹, 감사 로그 분리, 불변 저장소, 보존 정책이 모두 함께 필요하며, 시리즈 전체의 보안 원칙이 마지막에 로그로 모이는지도 분명해집니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 애플리케이션 로그와 감사 로그는 무엇이 다를까요?
 - 민감 필드 마스킹 정책은 어디까지 포함해야 할까요?
 - 위변조 탐지와 append-only 저장은 왜 중요한가요?
-- 보존 정책은 비용과 규제 사이에서 어떻게 설계해야 할까요?
-- SIEM은 로깅 체계에서 어떤 역할을 할까요?
 
-> 로그는 증거이면서 동시에 위험입니다. 정확한 기록과 민감정보 비노출, 그리고 위변조 방지가 함께 있어야 비로소 안전한 로그가 됩니다.
+## 큰 그림
+
+![Secure Coding 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Secure Coding 101 10장 흐름 개요*
+
+이 그림에서는 안전한 로깅과 감사를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 안전한 로깅과 감사의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 
 ## 한눈에 보는 구조
 
-![구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
-
-*구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름*
 애플리케이션은 구조화된 로그를 남기고, 민감 필드는 먼저 마스킹됩니다. 중요한 감사 이벤트는 중앙 저장소에 별도로 보관되며, 저장소는 위변조가 어려운 형태여야 합니다. SIEM은 그 기록을 모아 이상 징후를 탐지하고 알림을 보냅니다.
 
 ## 핵심 용어
@@ -181,17 +184,29 @@ aws s3api put-object-lock-configuration ...
 
 여기까지가 Secure Coding 101입니다. 입력 검증에서 시작해 인증, 인가, 저장, secret, 데이터베이스, 브라우저, 의존성, 로깅까지 가장 흔한 함정을 단계별로 피하면 시스템은 사고를 늦추고 복구 시간을 벌 수 있는 보안을 갖게 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **애플리케이션 로그와 감사 로그는 무엇이 다를까요?**
+  - 본문의 기준은 안전한 로깅과 감사를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **민감 필드 마스킹 정책은 어디까지 포함해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **위변조 탐지와 append-only 저장은 왜 중요한가요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
-- [입력값 검증](./02-input-validation.md)
-- [인증과 세션](./03-authentication-and-session.md)
-- [인가와 권한](./04-authorization-and-permissions.md)
-- [안전한 데이터 저장](./05-safe-data-storage.md)
-- [Secret과 키 관리](./06-secret-and-key-management.md)
-- [SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
-- [XSS와 CSRF 방어](./08-xss-and-csrf.md)
-- [Dependency 취약점 관리](./09-dependency-vulnerabilities.md)
+## 시리즈 목차
+
+- [Secure Coding 101 (1/10): Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
+- [Secure Coding 101 (2/10): 입력값 검증](./02-input-validation.md)
+- [Secure Coding 101 (3/10): 인증과 세션](./03-authentication-and-session.md)
+- [Secure Coding 101 (4/10): 인가와 권한](./04-authorization-and-permissions.md)
+- [Secure Coding 101 (5/10): 안전한 데이터 저장](./05-safe-data-storage.md)
+- [Secure Coding 101 (6/10): Secret과 키 관리](./06-secret-and-key-management.md)
+- [Secure Coding 101 (7/10): SQL Injection과 ORM 안전 사용](./07-sql-injection-and-orm.md)
+- [Secure Coding 101 (8/10): XSS와 CSRF 방어](./08-xss-and-csrf.md)
+- [Secure Coding 101 (9/10): Dependency 취약점 관리](./09-dependency-vulnerabilities.md)
 - **안전한 로깅과 감사 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: secure-coding-101
 episode: 2
-title: Input Validation
+title: "Secure Coding 101 (2/10): Input Validation"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Allowlists, schema-based validation, and a five-step playbook f
 last_reviewed: '2026-05-15'
 ---
 
-# Input Validation
+# Secure Coding 101 (2/10): Input Validation
 
 Most applications first become unstable at the input boundary. A login form, search box, JSON body, file name, or query string may look harmless, but the moment the server trusts it too early, ordinary bugs and attack paths start to overlap. SQL injection, XSS, path traversal, and unsafe deserialization all begin with the same mistake: giving external input more trust than it deserves.
 
@@ -29,6 +29,22 @@ This is post 2 in the Secure Coding 101 series.
 In this chapter, we will frame validation as a contract that makes the system predictable at every trust boundary, not as a scattered pile of `if` statements. Once that idea is clear, schema validation, allowlists, normalization, and safe error handling stop feeling like separate tricks and start looking like one coherent design choice.
 
 > Input validation is the first security control most systems execute, and the first reliability control they cannot afford to skip.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Input Validation?
+- Which signal should the example or diagram make visible for Input Validation?
+- What failure should be prevented first when Input Validation reaches a real system?
+
+## Big Picture
+
+![secure coding 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
+
+*secure coding 101 chapter 2 flow overview*
+
+This picture places Input Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Input Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Chapter Answers
 
@@ -46,9 +62,6 @@ Half of the OWASP Top 10 comes from *trusting input*. SQL injection, XSS, path t
 
 ## Concept at a Glance
 
-![Input validation split across edge checks, schema validation, and business rules](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
-
-*Input validation split across edge checks, schema validation, and business rules*
 ## Key Terms
 
 - **Allowlist**: only *what is allowed* gets through.
@@ -157,8 +170,19 @@ Most FastAPI / Flask teams use *Pydantic* or *marshmallow* to validate at the *r
 
 With validation, behavior becomes *predictable*. Next we look at *who is who* â€” *authentication and session*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Input Validation?**
+  - The article treats Input Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Input Validation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Input Validation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Secure Coding?](./01-what-is-secure-coding.md)
+## In this series
+
+- [Secure Coding 101 (1/10): What Is Secure Coding?](./01-what-is-secure-coding.md)
 - **Input Validation (current)**
 - Authentication and Session (upcoming)
 - Authorization and Permissions (upcoming)
@@ -168,6 +192,7 @@ With validation, behavior becomes *predictable*. Next we look at *who is who* â€
 - XSS and CSRF Defense (upcoming)
 - Managing Dependency Vulnerabilities (upcoming)
 - Safe Logging and Audit (upcoming)
+
 <!-- toc:end -->
 
 ## References
