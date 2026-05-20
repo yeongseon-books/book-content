@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:41:52+00:00
+Generated: 2026-05-20T11:42:13+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **47**
-- Series at or above 5 issues: **35**
-- Total issues: **381**
-  - BadImg: **381**
+- Series with any issue: **46**
+- Series at or above 5 issues: **34**
+- Total issues: **363**
+  - BadImg: **363**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,65 +41,52 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `azure-app-service-deep-dive` | 18 | 18 | 0 | 0 | 0 | 0 |
-| 2 | `developer-career-101` | 18 | 18 | 0 | 0 | 0 | 0 |
-| 3 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
-| 4 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 5 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 6 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 7 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 8 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 9 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 10 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 11 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 14 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 16 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 17 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 18 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 19 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 20 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 21 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 23 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 24 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 25 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 26 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 27 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 31 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 32 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 33 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 34 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 35 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 36 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 37 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 38 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 39 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 42 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 43 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 44 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 45 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 46 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 47 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## azure-app-service-deep-dive — Total 18
-
-- BadImg=18 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.en.png:1` — PNG height 88px <= 100px (size=1210x88)
-- `assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.ko.png:1` — PNG height 88px <= 100px (size=1210x88)
-- `assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.en.png:1` — PNG height 67px <= 100px (size=920x67)
-- `assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.ko.png:1` — PNG height 67px <= 100px (size=920x67)
-- `assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png:1` — PNG height 80px <= 100px (size=1384x80)
-- ... 13 more
+| 1 | `developer-career-101` | 18 | 18 | 0 | 0 | 0 | 0 |
+| 2 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
+| 3 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 4 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 5 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 6 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 7 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 8 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 9 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 10 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 13 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 14 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 15 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 16 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 18 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 19 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 20 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 22 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 23 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 24 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 25 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 30 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 31 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 32 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 33 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 34 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 35 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 36 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 37 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 38 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 39 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 40 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 41 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 42 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 43 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 44 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 45 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 46 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
