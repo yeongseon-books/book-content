@@ -1,5 +1,5 @@
 ---
-title: 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
+title: "Azure Functions Deep Dive (6/6): 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때"
 series: azure-functions-deep-dive
 episode: 6
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-12'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
-# 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
+# Azure Functions Deep Dive (6/6): 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
 스케일아웃은 왜 새 인스턴스가 생겼는지를 설명해 줍니다. 하지만 사용자가 체감하는 문제는 그 다음에 남습니다. 어떤 인스턴스는 첫 요청을 거의 즉시 처리하는데, 어떤 인스턴스는 몇 초를 기다리게 만듭니다. 이 차이는 새 인스턴스가 **placeholder 상태에서 specialization 상태로 넘어가는 경로**에 숨어 있습니다.
 
@@ -30,13 +30,21 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 사용자가 실제로 체감하는 cold start가 어떤 코드 경로의 합으로 만들어지는지 끝까지 따라가겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?
 - Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?
 - Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?
-- cold start를 줄이기 위한 코드 수준의 레버는 무엇일까요?
-- SLO 문서 안에서 cold-start 지표를 어떻게 표현해야 할까요?
+
+## 큰 그림
+
+![Azure Functions Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
+
+*Azure Functions Deep Dive 6장 흐름 개요*
+
+이 그림에서는 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 시리즈 전체 관점에서도 이 글은 중요합니다. 1화에서 본 host bootstrap, 2화의 worker process, 3~4화의 host-worker protocol과 invocation, 5화의 scale-out이 모두 마지막에 새 인스턴스 한 대의 생애 주기로 다시 합쳐집니다. 이 마지막 그림이 잡혀야 Functions 운영 모델이 하나의 구조로 닫힙니다.
 
-## 콜드 스타트를 이해하는 가장 좋은 방법: 사용자와 무관한 공통 부트스트랩을 placeholder가 미리 끝내고, 사용자별 나머지를 specialization 단계로 덧입힌다고 보는 것입니다
+## 핵심 관점
 
 콜드 스타트 비용은 하나의 거대한 지연이 아닙니다. VM 할당부터 DI 컨테이너 준비까지는 사용자 코드와 무관한 공통 비용이고, 코드 주입 이후는 사용자별 비용입니다. Placeholder Mode의 발상은 바로 이 선을 이용합니다. 플랫폼이 공통 비용을 미리 지불해 두고, 사용자가 실제로 배정되면 그 위에 specialization만 올리는 구조입니다.
 
@@ -59,8 +67,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 ### 먼저 cold start 비용을 공통 단계와 사용자 단계로 나눠 봐야 합니다
 
 새 인스턴스가 처음부터 함수를 실행할 준비가 될 때까지 거치는 단계는 다음처럼 나눌 수 있습니다.
-
-![공통 부트스트랩과 사용자 단계 분해](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
 
 1번부터 5번까지, 즉 VM 할당부터 DI 컨테이너 빌드까지는 **사용자 코드와 무관한 공통 부트스트랩**입니다. 6번 이후 코드 주입, 실제 런타임 환경 반영, worker specialization, host restart는 사용자별 단계입니다. Placeholder Mode는 바로 이 분리를 이용해 1~5번을 미리 끝내 둡니다.
 
@@ -357,15 +363,24 @@ host code를 따라가고 나면 어떤 레버가 어느 단계를 줄이는지 
 
 이 글로 Azure Functions Deep Dive 시리즈를 마칩니다. 1화의 host bootstrap, 2화의 worker process, 3~4화의 gRPC 채널과 invocation, 5화의 scale-out이 모두 마지막에 한 인스턴스의 생애 주기로 닫혔습니다. 이제 Functions 운영을 볼 때는 “서버리스라서 느릴 수 있다”가 아니라, 어느 단계의 bootstrap과 specialization이 지금 지연을 만들고 있는지 더 정확하게 질문할 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?**
+  - 본문의 기준은 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md)
-- [Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
-- [gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가](./03-grpc-event-stream.md)
-- [Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md)
-- [스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이](./05-scaling-internals.md)
-- **콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (현재 글)**
+- [Azure Functions Deep Dive (1/6): 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
+- [Azure Functions Deep Dive (3/6): gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가](./03-grpc-event-stream.md)
+- [Azure Functions Deep Dive (4/6): Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지](./04-dispatcher-and-invocation.md)
+- [Azure Functions Deep Dive (5/6): 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이](./05-scaling-internals.md)
+- **Azure Functions Deep Dive (6/6): 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (현재 글)**
 
 <!-- toc:end -->
 

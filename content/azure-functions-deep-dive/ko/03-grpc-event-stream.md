@@ -1,5 +1,5 @@
 ---
-title: gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
+title: "Azure Functions Deep Dive (3/6): gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가"
 series: azure-functions-deep-dive
 episode: 3
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-12'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
-# gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
+# Azure Functions Deep Dive (3/6): gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
 
 워커 프로세스를 띄웠다고 해서 Functions가 곧바로 동작하는 것은 아닙니다. 실제 시스템 경계는 호스트와 워커가 생명주기 메시지, 함수 메타데이터, invocation, 로그, 상태 신호를 어떤 전송 경로로 주고받는지에서 드러납니다. 이 경로를 모르면 out-of-proc 모델은 “프로세스가 따로 있다”는 설명 이상으로 내려가지 못합니다.
 
@@ -30,13 +30,21 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 워커가 연결된 뒤 호스트와 워커 사이에 놓이는 실제 wire protocol 경계를 선명하게 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 호스트-워커 gRPC 스트림에는 어떤 메시지가 어떤 방식으로 실릴까요?
 - 스트림이 끊기면 호스트와 워커는 각각 무엇을 가정할까요?
 - 큰 페이로드는 이 스트림 위를 어떻게 지나가며, 어디에서 한계가 드러날까요?
-- gRPC 흐름의 backpressure는 어디에서 눈에 띄기 시작할까요?
-- 이 채널은 디버깅 가능한 구조일까요, 아니면 사실상 블랙박스일까요?
+
+## 큰 그림
+
+![Azure Functions Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
+
+*Azure Functions Deep Dive 3장 흐름 개요*
+
+이 그림에서는 gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 마지막으로, 이 글은 다음 화의 invocation 경로를 위한 전제 조건입니다. 한 번의 함수 호출이 워커에 도달하려면 먼저 워커별 채널과 응답 상관관계 구조가 이미 준비되어 있어야 합니다. 따라서 gRPC 스트림 구조를 이해하지 않고 dispatcher와 invocation을 보면 메시지 흐름이 지나치게 추상적으로 남습니다.
 
-## gRPC 이벤트 스트림을 이해하는 가장 좋은 방법: `StreamingMessage` 하나가 모든 메시지를 실어 나르는 단일 양방향 채널로 보는 것입니다
+## 핵심 관점
 
 Azure Functions 호스트-워커 통신은 서비스 하나와 RPC 하나로 압축됩니다. 중요한 것은 RPC가 많지 않다는 사실이 아니라, **하나의 양방향 스트림 위에 거의 모든 프로토콜 메시지가 `oneof`로 다중화되어 있다는 점**입니다. 생명주기, 함수 로드, invocation, 로그, 상태 점검이 모두 같은 운반체 위를 지나갑니다.
 
@@ -200,8 +208,6 @@ message FunctionLoadRequest {
 
 이 네 단계가 끝나야 워커는 invocation을 받을 준비를 갖춥니다.
 
-![Common worker protocol lifecycle flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
-
 ### 호스트 쪽 gRPC 서버는 `FunctionRpcService`입니다
 
 워커는 gRPC 클라이언트이고, 호스트는 서버입니다. 호스트 쪽 `EventStream` 구현은 `src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs`에 있습니다. 이 클래스는 `FunctionRpc.FunctionRpcBase`를 상속하고 `EventStream` 메서드를 override합니다.
@@ -251,15 +257,24 @@ message FunctionLoadRequest {
 
 이제 다음 글에서는 이 스트림 위를 오가는 메시지 중 가장 중요한 `InvocationRequest`와 `InvocationResponse`에 집중합니다. 트리거가 발화했을 때 그 사건이 어떻게 워커 안의 사용자 함수 호출이 되고, 결과가 어떤 상관관계 경로를 따라 호스트로 되돌아오는지 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **호스트-워커 gRPC 스트림에는 어떤 메시지가 어떤 방식으로 실릴까요?**
+  - 본문의 기준은 gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **스트림이 끊기면 호스트와 워커는 각각 무엇을 가정할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **큰 페이로드는 이 스트림 위를 어떻게 지나가며, 어디에서 한계가 드러날까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md)
-- [Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
-- **gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가 (현재 글)**
-- Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지 (예정)
-- 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이 (예정)
-- 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (예정)
+- [Azure Functions Deep Dive (1/6): 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법](./02-worker-process.md)
+- **Azure Functions Deep Dive (3/6): gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가 (현재 글)**
+- Azure Functions Deep Dive (4/6): Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지 (예정)
+- Azure Functions Deep Dive (5/6): 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이 (예정)
+- Azure Functions Deep Dive (6/6): 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때 (예정)
 
 <!-- toc:end -->
 

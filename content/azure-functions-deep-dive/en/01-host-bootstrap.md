@@ -1,5 +1,5 @@
 ---
-title: Host Bootstrap — Following `WebJobsScriptHostService`
+title: "Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`"
 series: azure-functions-deep-dive
 episode: 1
 language: en
@@ -19,7 +19,7 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Host Bootstrap — Following `WebJobsScriptHostService`
+# Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`
 
 > Azure Functions Deep Dive series (1/6)
 
@@ -31,15 +31,21 @@ In episode 3 of the intro series, I wrote that Functions runs the Host process (
 
 This post focuses on one question: **what happens the moment a Function App instance powers on**. Everything is pinned to commit `5e59423`, and every host code citation uses that commit.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What process is the Functions Host exactly, and in what order does it bootstrap?
 - Is host.json just a config file, or a runtime configuration that changes host behaviour?
 - Where do host startup failures get logged, and where do you start looking?
-- What unit must the Functions runtime version be pinned at to stay safe?
-- Are Host and Worker the same container, separate processes, or separate machines?
+
+## Big Picture
+
+![azure functions deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
+
+*azure functions deep dive chapter 1 flow overview*
+
+This picture places Host Bootstrap — Following `WebJobsScriptHostService` inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Host Bootstrap — Following `WebJobsScriptHostService` is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — one Azure Functions host instance
 
@@ -47,9 +53,6 @@ This is the map for the rest of the series.
 Each later part zooms into one box from this picture.
 Get the layout in your head first; the code paths land more cleanly after that.
 
-![Host instance with worker boundaries](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
-
-*Host instance with worker boundaries*
 This post stays on host bootstrap only. The rest of the boxes are pinned in the series TOC below; here the job is to make the bootstrap boundary itself explicit.
 
 ---
@@ -201,15 +204,24 @@ az functionapp log tail -n my-func -g my-rg
 - [ ] Reviewed how the host/worker split affects your code
 - [ ] Decided runtime-upgrade policy (automatic vs manual)
 
+## Answering the Opening Questions
+
+- **What process is the Functions Host exactly, and in what order does it bootstrap?**
+  - The article treats Host Bootstrap — Following `WebJobsScriptHostService` as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is host.json just a config file, or a runtime configuration that changes host behaviour?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do host startup failures get logged, and where do you start looking?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Host Bootstrap — Following `WebJobsScriptHostService` (current)**
-- Worker Processes — How One Host Hosts Many Languages (upcoming)
-- The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
-- Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
-- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- **Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService` (current)**
+- Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages (upcoming)
+- Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
+- Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
+- Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

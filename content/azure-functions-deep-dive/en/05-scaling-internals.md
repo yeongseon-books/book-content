@@ -1,6 +1,5 @@
 ---
-title: Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across
-  Plans
+title: "Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans"
 series: azure-functions-deep-dive
 episode: 5
 language: en
@@ -20,7 +19,7 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
+# Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans
 
 > Azure Functions Deep Dive series (5/6)
 
@@ -48,23 +47,26 @@ This installment has three goals:
 
 > All code citations are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?
 - What signal makes the Scale Controller decide to add another instance?
 - Where does scale-out latency pile up most in burst traffic?
-- How do concurrency throttling and scaling cooperate, and how do they collide?
-- On scale-in, how are in-flight invocations protected?
+
+## Big Picture
+
+![azure functions deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
+
+*azure functions deep dive chapter 5 flow overview*
+
+This picture places Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — where scaling decisions are made
 
 Before we touch any code, here's the whole thing in one diagram.
 
-![Scale-out and worker expansion boundaries](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
-
-*Scale-out and worker expansion boundaries*
 The key insight is that two different decisions are made in two different places.
 
 | Decision | Decided by | Signal | Result |
@@ -351,15 +353,24 @@ The model in this post stops at the boundary where an external component has alr
 - [ ] Verified graceful-shutdown behaviour on scale-in
 - [ ] Decided Premium-plan minimum instances and cold-start protection strategy
 
+## Answering the Opening Questions
+
+- **Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?**
+  - The article treats Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What signal makes the Scale Controller decide to add another instance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does scale-out latency pile up most in burst traffic?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- [Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
-- [The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
-- [Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
-- **Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages](./02-worker-process.md)
+- [Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange?](./03-grpc-event-stream.md)
+- [Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker](./04-dispatcher-and-invocation.md)
+- **Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (current)**
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: Worker Processes — How One Host Hosts Many Languages
+title: "Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages"
 series: azure-functions-deep-dive
 episode: 2
 language: en
@@ -19,7 +19,7 @@ seo_description: All code citations in this post are based on Azure/azure-functi
   @ 5e59423.
 ---
 
-# Worker Processes — How One Host Hosts Many Languages
+# Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages
 
 > Azure Functions Deep Dive series (2/6)
 
@@ -35,15 +35,21 @@ At the end of part 1 I left a question hanging: *what exactly happens inside the
 
 The reference commit is the same as in part 1: `5e59423`.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How does the worker process differ across languages, and what does that mean operationally?
 - Is the worker stateless? How far is in-process state safe?
 - When a worker OOMs or hangs, by what signal does the host detect it?
-- How do worker pool size and the function execution model (in-process, out-of-process) meet?
-- Where do worker logs and function logs separate visually?
+
+## Big Picture
+
+![azure functions deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
+
+*azure functions deep dive chapter 2 flow overview*
+
+This picture places Worker Processes — How One Host Hosts Many Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Worker Processes — How One Host Hosts Many Languages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Starting point — `worker.config.json`
 
@@ -82,9 +88,6 @@ When the Host boots, the object at the center of worker-config aggregation is `W
 
 At `5e59423`, those providers are `DefaultWorkerConfigurationProvider`, `DynamicWorkerConfigurationProvider`, and `ExplicitWorkerConfigurationProvider`, all sharing `WorkerConfigurationProviderBase`. The default provider scans the host's built-in `workers/` directory, the dynamic provider resolves versioned workers from probing paths, and the explicit provider applies app-setting overrides for a specific worker directory.
 
-![Worker config provider aggregation flow](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
-
-*Worker config provider aggregation flow*
 That is why language workers plug in cleanly. **The Host does not carry language-specific launch logic for each runtime; it reads a config description and builds from there.**
 
 ---
@@ -188,15 +191,24 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 - [ ] Verified automatic recovery behaviour on worker hang
 - [ ] Split worker logs and business logs into distinct categories
 
+## Answering the Opening Questions
+
+- **How does the worker process differ across languages, and what does that mean operationally?**
+  - The article treats Worker Processes — How One Host Hosts Many Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is the worker stateless? How far is in-process state safe?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When a worker OOMs or hangs, by what signal does the host detect it?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
-- **Worker Processes — How One Host Hosts Many Languages (current)**
-- The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
-- Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
-- Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
-- Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
+- [Azure Functions Deep Dive (1/6): Host Bootstrap — Following `WebJobsScriptHostService`](./01-host-bootstrap.md)
+- **Azure Functions Deep Dive (2/6): Worker Processes — How One Host Hosts Many Languages (current)**
+- Azure Functions Deep Dive (3/6): The gRPC Event Stream — What Do the Host and Worker Actually Exchange? (upcoming)
+- Azure Functions Deep Dive (4/6): Dispatcher and Invocation — How a Function Call Reaches the Worker (upcoming)
+- Azure Functions Deep Dive (5/6): Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans (upcoming)
+- Azure Functions Deep Dive (6/6): Cold Start and Placeholder Mode — What Happens When a New Instance Is Born (upcoming)
 
 <!-- toc:end -->
 
