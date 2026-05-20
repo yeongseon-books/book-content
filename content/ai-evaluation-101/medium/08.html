@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Regression Testing — Don't Let Yesterday's Wins Break Today</title>
+<title>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Regression Testing — Don't Let Yesterday's Wins Break Today</h1>
+<h1>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today</h1>
 <p>Changing one line of a prompt can break other cases.</p>
 <p>This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why do manual evaluation runs still allow regressions to reach production?</li>
-<li>How is a regression golden set different from a broader quality benchmark set?</li>
-<li>Which fail policy should you start with, and when should you relax it?</li>
-<li>How do seed and tolerance help keep stochastic models from creating noisy CI failures?</li>
+<li>Why should regression testing move LLM evaluation from a pre-release event into the PR gate?</li>
+<li>What changes should the golden dataset and thresholds block?</li>
+<li>What tolerance and fail policy are needed when non-determinism makes evals noisy?</li>
 </ul>
-<blockquote>
-<p>Mental model: regression evaluation is the quality gate that turns yesterday's hard-won cases into today's automated branch protection.</p>
-</blockquote>
-<hr>
+<h2>Big Picture</h2>
 <p><img alt="Regression testing - Don't let Yesterday's wins break today" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png"></p>
 <p><em>Regression testing - Don't let Yesterday's wins break today</em></p>
+<p>This picture shows a golden dataset and evaluation thresholds running on every PR so yesterday’s quality does not break today. Regression testing turns LLM quality from a feeling into a deployment guardrail.</p>
+<blockquote>
+<p>Regression testing is not a one-time evaluation ritual; it is the guardrail that protects quality whenever change enters.</p>
+</blockquote>
 <h2>Evaluate Every Time, Not Just Once</h2>
 <p><img alt="Evaluate every Time, not just once" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png"></p>
 <p><em>Evaluate every Time, not just once</em><br>
@@ -325,18 +325,27 @@ def check_with_tolerance(metric: str, score: float) -&gt; bool:
 <li>[ ] Diff failed cases against main so reviewers can see the exact regression.</li>
 <li>[ ] Revisit thresholds on a schedule instead of freezing them forever.</li>
 </ul>
-<h2>AI Evaluation 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Ep5 Rubric-Based Multi-Dimensional Scoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">Ep6 RAG Evaluation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">Ep7 Agent Evaluation</a></li>
-<li><strong>Ep8 Regression Testing (current)</strong></li>
-<li>Ep9 A/B Testing LLMs (upcoming)</li>
-<li>Ep10 Production Evaluation (upcoming)</li>
+<li><strong>Why should regression testing move LLM evaluation from a pre-release event into the PR gate?</strong></li>
+<li>Prompts, models, retrieval, and tools can regress in small PRs, so quality must be checked at each change rather than once before release.</li>
+<li><strong>What changes should the golden dataset and thresholds block?</strong></li>
+<li>They should block changes that break core flows, past incidents, safety standards, or cost and latency limits.</li>
+<li><strong>What tolerance and fail policy are needed when non-determinism makes evals noisy?</strong></li>
+<li>Use seeds where possible, repeated runs, confidence intervals, dimension-level tolerances, and a policy that fails critical cases regardless of the average.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">AI Evaluation 101 (1/10): Why Evaluate LLM Applications</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">AI Evaluation 101 (2/10): Designing Evaluation Datasets</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">AI Evaluation 101 (5/10): Designing Rubric-Based Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">AI Evaluation 101 (6/10): Evaluating RAG Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses</a></li>
+<li><strong>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (current)</strong></li>
+<li>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)</li>
+<li>AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

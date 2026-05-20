@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Designing Evaluation Datasets</title>
+<title>AI Evaluation 101 (2/10): Designing Evaluation Datasets</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Designing Evaluation Datasets</h1>
+<h1>AI Evaluation 101 (2/10): Designing Evaluation Datasets</h1>
 <p>A good evaluation dataset mirrors production traffic distribution while including enough edge cases.</p>
 <p>This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What makes an evaluation dataset representative instead of flattering?</li>
-<li>Why do production samples, past failures, and deliberately adversarial cases each matter?</li>
-<li>How large should a smoke suite, regression set, or model-comparison dataset be?</li>
-<li>When should <code>expected</code> contain an exact answer versus keywords or a rubric?</li>
+<li>Why should a good evaluation dataset be an operating sample rather than a model exam?</li>
+<li>How should representative cases and failure cases be mixed to reveal real quality changes?</li>
+<li>What judgment becomes blurry when the eval set is not version-controlled?</li>
 </ul>
-<blockquote>
-<p>Mental model: an eval dataset is not a scrapbook of pretty demos. It is an operating sample of the traffic you must protect plus the edge cases that would hurt most if they broke.</p>
-</blockquote>
-<hr>
+<h2>Big Picture</h2>
 <p><img alt="Designing evaluation datasets" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png"></p>
 <p><em>Designing evaluation datasets</em></p>
+<p>This picture shows production requests, edge cases, and failures being organized into an evaluation dataset. A good eval set measures average quality while also preserving the incidents you do not want to forget.</p>
+<blockquote>
+<p>An evaluation dataset is not an exam paper for the model; it is a compressed sample of what the product actually meets.</p>
+</blockquote>
 <h2>What Makes a Good Evaluation Dataset?</h2>
 <p><img alt="What makes a good evaluation Dataset" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png"></p>
 <p><em>What makes a good evaluation Dataset</em><br>
@@ -213,18 +213,27 @@ def load_eval_set(path: Path) -&gt; list[EvalExample]:
 <li>[ ] Pick the labeling style per case instead of forcing exact match everywhere.</li>
 <li>[ ] Version the dataset file so model comparisons stay reproducible.</li>
 </ul>
-<h2>AI Evaluation 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Why Evaluate LLM Applications</a></li>
-<li><strong>Designing Evaluation Datasets (current)</strong></li>
-<li>Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
-<li>LLM-as-Judge (upcoming)</li>
-<li>Rubric-Based Scoring (upcoming)</li>
-<li>Evaluating RAG Systems (upcoming)</li>
-<li>Evaluating Agents (upcoming)</li>
-<li>Regression Testing (upcoming)</li>
-<li>A/B Testing LLMs (upcoming)</li>
-<li>Continuous Evaluation in Production (upcoming)</li>
+<li><strong>Why should a good evaluation dataset be an operating sample rather than a model exam?</strong></li>
+<li>The score can represent product risk only when real traffic shape and incident history are included. Artificial examples drift away from production quality.</li>
+<li><strong>How should representative cases and failure cases be mixed to reveal real quality changes?</strong></li>
+<li>Use frequent requests for baseline quality and past failures plus edge cases for regression risk. Too much of either hides either the average or the danger.</li>
+<li><strong>What judgment becomes blurry when the eval set is not version-controlled?</strong></li>
+<li>You lose the ability to tell whether the model improved or the dataset changed, so historical score comparisons become unreliable.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">AI Evaluation 101 (1/10): Why Evaluate LLM Applications</a></li>
+<li><strong>AI Evaluation 101 (2/10): Designing Evaluation Datasets (current)</strong></li>
+<li>AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
+<li>AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)</li>
+<li>AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)</li>
+<li>AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)</li>
+<li>AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)</li>
+<li>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)</li>
+<li>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)</li>
+<li>AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official docs</strong></p>

@@ -1,5 +1,5 @@
 ---
-title: Deterministic Metrics — Exact Match, BLEU, ROUGE
+title: "AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE"
 series: ai-evaluation-101
 episode: 3
 language: en
@@ -19,25 +19,28 @@ seo_description: Deterministic metrics are fast and reproducible, but they penal
   different wording even when the meaning matches.
 ---
 
-# Deterministic Metrics — Exact Match, BLEU, ROUGE
+# AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE
 
 Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches.
 
 This is post 3 in the AI Evaluation 101 series. Here we cover when to use Exact Match, F1, BLEU, and ROUGE — and when not to.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why are deterministic metrics attractive for CI, and where do they become misleading?
-- How do Exact Match and token-level F1 differ when the answer is short but phrased differently?
-- Why do BLEU and ROUGE struggle when the model is free to paraphrase?
-- What safety rails keep deterministic metrics useful instead of dangerous?
+- When are deterministic metrics such as Exact Match, BLEU, and ROUGE useful as fast filters?
+- What mistake appears when deterministic metrics are treated as semantic judges?
+- What complementary evaluation is needed when you gain speed and interpretability from these metrics?
 
-> Mental model: deterministic metrics are fast lexical filters. They are strong when the answer space is short and closed, but they become supporting evidence rather than final judgment once meaning can be expressed in many valid ways.
+## Big Picture
 
----
 ![Deterministic metrics - exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)
 
 *Deterministic metrics - exact Match, BLEU, ROUGE*
+
+This picture shows deterministic metrics such as Exact Match, BLEU, and ROUGE quickly filtering candidates without replacing full semantic judgment. Deterministic metrics are a starting point for evaluation, not the final verdict.
+
+> Deterministic metrics are fast and reproducible, but speed does not make them the final judge of semantic quality.
+
 ## What Are Deterministic Metrics?
 
 ![What are deterministic Metrics](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-02-what-are-deterministic-metrics.en.png)
@@ -170,11 +173,9 @@ from collections import Counter
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 
-
 def exact_match_normalized(pred: str, expected: str) -> int:
     normalize = lambda s: s.lower().strip().rstrip(".!?")
     return int(normalize(pred) == normalize(expected))
-
 
 def token_f1(pred: str, expected: str) -> float:
     pred_tokens = Counter(pred.lower().split())
@@ -186,7 +187,6 @@ def token_f1(pred: str, expected: str) -> float:
     precision = overlap / sum(pred_tokens.values())
     recall = overlap / sum(exp_tokens.values())
     return 2 * precision * recall / (precision + recall)
-
 
 scorer = rouge_scorer.RougeScorer(["rouge1", "rougeL"], use_stemmer=True)
 smooth = SmoothingFunction().method1
@@ -283,19 +283,28 @@ The next post covers LLM-as-judge — delegating scoring to a strong LLM, design
 - [ ] Read the lowest-scoring cases by hand instead of relying only on the average.
 - [ ] Escalate free-form or ambiguous cases to LLM-as-judge or human review.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
-- [Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
-- **Deterministic Metrics — Exact Match, BLEU, ROUGE (current)**
-- LLM-as-Judge (upcoming)
-- Rubric-Based Scoring (upcoming)
-- Evaluating RAG Systems (upcoming)
-- Evaluating Agents (upcoming)
-- Regression Testing (upcoming)
-- A/B Testing LLMs (upcoming)
-- Continuous Evaluation in Production (upcoming)
+- **When are deterministic metrics such as Exact Match, BLEU, and ROUGE useful as fast filters?**
+  - They are useful for fixed-string extraction, format compliance, keyword presence, and rough recall checks for summaries.
+- **What mistake appears when deterministic metrics are treated as semantic judges?**
+  - They may reject correct answers with different wording or reward wrong answers that share many tokens.
+- **What complementary evaluation is needed when you gain speed and interpretability from these metrics?**
+  - Add rubrics, LLM-as-judge, human review, and task-specific checks to cover semantic quality and user-visible success.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- **AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (current)**
+- AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)
+- AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

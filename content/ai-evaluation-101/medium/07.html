@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Evaluating Agents — Trajectories, Not Single Responses</title>
+<title>AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Evaluating Agents — Trajectories, Not Single Responses</h1>
+<h1>AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses</h1>
 <p>Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'</p>
 <p>This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why is a correct final answer still not enough evidence that an agent is production-ready?</li>
-<li>How should end-to-end success and step-level analysis complement each other?</li>
-<li>What do tool confusion, step overhead, and recovery metrics reveal that answer quality misses?</li>
-<li>How do you turn agent traces into an evaluation dashboard instead of anecdotal debugging?</li>
+<li>Why should agent evaluation inspect trajectory along with the single final response?</li>
+<li>What operational risk is caught by tool selection, step count, and recovery metrics?</li>
+<li>Which step-level signals belong on an agent evaluation dashboard?</li>
 </ul>
-<blockquote>
-<p>Mental model: the agent answer is only the visible tip. The actual product quality lives in the trajectory—tool choice, argument quality, recovery behavior, latency, and cost.</p>
-</blockquote>
-<hr>
+<h2>Big Picture</h2>
 <p><img alt="Evaluating agents - Trajectories, not single responses" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png"></p>
 <p><em>Evaluating agents - Trajectories, not single responses</em></p>
+<p>This picture shows agent evaluation looking at trajectory, tool choice, step efficiency, and recovery rather than only the final response. The execution path itself must be evaluated because it creates product cost and risk.</p>
+<blockquote>
+<p>Agent evaluation becomes operational only when it evaluates the path as well as the answer.</p>
+</blockquote>
 <h2>Why Agent Evaluation Is Different</h2>
 <p><img alt="Why agent evaluation is different" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png"></p>
 <p><em>Why agent evaluation is different</em><br>
@@ -251,18 +251,27 @@ print(df.describe())
 <li>[ ] Inject failures deliberately to confirm the agent retries or finds an alternative path.</li>
 <li>[ ] Allow multiple valid trajectories when the task can be solved in different orders.</li>
 </ul>
-<h2>AI Evaluation 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Ep5 Rubric-Based Multi-Dimensional Scoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">Ep6 RAG Evaluation</a></li>
-<li><strong>Ep7 Agent Evaluation (current)</strong></li>
-<li>Ep8 Regression Testing (upcoming)</li>
-<li>Ep9 A/B Testing LLMs (upcoming)</li>
-<li>Ep10 Production Evaluation (upcoming)</li>
+<li><strong>Why should agent evaluation inspect trajectory along with the single final response?</strong></li>
+<li>An agent can reach a correct-looking answer through the wrong path, or spend too much cost and risk to get a correct answer.</li>
+<li><strong>What operational risk is caught by tool selection, step count, and recovery metrics?</strong></li>
+<li>Tool selection catches wrong tools, step count catches inefficiency and loops, and recovery measures whether the agent can recover after failure.</li>
+<li><strong>Which step-level signals belong on an agent evaluation dashboard?</strong></li>
+<li>The dashboard should include step list, tool calls, arguments, errors, retries, cost, latency, and final success by request.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">AI Evaluation 101 (1/10): Why Evaluate LLM Applications</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">AI Evaluation 101 (2/10): Designing Evaluation Datasets</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">AI Evaluation 101 (5/10): Designing Rubric-Based Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">AI Evaluation 101 (6/10): Evaluating RAG Systems</a></li>
+<li><strong>AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (current)</strong></li>
+<li>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)</li>
+<li>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)</li>
+<li>AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official docs</strong></p>

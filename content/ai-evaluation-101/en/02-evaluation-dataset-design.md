@@ -1,5 +1,5 @@
 ---
-title: Designing Evaluation Datasets
+title: "AI Evaluation 101 (2/10): Designing Evaluation Datasets"
 series: ai-evaluation-101
 episode: 2
 language: en
@@ -19,25 +19,28 @@ seo_description: A good evaluation dataset mirrors production traffic distributi
   while including enough edge cases.
 ---
 
-# Designing Evaluation Datasets
+# AI Evaluation 101 (2/10): Designing Evaluation Datasets
 
 A good evaluation dataset mirrors production traffic distribution while including enough edge cases.
 
 This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- What makes an evaluation dataset representative instead of flattering?
-- Why do production samples, past failures, and deliberately adversarial cases each matter?
-- How large should a smoke suite, regression set, or model-comparison dataset be?
-- When should `expected` contain an exact answer versus keywords or a rubric?
+- Why should a good evaluation dataset be an operating sample rather than a model exam?
+- How should representative cases and failure cases be mixed to reveal real quality changes?
+- What judgment becomes blurry when the eval set is not version-controlled?
 
-> Mental model: an eval dataset is not a scrapbook of pretty demos. It is an operating sample of the traffic you must protect plus the edge cases that would hurt most if they broke.
+## Big Picture
 
----
 ![Designing evaluation datasets](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
 
 *Designing evaluation datasets*
+
+This picture shows production requests, edge cases, and failures being organized into an evaluation dataset. A good eval set measures average quality while also preserving the incidents you do not want to forget.
+
+> An evaluation dataset is not an exam paper for the model; it is a compressed sample of what the product actually meets.
+
 ## What Makes a Good Evaluation Dataset?
 
 ![What makes a good evaluation Dataset](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.en.png)
@@ -214,19 +217,28 @@ The next post covers deterministic metrics — when Exact Match, F1, BLEU, and R
 - [ ] Pick the labeling style per case instead of forcing exact match everywhere.
 - [ ] Version the dataset file so model comparisons stay reproducible.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
-- **Designing Evaluation Datasets (current)**
-- Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)
-- LLM-as-Judge (upcoming)
-- Rubric-Based Scoring (upcoming)
-- Evaluating RAG Systems (upcoming)
-- Evaluating Agents (upcoming)
-- Regression Testing (upcoming)
-- A/B Testing LLMs (upcoming)
-- Continuous Evaluation in Production (upcoming)
+- **Why should a good evaluation dataset be an operating sample rather than a model exam?**
+  - The score can represent product risk only when real traffic shape and incident history are included. Artificial examples drift away from production quality.
+- **How should representative cases and failure cases be mixed to reveal real quality changes?**
+  - Use frequent requests for baseline quality and past failures plus edge cases for regression risk. Too much of either hides either the average or the danger.
+- **What judgment becomes blurry when the eval set is not version-controlled?**
+  - You lose the ability to tell whether the model improved or the dataset changed, so historical score comparisons become unreliable.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- **AI Evaluation 101 (2/10): Designing Evaluation Datasets (current)**
+- AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)
+- AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)
+- AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

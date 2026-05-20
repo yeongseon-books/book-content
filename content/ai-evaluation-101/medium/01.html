@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why Evaluate LLM Applications</title>
+<title>AI Evaluation 101 (1/10): Why Evaluate LLM Applications</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Why Evaluate LLM Applications</h1>
+<h1>AI Evaluation 101 (1/10): Why Evaluate LLM Applications</h1>
 <p>LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today.</p>
 <p>This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why does traditional <code>==</code>-style testing stop working as soon as an LLM starts paraphrasing?</li>
-<li>What kinds of product risk stay invisible when a team ships prompt or model changes without evaluation?</li>
-<li>Which quality dimensions should you track separately instead of collapsing into a single score?</li>
-<li>What does a minimal evaluation loop look like before you have a mature platform or a large dataset?</li>
+<li>Why is regular feature testing not enough to judge the quality of an LLM app?</li>
+<li>What problems show up too late when an LLM app runs without evaluation?</li>
+<li>What small unit should a first evaluation pipeline start with?</li>
 </ul>
-<blockquote>
-<p>Mental model: evaluation is not a research luxury. It is the change-management dashboard that tells you whether a prompt, model, or retrieval change improved the system or quietly pushed it backward.</p>
-</blockquote>
-<hr>
+<h2>Big Picture</h2>
 <p><img alt="Why evaluate LLM applications" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png"></p>
 <p><em>Why evaluate LLM applications</em></p>
+<p>This picture shows LLM app quality managed through an evaluation loop that considers inputs, outputs, expected criteria, and production signals rather than a simple pass/fail test. Once evaluation is attached, an LLM feature becomes a traceable system instead of a demo.</p>
+<blockquote>
+<p>LLM evaluation is not decorative testing; it is the dashboard that lets you keep reading quality changes.</p>
+</blockquote>
 <h2>Why Is LLM Evaluation Different from Regular Testing?</h2>
 <p><img alt="Why is LLM evaluation different from regular Testing" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-02-why-is-llm-evaluation-different-from-reg.en.png"></p>
 <p><em>Why is LLM evaluation different from regular Testing</em><br>
@@ -261,18 +261,27 @@ print(report)
 <li>[ ] Print failed case IDs and raw outputs, not just a single average score.</li>
 <li>[ ] Run the smoke suite before every prompt or model change reaches production.</li>
 </ul>
-<h2>AI Evaluation 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><strong>Why Evaluate LLM Applications (current)</strong></li>
-<li>Designing Evaluation Datasets (upcoming)</li>
-<li>Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
-<li>LLM-as-Judge (upcoming)</li>
-<li>Rubric-Based Scoring (upcoming)</li>
-<li>Evaluating RAG Systems (upcoming)</li>
-<li>Evaluating Agents (upcoming)</li>
-<li>Regression Testing (upcoming)</li>
-<li>A/B Testing LLMs (upcoming)</li>
-<li>Continuous Evaluation in Production (upcoming)</li>
+<li><strong>Why is regular feature testing not enough to judge the quality of an LLM app?</strong></li>
+<li>LLM output can be correct with different wording and wrong while looking plausible, so simple assertions do not capture semantic quality.</li>
+<li><strong>What problems show up too late when an LLM app runs without evaluation?</strong></li>
+<li>Cost growth, regressions on specific cases, hallucinations, and safety misses often appear only after they accumulate in user or operations data.</li>
+<li><strong>What small unit should a first evaluation pipeline start with?</strong></li>
+<li>Start with a small eval set of about ten representative requests, clear expected criteria, and failure logs that make the loop repeatable.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><strong>AI Evaluation 101 (1/10): Why Evaluate LLM Applications (current)</strong></li>
+<li>AI Evaluation 101 (2/10): Designing Evaluation Datasets (upcoming)</li>
+<li>AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE (upcoming)</li>
+<li>AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models (upcoming)</li>
+<li>AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (upcoming)</li>
+<li>AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)</li>
+<li>AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)</li>
+<li>AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)</li>
+<li>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)</li>
+<li>AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official docs</strong></p>

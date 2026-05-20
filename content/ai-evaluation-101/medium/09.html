@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>A/B Testing LLMs — Which Prompt Is Better?</title>
+<title>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,22 +53,22 @@
 </style>
 </head>
 <body>
-<h1>A/B Testing LLMs — Which Prompt Is Better?</h1>
+<h1>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?</h1>
 <p>How do you decide which of two prompts is better?</p>
 <p>This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why is "this one feels better" too weak to justify a rollout decision?</li>
-<li>When is pairwise judging better than comparing average scalar scores?</li>
-<li>How many samples do you need before a difference becomes trustworthy?</li>
-<li>Why must p-values and effect size travel together in the final decision?</li>
+<li>Why must LLM A/B testing be a statistical decision instead of “it looks better”?</li>
+<li>What decisions do win rate, sample size, and statistical significance each support?</li>
+<li>What guardrail metrics reduce user risk in online A/B tests?</li>
 </ul>
-<blockquote>
-<p>Mental model: A/B testing is how you turn taste into evidence. The job is not to crown a winner quickly, but to decide whether the observed win rate is large enough and stable enough to justify a production switch.</p>
-</blockquote>
-<hr>
+<h2>Big Picture</h2>
 <p><img alt="A/B testing LLMs - which prompt is Better" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png"></p>
 <p><em>A/B testing LLMs - which prompt is Better</em></p>
+<p>This picture shows two prompt or model candidates compared pairwise, then judged with win rate and statistical significance for rollout decisions. A/B testing is not a taste contest; it is experiment design that reduces uncertainty.</p>
+<blockquote>
+<p>The goal of LLM A/B testing is not to pick what looks better; it is to produce evidence that one option is better.</p>
+</blockquote>
 <h2>"Looks Better" Is Not Evidence</h2>
 <p><img alt="&quot;Looks Better&quot; is not evidence" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png"></p>
 <p><em>"Looks Better" is not evidence</em><br>
@@ -296,18 +296,27 @@ print(f&quot;A satisfaction: {a.mean():.3f}, B: {b.mean():.3f}, p={p:.4f}&quot;)
 <li>[ ] Require both statistical significance and practical effect size before switching variants.</li>
 <li>[ ] Run online experiments long enough to cover weekday and weekend behavior.</li>
 </ul>
-<h2>AI Evaluation 101 Series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">Ep2 Evaluation Dataset Design</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">Ep4 LLM-as-Judge — Evaluating Models with Models</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">Ep5 Rubric-Based Multi-Dimensional Scoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">Ep6 RAG Evaluation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">Ep7 Agent Evaluation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/08-regression-testing.md">Ep8 Regression Testing</a></li>
-<li><strong>Ep9 A/B Testing LLMs (current)</strong></li>
-<li>Ep10 Production Evaluation (upcoming)</li>
+<li><strong>Why must LLM A/B testing be a statistical decision instead of “it looks better”?</strong></li>
+<li>LLM outputs vary and human impressions are biased, so without samples and effect size you may mistake chance for improvement.</li>
+<li><strong>What decisions do win rate, sample size, and statistical significance each support?</strong></li>
+<li>Win rate shows which candidate wins more often, sample size tells how much evidence is needed, and significance estimates whether the result is likely random.</li>
+<li><strong>What guardrail metrics reduce user risk in online A/B tests?</strong></li>
+<li>Track complaint rate, latency, cost, safety violations, and fallback rate so a quality win does not create user risk.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">AI Evaluation 101 (1/10): Why Evaluate LLM Applications</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/02-evaluation-dataset-design.md">AI Evaluation 101 (2/10): Designing Evaluation Datasets</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/03-deterministic-metrics.md">AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/04-llm-as-judge.md">AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/05-rubric-based-scoring.md">AI Evaluation 101 (5/10): Designing Rubric-Based Scoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/06-rag-evaluation.md">AI Evaluation 101 (6/10): Evaluating RAG Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/07-agent-evaluation.md">AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/08-regression-testing.md">AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today</a></li>
+<li><strong>AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (current)</strong></li>
+<li>AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official docs</strong></p>

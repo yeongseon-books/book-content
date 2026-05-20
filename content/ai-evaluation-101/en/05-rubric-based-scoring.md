@@ -1,5 +1,5 @@
 ---
-title: Designing Rubric-Based Scoring
+title: "AI Evaluation 101 (5/10): Designing Rubric-Based Scoring"
 series: ai-evaluation-101
 episode: 5
 language: en
@@ -19,25 +19,28 @@ seo_description: Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are
   more useful than a single 1-5 score.
 ---
 
-# Designing Rubric-Based Scoring
+# AI Evaluation 101 (5/10): Designing Rubric-Based Scoring
 
 Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score.
 
 This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why does a single judge score hide the exact thing your team needs to fix?
-- How do you turn user value into 3-5 practical scoring dimensions?
-- Why are 1/3/5 anchors mandatory if you want judges and humans to stay aligned?
-- Which aggregation strategies preserve safety-critical failures instead of averaging them away?
+- What failure location is hidden when LLM quality is reduced to one score?
+- How should good rubric dimensions be separated so they do not overlap?
+- What risk is missed when rubric scores are aggregated only by the mean?
 
-> Mental model: a rubric is a fault-isolation tool. Its job is not to make the score look sophisticated, but to show which quality dimension failed so the next engineering move is obvious.
+## Big Picture
 
----
 ![Designing Rubric-Based scoring](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
 
 *Designing Rubric-Based scoring*
+
+This picture shows quality split into dimensions such as correctness, grounding, completeness, and safety instead of one total score. A rubric is not ceremony for producing more numbers; it is a design for locating failure.
+
+> The value of a rubric is not prettier scoring; it is showing which part of the output failed.
+
 ## The Limits of Single Scores
 
 ![The limits of single scores](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.en.png)
@@ -304,19 +307,28 @@ The next post covers RAG pipeline evaluation — retrieval, faithfulness, answer
 - [ ] Add hard fail thresholds for safety-critical dimensions like correctness.
 - [ ] Review per-dimension agreement with humans before trusting the rubric at scale.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Ep2 Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [Ep4 LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- **Ep5 Rubric-Based Multi-Dimensional Scoring (current)**
-- Ep6 RAG Evaluation (upcoming)
-- Ep7 Agent Evaluation (upcoming)
-- Ep8 Regression Testing (upcoming)
-- Ep9 A/B Testing LLMs (upcoming)
-- Ep10 Production Evaluation (upcoming)
+- **What failure location is hidden when LLM quality is reduced to one score?**
+  - You lose whether correctness is high but grounding is weak, or safety passes while completeness fails. The total score hides the repair target.
+- **How should good rubric dimensions be separated so they do not overlap?**
+  - Each dimension should ask one judgment question and include observable criteria with anchors for score levels.
+- **What risk is missed when rubric scores are aggregated only by the mean?**
+  - A good mean can hide a low safety or factuality dimension. Critical dimensions need minimum thresholds, not just averages.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- **AI Evaluation 101 (5/10): Designing Rubric-Based Scoring (current)**
+- AI Evaluation 101 (6/10): Evaluating RAG Systems (upcoming)
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

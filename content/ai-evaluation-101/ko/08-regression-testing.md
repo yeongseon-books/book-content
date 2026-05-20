@@ -1,5 +1,5 @@
 ---
-title: 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게
+title: "AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게"
 series: ai-evaluation-101
 episode: 8
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-12'
 seo_description: Prompt 한 줄을 고치면 다른 케이스가 깨질 수 있습니다. 이 글은 CI에 통합되는 LLM 회귀 테스트 suite, 골든 데이터셋…
 ---
 
-# 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게
+# AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게
 
 LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이 늦기 때문인 경우가 많습니다. 큰 프롬프트 변경 뒤에만 한 번 돌리고, 모델을 바꿀 때만 잠깐 확인하고, 나머지 변경은 그냥 merge해 버리면 회귀는 결국 운영까지 흘러갑니다.
 
@@ -30,13 +30,21 @@ LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이
 
 여기서는 회귀 테스트용 Golden dataset을 어떻게 만들고, 임계값을 어떻게 두고, GitHub Actions로 어떻게 매 PR 방어선에 올릴지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 평가를 한 번만 돌리는 습관이 왜 회귀를 main 브랜치까지 흘려보낼까요?
-- Golden dataset은 일반 운영 평가셋과 어떤 목적 차이를 가질까요?
-- any, majority, weighted 세 가지 fail policy는 어떤 운영 성격에 맞을까요?
-- LLM 비결정성을 감안해 seed와 tolerance는 어떻게 설정해야 할까요?
-- PR에서 회귀가 터졌을 때 재실행, diff, 의사결정은 어떤 순서로 진행해야 할까요?
+- 회귀 테스트는 왜 LLM 평가를 배포 전 행사가 아니라 PR 방어선으로 옮겨야 할까요?
+- golden dataset과 threshold는 어떤 변경을 막아야 할까요?
+- non-determinism 때문에 eval이 흔들릴 때 어떤 tolerance와 fail policy가 필요할까요?
+
+## 큰 그림
+
+![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)
+
+*회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게*
+
+이 그림에서는 golden dataset과 평가 threshold가 PR마다 실행되어 어제 통과한 품질이 오늘 깨지지 않게 막는 흐름을 봅니다. 회귀 테스트는 LLM 품질을 감각이 아니라 배포 안전장치로 옮기는 과정입니다.
+
+> 회귀 테스트는 평가를 한 번 하는 절차가 아니라, 변경이 들어올 때마다 품질을 지키는 방어선입니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이
 
 그래서 회귀 테스트는 편의 기능이 아니라 운영 안전장치입니다. 평가를 PR 단계로 끌어와야 품질 저하가 main으로 들어가기 전에 막힙니다.
 
-## 회귀 테스트를 이해하는 가장 좋은 방법: LLM 평가를 배포 전 행사가 아니라 PR 방어선으로 옮기는 것입니다
+## 핵심 관점
 
 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 회귀 테스트가 없으면 팀은 개선과 파손을 구분하지 못합니다. 프롬프트를 고쳐 한 사례가 나아졌더라도 다른 핵심 사례가 조용히 나빠질 수 있고, 그 사실은 사용자 불만이 쌓인 뒤에야 드러납니다.
 
@@ -55,8 +63,6 @@ LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이
 이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
 
 ## 핵심 개념
-
-![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)
 
 회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게
 
@@ -353,19 +359,28 @@ PR이 fail했을 때 다음 절차를 따릅니다.
 - [ ] 실패 사례를 diff로 바로 읽을 수 있게 만들기
 - [ ] 분기마다 threshold를 재검토하기
 
-<!-- toc:begin -->
-## AI Evaluation 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- [결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
-- [Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
-- [RAG 시스템 평가하기](./06-rag-evaluation.md)
-- [에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
-- **회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (현재 글)**
-- LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
-- 운영 환경에서의 지속적 평가 (예정)
+- **회귀 테스트는 왜 LLM 평가를 배포 전 행사가 아니라 PR 방어선으로 옮겨야 할까요?**
+  - prompt, 모델, retrieval, tool 변경이 작은 PR에서도 품질을 무너뜨릴 수 있으므로 배포 전 한 번이 아니라 변경마다 막아야 합니다.
+- **golden dataset과 threshold는 어떤 변경을 막아야 할까요?**
+  - 핵심 사용자 흐름, 과거 장애, safety 기준, 비용·latency 한도를 깨는 변경을 막아야 합니다.
+- **non-determinism 때문에 eval이 흔들릴 때 어떤 tolerance와 fail policy가 필요할까요?**
+  - seed 고정, 반복 실행, confidence interval, 차원별 tolerance를 두고 critical case 실패는 평균과 무관하게 fail하도록 정책을 둡니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Rubric 기반 채점 설계](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): RAG 시스템 평가하기](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory](./07-agent-evaluation.md)
+- **AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (현재 글)**
+- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
+- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

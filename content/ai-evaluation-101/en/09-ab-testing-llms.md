@@ -1,5 +1,5 @@
 ---
-title: A/B Testing LLMs — Which Prompt Is Better?
+title: "AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?"
 series: ai-evaluation-101
 episode: 9
 language: en
@@ -19,25 +19,28 @@ seo_description: How do you decide which of two prompts is better? This post cov
   paired comparison, win rate, statistical significance, and sample size…
 ---
 
-# A/B Testing LLMs — Which Prompt Is Better?
+# AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?
 
 How do you decide which of two prompts is better?
 
 This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why is "this one feels better" too weak to justify a rollout decision?
-- When is pairwise judging better than comparing average scalar scores?
-- How many samples do you need before a difference becomes trustworthy?
-- Why must p-values and effect size travel together in the final decision?
+- Why must LLM A/B testing be a statistical decision instead of “it looks better”?
+- What decisions do win rate, sample size, and statistical significance each support?
+- What guardrail metrics reduce user risk in online A/B tests?
 
-> Mental model: A/B testing is how you turn taste into evidence. The job is not to crown a winner quickly, but to decide whether the observed win rate is large enough and stable enough to justify a production switch.
+## Big Picture
 
----
 ![A/B testing LLMs - which prompt is Better](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
 
 *A/B testing LLMs - which prompt is Better*
+
+This picture shows two prompt or model candidates compared pairwise, then judged with win rate and statistical significance for rollout decisions. A/B testing is not a taste contest; it is experiment design that reduces uncertainty.
+
+> The goal of LLM A/B testing is not to pick what looks better; it is to produce evidence that one option is better.
+
 ## "Looks Better" Is Not Evidence
 
 !["Looks Better" is not evidence](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.en.png)
@@ -320,19 +323,28 @@ The next post covers **continuous evaluation in production** — sampling live t
 - [ ] Require both statistical significance and practical effect size before switching variants.
 - [ ] Run online experiments long enough to cover weekday and weekend behavior.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Ep2 Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [Ep4 LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- [Ep5 Rubric-Based Multi-Dimensional Scoring](./05-rubric-based-scoring.md)
-- [Ep6 RAG Evaluation](./06-rag-evaluation.md)
-- [Ep7 Agent Evaluation](./07-agent-evaluation.md)
-- [Ep8 Regression Testing](./08-regression-testing.md)
-- **Ep9 A/B Testing LLMs (current)**
-- Ep10 Production Evaluation (upcoming)
+- **Why must LLM A/B testing be a statistical decision instead of “it looks better”?**
+  - LLM outputs vary and human impressions are biased, so without samples and effect size you may mistake chance for improvement.
+- **What decisions do win rate, sample size, and statistical significance each support?**
+  - Win rate shows which candidate wins more often, sample size tells how much evidence is needed, and significance estimates whether the result is likely random.
+- **What guardrail metrics reduce user risk in online A/B tests?**
+  - Track complaint rate, latency, cost, safety violations, and fallback rate so a quality win does not create user risk.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today](./08-regression-testing.md)
+- **AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (current)**
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

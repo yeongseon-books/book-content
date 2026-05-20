@@ -1,5 +1,5 @@
 ---
-title: Evaluating RAG Systems
+title: "AI Evaluation 101 (6/10): Evaluating RAG Systems"
 series: ai-evaluation-101
 episode: 6
 language: en
@@ -19,25 +19,28 @@ seo_description: RAG requires evaluating both retrieval and generation stages. T
   post covers RAG-specific metrics like retrieval recall, context precision…
 ---
 
-# Evaluating RAG Systems
+# AI Evaluation 101 (6/10): Evaluating RAG Systems
 
 RAG requires evaluating both retrieval and generation stages.
 
 This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why does a single end-to-end accuracy number hide the real RAG failure point?
-- What do recall and precision tell you specifically about retrieval quality?
-- Why is faithfulness the highest-priority production metric for most RAG systems?
-- How do the four core metrics combine into a concrete diagnosis?
+- Why should RAG evaluation separate retrieval and generation instead of judging only the final answer?
+- What do context precision, context recall, faithfulness, and answer relevance each diagnose?
+- How do you narrow whether retrieval or generation is the broken part?
 
-> Mental model: treat RAG as a two-stage pipeline under test. Retrieval decides what evidence is available; generation decides whether the model actually stays faithful to that evidence.
+## Big Picture
 
----
 ![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
 
 *Evaluating RAG systems*
+
+This picture splits a RAG system into retrieval, context construction, and answer generation, then attaches metrics to each stage. RAG evaluation must be pipeline diagnosis, not just an answer score, if you want to know what to fix.
+
+> RAG evaluation must separate whether the system found good evidence from whether it used that evidence faithfully.
+
 ## RAG Is a Pipeline, Not a Single Model
 
 ![RAG is a Pipeline, not a single model](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.en.png)
@@ -336,19 +339,28 @@ The next post moves from single responses to evaluating **agent trajectories**.
 - [ ] Keep reference answers in the eval set so recall remains measurable.
 - [ ] Use the four-metric diagnosis table to decide which subsystem to change first.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Ep2 Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [Ep4 LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- [Ep5 Rubric-Based Multi-Dimensional Scoring](./05-rubric-based-scoring.md)
-- **Ep6 RAG Evaluation (current)**
-- Ep7 Agent Evaluation (upcoming)
-- Ep8 Regression Testing (upcoming)
-- Ep9 A/B Testing LLMs (upcoming)
-- Ep10 Production Evaluation (upcoming)
+- **Why should RAG evaluation separate retrieval and generation instead of judging only the final answer?**
+  - The final answer alone cannot tell whether retrieval failed, context was incomplete, or the model ignored the evidence.
+- **What do context precision, context recall, faithfulness, and answer relevance each diagnose?**
+  - Precision checks relevance of retrieved context, recall checks whether needed evidence was found, faithfulness checks grounding, and answer relevance checks whether the question was answered.
+- **How do you narrow whether retrieval or generation is the broken part?**
+  - Store retrieved documents, selected context, and generated answers together, then compare metrics by stage to find the first broken boundary.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- **AI Evaluation 101 (6/10): Evaluating RAG Systems (current)**
+- AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (upcoming)
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

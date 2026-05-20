@@ -1,5 +1,5 @@
 ---
-title: Regression Testing — Don't Let Yesterday's Wins Break Today
+title: "AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today"
 series: ai-evaluation-101
 episode: 8
 language: en
@@ -19,25 +19,28 @@ seo_description: Changing one line of a prompt can break other cases. This post 
   a CI-integrated LLM regression test suite, golden datasets, and…
 ---
 
-# Regression Testing — Don't Let Yesterday's Wins Break Today
+# AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today
 
 Changing one line of a prompt can break other cases.
 
 This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why do manual evaluation runs still allow regressions to reach production?
-- How is a regression golden set different from a broader quality benchmark set?
-- Which fail policy should you start with, and when should you relax it?
-- How do seed and tolerance help keep stochastic models from creating noisy CI failures?
+- Why should regression testing move LLM evaluation from a pre-release event into the PR gate?
+- What changes should the golden dataset and thresholds block?
+- What tolerance and fail policy are needed when non-determinism makes evals noisy?
 
-> Mental model: regression evaluation is the quality gate that turns yesterday's hard-won cases into today's automated branch protection.
+## Big Picture
 
----
 ![Regression testing - Don't let Yesterday's wins break today](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
 
 *Regression testing - Don't let Yesterday's wins break today*
+
+This picture shows a golden dataset and evaluation thresholds running on every PR so yesterday’s quality does not break today. Regression testing turns LLM quality from a feeling into a deployment guardrail.
+
+> Regression testing is not a one-time evaluation ritual; it is the guardrail that protects quality whenever change enters.
+
 ## Evaluate Every Time, Not Just Once
 
 ![Evaluate every Time, not just once](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-02-evaluate-every-time-not-just-once.en.png)
@@ -321,19 +324,28 @@ The next post covers **A/B testing** to decide statistically which of two models
 - [ ] Diff failed cases against main so reviewers can see the exact regression.
 - [ ] Revisit thresholds on a schedule instead of freezing them forever.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Ep2 Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [Ep4 LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- [Ep5 Rubric-Based Multi-Dimensional Scoring](./05-rubric-based-scoring.md)
-- [Ep6 RAG Evaluation](./06-rag-evaluation.md)
-- [Ep7 Agent Evaluation](./07-agent-evaluation.md)
-- **Ep8 Regression Testing (current)**
-- Ep9 A/B Testing LLMs (upcoming)
-- Ep10 Production Evaluation (upcoming)
+- **Why should regression testing move LLM evaluation from a pre-release event into the PR gate?**
+  - Prompts, models, retrieval, and tools can regress in small PRs, so quality must be checked at each change rather than once before release.
+- **What changes should the golden dataset and thresholds block?**
+  - They should block changes that break core flows, past incidents, safety standards, or cost and latency limits.
+- **What tolerance and fail policy are needed when non-determinism makes evals noisy?**
+  - Use seeds where possible, repeated runs, confidence intervals, dimension-level tolerances, and a policy that fails critical cases regardless of the average.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses](./07-agent-evaluation.md)
+- **AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (current)**
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

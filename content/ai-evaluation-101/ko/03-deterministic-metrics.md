@@ -1,5 +1,5 @@
 ---
-title: 결정적 지표 — Exact Match, BLEU, ROUGE
+title: "AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE"
 series: ai-evaluation-101
 episode: 3
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다.
 ---
 
-# 결정적 지표 — Exact Match, BLEU, ROUGE
+# AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE
 
 평가를 자동화하려는 팀이 가장 먼저 찾는 것은 대개 싸고 빠른 지표입니다. 매번 사람을 붙일 수 없고, LLM judge를 돌리기에도 비용이 부담되기 때문입니다. 그래서 Exact Match, F1, BLEU, ROUGE 같은 결정적 지표가 자연스럽게 후보에 올라옵니다.
 
@@ -30,13 +30,21 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 
 여기서는 결정적 지표가 무엇인지, 각각이 어떤 문제에 맞는지, 그리고 언제 LLM-as-judge나 사람 검토로 넘어가야 하는지 기준을 세워 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 결정적 지표는 왜 같은 입력과 답에 항상 같은 점수를 줄 수 있을까요?
-- Exact Match는 어떤 태스크에서만 의미 있고, 왜 조금만 자유도가 생겨도 약해질까요?
-- Token-level F1은 Exact Match보다 무엇을 더 잘 잡아낼까요?
-- BLEU와 ROUGE는 왜 자유 형식 챗봇 답변의 단독 지표로 위험할까요?
-- 닫힌 답 공간과 열린 답 공간을 구분해서 지표를 고르는 실무 기준은 무엇일까요?
+- Exact Match, BLEU, ROUGE 같은 결정적 지표는 언제 빠른 필터로 유용할까요?
+- 결정적 지표가 의미 판단까지 대신한다고 보면 어떤 오판이 생길까요?
+- 속도와 해석 가능성을 얻는 대신 어떤 보완 평가를 붙여야 할까요?
+
+## 큰 그림
+
+![결정적 지표 - Exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
+
+*결정적 지표 - Exact Match, BLEU, ROUGE*
+
+이 그림에서는 Exact Match, BLEU, ROUGE 같은 결정적 지표가 빠르게 후보를 걸러내지만 의미 판단 전체를 대신하지는 못하는 구조를 봅니다. 결정적 지표는 평가의 시작점이지 최종 판결이 아닙니다.
+
+> 결정적 지표는 빠르고 재현 가능하지만, 빠르다는 이유로 의미 품질의 최종 심판이 되지는 않습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 
 결국 핵심은 도구의 한계를 정확히 아는 것입니다. 결정적 지표는 버려야 할 것이 아니라, 어디까지 믿을 수 있는지 경계를 알고 써야 하는 빠른 필터입니다.
 
-## 결정적 지표를 이해하는 가장 좋은 방법: 빠른 필터로 쓰고 최종 심판으로 쓰지 않는 것입니다
+## 핵심 관점
 
 이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 결정적 지표는 평가 비용을 크게 낮춰 줍니다. 같은 입력에 같은 점수를 주기 때문에 CI에 넣기도 쉽고, 분산이나 편차를 따로 설명하지 않아도 됩니다. 그래서 첫 자동화 단계에서 매우 매력적으로 보입니다.
 
@@ -55,8 +63,6 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
 
 ## 핵심 개념
-
-![결정적 지표 - Exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
 
 결정적 지표 - Exact Match, BLEU, ROUGE
 
@@ -192,11 +198,9 @@ from collections import Counter
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from rouge_score import rouge_scorer
 
-
 def exact_match_normalized(pred: str, expected: str) -> int:
     normalize = lambda s: s.lower().strip().rstrip(".!?")
     return int(normalize(pred) == normalize(expected))
-
 
 def token_f1(pred: str, expected: str) -> float:
     pred_tokens = Counter(pred.lower().split())
@@ -208,7 +212,6 @@ def token_f1(pred: str, expected: str) -> float:
     precision = overlap / sum(pred_tokens.values())
     recall = overlap / sum(exp_tokens.values())
     return 2 * precision * recall / (precision + recall)
-
 
 scorer = rouge_scorer.RougeScorer(["rouge1", "rougeL"], use_stemmer=True)
 smooth = SmoothingFunction().method1
@@ -329,19 +332,28 @@ def deterministic_gate(task_type: str, pred: str, expected: str) -> str:
 - [ ] 하위 사례를 사람 눈으로 읽는 검토 루프 두기
 - [ ] 자유 형식 태스크에는 LLM judge나 rubric 평가를 병행하기
 
-<!-- toc:begin -->
-## AI Evaluation 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
-- [평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
-- **결정적 지표 — Exact Match, BLEU, ROUGE (현재 글)**
-- LLM-as-Judge — 모델로 모델을 평가하기 (예정)
-- Rubric 기반 채점 설계 (예정)
-- RAG 시스템 평가하기 (예정)
-- 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
-- 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
-- LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
-- 운영 환경에서의 지속적 평가 (예정)
+- **Exact Match, BLEU, ROUGE 같은 결정적 지표는 언제 빠른 필터로 유용할까요?**
+  - 정답 문자열이 고정된 extraction, format compliance, keyword presence, 요약의 rough recall처럼 빠른 회귀 감시에 유용합니다.
+- **결정적 지표가 의미 판단까지 대신한다고 보면 어떤 오판이 생길까요?**
+  - 표현이 다른 정답을 틀렸다고 하거나, 단어가 겹치는 틀린 답을 높게 평가하는 오판이 생깁니다.
+- **속도와 해석 가능성을 얻는 대신 어떤 보완 평가를 붙여야 할까요?**
+  - rubric, LLM-as-judge, human review, task-specific checks를 함께 붙여 의미 품질과 사용자 관점의 성공 여부를 보완해야 합니다.
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [AI Evaluation 101 (1/10): 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): 평가 데이터셋 설계하기](./02-evaluation-dataset-design.md)
+- **AI Evaluation 101 (3/10): 결정적 지표 — Exact Match, BLEU, ROUGE (현재 글)**
+- AI Evaluation 101 (4/10): LLM-as-Judge — 모델로 모델을 평가하기 (예정)
+- AI Evaluation 101 (5/10): Rubric 기반 채점 설계 (예정)
+- AI Evaluation 101 (6/10): RAG 시스템 평가하기 (예정)
+- AI Evaluation 101 (7/10): 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
+- AI Evaluation 101 (8/10): 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
+- AI Evaluation 101 (9/10): LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
+- AI Evaluation 101 (10/10): 운영 환경에서의 지속적 평가 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

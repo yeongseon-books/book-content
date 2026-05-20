@@ -1,5 +1,5 @@
 ---
-title: Evaluating Agents — Trajectories, Not Single Responses
+title: "AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses"
 series: ai-evaluation-101
 episode: 7
 language: en
@@ -19,25 +19,28 @@ seo_description: Agents reach answers through multiple steps. You need to evalua
   not just the final response but 'which tools, in what order, how many times.' This…
 ---
 
-# Evaluating Agents — Trajectories, Not Single Responses
+# AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses
 
 Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'
 
 This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why is a correct final answer still not enough evidence that an agent is production-ready?
-- How should end-to-end success and step-level analysis complement each other?
-- What do tool confusion, step overhead, and recovery metrics reveal that answer quality misses?
-- How do you turn agent traces into an evaluation dashboard instead of anecdotal debugging?
+- Why should agent evaluation inspect trajectory along with the single final response?
+- What operational risk is caught by tool selection, step count, and recovery metrics?
+- Which step-level signals belong on an agent evaluation dashboard?
 
-> Mental model: the agent answer is only the visible tip. The actual product quality lives in the trajectory—tool choice, argument quality, recovery behavior, latency, and cost.
+## Big Picture
 
----
 ![Evaluating agents - Trajectories, not single responses](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
 
 *Evaluating agents - Trajectories, not single responses*
+
+This picture shows agent evaluation looking at trajectory, tool choice, step efficiency, and recovery rather than only the final response. The execution path itself must be evaluated because it creates product cost and risk.
+
+> Agent evaluation becomes operational only when it evaluates the path as well as the answer.
+
 ## Why Agent Evaluation Is Different
 
 ![Why agent evaluation is different](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-02-why-agent-evaluation-is-different.en.png)
@@ -283,19 +286,28 @@ The next post integrates evaluation into **CI** so regressions are blocked autom
 - [ ] Inject failures deliberately to confirm the agent retries or finds an alternative path.
 - [ ] Allow multiple valid trajectories when the task can be solved in different orders.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Ep1 Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Ep2 Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Ep3 Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [Ep4 LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- [Ep5 Rubric-Based Multi-Dimensional Scoring](./05-rubric-based-scoring.md)
-- [Ep6 RAG Evaluation](./06-rag-evaluation.md)
-- **Ep7 Agent Evaluation (current)**
-- Ep8 Regression Testing (upcoming)
-- Ep9 A/B Testing LLMs (upcoming)
-- Ep10 Production Evaluation (upcoming)
+- **Why should agent evaluation inspect trajectory along with the single final response?**
+  - An agent can reach a correct-looking answer through the wrong path, or spend too much cost and risk to get a correct answer.
+- **What operational risk is caught by tool selection, step count, and recovery metrics?**
+  - Tool selection catches wrong tools, step count catches inefficiency and loops, and recovery measures whether the agent can recover after failure.
+- **Which step-level signals belong on an agent evaluation dashboard?**
+  - The dashboard should include step list, tool calls, arguments, errors, retries, cost, latency, and final success by request.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- **AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses (current)**
+- AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today (upcoming)
+- AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better? (upcoming)
+- AI Evaluation 101 (10/10): Continuous Evaluation in Production (upcoming)
+
 <!-- toc:end -->
 
 ## References

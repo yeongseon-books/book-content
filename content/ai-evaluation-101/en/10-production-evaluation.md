@@ -1,5 +1,5 @@
 ---
-title: Continuous Evaluation in Production
+title: "AI Evaluation 101 (10/10): Continuous Evaluation in Production"
 series: ai-evaluation-101
 episode: 10
 language: en
@@ -19,25 +19,28 @@ seo_description: Evaluation is not a one-shot pre-deploy check; it must run cont
   in production.
 ---
 
-# Continuous Evaluation in Production
+# AI Evaluation 101 (10/10): Continuous Evaluation in Production
 
 Evaluation is not a one-shot pre-deploy check; it must run continuously in production.
 
 This is the final post in the AI Evaluation 101 series. Here we cover sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
-- Why does a pre-deploy pass still fail to guarantee production quality?
-- How should uniform, stratified, and failure-biased sampling share the evaluation budget?
-- Which online metrics complement judge-based evaluation instead of duplicating it?
-- How do you close the loop from production failures back into the regression set?
+- What continuous loop should production evaluation close after pre-release evaluation?
+- What signals do production trace sampling, drift detection, and shadow mode each catch?
+- How do you control evaluation cost while recycling failures into the regression set?
 
-> Mental model: offline evaluation is rehearsal; production evaluation is the ongoing operating loop. Its job is to observe live behavior, detect drift, and feed failures back into the next release gate.
+## Big Picture
 
----
 ![Continuous evaluation in production](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
 
 *Continuous evaluation in production*
+
+This picture shows a continuous evaluation loop that samples production traces, watches online metrics and drift, and sends failures back into the regression set. Production evaluation closes pre-release checks with real service signals.
+
+> Production evaluation is not a new activity after deployment; it is where pre-release evaluation meets real user signals.
+
 ## Deployment Is Where It Starts
 
 ![Deployment is where it starts](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-02-deployment-is-where-it-starts.en.png)
@@ -339,19 +342,28 @@ Evaluation is not a pre-deployment milestone. It is a continuous operational dis
 - [ ] Run shadow or canary checks before broad model rollouts.
 - [ ] Feed production failures back into the regression suite so the same incident stays fixed.
 
-<!-- toc:begin -->
-## AI Evaluation 101 Series
+## Answering the Opening Questions
 
-- [Why Evaluate LLM Apps](./01-why-evaluate-llm-apps.md)
-- [Evaluation Dataset Design](./02-evaluation-dataset-design.md)
-- [Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
-- [LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
-- [Rubric-Based Multi-Dimensional Scoring](./05-rubric-based-scoring.md)
-- [RAG Evaluation](./06-rag-evaluation.md)
-- [Agent Evaluation](./07-agent-evaluation.md)
-- [Regression Testing](./08-regression-testing.md)
-- [A/B Testing LLMs](./09-ab-testing-llms.md)
-- **Continuous Evaluation in Production (current)**
+- **What continuous loop should production evaluation close after pre-release evaluation?**
+  - It should close the loop across eval datasets, CI regression, production sampling, incident review, and dataset updates.
+- **What signals do production trace sampling, drift detection, and shadow mode each catch?**
+  - Trace sampling catches real request quality, drift detection catches input and output distribution shifts, and shadow mode tests candidates without user impact.
+- **How do you control evaluation cost while recycling failures into the regression set?**
+  - Prioritize high-risk and representative samples, promote reproducible failures that must not recur, and control cost with sampling rates and judge-call budgets.
+<!-- toc:begin -->
+## In this series
+
+- [AI Evaluation 101 (1/10): Why Evaluate LLM Applications](./01-why-evaluate-llm-apps.md)
+- [AI Evaluation 101 (2/10): Designing Evaluation Datasets](./02-evaluation-dataset-design.md)
+- [AI Evaluation 101 (3/10): Deterministic Metrics — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [AI Evaluation 101 (4/10): LLM-as-Judge — Evaluating Models with Models](./04-llm-as-judge.md)
+- [AI Evaluation 101 (5/10): Designing Rubric-Based Scoring](./05-rubric-based-scoring.md)
+- [AI Evaluation 101 (6/10): Evaluating RAG Systems](./06-rag-evaluation.md)
+- [AI Evaluation 101 (7/10): Evaluating Agents — Trajectories, Not Single Responses](./07-agent-evaluation.md)
+- [AI Evaluation 101 (8/10): Regression Testing — Don't Let Yesterday's Wins Break Today](./08-regression-testing.md)
+- [AI Evaluation 101 (9/10): A/B Testing LLMs — Which Prompt Is Better?](./09-ab-testing-llms.md)
+- **AI Evaluation 101 (10/10): Continuous Evaluation in Production (current)**
+
 <!-- toc:end -->
 
 ## References
