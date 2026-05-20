@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding RAG evaluation metrics</title>
+<title>RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Understanding RAG evaluation metrics</h1>
+<h1>RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics</h1>
 <p>Retrieval metrics compare a gold document set with a ranked result list. Once you separate those two objects, it becomes much easier to see what Precision@k, Recall@k, and MRR each reveal.</p>
 <p>This is the first post in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>What you'll learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Compute Precision@k, Recall@k, and MRR — the three most common retrieval metrics — by hand.</li>
-<li>Build the habit of reading per-query scores separately from benchmark averages.</li>
-<li>Understand why retrieval quality must be measured independently before adding LLM evaluation on top.</li>
-<li>Run a one-file Python example that calculates the metrics end-to-end.</li>
+<li>When a RAG answer is wrong, how can retrieval failure be separated from generation failure?</li>
+<li>What different failures do Precision@k, Recall@k, and MRR reveal from the same ranked list?</li>
+<li>Why can average scores hide per-query failure patterns?</li>
 </ul>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<h2>Questions this post answers</h2>
-<ul>
-<li>What does Precision@k, Recall@k, and MRR each measure, and what question does each answer?</li>
-<li>Why must retrieval quality be measured independently before adding LLM evaluation on top?</li>
-<li>Why is it dangerous to look only at average scores instead of per-query scores?</li>
-<li>How should you choose k, and how do the three metrics shift as k changes?</li>
-<li>What is the minimal Python file that computes all three metrics end to end?</li>
-</ul>
+<h2>Big Picture</h2>
+<p><img alt="Top-k overlap and metric calculation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png"></p>
+<p><em>Top-k overlap and metric calculation flow</em></p>
+<p>This picture shows retrieval quality being computed from the overlap between a gold document set and a ranked result list. RAG evaluation needs this retrieval layer isolated before generation quality can be interpreted.</p>
+<blockquote>
+<p>The core mental model for retrieval metrics is to separate the gold set from the ranked result list. Even on the same data, Precision@k, Recall@k, and MRR expose different kinds of failure.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>When a RAG system returns a wrong answer, the cause is one of two layers: <strong>the retriever fetched the wrong document, or the LLM mishandled the right one.</strong><br>
 Mixing those two layers makes debugging impossible.<br>
@@ -133,8 +129,6 @@ This post breaks down the three foundational metrics.</p>
 <p>Q2 has <strong>low precision but perfect recall</strong> — there is only one relevant doc, but the slot for top-3 must be filled.<br>
 Q3 has <strong>perfect precision but low recall</strong> — three of five relevant docs found.<br>
 Looking at one without the other leads you to the wrong conclusion.</p>
-<p><img alt="Top-k overlap and metric calculation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png"></p>
-<p><em>Top-k overlap and metric calculation flow</em></p>
 <p><strong>2. MRR (Mean Reciprocal Rank)</strong></p>
 <p>MRR looks <strong>only at the rank of the first relevant hit</strong>. Position 1 → 1.0, position 2 → 0.5, position 3 → 0.33...<br>
 Anything after the first hit is ignored.</p>
@@ -305,6 +299,21 @@ for row in report_rows:
 </ul>
 <p>The next post moves to <strong>measuring retrieval performance</strong> — wrapping a real retriever in a benchmark loop that captures latency, hit rate, and ranking quality together.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>When a RAG answer is wrong, how can retrieval failure be separated from generation failure?</strong><br>
+  Compare the gold document set with the retrieved list first; that tells you whether the retriever supplied evidence before the LLM is judged.</p>
+</li>
+<li>
+<p><strong>What different failures do Precision@k, Recall@k, and MRR reveal from the same ranked list?</strong><br>
+  Precision@k exposes noise in the top results, Recall@k exposes missed relevant documents, and MRR exposes how early the first relevant result appears.</p>
+</li>
+<li>
+<p><strong>Why can average scores hide per-query failure patterns?</strong><br>
+  Averages can hide queries that failed completely, so per-query scores must be read alongside the mean.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>Understanding RAG evaluation metrics (current)</strong></li>

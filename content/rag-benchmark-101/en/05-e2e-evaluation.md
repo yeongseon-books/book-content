@@ -1,5 +1,5 @@
 ---
-title: End-to-end RAG pipeline evaluation
+title: "RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation"
 series: rag-benchmark-101
 episode: 5
 language: en
@@ -20,22 +20,25 @@ last_reviewed: '2026-05-01'
 seo_description: Evaluate the RAG pipeline with RAGAS. Measure Faithfulness and Answer Relevancy to detect hallucinations and ensure grounded answers.
 ---
 
-# End-to-end RAG pipeline evaluation
+# RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation
 
 End-to-end evaluation only becomes useful when question, context, and answer are observed as one flow. Measure retrieval and generation on that shared path, and you can tell which layer is actually responsible for quality loss.
 
 This is the 5th article in the RAG Evaluation and Benchmarking 101 series.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
+- If retrieval metrics improve but final answers are poor, which layer should be inspected next?
+- What debugging becomes easier when retrieval, generation, and grounding scores are reported together?
+- Why is using LLM-as-judge or RAGAS scores risky without a baseline?
 
-*Questions this post answers*
+## Big Picture
 
-- How do you actually compute `Faithfulness` and `AnswerRelevancy` with ragas 0.1.22?
-- How do you wire a LangChain LLM and embedding model into the RAGAS evaluator?
-- What dataset shape do you need when measuring **answer quality**, not retrieval?
-- How do you separate retrieval failures from generation failures?
+![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
+
+*Dataset structure for end-to-end evaluation*
+
+This picture reads retrieval metrics, answer quality, and grounding evaluation inside one pipeline. End-to-end evaluation is less a final score than a diagnostic tool for locating the failing layer.
 
 > End-to-end evaluation is not "does the answer look right?". It is a structured score for **whether the answer is grounded in the context and actually addresses the question**.
 
@@ -97,10 +100,6 @@ Faithfulness rising from 0.78 to 0.91 is direct evidence that hallucinations dro
 ## Step-by-step walkthrough
 
 ### Step 1 — Build the evaluation dataset
-
-![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
-
-*Dataset structure for end-to-end evaluation*
 
 ```python
 from datasets import Dataset
@@ -220,15 +219,26 @@ This post built an end-to-end evaluation loop with RAGAS, scoring faithfulness a
 
 Episode 6 — the final episode — combines every measurement tool from Episodes 1–5 into a single benchmark report.
 
+## Answering the Opening Questions
+
+- **If retrieval metrics improve but final answers are poor, which layer should be inspected next?**
+  Inspect prompt construction, context injection, generation settings, and grounding if retrieval improved but answers remain poor.
+
+- **What debugging becomes easier when retrieval, generation, and grounding scores are reported together?**
+  A combined report separates cases like retrieval failure, answer failure despite good evidence, and good answer with missing citation.
+
+- **Why is using LLM-as-judge or RAGAS scores risky without a baseline?**
+  Without a baseline and sampled human review, judge-score movement can reflect evaluator bias or prompt drift rather than real improvement.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-- [Comparing embedding models](./03-embedding-comparison.md)
-- [VectorDB selection criteria](./04-vectordb-selection.md)
-- **End-to-end RAG pipeline evaluation (current)**
-- Completing the RAG Benchmark (upcoming)
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models](./03-embedding-comparison.md)
+- [RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria](./04-vectordb-selection.md)
+- **RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (current)**
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
 
 <!-- toc:end -->
 

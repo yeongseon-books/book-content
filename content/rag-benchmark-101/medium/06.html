@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Completing the RAG Benchmark</title>
+<title>RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,19 @@
 </style>
 </head>
 <body>
-<h1>Completing the RAG Benchmark</h1>
+<h1>RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark</h1>
 <p>A finished benchmark has to encode its experimental knobs in configuration and reproduce the same result from the same inputs. That is what turns scattered evaluation code into something you can use for regression checks, candidate comparison, and operational tracking.</p>
 <p>This is the final article in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do we wire dataset → retrieval → generation → evaluation into a <strong>single executable</strong>?</li>
-<li>What separation do we need when merging retrieval metrics and RAGAS scores into one report?</li>
-<li>Which experimental knobs should be frozen first in the final pipeline benchmark?</li>
-<li>How do we attach the benchmark to CI so it blocks regressions automatically?</li>
+<li>What turns a one-off benchmark script into a repeatable decision tool?</li>
+<li>Which failure cases should an automatic report show beyond average scores?</li>
+<li>What regression thresholds should become blockers when the benchmark runs in CI?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="End-to-end benchmark pipeline in one run" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png"></p>
+<p><em>End-to-end benchmark pipeline in one run</em></p>
+<p>This picture connects dataset, runner, metric calculation, report, and CI gate into one repeatable benchmark. A complete benchmark is not a score table; it is an operational tool for change decisions.</p>
 <blockquote>
 <p>A finished RAG benchmark is <strong>not a single number</strong>. It is a reproducible pipeline that splits retrieval and generation and runs them under the same fixed experimental conditions, on demand.</p>
 </blockquote>
@@ -125,8 +126,6 @@ llm_model: &quot;llama-3.1-8b-instant&quot;
 ragas_metrics: [&quot;faithfulness&quot;, &quot;answer_relevancy&quot;]
 </code></pre>
 <p><strong>Step 2 — Write the integrated function</strong></p>
-<p><img alt="End-to-end benchmark pipeline in one run" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png"></p>
-<p><em>End-to-end benchmark pipeline in one run</em></p>
 <p>The runnable code lives at <code>rag-benchmark-101/en/06-benchmark-complete/main.py</code>. It expects <code>GROQ_API_KEY</code> to be set.</p>
 <pre><code class="language-bash">cd en/06-benchmark-complete
 export GROQ_API_KEY=...
@@ -254,6 +253,21 @@ def gate(deltas):
 - Tool: Integrated retrieval + generation + evaluation benchmark with a CI gate</p>
 <p>The recurring idea is <strong>not a single fused number, but repeatable measurement under the same experimental conditions</strong>. The goal of this series was to make it obvious which layer to fix when a RAG system's scores wobble.</p>
 <p>Natural follow-ups from here include longer corpora (100k+), hybrid retrievers (BM25 + vector), rerankers, and multi-turn conversation evaluation.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What turns a one-off benchmark script into a repeatable decision tool?</strong><br>
+  It needs a fixed dataset, version record, reproducible command, structured JSON output, readable report, and regression thresholds.</p>
+</li>
+<li>
+<p><strong>Which failure cases should an automatic report show beyond average scores?</strong><br>
+  Reports should show worst queries, score drops, latency increases, raw failures, and diffs from the previous run, not only averages.</p>
+</li>
+<li>
+<p><strong>What regression thresholds should become blockers when the benchmark runs in CI?</strong><br>
+  Block CI when key metrics such as Recall, MRR, faithfulness, or latency cross the agreed regression threshold.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>

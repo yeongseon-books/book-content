@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>VectorDB selection criteria</title>
+<title>RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,19 @@
 </style>
 </head>
 <body>
-<h1>VectorDB selection criteria</h1>
+<h1>RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria</h1>
 <p>VectorDB comparison is really a comparison of index behavior under the same vectors and the same queries. Hold that frame steady and the trade-offs across accuracy, latency, and memory become hard to ignore.</p>
 <p>This is the 4th article in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you compare a FAISS flat index against an IVF index fairly?</li>
-<li>What do you have to record alongside accuracy to talk about a real trade-off?</li>
-<li>How do you surface the trade-offs of approximate nearest neighbor (ANN) search even on a small example?</li>
-<li>What needs to be fixed to compare candidate vector databases (FAISS, Chroma, pgvector, Qdrant) on equal footing?</li>
+<li>Which operating conditions should compare VectorDBs beyond feature lists?</li>
+<li>What must stay fixed when changing only the VectorDB over the same embeddings and corpus?</li>
+<li>How should you decide when accuracy, latency, filtering, and operational complexity conflict?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="same vectors compared across flat and IVF indexes" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png"></p>
+<p><em>same vectors compared across flat and IVF indexes</em></p>
+<p>This picture runs the same vectors and queries through multiple VectorDB candidates, then compares quality, latency, and filtering behavior. VectorDB selection should follow measured operating conditions, not tool preference.</p>
 <blockquote>
 <p>Choosing a vector database is <strong>not a brand comparison</strong>. It is an experiment that measures how the same embedding vectors behave when placed inside different index structures.</p>
 </blockquote>
@@ -123,8 +124,6 @@ query_vectors = model.encode(QUERY_TEXTS, normalize_embeddings=True).astype(&quo
 dimension = doc_vectors.shape[1]
 </code></pre>
 <p><strong>Step 2 — Build the flat index</strong></p>
-<p><img alt="same vectors compared across flat and IVF indexes" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png"></p>
-<p><em>same vectors compared across flat and IVF indexes</em></p>
 <p>The runnable code lives in <code>rag-benchmark-101/en/04-vectordb-selection/main.py</code>. Episodes 05 and 06 require <code>GROQ_API_KEY</code>.</p>
 <pre><code class="language-bash">cd en/04-vectordb-selection
 python3 main.py
@@ -201,6 +200,21 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 <h2>Wrap-up · what's next</h2>
 <p>This post fed identical embedding vectors into flat and IVF indexes and measured the recall vs search-latency trade-off. The keys are <strong>don't re-embed</strong>, <strong>time only the search step</strong>, and <strong>use medians plus an nprobe sweep</strong>.</p>
 <p>Episode 5 evaluates the <strong>end-to-end RAG pipeline</strong> with the retriever wired to an LLM, measuring not just retrieval but the answer itself.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Which operating conditions should compare VectorDBs beyond feature lists?</strong><br>
+  Compare by data size, latency target, filter needs, update frequency, team operations capacity, and cost model.</p>
+</li>
+<li>
+<p><strong>What must stay fixed when changing only the VectorDB over the same embeddings and corpus?</strong><br>
+  Fix embeddings, chunking, query set, gold labels, metadata schema, top_k, and hardware so the VectorDB is the main variable.</p>
+</li>
+<li>
+<p><strong>How should you decide when accuracy, latency, filtering, and operational complexity conflict?</strong><br>
+  Set product-weighted tradeoffs before choosing; if filter correctness is critical, a slightly slower candidate may be better.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>

@@ -1,5 +1,5 @@
 ---
-title: VectorDB selection criteria
+title: "RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria"
 series: rag-benchmark-101
 episode: 4
 language: en
@@ -20,22 +20,25 @@ last_reviewed: '2026-05-01'
 seo_description: Compare VectorDB indexes fairly. Learn to balance accuracy, latency, and memory by benchmarking flat vs. approximate nearest neighbor indexes.
 ---
 
-# VectorDB selection criteria
+# RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria
 
 VectorDB comparison is really a comparison of index behavior under the same vectors and the same queries. Hold that frame steady and the trade-offs across accuracy, latency, and memory become hard to ignore.
 
 This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)
+- Which operating conditions should compare VectorDBs beyond feature lists?
+- What must stay fixed when changing only the VectorDB over the same embeddings and corpus?
+- How should you decide when accuracy, latency, filtering, and operational complexity conflict?
 
-*Questions this post answers*
+## Big Picture
 
-- How do you compare a FAISS flat index against an IVF index fairly?
-- What do you have to record alongside accuracy to talk about a real trade-off?
-- How do you surface the trade-offs of approximate nearest neighbor (ANN) search even on a small example?
-- What needs to be fixed to compare candidate vector databases (FAISS, Chroma, pgvector, Qdrant) on equal footing?
+![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
+
+*same vectors compared across flat and IVF indexes*
+
+This picture runs the same vectors and queries through multiple VectorDB candidates, then compares quality, latency, and filtering behavior. VectorDB selection should follow measured operating conditions, not tool preference.
 
 > Choosing a vector database is **not a brand comparison**. It is an experiment that measures how the same embedding vectors behave when placed inside different index structures.
 
@@ -112,10 +115,6 @@ dimension = doc_vectors.shape[1]
 ```
 
 ### Step 2 — Build the flat index
-
-![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
-
-*same vectors compared across flat and IVF indexes*
 
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
@@ -220,15 +219,26 @@ This post fed identical embedding vectors into flat and IVF indexes and measured
 
 Episode 5 evaluates the **end-to-end RAG pipeline** with the retriever wired to an LLM, measuring not just retrieval but the answer itself.
 
+## Answering the Opening Questions
+
+- **Which operating conditions should compare VectorDBs beyond feature lists?**
+  Compare by data size, latency target, filter needs, update frequency, team operations capacity, and cost model.
+
+- **What must stay fixed when changing only the VectorDB over the same embeddings and corpus?**
+  Fix embeddings, chunking, query set, gold labels, metadata schema, top_k, and hardware so the VectorDB is the main variable.
+
+- **How should you decide when accuracy, latency, filtering, and operational complexity conflict?**
+  Set product-weighted tradeoffs before choosing; if filter correctness is critical, a slightly slower candidate may be better.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
-- [Measuring retrieval performance](./02-retrieval-benchmarking.md)
-- [Comparing embedding models](./03-embedding-comparison.md)
-- **VectorDB selection criteria (current)**
-- End-to-end RAG pipeline evaluation (upcoming)
-- Completing the RAG Benchmark (upcoming)
+- [RAG Evaluation and Benchmarking 101 (1/6): Understanding RAG evaluation metrics](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models](./03-embedding-comparison.md)
+- **RAG Evaluation and Benchmarking 101 (4/6): VectorDB selection criteria (current)**
+- RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation (upcoming)
+- RAG Evaluation and Benchmarking 101 (6/6): Completing the RAG benchmark (upcoming)
 
 <!-- toc:end -->
 

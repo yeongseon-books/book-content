@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Measuring retrieval performance</title>
+<title>RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,19 @@
 </style>
 </head>
 <body>
-<h1>Measuring retrieval performance</h1>
+<h1>RAG Evaluation and Benchmarking 101 (2/6): Measuring retrieval performance</h1>
 <p>A retrieval benchmark works only when questions, gold documents, ranked results, and metrics stay in the same loop. Fix those inputs and you can tell whether a retriever change improved the system or just changed the feel of a few examples.</p>
 <p>This is post 2 in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you attach hit rate and MRR to a FAISS retriever?</li>
-<li>Where should retrieval latency be measured, and in what unit?</li>
-<li>Can you start a meaningful benchmark with only a small gold set?</li>
-<li>What needs to stay fixed so the same loop works for any retriever or embedding model?</li>
+<li>What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?</li>
+<li>What different aspects of a retriever do hit rate, MRR, and latency measure?</li>
+<li>Can a small gold set still create a meaningful regression check?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Benchmark loop for queries and latency" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png"></p>
+<p><em>Benchmark loop for queries and latency</em></p>
+<p>This picture ties questions, gold documents, retrieved results, and metric calculation into one repeatable loop. A benchmark is not a specific retriever; it is the fixed loop that lets the same system be observed again.</p>
 <blockquote>
 <p>The core of retrieval benchmarking is not the vector DB or index. It is the <strong>repeatable loop of query, gold document, and metric collection</strong> that lets you observe the same retriever again and again.</p>
 </blockquote>
@@ -114,8 +115,6 @@ latency_ms                                       hit_rate / MRR
 ]
 </code></pre>
 <p><strong>Step 2 — Build the measurement loop</strong></p>
-<p><img alt="Benchmark loop for queries and latency" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png"></p>
-<p><em>Benchmark loop for queries and latency</em></p>
 <p>The runnable code lives in <code>rag-benchmark-101/en/02-retrieval-benchmarking/main.py</code>. Episodes 05 and 06 require <code>GROQ_API_KEY</code>.</p>
 <pre><code class="language-bash">cd en/02-retrieval-benchmarking
 python3 main.py
@@ -240,6 +239,21 @@ for row in report_rows:
 <h2>Wrap-up · what's next</h2>
 <p>This post lifted the hand-written metrics onto a real retriever and produced a single loop that captures hit rate, MRR, and latency together. The skeleton is the foundation for every comparison experiment that follows.</p>
 <p>In Episode 3 we swap the embedding model on top of the same loop. The code change is a single line, but interpreting the result needs care.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?</strong><br>
+  Fix the question set, gold document ids, evaluation k, corpus version, and metric code so changes can be compared fairly.</p>
+</li>
+<li>
+<p><strong>What different aspects of a retriever do hit rate, MRR, and latency measure?</strong><br>
+  Hit rate measures whether any relevant document appeared, MRR measures first-hit rank, and latency measures retrieval time. Together they show quality-speed tradeoffs.</p>
+</li>
+<li>
+<p><strong>Can a small gold set still create a meaningful regression check?</strong><br>
+  A small gold set is useful for regression detection if it covers important cases, but its coverage limits must be stated.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>

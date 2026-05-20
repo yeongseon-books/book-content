@@ -1,5 +1,5 @@
 ---
-title: 검색 성능 측정
+title: "RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정"
 series: rag-benchmark-101
 episode: 2
 language: ko
@@ -20,22 +20,25 @@ last_reviewed: '2026-05-15'
 seo_description: 검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
 ---
 
-# 검색 성능 측정
+# RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정
 
 검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
 
 이 글은 RAG 평가와 벤치마크 101 시리즈의 두 번째 글입니다. 여기서는 검색기 변경이 실제 개선인지, 단지 몇 개 예제가 그럴듯해 보인 것인지 구분할 수 있는 최소 측정 루프를 만들겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- FAISS 검색기에 hit rate와 MRR를 어떻게 붙일 수 있을까요?
-- 검색 지연 시간은 어디서, 어떤 단위로 재야 할까요?
-- 작은 골드셋만 있어도 의미 있는 벤치마크를 시작할 수 있을까요?
-- 검색기나 임베딩 모델이 바뀌어도 같은 루프를 재사용하려면 무엇을 고정해야 할까요?
+- 검색 성능을 감이 아니라 벤치마크 루프로 보려면 무엇을 고정해야 할까요?
+- hit rate, MRR, latency는 검색기의 어떤 다른 측면을 측정할까요?
+- 작은 gold set으로 시작해도 의미 있는 회귀 검사를 만들 수 있을까요?
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-questions-this-post-answers.ko.png)
+## 큰 그림
 
-*이 글에서 답할 질문*
+![질의와 지연 시간을 함께 묶는 검색 벤치마크 루프](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.ko.png)
+
+*질의와 지연 시간을 함께 묶는 검색 벤치마크 루프*
+
+이 그림에서는 질문, 정답 문서, 검색 결과, 지표 계산이 하나의 반복 가능한 루프로 묶이는 흐름을 봅니다. 벤치마크는 특정 검색기가 아니라 같은 조건으로 다시 관찰할 수 있는 측정 루프입니다.
 
 > 검색 벤치마크의 핵심은 벡터 DB나 인덱스 자체가 아닙니다. **질문, 정답 문서, 순위 결과, 지표 수집이 반복 가능한 하나의 루프**로 묶여 있다는 점이 핵심입니다.
 
@@ -100,10 +103,6 @@ QUERIES = [
 작게 시작해도 괜찮습니다. 이 단계의 목표는 완벽한 데이터셋이 아니라, 같은 질문 세트를 반복 실행할 수 있는 루프를 만드는 것입니다.
 
 ### 2단계 — 측정 루프 만들기
-
-![질의와 지연 시간을 함께 묶는 검색 벤치마크 루프](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.ko.png)
-
-*질의와 지연 시간을 함께 묶는 검색 벤치마크 루프*
 
 실행 코드는 `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
@@ -255,15 +254,26 @@ for row in report_rows:
 
 다음 글에서는 같은 루프를 그대로 둔 채 임베딩 모델만 바꿔 봅니다. 코드 변경은 한 줄에 가깝지만, 결과 해석은 의외로 까다롭습니다.
 
+## 처음 질문으로 돌아가기
+
+- **검색 성능을 감이 아니라 벤치마크 루프로 보려면 무엇을 고정해야 할까요?**
+  질문 집합, gold 문서 ID, 평가 k, 문서 버전, 측정 코드를 고정해야 변경 전후를 비교할 수 있습니다.
+
+- **hit rate, MRR, latency는 검색기의 어떤 다른 측면을 측정할까요?**
+  hit rate는 정답이 포함됐는지, MRR은 첫 정답 순위, latency는 검색 응답 시간을 측정합니다. 셋을 함께 봐야 품질과 속도 균형을 읽을 수 있습니다.
+
+- **작은 gold set으로 시작해도 의미 있는 회귀 검사를 만들 수 있을까요?**
+  작은 gold set도 핵심 질문을 잘 대표하면 회귀 감지에 유용합니다. 다만 대표 범위와 한계를 결과에 명시해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [RAG 평가 지표 이해](./01-evaluation-metrics.md)
-- **검색 성능 측정 (현재 글)**
-- 임베딩 모델 비교 (예정)
-- VectorDB 선택 기준 (예정)
-- 종단 간 RAG 파이프라인 평가 (예정)
-- RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
+- **RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정 (현재 글)**
+- RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교 (예정)
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준 (예정)
+- RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (예정)
+- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
 
 <!-- toc:end -->
 

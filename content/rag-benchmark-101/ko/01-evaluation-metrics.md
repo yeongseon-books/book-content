@@ -1,5 +1,5 @@
 ---
-title: RAG 평가 지표 이해
+title: "RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해"
 series: rag-benchmark-101
 episode: 1
 language: ko
@@ -20,23 +20,25 @@ last_reviewed: '2026-05-15'
 seo_description: 정답 문서 집합과 검색 결과 목록을 분리해서 보면 Precision@k, Recall@k, MRR가 무엇을 말하는지 훨씬 선명해집니다.
 ---
 
-# RAG 평가 지표 이해
+# RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해
 
 정답 문서 집합과 검색 결과 목록을 분리해서 보면 Precision@k, Recall@k, MRR가 각각 무엇을 드러내는지 훨씬 선명해집니다.
 
 이 글은 RAG 평가와 벤치마크 101 시리즈의 첫 번째 글입니다. 여기서는 생성 품질을 붙이기 전에 검색 품질을 독립적으로 읽는 법부터 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- Precision@k, Recall@k, MRR는 각각 무엇을 측정하며 어떤 질문에 답할까요?
-- 왜 LLM 평가를 붙이기 전에 검색 품질을 먼저 분리해서 봐야 할까요?
-- 평균 점수만 보면 왜 위험할까요?
-- k 값은 어떻게 정해야 하며, k가 바뀌면 세 지표는 어떻게 달라질까요?
-- 세 지표를 끝까지 계산하는 최소 Python 예제는 어떤 모습일까요?
+- RAG 답변이 틀렸을 때 검색 문제와 생성 문제를 어떻게 분리할 수 있을까요?
+- Precision@k, Recall@k, MRR는 같은 결과 목록에서 각각 어떤 실패를 보여 줄까요?
+- 평균 점수만 보면 왜 질문별 실패 패턴을 놓칠 수 있을까요?
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-01-questions-this-post-answers.ko.png)
+## 큰 그림
 
-*이 글에서 답할 질문*
+![상위 k 결과와 정답 집합의 교집합 계산 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.ko.png)
+
+*상위 k 결과와 정답 집합의 교집합 계산 흐름*
+
+이 그림에서는 정답 문서 집합과 검색 결과 목록의 교집합을 기준으로 검색 품질을 계산하는 흐름을 봅니다. RAG 평가는 먼저 검색 단계의 실패를 수치로 분리해야 생성 품질을 제대로 해석할 수 있습니다.
 
 > 검색 지표의 핵심은 정답 집합과 검색 결과 목록을 분리해서 보는 것입니다. 같은 데이터를 놓고도 Precision@k, Recall@k, MRR는 서로 다른 실패를 드러냅니다.
 
@@ -76,10 +78,6 @@ RAG 시스템이 틀린 답을 낼 때 원인은 대개 두 층 중 하나입니
 Q2는 **Precision은 낮지만 Recall은 완벽**합니다. 정답이 하나뿐인데 상위 3개를 모두 채워야 하므로, 남는 칸에 잡음이 들어갑니다. 반대로 Q3는 **Precision은 완벽하지만 Recall은 낮습니다.** 상위 3개는 모두 맞았지만, 실제로는 정답 5개 중 2개를 놓쳤기 때문입니다.
 
 이 차이는 실무에서도 중요합니다. Precision이 낮으면 상위 슬롯에 잡음이 많다는 뜻이고, Recall이 낮으면 정답 문서를 아예 빠뜨리고 있다는 뜻입니다. 둘은 서로 다른 개선 전략으로 이어집니다.
-
-![상위 k 결과와 정답 집합의 교집합 계산 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.ko.png)
-
-*상위 k 결과와 정답 집합의 교집합 계산 흐름*
 
 ### MRR은 첫 번째 정답의 순위만 봅니다
 
@@ -290,15 +288,26 @@ for row in report_rows:
 
 다음 글에서는 이 손계산 감각을 실제 검색기로 옮깁니다. 질문 집합, 정답 문서, 검색 결과, 지표를 한 루프에 묶어 **검색 성능을 계량하는 벤치마크 골격**을 만들겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **RAG 답변이 틀렸을 때 검색 문제와 생성 문제를 어떻게 분리할 수 있을까요?**
+  정답 문서 집합과 검색 결과 목록을 먼저 비교하면, LLM을 호출하기 전 검색기가 근거를 제대로 가져왔는지 분리해서 볼 수 있습니다.
+
+- **Precision@k, Recall@k, MRR는 같은 결과 목록에서 각각 어떤 실패를 보여 줄까요?**
+  Precision@k는 상위 결과의 잡음, Recall@k는 정답 누락, MRR은 첫 정답이 얼마나 빨리 나오는지를 보여 줍니다.
+
+- **평균 점수만 보면 왜 질문별 실패 패턴을 놓칠 수 있을까요?**
+  평균은 개별 질문의 완전 실패를 숨길 수 있습니다. 질문별 점수와 평균을 함께 봐야 어떤 쿼리가 회귀했는지 찾을 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **RAG 평가 지표 이해 (현재 글)**
-- 검색 성능 측정 (예정)
-- 임베딩 모델 비교 (예정)
-- VectorDB 선택 기준 (예정)
-- 종단 간 RAG 파이프라인 평가 (예정)
-- RAG 벤치마크 완성 (예정)
+- **RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해 (현재 글)**
+- RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정 (예정)
+- RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교 (예정)
+- RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준 (예정)
+- RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (예정)
+- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
 
 <!-- toc:end -->
 

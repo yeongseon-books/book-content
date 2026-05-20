@@ -1,5 +1,5 @@
 ---
-title: RAG 벤치마크 완성
+title: "RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성"
 series: rag-benchmark-101
 episode: 6
 language: ko
@@ -20,20 +20,23 @@ last_reviewed: '2026-05-12'
 seo_description: 완성된 벤치마크는 같은 설정과 같은 입력에서 같은 결과를 재현할 수 있는 하나의 실행 파이프라인이어야 합니다.
 ---
 
-# RAG 벤치마크 완성
+# RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성
 
 완성된 벤치마크는 같은 설정과 같은 입력에서 같은 결과를 재현할 수 있는 하나의 실행 파이프라인이어야 합니다. 이 글은 RAG Benchmark 101 시리즈의 마지막 글입니다. 여기서는 검색, 생성, 평가를 하나의 실행 파일로 묶고, 회귀를 자동으로 막을 수 있는 보고 체계까지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- 데이터셋 → 검색 → 생성 → 평가를 어떻게 **하나의 실행 경로**로 연결할까요?
-- 검색 지표와 RAGAS 점수를 한 리포트에 넣을 때 어떤 분리가 필요할까요?
-- 최종 파이프라인 벤치마크에서 가장 먼저 고정해야 할 실험 변수는 무엇일까요?
-- 이 벤치마크를 CI에 붙여 회귀를 자동 차단하려면 어떤 구조가 필요할까요?
+- 벤치마크를 한 번 실행하는 스크립트에서 반복 가능한 의사결정 도구로 바꾸려면 무엇이 필요할까요?
+- 자동 리포트는 평균 점수뿐 아니라 어떤 실패 사례를 보여 줘야 할까요?
+- CI에 벤치마크를 붙일 때 어떤 회귀 기준을 차단선으로 삼아야 할까요?
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-questions-this-post-answers.ko.png)
+## 큰 그림
 
-*이 글에서 답할 질문*
+![검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
+
+*검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인*
+
+이 그림에서는 데이터셋, 실행 스크립트, 지표 계산, 리포트, CI 게이트가 하나의 반복 가능한 벤치마크로 연결되는 흐름을 봅니다. 완성된 벤치마크는 점수표가 아니라 변경 결정을 돕는 운영 도구입니다.
 
 > 완성된 RAG 벤치마크는 **숫자 하나**가 아닙니다. 검색과 생성을 분리하면서도 같은 실험 조건에서 반복 실행할 수 있는 재현 가능한 파이프라인입니다.
 
@@ -114,10 +117,6 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 실험 변수는 코드 곳곳에 흩어져 있으면 안 됩니다. 설정 파일 한곳에 모아야 비교가 재현 가능해집니다.
 
 ### 2단계 — 검색, 생성, 평가를 하나의 함수로 묶기
-
-![검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.ko.png)
-
-*검색, 생성, 평가가 한 번의 실행으로 이어지는 파이프라인*
 
 실행 코드는 `rag-benchmark-101/en/06-benchmark-complete/main.py`에 있습니다. `GROQ_API_KEY`가 필요합니다.
 
@@ -274,15 +273,26 @@ def gate(deltas):
 
 이후 확장 주제로는 더 긴 코퍼스, 하이브리드 검색기, reranker, 다회전 대화 평가가 자연스럽게 이어질 수 있습니다. 하지만 그 확장도 결국 같은 원칙 위에 서야 합니다. 먼저 변수와 측정 조건을 고정하고, 그다음에 비교해야 합니다.
 
+## 처음 질문으로 돌아가기
+
+- **벤치마크를 한 번 실행하는 스크립트에서 반복 가능한 의사결정 도구로 바꾸려면 무엇이 필요할까요?**
+  고정된 데이터셋, 버전 기록, 재현 가능한 실행 명령, 구조화된 JSON 결과, 사람이 읽는 리포트, 회귀 기준이 필요합니다.
+
+- **자동 리포트는 평균 점수뿐 아니라 어떤 실패 사례를 보여 줘야 할까요?**
+  평균뿐 아니라 최악의 질문, 점수 하락 쿼리, latency 증가, 실패 원문, 이전 실행 대비 diff를 보여 줘야 합니다.
+
+- **CI에 벤치마크를 붙일 때 어떤 회귀 기준을 차단선으로 삼아야 할까요?**
+  Recall, MRR, faithfulness, latency 같은 핵심 지표가 정한 허용 폭을 넘게 하락하거나 증가하면 CI에서 차단해야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [RAG 평가 지표 이해](./01-evaluation-metrics.md)
-- [검색 성능 측정](./02-retrieval-benchmarking.md)
-- [임베딩 모델 비교](./03-embedding-comparison.md)
-- [VectorDB 선택 기준](./04-vectordb-selection.md)
-- [종단 간 RAG 파이프라인 평가](./05-e2e-evaluation.md)
-- **RAG 벤치마크 완성 (현재 글)**
+- [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교](./03-embedding-comparison.md)
+- [RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준](./04-vectordb-selection.md)
+- [RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가](./05-e2e-evaluation.md)
+- **RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (현재 글)**
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: VectorDB 선택 기준
+title: "RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준"
 series: rag-benchmark-101
 episode: 4
 language: ko
@@ -20,20 +20,23 @@ last_reviewed: '2026-05-15'
 seo_description: VectorDB 비교는 브랜드 비교가 아니라 같은 벡터와 같은 질의를 서로 다른 인덱스 구조에 넣어 보는 실험입니다.
 ---
 
-# VectorDB 선택 기준
+# RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준
 
 VectorDB 비교는 브랜드 비교가 아니라 같은 벡터와 같은 질의를 서로 다른 인덱스 구조에 넣어 보는 실험입니다. 이 글은 RAG Benchmark 101 시리즈의 네 번째 글입니다. 여기서는 같은 임베딩 결과를 기준으로 정확도, 검색 지연 시간, 메모리의 트레이드오프를 읽는 방법을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- FAISS의 flat 인덱스와 IVF 인덱스를 어떻게 공정하게 비교할 수 있을까요?
-- 정확도와 함께 어떤 값을 기록해야 실제 트레이드오프를 논할 수 있을까요?
-- 작은 예제에서도 ANN 검색의 손익을 어떻게 드러낼 수 있을까요?
-- FAISS, Chroma, pgvector, Qdrant 같은 후보를 같은 기준으로 비교하려면 무엇을 고정해야 할까요?
+- VectorDB는 기능 목록이 아니라 어떤 운영 조건으로 비교해야 할까요?
+- 같은 임베딩과 corpus에서 VectorDB만 바꿔 보려면 무엇을 고정해야 할까요?
+- 정확도, latency, 필터링, 운영 복잡도가 충돌할 때 어떤 기준으로 선택해야 할까요?
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-questions-this-post-answers.ko.png)
+## 큰 그림
 
-*이 글에서 답할 질문*
+![같은 벡터를 flat과 IVF에 넣는 비교 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.ko.png)
+
+*같은 벡터를 flat과 IVF에 넣는 비교 구조*
+
+이 그림에서는 같은 벡터와 쿼리를 여러 VectorDB 후보에 넣고 품질과 지연 시간, 필터링 동작을 비교하는 흐름을 봅니다. VectorDB 선택은 도구 선호가 아니라 운영 조건에 맞춘 실험 결과여야 합니다.
 
 > VectorDB 선택은 **브랜드 이름을 고르는 일**이 아닙니다. 같은 임베딩 벡터가 서로 다른 인덱스 구조 안에서 어떻게 동작하는지 측정하는 실험입니다.
 
@@ -112,10 +115,6 @@ dimension = doc_vectors.shape[1]
 이 단계에서 이미 실험의 절반이 결정됩니다. 임베딩 결과를 고정해 두어야 뒤의 차이를 인덱스 탓으로 돌릴 수 있습니다.
 
 ### 2단계 — Flat 인덱스 만들기
-
-![같은 벡터를 flat과 IVF에 넣는 비교 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.ko.png)
-
-*같은 벡터를 flat과 IVF에 넣는 비교 구조*
 
 실행 코드는 `rag-benchmark-101/en/04-vectordb-selection/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
@@ -223,15 +222,26 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 다음 글에서는 검색기 뒤에 LLM을 연결해 종단 간 RAG 파이프라인을 평가합니다. 이제부터는 문서를 찾는 것뿐 아니라 답변 자체도 함께 점수화해야 합니다.
 
+## 처음 질문으로 돌아가기
+
+- **VectorDB는 기능 목록이 아니라 어떤 운영 조건으로 비교해야 할까요?**
+  데이터 크기, latency 목표, 필터 조건, 업데이트 빈도, 운영팀 역량, 비용 모델을 기준으로 비교해야 합니다.
+
+- **같은 임베딩과 corpus에서 VectorDB만 바꿔 보려면 무엇을 고정해야 할까요?**
+  임베딩, chunking, query set, gold labels, metadata schema, top_k, 하드웨어 조건을 고정해야 VectorDB 차이를 볼 수 있습니다.
+
+- **정확도, latency, 필터링, 운영 복잡도가 충돌할 때 어떤 기준으로 선택해야 할까요?**
+  제품 요구사항별 가중치를 정해 tradeoff를 판단해야 합니다. 예를 들어 필터 정확성이 핵심이면 약간 느린 후보가 더 나을 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [RAG 평가 지표 이해](./01-evaluation-metrics.md)
-- [검색 성능 측정](./02-retrieval-benchmarking.md)
-- [임베딩 모델 비교](./03-embedding-comparison.md)
-- **VectorDB 선택 기준 (현재 글)**
-- 종단 간 RAG 파이프라인 평가 (예정)
-- RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교](./03-embedding-comparison.md)
+- **RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준 (현재 글)**
+- RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (예정)
+- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
 
 <!-- toc:end -->
 

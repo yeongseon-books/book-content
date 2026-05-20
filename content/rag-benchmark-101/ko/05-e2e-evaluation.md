@@ -1,5 +1,5 @@
 ---
-title: 종단 간 RAG 파이프라인 평가
+title: "RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가"
 series: rag-benchmark-101
 episode: 5
 language: ko
@@ -20,20 +20,23 @@ last_reviewed: '2026-05-12'
 seo_description: 종단 간 평가는 질문, 컨텍스트, 답변을 하나의 흐름으로 관찰할 때 비로소 의미가 생깁니다.
 ---
 
-# 종단 간 RAG 파이프라인 평가
+# RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가
 
 종단 간 평가는 질문, 컨텍스트, 답변을 하나의 흐름으로 관찰할 때 비로소 의미가 생깁니다. 이 글은 RAG Benchmark 101 시리즈의 다섯 번째 글입니다. 여기서는 검색과 생성이 같은 데이터 경로 위에서 어떻게 만나며, 어디서 품질이 무너지는지 RAGAS로 구조적으로 측정하는 방법을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- ragas 0.1.22에서 `Faithfulness`와 `AnswerRelevancy`를 실제로 어떻게 계산할까요?
-- LangChain LLM과 임베딩 모델을 RAGAS 평가기에 어떻게 연결할까요?
-- 검색 품질이 아니라 **답변 품질**을 측정하려면 데이터셋이 어떤 형태여야 할까요?
-- 검색 실패와 생성 실패를 어떻게 분리해서 볼 수 있을까요?
+- 검색 지표가 좋아도 최종 답변이 나쁘면 어느 단계를 다시 봐야 할까요?
+- 검색, 생성, 근거성 평가를 한 리포트에 묶으면 어떤 디버깅이 쉬워질까요?
+- LLM-as-judge나 RAGAS 점수는 어떤 기준선 없이 쓰면 위험할까요?
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-questions-this-post-answers.ko.png)
+## 큰 그림
 
-*이 글에서 답할 질문*
+![질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.ko.png)
+
+*질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조*
+
+이 그림에서는 검색 지표와 답변 품질, 근거성 평가를 한 파이프라인에서 함께 읽는 흐름을 봅니다. 종단 간 평가는 하나의 최종 점수가 아니라 어느 단계가 실패했는지 좁히는 진단 도구입니다.
 
 > 종단 간 평가는 "답이 맞아 보이는가"를 묻는 인상 비평이 아닙니다. **답변이 컨텍스트에 근거하고 실제 질문에 답하는지**를 구조화된 점수로 읽는 과정입니다.
 
@@ -95,10 +98,6 @@ answer_relevancy    0.82    0.85
 ## 단계별로 종단 간 평가 만들기
 
 ### 1단계 — 평가 데이터셋 만들기
-
-![질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.ko.png)
-
-*질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조*
 
 ```python
 from datasets import Dataset
@@ -222,15 +221,26 @@ python3 main.py
 
 다음 글에서는 1편부터 5편까지의 도구를 하나로 묶습니다. 검색, 생성, 평가 결과를 한 번에 내는 통합 벤치마크 파이프라인이 시리즈의 마지막 주제입니다.
 
+## 처음 질문으로 돌아가기
+
+- **검색 지표가 좋아도 최종 답변이 나쁘면 어느 단계를 다시 봐야 할까요?**
+  검색은 좋아졌는데 답변이 나쁘다면 프롬프트 구성, context 주입, 생성 설정, 근거성 평가를 다음으로 봐야 합니다.
+
+- **검색, 생성, 근거성 평가를 한 리포트에 묶으면 어떤 디버깅이 쉬워질까요?**
+  한 리포트에 묶으면 “검색 실패”, “근거는 맞지만 답변 실패”, “답변은 좋지만 출처 누락” 같은 유형을 빠르게 나눌 수 있습니다.
+
+- **LLM-as-judge나 RAGAS 점수는 어떤 기준선 없이 쓰면 위험할까요?**
+  기준선과 샘플 리뷰 없이 judge 점수만 보면 평가 모델의 편향이나 프롬프트 변화가 실제 개선처럼 보일 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [RAG 평가 지표 이해](./01-evaluation-metrics.md)
-- [검색 성능 측정](./02-retrieval-benchmarking.md)
-- [임베딩 모델 비교](./03-embedding-comparison.md)
-- [VectorDB 선택 기준](./04-vectordb-selection.md)
-- **종단 간 RAG 파이프라인 평가 (현재 글)**
-- RAG 벤치마크 완성 (예정)
+- [RAG Evaluation and Benchmarking 101 (1/6): RAG 평가 지표 이해](./01-evaluation-metrics.md)
+- [RAG Evaluation and Benchmarking 101 (2/6): 검색 성능 측정](./02-retrieval-benchmarking.md)
+- [RAG Evaluation and Benchmarking 101 (3/6): 임베딩 모델 비교](./03-embedding-comparison.md)
+- [RAG Evaluation and Benchmarking 101 (4/6): VectorDB 선택 기준](./04-vectordb-selection.md)
+- **RAG Evaluation and Benchmarking 101 (5/6): 종단 간 RAG 파이프라인 평가 (현재 글)**
+- RAG Evaluation and Benchmarking 101 (6/6): RAG 벤치마크 완성 (예정)
 
 <!-- toc:end -->
 

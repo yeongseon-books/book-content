@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Comparing embedding models</title>
+<title>RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,19 @@
 </style>
 </head>
 <body>
-<h1>Comparing embedding models</h1>
+<h1>RAG Evaluation and Benchmarking 101 (3/6): Comparing embedding models</h1>
 <p>Embedding comparison is only credible when you change one variable at a time. Keep the corpus, queries, and top-k fixed, and the score gap starts to reflect the embedding model instead of the test setup.</p>
 <p>This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What do you see when you run <code>all-MiniLM-L6-v2</code> and <code>paraphrase-MiniLM-L3-v2</code> on the same query set?</li>
-<li>Why is hit rate alone insufficient for embedding model comparison?</li>
-<li>How do you tell whether speed or accuracy is the bottleneck?</li>
-<li>Why can MTEB leaderboard scores disagree with what you measure on your own data?</li>
+<li>Why is it risky to choose an embedding model from leaderboard scores alone?</li>
+<li>What conditions must stay fixed when only the model changes over the same corpus and queries?</li>
+<li>How should you judge a model that improves quality but increases latency or cost?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Fixed-corpus embedding comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png"></p>
+<p><em>Fixed-corpus embedding comparison structure</em></p>
+<p>This picture compares retrieval results and metrics while changing only the embedding model over the same queries and corpus. Model comparison is an experiment over quality, latency, and cost under fixed conditions.</p>
 <blockquote>
 <p>Comparing embedding models is not about which one is "smarter". It is about which one <strong>places relevant documents earlier in the same retrieval pipeline</strong>.</p>
 </blockquote>
@@ -136,8 +137,6 @@ def benchmark_model(model_name: str):
     }
 </code></pre>
 <p><strong>Step 2 — Run two models</strong></p>
-<p><img alt="Fixed-corpus embedding comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png"></p>
-<p><em>Fixed-corpus embedding comparison structure</em></p>
 <p>The runnable code lives in <code>rag-benchmark-101/en/03-embedding-comparison/main.py</code>. Episodes 05 and 06 require <code>GROQ_API_KEY</code>.</p>
 <pre><code class="language-bash">cd en/03-embedding-comparison
 python3 main.py
@@ -196,6 +195,21 @@ index_build_s = round(time.perf_counter() - t0, 2)
 <h2>Wrap-up · what's next</h2>
 <p>This post kept the retriever fixed and varied only the embedding model, comparing hit rate, MRR, and latency. The key ideas are <strong>change one variable at a time</strong> and <strong>read quality, speed, and cost on the same table</strong>.</p>
 <p>Episode 4 applies the same thinking to vector DB selection: FAISS, Chroma, pgvector — same loop, different store.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why is it risky to choose an embedding model from leaderboard scores alone?</strong><br>
+  Leaderboards do not measure your documents, language mix, query distribution, latency target, or infrastructure constraints.</p>
+</li>
+<li>
+<p><strong>What conditions must stay fixed when only the model changes over the same corpus and queries?</strong><br>
+  Keep corpus, chunking, query set, gold labels, k, VectorDB settings, and metric code fixed while changing only the embedding model.</p>
+</li>
+<li>
+<p><strong>How should you judge a model that improves quality but increases latency or cost?</strong><br>
+  Use an explicit decision table to weigh quality gain against latency, infrastructure cost, and reindexing cost. The highest score is not always the best product choice.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>

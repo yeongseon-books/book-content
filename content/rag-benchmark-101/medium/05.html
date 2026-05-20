@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>End-to-end RAG pipeline evaluation</title>
+<title>RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,19 @@
 </style>
 </head>
 <body>
-<h1>End-to-end RAG pipeline evaluation</h1>
+<h1>RAG Evaluation and Benchmarking 101 (5/6): End-to-end RAG pipeline evaluation</h1>
 <p>End-to-end evaluation only becomes useful when question, context, and answer are observed as one flow. Measure retrieval and generation on that shared path, and you can tell which layer is actually responsible for quality loss.</p>
 <p>This is the 5th article in the RAG Evaluation and Benchmarking 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How do you actually compute <code>Faithfulness</code> and <code>AnswerRelevancy</code> with ragas 0.1.22?</li>
-<li>How do you wire a LangChain LLM and embedding model into the RAGAS evaluator?</li>
-<li>What dataset shape do you need when measuring <strong>answer quality</strong>, not retrieval?</li>
-<li>How do you separate retrieval failures from generation failures?</li>
+<li>If retrieval metrics improve but final answers are poor, which layer should be inspected next?</li>
+<li>What debugging becomes easier when retrieval, generation, and grounding scores are reported together?</li>
+<li>Why is using LLM-as-judge or RAGAS scores risky without a baseline?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Dataset structure for end-to-end evaluation" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png"></p>
+<p><em>Dataset structure for end-to-end evaluation</em></p>
+<p>This picture reads retrieval metrics, answer quality, and grounding evaluation inside one pipeline. End-to-end evaluation is less a final score than a diagnostic tool for locating the failing layer.</p>
 <blockquote>
 <p>End-to-end evaluation is not "does the answer look right?". It is a structured score for <strong>whether the answer is grounded in the context and actually addresses the question</strong>.</p>
 </blockquote>
@@ -113,8 +114,6 @@ answer_relevancy    0.82    0.85
 <p>Faithfulness rising from 0.78 to 0.91 is direct evidence that hallucinations dropped.</p>
 <h2>Step-by-step walkthrough</h2>
 <p><strong>Step 1 — Build the evaluation dataset</strong></p>
-<p><img alt="Dataset structure for end-to-end evaluation" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png"></p>
-<p><em>Dataset structure for end-to-end evaluation</em></p>
 <pre><code class="language-python">from datasets import Dataset
 
 samples = []
@@ -215,6 +214,21 @@ python3 main.py
 <h2>Wrap-up · what's next</h2>
 <p>This post built an end-to-end evaluation loop with RAGAS, scoring faithfulness and answer relevancy to surface hallucinations and off-topic answers. Key ideas: <strong>match the dataset shape</strong>, <strong>wire LLM/embedding via wrappers</strong>, and <strong>read retrieval and generation scores together</strong>.</p>
 <p>Episode 6 — the final episode — combines every measurement tool from Episodes 1–5 into a single benchmark report.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>If retrieval metrics improve but final answers are poor, which layer should be inspected next?</strong><br>
+  Inspect prompt construction, context injection, generation settings, and grounding if retrieval improved but answers remain poor.</p>
+</li>
+<li>
+<p><strong>What debugging becomes easier when retrieval, generation, and grounding scores are reported together?</strong><br>
+  A combined report separates cases like retrieval failure, answer failure despite good evidence, and good answer with missing citation.</p>
+</li>
+<li>
+<p><strong>Why is using LLM-as-judge or RAGAS scores risky without a baseline?</strong><br>
+  Without a baseline and sampled human review, judge-score movement can reflect evaluator bias or prompt drift rather than real improvement.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-benchmark-101/en/01-evaluation-metrics.md">Understanding RAG evaluation metrics</a></li>
