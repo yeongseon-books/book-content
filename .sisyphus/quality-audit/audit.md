@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:53:24+00:00
+Generated: 2026-05-20T11:53:44+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **30**
-- Series at or above 5 issues: **22**
-- Total issues: **228**
-  - BadImg: **228**
+- Series with any issue: **29**
+- Series at or above 5 issues: **21**
+- Total issues: **218**
+  - BadImg: **218**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -48,29 +48,28 @@ Warnings:
 | 5 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 6 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 7 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 8 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 9 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 10 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 11 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 13 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 14 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 15 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 16 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 17 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 18 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 19 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 20 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 21 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 22 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 23 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 24 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 25 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 26 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 27 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 28 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 29 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 30 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 8 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 9 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 10 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 12 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 13 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 14 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 15 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 16 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 17 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 18 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 19 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 20 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 21 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 22 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 23 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 24 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 25 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 26 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 27 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 28 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 29 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -154,18 +153,6 @@ Warnings:
 - `assets/containers-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=802x67)
 - `assets/containers-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=802x67)
 - `assets/containers-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=714x67)
-- ... 5 more
-
-## linear-algebra-101 — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
-- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 88px <= 100px (size=731x88)
-- `assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 88px <= 100px (size=731x88)
-- `assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=944x67)
 - ... 5 more
 
 ## pandas-101 — Total 10

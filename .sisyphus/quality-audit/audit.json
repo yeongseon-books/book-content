@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:53:24+00:00",
+  "generated_at": "2026-05-20T11:53:44+00:00",
   "series_count": 92,
-  "problem_series_count": 30,
-  "series_with_5_plus": 22,
+  "problem_series_count": 29,
+  "series_with_5_plus": 21,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 228,
+    "BadImg": 218,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 228
+    "all": 218
   },
   "results": [
     {
@@ -2178,286 +2178,6 @@
             "code": null,
             "image": "08-01-concept-at-a-glance.ko.png",
             "width": 952,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
-      "series": "linear-algebra-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 10
-      },
-      "total": 10,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.ko.png",
-            "width": 731,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.en.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-concept-at-a-glance.ko.png",
-            "width": 944,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.en.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-concept-at-a-glance.ko.png",
-            "width": 1061,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.en.png",
-            "width": 1030,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-concept-at-a-glance.ko.png",
-            "width": 1030,
             "height": 67,
             "repo": null
           }
@@ -6870,6 +6590,20 @@
     },
     {
       "series": "langgraph-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "linear-algebra-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
