@@ -1,9 +1,9 @@
 flowchart TD
-  A["Supervisor<br/>route 선택 + fallback + 종료 규칙 소유"] --> B["Worker<br/>역할별 결과만 생산"]
-  B --> C["Finalizer<br/>사용자 응답 최종 조립"]
-  C --> D["경계 점검<br/>supervisor가 답변까지 쓰면 안 됨"]
-  D --> E["경계 점검<br/>worker가 shared state 전체를 수정하면 안 됨"]
-  E --> F["안정적 설계<br/>handoff마다 책임 소유권 명확"]
+  A["관리자<br/>route 선택 + 대체 경로 + 종료 규칙 소유"] --> B["작업자<br/>역할별 결과만 생산"]
+  B --> C["최종 처리자<br/>사용자 응답 최종 조립"]
+  C --> D["경계 점검<br/>관리자가 답변까지 쓰면 안 됨"]
+  D --> E["경계 점검<br/>작업자가 공유 상태 전체를 수정하면 안 됨"]
+  E --> F["안정적 설계<br/>인계마다 책임 소유권 명확"]
 
   style A fill:#e3f2fd,stroke:#1976d2
   style B fill:#fff3e0,stroke:#f57c00

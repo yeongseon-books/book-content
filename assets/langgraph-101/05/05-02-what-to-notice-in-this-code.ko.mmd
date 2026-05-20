@@ -1,10 +1,10 @@
 flowchart TD
-  A["SupervisorState<br/>request + route + worker_result + final_answer"] --> B["supervisor<br/>research 또는 code 선택"]
+  A["SupervisorState<br/>request + route + worker_result + final_answer"] --> B["supervisor<br/>조사 또는 코드 선택"]
   B --> C["worker 노드<br/>worker_result만 기록"]
   C --> D["finalize<br/>final_answer 조립"]
 
   B --> E["전용 route 필드<br/>위임 이유를 구조로 노출"]
-  C --> F["최소 shared state<br/>worker 간 결합도 축소"]
+  C --> F["최소 공유 상태<br/>worker 간 결합도 축소"]
 
   style A fill:#e3f2fd,stroke:#1976d2
   style B fill:#fff3e0,stroke:#f57c00

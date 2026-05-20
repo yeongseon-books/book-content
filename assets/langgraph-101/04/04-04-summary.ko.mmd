@@ -3,7 +3,7 @@ flowchart TD
   S2 --> S3["ToolNode<br/>실제 도구 호출 실행"]
   S3 --> S4["ToolMessage<br/>도구 결과를 agent로 반환"]
   S4 --> S5["LLM 노드<br/>결과를 읽고 최종 답 생성"]
-  S5 --> S6["안전 계층<br/>schema 품질 + loop guard + side-effect 통제"]
+  S5 --> S6["안전 계층<br/>스키마 품질 + 반복 방지 + 부수 효과 통제"]
 
   style S1 fill:#e3f2fd,stroke:#1976d2
   style S2 fill:#fff3e0,stroke:#f57c00

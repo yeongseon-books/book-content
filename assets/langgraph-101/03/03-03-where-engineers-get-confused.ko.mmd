@@ -1,10 +1,10 @@
 flowchart TD
   A["classify_question()<br/>route를 상태에 기록"] --> B["route_question()<br/>다음 route 라벨만 반환"]
-  B --> C["Path map<br/>code / concept / debug / fallback"]
+  B --> C["경로 맵<br/>코드 / 개념 / 디버그 / 대체 경로"]
   C --> D["작업 분기<br/>선택된 노드 실행"]
 
-  C --> E["예상 밖 route?<br/>fallback으로 이동"]
-  D --> F["loop가 있나?<br/>종료 규칙 + recursion limit"]
+  C --> E["예상 밖 route?<br/>대체 경로로 이동"]
+  D --> F["반복이 있나?<br/>종료 규칙 + 재귀 한도"]
   E --> F
   F --> G["안전한 종료<br/>END 또는 안정적 다음 단계"]
 

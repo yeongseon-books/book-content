@@ -1,8 +1,8 @@
 flowchart TD
-  Q1["Checkpointing"] --> Q2["체크포인터는 실제로<br/>무엇을 저장할까요?"]
+  Q1["체크포인트 저장"] --> Q2["체크포인터는 실제로<br/>무엇을 저장할까요?"]
   Q2 --> Q3["MemorySaver와 thread_id는<br/>어떻게 같은 타임라인을 이어 줄까요?"]
   Q3 --> Q4["다음 턴 뒤 복원된 상태를<br/>어떻게 확인할까요?"]
-  Q4 --> Q5["왜 checkpoint 없는 retry는<br/>stateless replay가 될까요?"]
+  Q4 --> Q5["왜 체크포인트 없는 재시도는<br/>상태 없는 재실행이 될까요?"]
   Q5 --> Q6["어떤 필드는 누적하고,<br/>어떤 필드는 덮어써야 할까요?"]
 
   style Q1 fill:#e3f2fd,stroke:#1976d2
