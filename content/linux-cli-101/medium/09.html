@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Shell Script Basics</title>
+<title>Linux CLI 101 (9/10): Shell Script Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Shell Script Basics</h1>
+<h1>Linux CLI 101 (9/10): Shell Script Basics</h1>
 <p>Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.</p>
 <p>This is post 9 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The basic flow of writing and running a shell script</li>
-<li>Bash syntax for variables, <code>if/else</code>, and <code>for</code> loops</li>
-<li>Script arguments (<code>$1</code>, <code>$2</code>, <code>$#</code>) and exit codes (<code>$?</code>)</li>
-<li>Common script patterns used in real-world workflows</li>
+<li>The basic flow of writing and running a shell script?</li>
+<li>Bash syntax for variables, <code>if/else</code>, and <code>for</code> loops?</li>
+<li>Script arguments (<code>$1</code>, <code>$2</code>, <code>$#</code>) and exit codes (<code>$?</code>)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 9 flow overview</em></p>
+<p>This picture places Shell Script Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Shell Script Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>If you log into a server every morning and run the same five commands, you can write those five lines in a file and run them all at once. That is a shell script.</p>
 <blockquote>
@@ -289,16 +295,25 @@ echo &quot;Error: file not found&quot;       # stdout — gets mixed in pipes
 <li>Optimal for sub-50-line command compositions; switch to Python when complexity grows.</li>
 </ul>
 <p>The next post covers <strong>SSH and remote access</strong> — key-based authentication, scp, and ssh config.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Pipes and Redirection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Process Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/08-environment-variables.md">Environment Variables and PATH</a></li>
+<li><strong>The basic flow of writing and running a shell script?</strong></li>
+<li>The article treats Shell Script Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Bash syntax for variables, <code>if/else</code>, and <code>for</code> loops?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Script arguments (<code>$1</code>, <code>$2</code>, <code>$#</code>) and exit codes (<code>$?</code>)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Linux CLI 101 (6/10): Pipes and Redirection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Linux CLI 101 (7/10): Process Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/08-environment-variables.md">Linux CLI 101 (8/10): Environment Variables and PATH</a></li>
 <li><strong>Shell Script Basics (current)</strong></li>
 <li>SSH and Remote Access (upcoming)</li>
 </ul>

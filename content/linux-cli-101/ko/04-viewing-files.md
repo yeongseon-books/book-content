@@ -1,5 +1,5 @@
 ---
-title: "cat, less, head, tail — 파일 내용 보기"
+title: "Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기"
 series: linux-cli-101
 episode: 4
 language: ko
@@ -21,20 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: cat, less, head, tail로 파일 내용을 읽는 기본 흐름을 정리합니다.
 ---
 
-# cat, less, head, tail — 파일 내용 보기
+# Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기
 
 개발하다 보면 파일 내용을 확인하는 일이 수시로 발생합니다. 설정 파일의 값을 확인하고, 로그에서 에러를 찾고, CSV 데이터의 헤더를 봅니다. 에디터를 열면 무거운 파일은 몇 초씩 걸리고, 수정 모드로 들어가면 실수로 내용을 바꿀 위험도 있습니다.
 
 이 글은 Linux CLI 101 시리즈의 4번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 파일을 통째로 볼 때와 일부만 볼 때는 어떤 명령을 골라야 할까요?
 - `less`가 단순 출력보다 더 안전한 이유는 무엇일까요?
 - `head`와 `tail`은 로그 확인에서 어떻게 다르게 쓰일까요?
-- 대용량 파일을 볼 때 왜 `cat`부터 치면 곤란해질까요?
 
-> `cat`은 양동이를 한 번에 쏟는 것이고, `less`는 책을 한 페이지씩 넘기는 것입니다. `head`는 책의 첫 몇 페이지만 찢어보는 것이고, `tail`은 마지막 몇 페이지만 보는 것입니다.
+## 큰 그림
+
+![Linux CLI 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.ko.png)
+
+*Linux CLI 101 4장 흐름 개요*
+
+이 그림에서는 cat, less, head, tail — 파일 내용 보기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> cat, less, head, tail — 파일 내용 보기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 머릿속에 먼저 그릴 그림
 
@@ -219,12 +226,21 @@ cat header.csv data1.csv data2.csv > combined.csv
 
 다음 글에서는 **텍스트 검색과 파일 찾기** — `grep`, `find`, `xargs`를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **파일을 통째로 볼 때와 일부만 볼 때는 어떤 명령을 골라야 할까요?**
+  - 본문의 기준은 cat, less, head, tail — 파일 내용 보기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`less`가 단순 출력보다 더 안전한 이유는 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`head`와 `tail`은 로그 확인에서 어떻게 다르게 쓰일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
-- [파일과 디렉터리 다루기](./02-files-and-directories.md)
-- [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): 권한과 소유자 이해하기](./03-permissions-and-ownership.md)
 - **cat, less, head, tail — 파일 내용 보기 (현재 글)**
 - grep, find, xargs — 검색의 삼총사 (예정)
 - pipe와 redirection (예정)

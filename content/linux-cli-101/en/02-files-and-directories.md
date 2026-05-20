@@ -1,5 +1,5 @@
 ---
-title: Files and Directories
+title: "Linux CLI 101 (2/10): Files and Directories"
 series: linux-cli-101
 episode: 2
 language: en
@@ -22,18 +22,27 @@ seo_description: The Linux file system is a giant tree that starts from a single
   (/). Every file and directory is a branch of this tree.
 ---
 
-# Files and Directories
+# Linux CLI 101 (2/10): Files and Directories
 
 Most server work is not glamorous. You move release bundles, back up config files, clean up logs, and figure out where a missing file actually lives. If your path sense is weak, even simple maintenance work slows down fast.
 
 This is post 2 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)
-- Checking your current location and navigating with `pwd`, `cd`, `ls`
-- Manipulating files and directories with `mkdir`, `touch`, `cp`, `mv`, `rm`
-- The difference between absolute and relative paths, and when to use each
+- The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)?
+- Checking your current location and navigating with `pwd`, `cd`, `ls`?
+- Manipulating files and directories with `mkdir`, `touch`, `cp`, `mv`, `rm`?
+
+## Big Picture
+
+![Linux CLI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 2 flow overview*
+
+This picture places Files and Directories inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Files and Directories is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -217,14 +226,23 @@ Teams put safety guards on dangerous commands. Adding `alias rm='rm -i'` to `.ba
 
 The next post covers **permissions and ownership** — `chmod`, `chown`, and the meaning of `rwx`.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- **The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)?**
+  - The article treats Files and Directories as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Checking your current location and navigating with `pwd`, `cd`, `ls`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Manipulating files and directories with `mkdir`, `touch`, `cp`, `mv`, `rm`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
 - **Files and Directories (current)**
 - Permissions and Ownership (upcoming)
-- cat, less, head, tail (upcoming)
-- grep, find, xargs (upcoming)
+- cat, less, head, tail — Viewing File Contents (upcoming)
+- grep, find, xargs — The Search Trio (upcoming)
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

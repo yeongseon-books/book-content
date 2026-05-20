@@ -1,5 +1,5 @@
 ---
-title: "grep, find, xargs — The Search Trio"
+title: "Linux CLI 101 (5/10): grep, find, xargs — The Search Trio"
 series: linux-cli-101
 episode: 5
 language: en
@@ -22,18 +22,27 @@ seo_description: grep is a detective that finds text inside file contents, and f
   is a search party that locates files by name and attributes.
 ---
 
-# grep, find, xargs — The Search Trio
+# Linux CLI 101 (5/10): grep, find, xargs — The Search Trio
 
 Once a project stops fitting in your head, search becomes a workflow, not a convenience. You need to answer questions like "Where is this called?", "Which logs changed today?", and "Which matching files should I delete?" without opening everything one by one.
 
 This is post 5 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Searching for strings inside files with `grep`
-- Finding files by name, size, and modification time with `find`
-- Passing search results as arguments to other commands with `xargs`
-- Combining all three commands to automate real-world tasks
+- Searching for strings inside files with `grep`?
+- Finding files by name, size, and modification time with `find`?
+- Passing search results as arguments to other commands with `xargs`?
+
+## Big Picture
+
+![Linux CLI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
+
+*Linux CLI 101 chapter 5 flow overview*
+
+This picture places grep, find, xargs — The Search Trio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of grep, find, xargs — The Search Trio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -46,10 +55,6 @@ Instead of opening files one by one in an editor, `grep -rn "connection timeout"
 ## Mental Model
 
 > `grep` is a specialist librarian who searches book contents, `find` is a search party that locates books by title or size on the shelves, and `xargs` is the courier who hands the found books to someone else.
-
-![How grep, find, and xargs fit together](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
-
-*How content search, file search, and follow-up actions fit into one workflow*
 
 ```text
 grep: "Find pages containing this word"     -> content search
@@ -245,14 +250,23 @@ In practice, many teams use `ripgrep (rg)` which is faster than `grep`, and `fd`
 
 The next post covers **pipes and redirection** — connecting commands and redirecting input/output.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- **grep, find, xargs (current)**
+- **Searching for strings inside files with `grep`?**
+  - The article treats grep, find, xargs — The Search Trio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Finding files by name, size, and modification time with `find`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Passing search results as arguments to other commands with `xargs`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- **grep, find, xargs — The Search Trio (current)**
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

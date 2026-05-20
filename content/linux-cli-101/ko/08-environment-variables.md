@@ -1,5 +1,5 @@
 ---
-title: 환경변수와 PATH
+title: "Linux CLI 101 (8/10): 환경변수와 PATH"
 series: linux-cli-101
 episode: 8
 language: ko
@@ -21,20 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: 환경변수와 PATH가 명령 실행과 설정 전달에 쓰이는 방식을 정리합니다.
 ---
 
-# 환경변수와 PATH
+# Linux CLI 101 (8/10): 환경변수와 PATH
 
 `python`을 입력하면 Shell이 Python 실행 파일을 찾아서 실행합니다. 어떻게 찾을까요? 모든 디렉터리를 뒤지는 것이 아니라, PATH에 등록된 디렉터리만 순서대로 확인합니다. PATH에 없으면 "command not found"입니다.
 
 이 글은 Linux CLI 101 시리즈의 8번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 환경변수는 어떤 방식으로 프로세스에 전달될까요?
 - `export`와 로컬 Shell 변수는 무엇이 다를까요?
 - `PATH`는 명령 실행에서 어떤 검색 순서를 만들까요?
-- 도구를 설치했는데 command not found가 뜨면 무엇부터 봐야 할까요?
 
-> 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
+## 큰 그림
+
+![Linux CLI 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.ko.png)
+
+*Linux CLI 101 8장 흐름 개요*
+
+이 그림에서는 환경변수와 PATH를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 환경변수와 PATH의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 머릿속에 먼저 그릴 그림
 
@@ -225,16 +232,25 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 
 다음 글에서는 **간단한 shell script** — 반복 작업을 자동화하는 스크립트 작성법을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **환경변수는 어떤 방식으로 프로세스에 전달될까요?**
+  - 본문의 기준은 환경변수와 PATH를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`export`와 로컬 Shell 변수는 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`PATH`는 명령 실행에서 어떤 검색 순서를 만들까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
-- [파일과 디렉터리 다루기](./02-files-and-directories.md)
-- [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
-- [cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
-- [grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
-- [pipe와 redirection](./06-pipe-and-redirection.md)
-- [프로세스 확인과 종료](./07-process-management.md)
+- [Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): 권한과 소유자 이해하기](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): pipe와 redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): 프로세스 확인과 종료](./07-process-management.md)
 - **환경변수와 PATH (현재 글)**
 - 간단한 shell script (예정)
 - SSH와 원격 서버 접속 (예정)

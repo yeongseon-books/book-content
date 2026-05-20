@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is the CLI and Shell?</title>
+<title>Linux CLI 101 (1/10): What Is the CLI and Shell?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What Is the CLI and Shell?</h1>
+<h1>Linux CLI 101 (1/10): What Is the CLI and Shell?</h1>
 <p>Sooner or later every developer lands on a machine with nothing to click: a cloud VM over SSH, a Docker container, or a CI runner that only accepts text commands. That is the moment when the difference between "I can code" and "I can operate" becomes very visible.</p>
 <p>This is the first post in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The exact difference between CLI, Shell, and Terminal</li>
-<li>How to run your first commands in a Bash shell</li>
-<li>How to read command structure: command, option, argument</li>
-<li>Practical reasons developers use the CLI over GUIs</li>
+<li>The exact difference between CLI, Shell, and Terminal?</li>
+<li>How to run your first commands in a Bash shell?</li>
+<li>How to read command structure: command, option, argument?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is the CLI and Shell? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is the CLI and Shell? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Most people start programming with a GUI editor and mouse clicks. Double-click a file to open it, click "Run" in the menu. That approach works at first, but the moment you step into a server environment, it falls apart.</p>
 <blockquote>
@@ -192,13 +198,22 @@ cd My\ Documents    # Correct: backslash escapes the space
 <li>Learning the CLI enables you to handle server management, Docker, CI/CD, and automation scripts directly.</li>
 </ul>
 <p>The next post covers <strong>files and directories</strong> — <code>ls</code>, <code>cd</code>, <code>mkdir</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The exact difference between CLI, Shell, and Terminal?</strong></li>
+<li>The article treats What Is the CLI and Shell? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to run your first commands in a Bash shell?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to read command structure: command, option, argument?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is the CLI and Shell? (current)</strong></li>
 <li>Files and Directories (upcoming)</li>
 <li>Permissions and Ownership (upcoming)</li>
-<li>cat, less, head, tail (upcoming)</li>
-<li>grep, find, xargs (upcoming)</li>
+<li>cat, less, head, tail — Viewing File Contents (upcoming)</li>
+<li>grep, find, xargs — The Search Trio (upcoming)</li>
 <li>Pipes and Redirection (upcoming)</li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>

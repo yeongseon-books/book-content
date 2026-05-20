@@ -1,5 +1,5 @@
 ---
-title: Permissions and Ownership
+title: "Linux CLI 101 (3/10): Permissions and Ownership"
 series: linux-cli-101
 episode: 3
 language: en
@@ -22,18 +22,27 @@ seo_description: Linux file permissions are like a door with three locks. The ow
   the group, and everyone else each get a different key.
 ---
 
-# Permissions and Ownership
+# Linux CLI 101 (3/10): Permissions and Ownership
 
 Permission problems often look misleading. A file is right there, but the script will not run. A config path exists, but the process still cannot read it. Until you can read `rwx` fluently, these errors feel arbitrary.
 
 This is post 3 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)
-- How to read permission strings in `ls -l` output
-- Two ways to change permissions with `chmod` (numeric and symbolic)
-- How to change ownership and group with `chown`
+- The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?
+- How to read permission strings in `ls -l` output?
+- Two ways to change permissions with `chmod` (numeric and symbolic)?
+
+## Big Picture
+
+![Linux CLI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 3 flow overview*
+
+This picture places Permissions and Ownership inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Permissions and Ownership is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -211,14 +220,23 @@ On the other hand, permissions that are too strict block team collaboration. A b
 
 The next post covers **viewing file contents** — `cat`, `less`, `head`, `tail`.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
+- **The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?**
+  - The article treats Permissions and Ownership as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to read permission strings in `ls -l` output?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Two ways to change permissions with `chmod` (numeric and symbolic)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
 - **Permissions and Ownership (current)**
-- cat, less, head, tail (upcoming)
-- grep, find, xargs (upcoming)
+- cat, less, head, tail — Viewing File Contents (upcoming)
+- grep, find, xargs — The Search Trio (upcoming)
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

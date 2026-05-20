@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>grep, find, xargs — The Search Trio</title>
+<title>Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>grep, find, xargs — The Search Trio</h1>
+<h1>Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</h1>
 <p>Once a project stops fitting in your head, search becomes a workflow, not a convenience. You need to answer questions like "Where is this called?", "Which logs changed today?", and "Which matching files should I delete?" without opening everything one by one.</p>
 <p>This is post 5 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Searching for strings inside files with <code>grep</code></li>
-<li>Finding files by name, size, and modification time with <code>find</code></li>
-<li>Passing search results as arguments to other commands with <code>xargs</code></li>
-<li>Combining all three commands to automate real-world tasks</li>
+<li>Searching for strings inside files with <code>grep</code>?</li>
+<li>Finding files by name, size, and modification time with <code>find</code>?</li>
+<li>Passing search results as arguments to other commands with <code>xargs</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png"></p>
+<p><em>Linux CLI 101 chapter 5 flow overview</em></p>
+<p>This picture places grep, find, xargs — The Search Trio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of grep, find, xargs — The Search Trio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>As projects grow, file counts climb into the hundreds. "Where is this function called?", "Which files were modified yesterday?", "Show me only the log lines containing ERROR" — <code>grep</code> and <code>find</code> answer all of these questions.</p>
 <blockquote>
@@ -73,8 +79,6 @@
 <blockquote>
 <p><code>grep</code> is a specialist librarian who searches book contents, <code>find</code> is a search party that locates books by title or size on the shelves, and <code>xargs</code> is the courier who hands the found books to someone else.</p>
 </blockquote>
-<p><img alt="How grep, find, and xargs fit together" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png"></p>
-<p><em>How content search, file search, and follow-up actions fit into one workflow</em></p>
 <pre><code class="language-text">grep: &quot;Find pages containing this word&quot;     -&gt; content search
 find: &quot;Find the red 200-page book&quot;          -&gt; file search
 xargs: &quot;Take the found books to the copier&quot; -&gt; results -&gt; command
@@ -250,13 +254,22 @@ find . -name &quot;*.log&quot; -print0 | xargs -0 rm
 <li>Learn the standard commands first, then move on to alternatives like <code>ripgrep</code> and <code>fd</code>.</li>
 </ul>
 <p>The next post covers <strong>pipes and redirection</strong> — connecting commands and redirecting input/output.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
-<li><strong>grep, find, xargs (current)</strong></li>
+<li><strong>Searching for strings inside files with <code>grep</code>?</strong></li>
+<li>The article treats grep, find, xargs — The Search Trio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Finding files by name, size, and modification time with <code>find</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Passing search results as arguments to other commands with <code>xargs</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</a></li>
+<li><strong>grep, find, xargs — The Search Trio (current)</strong></li>
 <li>Pipes and Redirection (upcoming)</li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>

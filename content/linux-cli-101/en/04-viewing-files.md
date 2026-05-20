@@ -1,5 +1,5 @@
 ---
-title: "cat, less, head, tail — Viewing File Contents"
+title: "Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents"
 series: linux-cli-101
 episode: 4
 language: en
@@ -22,18 +22,27 @@ seo_description: cat dumps a file all at once like pouring a bucket, and less le
   you flip through it one page at a time like reading a book.
 ---
 
-# cat, less, head, tail — Viewing File Contents
+# Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents
 
 When you work on servers, reading files efficiently matters almost as much as editing them. Logs, config files, CSVs, and generated output all need different reading habits, and using the wrong command can waste time or flood your terminal.
 
 This is post 4 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Using `cat` to quickly view short files
-- Using `less` to browse long files page by page
-- Using `head` and `tail` to slice the beginning or end of a file
-- Using `tail -f` to monitor logs in real time
+- Using `cat` to quickly view short files?
+- Using `less` to browse long files page by page?
+- Using `head` and `tail` to slice the beginning or end of a file?
+
+## Big Picture
+
+![Linux CLI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 4 flow overview*
+
+This picture places cat, less, head, tail — Viewing File Contents inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of cat, less, head, tail — Viewing File Contents is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -226,14 +235,23 @@ The most-used combination in production is `tail -f` + `grep`. Running `tail -f 
 
 The next post covers **text search and file finding** — `grep`, `find`, `xargs`.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- **cat, less, head, tail (current)**
-- grep, find, xargs (upcoming)
+- **Using `cat` to quickly view short files?**
+  - The article treats cat, less, head, tail — Viewing File Contents as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Using `less` to browse long files page by page?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Using `head` and `tail` to slice the beginning or end of a file?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- **cat, less, head, tail — Viewing File Contents (current)**
+- grep, find, xargs — The Search Trio (upcoming)
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

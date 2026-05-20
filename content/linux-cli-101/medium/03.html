@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Permissions and Ownership</title>
+<title>Linux CLI 101 (3/10): Permissions and Ownership</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Permissions and Ownership</h1>
+<h1>Linux CLI 101 (3/10): Permissions and Ownership</h1>
 <p>Permission problems often look misleading. A file is right there, but the script will not run. A config path exists, but the process still cannot read it. Until you can read <code>rwx</code> fluently, these errors feel arbitrary.</p>
 <p>This is post 3 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)</li>
-<li>How to read permission strings in <code>ls -l</code> output</li>
-<li>Two ways to change permissions with <code>chmod</code> (numeric and symbolic)</li>
-<li>How to change ownership and group with <code>chown</code></li>
+<li>The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?</li>
+<li>How to read permission strings in <code>ls -l</code> output?</li>
+<li>Two ways to change permissions with <code>chmod</code> (numeric and symbolic)?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 3 flow overview</em></p>
+<p>This picture places Permissions and Ownership inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Permissions and Ownership is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>You try to run a script on a server with <code>./deploy.sh</code> and get "Permission denied". The file clearly exists — so why won't it run? Because the execute permission (x) is missing.</p>
 <blockquote>
@@ -229,13 +235,22 @@ find project/ -type f -exec chmod 644 {} \;   # Files only
 <li><code>chown</code> requires root privileges to change ownership.</li>
 </ul>
 <p>The next post covers <strong>viewing file contents</strong> — <code>cat</code>, <code>less</code>, <code>head</code>, <code>tail</code>.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><strong>The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?</strong></li>
+<li>The article treats Permissions and Ownership as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to read permission strings in <code>ls -l</code> output?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Two ways to change permissions with <code>chmod</code> (numeric and symbolic)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
 <li><strong>Permissions and Ownership (current)</strong></li>
-<li>cat, less, head, tail (upcoming)</li>
-<li>grep, find, xargs (upcoming)</li>
+<li>cat, less, head, tail — Viewing File Contents (upcoming)</li>
+<li>grep, find, xargs — The Search Trio (upcoming)</li>
 <li>Pipes and Redirection (upcoming)</li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>

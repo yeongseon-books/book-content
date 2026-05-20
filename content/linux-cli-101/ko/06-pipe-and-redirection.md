@@ -1,5 +1,5 @@
 ---
-title: pipe와 redirection
+title: "Linux CLI 101 (6/10): pipe와 redirection"
 series: linux-cli-101
 episode: 6
 language: ko
@@ -21,28 +21,31 @@ last_reviewed: '2026-05-15'
 seo_description: 표준 입출력 개념을 파악하고 파이프와 리다이렉션을 활용해 명령어를 연결하거나 파일로 저장하는 실무 텍스트 처리 기법을 단계별 예제로 실습합니다.
 ---
 
-# pipe와 redirection
+# Linux CLI 101 (6/10): pipe와 redirection
 
 Linux의 철학은 "한 가지 일을 잘하는 작은 도구를 만들고, 조합하여 큰 일을 한다"입니다. `grep`은 검색만 하고, `sort`는 정렬만 하고, `wc`는 세기만 합니다. 이 도구들을 연결하는 접착제가 pipe와 redirection입니다.
 
 이 글은 Linux CLI 101 시리즈의 6번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 표준 입력, 표준 출력, 표준 오류는 왜 분리되어 있을까요?
 - `|`, `>`, `>>`, `2>`는 각각 어떤 흐름을 만들까요?
 - 중간 파일 없이 명령을 이어 붙이면 무엇이 좋아질까요?
-- 로그 분석에서 파이프를 읽는 감각이 왜 중요한가요?
 
-> 명령어는 수도꼭지이고, pipe(`|`)는 수도관입니다. 물(데이터)은 왼쪽에서 오른쪽으로 흐릅니다. redirection(`>`)은 물줄기를 수도관 대신 물통(파일)으로 보내는 것입니다.
+## 큰 그림
+
+![Linux CLI 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.ko.png)
+
+*Linux CLI 101 6장 흐름 개요*
+
+이 그림에서는 pipe와 redirection를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> pipe와 redirection의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 머릿속에 먼저 그릴 그림
 
 > 명령어는 수도꼭지이고, pipe(`|`)는 수도관입니다. 물(데이터)은 왼쪽에서 오른쪽으로 흐릅니다. redirection(`>`)은 물줄기를 수도관 대신 물통(파일)으로 보내는 것입니다.
-
-![stdin, stdout, stderr 흐름도](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.ko.png)
-
-*stdin, stdout, stderr가 파이프와 리다이렉션으로 어디로 흐르는지 보여 주는 그림*
 
 ```text
 [Command A] --stdout--|--stdin--> [Command B] --stdout--> screen
@@ -235,14 +238,23 @@ pipe는 Unix 철학의 핵심입니다. 작은 도구를 조합하면 전용 프
 
 다음 글에서는 **프로세스 확인과 종료** — `ps`, `top`, `kill`, 백그라운드 실행을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **표준 입력, 표준 출력, 표준 오류는 왜 분리되어 있을까요?**
+  - 본문의 기준은 pipe와 redirection를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`|`, `>`, `>>`, `2>`는 각각 어떤 흐름을 만들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **중간 파일 없이 명령을 이어 붙이면 무엇이 좋아질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
-- [파일과 디렉터리 다루기](./02-files-and-directories.md)
-- [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
-- [cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
-- [grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
+- [Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): 파일과 디렉터리 다루기](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): 권한과 소유자 이해하기](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
 - **pipe와 redirection (현재 글)**
 - 프로세스 확인과 종료 (예정)
 - 환경변수와 PATH (예정)

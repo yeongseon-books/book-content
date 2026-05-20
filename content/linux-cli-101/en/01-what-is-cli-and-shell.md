@@ -1,5 +1,5 @@
 ---
-title: What Is the CLI and Shell?
+title: "Linux CLI 101 (1/10): What Is the CLI and Shell?"
 series: linux-cli-101
 episode: 1
 language: en
@@ -22,18 +22,27 @@ seo_description: The CLI operates your computer with keystrokes, and the Shell t
   those keystrokes into actions.
 ---
 
-# What Is the CLI and Shell?
+# Linux CLI 101 (1/10): What Is the CLI and Shell?
 
 Sooner or later every developer lands on a machine with nothing to click: a cloud VM over SSH, a Docker container, or a CI runner that only accepts text commands. That is the moment when the difference between "I can code" and "I can operate" becomes very visible.
 
 This is the first post in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The exact difference between CLI, Shell, and Terminal
-- How to run your first commands in a Bash shell
-- How to read command structure: command, option, argument
-- Practical reasons developers use the CLI over GUIs
+- The exact difference between CLI, Shell, and Terminal?
+- How to run your first commands in a Bash shell?
+- How to read command structure: command, option, argument?
+
+## Big Picture
+
+![Linux CLI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 1 flow overview*
+
+This picture places What Is the CLI and Shell? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is the CLI and Shell? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -208,14 +217,23 @@ That said, not everything should be done in the CLI. Code editing is more produc
 
 The next post covers **files and directories** — `ls`, `cd`, `mkdir`, `cp`, `mv`, `rm`.
 
+## Answering the Opening Questions
+
+- **The exact difference between CLI, Shell, and Terminal?**
+  - The article treats What Is the CLI and Shell? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to run your first commands in a Bash shell?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to read command structure: command, option, argument?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - **What Is the CLI and Shell? (current)**
 - Files and Directories (upcoming)
 - Permissions and Ownership (upcoming)
-- cat, less, head, tail (upcoming)
-- grep, find, xargs (upcoming)
+- cat, less, head, tail — Viewing File Contents (upcoming)
+- grep, find, xargs — The Search Trio (upcoming)
 - Pipes and Redirection (upcoming)
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

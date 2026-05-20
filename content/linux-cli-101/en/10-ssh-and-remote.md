@@ -1,5 +1,5 @@
 ---
-title: SSH and Remote Access
+title: "Linux CLI 101 (10/10): SSH and Remote Access"
 series: linux-cli-101
 episode: 10
 language: en
@@ -22,18 +22,27 @@ seo_description: SSH opens a remote terminal over an encrypted channel, and key-
   authentication replaces passwords with a lock-and-key pair.
 ---
 
-# SSH and Remote Access
+# Linux CLI 101 (10/10): SSH and Remote Access
 
 The CLI becomes truly operational the moment you leave your own machine. Deploying code, checking logs on a server, copying build artifacts, and tunneling to a remote database all start with secure remote access.
 
 This is the final post in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The basic SSH connection flow and key-based authentication setup
-- Generating a key pair with `ssh-keygen` and registering it on a server
-- Creating connection aliases with `~/.ssh/config`
-- Copying and syncing files remotely with `scp` and `rsync`
+- The basic SSH connection flow and key-based authentication setup?
+- Generating a key pair with `ssh-keygen` and registering it on a server?
+- Creating connection aliases with `~/.ssh/config`?
+
+## Big Picture
+
+![Linux CLI 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 10 flow overview*
+
+This picture places SSH and Remote Access inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SSH and Remote Access is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -248,18 +257,27 @@ That said, you still need to know SSH. When CI/CD fails, when monitoring misses 
 
 This concludes the Linux CLI 101 series. You now have the CLI fundamentals to connect to servers, analyze logs, and automate deployments with confidence.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
-- [Process Management](./07-process-management.md)
-- [Environment Variables and PATH](./08-environment-variables.md)
-- [Shell Script Basics](./09-shell-script-basics.md)
+- **The basic SSH connection flow and key-based authentication setup?**
+  - The article treats SSH and Remote Access as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Generating a key pair with `ssh-keygen` and registering it on a server?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Creating connection aliases with `~/.ssh/config`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): Process Management](./07-process-management.md)
+- [Linux CLI 101 (8/10): Environment Variables and PATH](./08-environment-variables.md)
+- [Linux CLI 101 (9/10): Shell Script Basics](./09-shell-script-basics.md)
 - **SSH and Remote Access (current)**
 
 <!-- toc:end -->

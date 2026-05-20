@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>cat, less, head, tail — Viewing File Contents</title>
+<title>Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>cat, less, head, tail — Viewing File Contents</h1>
+<h1>Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</h1>
 <p>When you work on servers, reading files efficiently matters almost as much as editing them. Logs, config files, CSVs, and generated output all need different reading habits, and using the wrong command can waste time or flood your terminal.</p>
 <p>This is post 4 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Using <code>cat</code> to quickly view short files</li>
-<li>Using <code>less</code> to browse long files page by page</li>
-<li>Using <code>head</code> and <code>tail</code> to slice the beginning or end of a file</li>
-<li>Using <code>tail -f</code> to monitor logs in real time</li>
+<li>Using <code>cat</code> to quickly view short files?</li>
+<li>Using <code>less</code> to browse long files page by page?</li>
+<li>Using <code>head</code> and <code>tail</code> to slice the beginning or end of a file?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 4 flow overview</em></p>
+<p>This picture places cat, less, head, tail — Viewing File Contents inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of cat, less, head, tail — Viewing File Contents is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Viewing file contents comes up constantly during development. You check config values, hunt for errors in logs, and inspect CSV headers. Opening an editor is slow for large files, and edit mode risks accidental changes.</p>
 <blockquote>
@@ -214,13 +220,22 @@ kill %1 2&gt;/dev/null
 <li>Choosing the appropriate command based on file size and purpose is a mark of CLI proficiency.</li>
 </ul>
 <p>The next post covers <strong>text search and file finding</strong> — <code>grep</code>, <code>find</code>, <code>xargs</code>.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><strong>cat, less, head, tail (current)</strong></li>
-<li>grep, find, xargs (upcoming)</li>
+<li><strong>Using <code>cat</code> to quickly view short files?</strong></li>
+<li>The article treats cat, less, head, tail — Viewing File Contents as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Using <code>less</code> to browse long files page by page?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Using <code>head</code> and <code>tail</code> to slice the beginning or end of a file?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><strong>cat, less, head, tail — Viewing File Contents (current)</strong></li>
+<li>grep, find, xargs — The Search Trio (upcoming)</li>
 <li>Pipes and Redirection (upcoming)</li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>

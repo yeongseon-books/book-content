@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Files and Directories</title>
+<title>Linux CLI 101 (2/10): Files and Directories</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Files and Directories</h1>
+<h1>Linux CLI 101 (2/10): Files and Directories</h1>
 <p>Most server work is not glamorous. You move release bundles, back up config files, clean up logs, and figure out where a missing file actually lives. If your path sense is weak, even simple maintenance work slows down fast.</p>
 <p>This is post 2 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The Linux file system hierarchy (<code>/</code>, <code>/home</code>, <code>/etc</code>, <code>/var</code>)</li>
-<li>Checking your current location and navigating with <code>pwd</code>, <code>cd</code>, <code>ls</code></li>
-<li>Manipulating files and directories with <code>mkdir</code>, <code>touch</code>, <code>cp</code>, <code>mv</code>, <code>rm</code></li>
-<li>The difference between absolute and relative paths, and when to use each</li>
+<li>The Linux file system hierarchy (<code>/</code>, <code>/home</code>, <code>/etc</code>, <code>/var</code>)?</li>
+<li>Checking your current location and navigating with <code>pwd</code>, <code>cd</code>, <code>ls</code>?</li>
+<li>Manipulating files and directories with <code>mkdir</code>, <code>touch</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 2 flow overview</em></p>
+<p>This picture places Files and Directories inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Files and Directories is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>A developer's daily routine is an endless cycle of creating, moving, copying, and deleting files. You organize code files, copy configuration files, and remove build artifacts. In a GUI you drag and drop, but on a server everything is done through commands.</p>
 <blockquote>
@@ -203,13 +209,22 @@ cp -r src/ backup/      # Correct: recursive copy
 <li>Absolute paths work from anywhere; relative paths depend on your current location.</li>
 </ul>
 <p>The next post covers <strong>permissions and ownership</strong> — <code>chmod</code>, <code>chown</code>, and the meaning of <code>rwx</code>.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><strong>The Linux file system hierarchy (<code>/</code>, <code>/home</code>, <code>/etc</code>, <code>/var</code>)?</strong></li>
+<li>The article treats Files and Directories as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Checking your current location and navigating with <code>pwd</code>, <code>cd</code>, <code>ls</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Manipulating files and directories with <code>mkdir</code>, <code>touch</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
 <li><strong>Files and Directories (current)</strong></li>
 <li>Permissions and Ownership (upcoming)</li>
-<li>cat, less, head, tail (upcoming)</li>
-<li>grep, find, xargs (upcoming)</li>
+<li>cat, less, head, tail — Viewing File Contents (upcoming)</li>
+<li>grep, find, xargs — The Search Trio (upcoming)</li>
 <li>Pipes and Redirection (upcoming)</li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>

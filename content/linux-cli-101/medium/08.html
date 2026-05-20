@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Environment Variables and PATH</title>
+<title>Linux CLI 101 (8/10): Environment Variables and PATH</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Environment Variables and PATH</h1>
+<h1>Linux CLI 101 (8/10): Environment Variables and PATH</h1>
 <p>Environment variables sit behind a lot of everyday confusion: a command installs successfully but cannot be found, a script sees a variable in your shell but not in Python, or a setting works in one terminal and disappears in the next.</p>
 <p>This is post 8 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Viewing and setting environment variables with <code>echo</code>, <code>env</code>, <code>export</code></li>
-<li>How PATH drives command lookup</li>
-<li>Adding permanent settings to <code>.bashrc</code> and <code>.bash_profile</code></li>
-<li>Managing application configuration with <code>.env</code> files</li>
+<li>Viewing and setting environment variables with <code>echo</code>, <code>env</code>, <code>export</code>?</li>
+<li>How PATH drives command lookup?</li>
+<li>Adding permanent settings to <code>.bashrc</code> and <code>.bash_profile</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 8 flow overview</em></p>
+<p>This picture places Environment Variables and PATH inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Environment Variables and PATH is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>When you type <code>python</code>, the Shell finds and runs the Python executable. How does it find it? Not by searching every directory — it checks only the directories listed in PATH, in order. If the path is not in PATH, you get "command not found".</p>
 <blockquote>
@@ -220,15 +226,24 @@ echo &quot;${HOME}_backup&quot;         # HOME variable + &quot;_backup&quot; st
 <li>Without <code>export</code>, child processes (Python, Docker, etc.) cannot see the variable.</li>
 </ul>
 <p>The next post covers <strong>shell scripting basics</strong> — writing scripts to automate repetitive tasks.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Pipes and Redirection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Process Management</a></li>
+<li><strong>Viewing and setting environment variables with <code>echo</code>, <code>env</code>, <code>export</code>?</strong></li>
+<li>The article treats Environment Variables and PATH as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How PATH drives command lookup?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Adding permanent settings to <code>.bashrc</code> and <code>.bash_profile</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Linux CLI 101 (6/10): Pipes and Redirection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Linux CLI 101 (7/10): Process Management</a></li>
 <li><strong>Environment Variables and PATH (current)</strong></li>
 <li>Shell Script Basics (upcoming)</li>
 <li>SSH and Remote Access (upcoming)</li>

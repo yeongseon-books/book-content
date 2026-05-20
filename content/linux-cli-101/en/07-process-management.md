@@ -1,5 +1,5 @@
 ---
-title: Process Management
+title: "Linux CLI 101 (7/10): Process Management"
 series: linux-cli-101
 episode: 7
 language: en
@@ -22,18 +22,27 @@ seo_description: A process is a running instance of a program, each with a uniqu
   PID, acting as an independent worker.
 ---
 
-# Process Management
+# Linux CLI 101 (7/10): Process Management
 
 Process problems show up in very practical ways: a port is already in use, CPU spikes to 100 percent, or a long-running job dies the moment your SSH session closes. If you cannot inspect and control processes, those problems stay mysterious longer than they should.
 
 This is post 7 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Checking running processes with `ps` and `top`
-- Terminating processes with `kill` and `kill -9`
-- Switching between background and foreground with `&`, `bg`, `fg`, `jobs`
-- Keeping processes alive after SSH disconnection with `nohup`
+- Checking running processes with `ps` and `top`?
+- Terminating processes with `kill` and `kill -9`?
+- Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?
+
+## Big Picture
+
+![Linux CLI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
+
+*Linux CLI 101 chapter 7 flow overview*
+
+This picture places Process Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Process Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -44,10 +53,6 @@ When a web server is consuming 100% CPU, a Python script is stuck in an infinite
 ## Mental Model
 
 > A program is a recipe (code file), and a process is a cook actually cooking with that recipe (running instance). Just as 3 cooks can cook the same recipe simultaneously, 3 processes can run from the same program at the same time.
-
-![A practical escalation path for process troubleshooting](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
-
-*A practical escalation path for checking and stopping problematic processes*
 
 ```text
 Program (python)  ->  Process 1 (PID 1234)  <- check with ps
@@ -221,15 +226,24 @@ Even during development, process awareness matters. Building the habit of asking
 
 The next post covers **environment variables and PATH** — how the Shell finds commands and manages configuration.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
+- **Checking running processes with `ps` and `top`?**
+  - The article treats Process Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Terminating processes with `kill` and `kill -9`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
 - **Process Management (current)**
 - Environment Variables and PATH (upcoming)
 - Shell Script Basics (upcoming)

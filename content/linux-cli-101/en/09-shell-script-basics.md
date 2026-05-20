@@ -1,5 +1,5 @@
 ---
-title: Shell Script Basics
+title: "Linux CLI 101 (9/10): Shell Script Basics"
 series: linux-cli-101
 episode: 9
 language: en
@@ -22,18 +22,27 @@ seo_description: A shell script is a recipe file of CLI commands. Write it once,
   it runs repetitive tasks automatically every time.
 ---
 
-# Shell Script Basics
+# Linux CLI 101 (9/10): Shell Script Basics
 
 Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.
 
 This is post 9 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The basic flow of writing and running a shell script
-- Bash syntax for variables, `if/else`, and `for` loops
-- Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)
-- Common script patterns used in real-world workflows
+- The basic flow of writing and running a shell script?
+- Bash syntax for variables, `if/else`, and `for` loops?
+- Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?
+
+## Big Picture
+
+![Linux CLI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png)
+
+*Linux CLI 101 chapter 9 flow overview*
+
+This picture places Shell Script Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Shell Script Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -302,17 +311,26 @@ On the other hand, complex logic — JSON parsing, API calls, error handling —
 
 The next post covers **SSH and remote access** — key-based authentication, scp, and ssh config.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
-- [Pipes and Redirection](./06-pipe-and-redirection.md)
-- [Process Management](./07-process-management.md)
-- [Environment Variables and PATH](./08-environment-variables.md)
+- **The basic flow of writing and running a shell script?**
+  - The article treats Shell Script Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Bash syntax for variables, `if/else`, and `for` loops?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
+- [Linux CLI 101 (6/10): Pipes and Redirection](./06-pipe-and-redirection.md)
+- [Linux CLI 101 (7/10): Process Management](./07-process-management.md)
+- [Linux CLI 101 (8/10): Environment Variables and PATH](./08-environment-variables.md)
 - **Shell Script Basics (current)**
 - SSH and Remote Access (upcoming)
 

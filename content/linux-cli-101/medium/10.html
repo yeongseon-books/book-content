@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SSH and Remote Access</title>
+<title>Linux CLI 101 (10/10): SSH and Remote Access</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>SSH and Remote Access</h1>
+<h1>Linux CLI 101 (10/10): SSH and Remote Access</h1>
 <p>The CLI becomes truly operational the moment you leave your own machine. Deploying code, checking logs on a server, copying build artifacts, and tunneling to a remote database all start with secure remote access.</p>
 <p>This is the final post in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The basic SSH connection flow and key-based authentication setup</li>
-<li>Generating a key pair with <code>ssh-keygen</code> and registering it on a server</li>
-<li>Creating connection aliases with <code>~/.ssh/config</code></li>
-<li>Copying and syncing files remotely with <code>scp</code> and <code>rsync</code></li>
+<li>The basic SSH connection flow and key-based authentication setup?</li>
+<li>Generating a key pair with <code>ssh-keygen</code> and registering it on a server?</li>
+<li>Creating connection aliases with <code>~/.ssh/config</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.en.png"></p>
+<p><em>Linux CLI 101 chapter 10 flow overview</em></p>
+<p>This picture places SSH and Remote Access inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of SSH and Remote Access is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Deploying code to a server, checking server logs, and connecting to a database all start with remote access. SSH is the foundation of every remote operation.</p>
 <blockquote>
@@ -239,17 +245,26 @@ chmod 600 ~/.ssh/config
 <li>Proper key file permissions and disabling password authentication are security essentials.</li>
 </ul>
 <p>This concludes the Linux CLI 101 series. You now have the CLI fundamentals to connect to servers, analyze logs, and automate deployments with confidence.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Pipes and Redirection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Process Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/08-environment-variables.md">Environment Variables and PATH</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/09-shell-script-basics.md">Shell Script Basics</a></li>
+<li><strong>The basic SSH connection flow and key-based authentication setup?</strong></li>
+<li>The article treats SSH and Remote Access as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Generating a key pair with <code>ssh-keygen</code> and registering it on a server?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Creating connection aliases with <code>~/.ssh/config</code>?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Linux CLI 101 (6/10): Pipes and Redirection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Linux CLI 101 (7/10): Process Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/08-environment-variables.md">Linux CLI 101 (8/10): Environment Variables and PATH</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/09-shell-script-basics.md">Linux CLI 101 (9/10): Shell Script Basics</a></li>
 <li><strong>SSH and Remote Access (current)</strong></li>
 </ul>
 <h2>References</h2>

@@ -1,5 +1,5 @@
 ---
-title: Pipes and Redirection
+title: "Linux CLI 101 (6/10): Pipes and Redirection"
 series: linux-cli-101
 episode: 6
 language: en
@@ -22,18 +22,27 @@ seo_description: A pipe connects commands like plumbing, and redirection changes
   flow of data from the screen to a file.
 ---
 
-# Pipes and Redirection
+# Linux CLI 101 (6/10): Pipes and Redirection
 
 Single commands are useful, but real CLI work usually starts when you connect them. Filtering logs, saving build output, and separating failures from normal output all depend on understanding where stdin, stdout, and stderr are flowing.
 
 This is post 6 in the Linux CLI 101 series.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- Passing the output of one command as input to the next with pipe (`|`)
-- Saving output to a file with `>` (overwrite) and `>>` (append)
-- The meaning of stdin (0), stdout (1), and stderr (2) file descriptors
-- Merging or separating error and normal output with `2>&1`
+- Passing the output of one command as input to the next with pipe (`|`)?
+- Saving output to a file with `>` (overwrite) and `>>` (append)?
+- The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?
+
+## Big Picture
+
+![Linux CLI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
+
+*Linux CLI 101 chapter 6 flow overview*
+
+This picture places Pipes and Redirection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Pipes and Redirection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -50,10 +59,6 @@ This single line finishes in 3 seconds what would take an analyst 30 minutes in 
 ## Mental Model
 
 > Commands are faucets and pipe (`|`) is plumbing. Data flows from left to right. Redirection (`>`) diverts the flow from the pipe to a bucket (file) instead.
-
-![How stdin, stdout, and stderr move through pipes and files](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
-
-*How stdin, stdout, and stderr move through pipes and files*
 
 ```text
 [Command A] --stdout--|--stdin--> [Command B] --stdout--> screen
@@ -246,14 +251,23 @@ On the other hand, when a pipe chain exceeds 5 stages, maintainability drops. At
 
 The next post covers **process management** — `ps`, `top`, `kill`, and background execution.
 
-<!-- toc:begin -->
-## Series Table of Contents
+## Answering the Opening Questions
 
-- [What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
-- [Files and Directories](./02-files-and-directories.md)
-- [Permissions and Ownership](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
+- **Passing the output of one command as input to the next with pipe (`|`)?**
+  - The article treats Pipes and Redirection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Saving output to a file with `>` (overwrite) and `>>` (append)?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Linux CLI 101 (1/10): What Is the CLI and Shell?](./01-what-is-cli-and-shell.md)
+- [Linux CLI 101 (2/10): Files and Directories](./02-files-and-directories.md)
+- [Linux CLI 101 (3/10): Permissions and Ownership](./03-permissions-and-ownership.md)
+- [Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents](./04-viewing-files.md)
+- [Linux CLI 101 (5/10): grep, find, xargs — The Search Trio](./05-grep-find-xargs.md)
 - **Pipes and Redirection (current)**
 - Process Management (upcoming)
 - Environment Variables and PATH (upcoming)

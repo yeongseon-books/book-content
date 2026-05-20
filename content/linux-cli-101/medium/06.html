@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Pipes and Redirection</title>
+<title>Linux CLI 101 (6/10): Pipes and Redirection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,16 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Pipes and Redirection</h1>
+<h1>Linux CLI 101 (6/10): Pipes and Redirection</h1>
 <p>Single commands are useful, but real CLI work usually starts when you connect them. Filtering logs, saving build output, and separating failures from normal output all depend on understanding where stdin, stdout, and stderr are flowing.</p>
 <p>This is post 6 in the Linux CLI 101 series.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Passing the output of one command as input to the next with pipe (<code>|</code>)</li>
-<li>Saving output to a file with <code>&gt;</code> (overwrite) and <code>&gt;&gt;</code> (append)</li>
-<li>The meaning of stdin (0), stdout (1), and stderr (2) file descriptors</li>
-<li>Merging or separating error and normal output with <code>2&gt;&amp;1</code></li>
+<li>Passing the output of one command as input to the next with pipe (<code>|</code>)?</li>
+<li>Saving output to a file with <code>&gt;</code> (overwrite) and <code>&gt;&gt;</code> (append)?</li>
+<li>The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Linux CLI 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png"></p>
+<p><em>Linux CLI 101 chapter 6 flow overview</em></p>
+<p>This picture places Pipes and Redirection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Pipes and Redirection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>The Linux philosophy is "build small tools that each do one thing well, and compose them to accomplish big tasks". <code>grep</code> only searches, <code>sort</code> only sorts, <code>wc</code> only counts. The glue that connects these tools is pipes and redirection.</p>
 <blockquote>
@@ -75,8 +81,6 @@
 <blockquote>
 <p>Commands are faucets and pipe (<code>|</code>) is plumbing. Data flows from left to right. Redirection (<code>&gt;</code>) diverts the flow from the pipe to a bucket (file) instead.</p>
 </blockquote>
-<p><img alt="How stdin, stdout, and stderr move through pipes and files" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png"></p>
-<p><em>How stdin, stdout, and stderr move through pipes and files</em></p>
 <pre><code class="language-text">[Command A] --stdout--|--stdin--&gt; [Command B] --stdout--&gt; screen
                                                           |
 [Command A] --stdout--&gt; file.txt    (overwrite)           |
@@ -263,13 +267,22 @@ grep &quot;pattern&quot; file.txt          # grep reads the file directly — mo
 <li>When pipe chains get complex, moving to a script improves maintainability.</li>
 </ul>
 <p>The next post covers <strong>process management</strong> — <code>ps</code>, <code>top</code>, <code>kill</code>, and background execution.</p>
-<h2>Series Table of Contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
+<li><strong>Passing the output of one command as input to the next with pipe (<code>|</code>)?</strong></li>
+<li>The article treats Pipes and Redirection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Saving output to a file with <code>&gt;</code> (overwrite) and <code>&gt;&gt;</code> (append)?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">Linux CLI 101 (1/10): What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Linux CLI 101 (2/10): Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Linux CLI 101 (3/10): Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">Linux CLI 101 (4/10): cat, less, head, tail — Viewing File Contents</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">Linux CLI 101 (5/10): grep, find, xargs — The Search Trio</a></li>
 <li><strong>Pipes and Redirection (current)</strong></li>
 <li>Process Management (upcoming)</li>
 <li>Environment Variables and PATH (upcoming)</li>
