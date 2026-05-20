@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:50:09+00:00
+Generated: 2026-05-20T11:50:29+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **35**
+- Series with any issue: **34**
 - Series at or above 5 issues: **26**
-- Total issues: **282**
-  - BadImg: **282**
+- Total issues: **278**
+  - BadImg: **278**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -70,12 +70,11 @@ Warnings:
 | 27 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 28 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 29 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 30 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 31 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 32 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 33 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 34 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 35 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 30 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 31 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 32 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 33 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 34 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -416,16 +415,6 @@ Warnings:
 - `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=673x67)
 - `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=612x67)
 - `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=612x67)
-
-## data-warehouse-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=840x67)
-- `assets/data-warehouse-101/06/06-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=840x67)
-- `assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=899x67)
-- `assets/data-warehouse-101/07/07-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=899x67)
 
 ## design-patterns-101 — Total 4
 
