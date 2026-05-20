@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:39:29+00:00
+Generated: 2026-05-20T11:39:49+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **52**
+- Series with any issue: **51**
 - Series at or above 5 issues: **39**
-- Total issues: **449**
-  - BadImg: **449**
+- Total issues: **447**
+  - BadImg: **447**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -89,10 +89,9 @@ Warnings:
 | 46 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 47 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 48 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 49 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 50 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 51 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 52 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 49 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 50 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 51 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## rag-deep-dive — Total 24
 
@@ -648,14 +647,6 @@ Warnings:
 - `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png:1` — PNG height 88px <= 100px (size=1355x88)
 - `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.ko.png:1` — PNG height 88px <= 100px (size=1138x88)
 - `assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png:1` — PNG height 88px <= 100px (size=1325x88)
-
-## ai-agent-101 — Total 2
-
-- BadImg=2 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/ai-agent-101/09/09-01-observability.en.png:1` — PNG height 88px <= 100px (size=1266x88)
-- `assets/ai-agent-101/09/09-01-observability.ko.png:1` — PNG height 67px <= 100px (size=1194x67)
 
 ## azure-aks-101 — Total 2
 

@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:39:29+00:00",
+  "generated_at": "2026-05-20T11:39:49+00:00",
   "series_count": 92,
-  "problem_series_count": 52,
+  "problem_series_count": 51,
   "series_with_5_plus": 39,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 449,
+    "BadImg": 447,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 449
+    "all": 447
   },
   "results": [
     {
@@ -11611,78 +11611,6 @@
       }
     },
     {
-      "series": "ai-agent-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 2
-      },
-      "total": 2,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-agent-101/09/09-01-observability.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-observability.en.png",
-            "width": 1266,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-agent-101/09/09-01-observability.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-observability.ko.png",
-            "width": 1194,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-agent-101/09/09-01-observability.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-observability.en.png",
-            "width": 1266,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/ai-agent-101/09/09-01-observability.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "09-01-observability.ko.png",
-            "width": 1194,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "azure-aks-101",
       "counts": {
         "Synt": 0,
@@ -11897,6 +11825,20 @@
           }
         ]
       }
+    },
+    {
+      "series": "ai-agent-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
     },
     {
       "series": "ai-app-patterns-101",
