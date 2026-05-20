@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:53:04+00:00
+Generated: 2026-05-20T11:53:24+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **31**
-- Series at or above 5 issues: **23**
-- Total issues: **240**
-  - BadImg: **240**
+- Series with any issue: **30**
+- Series at or above 5 issues: **22**
+- Total issues: **228**
+  - BadImg: **228**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -45,33 +45,32 @@ Warnings:
 | 2 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
 | 3 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 4 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 5 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 6 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 7 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 8 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 9 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 10 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 11 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 14 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 15 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 16 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 17 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 18 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 19 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 20 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 21 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 22 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 23 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 24 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 25 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 26 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 27 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 28 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 29 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 30 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 31 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 5 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 6 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 7 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 8 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 9 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 10 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 13 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 14 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 15 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 16 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 17 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 18 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 19 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 20 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 21 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 22 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 23 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 24 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 25 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 26 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 27 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 28 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 29 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 30 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -119,18 +118,6 @@ Warnings:
 - `assets/docker-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=951x67)
 - `assets/docker-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=951x67)
 - `assets/docker-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 88px <= 100px (size=835x88)
-- ... 7 more
-
-## incident-response-101 — Total 12
-
-- BadImg=12 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=596x67)
-- `assets/incident-response-101/02/02-01-diagram-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=565x67)
-- `assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=772x67)
-- `assets/incident-response-101/03/03-01-diagram-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=694x67)
-- `assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=909x67)
 - ... 7 more
 
 ## llm-apps-ops-101 — Total 12
