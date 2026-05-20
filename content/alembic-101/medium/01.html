@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Why Alembic, and getting to alembic init</title>
+<title>Alembic 101 (1/10): Why Alembic, and getting to alembic init</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Why Alembic, and getting to alembic init</h1>
+<h1>Alembic 101 (1/10): Why Alembic, and getting to alembic init</h1>
 <p>When a team first meets Alembic, the real question is not the command syntax but why raw SQL files stop scaling. Once schema history depends on memory instead of revision history, deploys and rollbacks turn into guesswork.</p>
 <p>This is the first post in the Alembic 101 series. Here we will frame why Alembic exists and what <code>alembic init</code> actually sets up.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What problem a "migration tool" actually solves</li>
-<li>Why <code>Base.metadata.create_all</code> is not enough for production</li>
-<li>Alembic's core concepts: revision, head, version table</li>
-<li>How to scaffold a project with <code>alembic init</code></li>
-<li>The two or three traps you usually hit on a SQLite-based Alembic setup</li>
+<li>What problem a "migration tool" actually solves?</li>
+<li>Why <code>Base.metadata.create_all</code> is not enough for production?</li>
+<li>Alembic's core concepts: revision, head, version table?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="alembic 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png"></p>
+<p><em>alembic 101 chapter 1 flow overview</em></p>
+<p>This picture places Why Alembic, and getting to alembic init inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Why Alembic, and getting to alembic init is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Schema changes are a recurring source of production incidents. Code lives in git, infrastructure lives in Terraform, but it is surprisingly common to manage "who ran which SQL on which environment" by hand. Staging quietly drifts away from production, and when something needs to roll back nobody can confidently say how far the schema should rewind.</p>
 <p>Alembic is the migration tool by SQLAlchemy's author, and it treats this problem the way git treats code. Each change is a revision, head is the latest state, and every environment walks the same history up or down. This article covers the first two questions: why you need it, and how to start.</p>
@@ -73,8 +78,6 @@
 </blockquote>
 <p>Once that analogy lands, almost every command makes sense. <code>revision</code> creates a new commit, <code>merge</code> reconciles two heads, and <code>stamp</code> is like <code>git reset</code> — it changes HEAD without touching the working tree.</p>
 <p><strong>Diagram: how revision history reaches the database</strong></p>
-<p><img alt="Diagram: how revision history reaches the database" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png"><br>
-<em>The revision file, <code>alembic_version</code>, and the deploy command form one auditable history chain.</em></p>
 <h2>Core concepts</h2>
 <p><strong>Revisions and head</strong></p>
 <p>Every migration file has a unique <code>revision</code> ID and a parent <code>down_revision</code>. The revisions form a directed graph; the leaf nodes (no children) are <code>head</code>s. Normally there is exactly one head, but branches can give you more than one.</p>
@@ -203,6 +206,28 @@ sqlite3 app.db &quot;SELECT version_num FROM alembic_version;&quot;
 <h2>Wrap-up and what is next</h2>
 <p>Alembic boils down to one analogy: it is git for your database schema. Once you have revisions, head, and the version table in your head, the rest is mostly memorizing commands.</p>
 <p>The next episode opens up <code>env.py</code>. We will wire it to your model metadata, read the DB URL safely from the environment, and look at what online vs offline mode actually means.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What problem a "migration tool" actually solves?</strong></li>
+<li>The article treats Why Alembic, and getting to alembic init as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why <code>Base.metadata.create_all</code> is not enough for production?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Alembic's core concepts: revision, head, version table?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><strong>Why Alembic, and getting to alembic init (current)</strong></li>
+<li>env.py and target_metadata: wiring models to migrations (upcoming)</li>
+<li>Your first revision: writing upgrade and downgrade by hand (upcoming)</li>
+<li>autogenerate: the line between what it catches and what it misses (upcoming)</li>
+<li>branches and merges: combining revisions made in parallel (upcoming)</li>
+<li>Data migrations: separating schema changes from data changes (upcoming)</li>
+<li>Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)</li>
+<li>Downgrade strategy: when to write it for real and when to forbid it (upcoming)</li>
+<li>Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)</li>
+<li>Production and team workflow: PR, CI, monitoring, and incident response (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
@@ -211,6 +236,6 @@ sqlite3 app.db &quot;SELECT version_num FROM alembic_version;&quot;
 <li><a href="https://docs.sqlalchemy.org/en/20/core/metadata.html">SQLAlchemy: MetaData</a></li>
 <li><a href="https://www.sqlite.org/docs.html">SQLite Documentation</a></li>
 </ul>
-<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration, init, SQLite</p>
+<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration</p>
 </body>
 </html>

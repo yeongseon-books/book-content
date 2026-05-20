@@ -1,5 +1,5 @@
 ---
-title: 'Production and team workflow: PR, CI, monitoring, and incident response'
+title: "Alembic 101 (10/10): Production and team workflow: PR, CI, monitoring, and incident response"
 series: alembic-101
 episode: 10
 language: en
@@ -22,19 +22,27 @@ seo_description: A migration is "the most irreversible kind of code change". Ord
   code can be reverted with a single click; a schema change carries data with it…
 ---
 
-# Production and team workflow: PR, CI, monitoring, and incident response
+# Alembic 101 (10/10): Production and team workflow: PR, CI, monitoring, and incident response
 
 In production, a migration is more irreversible than ordinary application code. That is why Alembic safety has to live in team workflow, PR rules, and verification routines rather than in individual discipline alone.
 
 This is the final post in the Alembic 101 series. Here we will pull the series together into a practical operating model for PRs, CI, monitoring, and incident response.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The one-revision-per-PR rule and why it matters
-- How to compose an Alembic-aware PR template and the matching CI checks
-- How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL
-- A monitoring pattern that detects schema drift in production
-- The forward-fix procedure when a migration causes an incident
+- The one-revision-per-PR rule and why it matters?
+- How to compose an Alembic-aware PR template and the matching CI checks?
+- How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?
+
+## Big Picture
+
+![alembic 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
+
+*alembic 101 chapter 10 flow overview*
+
+This picture places Production and team workflow: PR, CI, monitoring, and incident response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Production and team workflow: PR, CI, monitoring, and incident response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -47,9 +55,6 @@ Everything in the previous nine posts described how a single engineer can apply 
 The starting point of the operational workflow is: one PR equals one revision, and that revision's upgrade and downgrade are both verified.
 
 ### Diagram: the team-level Alembic operating loop
-
-![Diagram: the team-level Alembic operating loop](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
-*PR policy, CI, deploy ordering, monitoring, and incident response need to close into one operating loop.*
 
 ## Core concepts
 
@@ -334,18 +339,27 @@ Across ten episodes we covered Alembic from init all the way to a production wor
 
 This series ends here, but in real operations every item above must be automated and locked in via PR templates and CI enforcement. The next learning step is the depth of SQLAlchemy ORM (relationship, query optimization, async).
 
+## Answering the Opening Questions
+
+- **The one-revision-per-PR rule and why it matters?**
+  - The article treats Production and team workflow: PR, CI, monitoring, and incident response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to compose an Alembic-aware PR template and the matching CI checks?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
-- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
-- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
-- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
-- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
-- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
-- [Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
-- [Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
-- [Deploy ordering and blue/green: synchronizing schema and application code safely](./09-deploy-ordering-and-blue-green.md)
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
+- [Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely](./09-deploy-ordering-and-blue-green.md)
 - **Production and team workflow: PR, CI, monitoring, and incident response (current)**
 
 <!-- toc:end -->

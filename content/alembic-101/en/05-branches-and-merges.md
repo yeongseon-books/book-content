@@ -1,5 +1,5 @@
 ---
-title: 'branches and merges: combining revisions made in parallel'
+title: "Alembic 101 (5/10): branches and merges: combining revisions made in parallel"
 series: alembic-101
 episode: 5
 language: en
@@ -22,19 +22,27 @@ seo_description: An alembic revision graph is a directed acyclic graph (DAG), ju
   like git.
 ---
 
-# branches and merges: combining revisions made in parallel
+# Alembic 101 (5/10): branches and merges: combining revisions made in parallel
 
 When teammates generate revisions in parallel, the graph naturally forks into multiple heads. If you do not recognize that as a normal state, the first `Multiple head revisions are present` error feels much worse than it is.
 
 This is post 5 in the Alembic 101 series. Here we will cover why branches appear and how `alembic merge` brings the graph back to a single head.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- When the alembic revision graph forks into branches
-- The exact role of `branch_labels` and `depends_on`
-- How to consolidate two heads with `alembic merge`
-- How `upgrade` and `downgrade` behave in a multi-head state
-- Operational rules to reduce branch incidents on a team
+- When the alembic revision graph forks into branches?
+- The exact role of `branch_labels` and `depends_on`?
+- How to consolidate two heads with `alembic merge`?
+
+## Big Picture
+
+![alembic 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
+
+*alembic 101 chapter 5 flow overview*
+
+This picture places branches and merges: combining revisions made in parallel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of branches and merges: combining revisions made in parallel is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -47,9 +55,6 @@ On any team where several people open PRs in parallel, alembic branches happen a
 Borrowing from git: `alembic merge` is `git merge`. The difference is that the merge revision does not introduce new schema changes — it only stitches the graph back together.
 
 ### Diagram: merging multiple heads back to one
-
-![Diagram: merging multiple heads back to one](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
-*Two concurrent heads become one head again through a merge revision that only repairs the graph.*
 
 ## Core concepts
 
@@ -269,13 +274,22 @@ An alembic branch follows the same model as a git branch. There is nothing to fe
 
 The next post covers data migrations: changes that update the data itself rather than the schema.
 
+## Answering the Opening Questions
+
+- **When the alembic revision graph forks into branches?**
+  - The article treats branches and merges: combining revisions made in parallel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The exact role of `branch_labels` and `depends_on`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to consolidate two heads with `alembic merge`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
-- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
-- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
-- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
 - **branches and merges: combining revisions made in parallel (current)**
 - Data migrations: separating schema changes from data changes (upcoming)
 - Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)

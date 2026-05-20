@@ -1,5 +1,5 @@
 ---
-title: '배포 순서와 blue/green: schema와 application code의 안전한 동기화'
+title: "Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화"
 series: alembic-101
 episode: 9
 language: ko
@@ -21,19 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: migration은 항상 "코드보다 먼저, 그리고 코드보다 호환성이 넓게"입니다.
 ---
 
-# 배포 순서와 blue/green: schema와 application code의 안전한 동기화
+# Alembic 101 (9/10): 배포 순서와 blue/green: schema와 application code의 안전한 동기화
 
 이 글은 Alembic 101 시리즈의 아홉 번째 글입니다. 여기서는 migration과 application code를 어떤 순서로 배포해야 안전한지, 그리고 blue/green 환경에서 schema 호환성을 어떻게 설계해야 하는지 정리합니다.
 
 많은 schema 사고는 migration 코드 자체보다 deploy ordering에서 시작됩니다. 특히 blue/green이나 rolling 환경에서는 두 버전의 앱이 같은 DB를 동시에 사용하므로, schema는 항상 그 두 버전 모두와 호환되어야 합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - migration-first와 code-first deploy ordering은 어떻게 다를까요?
 - 왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?
 - NOT NULL 강화는 왜 두 단계로 나눠야 할까요?
-- column rename은 왜 4단계 패턴으로 접근해야 할까요?
-- 여러 인스턴스 환경에서 migration을 정확히 한 번만 실행하려면 어떻게 할까요?
+
+## 큰 그림
+
+![Alembic 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
+
+*Alembic 101 9장 흐름 개요*
+
+이 그림에서는 배포 순서와 blue/green: schema와 application code의 안전한 동기화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 배포 순서와 blue/green: schema와 application code의 안전한 동기화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +54,6 @@ production schema 사고의 상당수는 코드와 schema가 잘못된 순서로
 git 비유로 보면 migration은 코드 PR보다 먼저 들어가는 PR이고, drop은 “이 컬럼 사용을 중단한다”는 코드 PR보다 나중에 들어가는 PR입니다.
 
 ### 다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점
-
-![다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
-*확장 단계의 schema는 전환 구간 동안 v1과 v2를 동시에 수용해야 합니다*
 
 ## 핵심 개념
 
@@ -319,17 +324,26 @@ deploy ordering은 Alembic 기능이 아니라 운영 정책입니다. “schema
 
 다음 글에서는 팀 단위의 실제 workflow, 즉 PR 규칙, CI 체크, 모니터링, incident response를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **migration-first와 code-first deploy ordering은 어떻게 다를까요?**
+  - 본문의 기준은 배포 순서와 blue/green: schema와 application code의 안전한 동기화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **NOT NULL 강화는 왜 두 단계로 나눠야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
-- [env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
-- [첫 revision: upgrade와 downgrade를 손으로 작성](./03-first-revision-upgrade-downgrade.md)
-- [autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
-- [branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
-- [데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
-- [online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
-- [downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가](./08-downgrade-strategy.md)
+- [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): 첫 revision: upgrade와 downgrade를 손으로 작성](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
+- [Alembic 101 (7/10): online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가](./08-downgrade-strategy.md)
 - **배포 순서와 blue/green: schema와 application code의 안전한 동기화 (현재 글)**
 - Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
 

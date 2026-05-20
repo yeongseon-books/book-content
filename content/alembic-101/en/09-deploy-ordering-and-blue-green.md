@@ -1,6 +1,5 @@
 ---
-title: 'Deploy ordering and blue/green: synchronizing schema and application code
-  safely'
+title: "Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely"
 series: alembic-101
 episode: 9
 language: en
@@ -23,19 +22,27 @@ seo_description: A migration always ships "before the code, and with broader com
   than the code".
 ---
 
-# Deploy ordering and blue/green: synchronizing schema and application code safely
+# Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely
 
 Many schema incidents begin with deploy ordering, not with the migration code itself. In blue/green or rolling setups, two app versions may share one database, so compatibility width has to be designed up front.
 
 This is post 9 in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- The difference between migration-first and code-first deploy ordering
-- Why a blue/green deploy requires schema changes that are compatible with two app versions at once
-- How to split a NOT NULL tightening into two phases via expand-contract
-- The four-phase pattern for a column rename
-- How to run a migration exactly once across many application instances
+- The difference between migration-first and code-first deploy ordering?
+- Why a blue/green deploy requires schema changes that are compatible with two app versions at once?
+- How to split a NOT NULL tightening into two phases via expand-contract?
+
+## Big Picture
+
+![alembic 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
+
+*alembic 101 chapter 9 flow overview*
+
+This picture places Deploy ordering and blue/green: synchronizing schema and application code safely inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deploy ordering and blue/green: synchronizing schema and application code safely is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -48,9 +55,6 @@ Most production schema incidents are caused by code and schema being deployed in
 If git is your analogy, a migration is a PR that lands earlier than the code PR, and a drop is a PR that lands later than the "stop using" PR.
 
 ### Diagram: the blue/green compatibility window
-
-![Diagram: the blue/green compatibility window](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
-*The expanded schema must stay compatible with both versions throughout the overlap window.*
 
 ## Core concepts
 
@@ -321,17 +325,26 @@ Deploy ordering is an operations policy concern, not an Alembic feature. Keep th
 
 The next post covers real team workflows: PR conventions, CI checks, and operational automation.
 
+## Answering the Opening Questions
+
+- **The difference between migration-first and code-first deploy ordering?**
+  - The article treats Deploy ordering and blue/green: synchronizing schema and application code safely as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why a blue/green deploy requires schema changes that are compatible with two app versions at once?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to split a NOT NULL tightening into two phases via expand-contract?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
-- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
-- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
-- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
-- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
-- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
-- [Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
-- [Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (6/10): Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- [Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
 - **Deploy ordering and blue/green: synchronizing schema and application code safely (current)**
 - Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
 

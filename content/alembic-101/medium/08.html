@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Downgrade strategy: when to write it for real and when to forbid it</title>
+<title>Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Downgrade strategy: when to write it for real and when to forbid it</h1>
+<h1>Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it</h1>
 <p>The existence of a <code>downgrade()</code> function does not make a change safe to reverse. Some revisions can be undone precisely, while others imply immediate data loss the moment you try.</p>
 <p>This is post 8 in the Alembic 101 series. Here we will separate reversible from irreversible changes and show how to encode that policy honestly.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>When a production downgrade is possible and when it is effectively impossible</li>
-<li>The kinds of irreversible changes and how to handle them</li>
-<li>How the expand-contract pattern restores the ability to downgrade</li>
-<li>How to express a "no downgrade" policy at the code level</li>
-<li>How to choose between forward-fix and downgrade when something goes wrong</li>
+<li>When a production downgrade is possible and when it is effectively impossible?</li>
+<li>The kinds of irreversible changes and how to handle them?</li>
+<li>How the expand-contract pattern restores the ability to downgrade?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="alembic 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png"></p>
+<p><em>alembic 101 chapter 8 flow overview</em></p>
+<p>This picture places Downgrade strategy: when to write it for real and when to forbid it inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Downgrade strategy: when to write it for real and when to forbid it is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>When you first learn alembic, downgrade looks like an obvious built-in feature. In real production, it is rarely used and frequently dangerous. But leaving it as an empty function is not the right answer either. "How do we handle downgrade" is an operational policy decision, and that policy should be expressed explicitly in code.</p>
 <h2>Mental Model</h2>
@@ -72,8 +77,6 @@
 </blockquote>
 <p>The git analogy: type 1 is a commit that reverts cleanly; type 2 is a merged history you cannot undo without a force-push.</p>
 <p><strong>Diagram: deciding between reversible and irreversible changes</strong></p>
-<p><img alt="Diagram: deciding between reversible and irreversible changes" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png"><br>
-<em>You decide whether downgrade is honest only after classifying the change by reversibility.</em></p>
 <h2>Core concepts</h2>
 <p><strong>Reversible vs irreversible</strong></p>
 <p><strong>Add nullable column</strong><br>
@@ -231,6 +234,28 @@ def downgrade() -&gt; None:
 <h2>Wrap up, next post</h2>
 <p>Downgrade is not a "feature on by default" — it is a feature decided by policy. Classifying changes into reversible and irreversible and explicitly blocking the latter is honest operations. The expand-contract pattern is the strongest tool for turning irreversible changes back into reversible ones.</p>
 <p>The next post covers deploy ordering between application code and schema changes, and the blue/green safety rules.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>When a production downgrade is possible and when it is effectively impossible?</strong></li>
+<li>The article treats Downgrade strategy: when to write it for real and when to forbid it as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The kinds of irreversible changes and how to handle them?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How the expand-contract pattern restores the ability to downgrade?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/01-why-alembic-and-init.md">Alembic 101 (1/10): Why Alembic, and getting to alembic init</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/02-env-py-and-target-metadata.md">Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/03-first-revision-upgrade-downgrade.md">Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/04-autogenerate-and-its-limits.md">Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/05-branches-and-merges.md">Alembic 101 (5/10): branches and merges: combining revisions made in parallel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/06-data-migrations.md">Alembic 101 (6/10): Data migrations: separating schema changes from data changes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/07-online-vs-offline-and-batch.md">Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch</a></li>
+<li><strong>Downgrade strategy: when to write it for real and when to forbid it (current)</strong></li>
+<li>Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)</li>
+<li>Production and team workflow: PR, CI, monitoring, and incident response (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
@@ -239,6 +264,6 @@ def downgrade() -&gt; None:
 <li>"Refactoring Databases" by Scott Ambler &amp; Pramod Sadalage (expand-contract origin)</li>
 <li><a href="https://wiki.postgresql.org/wiki/Don%27t_Do_This">PostgreSQL Wiki: Don't Do This</a></li>
 </ul>
-<p class="tags-line">Tags: Python, Alembic, downgrade, expand-contract, rollback, SQLite</p>
+<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration</p>
 </body>
 </html>

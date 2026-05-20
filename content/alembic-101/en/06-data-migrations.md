@@ -1,5 +1,5 @@
 ---
-title: 'Data migrations: separating schema changes from data changes'
+title: "Alembic 101 (6/10): Data migrations: separating schema changes from data changes"
 series: alembic-101
 episode: 6
 language: en
@@ -22,19 +22,27 @@ seo_description: A data migration is a revision that leaves the schema alone and
   rows.
 ---
 
-# Data migrations: separating schema changes from data changes
+# Alembic 101 (6/10): Data migrations: separating schema changes from data changes
 
 Data migrations are often slower and more irreversible than the schema changes around them. How you isolate row transformation work inside revisions determines lock time, retry behavior, and recovery difficulty.
 
 This is post 6 in the Alembic 101 series. Here we will focus on why schema changes and data changes should be split, and what safe execution patterns look like.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- How a "data migration" is different from a schema migration
-- Two writing styles for `op.execute` — raw SQL and SQLAlchemy core
-- A pattern for splitting a large dataset into batches
-- Why schema-only and data-only revisions should be separated
-- How to ensure idempotency and safe re-execution
+- How a "data migration" is different from a schema migration?
+- Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?
+- A pattern for splitting a large dataset into batches?
+
+## Big Picture
+
+![alembic 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
+
+*alembic 101 chapter 6 flow overview*
+
+This picture places Data migrations: separating schema changes from data changes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data migrations: separating schema changes from data changes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -47,9 +55,6 @@ This is post 6 in the Alembic 101 series. Here we will focus on why schema chang
 To borrow a git analogy: schema changes are code refactors, and data changes are database migration scripts. Mixing both into one commit clouds the history.
 
 ### Diagram: the three-stage split for data migrations
-
-![Diagram: the three-stage split for data migrations](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
-*Isolating row transformation in the middle stage keeps long-running work separate from short schema changes.*
 
 ## Core concepts
 
@@ -272,14 +277,23 @@ The standard form for data migrations is to split them out as separate revisions
 
 The next post goes deep on `--sql` for offline DDL and the SQLite-specific batch mode — the online vs offline DDL story.
 
+## Answering the Opening Questions
+
+- **How a "data migration" is different from a schema migration?**
+  - The article treats Data migrations: separating schema changes from data changes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **A pattern for splitting a large dataset into batches?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
-- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
-- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
-- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
-- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [Alembic 101 (5/10): branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
 - **Data migrations: separating schema changes from data changes (current)**
 - Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
 - Downgrade strategy: when to write it for real and when to forbid it (upcoming)

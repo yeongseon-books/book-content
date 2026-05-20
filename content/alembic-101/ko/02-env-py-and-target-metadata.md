@@ -1,5 +1,5 @@
 ---
-title: 'env.py와 target_metadata: 모델과 마이그레이션 연결'
+title: "Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결"
 series: alembic-101
 episode: 2
 language: ko
@@ -21,19 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_metadata를 통한 모델 연결, 환경 변수 활용 패턴을 정리합니다.
 ---
 
-# env.py와 target_metadata: 모델과 마이그레이션 연결
+# Alembic 101 (2/10): env.py와 target_metadata: 모델과 마이그레이션 연결
 
 이 글은 Alembic 101 시리즈의 두 번째 글입니다. 여기서는 `env.py`가 Alembic 실행 흐름에서 정확히 어떤 위치를 차지하는지, 그리고 `target_metadata`가 autogenerate의 근거로서 무엇을 제공해야 하는지 실무 관점에서 정리합니다.
 
 1편에서 `alembic init`까지 마쳤더라도 그 상태의 Alembic은 여러분 모델을 모릅니다. 이 연결을 `env.py`에서 제대로 하지 못하면 `alembic revision --autogenerate`는 즉시 신뢰를 잃습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `env.py`는 정확히 무엇이고 언제 실행될까요?
 - 왜 `target_metadata`는 선택 사항이 아니라 필수일까요?
 - DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?
-- online과 offline 모드는 무엇이 다르고 언제 중요할까요?
-- SQLite와 Alembic을 함께 쓸 때 거의 항상 필요한 옵션은 무엇일까요?
+
+## 큰 그림
+
+![Alembic 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
+
+*Alembic 101 2장 흐름 개요*
+
+이 그림에서는 env.py와 target_metadata: 모델과 마이그레이션 연결를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> env.py와 target_metadata: 모델과 마이그레이션 연결의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,9 +56,6 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 여기서 가장 중요한 사실은 매번 실행된다는 점입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`의 책임이 훨씬 또렷해집니다.
 
 ### 다이어그램: `env.py`가 metadata와 연결을 조립하는 위치
-
-![env.py가 metadata와 연결을 조립하는 위치](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
-*Alembic 실행마다 `env.py`가 URL, metadata, 실행 모드를 조립하는 순서*
 
 ## 핵심 개념
 
@@ -267,10 +272,19 @@ PY
 
 다음 글에서는 첫 의미 있는 revision을 손으로 작성해 봅니다. `op.create_table`, `op.add_column`, `op.execute`를 중심으로 수동 작성과 autogenerate 결과를 비교하고, `upgrade`와 `downgrade`를 대칭으로 유지하는 법을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **`env.py`는 정확히 무엇이고 언제 실행될까요?**
+  - 본문의 기준은 env.py와 target_metadata: 모델과 마이그레이션 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **왜 `target_metadata`는 선택 사항이 아니라 필수일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [Alembic 101 (1/10): 왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
 - **env.py와 target_metadata: 모델과 마이그레이션 연결 (현재 글)**
 - 첫 revision: upgrade와 downgrade를 손으로 작성 (예정)
 - autogenerate: 잡는 것과 못 잡는 것의 경계 (예정)

@@ -1,5 +1,5 @@
 ---
-title: 'autogenerate: the line between what it catches and what it misses'
+title: "Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses"
 series: alembic-101
 episode: 4
 language: en
@@ -22,19 +22,27 @@ seo_description: Autogenerate is a tool that diffs the live database (ground tru
   against target_metadata (desired state) and serializes that diff into op calls.
 ---
 
-# autogenerate: the line between what it catches and what it misses
+# Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses
 
 Autogenerate can diff the live database against `target_metadata`, but it cannot infer your intent. Renames are the classic example: the tool sees structural change, while you still have to judge safety.
 
 This is post 4 in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What `alembic revision --autogenerate` actually compares under the hood
-- Which kinds of changes autogenerate handles well, and which it misses
-- The `compare_type`, `compare_server_default`, `include_object`, and `include_name` options
-- How to handle table and column renames safely
-- Why you still need to read the generated file by eye
+- What `alembic revision --autogenerate` actually compares under the hood?
+- Which kinds of changes autogenerate handles well, and which it misses?
+- The `compare_type`, `compare_server_default`, `include_object`, and `include_name` options?
+
+## Big Picture
+
+![alembic 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
+
+*alembic 101 chapter 4 flow overview*
+
+This picture places autogenerate: the line between what it catches and what it misses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of autogenerate: the line between what it catches and what it misses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
@@ -49,9 +57,6 @@ The goal of this post is not to make you afraid of autogenerate, but to map its 
 The git diff analogy fits: autogenerate is a line-level diff. A semantically equivalent change (a rename) shows up as two-line delete plus two-line add, with the same blind spot you would expect.
 
 ### Diagram: the autogenerate diff pipeline
-
-![Diagram: the autogenerate diff pipeline](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
-*Autogenerate builds a diff, but intent-heavy decisions such as renames still belong to a human review.*
 
 ## Core concepts
 
@@ -252,12 +257,21 @@ Autogenerate is highly efficient when used well, but ignoring its limits leads d
 
 The next post covers the branches that appear when several people generate revisions concurrently, and how to consolidate them with `alembic merge`.
 
+## Answering the Opening Questions
+
+- **What `alembic revision --autogenerate` actually compares under the hood?**
+  - The article treats autogenerate: the line between what it catches and what it misses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which kinds of changes autogenerate handles well, and which it misses?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The `compare_type`, `compare_server_default`, `include_object`, and `include_name` options?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
-- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
-- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [Alembic 101 (1/10): Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
 - **autogenerate: the line between what it catches and what it misses (current)**
 - branches and merges: combining revisions made in parallel (upcoming)
 - Data migrations: separating schema changes from data changes (upcoming)

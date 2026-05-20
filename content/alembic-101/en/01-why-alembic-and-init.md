@@ -1,5 +1,5 @@
 ---
-title: Why Alembic, and getting to alembic init
+title: "Alembic 101 (1/10): Why Alembic, and getting to alembic init"
 series: alembic-101
 episode: 1
 language: en
@@ -21,19 +21,27 @@ seo_description: Alembic is git for your database schema. Each migration file is
   commit, the alembic_version table is the current HEAD pointer, upgrade head is…
 ---
 
-# Why Alembic, and getting to alembic init
+# Alembic 101 (1/10): Why Alembic, and getting to alembic init
 
 When a team first meets Alembic, the real question is not the command syntax but why raw SQL files stop scaling. Once schema history depends on memory instead of revision history, deploys and rollbacks turn into guesswork.
 
 This is the first post in the Alembic 101 series. Here we will frame why Alembic exists and what `alembic init` actually sets up.
 
-## What you will learn
+## Questions to Keep in Mind
 
-- What problem a "migration tool" actually solves
-- Why `Base.metadata.create_all` is not enough for production
-- Alembic's core concepts: revision, head, version table
-- How to scaffold a project with `alembic init`
-- The two or three traps you usually hit on a SQLite-based Alembic setup
+- What problem a "migration tool" actually solves?
+- Why `Base.metadata.create_all` is not enough for production?
+- Alembic's core concepts: revision, head, version table?
+
+## Big Picture
+
+![alembic 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
+
+*alembic 101 chapter 1 flow overview*
+
+This picture places Why Alembic, and getting to alembic init inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Alembic, and getting to alembic init is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -48,9 +56,6 @@ Alembic is the migration tool by SQLAlchemy's author, and it treats this problem
 Once that analogy lands, almost every command makes sense. `revision` creates a new commit, `merge` reconciles two heads, and `stamp` is like `git reset` — it changes HEAD without touching the working tree.
 
 ### Diagram: how revision history reaches the database
-
-![Diagram: how revision history reaches the database](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
-*The revision file, `alembic_version`, and the deploy command form one auditable history chain.*
 
 ## Core concepts
 
@@ -222,6 +227,15 @@ sqlite3 app.db "SELECT version_num FROM alembic_version;"
 Alembic boils down to one analogy: it is git for your database schema. Once you have revisions, head, and the version table in your head, the rest is mostly memorizing commands.
 
 The next episode opens up `env.py`. We will wire it to your model metadata, read the DB URL safely from the environment, and look at what online vs offline mode actually means.
+
+## Answering the Opening Questions
+
+- **What problem a "migration tool" actually solves?**
+  - The article treats Why Alembic, and getting to alembic init as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why `Base.metadata.create_all` is not enough for production?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Alembic's core concepts: revision, head, version table?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
 ## In this series

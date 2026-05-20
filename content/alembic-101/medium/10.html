@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Production and team workflow: PR, CI, monitoring, and incident response</title>
+<title>Alembic 101 (10/10): Production and team workflow: PR, CI, monitoring, and incident response</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Production and team workflow: PR, CI, monitoring, and incident response</h1>
+<h1>Alembic 101 (10/10): Production and team workflow: PR, CI, monitoring, and incident response</h1>
 <p>In production, a migration is more irreversible than ordinary application code. That is why Alembic safety has to live in team workflow, PR rules, and verification routines rather than in individual discipline alone.</p>
 <p>This is the final post in the Alembic 101 series. Here we will pull the series together into a practical operating model for PRs, CI, monitoring, and incident response.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The one-revision-per-PR rule and why it matters</li>
-<li>How to compose an Alembic-aware PR template and the matching CI checks</li>
-<li>How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL</li>
-<li>A monitoring pattern that detects schema drift in production</li>
-<li>The forward-fix procedure when a migration causes an incident</li>
+<li>The one-revision-per-PR rule and why it matters?</li>
+<li>How to compose an Alembic-aware PR template and the matching CI checks?</li>
+<li>How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="alembic 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png"></p>
+<p><em>alembic 101 chapter 10 flow overview</em></p>
+<p>This picture places Production and team workflow: PR, CI, monitoring, and incident response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Production and team workflow: PR, CI, monitoring, and incident response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Everything in the previous nine posts described how a single engineer can apply migrations safely in their own environment. Once a team starts changing the schema concurrently, a different class of problems appears. Two people creating a new revision at the same time produce a multi-head; if no one tests downgrade, rollback breaks; if production schema starts drifting, you have no idea where to start. Operational stability comes from workflow quality, not from code quality.</p>
 <h2>Mental Model</h2>
@@ -72,8 +77,6 @@
 </blockquote>
 <p>The starting point of the operational workflow is: one PR equals one revision, and that revision's upgrade and downgrade are both verified.</p>
 <p><strong>Diagram: the team-level Alembic operating loop</strong></p>
-<p><img alt="Diagram: the team-level Alembic operating loop" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png"><br>
-<em>PR policy, CI, deploy ordering, monitoring, and incident response need to close into one operating loop.</em></p>
 <h2>Core concepts</h2>
 <p><strong>One revision per PR</strong></p>
 <p>Bundling several schema changes into one PR creates two problems.</p>
@@ -83,13 +86,55 @@
 </ul>
 <p>When each revision is its own PR, reviews are simpler and the blast radius on failure is smaller. Expand-contract also decomposes naturally into per-phase PRs.</p>
 <p><strong>CI check items</strong></p>
-<pre><code class="language-text">1. python3 -m pytest                                    # unit tests
-2. alembic check                                        # model vs schema drift
-3. alembic upgrade head &amp;&amp; alembic downgrade -1         # downgrade verification
-4. alembic upgrade head --sql                           # SQL preview, attached as PR artifact
-5. python3 scripts/check_alembic_heads.py               # confirm head count = 1
-6. python3 scripts/migrate_smoke_test.py                # apply migrations to a fresh DB
-</code></pre>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Command</th>
+<th>Pass condition</th>
+<th>What failure means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unit tests</td>
+<td><code>python3 -m pytest</code></td>
+<td>application and model tests pass</td>
+<td>the migration assumptions already diverge from runtime code behavior</td>
+</tr>
+<tr>
+<td>drift guard</td>
+<td><code>alembic check</code></td>
+<td>every model change has a matching revision</td>
+<td>a model changed without a revision, or the autogenerate review is incomplete</td>
+</tr>
+<tr>
+<td>downgrade round-trip</td>
+<td><code>alembic upgrade head &amp;&amp; alembic downgrade -1 &amp;&amp; alembic upgrade head</code></td>
+<td>upgrade and downgrade both succeed</td>
+<td>an irreversible change, a broken downgrade, or a hidden stateful data assumption exists</td>
+</tr>
+<tr>
+<td>single-head guard</td>
+<td>count the lines from <code>alembic heads</code> and require exactly one</td>
+<td>head count = 1</td>
+<td>concurrent revisions were created but never merged</td>
+</tr>
+<tr>
+<td>SQL preview artifact</td>
+<td><code>alembic upgrade head --sql &gt; migration_preview.sql</code></td>
+<td>preview file is produced and reviewed</td>
+<td>risky DDL may be hidden, or reviewers have no SQL artifact to inspect</td>
+</tr>
+<tr>
+<td>fresh DB smoke</td>
+<td>create a temporary DB, run <code>alembic upgrade head</code>, then run one minimal verification query</td>
+<td>a blank database reaches head and contains the expected core objects</td>
+<td>new-environment bootstrap or the initial revision chain is broken</td>
+</tr>
+</tbody>
+</table>
 <p><code>alembic check</code> is supported on 1.9 and later. If a model was added but the revision is missing, it fails immediately.</p>
 <p><strong>Multi-environment strategy</strong></p>
 <p><strong>dev</strong><br>
@@ -120,14 +165,52 @@ def health():
 <p>Inject EXPECTED_VERSION as an env var at deploy time, and raise an alarm if any instance reports a different version. In a multi-instance deploy, you can immediately detect a partially-applied migration or an instance still running outdated code.</p>
 <p><strong>Incident response</strong></p>
 <p>When a migration causes an incident, the first instinct is to downgrade, but as we saw in episode 8 downgrade is only feasible in limited cases. The procedure used most often in practice is the following.</p>
-<pre><code class="language-text">1. Detect the incident (alarm, error rate, /health version mismatch)
-2. Classify the cause:
-   - code issue → code rollback (leave schema as is; safe if you are in expand phase)
-   - schema issue → write a forward-fix revision
-3. forward-fix revision: &quot;fix &lt;broken_revision_id&gt;: &lt;issue&gt;&quot;
-4. After recovery, post-mortem investigates which verification step was missing for the broken revision
+<pre><code class="language-text">1. Compare the `/health` reported version with the expected release version
+2. Inspect `alembic heads` and the current `alembic_version`
+3. Decide whether the failure is code-only, schema-only, or mixed code/schema
+4. Roll back code only if the schema is still backward-compatible; otherwise write a forward-fix
+5. Name the exact broken revision before you write `fix &lt;broken_revision_id&gt;: &lt;issue&gt;`
 </code></pre>
 <p>A forward-fix adds a new revision that brings the broken state back to a valid one. Unlike downgrade, the alembic_version graph stays moving forward, which gives better traceability and is compatible with blue/green.</p>
+<p><strong>Drift triage table</strong></p>
+<p>At the start of an incident, an explicit <code>symptom → first command → next action</code> table is usually more useful than a long policy paragraph.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>First command</th>
+<th>Next action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/health</code> shows different <code>expected</code> and <code>alembic_version</code> values</td>
+<td>only some instances see the new code or schema</td>
+<td><code>curl -fsS https://api.example.com/health</code></td>
+<td>compare responses per instance and split the problem into rollout drift vs schema drift</td>
+</tr>
+<tr>
+<td><code>alembic heads</code> returns more than one line</td>
+<td>merge revision is missing</td>
+<td><code>alembic heads</code></td>
+<td>stop deploys and create the merge-revision PR first</td>
+</tr>
+<tr>
+<td>only the new version is failing</td>
+<td>code assumed the new schema incorrectly</td>
+<td>compare <code>/health</code> versions and the latest deploy record</td>
+<td>if you are still in the expand phase, prefer code rollback first</td>
+</tr>
+<tr>
+<td>both old and new versions are failing</td>
+<td>the schema revision itself is broken</td>
+<td><code>SELECT version_num FROM alembic_version</code></td>
+<td>pin the broken revision ID and write the forward-fix</td>
+</tr>
+</tbody>
+</table>
 <h2>Before-After</h2>
 <pre><code class="language-text"># Before: 6 revisions per PR, downgrade not verified
 - reviewer spends 30 minutes tracing all revisions
@@ -139,7 +222,7 @@ def health():
 - CI auto-runs upgrade head + downgrade -1 + upgrade head
 - broken downgrade is blocked at the PR
 </code></pre>
-<p>Keeping PRs small and forcing downgrade verification in CI removes about half of all incidents.</p>
+<p>Keeping PRs small and verifying downgrade, single-head, and fresh-DB bootstrap in CI makes it explicit which migration defects are being blocked before merge.</p>
 <h2>Step-by-step walkthrough</h2>
 <p><strong>Step 1: write a PR template</strong></p>
 <pre><code class="language-markdown">## Migration PR Checklist
@@ -159,21 +242,45 @@ def health():
   run: alembic check
 - name: upgrade then downgrade
   run: |
+    set -euo pipefail
     alembic upgrade head
     alembic downgrade -1
     alembic upgrade head
 - name: head count guard
   run: |
-    HEADS=$(alembic heads | wc -l)
-    [ &quot;$HEADS&quot; = &quot;1&quot; ] || (echo &quot;multi-head detected&quot;; exit 1)
+    set -euo pipefail
+    HEADS=$(alembic heads | python3 -c &quot;import sys; print(sum(1 for line in sys.stdin if line.strip()))&quot;)
+    [ &quot;$HEADS&quot; = &quot;1&quot; ] || { echo &quot;Fail: multi-head detected ($HEADS)&quot;; exit 1; }
 - name: SQL preview
   run: alembic upgrade head --sql &gt; migration_preview.sql
+- name: fresh DB smoke
+  run: |
+    set -euo pipefail
+    DB_FILE=$(mktemp /tmp/alembic-smoke-XXXX.db)
+    trap 'rm -f &quot;$DB_FILE&quot;' EXIT
+    export DATABASE_URL=&quot;sqlite:///$DB_FILE&quot;
+    alembic upgrade head
+    python3 - &lt;&lt;'PY'
+    import os
+    import sqlite3
+
+    db_path = os.environ[&quot;DATABASE_URL&quot;].removeprefix(&quot;sqlite:///&quot;)
+    conn = sqlite3.connect(db_path)
+    try:
+        count = conn.execute(
+            &quot;SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='alembic_version'&quot;
+        ).fetchone()[0]
+        assert count == 1, f&quot;alembic_version missing in {db_path}&quot;
+        print(f&quot;Pass: fresh DB reached head at {db_path}&quot;)
+    finally:
+        conn.close()
+PY
 - uses: actions/upload-artifact@v4
   with:
     name: migration-preview
     path: migration_preview.sql
 </code></pre>
-<p>This single job blocks multi-head, broken downgrade, and missing revisions.</p>
+<p>This example does not depend on repo-local helpers such as <code>scripts/check_alembic_heads.py</code> or <code>scripts/migrate_smoke_test.py</code>. The article stays honest only when the head guard, downgrade round-trip, and fresh-DB smoke are visible as commands the reader can reuse directly.</p>
 <p><strong>Step 3: split per-environment configuration</strong></p>
 <pre><code class="language-python"># part of env.py
 def get_url():
@@ -212,13 +319,30 @@ def health():
 </code></pre>
 <p>Inject EXPECTED_ALEMBIC_VERSION from your deploy pipeline and compare per-instance responses on your operations dashboard. Alert on drift.</p>
 <h2>Verification routine</h2>
-<pre><code class="language-bash">alembic check
+<pre><code class="language-bash">set -euo pipefail
+
+alembic check
 alembic upgrade head
 alembic downgrade -1
 alembic upgrade head
-alembic heads
+HEADS=$(alembic heads | python3 -c &quot;import sys; print(sum(1 for line in sys.stdin if line.strip()))&quot;)
+[ &quot;$HEADS&quot; = &quot;1&quot; ] || { echo &quot;Fail: multi-head detected ($HEADS)&quot;; exit 1; }
+
+DB_FILE=$(mktemp /tmp/alembic-smoke-XXXX.db)
+trap 'rm -f &quot;$DB_FILE&quot;' EXIT
+export DATABASE_URL=&quot;sqlite:///$DB_FILE&quot;
+alembic upgrade head
 </code></pre>
-<p><strong>Expected output:</strong> drift detection, downgrade round-trip, and single-head validation all pass in one green run.</p>
+<p><strong>Expected output:</strong> this block reruns the same gates the chapter taught earlier. <code>alembic check</code> validates drift, the round-trip validates downgrade, the head count validates branch hygiene, and the fresh-DB smoke validates bootstrap from zero.</p>
+<p><strong>The first 10 minutes of a migration incident</strong></p>
+<pre><code class="language-text">1. Compare `/health` expected vs `alembic_version`.
+2. Check `alembic heads` and `SELECT version_num FROM alembic_version`.
+3. Classify the failure as code-only, schema-only, or mixed.
+4. If you are still in a backward-compatible expand phase, consider code rollback; otherwise switch to forward-fix.
+5. Pin the broken revision ID and draft `fix &lt;broken_revision_id&gt;: &lt;issue&gt;`.
+6. After recovery, record which CI gate was missing in the post-mortem.
+</code></pre>
+<p>This is not a green-check recap. It is a branching diagnostic order. If step 2 reveals a multi-head, stop deploys and return to graph repair first. If step 3 shows a mixed failure, do not treat it as a code rollback alone until schema compatibility is confirmed.</p>
 <h2>Common mistakes</h2>
 <ul>
 <li><strong>Multiple revisions in one PR.</strong> Reviews are hard and partial revert is impossible.</li>
@@ -239,7 +363,7 @@ alembic heads
 <h2>Checklist</h2>
 <ul>
 <li>[ ] PR template enforces one PR = one revision</li>
-<li>[ ] CI auto-runs alembic check, upgrade+downgrade, head-count guard, and SQL preview</li>
+<li>[ ] CI auto-runs alembic check, upgrade+downgrade, head-count guard, SQL preview, and fresh DB smoke</li>
 <li>[ ] Per-environment split: dev=SQLite, staging+prod=PostgreSQL</li>
 <li>[ ] <code>/health</code> response includes alembic_version</li>
 <li>[ ] Forward-fix template and procedure are documented</li>
@@ -257,6 +381,28 @@ alembic heads
 <p>"Schema changes ship before code, with broader compatibility, one PR per revision, downgrade verified in CI, monitoring detects drift, incidents respond with forward-fix."</p>
 </blockquote>
 <p>This series ends here, but in real operations every item above must be automated and locked in via PR templates and CI enforcement. The next learning step is the depth of SQLAlchemy ORM (relationship, query optimization, async).</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The one-revision-per-PR rule and why it matters?</strong></li>
+<li>The article treats Production and team workflow: PR, CI, monitoring, and incident response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to compose an Alembic-aware PR template and the matching CI checks?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/01-why-alembic-and-init.md">Alembic 101 (1/10): Why Alembic, and getting to alembic init</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/02-env-py-and-target-metadata.md">Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/03-first-revision-upgrade-downgrade.md">Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/04-autogenerate-and-its-limits.md">Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/05-branches-and-merges.md">Alembic 101 (5/10): branches and merges: combining revisions made in parallel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/06-data-migrations.md">Alembic 101 (6/10): Data migrations: separating schema changes from data changes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/07-online-vs-offline-and-batch.md">Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/08-downgrade-strategy.md">Alembic 101 (8/10): Downgrade strategy: when to write it for real and when to forbid it</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/09-deploy-ordering-and-blue-green.md">Alembic 101 (9/10): Deploy ordering and blue/green: synchronizing schema and application code safely</a></li>
+<li><strong>Production and team workflow: PR, CI, monitoring, and incident response (current)</strong></li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
@@ -265,6 +411,6 @@ alembic heads
 <li><a href="https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests">GitHub: PR templates</a></li>
 <li>"Database Reliability Engineering" by Laine Campbell &amp; Charity Majors</li>
 </ul>
-<p class="tags-line">Tags: Python, Alembic, Production, CI, workflow, SQLite</p>
+<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration</p>
 </body>
 </html>

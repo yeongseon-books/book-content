@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Online and offline modes: previewing DDL with --sql and handling SQLite batch</title>
+<title>Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Online and offline modes: previewing DDL with --sql and handling SQLite batch</h1>
+<h1>Alembic 101 (7/10): Online and offline modes: previewing DDL with --sql and handling SQLite batch</h1>
 <p>Before a production deploy, there are times when you need to see the exact SQL a migration will emit. Add SQLite's DDL limits to the mix, and you need to understand offline mode and batch mode together.</p>
 <p>This is post 7 in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The two execution modes alembic offers — online and offline</li>
-<li>How to preview the actual SQL with <code>--sql</code></li>
-<li>A workflow for producing SQL scripts that a DBA can review</li>
-<li>The limits of <code>ALTER TABLE</code> on SQLite and what <code>batch_alter_table</code> does internally</li>
-<li>Patterns to avoid when running in offline mode</li>
+<li>The two execution modes alembic offers — online and offline?</li>
+<li>How to preview the actual SQL with <code>--sql</code>?</li>
+<li>A workflow for producing SQL scripts that a DBA can review?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="alembic 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png"></p>
+<p><em>alembic 101 chapter 7 flow overview</em></p>
+<p>This picture places Online and offline modes: previewing DDL with --sql and handling SQLite batch inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Online and offline modes: previewing DDL with --sql and handling SQLite batch is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>There are times before a production deploy when you want to see exactly what SQL a migration will run — when an external DBA needs to review it, or when the impact is so large that PR review alone is not reassuring. Alembic's offline mode is the tool for that.</p>
 <p>SQLite also has very restricted <code>ALTER TABLE</code> support, so every alembic user eventually has to learn batch mode. The two topics are best learned together.</p>
@@ -73,8 +78,6 @@
 </blockquote>
 <p>Turning on <code>render_as_batch</code> makes calls like <code>op.alter_column</code> expand internally — for SQLite — into "create a temporary table, INSERT SELECT, swap names." Batch mode is alembic's safety net for SQLite.</p>
 <p><strong>Diagram: how online, offline, and batch mode divide responsibilities</strong></p>
-<p><img alt="Diagram: how online, offline, and batch mode divide responsibilities" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png"><br>
-<em>The same revision can drive apply-time execution, review-time SQL output, and SQLite-specific batch rewriting.</em></p>
 <h2>Core concepts</h2>
 <p><strong>Online vs offline</strong></p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
@@ -244,6 +247,28 @@ PY
 <h2>Wrap up, next post</h2>
 <p>Online for application, offline for review. The division of labor between the two modes increases safety in operations. On SQLite, build the habit of always using batch mode explicitly.</p>
 <p>The next post is downgrade strategy: when to seriously write a downgrade and when to deliberately forbid it.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>The two execution modes alembic offers — online and offline?</strong></li>
+<li>The article treats Online and offline modes: previewing DDL with --sql and handling SQLite batch as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to preview the actual SQL with <code>--sql</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>A workflow for producing SQL scripts that a DBA can review?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/01-why-alembic-and-init.md">Alembic 101 (1/10): Why Alembic, and getting to alembic init</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/02-env-py-and-target-metadata.md">Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/03-first-revision-upgrade-downgrade.md">Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/04-autogenerate-and-its-limits.md">Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/05-branches-and-merges.md">Alembic 101 (5/10): branches and merges: combining revisions made in parallel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/06-data-migrations.md">Alembic 101 (6/10): Data migrations: separating schema changes from data changes</a></li>
+<li><strong>Online and offline modes: previewing DDL with --sql and handling SQLite batch (current)</strong></li>
+<li>Downgrade strategy: when to write it for real and when to forbid it (upcoming)</li>
+<li>Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)</li>
+<li>Production and team workflow: PR, CI, monitoring, and incident response (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
@@ -252,6 +277,6 @@ PY
 <li><a href="https://www.sqlite.org/lang_altertable.html">SQLite: ALTER TABLE</a></li>
 <li><a href="https://alembic.sqlalchemy.org/en/latest/ops.html">Alembic: Operation Reference</a></li>
 </ul>
-<p class="tags-line">Tags: Python, Alembic, online, offline, batch, SQLite</p>
+<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration</p>
 </body>
 </html>

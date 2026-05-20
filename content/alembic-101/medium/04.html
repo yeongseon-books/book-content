@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>autogenerate: the line between what it catches and what it misses</title>
+<title>Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>autogenerate: the line between what it catches and what it misses</h1>
+<h1>Alembic 101 (4/10): autogenerate: the line between what it catches and what it misses</h1>
 <p>Autogenerate can diff the live database against <code>target_metadata</code>, but it cannot infer your intent. Renames are the classic example: the tool sees structural change, while you still have to judge safety.</p>
 <p>This is post 4 in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.</p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What <code>alembic revision --autogenerate</code> actually compares under the hood</li>
-<li>Which kinds of changes autogenerate handles well, and which it misses</li>
-<li>The <code>compare_type</code>, <code>compare_server_default</code>, <code>include_object</code>, and <code>include_name</code> options</li>
-<li>How to handle table and column renames safely</li>
-<li>Why you still need to read the generated file by eye</li>
+<li>What <code>alembic revision --autogenerate</code> actually compares under the hood?</li>
+<li>Which kinds of changes autogenerate handles well, and which it misses?</li>
+<li>The <code>compare_type</code>, <code>compare_server_default</code>, <code>include_object</code>, and <code>include_name</code> options?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="alembic 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png"></p>
+<p><em>alembic 101 chapter 4 flow overview</em></p>
+<p>This picture places autogenerate: the line between what it catches and what it misses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of autogenerate: the line between what it catches and what it misses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
 <p>Autogenerate is alembic's most powerful feature, but the moment you treat it as a "press a button and you're done" tool, production incidents start. Committing a generated file as-is and watching a column rename get expanded into drop+create — losing the data — is a real, common failure.</p>
 <p>The goal of this post is not to make you afraid of autogenerate, but to map its limits precisely so you can patch the parts that need a human touch.</p>
@@ -73,8 +78,6 @@
 </blockquote>
 <p>The git diff analogy fits: autogenerate is a line-level diff. A semantically equivalent change (a rename) shows up as two-line delete plus two-line add, with the same blind spot you would expect.</p>
 <p><strong>Diagram: the autogenerate diff pipeline</strong></p>
-<p><img alt="Diagram: the autogenerate diff pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png"><br>
-<em>Autogenerate builds a diff, but intent-heavy decisions such as renames still belong to a human review.</em></p>
 <h2>Core concepts</h2>
 <p><strong>How it works</strong></p>
 <p>Running <code>alembic revision --autogenerate -m "..."</code> does the following in order:</p>
@@ -240,6 +243,28 @@ PY
 <h2>Wrap up, next post</h2>
 <p>Autogenerate is highly efficient when used well, but ignoring its limits leads directly to data loss. Keep the "it makes a diff" mental model in your head and build the habit of reading every result with human eyes.</p>
 <p>The next post covers the branches that appear when several people generate revisions concurrently, and how to consolidate them with <code>alembic merge</code>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What <code>alembic revision --autogenerate</code> actually compares under the hood?</strong></li>
+<li>The article treats autogenerate: the line between what it catches and what it misses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which kinds of changes autogenerate handles well, and which it misses?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>The <code>compare_type</code>, <code>compare_server_default</code>, <code>include_object</code>, and <code>include_name</code> options?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/01-why-alembic-and-init.md">Alembic 101 (1/10): Why Alembic, and getting to alembic init</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/02-env-py-and-target-metadata.md">Alembic 101 (2/10): env.py and target_metadata: wiring models to migrations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/alembic-101/en/03-first-revision-upgrade-downgrade.md">Alembic 101 (3/10): Your first revision: writing upgrade and downgrade by hand</a></li>
+<li><strong>autogenerate: the line between what it catches and what it misses (current)</strong></li>
+<li>branches and merges: combining revisions made in parallel (upcoming)</li>
+<li>Data migrations: separating schema changes from data changes (upcoming)</li>
+<li>Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)</li>
+<li>Downgrade strategy: when to write it for real and when to forbid it (upcoming)</li>
+<li>Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)</li>
+<li>Production and team workflow: PR, CI, monitoring, and incident response (upcoming)</li>
+</ul>
 <h2>References</h2>
 <ul>
 <li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
@@ -248,6 +273,6 @@ PY
 <li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-server-defaults">Alembic: Comparing Server Defaults</a></li>
 <li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect">Alembic: Limitations of Autogenerate</a></li>
 </ul>
-<p class="tags-line">Tags: Python, Alembic, autogenerate, compare_type, MetaData, SQLite</p>
+<p class="tags-line">Tags: Python, Alembic, SQLAlchemy, Migration</p>
 </body>
 </html>
