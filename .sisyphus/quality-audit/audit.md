@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:58:17+00:00
+Generated: 2026-05-20T11:58:37+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **19**
-- Series at or above 5 issues: **15**
-- Total issues: **154**
-  - BadImg: **154**
+- Series with any issue: **18**
+- Series at or above 5 issues: **14**
+- Total issues: **144**
+  - BadImg: **144**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -48,18 +48,17 @@ Warnings:
 | 5 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 6 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 7 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 8 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 9 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 10 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 11 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 12 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 13 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 14 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 15 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 16 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 17 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 18 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 19 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 8 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 9 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 10 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 11 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 12 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 13 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 14 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 15 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 16 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 17 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 18 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -143,18 +142,6 @@ Warnings:
 - `assets/python-package-101/05/05-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1307x67)
 - `assets/python-package-101/05/05-01-mental-model.ko.png:1` — PNG height 67px <= 100px (size=1245x67)
 - `assets/python-package-101/06/06-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1317x67)
-- ... 5 more
-
-## secure-coding-101 — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=898x67)
-- `assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=898x67)
-- `assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1092x67)
-- `assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1092x67)
-- `assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=920x67)
 - ... 5 more
 
 ## devops-101 — Total 8
