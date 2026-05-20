@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:00:59+00:00
+Generated: 2026-05-20T12:01:32+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **11**
-- Series at or above 5 issues: **9**
-- Total issues: **92**
-  - BadImg: **92**
+- Series with any issue: **10**
+- Series at or above 5 issues: **8**
+- Total issues: **84**
+  - BadImg: **84**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -45,13 +45,12 @@ Warnings:
 | 2 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 3 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 4 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 5 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 6 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 7 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 8 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 9 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 10 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 11 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 5 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 6 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 7 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 8 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 9 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 10 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -100,18 +99,6 @@ Warnings:
 - `assets/python-package-101/05/05-01-mental-model.ko.png:1` — PNG height 67px <= 100px (size=1245x67)
 - `assets/python-package-101/06/06-01-mental-model.en.png:1` — PNG height 67px <= 100px (size=1317x67)
 - ... 5 more
-
-## devops-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/devops-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=922x67)
-- `assets/devops-101/02/02-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=922x67)
-- `assets/devops-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=967x67)
-- `assets/devops-101/06/06-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=967x67)
-- `assets/devops-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=884x67)
-- ... 3 more
 
 ## llm-from-scratch-101 — Total 8
 
