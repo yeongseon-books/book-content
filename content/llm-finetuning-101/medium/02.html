@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dataset Preparation and Preprocessing</title>
+<title>LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,21 @@
 </style>
 </head>
 <body>
-<h1>Dataset Preparation and Preprocessing</h1>
+<h1>LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing</h1>
 <p>Dataset work fails less often because of size than because of shape. This article breaks the problem into raw samples, templated text, and tokenized tensors so you can verify each layer before training starts.</p>
 <p>This is the second post in the LLM Fine-tuning 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How should we shape the three fields instruction / input / output?</li>
 <li>How do we read a small JSONL file directly with Hugging Face datasets?</li>
 <li>What minimum verification points must we hit during preprocessing?</li>
-<li>Where should the prompt/response boundary live so training stays stable?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="LLM Fine-tuning 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png"></p>
+<p><em>LLM Fine-tuning 101 chapter 2 flow overview</em></p>
+<p>This picture places Dataset Preparation and Preprocessing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A good fine-tuning dataset is not a pile of sentences but a <strong>request-response contract</strong> the model is asked to imitate, repeatedly.</p>
+<p>The core of Dataset Preparation and Preprocessing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why this matters</h2>
 <p>At the dataset stage, what matters most is not volume but <strong>format consistency</strong>. If it is unclear what counts as input and which span the model should learn as a response, the loss may drop while the answers stay blurry. With the same 1,000 samples a consistent prompt format lets LoRA r=8 succeed; a mixed format may not converge even at r=64 with 5× more data.</p>
@@ -112,8 +113,6 @@ You can use lst[::-1] or lst.reverse().&lt;eos&gt;
 </code></pre>
 <p>The prompt prefix (everything up to <code>### Response:</code>) is masked to -100; only the response carries loss. EOS is explicit, so the model also learns when to stop at inference.</p>
 <h2>What to fix first about the dataset</h2>
-<p><img alt="Three layers of dataset preparation" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png"></p>
-<p><em>Three layers of dataset preparation</em></p>
 <p>Fine-tuning data is usually three layers: <strong>raw samples</strong>, <strong>template-applied text</strong>, and <strong>tokenized tensors</strong>. Separating them is what lets you isolate filtering issues from token-length issues.</p>
 <p><img alt="Three layers of dataset preparation" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png"></p>
 <p><em>Three layers of dataset preparation</em></p>
@@ -217,14 +216,23 @@ print(len(tokenized[0][&quot;input_ids&quot;]))   # 64
 <h2>Wrap-up · next post</h2>
 <p>The point of dataset preparation is to make the input/output boundary the model must learn unmistakably clear. Locking in structure on a tiny set keeps the training loop debuggable later.</p>
 <p>Post 3 moves on to LoRA adapter configuration. We dissect <code>LoraConfig</code>'s <code>r</code>, <code>alpha</code>, <code>target_modules</code>, and <code>dropout</code> line by line and see how each one shows up in training behavior.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How should we shape the three fields instruction / input / output?</strong></li>
+<li>The article treats Dataset Preparation and Preprocessing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do we read a small JSONL file directly with Hugging Face datasets?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What minimum verification points must we hit during preprocessing?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning Primer</a></li>
-<li><strong>Dataset Preparation and Preprocessing (current)</strong></li>
-<li>Configuring LoRA Adapters (upcoming)</li>
-<li>Training Loop and Hyperparameters (upcoming)</li>
-<li>Model Evaluation (upcoming)</li>
-<li>Model Serving (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer</a></li>
+<li><strong>LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing (current)</strong></li>
+<li>LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (upcoming)</li>
+<li>LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)</li>
+<li>LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)</li>
+<li>LLM Fine-tuning 101 (6/6): Model Serving (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

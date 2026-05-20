@@ -1,5 +1,5 @@
 ---
-title: Configuring LoRA Adapters
+title: "LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters"
 series: llm-finetuning-101
 episode: 3
 language: en
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-01'
 seo_description: Master LoRA adapter configuration by understanding rank, scaling, and target modules while verifying proper wiring using real model objects.
 ---
 
-# Configuring LoRA Adapters
+# LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters
 
 A LoRA adapter does not replace the model; it adds a narrow correction path beside selected linear layers. This article uses that structure to explain how to choose rank, scaling, and target modules without guessing.
 
 This is the third post in the LLM Fine-tuning 101 series.
 
-## Questions this post answers
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
+## Questions to Keep in Mind
 
 - Which `LoraConfig` fields actually need to be understood?
 - What goes wrong when `target_modules` is mis-specified?
 - For a tiny GPT-2 class model, how low does the trainable parameter ratio go?
-- How does the `lora_alpha / r` ratio (scaling) interact with learning rate?
 
-> A LoRA adapter is not a device for rewriting an entire model — it is a small correction patch attached beside specific linear transformations.
+## Big Picture
+
+![LLM Fine-tuning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
+
+*LLM Fine-tuning 101 chapter 3 flow overview*
+
+This picture places Configuring LoRA Adapters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Configuring LoRA Adapters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -90,10 +93,6 @@ trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 That single line confirms attachment. It also lines up with the 1.5% you computed by hand in post 1.
 
 ## What to fix first about the config
-
-![Low-rank decomposition and scaling structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
-
-*Low-rank decomposition and scaling structure*
 
 `r` is the low-rank dimension, `lora_alpha` is the scale, and `lora_dropout` is dropout on the adapter path only. The most accident-prone field in practice is `target_modules`. Get this list wrong and either nothing attaches, or you attach to layers you did not mean to.
 
@@ -209,15 +208,24 @@ The point of LoRA configuration is **wiring verification**, not performance tuni
 
 Post 4 covers the training loop. We push real gradients through this adapter and watch how learning rate / batch size / gradient accumulation reshape the loss curve.
 
+## Answering the Opening Questions
+
+- **Which `LoraConfig` fields actually need to be understood?**
+  - The article treats Configuring LoRA Adapters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What goes wrong when `target_modules` is mis-specified?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **For a tiny GPT-2 class model, how low does the trainable parameter ratio go?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- [Dataset Preparation and Preprocessing](./02-dataset.md)
-- **Configuring LoRA Adapters (current)**
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- [LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing](./02-dataset.md)
+- **LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (current)**
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

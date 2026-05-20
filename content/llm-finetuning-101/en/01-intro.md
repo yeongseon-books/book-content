@@ -1,5 +1,5 @@
 ---
-title: LLM Fine-tuning Primer
+title: "LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer"
 series: llm-finetuning-101
 episode: 1
 language: en
@@ -21,7 +21,7 @@ seo_description: 'A fine-tuning experiment is a decision about how to slice thre
   variables:'
 ---
 
-# LLM Fine-tuning Primer
+# LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer
 
 Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact.
 
@@ -29,18 +29,21 @@ This is the first post in the LLM Fine-tuning 101 series.
 
 This article frames that decision around three variables so the rest of the series has a stable mental model. If you skip this framing and jump straight into GPUs and loss curves, learning rate, dataset format, and adapter rank all start wobbling at once.
 
-## Questions this post answers
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
+## Questions to Keep in Mind
 
 - How can we calculate why LoRA is so much lighter than full fine-tuning?
 - How do we tell apart problems that need fine-tuning from those a prompt can solve?
 - What can we verify in post 1 without a GPU?
-- Does LoRA shrink model size, or does it shrink trainable parameter count?
 
-> If full fine-tuning is rebuilding an entire building, LoRA is bolting reinforcement onto a few load-bearing columns.
+## Big Picture
+
+![LLM Fine-tuning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+
+*LLM Fine-tuning 101 chapter 1 flow overview*
+
+This picture places LLM Fine-tuning Primer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of LLM Fine-tuning Primer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -91,10 +94,6 @@ Adapter file size                 ~7MB (one per domain)
 With this table in hand, "we just want to nudge the response tone" branches naturally to LoRA, while "we need to teach new facts" branches to full fine-tuning or RAG.
 
 ## What to understand first
-
-![base weights vs trainable boundary in fine-tuning](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
-
-*base weights vs trainable boundary in fine-tuning*
 
 The point most easily missed in fine-tuning is **what we choose as the training target**. Full fine-tuning updates every existing weight, so memory and optimizer state both balloon. LoRA freezes the existing weights and adds two low-rank matrices instead. So when discussing cost, look at the **trainable parameter count** separately from the total model parameters.
 
@@ -278,15 +277,24 @@ The point of post 1 is to stop treating fine-tuning as a mystical GPU ritual. Ju
 
 Post 2 covers dataset preparation. We compare three formats — instruction, chat, completion — and verify in code why label masking and `eos_token` handling are decisive for training stability.
 
+## Answering the Opening Questions
+
+- **How can we calculate why LoRA is so much lighter than full fine-tuning?**
+  - The article treats LLM Fine-tuning Primer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do we tell apart problems that need fine-tuning from those a prompt can solve?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What can we verify in post 1 without a GPU?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **LLM Fine-tuning Primer (current)**
-- Dataset Preparation and Preprocessing (upcoming)
-- Configuring LoRA Adapters (upcoming)
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- **LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer (current)**
+- LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing (upcoming)
+- LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (upcoming)
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

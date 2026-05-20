@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model Evaluation</title>
+<title>LLM Fine-tuning 101 (5/6): Model Evaluation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,21 @@
 </style>
 </head>
 <body>
-<h1>Model Evaluation</h1>
+<h1>LLM Fine-tuning 101 (5/6): Model Evaluation</h1>
 <p>Evaluation is where many fine-tuning demos become misleading. This article separates internal model signals from user-facing quality so you can measure improvement and catch regressions with a repeatable loop.</p>
 <p>This is the fifth post in the LLM Fine-tuning 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?</li>
 <li>Why is comparing perplexity before and after training not a complete quality evaluation?</li>
 <li>Why keep a separate evaluation loop even in a tiny model demo?</li>
-<li>How should you combine perplexity with golden-set evaluation?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="LLM Fine-tuning 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png"></p>
+<p><em>LLM Fine-tuning 101 chapter 5 flow overview</em></p>
+<p>This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Perplexity measures how unsurprised the model is by the next token. It does not directly guarantee that humans will find the output good.</p>
+<p>The core of Model Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why this matters</h2>
 <p>Right after training, the temptation is to look only at generated samples. In production you must look at quantitative signals first. The most basic one is perplexity, which shows how naturally the model predicts tokens in your evaluation data.</p>
@@ -111,8 +112,6 @@
 </code></pre>
 <p>The absolute value does not matter. What matters is (1) evaluation is separated from training, (2) the same data was measured twice to compare trends, and (3) CI produces the same numbers.</p>
 <h2>How to read perplexity correctly</h2>
-<p><img alt="Relationship between perplexity and quality metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png"></p>
-<p><em>Relationship between perplexity and quality metrics</em></p>
 <p>Perplexity is "lower is better," but you cannot judge quality from the absolute value alone. Tiny demo models, small datasets, and short context lengths cause large swings. So in practice, perplexity is best used as a <strong>regression baseline</strong> — strong at detecting whether things got worse, or whether a setting change improved the trend.</p>
 <p><img alt="How to read perplexity correctly" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-01-the-right-way-to-read-perplexity.en.png"></p>
 <p><em>How to read perplexity correctly</em></p>
@@ -210,14 +209,23 @@ print({&quot;before_ppl&quot;: before, &quot;after_ppl&quot;: after, &quot;delta
 <h2>Summary · Next article</h2>
 <p>Evaluation is unglamorous, but it is the step that earns trust in a fine-tuning pipeline. Establishing a baseline before looking at generated samples makes future experiments depend less on intuition. The production pattern is the two-tier setup: fast quantitative signals (perplexity) below, slow qualitative evaluation (golden set, human review) above.</p>
 <p>The next article (episode 6) covers serving. We will deploy the LoRA adapter separated from the base model and reduce inference memory and latency in code.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?</strong></li>
+<li>The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is comparing perplexity before and after training not a complete quality evaluation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why keep a separate evaluation loop even in a tiny model demo?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning Primer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">Dataset Preparation and Preprocessing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">Configuring LoRA Adapters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/04-training.md">Training Loop and Hyperparameters</a></li>
-<li><strong>Model Evaluation (current)</strong></li>
-<li>Model Serving (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/04-training.md">LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters</a></li>
+<li><strong>LLM Fine-tuning 101 (5/6): Model Evaluation (current)</strong></li>
+<li>LLM Fine-tuning 101 (6/6): Model Serving (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

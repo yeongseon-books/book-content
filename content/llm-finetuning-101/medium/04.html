@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Training Loop and Hyperparameters</title>
+<title>LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Training Loop and Hyperparameters</h1>
+<h1>LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters</h1>
 <p>Training loops are easier to debug once you stop treating them like framework magic.</p>
 <p>This is the fourth post in the LLM Fine-tuning 101 series.</p>
 <p>This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is the minimum you must set in <code>TrainingArguments</code> for a single training step to run?</li>
 <li>Why do <code>labels</code> and a data collator matter even in tiny experiments?</li>
 <li>When debugging a training loop, which output should you read first?</li>
-<li>How do learning rate, batch size, and gradient accumulation interact?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="LLM Fine-tuning 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png"></p>
+<p><em>LLM Fine-tuning 101 chapter 4 flow overview</em></p>
+<p>This picture places Training Loop and Hyperparameters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>The training loop is not a giant black box. It is a repetition: feed a tokenized batch into the model and reduce the loss once.</p>
+<p>The core of Training Loop and Hyperparameters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why this matters</h2>
 <p>Episode 4 is the first article in this series where actual weight updates happen. But the goal is still not high accuracy — it is to <strong>prove that the training loop is alive</strong>. Once you verify a single end-to-end step, future failures become easy to triage: is it the environment, the data, or the hyperparameters?</p>
@@ -110,8 +111,6 @@
 </code></pre>
 <p>The absolute loss value (8.74) is meaningless. What matters is (1) the run completed, (2) loss is a finite number (not NaN/Inf), and (3) <code>global_step=1</code>. When all three hold, your environment, data, adapter, and optimizer all worked at least once.</p>
 <h2>What you can shrink and what you cannot</h2>
-<p><img alt="Comparison of shrinkable and must-keep components" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png"></p>
-<p><em>Comparison of shrinkable and must-keep components</em></p>
 <p>Sample count and step count can be cut down. But <strong>tokenized inputs, labels, optimizer step, and loss computation</strong> cannot be removed — drop any of them and you no longer have a training validation, just an inference test. That is why even the smallest example in this article keeps every training-related component intact.</p>
 <p><img alt="What you can shrink and what you cannot" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-what-you-can-shrink-and-what-you-cannot.en.png"></p>
 <p><em>What you can shrink and what you cannot</em></p>
@@ -305,14 +304,23 @@ print(metrics)
 <h2>Summary · Next article</h2>
 <p>The training loop can be validated in surprisingly small units. Once a single step succeeds, the things that need to grow are data and time, not the basic structure. If the environment, data, adapter, or optimizer is broken, you will see the signal in step 1.</p>
 <p>The next article (episode 5) covers evaluation. We will use perplexity as a quick sanity check and combine it with golden-set qualitative and quantitative evaluation, all in code.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What is the minimum you must set in <code>TrainingArguments</code> for a single training step to run?</strong></li>
+<li>The article treats Training Loop and Hyperparameters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why do <code>labels</code> and a data collator matter even in tiny experiments?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When debugging a training loop, which output should you read first?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning Primer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">Dataset Preparation and Preprocessing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">Configuring LoRA Adapters</a></li>
-<li><strong>Training Loop and Hyperparameters (current)</strong></li>
-<li>Model Evaluation (upcoming)</li>
-<li>Model Serving (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters</a></li>
+<li><strong>LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (current)</strong></li>
+<li>LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)</li>
+<li>LLM Fine-tuning 101 (6/6): Model Serving (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

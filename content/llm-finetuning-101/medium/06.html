@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model Serving</title>
+<title>LLM Fine-tuning 101 (6/6): Model Serving</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,21 @@
 </style>
 </head>
 <body>
-<h1>Model Serving</h1>
+<h1>LLM Fine-tuning 101 (6/6): Model Serving</h1>
 <p>Serving forces a different set of trade-offs than training. This article breaks the system into four layers so you can see where the API boundary ends, where inference begins, and why adapters change deployment options.</p>
 <p>This is the final post in the LLM Fine-tuning 101 series.</p>
-<h2>Questions this post answers</h2>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?</li>
 <li>In serving code, where do you draw the line between training and inference?</li>
 <li>How can you validate the endpoint without opening a browser?</li>
-<li>What do you gain by deploying the LoRA adapter separately from the base model?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="LLM Fine-tuning 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png"></p>
+<p><em>LLM Fine-tuning 101 chapter 6 flow overview</em></p>
+<p>This picture places Model Serving inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Serving is not the step that makes the model smarter. It is the step that places an already-prepared model behind a predictable HTTP contract.</p>
+<p>The core of Model Serving is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why this matters</h2>
 <p>The final article in the series puts the trained adapter behind an API. In production, training and serving are kept separate as a rule. For a demo, however, doing one small fine-tuning step and immediately wrapping the result in an endpoint helps you see the whole flow at once.</p>
@@ -114,8 +115,6 @@
 </code></pre>
 <p>What matters is (1) the model is behind an HTTP contract, (2) <code>TestClient</code> validates it in CI, and (3) swapping the adapter switches to a different model on the same infrastructure.</p>
 <h2>What this demo isolates on purpose</h2>
-<p><img alt="Separation of model preparation and HTTP contract" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png"></p>
-<p><em>Separation of model preparation and HTTP contract</em></p>
 <p>In production, model loading, request validation, generation options, response serialization, and observability logs are all separate responsibilities. This article's example shows only <strong>model preparation</strong> and the <strong>HTTP contract</strong> at minimum scale. Even in a small demo, separating health check and generate endpoints makes it easy to grow into production code.</p>
 <p><img alt="What this demo isolates on purpose" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-01-what-this-demo-isolates-on-purpose.en.png"></p>
 <p><em>What this demo isolates on purpose</em></p>
@@ -212,14 +211,23 @@ print(client.post(&quot;/generate&quot;, json={&quot;prompt&quot;: &quot;Python 
 <h2>Summary · Series wrap-up</h2>
 <p>The minimum end-to-end path of the fine-tuning series is now complete. You built intuition with formulas (ep 1), prepared data (ep 2), attached LoRA (ep 3), trained one step (ep 4), evaluated (ep 5), and finally wired up an HTTP endpoint (ep 6).</p>
 <p>The next step is leaving the series and repeating this same flow on your own domain data. 100-1000 examples, LoRA rank 8-16, 1 epoch, perplexity + golden-set evaluation, FastAPI serving — once this one-line recipe is in your hands, you can ship any small model into a service.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?</strong></li>
+<li>The article treats Model Serving as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>In serving code, where do you draw the line between training and inference?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How can you validate the endpoint without opening a browser?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning Primer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">Dataset Preparation and Preprocessing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">Configuring LoRA Adapters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/04-training.md">Training Loop and Hyperparameters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/05-evaluation.md">Model Evaluation</a></li>
-<li><strong>Model Serving (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/01-intro.md">LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/02-dataset.md">LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/03-lora.md">LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/04-training.md">LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-finetuning-101/en/05-evaluation.md">LLM Fine-tuning 101 (5/6): Model Evaluation</a></li>
+<li><strong>LLM Fine-tuning 101 (6/6): Model Serving (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>

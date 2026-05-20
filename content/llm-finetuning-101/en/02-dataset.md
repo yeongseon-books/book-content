@@ -1,5 +1,5 @@
 ---
-title: Dataset Preparation and Preprocessing
+title: "LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing"
 series: llm-finetuning-101
 episode: 2
 language: en
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-01'
 seo_description: Learn how to preprocess LLM datasets by breaking them into raw samples, templated text, and tokenized tensors to ensure consistent fine-tuning.
 ---
 
-# Dataset Preparation and Preprocessing
+# LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing
 
 Dataset work fails less often because of size than because of shape. This article breaks the problem into raw samples, templated text, and tokenized tensors so you can verify each layer before training starts.
 
 This is the second post in the LLM Fine-tuning 101 series.
 
-## Questions this post answers
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
+## Questions to Keep in Mind
 
 - How should we shape the three fields instruction / input / output?
 - How do we read a small JSONL file directly with Hugging Face datasets?
 - What minimum verification points must we hit during preprocessing?
-- Where should the prompt/response boundary live so training stays stable?
 
-> A good fine-tuning dataset is not a pile of sentences but a **request-response contract** the model is asked to imitate, repeatedly.
+## Big Picture
+
+![LLM Fine-tuning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
+
+*LLM Fine-tuning 101 chapter 2 flow overview*
+
+This picture places Dataset Preparation and Preprocessing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dataset Preparation and Preprocessing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -95,10 +98,6 @@ You can use lst[::-1] or lst.reverse().<eos>
 The prompt prefix (everything up to `### Response:`) is masked to -100; only the response carries loss. EOS is explicit, so the model also learns when to stop at inference.
 
 ## What to fix first about the dataset
-
-![Three layers of dataset preparation](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
-
-*Three layers of dataset preparation*
 
 Fine-tuning data is usually three layers: **raw samples**, **template-applied text**, and **tokenized tensors**. Separating them is what lets you isolate filtering issues from token-length issues.
 
@@ -228,15 +227,24 @@ The point of dataset preparation is to make the input/output boundary the model 
 
 Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `alpha`, `target_modules`, and `dropout` line by line and see how each one shows up in training behavior.
 
+## Answering the Opening Questions
+
+- **How should we shape the three fields instruction / input / output?**
+  - The article treats Dataset Preparation and Preprocessing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do we read a small JSONL file directly with Hugging Face datasets?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What minimum verification points must we hit during preprocessing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- **Dataset Preparation and Preprocessing (current)**
-- Configuring LoRA Adapters (upcoming)
-- Training Loop and Hyperparameters (upcoming)
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- **LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing (current)**
+- LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters (upcoming)
+- LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (upcoming)
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 

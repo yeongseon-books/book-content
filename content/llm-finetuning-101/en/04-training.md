@@ -1,5 +1,5 @@
 ---
-title: Training Loop and Hyperparameters
+title: "LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters"
 series: llm-finetuning-101
 episode: 4
 language: en
@@ -20,7 +20,7 @@ last_reviewed: '2026-05-01'
 seo_description: Deconstruct one LLM training step into six stages to understand how learning rate, batch size, and gradient accumulation drive convergence.
 ---
 
-# Training Loop and Hyperparameters
+# LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters
 
 Training loops are easier to debug once you stop treating them like framework magic.
 
@@ -28,18 +28,21 @@ This is the fourth post in the LLM Fine-tuning 101 series.
 
 This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.
 
-## Questions this post answers
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
+## Questions to Keep in Mind
 
 - What is the minimum you must set in `TrainingArguments` for a single training step to run?
 - Why do `labels` and a data collator matter even in tiny experiments?
 - When debugging a training loop, which output should you read first?
-- How do learning rate, batch size, and gradient accumulation interact?
 
-> The training loop is not a giant black box. It is a repetition: feed a tokenized batch into the model and reduce the loss once.
+## Big Picture
+
+![LLM Fine-tuning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
+
+*LLM Fine-tuning 101 chapter 4 flow overview*
+
+This picture places Training Loop and Hyperparameters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Training Loop and Hyperparameters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -93,10 +96,6 @@ Two more relationships worth memorizing:
 The absolute loss value (8.74) is meaningless. What matters is (1) the run completed, (2) loss is a finite number (not NaN/Inf), and (3) `global_step=1`. When all three hold, your environment, data, adapter, and optimizer all worked at least once.
 
 ## What you can shrink and what you cannot
-
-![Comparison of shrinkable and must-keep components](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
-
-*Comparison of shrinkable and must-keep components*
 
 Sample count and step count can be cut down. But **tokenized inputs, labels, optimizer step, and loss computation** cannot be removed — drop any of them and you no longer have a training validation, just an inference test. That is why even the smallest example in this article keeps every training-related component intact.
 
@@ -325,15 +324,24 @@ The training loop can be validated in surprisingly small units. Once a single st
 
 The next article (episode 5) covers evaluation. We will use perplexity as a quick sanity check and combine it with golden-set qualitative and quantitative evaluation, all in code.
 
+## Answering the Opening Questions
+
+- **What is the minimum you must set in `TrainingArguments` for a single training step to run?**
+  - The article treats Training Loop and Hyperparameters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do `labels` and a data collator matter even in tiny experiments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When debugging a training loop, which output should you read first?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LLM Fine-tuning Primer](./01-intro.md)
-- [Dataset Preparation and Preprocessing](./02-dataset.md)
-- [Configuring LoRA Adapters](./03-lora.md)
-- **Training Loop and Hyperparameters (current)**
-- Model Evaluation (upcoming)
-- Model Serving (upcoming)
+- [LLM Fine-tuning 101 (1/6): LLM Fine-tuning Primer](./01-intro.md)
+- [LLM Fine-tuning 101 (2/6): Dataset Preparation and Preprocessing](./02-dataset.md)
+- [LLM Fine-tuning 101 (3/6): Configuring LoRA Adapters](./03-lora.md)
+- **LLM Fine-tuning 101 (4/6): Training Loop and Hyperparameters (current)**
+- LLM Fine-tuning 101 (5/6): Model Evaluation (upcoming)
+- LLM Fine-tuning 101 (6/6): Model Serving (upcoming)
 
 <!-- toc:end -->
 
