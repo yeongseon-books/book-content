@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Subquery</title>
+<title>SQL 101 (6/10): Subquery</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Subquery</h1>
+<h1>SQL 101 (6/10): Subquery</h1>
 <p>Real SQL rarely stays flat. One question turns into a smaller question about big spenders, another about recent activity, and another about whether a user has done something at least once. If all of that logic gets packed into one layer, the statement becomes technically valid but hard for a team to review.</p>
 <p>Subqueries and CTEs are the tools that let you split that complexity into readable steps. They matter less because they are advanced syntax and more because they let you express a multi-stage thought process without losing control of the result.</p>
 <p>This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When is a subquery enough, and when is a CTE the better fit?</li>
 <li>What is the difference between a scalar subquery and an inline view?</li>
 <li>How do IN and EXISTS differ in intent and behavior?</li>
-<li>Why do correlated subqueries become expensive so easily?</li>
-<li>How should you name intermediate layers in longer SQL files?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png"></p>
+<p><em>sql 101 chapter 6 flow overview</em></p>
+<p>This picture places Subquery inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A subquery is a smaller question nested inside a larger one. If the smaller question is unclear, the final answer is usually untrustworthy too.</p>
+<p>The core of Subquery is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Analytical queries are usually layered. You compute a cohort start date, attach later activity, aggregate it, and maybe join the result back to user attributes. If that logic is crammed into one long statement, it becomes difficult to debug or modify without breaking something unrelated.</p>
 <p>Readable layers are operationally valuable. Once each step has a name, you can test intermediate results, reason about row counts, and explain the logic during review instead of staring at one oversized FROM clause.</p>
 <h2>Subquery layering flow</h2>
-<p><img alt="Subquery layering flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Scalar subquery</strong>: returns a <em>single value</em>.</li>
@@ -162,12 +163,22 @@ JOIN users u ON u.id = b.user_id;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Subqueries split a question into pieces. Next up: <em>Window functions</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
+<li><strong>When is a subquery enough, and when is a CTE the better fit?</strong></li>
+<li>The article treats Subquery as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the difference between a scalar subquery and an inline view?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do IN and EXISTS differ in intent and behavior?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">SQL 101 (5/10): GROUP BY and Aggregates</a></li>
 <li><strong>Subquery (current)</strong></li>
 <li>Window Function (upcoming)</li>
 <li>INSERT, UPDATE, DELETE (upcoming)</li>
@@ -182,6 +193,6 @@ JOIN users u ON u.id = b.user_id;
 <li><a href="https://use-the-index-luke.com/sql/where-clause/null/not-in">Use The Index, Luke — IN vs EXISTS</a></li>
 <li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-FROM">PostgreSQL — FROM Clause</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, Subquery, CTE, Database, Query</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 5
-title: GROUP BY and Aggregates
+title: "SQL 101 (5/10): GROUP BY and Aggregates"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: GROUP BY explained — aggregate functions, HAVING vs WHERE, mu
 last_reviewed: '2026-05-15'
 ---
 
-# GROUP BY and Aggregates
+# SQL 101 (5/10): GROUP BY and Aggregates
 
 As soon as someone asks for daily revenue, users per country, or the average order size, you stop reading rows one by one and start compressing them into numbers. That compression is where GROUP BY and aggregate functions become the core of analytical SQL.
 
@@ -28,15 +28,21 @@ The tricky part is not writing SUM or COUNT. It is deciding what a group actuall
 
 This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - When does GROUP BY run, and what exactly gets grouped?
 - How do SUM, COUNT, and AVG differ in practice?
 - What is the real split between WHERE and HAVING?
-- What changes when you group by multiple columns?
-- How should you interpret groups that include NULL?
 
-> Aggregation is not just shrinking rows. It is choosing which detail disappears so a useful number can remain.
+## Big Picture
+
+![sql 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
+
+*sql 101 chapter 5 flow overview*
+
+This picture places GROUP BY and Aggregates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of GROUP BY and Aggregates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ It is also one of the easiest places to create plausible but incorrect numbers. 
 
 ## Aggregation flow
 
-![Aggregation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
 ## Key Terms
 
 - **Aggregate function**: `SUM, COUNT, AVG, MIN, MAX`, etc.
@@ -152,13 +157,22 @@ GROUP BY country;
 
 GROUP BY makes meaning by *shrinking rows*. Next: *Subquery*.
 
+## Answering the Opening Questions
+
+- **When does GROUP BY run, and what exactly gets grouped?**
+  - The article treats GROUP BY and Aggregates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do SUM, COUNT, and AVG differ in practice?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the real split between WHERE and HAVING?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
 - **GROUP BY and Aggregates (current)**
 - Subquery (upcoming)
 - Window Function (upcoming)

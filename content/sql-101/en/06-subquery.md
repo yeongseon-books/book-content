@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 6
-title: Subquery
+title: "SQL 101 (6/10): Subquery"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Scalar subqueries, IN, EXISTS, inline views, and CTEs — the t
 last_reviewed: '2026-05-15'
 ---
 
-# Subquery
+# SQL 101 (6/10): Subquery
 
 Real SQL rarely stays flat. One question turns into a smaller question about big spenders, another about recent activity, and another about whether a user has done something at least once. If all of that logic gets packed into one layer, the statement becomes technically valid but hard for a team to review.
 
@@ -28,15 +28,21 @@ Subqueries and CTEs are the tools that let you split that complexity into readab
 
 This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - When is a subquery enough, and when is a CTE the better fit?
 - What is the difference between a scalar subquery and an inline view?
 - How do IN and EXISTS differ in intent and behavior?
-- Why do correlated subqueries become expensive so easily?
-- How should you name intermediate layers in longer SQL files?
 
-> A subquery is a smaller question nested inside a larger one. If the smaller question is unclear, the final answer is usually untrustworthy too.
+## Big Picture
+
+![sql 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)
+
+*sql 101 chapter 6 flow overview*
+
+This picture places Subquery inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Subquery is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Readable layers are operationally valuable. Once each step has a name, you can t
 
 ## Subquery layering flow
 
-![Subquery layering flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)
 ## Key Terms
 
 - **Scalar subquery**: returns a *single value*.
@@ -161,14 +166,23 @@ ETL pipelines are mostly CTE-based *named transformations*. *Cohort analysis*, *
 
 Subqueries split a question into pieces. Next up: *Window functions*.
 
+## Answering the Opening Questions
+
+- **When is a subquery enough, and when is a CTE the better fit?**
+  - The article treats Subquery as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between a scalar subquery and an inline view?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do IN and EXISTS differ in intent and behavior?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
 - **Subquery (current)**
 - Window Function (upcoming)
 - INSERT, UPDATE, DELETE (upcoming)

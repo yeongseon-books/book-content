@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 7
-title: 윈도 함수
+title: "SQL 101 (7/10): 윈도 함수"
 status: content-ready
 targets:
   tistory: true
@@ -20,21 +20,27 @@ seo_description: 윈도 함수로 행을 유지한 채 순위, 누적값, 이전
 last_reviewed: '2026-05-15'
 ---
 
-# 윈도 함수
+# SQL 101 (7/10): 윈도 함수
 
 `GROUP BY`를 배우고 나면 자연스럽게 다음 질문이 나옵니다. 그룹별 합계나 평균은 구할 수 있는데, 원본 행은 그대로 두면서 그 합계나 순위를 옆에 붙일 수는 없을까 하는 질문입니다. 이 지점에서 윈도 함수가 등장합니다.
 
 이 글은 SQL 101 시리즈의 일곱 번째 글입니다. 여기서는 윈도 함수를 사용해 원본 행을 유지하면서 그룹별 계산 결과를 덧붙이는 방법을 설명합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `OVER (PARTITION BY ...)`는 무엇을 뜻할까요?
 - `ROW_NUMBER`, `RANK`, `DENSE_RANK`는 어떻게 다를까요?
 - `LAG`, `LEAD`는 왜 시계열 분석에서 자주 쓰일까요?
-- 누적 합계와 이동 평균은 어떤 모양으로 쓸까요?
-- 프레임을 명시하지 않으면 왜 오해가 생길 수 있을까요?
 
-> 윈도 함수는 집계 결과를 없애지 않고 각 행 옆에 붙이는 도구입니다.
+## 큰 그림
+
+![SQL 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
+
+*SQL 101 7장 흐름 개요*
+
+이 그림에서는 윈도 함수를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 윈도 함수의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -44,7 +50,6 @@ last_reviewed: '2026-05-15'
 
 ## 윈도 계산 흐름
 
-![윈도 계산 흐름](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
 원본 행이 먼저 있고, 그 행들을 어떤 그룹으로 나눌지와 어떤 순서로 볼지를 `OVER (...)` 안에서 정의합니다. 그 위에 순위 함수나 누적 합계 함수를 얹어 계산 열을 추가하는 방식입니다.
 
 ## 핵심 개념 정리
@@ -158,15 +163,24 @@ FROM daily_revenue;
 
 다음 글에서는 데이터를 읽는 쿼리에서 한 걸음 나아가, 실제로 데이터를 넣고 수정하고 삭제하는 DML을 안전하게 다루는 방법을 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`OVER (PARTITION BY ...)`는 무엇을 뜻할까요?**
+  - 본문의 기준은 윈도 함수를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`ROW_NUMBER`, `RANK`, `DENSE_RANK`는 어떻게 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`LAG`, `LEAD`는 왜 시계열 분석에서 자주 쓰일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQL이란 무엇인가?](./01-what-is-sql.md)
-- [SELECT 기본](./02-select-basics.md)
-- [WHERE와 조건](./03-where-and-conditions.md)
-- [JOIN 이해하기](./04-join.md)
-- [GROUP BY와 집계 함수](./05-group-by-and-aggregate.md)
-- [서브쿼리와 CTE](./06-subquery.md)
+- [SQL 101 (1/10): SQL이란 무엇인가?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT 기본](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE와 조건](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN 이해하기](./04-join.md)
+- [SQL 101 (5/10): GROUP BY와 집계 함수](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): 서브쿼리와 CTE](./06-subquery.md)
 - **윈도 함수 (현재 글)**
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)

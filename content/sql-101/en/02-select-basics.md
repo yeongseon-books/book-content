@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 2
-title: SELECT Basics
+title: "SQL 101 (2/10): SELECT Basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical tour of SELECT — clause order, column projection,
 last_reviewed: '2026-05-15'
 ---
 
-# SELECT Basics
+# SQL 101 (2/10): SELECT Basics
 
 SELECT is usually the first SQL statement people become comfortable with, and that familiarity is exactly why teams get sloppy with it. A query that looks harmless can still waste memory, hide intent, and make later review harder if it pulls too many columns or leaves ordering vague.
 
@@ -28,15 +28,21 @@ Good SELECT habits pay off long after the query leaves your editor. The column l
 
 This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What is the safest way to read a SELECT statement?
 - Why is naming columns explicitly more than a style preference?
 - Where do aliases work, and where do they not?
-- What costs come with ORDER BY, LIMIT, and DISTINCT?
-- When does SELECT * start to become risky?
 
-> SELECT is not just a way to read data. It is a way to declare exactly which result shape you want another person to trust.
+## Big Picture
+
+![sql 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
+
+*sql 101 chapter 2 flow overview*
+
+This picture places SELECT Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SELECT Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Explicit column lists help more than the current query. They show future readers
 
 ## SELECT evaluation flow
 
-![SELECT evaluation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
 ## Key Terms
 
 - **Projection**: the *set of columns* SELECT picks.
@@ -144,10 +149,19 @@ Dashboards repeat the `SELECT cols + ORDER BY + LIMIT` pattern *hundreds of time
 
 SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*.
 
+## Answering the Opening Questions
+
+- **What is the safest way to read a SELECT statement?**
+  - The article treats SELECT Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is naming columns explicitly more than a style preference?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where do aliases work, and where do they not?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
 - **SELECT Basics (current)**
 - WHERE and Conditions (upcoming)
 - JOIN (upcoming)

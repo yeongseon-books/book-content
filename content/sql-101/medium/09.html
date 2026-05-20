@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Index and Query Plan</title>
+<title>SQL 101 (9/10): Index and Query Plan</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Index and Query Plan</h1>
+<h1>SQL 101 (9/10): Index and Query Plan</h1>
 <p>Two SQL statements can look almost identical and still differ by orders of magnitude in runtime. That gap usually has less to do with magic database behavior than with the path the planner chose to read the data.</p>
 <p>If you cannot read that path, tuning stays stuck at guesswork. Indexes become cargo-cult fixes, and every slow query turns into trial and error instead of a repeatable investigation.</p>
 <p>This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is the simplest mental model for a B-tree index?</li>
 <li>How do EXPLAIN and EXPLAIN ANALYZE differ?</li>
 <li>Why can a database skip an index even when one exists?</li>
-<li>Why does composite index column order matter so much?</li>
-<li>When are partial and function indexes worth considering?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png"></p>
+<p><em>sql 101 chapter 9 flow overview</em></p>
+<p>This picture places Index and Query Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Tuning without reading the plan is guesswork. The more data grows, the more expensive those guesses become.</p>
+<p>The core of Index and Query Plan is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Query tuning becomes more valuable as data grows because small predicate differences start turning into noticeable latency. Once tables move beyond toy size, you need to know not only what the SQL says, but also how the planner expects to execute it.</p>
 <p>Indexes are powerful precisely because they are selective. They make some reads much faster while increasing storage and write cost. That means index work is not about adding more structures everywhere. It is about matching read patterns to the right access path and confirming the plan actually changes.</p>
 <h2>Plan selection flow</h2>
-<p><img alt="Plan selection flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>B-tree index</strong>: the most common <em>balanced-tree</em> index.</li>
@@ -164,15 +165,25 @@ ON users (id) WHERE deleted_at IS NULL;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Tuning starts with <em>reading the plan</em>. Next: <em>practical analysis SQL</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">Subquery</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">Window Function</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/08-insert-update-delete.md">INSERT, UPDATE, DELETE</a></li>
+<li><strong>What is the simplest mental model for a B-tree index?</strong></li>
+<li>The article treats Index and Query Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do EXPLAIN and EXPLAIN ANALYZE differ?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why can a database skip an index even when one exists?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">SQL 101 (5/10): GROUP BY and Aggregates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">SQL 101 (6/10): Subquery</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">SQL 101 (7/10): Window Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/08-insert-update-delete.md">SQL 101 (8/10): INSERT, UPDATE, DELETE</a></li>
 <li><strong>Index and Query Plan (current)</strong></li>
 <li>Practical Analysis SQL (upcoming)</li>
 </ul>
@@ -184,6 +195,6 @@ ON users (id) WHERE deleted_at IS NULL;
 <li><a href="https://www.postgresql.org/docs/current/indexes-partial.html">PostgreSQL — Partial Indexes</a></li>
 <li><a href="https://www.postgresql.org/docs/current/planner-stats.html">PostgreSQL — Planner Statistics</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, Index, QueryPlan, Performance, Postgres</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

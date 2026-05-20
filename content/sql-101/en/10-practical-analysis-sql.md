@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 10
-title: Practical Analysis SQL
+title: "SQL 101 (10/10): Practical Analysis SQL"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Cohort, funnel, retention, top-N — patterns for assembling re
 last_reviewed: '2026-05-15'
 ---
 
-# Practical Analysis SQL
+# SQL 101 (10/10): Practical Analysis SQL
 
 By the time you reach real reporting work, SQL features stop appearing one at a time. A single analytics request usually asks for filtering, grouping, window calculations, and layered intermediate steps in the same query.
 
@@ -28,15 +28,21 @@ That is why the final chapter is best approached as pattern assembly. The goal i
 
 This is the final post in the SQL 101 series. It ties the earlier clauses together into practical query patterns for analysis work.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What do DAU, WAU, and MAU queries usually look like?
 - How do you structure cohort and retention logic in layers?
 - What is the cleanest shape for a funnel query?
-- Why are window functions a natural fit for top-N per group?
-- Which verification steps keep analytical SQL from drifting into misleading metrics?
 
-> Analytical SQL is not a new kind of magic. It is the same familiar tools stacked in layers and named clearly enough for a team to reuse.
+## Big Picture
+
+![sql 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
+
+*sql 101 chapter 10 flow overview*
+
+This picture places Practical Analysis SQL inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Practical Analysis SQL is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Well-structured analytics SQL also becomes reusable team knowledge. A clean coho
 
 ## Analytics query layering flow
 
-![Analytics query layering flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
 ## Key Terms
 
 - **DAU/WAU/MAU**: daily / weekly / monthly *active users*.
@@ -189,18 +194,27 @@ Analytics teams maintain a *pattern library* of these queries. With PR review an
 
 Closing the series: *SQL is the shared language of reads, writes, and analytics*. Next stops: *deeper query plans*, *running PostgreSQL*, and *data warehouses*.
 
+## Answering the Opening Questions
+
+- **What do DAU, WAU, and MAU queries usually look like?**
+  - The article treats Practical Analysis SQL as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you structure cohort and retention logic in layers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What is the cleanest shape for a funnel query?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
-- [Window Function](./07-window-function.md)
-- [INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
-- [Index and Query Plan](./09-index-and-query-plan.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
+- [SQL 101 (7/10): Window Function](./07-window-function.md)
+- [SQL 101 (8/10): INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
+- [SQL 101 (9/10): Index and Query Plan](./09-index-and-query-plan.md)
 - **Practical Analysis SQL (current)**
 
 <!-- toc:end -->

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:25:42+00:00",
+  "generated_at": "2026-05-20T11:26:01+00:00",
   "series_count": 92,
   "problem_series_count": 56,
   "series_with_5_plus": 42,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 7,
+    "Shrt": 6,
     "NoEn": 0,
-    "all": 539
+    "all": 538
   },
   "results": [
     {
@@ -8594,264 +8594,6 @@
       }
     },
     {
-      "series": "sql-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 1,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 9,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/sql-101/en/03-where-and-conditions.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "03-where-and-conditions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/02/02-01-select-evaluation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-select-evaluation-flow.en.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/02/02-01-select-evaluation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-select-evaluation-flow.ko.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/05/05-01-aggregation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-aggregation-flow.en.png",
-            "width": 1021,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/05/05-01-aggregation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-aggregation-flow.ko.png",
-            "width": 1021,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/07/07-01-window-calculation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-window-calculation-flow.en.png",
-            "width": 1026,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/07/07-01-window-calculation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-window-calculation-flow.ko.png",
-            "width": 1026,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-analytics-query-layering-flow.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-analytics-query-layering-flow.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/sql-101/en/03-where-and-conditions.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "03-where-and-conditions.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/02/02-01-select-evaluation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-select-evaluation-flow.en.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/02/02-01-select-evaluation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-select-evaluation-flow.ko.png",
-            "width": 1231,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/05/05-01-aggregation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-aggregation-flow.en.png",
-            "width": 1021,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/05/05-01-aggregation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-aggregation-flow.ko.png",
-            "width": 1021,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/07/07-01-window-calculation-flow.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-window-calculation-flow.en.png",
-            "width": 1026,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/07/07-01-window-calculation-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "07-01-window-calculation-flow.ko.png",
-            "width": 1026,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-analytics-query-layering-flow.en.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "10-01-analytics-query-layering-flow.ko.png",
-            "width": 794,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "computer-networks-101",
       "counts": {
         "Synt": 0,
@@ -10897,6 +10639,234 @@
             "code": null,
             "image": "09-01-concept-at-a-glance.ko.png",
             "width": 638,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "sql-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 8
+      },
+      "total": 8,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/02/02-01-select-evaluation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-select-evaluation-flow.en.png",
+            "width": 1231,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/02/02-01-select-evaluation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-select-evaluation-flow.ko.png",
+            "width": 1231,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/05/05-01-aggregation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-aggregation-flow.en.png",
+            "width": 1021,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/05/05-01-aggregation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-aggregation-flow.ko.png",
+            "width": 1021,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/07/07-01-window-calculation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "07-01-window-calculation-flow.en.png",
+            "width": 1026,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/07/07-01-window-calculation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "07-01-window-calculation-flow.ko.png",
+            "width": 1026,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-analytics-query-layering-flow.en.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-analytics-query-layering-flow.ko.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/02/02-01-select-evaluation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-select-evaluation-flow.en.png",
+            "width": 1231,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/02/02-01-select-evaluation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "02-01-select-evaluation-flow.ko.png",
+            "width": 1231,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/05/05-01-aggregation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-aggregation-flow.en.png",
+            "width": 1021,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/05/05-01-aggregation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-aggregation-flow.ko.png",
+            "width": 1021,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/07/07-01-window-calculation-flow.en.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "07-01-window-calculation-flow.en.png",
+            "width": 1026,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/07/07-01-window-calculation-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 88px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "07-01-window-calculation-flow.ko.png",
+            "width": 1026,
+            "height": 88,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-analytics-query-layering-flow.en.png",
+            "width": 794,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "10-01-analytics-query-layering-flow.ko.png",
+            "width": 794,
             "height": 67,
             "repo": null
           }

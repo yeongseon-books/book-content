@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:25:42+00:00
+Generated: 2026-05-20T11:26:01+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **56**
 - Series at or above 5 issues: **42**
-- Total issues: **539**
+- Total issues: **538**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **7**
+  - Shrt: **6**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -66,16 +66,16 @@ Warnings:
 | 23 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 24 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 25 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 26 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 27 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 33 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 34 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 35 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 32 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 33 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 34 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 35 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 36 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 37 | `machine-learning-101` | 7 | 6 | 0 | 0 | 1 | 0 |
 | 38 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
@@ -402,21 +402,6 @@ Warnings:
 - `assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=920x67)
 - ... 5 more
 
-## sql-101 — Total 9
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=1 NoEn=0
-
-### BadImg
-- `assets/sql-101/02/02-01-select-evaluation-flow.en.png:1` — PNG height 67px <= 100px (size=1231x67)
-- `assets/sql-101/02/02-01-select-evaluation-flow.ko.png:1` — PNG height 67px <= 100px (size=1231x67)
-- `assets/sql-101/05/05-01-aggregation-flow.en.png:1` — PNG height 67px <= 100px (size=1021x67)
-- `assets/sql-101/05/05-01-aggregation-flow.ko.png:1` — PNG height 67px <= 100px (size=1021x67)
-- `assets/sql-101/07/07-01-window-calculation-flow.en.png:1` — PNG height 88px <= 100px (size=1026x88)
-- ... 3 more
-
-### Shrt
-- `content/sql-101/en/03-where-and-conditions.md:22` — markdown body has 149 lines (< 150)
-
 ## computer-networks-101 — Total 8
 
 - BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
@@ -523,6 +508,18 @@ Warnings:
 - `assets/software-design-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/07/07-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=811x67)
+- ... 3 more
+
+## sql-101 — Total 8
+
+- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/sql-101/02/02-01-select-evaluation-flow.en.png:1` — PNG height 67px <= 100px (size=1231x67)
+- `assets/sql-101/02/02-01-select-evaluation-flow.ko.png:1` — PNG height 67px <= 100px (size=1231x67)
+- `assets/sql-101/05/05-01-aggregation-flow.en.png:1` — PNG height 67px <= 100px (size=1021x67)
+- `assets/sql-101/05/05-01-aggregation-flow.ko.png:1` — PNG height 67px <= 100px (size=1021x67)
+- `assets/sql-101/07/07-01-window-calculation-flow.en.png:1` — PNG height 88px <= 100px (size=1026x88)
 - ... 3 more
 
 ## sre-101 — Total 8

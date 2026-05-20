@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>GROUP BY and Aggregates</title>
+<title>SQL 101 (5/10): GROUP BY and Aggregates</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>GROUP BY and Aggregates</h1>
+<h1>SQL 101 (5/10): GROUP BY and Aggregates</h1>
 <p>As soon as someone asks for daily revenue, users per country, or the average order size, you stop reading rows one by one and start compressing them into numbers. That compression is where GROUP BY and aggregate functions become the core of analytical SQL.</p>
 <p>The tricky part is not writing SUM or COUNT. It is deciding what a group actually means, what detail disappears when rows collapse, and whether the resulting number still matches the business question you thought you were answering.</p>
 <p>This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When does GROUP BY run, and what exactly gets grouped?</li>
 <li>How do SUM, COUNT, and AVG differ in practice?</li>
 <li>What is the real split between WHERE and HAVING?</li>
-<li>What changes when you group by multiple columns?</li>
-<li>How should you interpret groups that include NULL?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png"></p>
+<p><em>sql 101 chapter 5 flow overview</em></p>
+<p>This picture places GROUP BY and Aggregates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Aggregation is not just shrinking rows. It is choosing which detail disappears so a useful number can remain.</p>
+<p>The core of GROUP BY and Aggregates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Most dashboard metrics are grouped metrics. Daily active users, revenue by country, average rating per product, and orders per customer all depend on taking raw rows and reducing them to one line per business category. That makes aggregation one of the most reusable shapes in SQL.</p>
 <p>It is also one of the easiest places to create plausible but incorrect numbers. A missing grouping key, a join that multiplies rows, or a misunderstood NULL rule can produce a chart that looks clean while hiding a logic bug underneath.</p>
 <h2>Aggregation flow</h2>
-<p><img alt="Aggregation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Aggregate function</strong>: <code>SUM, COUNT, AVG, MIN, MAX</code>, etc.</li>
@@ -153,11 +154,21 @@ GROUP BY country;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>GROUP BY makes meaning by <em>shrinking rows</em>. Next: <em>Subquery</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
+<li><strong>When does GROUP BY run, and what exactly gets grouped?</strong></li>
+<li>The article treats GROUP BY and Aggregates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do SUM, COUNT, and AVG differ in practice?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What is the real split between WHERE and HAVING?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
 <li><strong>GROUP BY and Aggregates (current)</strong></li>
 <li>Subquery (upcoming)</li>
 <li>Window Function (upcoming)</li>
@@ -173,6 +184,6 @@ GROUP BY country;
 <li><a href="https://sqlbolt.com/lesson/select_queries_with_aggregates">SQLBolt — Aggregates</a></li>
 <li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS">PostgreSQL — GROUPING SETS, CUBE, and ROLLUP</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, GroupBy, Aggregate, Database, Analytics</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

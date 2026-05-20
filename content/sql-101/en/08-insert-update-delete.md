@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 8
-title: INSERT, UPDATE, DELETE
+title: "SQL 101 (8/10): INSERT, UPDATE, DELETE"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Safely insert, change, and remove data — transactions, UPSERT
 last_reviewed: '2026-05-15'
 ---
 
-# INSERT, UPDATE, DELETE
+# SQL 101 (8/10): INSERT, UPDATE, DELETE
 
 So far the series has mostly focused on reading data. Writing data is different. One misplaced condition can update or delete far more rows than intended, and by the time you notice, the mistake may already be live in production.
 
@@ -28,15 +28,21 @@ That is why data-changing SQL is less about syntax and more about safety procedu
 
 This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What are the basic shapes of INSERT, UPDATE, and DELETE?
 - Why is a transaction the default safety net for data changes?
 - Why is RETURNING so useful during verification?
-- What assumptions must be true before UPSERT behaves the way you expect?
-- Which habits make DML most dangerous in real work?
 
-> Data-changing SQL is not just about making a statement valid. It is about making the change reversible until you are sure it is correct.
+## Big Picture
+
+![sql 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
+
+*sql 101 chapter 8 flow overview*
+
+This picture places INSERT, UPDATE, DELETE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of INSERT, UPDATE, DELETE is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Transactions and RETURNING help turn risky changes into auditable ones. They let
 
 ## Safe data-change flow
 
-![Safe data-change flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
 ## Key Terms
 
 - **DML**: Data Manipulation Language — INSERT, UPDATE, DELETE.
@@ -152,16 +157,25 @@ Production changes go through *PR review* and *migration tools*. Ad-hoc changes 
 
 DML is the craft of making the *irreversible* feel safe. Next: *Index and query plan*.
 
+## Answering the Opening Questions
+
+- **What are the basic shapes of INSERT, UPDATE, and DELETE?**
+  - The article treats INSERT, UPDATE, DELETE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a transaction the default safety net for data changes?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is RETURNING so useful during verification?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
-- [Window Function](./07-window-function.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
+- [SQL 101 (7/10): Window Function](./07-window-function.md)
 - **INSERT, UPDATE, DELETE (current)**
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)

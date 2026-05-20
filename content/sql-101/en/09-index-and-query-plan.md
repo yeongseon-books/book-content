@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 9
-title: Index and Query Plan
+title: "SQL 101 (9/10): Index and Query Plan"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How B-tree indexes work, how to read EXPLAIN, why an index migh
 last_reviewed: '2026-05-15'
 ---
 
-# Index and Query Plan
+# SQL 101 (9/10): Index and Query Plan
 
 Two SQL statements can look almost identical and still differ by orders of magnitude in runtime. That gap usually has less to do with magic database behavior than with the path the planner chose to read the data.
 
@@ -28,15 +28,21 @@ If you cannot read that path, tuning stays stuck at guesswork. Indexes become ca
 
 This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What is the simplest mental model for a B-tree index?
 - How do EXPLAIN and EXPLAIN ANALYZE differ?
 - Why can a database skip an index even when one exists?
-- Why does composite index column order matter so much?
-- When are partial and function indexes worth considering?
 
-> Tuning without reading the plan is guesswork. The more data grows, the more expensive those guesses become.
+## Big Picture
+
+![sql 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)
+
+*sql 101 chapter 9 flow overview*
+
+This picture places Index and Query Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Index and Query Plan is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Indexes are powerful precisely because they are selective. They make some reads 
 
 ## Plan selection flow
 
-![Plan selection flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)
 ## Key Terms
 
 - **B-tree index**: the most common *balanced-tree* index.
@@ -163,17 +168,26 @@ Performance work is mostly *slow-query log → EXPLAIN → index or query change
 
 Tuning starts with *reading the plan*. Next: *practical analysis SQL*.
 
+## Answering the Opening Questions
+
+- **What is the simplest mental model for a B-tree index?**
+  - The article treats Index and Query Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do EXPLAIN and EXPLAIN ANALYZE differ?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why can a database skip an index even when one exists?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
-- [Window Function](./07-window-function.md)
-- [INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
+- [SQL 101 (7/10): Window Function](./07-window-function.md)
+- [SQL 101 (8/10): INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
 - **Index and Query Plan (current)**
 - Practical Analysis SQL (upcoming)
 

@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 7
-title: Window Function
+title: "SQL 101 (7/10): Window Function"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: ROW_NUMBER, RANK, LAG/LEAD, running totals — SQL tools for pe
 last_reviewed: '2026-05-15'
 ---
 
-# Window Function
+# SQL 101 (7/10): Window Function
 
 After GROUP BY, many readers hit the same wall: they can compute one total per group, but they still want to keep the original rows visible. Rankings, previous-value comparisons, running totals, and moving averages all come from that need.
 
@@ -28,15 +28,21 @@ Window functions solve exactly that problem. They let you add group-aware calcul
 
 This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does OVER (PARTITION BY ...) really mean?
 - How do ROW_NUMBER, RANK, and DENSE_RANK differ?
 - Why are LAG and LEAD so common in time-series analysis?
-- What is the safest shape for running totals and moving averages?
-- Why should you make the frame explicit instead of trusting defaults?
 
-> Window functions keep the original rows and attach calculations beside them. That is what makes them so useful for ranking, comparison, and trend analysis.
+## Big Picture
+
+![sql 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
+
+*sql 101 chapter 7 flow overview*
+
+This picture places Window Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Window Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ This is one of the places where SQL becomes more than a retrieval language. Once
 
 ## Window calculation flow
 
-![Window calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
 ## Key Terms
 
 - **Partition**: rows *grouped together*.
@@ -157,15 +162,24 @@ FROM daily_revenue;
 
 Windows are *aggregates that keep the rows*. Next: *INSERT/UPDATE/DELETE*.
 
+## Answering the Opening Questions
+
+- **What does OVER (PARTITION BY ...) really mean?**
+  - The article treats Window Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do ROW_NUMBER, RANK, and DENSE_RANK differ?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why are LAG and LEAD so common in time-series analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
-- [JOIN](./04-join.md)
-- [GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
-- [Subquery](./06-subquery.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (4/10): JOIN](./04-join.md)
+- [SQL 101 (5/10): GROUP BY and Aggregates](./05-group-by-and-aggregate.md)
+- [SQL 101 (6/10): Subquery](./06-subquery.md)
 - **Window Function (current)**
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Window Function</title>
+<title>SQL 101 (7/10): Window Function</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Window Function</h1>
+<h1>SQL 101 (7/10): Window Function</h1>
 <p>After GROUP BY, many readers hit the same wall: they can compute one total per group, but they still want to keep the original rows visible. Rankings, previous-value comparisons, running totals, and moving averages all come from that need.</p>
 <p>Window functions solve exactly that problem. They let you add group-aware calculations to each row without collapsing the table, which is why they show up constantly in analytical work.</p>
 <p>This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does OVER (PARTITION BY ...) really mean?</li>
 <li>How do ROW_NUMBER, RANK, and DENSE_RANK differ?</li>
 <li>Why are LAG and LEAD so common in time-series analysis?</li>
-<li>What is the safest shape for running totals and moving averages?</li>
-<li>Why should you make the frame explicit instead of trusting defaults?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png"></p>
+<p><em>sql 101 chapter 7 flow overview</em></p>
+<p>This picture places Window Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Window functions keep the original rows and attach calculations beside them. That is what makes them so useful for ranking, comparison, and trend analysis.</p>
+<p>The core of Window Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Rankings, differences, cumulative sums, and month-over-month comparisons are all row-level questions. GROUP BY alone cannot answer them cleanly because it removes the detail you still need. Window functions keep that detail while still letting you reason about the group around each row.</p>
 <p>This is one of the places where SQL becomes more than a retrieval language. Once windows become natural, cohort analysis, retention, funnels, and trend reporting stop feeling like special tricks and start looking like combinations of familiar building blocks.</p>
 <h2>Window calculation flow</h2>
-<p><img alt="Window calculation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Partition</strong>: rows <em>grouped together</em>.</li>
@@ -162,13 +163,23 @@ FROM daily_revenue;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Windows are <em>aggregates that keep the rows</em>. Next: <em>INSERT/UPDATE/DELETE</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">Subquery</a></li>
+<li><strong>What does OVER (PARTITION BY ...) really mean?</strong></li>
+<li>The article treats Window Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do ROW_NUMBER, RANK, and DENSE_RANK differ?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why are LAG and LEAD so common in time-series analysis?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">SQL 101 (5/10): GROUP BY and Aggregates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">SQL 101 (6/10): Subquery</a></li>
 <li><strong>Window Function (current)</strong></li>
 <li>INSERT, UPDATE, DELETE (upcoming)</li>
 <li>Index and Query Plan (upcoming)</li>
@@ -182,6 +193,6 @@ FROM daily_revenue;
 <li><a href="https://use-the-index-luke.com/sql/partial-results/top-n-queries">Use The Index, Luke — Top-N</a></li>
 <li><a href="https://www.postgresql.org/docs/current/sql-expressions.html">PostgreSQL — Value Expressions</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, WindowFunction, Analytics, Database, Query</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>INSERT, UPDATE, DELETE</title>
+<title>SQL 101 (8/10): INSERT, UPDATE, DELETE</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>INSERT, UPDATE, DELETE</h1>
+<h1>SQL 101 (8/10): INSERT, UPDATE, DELETE</h1>
 <p>So far the series has mostly focused on reading data. Writing data is different. One misplaced condition can update or delete far more rows than intended, and by the time you notice, the mistake may already be live in production.</p>
 <p>That is why data-changing SQL is less about syntax and more about safety procedure. Transactions, preview queries, RETURNING, and rollback habits matter as much as the actual INSERT, UPDATE, or DELETE statement.</p>
 <p>This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What are the basic shapes of INSERT, UPDATE, and DELETE?</li>
 <li>Why is a transaction the default safety net for data changes?</li>
 <li>Why is RETURNING so useful during verification?</li>
-<li>What assumptions must be true before UPSERT behaves the way you expect?</li>
-<li>Which habits make DML most dangerous in real work?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png"></p>
+<p><em>sql 101 chapter 8 flow overview</em></p>
+<p>This picture places INSERT, UPDATE, DELETE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Data-changing SQL is not just about making a statement valid. It is about making the change reversible until you are sure it is correct.</p>
+<p>The core of INSERT, UPDATE, DELETE is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Production data is harder to repair than to damage. A missing WHERE clause or a multi-step change executed without a transaction can leave the system in a half-updated state that is difficult to reason about later. That is why strong teams treat DML as operational work, not just query writing.</p>
 <p>Transactions and RETURNING help turn risky changes into auditable ones. They let you see what changed before you commit, and they make rollback part of the default workflow instead of an afterthought.</p>
 <h2>Safe data-change flow</h2>
-<p><img alt="Safe data-change flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DML</strong>: Data Manipulation Language — INSERT, UPDATE, DELETE.</li>
@@ -153,14 +154,24 @@ DO UPDATE SET name = EXCLUDED.name;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>DML is the craft of making the <em>irreversible</em> feel safe. Next: <em>Index and query plan</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">Subquery</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">Window Function</a></li>
+<li><strong>What are the basic shapes of INSERT, UPDATE, and DELETE?</strong></li>
+<li>The article treats INSERT, UPDATE, DELETE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is a transaction the default safety net for data changes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is RETURNING so useful during verification?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">SQL 101 (5/10): GROUP BY and Aggregates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">SQL 101 (6/10): Subquery</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">SQL 101 (7/10): Window Function</a></li>
 <li><strong>INSERT, UPDATE, DELETE (current)</strong></li>
 <li>Index and Query Plan (upcoming)</li>
 <li>Practical Analysis SQL (upcoming)</li>
@@ -173,6 +184,6 @@ DO UPDATE SET name = EXCLUDED.name;
 <li><a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">PostgreSQL — Transactions</a></li>
 <li><a href="https://www.postgresql.org/docs/current/ddl-constraints.html">PostgreSQL — Constraints</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, DML, Transaction, Database, Postgres</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Practical Analysis SQL</title>
+<title>SQL 101 (10/10): Practical Analysis SQL</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Practical Analysis SQL</h1>
+<h1>SQL 101 (10/10): Practical Analysis SQL</h1>
 <p>By the time you reach real reporting work, SQL features stop appearing one at a time. A single analytics request usually asks for filtering, grouping, window calculations, and layered intermediate steps in the same query.</p>
 <p>That is why the final chapter is best approached as pattern assembly. The goal is not to learn one more clause. It is to see how familiar building blocks combine into the shapes teams actually reuse for dashboards and decision-making.</p>
 <p>This is the final post in the SQL 101 series. It ties the earlier clauses together into practical query patterns for analysis work.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What do DAU, WAU, and MAU queries usually look like?</li>
 <li>How do you structure cohort and retention logic in layers?</li>
 <li>What is the cleanest shape for a funnel query?</li>
-<li>Why are window functions a natural fit for top-N per group?</li>
-<li>Which verification steps keep analytical SQL from drifting into misleading metrics?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png"></p>
+<p><em>sql 101 chapter 10 flow overview</em></p>
+<p>This picture places Practical Analysis SQL inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Analytical SQL is not a new kind of magic. It is the same familiar tools stacked in layers and named clearly enough for a team to reuse.</p>
+<p>The core of Practical Analysis SQL is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Most analytics requests are variations on a small set of patterns: active users, retention, conversion, top performers, and trend changes over time. Once those shapes become familiar, new requests stop starting from a blank screen.</p>
 <p>Well-structured analytics SQL also becomes reusable team knowledge. A clean cohort query or funnel query does not just answer one ticket. It becomes the basis for dashboards, models, and later reviews about whether the metric definition is still correct.</p>
 <h2>Analytics query layering flow</h2>
-<p><img alt="Analytics query layering flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DAU/WAU/MAU</strong>: daily / weekly / monthly <em>active users</em>.</li>
@@ -191,16 +192,26 @@ FROM monthly;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Closing the series: <em>SQL is the shared language of reads, writes, and analytics</em>. Next stops: <em>deeper query plans</em>, <em>running PostgreSQL</em>, and <em>data warehouses</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">WHERE and Conditions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">JOIN</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">GROUP BY and Aggregates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">Subquery</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">Window Function</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/08-insert-update-delete.md">INSERT, UPDATE, DELETE</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/09-index-and-query-plan.md">Index and Query Plan</a></li>
+<li><strong>What do DAU, WAU, and MAU queries usually look like?</strong></li>
+<li>The article treats Practical Analysis SQL as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do you structure cohort and retention logic in layers?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What is the cleanest shape for a funnel query?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SQL 101 (2/10): SELECT Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/03-where-and-conditions.md">SQL 101 (3/10): WHERE and Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/04-join.md">SQL 101 (4/10): JOIN</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/05-group-by-and-aggregate.md">SQL 101 (5/10): GROUP BY and Aggregates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/06-subquery.md">SQL 101 (6/10): Subquery</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/07-window-function.md">SQL 101 (7/10): Window Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/08-insert-update-delete.md">SQL 101 (8/10): INSERT, UPDATE, DELETE</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/09-index-and-query-plan.md">SQL 101 (9/10): Index and Query Plan</a></li>
 <li><strong>Practical Analysis SQL (current)</strong></li>
 </ul>
 <h2>References</h2>
@@ -211,6 +222,6 @@ FROM monthly;
 <li><a href="https://cloud.google.com/looker/docs">Looker — Block Library</a></li>
 <li><a href="https://www.postgresql.org/docs/current/functions-aggregate.html">PostgreSQL — Aggregate Functions</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, Analytics, Cohort, Funnel, Retention</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

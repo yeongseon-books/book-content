@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 3
-title: WHERE and Conditions
+title: "SQL 101 (3/10): WHERE and Conditions"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical guide to WHERE — comparison operators, AND/OR pre
 last_reviewed: '2026-05-15'
 ---
 
-# WHERE and Conditions
+# SQL 101 (3/10): WHERE and Conditions
 
 Most SQL mistakes do not come from exotic syntax. They come from one condition that was slightly too broad, one NULL comparison that silently dropped rows, or one expression shape that forced the database into a full scan.
 
@@ -28,15 +28,21 @@ That is why WHERE deserves more attention than its short syntax suggests. It dec
 
 This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How should you read comparison operators and predicates?
 - Why do AND and OR precedence mistakes keep showing up in production?
 - When do IN, BETWEEN, and LIKE fit best?
-- Why does NULL comparison behave differently from ordinary value comparison?
-- How can predicate shape change whether an index is usable?
 
-> WHERE is the front gate for data. If the gate is wrong, the query can be fast and still deliver the wrong answer.
+## Big Picture
+
+![sql 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
+
+*sql 101 chapter 3 flow overview*
+
+This picture places WHERE and Conditions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of WHERE and Conditions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Correctness is just as important. A query that returns the wrong answer quickly 
 
 ## WHERE evaluation flow
 
-![WHERE evaluation flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
 ## Key Terms
 
 - **Predicate**: a *condition expression* deciding row passage.
@@ -143,11 +148,20 @@ Dashboard filters, *search boxes*, and *permission checks* all funnel into WHERE
 
 WHERE is the *gatekeeper*. The next post is *JOIN*.
 
+## Answering the Opening Questions
+
+- **How should you read comparison operators and predicates?**
+  - The article treats WHERE and Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do AND and OR precedence mistakes keep showing up in production?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When do IN, BETWEEN, and LIKE fit best?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
 - **WHERE and Conditions (current)**
 - JOIN (upcoming)
 - GROUP BY and Aggregates (upcoming)

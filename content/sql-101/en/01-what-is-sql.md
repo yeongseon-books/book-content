@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 1
-title: What Is SQL?
+title: "SQL 101 (1/10): What Is SQL?"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical introduction to SQL — the relational model, decla
 last_reviewed: '2026-05-15'
 ---
 
-# What Is SQL?
+# SQL 101 (1/10): What Is SQL?
 
 Most people start SQL by memorizing syntax. In practice, the real turning point is earlier than that. You need a reason SQL survived across spreadsheets, web apps, dashboards, and warehouses, and you need a mental model for why teams still trust it as the common language around data.
 
@@ -28,15 +28,21 @@ If you start from that angle, the basic clauses stop looking like trivia. They s
 
 This is the first post in the SQL 101 series. It establishes the declarative mental model that makes later topics like filtering, joins, aggregation, and query plans easier to reason about.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What kind of language is SQL, exactly?
 - Why is the relational model still the default foundation for analytical and application data?
 - What does it mean that SQL is declarative?
-- How do DDL, DML, and DCL differ?
-- What should you notice first when reading your first query?
 
-> SQL is not a language for listing procedural steps. It is a language for declaring the shape of the result you want.
+## Big Picture
+
+![sql 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
+
+*sql 101 chapter 1 flow overview*
+
+This picture places What Is SQL? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is SQL? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ SQL also ages unusually well. PostgreSQL, MySQL, SQLite, BigQuery, and Snowflake
 
 ## Query flow at a glance
 
-![Query flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
 ## Key Terms
 
 - **Table**: the basic unit, made of *rows* and *columns*.
@@ -149,6 +154,15 @@ Dashboards, user metrics, A/B test results, revenue reports — *most analytics*
 ## Wrap-up and Next Steps
 
 SQL describes the *result*, not the steps. The next post takes a careful look at *SELECT*, the most-used statement.
+
+## Answering the Opening Questions
+
+- **What kind of language is SQL, exactly?**
+  - The article treats What Is SQL? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is the relational model still the default foundation for analytical and application data?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does it mean that SQL is declarative?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
 
 <!-- toc:begin -->
 ## In this series

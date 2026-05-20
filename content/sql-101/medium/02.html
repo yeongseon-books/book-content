@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SELECT Basics</title>
+<title>SQL 101 (2/10): SELECT Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,27 @@
 </style>
 </head>
 <body>
-<h1>SELECT Basics</h1>
+<h1>SQL 101 (2/10): SELECT Basics</h1>
 <p>SELECT is usually the first SQL statement people become comfortable with, and that familiarity is exactly why teams get sloppy with it. A query that looks harmless can still waste memory, hide intent, and make later review harder if it pulls too many columns or leaves ordering vague.</p>
 <p>Good SELECT habits pay off long after the query leaves your editor. The column list explains the business question, aliases make the result readable, and LIMIT keeps exploration fast instead of noisy.</p>
 <p>This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is the safest way to read a SELECT statement?</li>
 <li>Why is naming columns explicitly more than a style preference?</li>
 <li>Where do aliases work, and where do they not?</li>
-<li>What costs come with ORDER BY, LIMIT, and DISTINCT?</li>
-<li>When does SELECT * start to become risky?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sql 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png"></p>
+<p><em>sql 101 chapter 2 flow overview</em></p>
+<p>This picture places SELECT Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>SELECT is not just a way to read data. It is a way to declare exactly which result shape you want another person to trust.</p>
+<p>The core of SELECT Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Analysts write SELECT statements dozens of times a day, and application code behind an ORM still emits SELECT under the hood. That makes this clause the place where readability, cost, and trust start to diverge. Two queries can answer the same question while leaving very different maintenance burdens behind.</p>
 <p>Explicit column lists help more than the current query. They show future readers what information was actually needed, and they make it obvious when a query starts dragging along unused JSON blobs, large text columns, or unstable positional ordering.</p>
 <h2>SELECT evaluation flow</h2>
-<p><img alt="SELECT evaluation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Projection</strong>: the <em>set of columns</em> SELECT picks.</li>
@@ -146,8 +147,18 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>SELECT is mostly about <em>sentence shape</em>. The next post is <em>WHERE and conditions</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
+<li><strong>What is the safest way to read a SELECT statement?</strong></li>
+<li>The article treats SELECT Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is naming columns explicitly more than a style preference?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where do aliases work, and where do they not?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">SQL 101 (1/10): What Is SQL?</a></li>
 <li><strong>SELECT Basics (current)</strong></li>
 <li>WHERE and Conditions (upcoming)</li>
 <li>JOIN (upcoming)</li>
@@ -166,6 +177,6 @@
 <li><a href="https://www.sqlstyle.guide/">SQL Style Guide</a></li>
 <li><a href="https://www.postgresql.org/docs/current/queries-order.html">PostgreSQL — ORDER BY</a></li>
 </ul>
-<p class="tags-line">Tags: SQL, SELECT, Query, Database, Postgres</p>
+<p class="tags-line">Tags: SQL, Database, Postgres, Analytics</p>
 </body>
 </html>

@@ -1,7 +1,7 @@
 ---
 series: sql-101
 episode: 4
-title: JOIN
+title: "SQL 101 (4/10): JOIN"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical tour of INNER, LEFT, RIGHT, FULL, and CROSS JOIN â€
 last_reviewed: '2026-05-15'
 ---
 
-# JOIN
+# SQL 101 (4/10): JOIN
 
 Once you leave single-table questions behind, SQL gets more powerful and more dangerous at the same time. The query still looks readable, but one wrong join assumption can double a metric, erase unmatched rows, or explode the result size before anyone notices.
 
@@ -28,15 +28,21 @@ That is why JOIN is less about memorizing keywords and more about thinking in re
 
 This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?
 - Why should you inspect join keys and cardinality before anything else?
 - Why do row counts sometimes grow unexpectedly after a join?
-- What is the safest pattern for finding rows without a match?
-- How should you verify multi-table joins before aggregating?
 
-> JOIN combines rows according to a relationship. If the relationship assumption is wrong, the result can still look tidy while the metric becomes wrong.
+## Big Picture
+
+![sql 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
+
+*sql 101 chapter 4 flow overview*
+
+This picture places JOIN inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of JOIN is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,7 +52,6 @@ Strong SQL reviewers do not just read the ON clause. They ask what kind of match
 
 ## JOIN result flow
 
-![JOIN result flow](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
 ## Key Terms
 
 - **Join key**: the columns that *connect two tables*.
@@ -155,12 +160,21 @@ Reports usually join *event + user + product* â€” three to five tables. The *fac
 
 JOIN is the language of *sets*. Next up: *GROUP BY and aggregates*.
 
+## Answering the Opening Questions
+
+- **How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?**
+  - The article treats JOIN as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should you inspect join keys and cardinality before anything else?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do row counts sometimes grow unexpectedly after a join?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is SQL?](./01-what-is-sql.md)
-- [SELECT Basics](./02-select-basics.md)
-- [WHERE and Conditions](./03-where-and-conditions.md)
+- [SQL 101 (1/10): What Is SQL?](./01-what-is-sql.md)
+- [SQL 101 (2/10): SELECT Basics](./02-select-basics.md)
+- [SQL 101 (3/10): WHERE and Conditions](./03-where-and-conditions.md)
 - **JOIN (current)**
 - GROUP BY and Aggregates (upcoming)
 - Subquery (upcoming)
