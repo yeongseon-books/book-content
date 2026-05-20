@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 5
-title: 증명 방법
+title: "Discrete Math 101 (5/10): 증명 방법"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 직접, 대우, 귀류, 귀납 증명과 알고리즘 정확성
 last_reviewed: '2026-05-12'
 ---
 
-# 증명 방법
+# Discrete Math 101 (5/10): 증명 방법
 
 이 글은 Discrete Math 101 시리즈의 5번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 직접 증명과 대우 증명은 언제 쓰일까요?
 - 귀류법은 어떤 명제에서 특히 강력할까요?
 - 수학적 귀납법과 강한 귀납법은 어떻게 작동할까요?
-- 알고리즘의 정확성과 종료성은 어떻게 증명할까요?
 
-> 증명은 어떤 명제가 모든 가능한 경우에서 성립함을 보이는 엄밀한 논증입니다. 직접 증명, 대우 증명, 귀류법, 수학적 귀납법은 이산수학의 네 가지 핵심 도구이며, 알고리즘의 정확성과 종료성을 보일 때도 그대로 사용됩니다. 이 글에서는 각 기법의 쓰임새와 코드를 검증하는 관점까지 함께 정리합니다.
+## 큰 그림
+
+![Discrete Math 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.ko.png)
+
+*Discrete Math 101 5장 흐름 개요*
+
+이 그림에서는 증명 방법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 증명 방법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -107,7 +114,6 @@ def verify_direct(limit: int = 1000) -> bool:
         assert (n ** 2) % 2 == 0
     return True
 
-
 print(f"Verified: {verify_direct()}")
 ```
 
@@ -126,7 +132,6 @@ def contrapositive_check(limit: int = 1000) -> None:
         if n % 2 == 1:           # n odd
             assert (n ** 2) % 2 == 1   # n² odd
 
-
 contrapositive_check()
 print("Contrapositive cases verified")
 ```
@@ -144,7 +149,6 @@ print("Contrapositive cases verified")
 
 import math
 
-
 def is_rational_approx(x: float, max_q: int = 10000) -> bool:
     """Empirical: does x have an exact fraction with denominator ≤ max_q?"""
     for q in range(1, max_q):
@@ -152,7 +156,6 @@ def is_rational_approx(x: float, max_q: int = 10000) -> bool:
         if abs(x - p / q) < 1e-15:
             return True
     return False
-
 
 print(f"Is √2 expressible as fraction with q ≤ 10000? {is_rational_approx(math.sqrt(2))}")
 ```
@@ -167,14 +170,11 @@ print(f"Is √2 expressible as fraction with q ≤ 10000? {is_rational_approx(ma
 # Inductive step: assuming P(k), prove P(k+1)
 #   1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)(k+2)/2 ✓
 
-
 def gauss_sum(n: int) -> int:
     return n * (n + 1) // 2
 
-
 def actual_sum(n: int) -> int:
     return sum(range(1, n + 1))
-
 
 for n in [1, 10, 100, 1000]:
     assert gauss_sum(n) == actual_sum(n)
@@ -201,7 +201,6 @@ def binary_search(arr: list, target: int) -> int:
         else:
             high = mid - 1
     return -1
-
 
 # Termination: high - low strictly decreases each iteration
 # Correctness: loop invariant + termination condition
@@ -264,17 +263,29 @@ for arr, target in [([1, 3, 5, 7, 9], 5), ([1, 3, 5, 7, 9], 4)]:
 
 다음 글에서는 귀납법과 가장 가까운 주제인 수열과 점화식으로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **직접 증명과 대우 증명은 언제 쓰일까요?**
+  - 본문의 기준은 증명 방법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **귀류법은 어떤 명제에서 특히 강력할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **수학적 귀납법과 강한 귀납법은 어떻게 작동할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
-- [명제와 논리](./02-propositions-and-logic.md)
-- [집합과 함수](./03-sets-and-functions.md)
-- [관계와 동치관계](./04-relations-and-equivalence.md)
+## 시리즈 목차
+
+- [Discrete Math 101 (1/10): 이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): 명제와 논리](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): 집합과 함수](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): 관계와 동치관계](./04-relations-and-equivalence.md)
 - **증명 방법 (현재 글)**
 - 수열과 점화식 (예정)
 - 조합과 경우의 수 (예정)
 - 그래프 이론 기초 (예정)
 - 트리와 그래프 탐색 (예정)
 - 알고리즘과 이산수학의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

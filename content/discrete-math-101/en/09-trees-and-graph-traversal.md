@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 9
-title: Trees and Graph Traversal
+title: "Discrete Math 101 (9/10): Trees and Graph Traversal"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Trees, BFS and DFS, spanning trees, and the minimum spanning tr
 last_reviewed: '2026-05-04'
 ---
 
-# Trees and Graph Traversal
+# Discrete Math 101 (9/10): Trees and Graph Traversal
 
 This is post 9 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (9/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: On a graph, how do we answer "where can we get from here?" or "what is the cheapest way to connect everything?"
 
 > A tree is a connected acyclic graph — the most common substructure in graph algorithms. This article walks through the two fundamental graph traversals, breadth-first search (BFS) and depth-first search (DFS), and the concepts of spanning trees and minimum spanning trees (MST), with working code.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trees and Graph Traversal?
+- Which signal should the example or diagram make visible for Trees and Graph Traversal?
+- What failure should be prevented first when Trees and Graph Traversal reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.en.png)
+
+*discrete math 101 chapter 9 flow overview*
+
+This picture places Trees and Graph Traversal inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Trees and Graph Traversal is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -90,7 +102,6 @@ def friends_of_friends(person):
 ```python
 from collections import deque
 
-
 def reachable_within(graph, start, max_distance):
     """All vertices within distance max_distance from start."""
     visited = {start: 0}
@@ -113,7 +124,6 @@ def reachable_within(graph, start, max_distance):
 ```python
 from collections import defaultdict
 
-
 def is_tree(edges: list, n_nodes: int) -> bool:
     """Test whether an undirected graph is a tree — check edge count and connectivity."""
     if len(edges) != n_nodes - 1:
@@ -130,7 +140,6 @@ def is_tree(edges: list, n_nodes: int) -> bool:
         visited.add(v)
         stack.extend(adj[v] - visited)
     return len(visited) == n_nodes
-
 
 tree_edges = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
 print(f"is tree: {is_tree(tree_edges, 6)}")
@@ -152,7 +161,6 @@ def bfs(graph: dict, start) -> dict:
                 distances[u] = distances[v] + 1
                 queue.append(u)
     return distances
-
 
 graph = {1: [2, 3], 2: [1, 4, 5], 3: [1, 6], 4: [2], 5: [2], 6: [3]}
 print(f"distances from 1: {bfs(graph, 1)}")
@@ -184,7 +192,6 @@ def dfs_recursive(graph: dict, start, visited=None) -> list:
         order.extend(dfs_recursive(graph, u, visited))
     return order
 
-
 def dfs_iterative(graph: dict, start) -> list:
     """Stack-based DFS — safe when depth is large."""
     visited, order, stack = set(), [], [start]
@@ -195,7 +202,6 @@ def dfs_iterative(graph: dict, start) -> list:
         visited.add(v); order.append(v)
         stack.extend(sorted(graph[v], reverse=True))
     return order
-
 
 print(f"DFS recursive: {dfs_recursive(graph, 1)}")
 print(f"DFS iterative: {dfs_iterative(graph, 1)}")
@@ -229,7 +235,6 @@ def spanning_tree_bfs(graph: dict, start) -> list:
                 tree.append((v, u))
                 queue.append(u)
     return tree
-
 
 print(f"spanning tree (BFS): {spanning_tree_bfs(graph, 1)}")
 ```
@@ -272,7 +277,6 @@ def kruskal_mst(n_nodes: int, weighted_edges: list) -> list:
         if len(mst) == n_nodes - 1:
             break
     return mst
-
 
 edges = [(1, 0, 1), (4, 0, 2), (2, 1, 2), (3, 1, 3), (5, 2, 3)]
 mst = kruskal_mst(4, edges)
@@ -344,17 +348,29 @@ A tree is a connected acyclic graph. BFS and DFS are the most fundamental traver
 
 The next article ties everything together: how all the discrete-math topics covered so far show up in algorithm analysis and real engineering work.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trees and Graph Traversal?**
+  - The article treats Trees and Graph Traversal as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trees and Graph Traversal?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trees and Graph Traversal reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
-- [Sequences and Recurrence](./06-sequences-and-recurrence.md)
-- [Combinatorics](./07-combinatorics.md)
-- [Graph Theory Basics](./08-graph-theory-basics.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): Sequences and Recurrence](./06-sequences-and-recurrence.md)
+- [Discrete Math 101 (7/10): Combinatorics](./07-combinatorics.md)
+- [Discrete Math 101 (8/10): Graph Theory Basics](./08-graph-theory-basics.md)
 - **Trees and Graph Traversal (current)**
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

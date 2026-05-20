@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 4
-title: Relations and Equivalence
+title: "Discrete Math 101 (4/10): Relations and Equivalence"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Binary relations, the reflexive, symmetric, and transitive prop
 last_reviewed: '2026-05-04'
 ---
 
-# Relations and Equivalence
+# Discrete Math 101 (4/10): Relations and Equivalence
 
 This is post 4 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: A database "relation," the `==` operator, the topological sort of a dependency graph — what is the shared mathematical structure?
 
 > A relation is a subset of a Cartesian product expressing "some connection" between two elements. Combinations of properties (reflexive, symmetric, transitive) define equivalence relations and partial orders, which underpin partitions, ordering, and hierarchies. This article covers relations, their properties, equivalence classes, and topological sort.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Relations and Equivalence?
+- Which signal should the example or diagram make visible for Relations and Equivalence?
+- What failure should be prevented first when Relations and Equivalence reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.en.png)
+
+*discrete math 101 chapter 4 flow overview*
+
+This picture places Relations and Equivalence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Relations and Equivalence is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -123,10 +135,8 @@ A relation can be a set of pairs, an adjacency matrix, or an adjacency list. We 
 def is_reflexive(R: set, A: set) -> bool:
     return all((a, a) in R for a in A)
 
-
 def is_symmetric(R: set) -> bool:
     return all((b, a) in R for (a, b) in R)
-
 
 def is_transitive(R: set) -> bool:
     return all(
@@ -136,12 +146,10 @@ def is_transitive(R: set) -> bool:
         if b == b2
     )
 
-
 def is_antisymmetric(R: set) -> bool:
     return all(
         a == b for (a, b) in R if (b, a) in R
     )
-
 
 A = {1, 2, 3}
 R_eq = {(1, 1), (2, 2), (3, 3), (1, 2), (2, 1)}
@@ -158,13 +166,10 @@ print(f"Transitive: {is_transitive(R_eq)}")
 def mod_equivalent(a: int, b: int, n: int = 3) -> bool:
     return (a - b) % n == 0
 
-
 numbers = list(range(10))
-
 
 def equivalence_class(x: int, domain: list, eq) -> set:
     return {y for y in domain if eq(x, y)}
-
 
 for i in range(3):
     cls = equivalence_class(i, numbers, mod_equivalent)
@@ -184,10 +189,8 @@ Equivalence relations always induce partitions and vice versa — the two notion
 # Example: subset relation ⊆
 A = [{1}, {2}, {1, 2}, {1, 2, 3}]
 
-
 def is_subset_of(x: set, y: set) -> bool:
     return x <= y
-
 
 # Cover relation: x ⊂ y with no element strictly in between
 def covers(x, y, items):
@@ -197,7 +200,6 @@ def covers(x, y, items):
         is_subset_of(x, z) and is_subset_of(z, y) and z != x and z != y
         for z in items
     )
-
 
 for x in A:
     for y in A:
@@ -211,7 +213,6 @@ In a partial order, not every pair must be comparable — that's how it differs 
 
 ```python
 from collections import defaultdict, deque
-
 
 def topological_sort(nodes: list, edges: list[tuple]) -> list:
     """Return a linear order respecting the partial order."""
@@ -231,7 +232,6 @@ def topological_sort(nodes: list, edges: list[tuple]) -> list:
             if indegree[nxt] == 0:
                 queue.append(nxt)
     return result if len(result) == len(nodes) else []
-
 
 tasks = ["wake_up", "shower", "breakfast", "work"]
 deps = [("wake_up", "shower"), ("shower", "breakfast"), ("breakfast", "work")]
@@ -291,10 +291,21 @@ A relation is a subset of a Cartesian product, and combinations of properties pr
 
 Next, we examine how to "rigorously prove" claims like these — direct, contradiction, and induction proofs.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Relations and Equivalence?**
+  - The article treats Relations and Equivalence as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Relations and Equivalence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Relations and Equivalence reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
 - **Relations and Equivalence (current)**
 - Proof Techniques (upcoming)
 - Sequences and Recurrence (upcoming)
@@ -302,6 +313,7 @@ Next, we examine how to "rigorously prove" claims like these — direct, contrad
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

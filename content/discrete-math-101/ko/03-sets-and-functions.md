@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 3
-title: 집합과 함수
+title: "Discrete Math 101 (3/10): 집합과 함수"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 집합 연산과 함수의 분류를 통해 자료구조와 데
 last_reviewed: '2026-05-12'
 ---
 
-# 집합과 함수
+# Discrete Math 101 (3/10): 집합과 함수
 
 이 글은 Discrete Math 101 시리즈의 3번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 집합 표기와 기본 연산은 어떻게 읽어야 할까요?
 - 합집합, 교집합, 차집합, 곱집합은 실무에서 어디에 쓰일까요?
 - 함수의 정의역, 공역, 치역은 무엇이 다를까요?
-- 단사, 전사, 전단사는 왜 중요한가요?
 
-> 집합은 서로 다른 원소의 모임이고, 함수는 한 집합에서 다른 집합으로 가는 잘 정의된 대응입니다. `set`, `dict`, 관계형 데이터베이스, 함수형 프로그래밍의 `map`은 모두 이 두 개념의 직접적인 구현입니다. 이 글에서는 집합 연산, 곱집합, 함수의 분류, 합성과 역함수를 한 흐름으로 정리합니다.
+## 큰 그림
+
+![Discrete Math 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.ko.png)
+
+*Discrete Math 101 3장 흐름 개요*
+
+이 그림에서는 집합과 함수를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 집합과 함수의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -99,7 +106,6 @@ B = {x for x in range(1, 11) if x % 2 == 0}
 # Power set: the set of all subsets
 from itertools import chain, combinations
 
-
 def power_set(s: set) -> list[set]:
     items = list(s)
     return [
@@ -107,7 +113,6 @@ def power_set(s: set) -> list[set]:
         for r in range(len(items) + 1)
         for combo in combinations(items, r)
     ]
-
 
 print(f"A = {A}")
 print(f"B = {B}")
@@ -163,16 +168,13 @@ def is_injective(f: dict) -> bool:
     """Injective: distinct inputs map to distinct outputs"""
     return len(set(f.values())) == len(f)
 
-
 def is_surjective(f: dict, codomain: set) -> bool:
     """Surjective: every codomain element is hit"""
     return set(f.values()) == codomain
 
-
 def is_bijective(f: dict, codomain: set) -> bool:
     """Bijective: both injective and surjective"""
     return is_injective(f) and is_surjective(f, codomain)
-
 
 f1 = {1: "a", 2: "b", 3: "c"}     # injective; surjectivity depends on codomain
 f2 = {1: "a", 2: "a", 3: "b"}     # not injective
@@ -193,13 +195,11 @@ def compose(g, f):
     """(g ∘ f)(x) = g(f(x))"""
     return lambda x: g(f(x))
 
-
 def inverse(f: dict) -> dict:
     """Inverse exists only when f is injective"""
     if not is_injective(f):
         raise ValueError("non-injective functions have no inverse")
     return {v: k for k, v in f.items()}
-
 
 f = lambda x: x + 1
 g = lambda x: x * 2
@@ -265,9 +265,20 @@ print(f"Inverse: {inv}")
 
 다음 글에서는 집합 위에 정의되는 가장 중요한 구조인 관계와 동치관계를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **집합 표기와 기본 연산은 어떻게 읽어야 할까요?**
+  - 본문의 기준은 집합과 함수를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **합집합, 교집합, 차집합, 곱집합은 실무에서 어디에 쓰일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **함수의 정의역, 공역, 치역은 무엇이 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
-- [명제와 논리](./02-propositions-and-logic.md)
+## 시리즈 목차
+
+- [Discrete Math 101 (1/10): 이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): 명제와 논리](./02-propositions-and-logic.md)
 - **집합과 함수 (현재 글)**
 - 관계와 동치관계 (예정)
 - 증명 방법 (예정)
@@ -276,6 +287,7 @@ print(f"Inverse: {inv}")
 - 그래프 이론 기초 (예정)
 - 트리와 그래프 탐색 (예정)
 - 알고리즘과 이산수학의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

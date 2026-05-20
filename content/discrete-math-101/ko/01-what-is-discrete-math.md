@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 1
-title: 이산수학이란 무엇인가?
+title: "Discrete Math 101 (1/10): 이산수학이란 무엇인가?"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 이산수학의 범위와 연속 수학과의 차이, 그리고
 last_reviewed: '2026-05-12'
 ---
 
-# 이산수학이란 무엇인가?
+# Discrete Math 101 (1/10): 이산수학이란 무엇인가?
 
 이 글은 Discrete Math 101 시리즈의 1번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 이산수학과 연속 수학은 무엇이 다를까요?
 - 이산수학의 다섯 축은 어떻게 연결될까요?
 - 컴퓨터공학 커리큘럼에서 왜 이산수학이 필수일까요?
-- 이 시리즈 전체는 어떤 순서로 전개될까요?
 
-> 이산수학은 정수, 명제, 집합, 그래프처럼 셀 수 있고 분리된 대상을 다루는 수학입니다. 컴퓨터는 본질적으로 이산 기계이므로 컴퓨터과학의 거의 모든 이론은 이산수학 위에 서 있습니다. 이 글에서는 분야의 전체 지도를 먼저 그리고, 연속 수학과의 차이를 분명히 한 뒤, 이후 시리즈에서 다룰 핵심 주제를 미리 연결해 보겠습니다.
+## 큰 그림
+
+![Discrete Math 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.ko.png)
+
+*Discrete Math 101 1장 흐름 개요*
+
+이 그림에서는 이산수학이란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 이산수학이란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -145,7 +152,6 @@ def is_prime(n: int) -> bool:
             return False
     return True
 
-
 # "7 is prime" is a true proposition
 # "9 is prime" is a false proposition
 print(f"7 is prime: {is_prime(7)}")  # True
@@ -182,11 +188,9 @@ graph = {
     "E": ["D"],
 }
 
-
 def neighbors(g: dict, node: str) -> list:
     """Return neighbors of the given vertex."""
     return g.get(node, [])
-
 
 for node in graph:
     print(f"{node} neighbors: {neighbors(graph, node)}")
@@ -267,7 +271,18 @@ for num, title, keywords in roadmap:
 
 다음 글에서는 이산수학의 가장 작은 단위인 명제와, 모든 컴퓨터 추론을 움직이는 논리 연산자를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **이산수학과 연속 수학은 무엇이 다를까요?**
+  - 본문의 기준은 이산수학이란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **이산수학의 다섯 축은 어떻게 연결될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **컴퓨터공학 커리큘럼에서 왜 이산수학이 필수일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **이산수학이란 무엇인가? (현재 글)**
 - 명제와 논리 (예정)
 - 집합과 함수 (예정)
@@ -278,6 +293,7 @@ for num, title, keywords in roadmap:
 - 그래프 이론 기초 (예정)
 - 트리와 그래프 탐색 (예정)
 - 알고리즘과 이산수학의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

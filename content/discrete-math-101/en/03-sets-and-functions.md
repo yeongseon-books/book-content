@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 3
-title: Sets and Functions
+title: "Discrete Math 101 (3/10): Sets and Functions"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Set operations, function domain and range, injective and biject
 last_reviewed: '2026-05-04'
 ---
 
-# Sets and Functions
+# Discrete Math 101 (3/10): Sets and Functions
 
 This is post 3 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Python's `set`, database tables, hash maps — what is the shared mathematical foundation behind these tools?
 
 > A set is a collection of distinct elements, and a function is a well-defined correspondence from one set to another. Data structures (`set`, `dict`), database relational algebra, and the `map` of functional programming are all direct applications. This article covers set operations, Cartesian products, function classification, and composition with inverses.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sets and Functions?
+- Which signal should the example or diagram make visible for Sets and Functions?
+- What failure should be prevented first when Sets and Functions reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.en.png)
+
+*discrete math 101 chapter 3 flow overview*
+
+This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -107,7 +119,6 @@ B = {x for x in range(1, 11) if x % 2 == 0}
 # Power set: the set of all subsets
 from itertools import chain, combinations
 
-
 def power_set(s: set) -> list[set]:
     items = list(s)
     return [
@@ -115,7 +126,6 @@ def power_set(s: set) -> list[set]:
         for r in range(len(items) + 1)
         for combo in combinations(items, r)
     ]
-
 
 print(f"A = {A}")
 print(f"B = {B}")
@@ -171,16 +181,13 @@ def is_injective(f: dict) -> bool:
     """Injective: distinct inputs map to distinct outputs"""
     return len(set(f.values())) == len(f)
 
-
 def is_surjective(f: dict, codomain: set) -> bool:
     """Surjective: every codomain element is hit"""
     return set(f.values()) == codomain
 
-
 def is_bijective(f: dict, codomain: set) -> bool:
     """Bijective: both injective and surjective"""
     return is_injective(f) and is_surjective(f, codomain)
-
 
 f1 = {1: "a", 2: "b", 3: "c"}     # injective; surjectivity depends on codomain
 f2 = {1: "a", 2: "a", 3: "b"}     # not injective
@@ -201,13 +208,11 @@ def compose(g, f):
     """(g ∘ f)(x) = g(f(x))"""
     return lambda x: g(f(x))
 
-
 def inverse(f: dict) -> dict:
     """Inverse exists only when f is injective"""
     if not is_injective(f):
         raise ValueError("non-injective functions have no inverse")
     return {v: k for k, v in f.items()}
-
 
 f = lambda x: x + 1
 g = lambda x: x * 2
@@ -273,9 +278,20 @@ A set is a collection of data; a function is a well-defined correspondence betwe
 
 Next, we look at the most important structure built on top of sets — relations and equivalence.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sets and Functions?**
+  - The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sets and Functions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sets and Functions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
 - **Sets and Functions (current)**
 - Relations and Equivalence (upcoming)
 - Proof Techniques (upcoming)
@@ -284,6 +300,7 @@ Next, we look at the most important structure built on top of sets — relations
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

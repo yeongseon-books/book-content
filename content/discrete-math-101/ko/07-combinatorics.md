@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 7
-title: 조합과 경우의 수
+title: "Discrete Math 101 (7/10): 조합과 경우의 수"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 순열, 조합, 비둘기집 원리, 포함-배제로 경우의
 last_reviewed: '2026-05-12'
 ---
 
-# 조합과 경우의 수
+# Discrete Math 101 (7/10): 조합과 경우의 수
 
 이 글은 Discrete Math 101 시리즈의 7번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 곱의 법칙과 합의 법칙은 어떻게 구분할까요?
 - 순열과 조합은 언제 달라질까요?
 - 이항계수와 파스칼 삼각형은 왜 중요한가요?
-- 비둘기집 원리와 포함-배제는 어떤 실무 문제를 설명할까요?
 
-> 조합론은 “가능한 경우가 몇 개인가”를 세는 수학입니다. 순열, 조합, 이항정리, 비둘기집 원리, 포함-배제는 알고리즘 입력 공간의 크기, 암호 키 공간, 해시 충돌 확률, 확률 계산을 다루는 기본 도구입니다. 이 글에서는 셈의 기본 법칙부터 충돌 필연성까지 코드와 함께 정리합니다.
+## 큰 그림
+
+![Discrete Math 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.ko.png)
+
+*Discrete Math 101 7장 흐름 개요*
+
+이 그림에서는 조합과 경우의 수를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 조합과 경우의 수의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -118,16 +125,13 @@ print(f"lunch options: {korean + japanese}")
 ```python
 from math import factorial
 
-
 def permutation(n: int, r: int) -> int:
     """Ordered selection of r items from n."""
     return factorial(n) // factorial(n - r)
 
-
 def combination(n: int, r: int) -> int:
     """Unordered selection of r items from n."""
     return factorial(n) // (factorial(r) * factorial(n - r))
-
 
 # Line up 3 people from 5 (order matters)
 print(f"P(5, 3) = {permutation(5, 3)}")
@@ -156,10 +160,8 @@ def pascal_triangle(rows: int) -> list[list[int]]:
         triangle.append(new_row)
     return triangle
 
-
 for row in pascal_triangle(7):
     print(" ".join(str(x).rjust(3) for x in row).center(40))
-
 
 # (x + y)⁴ expansion: coefficients 1, 4, 6, 4, 1
 n = 4
@@ -177,11 +179,9 @@ print(f"(x+y)^{n} coefficients: {[combination(n, k) for k in range(n + 1)]}")
 def will_collide(input_space: int, hash_space: int) -> bool:
     return input_space > hash_space
 
-
 # A 32-bit hash has 4 × 10⁹ outputs.
 # Hashing 10 billion IDs into 32 bits guarantees a collision.
 print(f"10B → 32-bit collision? {will_collide(10 ** 10, 2 ** 32)}")
-
 
 # Birthday paradox: with just 23 people, two share a birthday with prob ~50%.
 def birthday_collision_prob(n: int, days: int = 365) -> float:
@@ -189,7 +189,6 @@ def birthday_collision_prob(n: int, days: int = 365) -> float:
     for i in range(n):
         no_collision *= (days - i) / days
     return 1 - no_collision
-
 
 for n in [10, 23, 50, 100]:
     print(f"n={n}: collision probability = {birthday_collision_prob(n):.3f}")
@@ -203,18 +202,15 @@ for n in [10, 23, 50, 100]:
 # |A ∪ B| = |A| + |B| - |A ∩ B|
 # |A ∪ B ∪ C| = |A| + |B| + |C| - |A∩B| - |A∩C| - |B∩C| + |A∩B∩C|
 
-
 # Example: 100 students, 60 study English, 40 Japanese, 20 both
 def union_two(a: int, b: int, ab: int) -> int:
     return a + b - ab
-
 
 print(f"studying at least one: {union_two(60, 40, 20)} students")
 
 # Multiples of 2 or 3 or 5 between 1 and 100
 def multiples_count(limit: int, n: int) -> int:
     return limit // n
-
 
 limit = 100
 m2, m3, m5 = multiples_count(limit, 2), multiples_count(limit, 3), multiples_count(limit, 5)
@@ -278,17 +274,29 @@ print(f"multiples of 2, 3, or 5 in 1..100: {answer}")
 
 다음 글에서는 이산수학의 또 다른 핵심 분야인 그래프 이론으로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **곱의 법칙과 합의 법칙은 어떻게 구분할까요?**
+  - 본문의 기준은 조합과 경우의 수를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **순열과 조합은 언제 달라질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **이항계수와 파스칼 삼각형은 왜 중요한가요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
-- [명제와 논리](./02-propositions-and-logic.md)
-- [집합과 함수](./03-sets-and-functions.md)
-- [관계와 동치관계](./04-relations-and-equivalence.md)
-- [증명 방법](./05-proof-techniques.md)
-- [수열과 점화식](./06-sequences-and-recurrence.md)
+## 시리즈 목차
+
+- [Discrete Math 101 (1/10): 이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): 명제와 논리](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): 집합과 함수](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): 관계와 동치관계](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): 증명 방법](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): 수열과 점화식](./06-sequences-and-recurrence.md)
 - **조합과 경우의 수 (현재 글)**
 - 그래프 이론 기초 (예정)
 - 트리와 그래프 탐색 (예정)
 - 알고리즘과 이산수학의 연결 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

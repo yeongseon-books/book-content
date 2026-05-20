@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Propositions and Logic</title>
+<title>Discrete Math 101 (2/10): Propositions and Logic</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Propositions and Logic</h1>
+<h1>Discrete Math 101 (2/10): Propositions and Logic</h1>
 <p>This is post 2 in the Discrete Math 101 series.</p>
 <blockquote>
 <p>Discrete Math 101 series (2/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: How is <code>if x &gt; 0 and y &lt; 10</code> actually evaluated, and what is its mathematical foundation?</p>
 <blockquote>
 <p>Propositional logic deals with sentences that are unambiguously true or false (propositions) and the operators (AND, OR, NOT) that combine them. Every conditional in every programming language, every SQL <code>WHERE</code> clause, and every digital logic gate is a direct application. This article covers propositions, truth tables, equivalence transformations, and predicate logic.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Propositions and Logic?</li>
+<li>Which signal should the example or diagram make visible for Propositions and Logic?</li>
+<li>What failure should be prevented first when Propositions and Logic reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="discrete math 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.en.png"></p>
+<p><em>discrete math 101 chapter 2 flow overview</em></p>
+<p>This picture places Propositions and Logic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Propositions and Logic is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The distinction between propositions and non-propositions</li>
@@ -277,8 +286,18 @@ print(f&quot;∃x ∈ [1,2,3]: x is even = {there_exists([1, 2, 3], is_even)}&qu
 <h2>Wrap-Up and Next Steps</h2>
 <p>Propositional logic is the foundation of all computer reasoning. With five connectives, truth tables, and equivalence laws, you can manipulate complex conditions precisely. Quantifiers extend propositions into predicate logic for richer expression.</p>
 <p>Next, together with logic we cover the other foundation of discrete math — sets and functions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><strong>What boundary should you inspect first when applying Propositions and Logic?</strong></li>
+<li>The article treats Propositions and Logic as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Propositions and Logic?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Propositions and Logic reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">Discrete Math 101 (1/10): What Is Discrete Mathematics?</a></li>
 <li><strong>Propositions and Logic (current)</strong></li>
 <li>Sets and Functions (upcoming)</li>
 <li>Relations and Equivalence (upcoming)</li>

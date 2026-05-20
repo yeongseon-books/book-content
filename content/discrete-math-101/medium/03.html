@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Sets and Functions</title>
+<title>Discrete Math 101 (3/10): Sets and Functions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Sets and Functions</h1>
+<h1>Discrete Math 101 (3/10): Sets and Functions</h1>
 <p>This is post 3 in the Discrete Math 101 series.</p>
 <blockquote>
 <p>Discrete Math 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Python's <code>set</code>, database tables, hash maps — what is the shared mathematical foundation behind these tools?</p>
 <blockquote>
 <p>A set is a collection of distinct elements, and a function is a well-defined correspondence from one set to another. Data structures (<code>set</code>, <code>dict</code>), database relational algebra, and the <code>map</code> of functional programming are all direct applications. This article covers set operations, Cartesian products, function classification, and composition with inverses.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Sets and Functions?</li>
+<li>Which signal should the example or diagram make visible for Sets and Functions?</li>
+<li>What failure should be prevented first when Sets and Functions reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="discrete math 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.en.png"></p>
+<p><em>discrete math 101 chapter 3 flow overview</em></p>
+<p>This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Set notation and definitions</li>
@@ -277,9 +286,19 @@ print(f&quot;Inverse: {inv}&quot;)
 <h2>Wrap-Up and Next Steps</h2>
 <p>A set is a collection of data; a function is a well-defined correspondence between sets. Together they form the mathematical basis of data structures and databases. Power sets, Cartesian products, composition, and inverses describe every transformation we can perform.</p>
 <p>Next, we look at the most important structure built on top of sets — relations and equivalence.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
+<li><strong>What boundary should you inspect first when applying Sets and Functions?</strong></li>
+<li>The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Sets and Functions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Sets and Functions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">Discrete Math 101 (1/10): What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Discrete Math 101 (2/10): Propositions and Logic</a></li>
 <li><strong>Sets and Functions (current)</strong></li>
 <li>Relations and Equivalence (upcoming)</li>
 <li>Proof Techniques (upcoming)</li>

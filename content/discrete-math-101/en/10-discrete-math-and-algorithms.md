@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 10
-title: Discrete Mathematics and Algorithms
+title: "Discrete Math 101 (10/10): Discrete Mathematics and Algorithms"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How propositions, sets, proofs, recurrences, combinatorics, and
 last_reviewed: '2026-05-04'
 ---
 
-# Discrete Mathematics and Algorithms
+# Discrete Math 101 (10/10): Discrete Mathematics and Algorithms
 
 This is the final post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (10/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Propositions, sets, proofs, recurrences, combinatorics, graphs — how do all the discrete-math ideas we have learned actually show up in real algorithms and code?
 
 > Discrete math is the language of algorithms. Recurrences feed time-complexity analysis, combinatorics counts cases, graph theory powers routing and dependency resolution, and proof techniques validate correctness. This final article reorganizes the whole series from an algorithmic point of view and briefly steps up to higher concepts like P and NP.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Discrete Mathematics and Algorithms?
+- Which signal should the example or diagram make visible for Discrete Mathematics and Algorithms?
+- What failure should be prevented first when Discrete Mathematics and Algorithms reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.en.png)
+
+*discrete math 101 chapter 10 flow overview*
+
+This picture places Discrete Mathematics and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Discrete Mathematics and Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -93,7 +105,6 @@ def predicted_n_log_n(n: int) -> int:
     """A quick reference scale for T(n) = 2T(n/2) + n."""
     return n * (n.bit_length() - 1)
 
-
 print(predicted_n_log_n(32))
 ```
 
@@ -107,7 +118,6 @@ A senior engineer's flow is to predict by theory, then verify by experiment.
 def predicted_n_log_n(n: int) -> int:
     """Reference scale: n * log2(n), ignoring constant factors."""
     return n * (n.bit_length() - 1)
-
 
 for n in [8, 16, 32, 64]:
     print(f"n={n:>2} -> prediction scale ≈ {predicted_n_log_n(n)}")
@@ -143,7 +153,6 @@ def merge_and_count(left: list[int], right: list[int]) -> tuple[list[int], int]:
     merged.extend(right[j:])
     return merged, comparisons
 
-
 def merge_sort_count(arr: list[int]) -> tuple[list[int], int]:
     if len(arr) <= 1:
         return arr[:], 0
@@ -152,7 +161,6 @@ def merge_sort_count(arr: list[int]) -> tuple[list[int], int]:
     right, right_count = merge_sort_count(arr[mid:])
     merged, merge_count = merge_and_count(left, right)
     return merged, left_count + right_count + merge_count
-
 
 for n in [8, 16, 32, 64]:
     sample = list(range(n, 0, -1))
@@ -194,7 +202,6 @@ def prefix_sum(nums: list[int]) -> list[int]:
         result.append(running)
     return result
 
-
 values = [3, 1, 4, 1]
 print(prefix_sum(values))
 assert prefix_sum(values) == [3, 4, 8, 9]
@@ -216,7 +223,6 @@ If the recurrence is the language of performance, the loop invariant is the lang
 ```python
 from collections import defaultdict, deque
 
-
 def topological_sort(graph: dict[str, list[str]]) -> list[str]:
     """Deterministic topological sort with cycle detection."""
     in_deg = defaultdict(int)
@@ -236,7 +242,6 @@ def topological_sort(graph: dict[str, list[str]]) -> list[str]:
     if len(order) != len(graph):
         raise ValueError("cycle detected")
     return order
-
 
 deps = {
     "lint": ["test"],
@@ -281,7 +286,6 @@ def subset_sum(nums: list[int], target: int) -> bool:
         if s == target:
             return True
     return False
-
 
 print(f"target 13 exists: {subset_sum([3, 7, 1, 8, 5], 13)}")
 print(f"target 2 exists:  {subset_sum([3, 7, 1, 8, 5], 2)}")
@@ -355,17 +359,29 @@ Discrete math is the language of algorithms. Propositions, sets, proofs, recurre
 
 After finishing this series the next steps are: (1) deeper into the data-structures and algorithms series, (2) observing how these discrete-math tools combine in system design, and (3) making recurrence, proof, and complexity analysis a daily habit in your code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Discrete Mathematics and Algorithms?**
+  - The article treats Discrete Mathematics and Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Discrete Mathematics and Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Discrete Mathematics and Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
-- [Sequences and Recurrence](./06-sequences-and-recurrence.md)
-- [Combinatorics](./07-combinatorics.md)
-- [Graph Theory Basics](./08-graph-theory-basics.md)
-- [Trees and Graph Traversal](./09-trees-and-graph-traversal.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): Sequences and Recurrence](./06-sequences-and-recurrence.md)
+- [Discrete Math 101 (7/10): Combinatorics](./07-combinatorics.md)
+- [Discrete Math 101 (8/10): Graph Theory Basics](./08-graph-theory-basics.md)
+- [Discrete Math 101 (9/10): Trees and Graph Traversal](./09-trees-and-graph-traversal.md)
 - **Discrete Mathematics and Algorithms (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 6
-title: Sequences and Recurrence
+title: "Discrete Math 101 (6/10): Sequences and Recurrence"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Sequences, recurrence relations, and the Master Theorem — the
 last_reviewed: '2026-05-04'
 ---
 
-# Sequences and Recurrence
+# Discrete Math 101 (6/10): Sequences and Recurrence
 
 This is post 6 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (6/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: How do we prove that merge sort is O(n log n)? How do we count the exact number of recursive calls a function makes?
 
 > A sequence is an ordered list of numbers, and a recurrence is an equation that defines each term using earlier terms. The running time of a recursive function is itself a recurrence, and techniques like substitution, recursion trees, and the Master Theorem turn that recurrence into a closed form. This article covers the definitions, the solving methods, and how they apply directly to algorithm analysis.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sequences and Recurrence?
+- Which signal should the example or diagram make visible for Sequences and Recurrence?
+- What failure should be prevented first when Sequences and Recurrence reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.en.png)
+
+*discrete math 101 chapter 6 flow overview*
+
+This picture places Sequences and Recurrence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sequences and Recurrence is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -96,10 +108,8 @@ def fib(n):
 def fib(n):
     return n if n < 2 else fib(n - 1) + fib(n - 2)
 
-
 # Memoized: T(n) = T(n-1) + O(1) → O(n)
 from functools import lru_cache
-
 
 @lru_cache(maxsize=None)
 def fib_fast(n):
@@ -115,11 +125,9 @@ def fib_fast(n):
 def arithmetic(a1: float, d: float, n: int) -> list:
     return [a1 + (i - 1) * d for i in range(1, n + 1)]
 
-
 # Geometric: aₙ = a₁ · rⁿ⁻¹
 def geometric(a1: float, r: float, n: int) -> list:
     return [a1 * (r ** (i - 1)) for i in range(1, n + 1)]
-
 
 print(f"arithmetic (a=2, d=3, n=5): {arithmetic(2, 3, 5)}")
 print(f"geometric  (a=1, r=2, n=8): {geometric(1, 2, 8)}")
@@ -137,11 +145,9 @@ def T(n: int) -> int:
         return 0
     return T(n - 1) + n
 
-
 # Closed form: T(n) = n(n+1)/2
 def T_closed(n: int) -> int:
     return n * (n + 1) // 2
-
 
 for n in [1, 5, 10, 100]:
     assert T(n) == T_closed(n)
@@ -161,7 +167,6 @@ for n in [1, 5, 10, 100]:
 # n/2^k = 1 → k = log n
 # T(n) = n·T(1) + n log n = O(n log n)
 
-
 def merge_sort_count(arr: list) -> tuple:
     """Merge sort that also returns the comparison count."""
     if len(arr) <= 1:
@@ -171,7 +176,6 @@ def merge_sort_count(arr: list) -> tuple:
     right, rc = merge_sort_count(arr[mid:])
     merged, mc = merge_count(left, right)
     return merged, lc + rc + mc
-
 
 def merge_count(a: list, b: list) -> tuple:
     result = []
@@ -184,7 +188,6 @@ def merge_count(a: list, b: list) -> tuple:
             result.append(b[j]); j += 1
     result.extend(a[i:]); result.extend(b[j:])
     return result, c
-
 
 import math
 
@@ -205,7 +208,6 @@ for n in [16, 64, 256]:
 
 import math
 
-
 def master_theorem(a: int, b: int, f_exponent: float) -> str:
     """Estimate the closed form of T(n) = aT(n/b) + n^f_exponent."""
     critical = math.log(a, b)
@@ -215,7 +217,6 @@ def master_theorem(a: int, b: int, f_exponent: float) -> str:
         return f"Θ(n^{critical:.2f} · log n)"
     else:
         return f"Θ(n^{f_exponent})"
-
 
 # Merge sort: T(n) = 2T(n/2) + n  → a=2, b=2, f(n)=n¹
 print(f"merge sort:        {master_theorem(2, 2, 1)}")
@@ -237,17 +238,14 @@ import math
 PHI = (1 + math.sqrt(5)) / 2
 PSI = (1 - math.sqrt(5)) / 2
 
-
 def fib_closed(n: int) -> int:
     return round((PHI ** n - PSI ** n) / math.sqrt(5))
-
 
 def fib_iter(n: int) -> int:
     a, b = 0, 1
     for _ in range(n):
         a, b = b, a + b
     return a
-
 
 for n in [10, 20, 30]:
     assert fib_closed(n) == fib_iter(n)
@@ -307,17 +305,29 @@ Sequences are ordered lists of numbers; recurrences define them recursively. Sub
 
 The next article looks at the math of counting: combinatorics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sequences and Recurrence?**
+  - The article treats Sequences and Recurrence as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sequences and Recurrence?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sequences and Recurrence reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
 - **Sequences and Recurrence (current)**
 - Combinatorics (upcoming)
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

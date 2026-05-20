@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Proof Techniques</title>
+<title>Discrete Math 101 (5/10): Proof Techniques</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Proof Techniques</h1>
+<h1>Discrete Math 101 (5/10): Proof Techniques</h1>
 <p>This is post 5 in the Discrete Math 101 series.</p>
 <blockquote>
 <p>Discrete Math 101 series (5/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: How do we guarantee that an algorithm "always" works correctly? Even if 100 tests pass, can't input 100,001 still fail?</p>
 <blockquote>
 <p>A proof is a rigorous argument that a statement holds in every possible case. Direct proof, contrapositive, contradiction, and mathematical induction are the four core techniques in discrete math, and they are the same tools used to prove algorithm correctness and termination. This article walks through each technique and shows how it applies to real code verification.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Proof Techniques?</li>
+<li>Which signal should the example or diagram make visible for Proof Techniques?</li>
+<li>What failure should be prevented first when Proof Techniques reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="discrete math 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.en.png"></p>
+<p><em>discrete math 101 chapter 5 flow overview</em></p>
+<p>This picture places Proof Techniques inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Proof Techniques is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Direct and contrapositive proofs</li>
@@ -270,11 +279,21 @@ for arr, target in [([1, 3, 5, 7, 9], 5), ([1, 3, 5, 7, 9], 4)]:
 <h2>Wrap-Up and Next Steps</h2>
 <p>A proof guarantees correctness across every possible input. The four techniques — direct, contrapositive, contradiction, induction — cover almost every claim in discrete math, and the same tools prove algorithm correctness. The thinking of a senior engineer closely resembles informal proof.</p>
 <p>Next, we cover sequences and recurrences — induction's natural partner and an essential tool for algorithm analysis.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Relations and Equivalence</a></li>
+<li><strong>What boundary should you inspect first when applying Proof Techniques?</strong></li>
+<li>The article treats Proof Techniques as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Proof Techniques?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Proof Techniques reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">Discrete Math 101 (1/10): What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Discrete Math 101 (2/10): Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Discrete Math 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Discrete Math 101 (4/10): Relations and Equivalence</a></li>
 <li><strong>Proof Techniques (current)</strong></li>
 <li>Sequences and Recurrence (upcoming)</li>
 <li>Combinatorics (upcoming)</li>

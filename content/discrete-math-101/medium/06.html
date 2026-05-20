@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Sequences and Recurrence</title>
+<title>Discrete Math 101 (6/10): Sequences and Recurrence</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Sequences and Recurrence</h1>
+<h1>Discrete Math 101 (6/10): Sequences and Recurrence</h1>
 <p>This is post 6 in the Discrete Math 101 series.</p>
 <blockquote>
 <p>Discrete Math 101 series (6/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: How do we prove that merge sort is O(n log n)? How do we count the exact number of recursive calls a function makes?</p>
 <blockquote>
 <p>A sequence is an ordered list of numbers, and a recurrence is an equation that defines each term using earlier terms. The running time of a recursive function is itself a recurrence, and techniques like substitution, recursion trees, and the Master Theorem turn that recurrence into a closed form. This article covers the definitions, the solving methods, and how they apply directly to algorithm analysis.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Sequences and Recurrence?</li>
+<li>Which signal should the example or diagram make visible for Sequences and Recurrence?</li>
+<li>What failure should be prevented first when Sequences and Recurrence reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="discrete math 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.en.png"></p>
+<p><em>discrete math 101 chapter 6 flow overview</em></p>
+<p>This picture places Sequences and Recurrence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Sequences and Recurrence is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Definition of sequences and closed forms</li>
@@ -302,12 +311,22 @@ for n in [10, 20, 30]:
 <h2>Wrap-Up and Next Steps</h2>
 <p>Sequences are ordered lists of numbers; recurrences define them recursively. Substitution, recursion trees, and the Master Theorem give us closed forms — and therefore exact complexity bounds — for divide-and-conquer and dynamic programming.</p>
 <p>The next article looks at the math of counting: combinatorics.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Relations and Equivalence</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/05-proof-techniques.md">Proof Techniques</a></li>
+<li><strong>What boundary should you inspect first when applying Sequences and Recurrence?</strong></li>
+<li>The article treats Sequences and Recurrence as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Sequences and Recurrence?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Sequences and Recurrence reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">Discrete Math 101 (1/10): What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Discrete Math 101 (2/10): Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Discrete Math 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Discrete Math 101 (4/10): Relations and Equivalence</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/05-proof-techniques.md">Discrete Math 101 (5/10): Proof Techniques</a></li>
 <li><strong>Sequences and Recurrence (current)</strong></li>
 <li>Combinatorics (upcoming)</li>
 <li>Graph Theory Basics (upcoming)</li>

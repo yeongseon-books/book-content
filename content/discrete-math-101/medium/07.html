@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Combinatorics</title>
+<title>Discrete Math 101 (7/10): Combinatorics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Combinatorics</h1>
+<h1>Discrete Math 101 (7/10): Combinatorics</h1>
 <p>This is post 7 in the Discrete Math 101 series.</p>
 <blockquote>
 <p>Discrete Math 101 series (7/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Why are hash collisions inevitable? How long does it take to brute-force every possible password?</p>
 <blockquote>
 <p>Combinatorics is the math of counting "how many cases are there?" Permutations, combinations, the binomial theorem, and the pigeonhole principle are the tools we use to size an algorithm's input space, a cipher's key space, or the probability of a hash collision. This article walks through the basic counting laws, the pigeonhole principle, and inclusion-exclusion, with code to verify each result.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Combinatorics?</li>
+<li>Which signal should the example or diagram make visible for Combinatorics?</li>
+<li>What failure should be prevented first when Combinatorics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="discrete math 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.en.png"></p>
+<p><em>discrete math 101 chapter 7 flow overview</em></p>
+<p>This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Combinatorics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The product rule and the sum rule</li>
@@ -284,13 +293,23 @@ print(f&quot;multiples of 2, 3, or 5 in 1..100: {answer}&quot;)
 <h2>Wrap-Up and Next Steps</h2>
 <p>Combinatorics is the math of measuring possibility. The product/sum rules, permutations and combinations, the binomial theorem, the pigeonhole principle, and inclusion-exclusion are the standard toolkit for security, hashing, and probability analysis.</p>
 <p>The next article enters another major area of discrete math: graph theory.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Relations and Equivalence</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/05-proof-techniques.md">Proof Techniques</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/06-sequences-and-recurrence.md">Sequences and Recurrence</a></li>
+<li><strong>What boundary should you inspect first when applying Combinatorics?</strong></li>
+<li>The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Combinatorics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Combinatorics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">Discrete Math 101 (1/10): What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Discrete Math 101 (2/10): Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Discrete Math 101 (3/10): Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Discrete Math 101 (4/10): Relations and Equivalence</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/05-proof-techniques.md">Discrete Math 101 (5/10): Proof Techniques</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/06-sequences-and-recurrence.md">Discrete Math 101 (6/10): Sequences and Recurrence</a></li>
 <li><strong>Combinatorics (current)</strong></li>
 <li>Graph Theory Basics (upcoming)</li>
 <li>Trees and Graph Traversal (upcoming)</li>

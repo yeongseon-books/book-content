@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 2
-title: Propositions and Logic
+title: "Discrete Math 101 (2/10): Propositions and Logic"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Propositions, truth values, logical connectives, truth tables, 
 last_reviewed: '2026-05-04'
 ---
 
-# Propositions and Logic
+# Discrete Math 101 (2/10): Propositions and Logic
 
 This is post 2 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (2/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: How is `if x > 0 and y < 10` actually evaluated, and what is its mathematical foundation?
 
 > Propositional logic deals with sentences that are unambiguously true or false (propositions) and the operators (AND, OR, NOT) that combine them. Every conditional in every programming language, every SQL `WHERE` clause, and every digital logic gate is a direct application. This article covers propositions, truth tables, equivalence transformations, and predicate logic.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Propositions and Logic?
+- Which signal should the example or diagram make visible for Propositions and Logic?
+- What failure should be prevented first when Propositions and Logic reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.en.png)
+
+*discrete math 101 chapter 2 flow overview*
+
+This picture places Propositions and Logic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Propositions and Logic is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -128,24 +140,19 @@ for statement, truth in propositions.items():
 def NOT(p: bool) -> bool:
     return not p
 
-
 def AND(p: bool, q: bool) -> bool:
     return p and q
 
-
 def OR(p: bool, q: bool) -> bool:
     return p or q
-
 
 def IMPLIES(p: bool, q: bool) -> bool:
     """P → Q: false only when P true and Q false"""
     return (not p) or q
 
-
 def IFF(p: bool, q: bool) -> bool:
     """P ↔ Q: true when both have the same value"""
     return p == q
-
 
 print(IMPLIES(True, False))  # False
 print(IMPLIES(False, True))  # True (false premise → always true)
@@ -159,7 +166,6 @@ The fact that P → Q is true whenever P is false often surprises beginners. "If
 ```python
 from itertools import product
 
-
 def truth_table(variables: list[str], expr) -> None:
     """Print the truth table for a given expression."""
     header = " | ".join(variables) + " | result"
@@ -170,7 +176,6 @@ def truth_table(variables: list[str], expr) -> None:
         result = expr(**env)
         row = " | ".join(str(v)[0] for v in values) + f" | {str(result)[0]}"
         print(row)
-
 
 # Truth table for (P ∧ Q) → P
 truth_table(["P", "Q"], lambda P, Q: IMPLIES(AND(P, Q), P))
@@ -192,7 +197,6 @@ def equivalent(expr1, expr2, variables: list[str]) -> bool:
             return False
     return True
 
-
 lhs = lambda P, Q: NOT(AND(P, Q))
 rhs = lambda P, Q: OR(NOT(P), NOT(Q))
 
@@ -206,16 +210,13 @@ print(f"De Morgan holds: {equivalent(lhs, rhs, ['P', 'Q'])}")
 def is_even(n: int) -> bool:
     return n % 2 == 0
 
-
 # Universal ∀: "for all n"
 def for_all(domain, predicate) -> bool:
     return all(predicate(x) for x in domain)
 
-
 # Existential ∃: "there exists an n"
 def there_exists(domain, predicate) -> bool:
     return any(predicate(x) for x in domain)
-
 
 numbers = [2, 4, 6, 8, 10]
 
@@ -276,8 +277,19 @@ Propositional logic is the foundation of all computer reasoning. With five conne
 
 Next, together with logic we cover the other foundation of discrete math — sets and functions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Propositions and Logic?**
+  - The article treats Propositions and Logic as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Propositions and Logic?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Propositions and Logic reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
 - **Propositions and Logic (current)**
 - Sets and Functions (upcoming)
 - Relations and Equivalence (upcoming)
@@ -287,6 +299,7 @@ Next, together with logic we cover the other foundation of discrete math — set
 - Graph Theory Basics (upcoming)
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References

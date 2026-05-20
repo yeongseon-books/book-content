@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 10
-title: 알고리즘과 이산수학의 연결
+title: "Discrete Math 101 (10/10): 알고리즘과 이산수학의 연결"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 이산수학의 핵심 개념이 알고리즘 분석, 정확성
 last_reviewed: '2026-05-12'
 ---
 
-# 알고리즘과 이산수학의 연결
+# Discrete Math 101 (10/10): 알고리즘과 이산수학의 연결
 
 이 글은 Discrete Math 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 점화식과 마스터 정리는 시간 복잡도와 어떻게 연결될까요?
 - 귀납법과 루프 불변식은 알고리즘 정확성을 어떻게 보장할까요?
 - P, NP, NP-완전은 어떤 직관으로 이해해야 할까요?
-- 지금까지 배운 주제는 알고리즘 도구 상자에서 어떻게 다시 정리될까요?
 
-> 이산수학은 알고리즘의 언어입니다. 점화식은 시간 복잡도를 설명하고, 조합론은 경우의 수를 세며, 그래프 이론은 의존성과 경로 문제를 모델링하고, 증명 기법은 정확성을 보장합니다. 이 마지막 글에서는 시리즈 전체를 알고리즘 관점에서 다시 묶고, P와 NP 같은 상위 개념까지 짧게 연결합니다.
+## 큰 그림
+
+![Discrete Math 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.ko.png)
+
+*Discrete Math 101 10장 흐름 개요*
+
+이 그림에서는 알고리즘과 이산수학의 연결를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 알고리즘과 이산수학의 연결의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -85,7 +92,6 @@ def predicted_n_log_n(n: int) -> int:
     """T(n) = 2T(n/2) + n의 대략적 스케일."""
     return n * (n.bit_length() - 1)
 
-
 print(predicted_n_log_n(32))
 ```
 
@@ -99,7 +105,6 @@ print(predicted_n_log_n(32))
 def predicted_n_log_n(n: int) -> int:
     """상수항을 무시한 n * log2(n) 기준선."""
     return n * (n.bit_length() - 1)
-
 
 for n in [8, 16, 32, 64]:
     print(f"n={n:>2} -> prediction scale ≈ {predicted_n_log_n(n)}")
@@ -135,7 +140,6 @@ def merge_and_count(left: list[int], right: list[int]) -> tuple[list[int], int]:
     merged.extend(right[j:])
     return merged, comparisons
 
-
 def merge_sort_count(arr: list[int]) -> tuple[list[int], int]:
     if len(arr) <= 1:
         return arr[:], 0
@@ -144,7 +148,6 @@ def merge_sort_count(arr: list[int]) -> tuple[list[int], int]:
     right, right_count = merge_sort_count(arr[mid:])
     merged, merge_count = merge_and_count(left, right)
     return merged, left_count + right_count + merge_count
-
 
 for n in [8, 16, 32, 64]:
     sample = list(range(n, 0, -1))
@@ -186,7 +189,6 @@ def prefix_sum(nums: list[int]) -> list[int]:
         result.append(running)
     return result
 
-
 values = [3, 1, 4, 1]
 print(prefix_sum(values))
 assert prefix_sum(values) == [3, 4, 8, 9]
@@ -208,7 +210,6 @@ assert prefix_sum(values) == [3, 4, 8, 9]
 ```python
 from collections import defaultdict, deque
 
-
 def topological_sort(graph: dict[str, list[str]]) -> list[str]:
     """Deterministic topological sort with cycle detection."""
     in_deg = defaultdict(int)
@@ -228,7 +229,6 @@ def topological_sort(graph: dict[str, list[str]]) -> list[str]:
     if len(order) != len(graph):
         raise ValueError("cycle detected")
     return order
-
 
 deps = {
     "lint": ["test"],
@@ -273,7 +273,6 @@ def subset_sum(nums: list[int], target: int) -> bool:
         if s == target:
             return True
     return False
-
 
 print(f"target 13 exists: {subset_sum([3, 7, 1, 8, 5], 13)}")
 print(f"target 2 exists:  {subset_sum([3, 7, 1, 8, 5], 2)}")
@@ -347,17 +346,29 @@ P는 다항 시간에 풀 수 있는 문제이고, NP는 답을 받으면 다항
 
 이 시리즈를 마쳤다면 다음 단계는 세 가지입니다. 자료구조와 알고리즘 학습으로 더 깊이 들어가고, 시스템 설계에서 이산수학 도구가 어떻게 결합되는지 계속 관찰하고, 실제 코드에서 복잡도와 증명 감각을 일상 습관으로 만드는 것입니다.
 
+## 처음 질문으로 돌아가기
+
+- **점화식과 마스터 정리는 시간 복잡도와 어떻게 연결될까요?**
+  - 본문의 기준은 알고리즘과 이산수학의 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **귀납법과 루프 불변식은 알고리즘 정확성을 어떻게 보장할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **P, NP, NP-완전은 어떤 직관으로 이해해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
-- [명제와 논리](./02-propositions-and-logic.md)
-- [집합과 함수](./03-sets-and-functions.md)
-- [관계와 동치관계](./04-relations-and-equivalence.md)
-- [증명 방법](./05-proof-techniques.md)
-- [수열과 점화식](./06-sequences-and-recurrence.md)
-- [조합과 경우의 수](./07-combinatorics.md)
-- [그래프 이론 기초](./08-graph-theory-basics.md)
-- [트리와 그래프 탐색](./09-trees-and-graph-traversal.md)
+## 시리즈 목차
+
+- [Discrete Math 101 (1/10): 이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): 명제와 논리](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): 집합과 함수](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): 관계와 동치관계](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): 증명 방법](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): 수열과 점화식](./06-sequences-and-recurrence.md)
+- [Discrete Math 101 (7/10): 조합과 경우의 수](./07-combinatorics.md)
+- [Discrete Math 101 (8/10): 그래프 이론 기초](./08-graph-theory-basics.md)
+- [Discrete Math 101 (9/10): 트리와 그래프 탐색](./09-trees-and-graph-traversal.md)
 - **알고리즘과 이산수학의 연결 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

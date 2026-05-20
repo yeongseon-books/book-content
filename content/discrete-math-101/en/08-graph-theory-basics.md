@@ -1,7 +1,7 @@
 ---
 series: discrete-math-101
 episode: 8
-title: Graph Theory Basics
+title: "Discrete Math 101 (8/10): Graph Theory Basics"
 status: content-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: Definitions, representations, degree, paths, and connectivity �
 last_reviewed: '2026-05-04'
 ---
 
-# Graph Theory Basics
+# Discrete Math 101 (8/10): Graph Theory Basics
 
 This is post 8 in the Discrete Math 101 series.
 
 > Discrete Math 101 series (8/10)
 
-<!-- a-grade-intro:begin -->
-
 **Core question**: Social networks, road maps, the internet, dependency trees — can a single mathematical structure model all of them?
 
 > A graph is a set of vertices and edges, the most general structure for representing relationships. From this simple definition flows an enormous range of applications — routing, recommendations, dependency resolution, circuit design, game AI. This article covers the definitions, representations, degree, paths, connectivity, and the special graphs (complete, bipartite, DAG).
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graph Theory Basics?
+- Which signal should the example or diagram make visible for Graph Theory Basics?
+- What failure should be prevented first when Graph Theory Basics reaches a real system?
+
+## Big Picture
+
+![discrete math 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.en.png)
+
+*discrete math 101 chapter 8 flow overview*
+
+This picture places Graph Theory Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Graph Theory Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +66,6 @@ Shortest path in navigation, friend recommendations on Instagram, npm dependency
 
 ### One graph, three representations
 
-![One undirected graph shown as a drawing, adjacency list, and adjacency matrix](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.en.png)
-*Left: the undirected graph itself. Middle: the same structure written as an adjacency list. Right: the adjacency matrix when the vertex order is fixed to `A, B, C, D`. The important idea is that these are not three different facts — they are three views of the same relationship data.*
-
 ## Key Terms
 
 | Term | Description |
@@ -75,7 +84,6 @@ Shortest path in navigation, friend recommendations on Instagram, npm dependency
 # Manage friendships as a list — slow lookup
 friends = [("alice", "bob"), ("bob", "carol"), ("alice", "carol")]
 
-
 def is_friend(a, b):
     return (a, b) in friends or (b, a) in friends
 ```
@@ -88,10 +96,8 @@ from collections import defaultdict
 
 graph = defaultdict(set)
 
-
 def add_edge(g, a, b):
     g[a].add(b); g[b].add(a)
-
 
 def is_adjacent(g, a, b):
     return b in g[a]
@@ -103,7 +109,6 @@ def is_adjacent(g, a, b):
 
 ```python
 from collections import defaultdict
-
 
 class Graph:
     def __init__(self, directed: bool = False):
@@ -131,7 +136,6 @@ class Graph:
                 e = (u, v) if self.directed else tuple(sorted((u, v)))
                 seen.add(e)
         return sorted(seen)
-
 
 g = Graph()
 for u, v in [("A", "B"), ("B", "C"), ("A", "C"), ("C", "D")]:
@@ -166,7 +170,6 @@ def to_adjacency_matrix(g: Graph) -> tuple:
             M[idx[v]][idx[u]] = 1
     return nodes, M
 
-
 nodes, M = to_adjacency_matrix(g)
 print(f"node order: {nodes}")
 print(f"adjacency matrix:\n{M}")
@@ -200,7 +203,6 @@ adjacency matrix:
 def degree(g: Graph, v) -> int:
     return len(g.adj[v])
 
-
 total_degree = sum(degree(g, v) for v in g.nodes())
 edge_count = len(g.edges())
 
@@ -226,7 +228,6 @@ sum of degrees = 8, 2|E| = 8
 ```python
 from collections import deque
 
-
 def has_path(g: Graph, start, target) -> bool:
     """Use BFS to test reachability — O(V + E)."""
     visited = {start}
@@ -239,7 +240,6 @@ def has_path(g: Graph, start, target) -> bool:
             if u not in visited:
                 visited.add(u); queue.append(u)
     return False
-
 
 def connected_components(g: Graph) -> list:
     """Connected components (undirected only)."""
@@ -258,7 +258,6 @@ def connected_components(g: Graph) -> list:
             queue.extend(sorted(g.adj[v] - comp))
         components.append(sorted(comp))
     return components
-
 
 g_disconnected = Graph()
 for u, v in [("A", "B"), ("B", "C"), ("C", "D"), ("X", "Y")]:
@@ -284,12 +283,10 @@ connected components: [['A', 'B', 'C', 'D'], ['X', 'Y']]
 ```python
 from itertools import combinations
 
-
 def is_complete(g: Graph) -> bool:
     """Complete graph K_n: every pair connected."""
     n = len(g.nodes())
     return len(g.edges()) == n * (n - 1) // 2
-
 
 def is_bipartite(g: Graph) -> bool:
     """Bipartite: vertices split into two groups with no intra-group edges."""
@@ -308,7 +305,6 @@ def is_bipartite(g: Graph) -> bool:
                 elif color[u] == color[v]:
                     return False
     return True
-
 
 k4 = Graph()
 for u, v in combinations(["a", "b", "c", "d"], 2):
@@ -385,17 +381,29 @@ Graphs use vertices and edges to model relationships, the most general structure
 
 The next article looks at the most important algorithms on graphs — trees, BFS, and DFS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graph Theory Basics?**
+  - The article treats Graph Theory Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graph Theory Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graph Theory Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
-- [Propositions and Logic](./02-propositions-and-logic.md)
-- [Sets and Functions](./03-sets-and-functions.md)
-- [Relations and Equivalence](./04-relations-and-equivalence.md)
-- [Proof Techniques](./05-proof-techniques.md)
-- [Sequences and Recurrence](./06-sequences-and-recurrence.md)
-- [Combinatorics](./07-combinatorics.md)
+## In this series
+
+- [Discrete Math 101 (1/10): What Is Discrete Mathematics?](./01-what-is-discrete-math.md)
+- [Discrete Math 101 (2/10): Propositions and Logic](./02-propositions-and-logic.md)
+- [Discrete Math 101 (3/10): Sets and Functions](./03-sets-and-functions.md)
+- [Discrete Math 101 (4/10): Relations and Equivalence](./04-relations-and-equivalence.md)
+- [Discrete Math 101 (5/10): Proof Techniques](./05-proof-techniques.md)
+- [Discrete Math 101 (6/10): Sequences and Recurrence](./06-sequences-and-recurrence.md)
+- [Discrete Math 101 (7/10): Combinatorics](./07-combinatorics.md)
 - **Graph Theory Basics (current)**
 - Trees and Graph Traversal (upcoming)
 - Discrete Mathematics and Algorithms (upcoming)
+
 <!-- toc:end -->
 
 ## References
