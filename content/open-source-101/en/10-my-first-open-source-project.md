@@ -42,7 +42,7 @@ Here, we will walk through the smallest complete path from idea to MVP, docs, fi
 
 This picture places My First Open Source Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of My First Open Source Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Your first open source project does not need to be unique. It needs to be honest, documented, and responsive to contributors.
 
 ## Why It Matters
 

@@ -42,7 +42,7 @@ Here, we will treat a GitHub issue not as a generic to-do item, but as a shared 
 
 This picture places Reading Issues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Reading Issues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Issues are where the project's public thoughts happen. Learning to read issues well teaches you how real teams work.
 
 ## Why It Matters
 

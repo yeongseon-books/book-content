@@ -42,7 +42,7 @@ Here, we will define the maintainer not as a heroic programmer who does everythi
 
 This picture places The Maintainer Role inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Maintainer Role is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Maintaining a project is not just writing code. It is keeping people, decisions, and sustainability in balance.
 
 ## Why It Matters
 

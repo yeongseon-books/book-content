@@ -42,7 +42,7 @@ Here, we will define a good README as the document that helps a first-time visit
 
 This picture places A Good README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of A Good README is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A good README is not a technical manual. It is a 5-minute message that answers: What does this do? When would I use it? How do I start?
 
 ## Why It Matters
 

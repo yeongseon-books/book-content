@@ -42,7 +42,7 @@ Here, we will use MIT, Apache 2.0, and GPL as the main reference points and lear
 
 This picture places Understanding Licenses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Licenses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A license is not just a legal document. It is a contract that lets people collaborate safely because everyone knows the boundaries.
 
 ## Why It Matters
 

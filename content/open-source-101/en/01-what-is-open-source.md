@@ -42,7 +42,7 @@ Here, we will define open source not as code that happens to be public, but as a
 
 This picture places What Is Open Source inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Open Source is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Open source is a rights model, not a pricing model. When you understand it this way, the rest of this series connects naturally.
 
 ## Why It Matters
 

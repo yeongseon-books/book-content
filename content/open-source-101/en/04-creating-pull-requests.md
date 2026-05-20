@@ -42,7 +42,7 @@ Here, we will walk through the full contribution path from fork and branch to co
 
 This picture places Creating Pull Requests inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Creating Pull Requests is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A pull request is not a finished product you submit. It is an invitation to collaborate and improve the code together.
 
 ## Why It Matters
 

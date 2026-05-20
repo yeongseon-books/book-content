@@ -42,7 +42,7 @@ Here, we will look at how to turn GitHub activity into a portfolio that shows pr
 
 This picture places An Open Source Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of An Open Source Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Your open source history is not a list of projects. It is a public record of how you solve problems and work with others.
 
 ## Why It Matters
 
