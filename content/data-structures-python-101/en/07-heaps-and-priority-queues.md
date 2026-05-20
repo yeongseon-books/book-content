@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 7
-title: Heaps and Priority Queues
+title: "Data Structures with Python 101 (7/10): Heaps and Priority Queues"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Implement heaps and priority queues in Python using the heapq m
 last_reviewed: '2026-05-04'
 ---
 
-# Heaps and Priority Queues
+# Data Structures with Python 101 (7/10): Heaps and Priority Queues
 
 > Data Structures with Python 101 Series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: What data structure lets you always retrieve the smallest (or largest) value quickly?
 
 > A heap retrieves the minimum or maximum in O(1) and inserts or removes in O(log n). Python's heapq module makes heaps easy to use. This article covers heap internals, heapq usage, and priority queue patterns.
 
-<!-- a-grade-intro:end -->
-
 This is post 7 in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Heaps and Priority Queues?
+- Which signal should the example or diagram make visible for Heaps and Priority Queues?
+- What failure should be prevented first when Heaps and Priority Queues reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.en.png)
+
+*Data Structures with Python 101 chapter 7 flow overview*
+
+This picture places Heaps and Priority Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Heaps and Priority Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -250,17 +262,29 @@ Top-K problems appear frequently in interviews. Solving them with "heap in O(n l
 
 Heaps efficiently manage minimum and maximum values, and Python's heapq module makes them easy to use. The next article covers graphs — data structures that represent relationships with nodes and edges.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Heaps and Priority Queues?**
+  - The article treats Heaps and Priority Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Heaps and Priority Queues?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Heaps and Priority Queues reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
-- [Trees and Binary Trees](./06-trees-and-binary-trees.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): Trees and Binary Trees](./06-trees-and-binary-trees.md)
 - **Heaps and Priority Queues (current)**
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

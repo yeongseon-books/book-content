@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Are Data Structures?</title>
+<title>Data Structures with Python 101 (1/10): What Are Data Structures?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Are Data Structures?</h1>
+<h1>Data Structures with Python 101 (1/10): What Are Data Structures?</h1>
 <blockquote>
 <p>Data Structures with Python 101 Series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: If you can store data in a variable, why bother learning data structures?</p>
 <blockquote>
 <p>When data grows, a single variable is not enough. The structure you choose determines whether a search takes 0.001 seconds or 10 seconds. This article explains what data structures are, why they matter, and which ones Python provides out of the box.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the first post in the Data Structures with Python 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Are Data Structures??</li>
+<li>Which signal should the example or diagram make visible for What Are Data Structures??</li>
+<li>What failure should be prevented first when What Are Data Structures? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Data Structures with Python 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.en.png"></p>
+<p><em>Data Structures with Python 101 chapter 1 flow overview</em></p>
+<p>This picture places What Are Data Structures? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Are Data Structures? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and role of data structures</li>
@@ -218,6 +227,16 @@ print(dd)  # defaultdict(&lt;class 'list'&gt;, {'fruits': ['apple']})
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Data structures are a fundamental concept for storing and accessing data efficiently. Python provides powerful built-in structures like list, dict, set, and tuple. The next article takes a deep dive into the most basic of these: arrays and lists.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Are Data Structures??</strong></li>
+<li>The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Are Data Structures??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Are Data Structures? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Are Data Structures? (current)</strong></li>
 <li>Arrays and Lists (upcoming)</li>

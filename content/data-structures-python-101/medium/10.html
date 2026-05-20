@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Choosing the Right Data Structure</title>
+<title>Data Structures with Python 101 (10/10): Choosing the Right Data Structure</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Choosing the Right Data Structure</h1>
+<h1>Data Structures with Python 101 (10/10): Choosing the Right Data Structure</h1>
 <blockquote>
 <p>Data Structures with Python 101 Series (10/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: Should you use a list, a dict, or a set for this problem?</p>
 <blockquote>
 <p>Choosing a data structure comes down to "what operation do you perform most often?" If lookups are frequent, use dict/set. If order matters, use list. If you need priority, use a heap. This article synthesizes the entire series and provides a decision framework for choosing the right data structure.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the final post in the Data Structures with Python 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Choosing the Right Data Structure?</li>
+<li>Which signal should the example or diagram make visible for Choosing the Right Data Structure?</li>
+<li>What failure should be prevented first when Choosing the Right Data Structure reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Data Structures with Python 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.en.png"></p>
+<p><em>Data Structures with Python 101 chapter 10 flow overview</em></p>
+<p>This picture places Choosing the Right Data Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Choosing the Right Data Structure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Comparing operation time complexities across data structures</li>
@@ -83,7 +92,7 @@
 <blockquote>
 <p>Data structure selection = optimizing based on the frequency of key operations and data characteristics</p>
 </blockquote>
-<pre><code>Frequent lookups?
+<pre><code class="language-text">Frequent lookups?
   +-- Key-value mapping? -&gt; dict
   +-- Existence only? -&gt; set
 
@@ -98,8 +107,6 @@ Hierarchical structure? -&gt; tree
 Relationship network? -&gt; graph
 </code></pre>
 <h2>Decision Flow at a Glance</h2>
-<p><img alt="Decision Flow at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.en.png"></p>
-<p><em>A quick decision flow for choosing between list, dict, set, deque, and heapq</em></p>
 <h2>Key Concepts</h2>
 <p><strong>time complexity</strong><br>
 - Description: The rate at which operation time grows with data size</p>
@@ -315,16 +322,26 @@ for scenario, choice in scenarios.items():
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>This series covered list, dict, set, deque, stacks, queues, linked lists, trees, heaps, and graphs. The key to choosing a data structure is asking "what is my most frequent operation?" The right choice makes code cleaner and faster.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Trees and Binary Trees</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/07-heaps-and-priority-queues.md">Heaps and Priority Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/08-graph-representations.md">Graph Representations</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/09-sets-and-set-operations.md">Sets and Set Operations</a></li>
+<li><strong>What boundary should you inspect first when applying Choosing the Right Data Structure?</strong></li>
+<li>The article treats Choosing the Right Data Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Choosing the Right Data Structure?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Choosing the Right Data Structure reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">Data Structures with Python 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Data Structures with Python 101 (2/10): Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Data Structures with Python 101 (3/10): Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Data Structures with Python 101 (4/10): Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Data Structures with Python 101 (5/10): Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Data Structures with Python 101 (6/10): Trees and Binary Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/07-heaps-and-priority-queues.md">Data Structures with Python 101 (7/10): Heaps and Priority Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/08-graph-representations.md">Data Structures with Python 101 (8/10): Graph Representations</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/09-sets-and-set-operations.md">Data Structures with Python 101 (9/10): Sets and Set Operations</a></li>
 <li><strong>Choosing the Right Data Structure (current)</strong></li>
 </ul>
 <h2>References</h2>

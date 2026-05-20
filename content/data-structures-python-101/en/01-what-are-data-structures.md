@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 1
-title: What Are Data Structures?
+title: "Data Structures with Python 101 (1/10): What Are Data Structures?"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn what data structures are, why they matter in Python, and 
 last_reviewed: '2026-05-04'
 ---
 
-# What Are Data Structures?
+# Data Structures with Python 101 (1/10): What Are Data Structures?
 
 > Data Structures with Python 101 Series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: If you can store data in a variable, why bother learning data structures?
 
 > When data grows, a single variable is not enough. The structure you choose determines whether a search takes 0.001 seconds or 10 seconds. This article explains what data structures are, why they matter, and which ones Python provides out of the box.
 
-<!-- a-grade-intro:end -->
-
 This is the first post in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Are Data Structures??
+- Which signal should the example or diagram make visible for What Are Data Structures??
+- What failure should be prevented first when What Are Data Structures? reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.en.png)
+
+*Data Structures with Python 101 chapter 1 flow overview*
+
+This picture places What Are Data Structures? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Are Data Structures? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -210,7 +222,18 @@ In practice, Python's built-in data structures handle most problems. The key is 
 
 Data structures are a fundamental concept for storing and accessing data efficiently. Python provides powerful built-in structures like list, dict, set, and tuple. The next article takes a deep dive into the most basic of these: arrays and lists.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Are Data Structures??**
+  - The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Are Data Structures??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Are Data Structures? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Are Data Structures? (current)**
 - Arrays and Lists (upcoming)
 - Stacks and Queues (upcoming)
@@ -221,6 +244,7 @@ Data structures are a fundamental concept for storing and accessing data efficie
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

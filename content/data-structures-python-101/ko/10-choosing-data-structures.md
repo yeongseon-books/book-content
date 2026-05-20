@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 10
-title: 자료구조 선택 기준
+title: "Data Structures with Python 101 (10/10): 자료구조 선택 기준"
 status: publish-ready
 targets:
   tistory: true
@@ -20,18 +20,25 @@ seo_description: 데이터 특성과 연산 빈도에 따른 Python 자료구조
 last_reviewed: '2026-05-15'
 ---
 
-# 자료구조 선택 기준
+# Data Structures with Python 101 (10/10): 자료구조 선택 기준
 
 이 글은 Data Structures with Python 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?
 - 자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?
 - 여러 구조를 조합해 요구사항을 동시에 만족시키는 방법은 무엇일까요?
-- 벤치마크와 프로파일링은 실제 선택 과정에서 어떤 역할을 할까요?
 
-> 멘탈 모델: 자료구조 선택은 “어느 구조가 더 고급인가”를 고르는 일이 아니라, “가장 자주 수행할 연산에 무엇을 최적화할 것인가”를 결정하는 일입니다.
+## 큰 그림
+
+![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
+
+*Data Structures with Python 101 10장 흐름 개요*
+
+이 그림에서는 자료구조 선택 기준를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 자료구조 선택 기준의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -62,10 +69,6 @@ Relationship network? -> graph
 ```
 
 ## 선택 흐름을 그림으로 보면
-
-![선택 흐름을 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
-
-*조회·순서·우선순위 같은 요구를 기준으로 기본 자료구조를 고르는 흐름도*
 
 ## 핵심 개념
 
@@ -308,17 +311,29 @@ for scenario, choice in scenarios.items():
 
 이 시리즈에서는 list, dict, set, deque, 스택, 큐, 연결 리스트, 트리, 힙, 그래프를 차례로 살펴봤습니다. 결국 좋은 자료구조 선택의 기준은 하나로 모입니다. “내가 가장 자주 수행하는 연산은 무엇인가?” 이 질문에 답할 수 있으면, 코드 구조와 성능은 훨씬 예측 가능해집니다.
 
+## 처음 질문으로 돌아가기
+
+- **list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?**
+  - 본문의 기준은 자료구조 선택 기준를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **여러 구조를 조합해 요구사항을 동시에 만족시키는 방법은 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 리스트](./02-arrays-and-lists.md)
-- [스택과 큐](./03-stacks-and-queues.md)
-- [해시 테이블과 dict](./04-hash-tables-and-dict.md)
-- [연결 리스트](./05-linked-lists.md)
-- [트리와 이진 트리](./06-trees-and-binary-trees.md)
-- [힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
-- [그래프 표현](./08-graph-representations.md)
-- [set과 집합 연산](./09-sets-and-set-operations.md)
+## 시리즈 목차
+
+- [Data Structures with Python 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): 배열과 리스트](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): 스택과 큐](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): 해시 테이블과 dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): 연결 리스트](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): 힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
+- [Data Structures with Python 101 (8/10): 그래프 표현](./08-graph-representations.md)
+- [Data Structures with Python 101 (9/10): set과 집합 연산](./09-sets-and-set-operations.md)
 - **자료구조 선택 기준 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

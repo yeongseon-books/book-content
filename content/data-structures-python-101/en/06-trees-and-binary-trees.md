@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 6
-title: Trees and Binary Trees
+title: "Data Structures with Python 101 (6/10): Trees and Binary Trees"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Implement binary trees and binary search trees in Python and pr
 last_reviewed: '2026-05-15'
 ---
 
-# Trees and Binary Trees
+# Data Structures with Python 101 (6/10): Trees and Binary Trees
 
 > Data Structures with Python 101 Series (6/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Why do file systems, org charts, and the DOM all use tree structures?
 
 > Trees naturally represent hierarchical relationships. Binary search trees (BSTs) enable O(log n) lookups on sorted data. This article covers tree concepts, binary tree implementation, traversal algorithms, and binary search trees.
 
-<!-- a-grade-intro:end -->
-
 This is post 6 in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trees and Binary Trees?
+- Which signal should the example or diagram make visible for Trees and Binary Trees?
+- What failure should be prevented first when Trees and Binary Trees reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
+
+*Data Structures with Python 101 chapter 6 flow overview*
+
+This picture places Trees and Binary Trees inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Trees and Binary Trees is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -69,10 +81,6 @@ Binary Search Tree (BST):
 ```
 
 ## Tree Shape at a Glance
-
-![Tree Shape at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
-
-*A simple tree shape and the BST ordering pattern from root to leaves*
 
 ## Key Concepts
 
@@ -300,17 +308,29 @@ There is no better data structure than trees for practicing recursive thinking. 
 
 Trees represent hierarchical structures, and BSTs search sorted data in O(log n). Tree traversals are naturally implemented with recursion. The next article covers heaps and priority queues — a specialized form of trees.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trees and Binary Trees?**
+  - The article treats Trees and Binary Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trees and Binary Trees?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trees and Binary Trees reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
 - **Trees and Binary Trees (current)**
 - Heaps and Priority Queues (upcoming)
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

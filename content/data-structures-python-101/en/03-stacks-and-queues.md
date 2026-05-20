@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 3
-title: Stacks and Queues
+title: "Data Structures with Python 101 (3/10): Stacks and Queues"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Implement stacks and queues in Python using list and deque, and
 last_reviewed: '2026-05-04'
 ---
 
-# Stacks and Queues
+# Data Structures with Python 101 (3/10): Stacks and Queues
 
 > Data Structures with Python 101 Series (3/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: Why is list alone not enough for both stacks and queues?
 
 > list implements stacks efficiently, but using list as a queue means popping from the front is O(n). This article covers the concepts of stack (LIFO) and queue (FIFO), Python implementations, and efficient queue implementation with deque.
 
-<!-- a-grade-intro:end -->
-
 This is post 3 in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Stacks and Queues?
+- Which signal should the example or diagram make visible for Stacks and Queues?
+- What failure should be prevented first when Stacks and Queues reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.en.png)
+
+*Data Structures with Python 101 chapter 3 flow overview*
+
+This picture places Stacks and Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Stacks and Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -287,9 +299,20 @@ At scale, in-memory queues give way to Redis, RabbitMQ, or Kafka. But the fundam
 
 Stacks operate on LIFO, queues on FIFO. In Python, stacks use list and queues use deque by convention. The next article explores hash tables and dict, which enable O(1) lookups.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Stacks and Queues?**
+  - The article treats Stacks and Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Stacks and Queues?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Stacks and Queues reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
 - **Stacks and Queues (current)**
 - Hash Tables and dict (upcoming)
 - Linked Lists (upcoming)
@@ -298,6 +321,7 @@ Stacks operate on LIFO, queues on FIFO. In Python, stacks use list and queues us
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

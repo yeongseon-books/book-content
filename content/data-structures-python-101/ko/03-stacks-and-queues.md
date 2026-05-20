@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 3
-title: 스택과 큐
+title: "Data Structures with Python 101 (3/10): 스택과 큐"
 status: publish-ready
 targets:
   tistory: true
@@ -20,18 +20,25 @@ seo_description: Python의 list와 deque를 활용해 스택(Stack)과 큐(Queue
 last_reviewed: '2026-05-12'
 ---
 
-# 스택과 큐
+# Data Structures with Python 101 (3/10): 스택과 큐
 
 이 글은 Data Structures with Python 101 시리즈의 세 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?
 - Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?
 - `list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?
-- BFS, undo, 작업 처리 같은 문제에 스택과 큐를 어떻게 연결할 수 있을까요?
 
-> 멘탈 모델: 스택과 큐의 핵심은 저장 방식이 아니라 “꺼내는 순서”입니다. LIFO와 FIFO를 구분하는 순간, 어떤 구조를 써야 할지도 거의 자동으로 결정됩니다.
+## 큰 그림
+
+![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)
+
+*Data Structures with Python 101 3장 흐름 개요*
+
+이 그림에서는 스택과 큐를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 스택과 큐의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -283,9 +290,20 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 
 스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?**
+  - 본문의 기준은 스택과 큐를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 리스트](./02-arrays-and-lists.md)
+## 시리즈 목차
+
+- [Data Structures with Python 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): 배열과 리스트](./02-arrays-and-lists.md)
 - **스택과 큐 (현재 글)**
 - 해시 테이블과 dict (예정)
 - 연결 리스트 (예정)
@@ -294,6 +312,7 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 - 그래프 표현 (예정)
 - set과 집합 연산 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

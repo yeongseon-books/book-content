@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Heaps and Priority Queues</title>
+<title>Data Structures with Python 101 (7/10): Heaps and Priority Queues</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Heaps and Priority Queues</h1>
+<h1>Data Structures with Python 101 (7/10): Heaps and Priority Queues</h1>
 <blockquote>
 <p>Data Structures with Python 101 Series (7/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: What data structure lets you always retrieve the smallest (or largest) value quickly?</p>
 <blockquote>
 <p>A heap retrieves the minimum or maximum in O(1) and inserts or removes in O(log n). Python's heapq module makes heaps easy to use. This article covers heap internals, heapq usage, and priority queue patterns.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 7 in the Data Structures with Python 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Heaps and Priority Queues?</li>
+<li>Which signal should the example or diagram make visible for Heaps and Priority Queues?</li>
+<li>What failure should be prevented first when Heaps and Priority Queues reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Data Structures with Python 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.en.png"></p>
+<p><em>Data Structures with Python 101 chapter 7 flow overview</em></p>
+<p>This picture places Heaps and Priority Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Heaps and Priority Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Heap structure and the heap property</li>
@@ -83,7 +92,7 @@
 <blockquote>
 <p>Heap = a complete binary tree where the parent is always smaller than its children (min-heap)</p>
 </blockquote>
-<pre><code>[Min-Heap]               [Array Representation]
+<pre><code class="language-text">[Min-Heap]               [Array Representation]
       1                   index: 0  1  2  3  4  5
     /   \                  value: [1, 3, 5, 7, 4, 8]
    3     5
@@ -258,13 +267,23 @@ print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Heaps efficiently manage minimum and maximum values, and Python's heapq module makes them easy to use. The next article covers graphs — data structures that represent relationships with nodes and edges.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Stacks and Queues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Hash Tables and dict</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Linked Lists</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Trees and Binary Trees</a></li>
+<li><strong>What boundary should you inspect first when applying Heaps and Priority Queues?</strong></li>
+<li>The article treats Heaps and Priority Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Heaps and Priority Queues?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Heaps and Priority Queues reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">Data Structures with Python 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Data Structures with Python 101 (2/10): Arrays and Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/03-stacks-and-queues.md">Data Structures with Python 101 (3/10): Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/04-hash-tables-and-dict.md">Data Structures with Python 101 (4/10): Hash Tables and dict</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/05-linked-lists.md">Data Structures with Python 101 (5/10): Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/06-trees-and-binary-trees.md">Data Structures with Python 101 (6/10): Trees and Binary Trees</a></li>
 <li><strong>Heaps and Priority Queues (current)</strong></li>
 <li>Graph Representations (upcoming)</li>
 <li>Sets and Set Operations (upcoming)</li>

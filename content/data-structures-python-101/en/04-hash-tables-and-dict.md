@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 4
-title: Hash Tables and dict
+title: "Data Structures with Python 101 (4/10): Hash Tables and dict"
 status: content-ready
 targets:
   tistory: false
@@ -20,9 +20,25 @@ seo_description: Understand how Python dict implements a hash table internally, 
 last_reviewed: '2026-05-17'
 ---
 
-# Hash Tables and dict
+# Data Structures with Python 101 (4/10): Hash Tables and dict
 
 This is the fourth post in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Hash Tables and dict?
+- Which signal should the example or diagram make visible for Hash Tables and dict?
+- What failure should be prevented first when Hash Tables and dict reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-and-resize.en.png)
+
+*Data Structures with Python 101 chapter 4 flow overview*
+
+This picture places Hash Tables and dict inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Hash Tables and dict is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Answers
 
@@ -53,10 +69,6 @@ slot 7 empty?    yes  -> store there
 ```
 
 ## Dict Probe and Resize
-
-![Dict Probe and Resize](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-and-resize.en.png)
-
-*How `dict` turns a key into a probe path in a sparse table, then resizes before collision chains grow too long*
 
 ## Key Concepts
 
@@ -124,7 +136,6 @@ class CollidingKey:
 
     def __repr__(self) -> str:
         return f"CollidingKey({self.label!r})"
-
 
 keys = [CollidingKey("alpha"), CollidingKey("beta"), CollidingKey("gamma")]
 table = {key: index for index, key in enumerate(keys, start=1)}
@@ -258,10 +269,21 @@ They also know that average-case O(1) depends on maintaining a healthy table sha
 
 Python `dict` is a hash-table-backed mapping whose performance depends on three ideas working together: stable hashing, short probe paths, and periodic resizing. Once that model is clear, collisions and preserved insertion order stop feeling contradictory. The next article shifts to linked lists, which store data in a completely different way from arrays and hash tables.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Hash Tables and dict?**
+  - The article treats Hash Tables and dict as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Hash Tables and dict?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Hash Tables and dict reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
 - **Hash Tables and dict (current)**
 - Linked Lists (upcoming)
 - Trees and Binary Trees (upcoming)
@@ -269,6 +291,7 @@ Python `dict` is a hash-table-backed mapping whose performance depends on three 
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

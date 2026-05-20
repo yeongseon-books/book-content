@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 2
-title: Arrays and Lists
+title: "Data Structures with Python 101 (2/10): Arrays and Lists"
 status: content-ready
 targets:
   tistory: false
@@ -20,9 +20,25 @@ seo_description: Understand how Python list works internally as a dynamic array,
 last_reviewed: '2026-05-17'
 ---
 
-# Arrays and Lists
+# Data Structures with Python 101 (2/10): Arrays and Lists
 
 This is the second post in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Arrays and Lists?
+- Which signal should the example or diagram make visible for Arrays and Lists?
+- What failure should be prevented first when Arrays and Lists reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
+
+*Data Structures with Python 101 chapter 2 flow overview*
+
+This picture places Arrays and Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Arrays and Lists is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Answers
 
@@ -58,10 +74,6 @@ Stacks naturally use `append()` and `pop()`, and even `heapq` stores its heap in
 ```
 
 ## List Capacity Growth
-
-![List capacity growth](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
-
-*How Python lists keep logical length separate from reserved capacity, then reallocate into a larger contiguous block when spare slots run out*
 
 ## Key Concepts
 
@@ -252,8 +264,19 @@ The first design question is simple: what operation pattern dominates? If you mo
 
 Python `list` is a dynamic array with two different ideas of size: logical length and reserved capacity. That is why index access is O(1), `append()` is amortized O(1), and front insertion is expensive. The next article builds on this storage model to explain stacks and queues.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Arrays and Lists?**
+  - The article treats Arrays and Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Arrays and Lists?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Arrays and Lists reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
 - **Arrays and Lists (current)**
 - Stacks and Queues (upcoming)
 - Hash Tables and dict (upcoming)
@@ -263,6 +286,7 @@ Python `list` is a dynamic array with two different ideas of size: logical lengt
 - Graph Representations (upcoming)
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

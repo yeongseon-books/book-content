@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 8
-title: Graph Representations
+title: "Data Structures with Python 101 (8/10): Graph Representations"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Represent graphs as adjacency lists and adjacency matrices in P
 last_reviewed: '2026-05-15'
 ---
 
-# Graph Representations
+# Data Structures with Python 101 (8/10): Graph Representations
 
 > Data Structures with Python 101 Series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Key Question**: How do you represent social networks, maps, and dependency relationships in code?
 
 > Graphs represent relationships using nodes (vertices) and edges. In Python, you implement adjacency lists with dict and adjacency matrices with 2D lists. This article covers graph representation methods and BFS/DFS traversals.
 
-<!-- a-grade-intro:end -->
-
 This is post 8 in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graph Representations?
+- Which signal should the example or diagram make visible for Graph Representations?
+- What failure should be prevented first when Graph Representations reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
+
+*Data Structures with Python 101 chapter 8 flow overview*
+
+This picture places Graph Representations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Graph Representations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -62,10 +74,6 @@ Graph problems appear at medium-to-hard difficulty in coding interviews. You nee
 ```
 
 ## Graph Representation at a Glance
-
-![Graph Representation at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
-
-*The same relationship data shown as an undirected graph and as an adjacency list view*
 
 ## Key Concepts
 
@@ -317,17 +325,29 @@ The ability to model problems as graphs is the key skill. Recognizing "is this a
 
 Graphs are general-purpose data structures for representing relationships. You represent them with adjacency lists or adjacency matrices and traverse them with BFS and DFS. The next article covers sets — data structures that perform set operations efficiently.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graph Representations?**
+  - The article treats Graph Representations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graph Representations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graph Representations reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
-- [Trees and Binary Trees](./06-trees-and-binary-trees.md)
-- [Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): Trees and Binary Trees](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
 - **Graph Representations (current)**
 - Sets and Set Operations (upcoming)
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 9
-title: Sets and Set Operations
+title: "Data Structures with Python 101 (9/10): Sets and Set Operations"
 status: content-ready
 targets:
   tistory: false
@@ -20,9 +20,25 @@ seo_description: Explore Python set internals and practice union, intersection, 
 last_reviewed: '2026-05-17'
 ---
 
-# Sets and Set Operations
+# Data Structures with Python 101 (9/10): Sets and Set Operations
 
 This is the ninth post in the Data Structures with Python 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sets and Set Operations?
+- Which signal should the example or diagram make visible for Sets and Set Operations?
+- What failure should be prevented first when Sets and Set Operations reaches a real system?
+
+## Big Picture
+
+![Data Structures with Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set-storage-and-dedup.en.png)
+
+*Data Structures with Python 101 chapter 9 flow overview*
+
+This picture places Sets and Set Operations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sets and Set Operations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Answers
 
@@ -55,10 +71,6 @@ sym. diff.   A ^ B  = {1, 2, 5, 6}
 ```
 
 ## Set Storage and Dedup
-
-![Set Storage and Dedup](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set-storage-and-dedup.en.png)
-
-*How a set stores only unique keys in a hash table, making deduplication and set algebra consequences of the same storage model*
 
 ## Key Concepts
 
@@ -121,7 +133,6 @@ class Tag:
 
     def __repr__(self) -> str:
         return f"Tag({self.name!r})"
-
 
 seen = {Tag("python"), Tag("api"), Tag("python")}
 
@@ -252,17 +263,29 @@ They also know correctness depends on element semantics. If equality or hashing 
 
 Python `set` is a key-only hash table. That explains its fast membership checks, automatic deduplication, and expressive set algebra. Once you understand that correctness still depends on stable hashing and equality, `set` stops being a convenient trick and becomes a reliable design tool. The next article closes the series by showing how to choose the right data structure for a given workload.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sets and Set Operations?**
+  - The article treats Sets and Set Operations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sets and Set Operations?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sets and Set Operations reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Data Structures?](./01-what-are-data-structures.md)
-- [Arrays and Lists](./02-arrays-and-lists.md)
-- [Stacks and Queues](./03-stacks-and-queues.md)
-- [Hash Tables and dict](./04-hash-tables-and-dict.md)
-- [Linked Lists](./05-linked-lists.md)
-- [Trees and Binary Trees](./06-trees-and-binary-trees.md)
-- [Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
-- [Graph Representations](./08-graph-representations.md)
+## In this series
+
+- [Data Structures with Python 101 (1/10): What Are Data Structures?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): Arrays and Lists](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): Stacks and Queues](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): Hash Tables and dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): Linked Lists](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): Trees and Binary Trees](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): Heaps and Priority Queues](./07-heaps-and-priority-queues.md)
+- [Data Structures with Python 101 (8/10): Graph Representations](./08-graph-representations.md)
 - **Sets and Set Operations (current)**
 - Choosing the Right Data Structure (upcoming)
+
 <!-- toc:end -->
 
 ## References

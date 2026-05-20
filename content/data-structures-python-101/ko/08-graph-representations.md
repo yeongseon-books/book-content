@@ -1,7 +1,7 @@
 ---
 series: data-structures-python-101
 episode: 8
-title: 그래프 표현
+title: "Data Structures with Python 101 (8/10): 그래프 표현"
 status: publish-ready
 targets:
   tistory: true
@@ -20,18 +20,25 @@ seo_description: 그래프를 인접 리스트와 행렬로 구현하고 BFS와 
 last_reviewed: '2026-05-15'
 ---
 
-# 그래프 표현
+# Data Structures with Python 101 (8/10): 그래프 표현
 
 이 글은 Data Structures with Python 101 시리즈의 여덟 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 소셜 네트워크, 지도, 의존성 관계는 코드에서 어떻게 표현할 수 있을까요?
 - 인접 리스트와 인접 행렬은 각각 언제 유리할까요?
 - BFS와 DFS는 무엇이 다르고 어디에 쓰일까요?
-- 가중치 그래프와 최단 경로 문제는 어떤 구조 위에서 풀릴까요?
 
-> 멘탈 모델: 그래프는 “노드들의 모음”이 아니라 “관계 자체를 데이터로 다루는 구조”입니다. 그래서 핵심은 값 하나보다, 누가 누구와 어떻게 연결되는가입니다.
+## 큰 그림
+
+![Data Structures with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
+
+*Data Structures with Python 101 8장 흐름 개요*
+
+이 그림에서는 그래프 표현를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 그래프 표현의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -54,10 +61,6 @@ last_reviewed: '2026-05-15'
 ```
 
 ## 그래프 표현을 그림으로 보면
-
-![그래프 표현을 그림으로 보면](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
-
-*같은 관계 데이터를 그래프와 인접 리스트로 읽는 방식을 함께 보여 주는 그림*
 
 ## 핵심 개념
 
@@ -313,17 +316,29 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 
 그래프는 관계를 표현하는 범용 자료구조입니다. 인접 리스트와 인접 행렬로 표현할 수 있고, BFS와 DFS로 순회할 수 있으며, 가중치가 붙으면 최단 경로 문제로 확장됩니다. 다음 글에서는 중복 제거와 집합 연산에 강한 set을 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **소셜 네트워크, 지도, 의존성 관계는 코드에서 어떻게 표현할 수 있을까요?**
+  - 본문의 기준은 그래프 표현를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **인접 리스트와 인접 행렬은 각각 언제 유리할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **BFS와 DFS는 무엇이 다르고 어디에 쓰일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [자료구조란 무엇인가?](./01-what-are-data-structures.md)
-- [배열과 리스트](./02-arrays-and-lists.md)
-- [스택과 큐](./03-stacks-and-queues.md)
-- [해시 테이블과 dict](./04-hash-tables-and-dict.md)
-- [연결 리스트](./05-linked-lists.md)
-- [트리와 이진 트리](./06-trees-and-binary-trees.md)
-- [힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
+## 시리즈 목차
+
+- [Data Structures with Python 101 (1/10): 자료구조란 무엇인가?](./01-what-are-data-structures.md)
+- [Data Structures with Python 101 (2/10): 배열과 리스트](./02-arrays-and-lists.md)
+- [Data Structures with Python 101 (3/10): 스택과 큐](./03-stacks-and-queues.md)
+- [Data Structures with Python 101 (4/10): 해시 테이블과 dict](./04-hash-tables-and-dict.md)
+- [Data Structures with Python 101 (5/10): 연결 리스트](./05-linked-lists.md)
+- [Data Structures with Python 101 (6/10): 트리와 이진 트리](./06-trees-and-binary-trees.md)
+- [Data Structures with Python 101 (7/10): 힙과 우선순위 큐](./07-heaps-and-priority-queues.md)
 - **그래프 표현 (현재 글)**
 - set과 집합 연산 (예정)
 - 자료구조 선택 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Stacks and Queues</title>
+<title>Data Structures with Python 101 (3/10): Stacks and Queues</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Stacks and Queues</h1>
+<h1>Data Structures with Python 101 (3/10): Stacks and Queues</h1>
 <blockquote>
 <p>Data Structures with Python 101 Series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: Why is list alone not enough for both stacks and queues?</p>
 <blockquote>
 <p>list implements stacks efficiently, but using list as a queue means popping from the front is O(n). This article covers the concepts of stack (LIFO) and queue (FIFO), Python implementations, and efficient queue implementation with deque.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 3 in the Data Structures with Python 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Stacks and Queues?</li>
+<li>Which signal should the example or diagram make visible for Stacks and Queues?</li>
+<li>What failure should be prevented first when Stacks and Queues reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Data Structures with Python 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.en.png"></p>
+<p><em>Data Structures with Python 101 chapter 3 flow overview</em></p>
+<p>This picture places Stacks and Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Stacks and Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How stacks (LIFO) and queues (FIFO) work</li>
@@ -83,7 +92,7 @@
 <blockquote>
 <p>Stack = LIFO (Last In, First Out), Queue = FIFO (First In, First Out)</p>
 </blockquote>
-<pre><code>[Stack — LIFO]            [Queue — FIFO]
+<pre><code class="language-text">[Stack — LIFO]            [Queue — FIFO]
   push -&gt; | C |           enqueue -&gt; | A | B | C | -&gt; dequeue
           | B |                     ^               ^
           | A |                   rear            front
@@ -295,9 +304,19 @@ print(f&quot;deque is {list_time / deque_time:.0f}x faster&quot;)
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Stacks operate on LIFO, queues on FIFO. In Python, stacks use list and queues use deque by convention. The next article explores hash tables and dict, which enable O(1) lookups.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Arrays and Lists</a></li>
+<li><strong>What boundary should you inspect first when applying Stacks and Queues?</strong></li>
+<li>The article treats Stacks and Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Stacks and Queues?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Stacks and Queues reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/01-what-are-data-structures.md">Data Structures with Python 101 (1/10): What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-python-101/en/02-arrays-and-lists.md">Data Structures with Python 101 (2/10): Arrays and Lists</a></li>
 <li><strong>Stacks and Queues (current)</strong></li>
 <li>Hash Tables and dict (upcoming)</li>
 <li>Linked Lists (upcoming)</li>
