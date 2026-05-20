@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:54:43+00:00
+Generated: 2026-05-20T11:55:03+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **26**
-- Series at or above 5 issues: **19**
-- Total issues: **200**
-  - BadImg: **200**
+- Series with any issue: **25**
+- Series at or above 5 issues: **18**
+- Total issues: **195**
+  - BadImg: **195**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -58,15 +58,14 @@ Warnings:
 | 15 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 16 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 17 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 18 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 19 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 20 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 21 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 22 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 23 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 24 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 25 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 26 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 18 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 19 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 20 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 21 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 22 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 23 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 24 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 25 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -271,17 +270,6 @@ Warnings:
 - `assets/observability-101/04/04-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=799x67)
 - `assets/observability-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1060x67)
 - ... 1 more
-
-## azure-functions-deep-dive — Total 5
-
-- BadImg=5 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.ko.png:1` — PNG height 74px <= 100px (size=1384x74)
-- `assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.en.png:1` — PNG height 96px <= 100px (size=1384x96)
-- `assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png:1` — PNG height 96px <= 100px (size=1384x96)
-- `assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png:1` — PNG height 52px <= 100px (size=1384x52)
-- `assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png:1` — PNG height 55px <= 100px (size=1384x55)
 
 ## git-github-101 — Total 5
 
