@@ -1,5 +1,5 @@
 ---
-title: Workers and the sandbox — where user code actually runs
+title: "Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs"
 series: azure-app-service-deep-dive
 episode: 3
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Compare the Windows App Service sandbox with Linux container boundaries to debug worker execution failures faster.
 ---
 
-# Workers and the sandbox — where user code actually runs
+# Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs
 
 “Works locally, fails in App Service” is often not a mystery inside your framework. It is usually a boundary problem: Windows code runs under a sandbox, while Linux apps live inside a container contract with different limits and startup rules.
 
@@ -53,21 +53,24 @@ Linux containers work,
 but Windows code apps do not.
 All of those symptoms start here.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Inside what sandbox does the Worker process run, and what does that sandbox actually block?
 - How do sandbox restrictions appear in file system, network, and process spawning?
 - When a worker dies, who starts healing on what signal?
-- What does Always On mean beyond a simple 'process keepalive'?
-- What is the first rule for writing sandbox-friendly code?
+
+## Big Picture
+
+![azure app service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
+
+*azure app service deep dive chapter 3 flow overview*
+
+This picture places Workers and the sandbox — where user code actually runs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Workers and the sandbox — where user code actually runs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The two worker models that matter
 
-![Windows and Linux worker execution boundaries](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
-
-*Windows and Linux worker execution boundaries*
 “Worker” is one platform term.
 The execution boundary under it differs by OS and hosting mode.
 
@@ -343,15 +346,24 @@ az webapp config appsettings list -n my-app -g my-rg \
 - [ ] Minimised Kudu/SCM access privileges
 - [ ] Run separate alerts on worker process memory and CPU metrics
 
+## Answering the Opening Questions
+
+- **Inside what sandbox does the Worker process run, and what does that sandbox actually block?**
+  - The article treats Workers and the sandbox — where user code actually runs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do sandbox restrictions appear in file system, network, and process spawning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When a worker dies, who starts healing on what signal?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- **Workers and the sandbox — where user code actually runs (current)**
-- Deployment and Kudu — build, sync, release from the inside (upcoming)
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- **Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs (current)**
+- Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

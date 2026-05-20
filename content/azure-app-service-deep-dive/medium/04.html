@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deployment and Kudu — build, sync, release from the inside</title>
+<title>Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Deployment and Kudu — build, sync, release from the inside</h1>
+<h1>Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside</h1>
 <p>“Deployment succeeded” is one of the most misleading sentences in App Service operations. An artifact can upload cleanly, land in the right path, and still leave you with a process that never becomes ready.</p>
 <p>This is the fourth post in the Azure App Service Deep Dive series.</p>
 <h2>Source Version</h2>
@@ -77,19 +77,21 @@ the public deployment engine at the center of that path is <strong>Kudu</strong>
 On Linux code apps,<br>
 the build stage is tightly connected to <strong>Oryx</strong>.</p>
 <p>This post follows that path end to end.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?</li>
 <li>How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?</li>
 <li>When you swap a Deployment Slot, what gets swapped and what does not?</li>
-<li>What does the warm-up page actually guarantee during a swap?</li>
-<li>Which deployment models allow automatic rollback on failure, and which do not?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure app service deep dive chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png"></p>
+<p><em>azure app service deep dive chapter 4 flow overview</em></p>
+<p>This picture places Deployment and Kudu — build, sync, release from the inside inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Deployment and Kudu — build, sync, release from the inside is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The deployment pipeline in one picture</h2>
-<p><img alt="Deployment path from upload to startup" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png"></p>
-<p><em>Deployment path from upload to startup</em><br>
-Read deployment incidents through these four stages.</p>
+<p>Read deployment incidents through these four stages.</p>
 <ol>
 <li>artifact upload failed</li>
 <li>build failed</li>
@@ -258,14 +260,23 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 <li>[ ] Confirmed no code relies on writing to a read-only filesystem under Run From Package</li>
 <li>[ ] Separated deployment privileges from slot privileges</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?</strong></li>
+<li>The article treats Deployment and Kudu — build, sync, release from the inside as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When you swap a Deployment Slot, what gets swapped and what does not?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Front-End and ARR — how a request reaches a worker</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Workers and the sandbox — where user code actually runs</a></li>
-<li><strong>Deployment and Kudu — build, sync, release from the inside (current)</strong></li>
-<li>Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
-<li>Cold start and warmup — why the first request is expensive (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs</a></li>
+<li><strong>Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (current)</strong></li>
+<li>Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
+<li>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

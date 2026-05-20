@@ -1,5 +1,5 @@
 ---
-title: App Service platform architecture — Front-End, Worker, File Server
+title: "Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server"
 series: azure-app-service-deep-dive
 episode: 1
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Understand how App Service Front-End, Worker, shared storage, and Kudu fit together into one operating model.
 ---
 
-# App Service platform architecture — Front-End, Worker, File Server
+# Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server
 
 App Service gets hard to reason about when every runtime symptom is collapsed into “the platform.” Restarts, slow first requests, sticky routing, and deployment side effects start to make sense only after you separate the boxes underneath the service name.
 
@@ -51,15 +51,21 @@ That is the boundary line:
 Functions Deep Dive looked inside the host process;
 this series looks at the platform that hosts it.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What layers really make up App Service's 'platform'?
 - Is an App Service Plan just a price tag, or is it an isolation unit?
 - Who owns the Front-End pool and the Worker pool, and where exactly does your code run?
-- How do internal differences between Linux and Windows plans affect your decisions?
-- How is App Service Environment (ASE) fundamentally different from the multi-tenant model?
+
+## Big Picture
+
+![azure app service deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
+
+*azure app service deep dive chapter 1 flow overview*
+
+This picture places App Service platform architecture — Front-End, Worker, File Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of App Service platform architecture — Front-End, Worker, File Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — one request through App Service
 
@@ -67,9 +73,6 @@ This is the map for the rest of the series.
 Each later episode zooms into one of these boxes.
 Get the layout into your head first and the lower-level details land much more cleanly.
 
-![One request path from Front-End to warm-up](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
-
-*One request path from Front-End to warm-up*
 The global entry and client edge are intro-series territory.
 The Front-End and ARR path are episode 2.
 Workers and the per-worker sandbox are episode 3.
@@ -361,15 +364,24 @@ az webapp show -n my-app -g my-rg \
 - [ ] Reviewed noisy-neighbour scenarios across apps on the same plan
 - [ ] Defined notification and regression-test flow for platform upgrades (OS, runtime)
 
+## Answering the Opening Questions
+
+- **What layers really make up App Service's 'platform'?**
+  - The article treats App Service platform architecture — Front-End, Worker, File Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Is an App Service Plan just a price tag, or is it an isolation unit?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Who owns the Front-End pool and the Worker pool, and where exactly does your code run?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **App Service platform architecture — Front-End, Worker, File Server (current)**
-- Front-End and ARR — how a request reaches a worker (upcoming)
-- Workers and the sandbox — where user code actually runs (upcoming)
-- Deployment and Kudu — build, sync, release from the inside (upcoming)
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- **Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server (current)**
+- Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker (upcoming)
+- Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs (upcoming)
+- Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (upcoming)
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

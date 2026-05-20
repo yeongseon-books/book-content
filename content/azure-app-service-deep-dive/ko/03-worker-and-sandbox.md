@@ -1,5 +1,5 @@
 ---
-title: Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
+title: "Azure App Service Deep Dive (3/6): Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가"
 series: azure-app-service-deep-dive
 episode: 3
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 App Service 실행 제약을 정리합니다.
 ---
 
-# Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
+# Azure App Service Deep Dive (3/6): Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
 
 로컬에서는 잘 되는데 App Service에서는 실패한다는 말은 흔하지만, 원인은 생각보다 자주 프레임워크 내부가 아니라 실행 경계에 있습니다. App Service는 같은 이름 아래에서 Windows code app과 Linux app을 모두 제공하지만, 실제 사용자 코드가 놓이는 경계와 제약은 두 환경에서 꽤 다르게 나타납니다.
 
@@ -30,13 +30,21 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 
 이제 worker 안쪽에서 사용자 코드가 실제로 어디에 놓이는지 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?
 - Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?
 - 왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?
-- Linux built-in과 custom container에서는 container boundary와 `/home` 마운트가 왜 핵심일까요?
-- "로컬에서는 되는데 App Service에서는 안 된다"는 증상을 어떻게 Windows형과 Linux형으로 나눠 볼 수 있을까요?
+
+## 큰 그림
+
+![Azure App Service Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.ko.png)
+
+*Azure App Service Deep Dive 3장 흐름 개요*
+
+이 그림에서는 Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 
 마지막으로 이 글은 4화의 배포 이야기와도 직접 이어집니다. 3화가 실행 경계를 설명한다면 4화는 아티팩트가 그 경계 안으로 어떻게 들어오는지를 설명합니다. 실행 경계와 배포 경계를 분리해 두어야 sandbox failure와 deployment-shape failure를 같은 문제로 오해하지 않게 됩니다.
 
-## worker 실행 경계를 이해하는 가장 좋은 방법: Windows sandbox와 Linux container를 서로 다른 계약으로 보는 것입니다
+## 핵심 관점
 
 이 글에서 가장 먼저 고정해야 할 문장은 이것입니다. **App Service의 worker는 하나의 용어이지만, Windows에서는 sandbox 안의 IIS-hosted process이고, Linux에서는 container contract 안의 프로세스입니다.** 같은 "worker"라는 단어가 같은 제약을 뜻하는 것은 아닙니다.
 
@@ -61,8 +69,6 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 ### worker는 하나의 이름 아래 두 가지 다른 실행 모델을 가집니다
 
 App Service 문맥에서 worker는 통일된 플랫폼 용어이지만, 운영자가 마주하는 실제 실행 경계는 OS와 호스팅 모드에 따라 달라집니다.
-
-![Windows 프로세스와 Linux 컨테이너의 실행 경계](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.ko.png)
 
 Windows code app에서는 앱이 IIS 아래에서 돌아가고 App Service sandbox 제약을 직접 받습니다. 반면 Linux built-in 또는 custom container에서는 컨테이너가 핵심 실행 경계입니다. 둘 다 격리는 제공하지만, 어떤 제약을 주고 어떤 실패를 유도하는지는 같지 않습니다.
 
@@ -180,15 +186,24 @@ az webapp config appsettings list -n my-app -g my-rg \
 
 다음 글에서는 실행 경계에서 한 걸음 더 나아가, 아티팩트가 이 경계 안으로 어떻게 들어오는지 보겠습니다. Kudu, Oryx, run-from-package, slot warm-up을 함께 놓고 배포 성공과 런타임 준비 완료가 왜 다른 질문인지 이어서 설명하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?**
+  - 본문의 기준은 Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
-- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
-- **Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (현재 글)**
-- 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (예정)
-- 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
-- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
+- [Azure App Service Deep Dive (1/6): App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- **Azure App Service Deep Dive (3/6): Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (현재 글)**
+- Azure App Service Deep Dive (4/6): 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (예정)
+- Azure App Service Deep Dive (5/6): 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
+- Azure App Service Deep Dive (6/6): 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
 
 <!-- toc:end -->
 

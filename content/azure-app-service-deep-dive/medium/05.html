@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scaling internals — how Scale Out decisions become new workers</title>
+<title>Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Scaling internals — how Scale Out decisions become new workers</h1>
+<h1>Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers</h1>
 <p>Autoscale looks instantaneous in architecture diagrams, but production behavior is slower and more mechanical than that. There is a real control loop between a threshold crossing and a worker that is healthy enough to receive traffic.</p>
 <p>This is the fifth post in the Azure App Service Deep Dive series.</p>
 <h2>Source Version</h2>
@@ -81,19 +81,21 @@ the safe facts are clear.</p>
 </ul>
 <p>This episode goes one level deeper without inventing private internals.<br>
 The goal is to map the <strong>publicly observable scale-decision loop</strong> into a usable worker-pool mental model.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>On what metric sources and what cadence does auto-scale evaluate rules?</li>
 <li>Scale-out and scale-up are not the same decision tree — who decides what, and how?</li>
 <li>When should you turn per-site scaling on, and when is it dangerous?</li>
-<li>During scale, how far is cold-start of a new instance shielded from the user?</li>
-<li>On scale-in, what happens to existing connections and any stateful in-process state?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure app service deep dive chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png"></p>
+<p><em>azure app service deep dive chapter 5 flow overview</em></p>
+<p>This picture places Scaling internals — how Scale Out decisions become new workers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scaling internals — how Scale Out decisions become new workers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The control path in one diagram</h2>
-<p><img alt="Autoscale control path to new workers" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png"></p>
-<p><em>Autoscale control path to new workers</em><br>
-Two things matter here.</p>
+<p>Two things matter here.</p>
 <ol>
 <li>separate the decision engine from the execution substrate</li>
 <li>stop imagining that the app directly “creates VMs” for itself</li>
@@ -296,14 +298,23 @@ az monitor metrics list \
 <li>[ ] Put scale-event alerts and instance-count graphs on the dashboard</li>
 <li>[ ] Split runbooks for scale-up (SKU change) and scale-out</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>On what metric sources and what cadence does auto-scale evaluate rules?</strong></li>
+<li>The article treats Scaling internals — how Scale Out decisions become new workers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Scale-out and scale-up are not the same decision tree — who decides what, and how?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When should you turn per-site scaling on, and when is it dangerous?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Front-End and ARR — how a request reaches a worker</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Workers and the sandbox — where user code actually runs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/04-deployment-and-kudu.md">Deployment and Kudu — build, sync, release from the inside</a></li>
-<li><strong>Scaling internals — how Scale Out decisions become new workers (current)</strong></li>
-<li>Cold start and warmup — why the first request is expensive (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/04-deployment-and-kudu.md">Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside</a></li>
+<li><strong>Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (current)</strong></li>
+<li>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

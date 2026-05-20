@@ -1,5 +1,5 @@
 ---
-title: Deployment and Kudu — build, sync, release from the inside
+title: "Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside"
 series: azure-app-service-deep-dive
 episode: 4
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Trace App Service deployment from Kudu upload through Oryx build, run-from-package, slot warm-up, and runtime readiness.
 ---
 
-# Deployment and Kudu — build, sync, release from the inside
+# Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside
 
 “Deployment succeeded” is one of the most misleading sentences in App Service operations. An artifact can upload cleanly, land in the right path, and still leave you with a process that never becomes ready.
 
@@ -49,21 +49,24 @@ the build stage is tightly connected to **Oryx**.
 
 This post follows that path end to end.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?
 - How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?
 - When you swap a Deployment Slot, what gets swapped and what does not?
-- What does the warm-up page actually guarantee during a swap?
-- Which deployment models allow automatic rollback on failure, and which do not?
+
+## Big Picture
+
+![azure app service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+
+*azure app service deep dive chapter 4 flow overview*
+
+This picture places Deployment and Kudu — build, sync, release from the inside inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deployment and Kudu — build, sync, release from the inside is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The deployment pipeline in one picture
 
-![Deployment path from upload to startup](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
-
-*Deployment path from upload to startup*
 Read deployment incidents through these four stages.
 
 1. artifact upload failed
@@ -285,15 +288,24 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 - [ ] Confirmed no code relies on writing to a read-only filesystem under Run From Package
 - [ ] Separated deployment privileges from slot privileges
 
+## Answering the Opening Questions
+
+- **Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?**
+  - The article treats Deployment and Kudu — build, sync, release from the inside as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When you swap a Deployment Slot, what gets swapped and what does not?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
-- [Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
-- [Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
-- **Deployment and Kudu — build, sync, release from the inside (current)**
-- Scaling internals — how Scale Out decisions become new workers (upcoming)
-- Cold start and warmup — why the first request is expensive (upcoming)
+- [Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs](./03-worker-and-sandbox.md)
+- **Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (current)**
+- Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)
+- Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)
 
 <!-- toc:end -->
 

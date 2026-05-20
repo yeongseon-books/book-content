@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Front-End and ARR — how a request reaches a worker</title>
+<title>Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Front-End and ARR — how a request reaches a worker</h1>
+<h1>Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker</h1>
 <p>Many App Service incidents start before your code runs. If you cannot explain how the Front-End resolves a host name, keeps affinity, and picks a worker, partial outages keep looking random.</p>
 <p>This is the second post in the Azure App Service Deep Dive series.</p>
 <h2>Source Version</h2>
@@ -75,19 +75,21 @@ This post zooms into the left edge of that map.</p>
 you understand when ARR Affinity should be turned off,<br>
 why only some users keep hitting a bad instance,<br>
 and why App Service keeps pushing you toward stateless design.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?</li>
 <li>Is the ARR Affinity cookie just a sticky session, or more than that?</li>
 <li>How do TLS termination and SNI handling flow through the Front End?</li>
-<li>How do custom domains and hostname bindings change Front-End routing?</li>
-<li>From the user's perspective, how does a Front-End failure look different from a Worker failure?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure app service deep dive chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png"></p>
+<p><em>azure app service deep dive chapter 2 flow overview</em></p>
+<p>This picture places Front-End and ARR — how a request reaches a worker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Front-End and ARR — how a request reaches a worker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The routing path in three stages</h2>
-<p><img alt="Three-stage path from ingress to worker" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png"></p>
-<p><em>Three-stage path from ingress to worker</em><br>
-At the public-documentation level, this is the safe mental model.</p>
+<p>At the public-documentation level, this is the safe mental model.</p>
 <ol>
 <li>The request enters the Front-End.</li>
 <li>The Front-End resolves the app and slot.</li>
@@ -298,14 +300,23 @@ curl -s https://my-app.azurewebsites.net/diag/worker
 <li>[ ] Catalogued routing priority and redirect rules per custom domain</li>
 <li>[ ] Separated paths that require client-cert auth from those that do not</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?</strong></li>
+<li>The article treats Front-End and ARR — how a request reaches a worker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Is the ARR Affinity cookie just a sticky session, or more than that?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do TLS termination and SNI handling flow through the Front End?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
-<li><strong>Front-End and ARR — how a request reaches a worker (current)</strong></li>
-<li>Workers and the sandbox — where user code actually runs (upcoming)</li>
-<li>Deployment and Kudu — build, sync, release from the inside (upcoming)</li>
-<li>Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
-<li>Cold start and warmup — why the first request is expensive (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><strong>Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker (current)</strong></li>
+<li>Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs (upcoming)</li>
+<li>Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside (upcoming)</li>
+<li>Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers (upcoming)</li>
+<li>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -1,5 +1,5 @@
 ---
-title: 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
+title: "Azure App Service Deep Dive (4/6): 배포와 Kudu — 빌드·동기화·릴리스의 안쪽"
 series: azure-app-service-deep-dive
 episode: 4
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-15'
 seo_description: Kudu, Oryx, run-from-package, slot warm-up으로 App Service 배포 경로를 해부합니다.
 ---
 
-# 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
+# Azure App Service Deep Dive (4/6): 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
 App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단계를 뭉뚱그린 표현입니다. artifact가 SCM 엔드포인트에 도착하는 것, 서버 쪽 build automation이 돌아가는 것, 결과물이 `wwwroot` 또는 mounted package 형태로 놓이는 것, 그리고 앱 프로세스가 실제로 새 코드를 들고 readiness를 통과하는 것은 서로 다른 경계입니다.
 
@@ -30,13 +30,21 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 
 이제 artifact가 worker가 보는 런타임 경로까지 도달하는 과정을 차례로 따라가 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?
 - ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?
 - Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?
-- `SCM_DO_BUILD_DURING_DEPLOYMENT`와 run-from-package는 배포 의미를 어떻게 바꿀까요?
-- slot 배포와 warm-up은 왜 배포 성공과 런타임 성공을 분리해서 보게 만들까요?
+
+## 큰 그림
+
+![Azure App Service Deep Dive 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
+
+*Azure App Service Deep Dive 4장 흐름 개요*
+
+이 그림에서는 배포와 Kudu — 빌드·동기화·릴리스의 안쪽를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 배포와 Kudu — 빌드·동기화·릴리스의 안쪽의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +54,7 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 
 마지막으로 이 글은 5화와 6화의 전제이기도 합니다. deployment slot의 진짜 가치는 파일 copy 자체보다 production URL 바깥에서 warm-up을 끝낼 수 있다는 데 있습니다. 따라서 배포와 warm-up은 separate topic처럼 보여도 실제 운영에서는 하나의 연속된 경로로 봐야 합니다.
 
-## 배포 경로를 이해하는 가장 좋은 방법: artifact upload, build, placement, startup readiness를 서로 다른 단계로 나눠 보는 것입니다
+## 핵심 관점
 
 이 주제에서 가장 중요한 문장은 이것입니다. **App Service 배포는 파일을 올리는 행위가 아니라, artifact를 받는 단계와 build automation 단계, 런타임이 읽는 경로에 배치하는 단계, 그리고 새 코드가 실제로 traffic-eligible 상태가 되는 단계를 차례로 통과하는 과정입니다.** 이 네 단계를 분리해야 Kudu success와 app readiness를 혼동하지 않게 됩니다.
 
@@ -61,8 +69,6 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 ### 배포 파이프라인은 한 장의 그림으로 먼저 보는 편이 좋습니다
 
 배포 문제를 읽을 때 가장 실용적인 출발점은 네 단계 모델입니다. upload 실패, build 실패, file placement 실패, placement는 끝났지만 runtime startup 실패라는 네 경계로 나누면 진단 순서가 훨씬 분명해집니다.
-
-![업로드부터 런타임 기동까지 이어지는 배포 경로](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
 
 이 모델이 좋은 이유는 "배포 실패"를 덩어리로 두지 않기 때문입니다. artifact를 받은 쪽이 실패했는지, build automation이 실패했는지, 최종 경로 배치가 실패했는지, 아니면 앱이 새 파일을 읽고도 startup contract를 지키지 못했는지 서로 다른 층으로 나뉩니다.
 
@@ -156,15 +162,24 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 
 다음 글에서는 control plane 관점에서 scale-out이 어떻게 worker 증가로 이어지는지 보겠습니다. 배포가 끝나 새 코드가 준비되더라도, 실제 사용자 경험은 결국 새 worker가 언제 healthy routing pool에 들어오는가에 달려 있기 때문입니다.
 
+## 처음 질문으로 돌아가기
+
+- **Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?**
+  - 본문의 기준은 배포와 Kudu — 빌드·동기화·릴리스의 안쪽를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
-- [Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
-- [Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
-- **배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (현재 글)**
-- 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
-- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
+- [Azure App Service Deep Dive (1/6): App Service 플랫폼 아키텍처 — Front-End·Worker·File Server](./01-platform-architecture.md)
+- [Azure App Service Deep Dive (2/6): Front-End과 ARR — 요청은 어떻게 워커에 도달하는가](./02-front-end-and-arr.md)
+- [Azure App Service Deep Dive (3/6): Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가](./03-worker-and-sandbox.md)
+- **Azure App Service Deep Dive (4/6): 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (현재 글)**
+- Azure App Service Deep Dive (5/6): 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
+- Azure App Service Deep Dive (6/6): 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
 
 <!-- toc:end -->
 

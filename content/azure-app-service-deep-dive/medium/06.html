@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cold start and warmup — why the first request is expensive</title>
+<title>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Cold start and warmup — why the first request is expensive</h1>
+<h1>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive</h1>
 <p>The first slow request is usually not “just latency.” It is the visible cost of turning an idle, recycled, or newly allocated execution path into something that can safely take real traffic.</p>
 <p>This is the final post in the Azure App Service Deep Dive series.</p>
 <h2>Source Version</h2>
@@ -73,19 +73,21 @@ and how does App Service try to reduce that cost?</strong></p>
 <p>Cold start is not a vague symptom.<br>
 It means there is no warm execution unit ready yet,<br>
 or the new process or container has not finished becoming traffic-eligible.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What sequence of steps actually adds up to cold-start on App Service?</li>
 <li>How much does Always On reduce cold-start, and when does it not help at all?</li>
 <li>What must a warm-up ping hit to be meaningful, and what would give false confidence?</li>
-<li>Per runtime (.NET, Node, Python), where does the dominant cold-start cost live?</li>
-<li>How do you express cold-start latency in an SLO — mean or p99?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure app service deep dive chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png"></p>
+<p><em>azure app service deep dive chapter 6 flow overview</em></p>
+<p>This picture places Cold start and warmup — why the first request is expensive inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cold start and warmup — why the first request is expensive is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The cold path and the warm path</h2>
-<p><img alt="First request waiting for a ready worker" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png"></p>
-<p><em>First request waiting for a ready worker</em><br>
-That one diagram is the whole story.<br>
+<p>That one diagram is the whole story.<br>
 The cost the user feels on the first request is usually the cost of turning an execution unit from “not ready” into “ready.”</p>
 <hr>
 <h2>Are warm-up signals the same on Windows and Linux?</h2>
@@ -255,14 +257,23 @@ done | sort -k2 -n | tail -10
 <li>[ ] Pinned p99 cold-start in the SLO document</li>
 <li>[ ] Load-tested the scenario where scale-out exposes cold-start to users</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What sequence of steps actually adds up to cold-start on App Service?</strong></li>
+<li>The article treats Cold start and warmup — why the first request is expensive as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How much does Always On reduce cold-start, and when does it not help at all?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What must a warm-up ping hit to be meaningful, and what would give false confidence?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">App Service platform architecture — Front-End, Worker, File Server</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Front-End and ARR — how a request reaches a worker</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Workers and the sandbox — where user code actually runs</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/04-deployment-and-kudu.md">Deployment and Kudu — build, sync, release from the inside</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/05-scaling-internals.md">Scaling internals — how Scale Out decisions become new workers</a></li>
-<li><strong>Cold start and warmup — why the first request is expensive (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/01-platform-architecture.md">Azure App Service Deep Dive (1/6): App Service platform architecture — Front-End, Worker, File Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/02-front-end-and-arr.md">Azure App Service Deep Dive (2/6): Front-End and ARR — how a request reaches a worker</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/03-worker-and-sandbox.md">Azure App Service Deep Dive (3/6): Workers and the sandbox — where user code actually runs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/04-deployment-and-kudu.md">Azure App Service Deep Dive (4/6): Deployment and Kudu — build, sync, release from the inside</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-app-service-deep-dive/en/05-scaling-internals.md">Azure App Service Deep Dive (5/6): Scaling internals — how Scale Out decisions become new workers</a></li>
+<li><strong>Azure App Service Deep Dive (6/6): Cold start and warmup — why the first request is expensive (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>
