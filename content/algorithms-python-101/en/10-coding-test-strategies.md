@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 10
-title: Coding Test Problem-Solving Strategies
+title: "Algorithms with Python 101 (10/10): Coding Test Problem-Solving Strategies"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Learn systematic strategies for coding tests — from analyzing
 last_reviewed: '2026-05-04'
 ---
 
-# Coding Test Problem-Solving Strategies
+# Algorithms with Python 101 (10/10): Coding Test Problem-Solving Strategies
 
 This is the final post in the Algorithms with Python 101 series. Knowing algorithms is not the same as applying them under time pressure, and in a coding test the real challenge is reading constraints quickly and mapping the problem to the right pattern before you get lost in implementation.
 
 This chapter connects the earlier posts through one continuous flow: read constraints first, reject the wrong complexity first, then carry the problem all the way through implementation and verification. A repeatable approach matters because it saves time, reduces avoidable mistakes, and helps you recover even when the problem is unfamiliar.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?
+- Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?
+- What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.en.png)
+
+*Algorithms with Python 101 chapter 10 flow overview*
+
+This picture places Coding Test Problem-Solving Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Coding Test Problem-Solving Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -152,7 +168,6 @@ def solve_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
 
     return None
 
-
 sample_nums = [7, 1, 11, 2, 9]
 sample_target = 10
 sample_answer = solve_two_sum(sample_nums, sample_target)
@@ -209,7 +224,6 @@ verification_cases = [
         "inspect_first": "check that the while loop exits immediately when fewer than two elements exist",
     },
 ]
-
 
 for case in verification_cases:
     actual = solve_two_sum(case["nums"], case["target"])
@@ -324,17 +338,29 @@ The same mindset applies in production work. "Is this algorithm fast enough for 
 
 The most important skill in coding tests is identifying the problem type quickly and discarding the approaches that cannot possibly meet the constraints. Once you internalize the full flow — input size → time complexity → algorithm choice → implementation → verification — you can approach unfamiliar problems systematically. The search, sorting, recursion, DP, graph, and greedy techniques in this series form the toolkit, but the final level of reliability comes from the verification loop.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?**
+  - The article treats Coding Test Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming Basics](./06-dynamic-programming-basics.md)
-- [Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
-- [Shortest Path Basics](./08-shortest-path-basics.md)
-- [Greedy Algorithms](./09-greedy-algorithms.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): Dynamic Programming Basics](./06-dynamic-programming-basics.md)
+- [Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
+- [Algorithms with Python 101 (8/10): Shortest Path Basics](./08-shortest-path-basics.md)
+- [Algorithms with Python 101 (9/10): Greedy Algorithms](./09-greedy-algorithms.md)
 - **Coding Test Problem-Solving Strategies (current)**
+
 <!-- toc:end -->
 
 ## References

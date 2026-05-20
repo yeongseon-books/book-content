@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 5
-title: Recursion and Divide and Conquer
+title: "Algorithms with Python 101 (5/10): Recursion and Divide and Conquer"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Understand recursion and the divide-and-conquer strategy in Pyt
 last_reviewed: '2026-05-04'
 ---
 
-# Recursion and Divide and Conquer
+# Algorithms with Python 101 (5/10): Recursion and Divide and Conquer
 
 Recursion is one of those ideas that looks simple on the surface and confusing in practice. Once it clicks, though, a lot of algorithm patterns start to feel much more consistent.
 
 Divide and conquer is one of the most important of those patterns. It shows up in binary search, merge sort, quick sort, and many problems that become manageable only after you split them into smaller parts.
 
 This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Recursion and Divide and Conquer?
+- Which signal should the example or diagram make visible for Recursion and Divide and Conquer?
+- What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.en.png)
+
+*Algorithms with Python 101 chapter 5 flow overview*
+
+This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Recursion and Divide and Conquer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -103,7 +119,6 @@ def factorial(n: int) -> int:
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
-
 def fibonacci(n: int) -> int:
     """Fibonacci — O(2^n), inefficient."""
     if n <= 1:  # base case
@@ -174,7 +189,6 @@ def find_max(data: list[int], left: int, right: int) -> int:
 data = [3, 7, 2, 9, 1, 8, 4]
 print(find_max(data, 0, len(data) - 1))  # 9
 
-
 def hanoi(n: int, source: str, target: str, auxiliary: str):
     """Tower of Hanoi — O(2^n)."""
     if n == 1:
@@ -205,7 +219,6 @@ def factorial_iter(n: int) -> int:
     return result
 
 print(factorial_iter(10))  # 3628800
-
 
 # Recursive fibonacci → memoized fibonacci
 from functools import lru_cache
@@ -279,17 +292,29 @@ The real value is learning to recognize the divide-and-conquer pattern. Habitual
 
 Recursion is a technique where a function calls itself; divide and conquer is a strategy that uses recursion to systematically break down problems. In the next article, we tackle the redundant computation problem with dynamic programming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Recursion and Divide and Conquer?**
+  - The article treats Recursion and Divide and Conquer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Recursion and Divide and Conquer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
 - **Recursion and Divide and Conquer (current)**
 - Dynamic Programming Basics (upcoming)
 - Graph Traversal — BFS and DFS (upcoming)
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

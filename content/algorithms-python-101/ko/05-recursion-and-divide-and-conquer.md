@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 5
-title: 재귀와 분할 정복
+title: "Algorithms with Python 101 (5/10): 재귀와 분할 정복"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 재귀 함수의 동작 원리와 기저 조건의 중요성을
 last_reviewed: '2026-05-12'
 ---
 
-# 재귀와 분할 정복
+# Algorithms with Python 101 (5/10): 재귀와 분할 정복
 
 재귀는 겉으로 보면 단순한데, 실제로 구현할 때는 갑자기 어렵게 느껴지는 개념입니다. 하지만 한 번 감이 잡히면 많은 알고리즘 패턴이 훨씬 일관되게 보이기 시작합니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-12'
 
 분할 정복은 그 패턴 가운데에서도 특히 중요합니다. 이진 탐색, 병합 정렬, 퀵 정렬처럼 이미 본 알고리즘들이 모두 이 아이디어 위에 서 있습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 재귀 함수는 어떻게 동작하고 호출 스택은 어떤 모양일까요?
 - 기저 조건은 왜 그렇게 중요할까요?
 - 분할 정복의 세 단계는 어떻게 구분할 수 있을까요?
-- 재귀를 반복문으로 바꾸는 이유와 메모이제이션의 가치는 무엇일까요?
+
+## 큰 그림
+
+![Algorithms with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.ko.png)
+
+*Algorithms with Python 101 5장 흐름 개요*
+
+이 그림에서는 재귀와 분할 정복를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 재귀와 분할 정복의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -102,7 +111,6 @@ def factorial(n: int) -> int:
 
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
-
 
 def fibonacci(n: int) -> int:
     """Fibonacci — O(2^n), inefficient."""
@@ -180,7 +188,6 @@ def find_max(data: list[int], left: int, right: int) -> int:
 data = [3, 7, 2, 9, 1, 8, 4]
 print(find_max(data, 0, len(data) - 1))  # 9
 
-
 def hanoi(n: int, source: str, target: str, auxiliary: str):
     """Tower of Hanoi — O(2^n)."""
     if n == 1:
@@ -213,7 +220,6 @@ def factorial_iter(n: int) -> int:
     return result
 
 print(factorial_iter(10))  # 3628800
-
 
 # Recursive fibonacci → memoized fibonacci
 from functools import lru_cache
@@ -283,17 +289,29 @@ print(f"Max recursion depth: {sys.getrecursionlimit()}")  # default 1000
 
 재귀는 함수가 자기 자신을 호출하는 기법이고, 분할 정복은 그 재귀를 이용해 문제를 체계적으로 쪼개는 전략입니다. 다음 글에서는 중복 계산을 본격적으로 줄이는 도구인 동적 계획법을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **재귀 함수는 어떻게 동작하고 호출 스택은 어떤 모양일까요?**
+  - 본문의 기준은 재귀와 분할 정복를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **기저 조건은 왜 그렇게 중요할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **분할 정복의 세 단계는 어떻게 구분할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
-- [시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
-- [선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
+## 시리즈 목차
+
+- [Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): 시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): 선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
 - **재귀와 분할 정복 (현재 글)**
 - 동적 계획법 기초 (예정)
 - 그래프 탐색 — BFS와 DFS (예정)
 - 최단 경로 기초 (예정)
 - 그리디 알고리즘 (예정)
 - 코딩 테스트 문제 접근법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

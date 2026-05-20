@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Greedy Algorithms</title>
+<title>Algorithms with Python 101 (9/10): Greedy Algorithms</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Greedy Algorithms</h1>
+<h1>Algorithms with Python 101 (9/10): Greedy Algorithms</h1>
 <p>Greedy algorithms are appealing because they often turn a hard-looking problem into a short implementation with strong performance. In the right setting, a single smart choice at each step is enough.</p>
 <p>The catch is that greedy logic is not universally safe. You need to know why it works for one problem and fails for another, or the simplicity becomes a trap.</p>
 <p>This is post 9 in the Algorithms with Python 101 series. Here, we'll examine the conditions that make greedy strategies valid and test them on classic Python examples.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Greedy Algorithms?</li>
+<li>Which signal should the example or diagram make visible for Greedy Algorithms?</li>
+<li>What failure should be prevented first when Greedy Algorithms reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 9 flow overview</em></p>
+<p>This picture places Greedy Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Greedy Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The conditions under which greedy algorithms produce optimal solutions</li>
@@ -82,8 +95,6 @@ Make change for 1,260:
 →  10 × 1 = 10    (remaining: 0)
 Total: 6 coins — optimal via greedy
 </code></pre>
-<p><img alt="Greedy rule selection and counterexample validation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.en.png"></p>
-<p><em>A greedy algorithm is not “pick the biggest thing.” It is a rule that still has to survive counterexamples.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Greedy choice property</strong><br>
 - Description: The local optimum is part of the global optimum</p>
@@ -290,15 +301,25 @@ print(f&quot;DP:     {coin_change_dp(coins, amount)} coins&quot;)            # 2
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Greedy algorithms make the locally optimal choice at each step. They are efficient — often sort + single pass — but do not always guarantee the optimal solution. In the final article, we wrap up the series with a practical guide to coding test problem-solving strategies.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Graph Traversal — BFS and DFS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/08-shortest-path-basics.md">Shortest Path Basics</a></li>
+<li><strong>What boundary should you inspect first when applying Greedy Algorithms?</strong></li>
+<li>The article treats Greedy Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Greedy Algorithms?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Greedy Algorithms reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Algorithms with Python 101 (2/10): Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Algorithms with Python 101 (3/10): Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Algorithms with Python 101 (4/10): Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Algorithms with Python 101 (5/10): Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Algorithms with Python 101 (6/10): Dynamic Programming Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/08-shortest-path-basics.md">Algorithms with Python 101 (8/10): Shortest Path Basics</a></li>
 <li><strong>Greedy Algorithms (current)</strong></li>
 <li>Coding Test Problem-Solving Strategies (upcoming)</li>
 </ul>

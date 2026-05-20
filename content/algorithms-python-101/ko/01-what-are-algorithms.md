@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 1
-title: 알고리즘이란 무엇인가?
+title: "Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 알고리즘의 정의와 다섯 가지 핵심 성질을 파이
 last_reviewed: '2026-05-12'
 ---
 
-# 알고리즘이란 무엇인가?
+# Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?
 
 프로그래밍은 결국 문제를 푸는 일입니다. 같은 답을 내는 코드라도 입력이 커지면 완전히 다른 성능을 보일 수 있고, 그 차이는 대개 알고리즘에서 시작됩니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-12'
 
 알고리즘은 코딩 테스트에서만 중요한 주제가 아닙니다. 성능 최적화, 데이터 처리, 시스템에서의 트레이드오프 판단까지, 개발자가 실무에서 문제를 바라보는 방식 자체를 바꿉니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 알고리즘은 정확히 무엇이며, 어떤 성질을 가져야 할까요?
 - 알고리즘을 의사코드나 Python 코드로 어떻게 표현할 수 있을까요?
 - 같은 문제를 푸는 두 알고리즘은 왜 효율이 크게 달라질까요?
-- 정확성과 효율성은 어떻게 구분해서 봐야 할까요?
+
+## 큰 그림
+
+![Algorithms with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/01/01-01-big-picture.ko.png)
+
+*Algorithms with Python 101 1장 흐름 개요*
+
+이 그림에서는 알고리즘이란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 알고리즘이란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -164,7 +173,6 @@ print("algorithm"[::-1])  # mhtirogla
 ```python
 import time
 
-
 def has_duplicate_brute(data: list[int]) -> bool:
     """Check for duplicates — brute force O(n^2)."""
     for i in range(len(data)):
@@ -172,7 +180,6 @@ def has_duplicate_brute(data: list[int]) -> bool:
             if data[i] == data[j]:
                 return True
     return False
-
 
 def has_duplicate_set(data: list[int]) -> bool:
     """Check for duplicates — set-based O(n)."""
@@ -273,7 +280,18 @@ print(is_palindrome("A man a plan a canal Panama"))  # True
 
 알고리즘은 문제를 해결하는 명확한 절차이며, 어떤 알고리즘을 선택하느냐가 성능과 확장성을 크게 좌우합니다. 다음 글에서는 이 효율을 더 객관적으로 비교하는 도구인 시간 복잡도와 Big-O 표기법을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **알고리즘은 정확히 무엇이며, 어떤 성질을 가져야 할까요?**
+  - 본문의 기준은 알고리즘이란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **알고리즘을 의사코드나 Python 코드로 어떻게 표현할 수 있을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **같은 문제를 푸는 두 알고리즘은 왜 효율이 크게 달라질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **알고리즘이란 무엇인가? (현재 글)**
 - 시간 복잡도와 Big-O (예정)
 - 선형 탐색과 이진 탐색 (예정)
@@ -284,6 +302,7 @@ print(is_palindrome("A man a plan a canal Panama"))  # True
 - 최단 경로 기초 (예정)
 - 그리디 알고리즘 (예정)
 - 코딩 테스트 문제 접근법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

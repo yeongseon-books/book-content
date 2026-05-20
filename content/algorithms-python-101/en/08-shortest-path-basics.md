@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 8
-title: Shortest Path Basics
+title: "Algorithms with Python 101 (8/10): Shortest Path Basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Implement Dijkstra's algorithm in Python using heapq to find sh
 last_reviewed: '2026-05-04'
 ---
 
-# Shortest Path Basics
+# Algorithms with Python 101 (8/10): Shortest Path Basics
 
 Route planning, network latency, and logistics optimization all come down to the same question: what is the cheapest path from here to there?
 
 Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.
 
 This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with `heapq`.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Shortest Path Basics?
+- Which signal should the example or diagram make visible for Shortest Path Basics?
+- What failure should be prevented first when Shortest Path Basics reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png)
+
+*Algorithms with Python 101 chapter 8 flow overview*
+
+This picture places Shortest Path Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Shortest Path Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -58,10 +74,6 @@ C --5-- E
 A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 ```
-
-![Priority queue and relaxation flow in Dijkstra's algorithm](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png)
-
-*Dijkstra keeps pulling the nearest candidate first, then updates distances whenever it discovers a cheaper path.*
 
 ## Key Concepts
 
@@ -138,7 +150,6 @@ for node, neighbors in graph.items():
 ```python
 import heapq
 
-
 def dijkstra(
     graph: dict[str, list[tuple[str, int]]], start: str
 ) -> dict[str, int]:
@@ -173,7 +184,6 @@ for node, d in sorted(distances.items()):
 
 ```python
 import heapq
-
 
 def dijkstra_with_path(
     graph: dict[str, list[tuple[str, int]]], start: str
@@ -214,7 +224,6 @@ for node in sorted(paths):
 
 ```python
 import heapq
-
 
 def grid_shortest_path(grid: list[list[int]]) -> int:
     """Minimum-cost path from top-left to bottom-right in a grid."""
@@ -318,17 +327,29 @@ In production, you use NetworkX's shortest_path() or a mapping API. But understa
 
 Dijkstra's algorithm finds shortest paths in non-negative weighted graphs in O((V+E) log V). The key insight is processing the nearest unfinalized node first via a priority queue. In the next article, we explore greedy algorithms — the strategy of always making the locally optimal choice.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Shortest Path Basics?**
+  - The article treats Shortest Path Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Shortest Path Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Shortest Path Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming Basics](./06-dynamic-programming-basics.md)
-- [Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): Dynamic Programming Basics](./06-dynamic-programming-basics.md)
+- [Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS](./07-graph-traversal-bfs-dfs.md)
 - **Shortest Path Basics (current)**
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 3
-title: Linear Search and Binary Search
+title: "Algorithms with Python 101 (3/10): Linear Search and Binary Search"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Implement linear search and binary search in Python, compare th
 last_reviewed: '2026-05-04'
 ---
 
-# Linear Search and Binary Search
+# Algorithms with Python 101 (3/10): Linear Search and Binary Search
 
 Searching is one of the most common operations in programming. On a small list, a linear scan is fine. On a large sorted list, cutting the search space in half each step changes the problem completely.
 
 That is why binary search shows up far beyond textbook examples. The same pattern appears whenever you need the first value that satisfies a condition, not just an exact match.
 
 This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Linear Search and Binary Search?
+- Which signal should the example or diagram make visible for Linear Search and Binary Search?
+- What failure should be prevented first when Linear Search and Binary Search reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.en.png)
+
+*Algorithms with Python 101 chapter 3 flow overview*
+
+This picture places Linear Search and Binary Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Linear Search and Binary Search is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -192,7 +208,6 @@ print(f"First position > 5: {upper}")   # 5
 import time
 import bisect
 
-
 def benchmark_search(n: int):
     data = list(range(n))
     target = n - 1  # worst case
@@ -273,9 +288,20 @@ You rarely implement binary search from scratch. The bisect module or database i
 
 Linear search is O(n); binary search is O(log n). Binary search only works on sorted data, but the performance gap is dramatic as data grows. In the next article, we cover the core algorithms that sort data.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Linear Search and Binary Search?**
+  - The article treats Linear Search and Binary Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Linear Search and Binary Search?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Linear Search and Binary Search reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
 - **Linear Search and Binary Search (current)**
 - Sorting Algorithms (upcoming)
 - Recursion and Divide and Conquer (upcoming)
@@ -284,6 +310,7 @@ Linear search is O(n); binary search is O(log n). Binary search only works on so
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

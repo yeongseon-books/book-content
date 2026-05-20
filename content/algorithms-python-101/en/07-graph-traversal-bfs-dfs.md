@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 7
-title: Graph Traversal — BFS and DFS
+title: "Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Represent graphs in Python and implement BFS and DFS for shorte
 last_reviewed: '2026-05-04'
 ---
 
-# Graph Traversal — BFS and DFS
+# Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS
 
 Networks, maps, dependency trees, and recommendation systems all reduce to relationships between nodes. That is why graph thinking shows up so often once you move past basic arrays and lists.
 
 BFS and DFS are the two foundational traversal strategies. If you can tell when to use each one, shortest paths, cycle checks, and connected-component problems become much easier to reason about.
 
 This is post 7 in the Algorithms with Python 101 series. Here, we'll represent graphs in Python and implement both BFS and DFS with practical use cases in mind.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Graph Traversal — BFS and DFS?
+- Which signal should the example or diagram make visible for Graph Traversal — BFS and DFS?
+- What failure should be prevented first when Graph Traversal — BFS and DFS reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.en.png)
+
+*Algorithms with Python 101 chapter 7 flow overview*
+
+This picture places Graph Traversal — BFS and DFS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Graph Traversal — BFS and DFS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -55,10 +71,6 @@ Example graph:     BFS order:           DFS order:
   |/ \
   E   F
 ```
-
-![BFS layers compared with a DFS-first path](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.en.png)
-
-*BFS expands level by level, while DFS commits to one branch first and backtracks later.*
 
 ## Key Concepts
 
@@ -138,7 +150,6 @@ weighted_graph: dict[str, list[tuple[str, int]]] = {
 ```python
 from collections import deque
 
-
 def bfs(graph: dict[str, list[str]], start: str) -> list[str]:
     """BFS — O(V+E), uses a queue."""
     visited = {start}
@@ -178,7 +189,6 @@ def dfs_recursive(
 
 print(dfs_recursive(graph, "A"))  # ['A', 'B', 'D', 'C', 'E', 'F']
 
-
 def dfs_iterative(graph: dict[str, list[str]], start: str) -> list[str]:
     """DFS iterative — O(V+E), uses a stack."""
     visited: set[str] = set()
@@ -204,7 +214,6 @@ print(dfs_iterative(graph, "A"))  # ['A', 'B', 'D', 'C', 'E', 'F']
 
 ```python
 from collections import deque
-
 
 def bfs_shortest_path(
     graph: dict[str, list[str]], start: str, end: str
@@ -256,7 +265,6 @@ split_graph: dict[str, list[str]] = {
 }
 print(find_connected_components(split_graph))
 # [['A', 'B'], ['C', 'D']]
-
 
 def has_cycle(graph: dict[str, list[str]], start: str) -> bool:
     """Cycle detection in an undirected graph using DFS."""
@@ -333,17 +341,29 @@ In production, you would use libraries like NetworkX, but knowing BFS/DFS intern
 
 BFS explores nodes layer by layer and guarantees shortest paths on unweighted graphs. DFS goes deep first and is well-suited for cycle detection and topological sorting. In the next article, we tackle shortest paths on weighted graphs with Dijkstra's algorithm.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Graph Traversal — BFS and DFS?**
+  - The article treats Graph Traversal — BFS and DFS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Graph Traversal — BFS and DFS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Graph Traversal — BFS and DFS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
-- [Dynamic Programming Basics](./06-dynamic-programming-basics.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): Dynamic Programming Basics](./06-dynamic-programming-basics.md)
 - **Graph Traversal — BFS and DFS (current)**
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

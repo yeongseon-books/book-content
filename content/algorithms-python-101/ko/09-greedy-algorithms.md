@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 9
-title: 그리디 알고리즘
+title: "Algorithms with Python 101 (9/10): 그리디 알고리즘"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 그리디 알고리즘 원리와 최적해 보장 조건을 파
 last_reviewed: '2026-05-12'
 ---
 
-# 그리디 알고리즘
+# Algorithms with Python 101 (9/10): 그리디 알고리즘
 
 그리디 알고리즘은 어려워 보이는 문제를 짧고 빠른 구현으로 바꿔 주는 경우가 많아서 매력적입니다. 올바른 상황에서는 매 단계의 똑똑한 선택 하나만으로도 충분합니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-12'
 
 다만 그리디 논리는 어디에나 안전하지 않습니다. 어떤 문제에서는 통하고 다른 문제에서는 실패하는 이유를 알아야, 단순함이 함정이 되지 않습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 그리디 알고리즘이 최적해를 만드는 조건은 무엇일까요?
 - 동전 거스름돈, 활동 선택, 분할 가능한 배낭 문제는 어떻게 풀까요?
 - 그리디는 동적 계획법과 어떤 차이가 있을까요?
-- 반례는 왜 그리디 검증에서 중요할까요?
+
+## 큰 그림
+
+![Algorithms with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
+
+*Algorithms with Python 101 9장 흐름 개요*
+
+이 그림에서는 그리디 알고리즘를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 그리디 알고리즘의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -56,10 +65,6 @@ Make change for 1,260:
 →  10 × 1 = 10    (remaining: 0)
 Total: 6 coins — optimal via greedy
 ```
-
-![그리디 선택 규칙과 반례 검증 흐름](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
-
-*그리디는 규칙 하나로 끝나는 알고리즘이 아니라, 그 규칙이 항상 맞는지 반례로 검증해야 하는 전략입니다.*
 
 ## 핵심 개념
 
@@ -297,17 +302,29 @@ print(f"DP:     {coin_change_dp(coins, amount)} coins")            # 2 (3+3)
 
 그리디 알고리즘은 매 단계의 지역 최적 선택을 기반으로 합니다. 보통 정렬과 단일 순회로 빠르게 풀리지만, 항상 최적해를 보장하지는 않습니다. 마지막 글에서는 지금까지 배운 내용을 코딩 테스트 문제 풀이 전략으로 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **그리디 알고리즘이 최적해를 만드는 조건은 무엇일까요?**
+  - 본문의 기준은 그리디 알고리즘를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **동전 거스름돈, 활동 선택, 분할 가능한 배낭 문제는 어떻게 풀까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **그리디는 동적 계획법과 어떤 차이가 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
-- [시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
-- [선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
-- [재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
-- [동적 계획법 기초](./06-dynamic-programming-basics.md)
-- [그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
-- [최단 경로 기초](./08-shortest-path-basics.md)
+## 시리즈 목차
+
+- [Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): 시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): 선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): 동적 계획법 기초](./06-dynamic-programming-basics.md)
+- [Algorithms with Python 101 (7/10): 그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
+- [Algorithms with Python 101 (8/10): 최단 경로 기초](./08-shortest-path-basics.md)
 - **그리디 알고리즘 (현재 글)**
 - 코딩 테스트 문제 접근법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

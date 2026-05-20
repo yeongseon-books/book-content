@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Shortest Path Basics</title>
+<title>Algorithms with Python 101 (8/10): Shortest Path Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Shortest Path Basics</h1>
+<h1>Algorithms with Python 101 (8/10): Shortest Path Basics</h1>
 <p>Route planning, network latency, and logistics optimization all come down to the same question: what is the cheapest path from here to there?</p>
 <p>Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.</p>
 <p>This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with <code>heapq</code>.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Shortest Path Basics?</li>
+<li>Which signal should the example or diagram make visible for Shortest Path Basics?</li>
+<li>What failure should be prevented first when Shortest Path Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 8 flow overview</em></p>
+<p>This picture places Shortest Path Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Shortest Path Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The shortest-path problem on weighted graphs</li>
@@ -84,8 +97,6 @@ C --5-- E
 A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 </code></pre>
-<p><img alt="Priority queue and relaxation flow in Dijkstra's algorithm" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png"></p>
-<p><em>Dijkstra keeps pulling the nearest candidate first, then updates distances whenever it discovers a cheaper path.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Weighted graph</strong><br>
 - Description: A graph where each edge has an associated cost (weight)</p>
@@ -318,14 +329,24 @@ for condition, algorithm in comparison:
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Dijkstra's algorithm finds shortest paths in non-negative weighted graphs in O((V+E) log V). The key insight is processing the nearest unfinalized node first via a priority queue. In the next article, we explore greedy algorithms — the strategy of always making the locally optimal choice.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Graph Traversal — BFS and DFS</a></li>
+<li><strong>What boundary should you inspect first when applying Shortest Path Basics?</strong></li>
+<li>The article treats Shortest Path Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Shortest Path Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Shortest Path Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Algorithms with Python 101 (2/10): Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Algorithms with Python 101 (3/10): Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Algorithms with Python 101 (4/10): Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Algorithms with Python 101 (5/10): Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Algorithms with Python 101 (6/10): Dynamic Programming Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS</a></li>
 <li><strong>Shortest Path Basics (current)</strong></li>
 <li>Greedy Algorithms (upcoming)</li>
 <li>Coding Test Problem-Solving Strategies (upcoming)</li>

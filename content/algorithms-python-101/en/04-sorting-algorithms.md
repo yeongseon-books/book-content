@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 4
-title: Sorting Algorithms
+title: "Algorithms with Python 101 (4/10): Sorting Algorithms"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Implement bubble, selection, insertion, merge, and quick sort i
 last_reviewed: '2026-05-04'
 ---
 
-# Sorting Algorithms
+# Algorithms with Python 101 (4/10): Sorting Algorithms
 
 This is post 4 in the Algorithms with Python 101 series. Sorting sits underneath far more problems than most beginners expect, and binary search, ranking, grouping, and deduplication all become easier once data is in order.
 
 This chapter uses one practical question as its spine: why is Python's built-in `sorted()` usually the default in real work? We will still implement classic algorithms, but as contrast material that helps explain performance, stability, and `key` design rather than as the main payoff.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Sorting Algorithms?
+- Which signal should the example or diagram make visible for Sorting Algorithms?
+- What failure should be prevented first when Sorting Algorithms reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.en.png)
+
+*Algorithms with Python 101 chapter 4 flow overview*
+
+This picture places Sorting Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sorting Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -138,14 +154,12 @@ def verify_sort(name: str, func, cases: dict[str, list[int]]) -> None:
         print(f"{name:>10} | {case_name:>14} | expected={expected} | actual={actual}")
         assert actual == expected, f"{name} failed on {case_name}"
 
-
 test_cases = {
     "random": [5, 3, 8, 1, 2],
     "sorted": [1, 2, 3, 4, 5],
     "reversed": [5, 4, 3, 2, 1],
     "duplicates": [4, 2, 4, 1, 2, 1],
 }
-
 
 def bubble_sort(data: list[int]) -> list[int]:
     arr = data[:]
@@ -160,7 +174,6 @@ def bubble_sort(data: list[int]) -> list[int]:
             break
     return arr
 
-
 def selection_sort(data: list[int]) -> list[int]:
     arr = data[:]
     n = len(arr)
@@ -172,7 +185,6 @@ def selection_sort(data: list[int]) -> list[int]:
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
     return arr
 
-
 def insertion_sort(data: list[int]) -> list[int]:
     arr = data[:]
     for i in range(1, len(arr)):
@@ -183,7 +195,6 @@ def insertion_sort(data: list[int]) -> list[int]:
             j -= 1
         arr[j + 1] = key
     return arr
-
 
 verify_sort("bubble", bubble_sort, test_cases)
 verify_sort("selection", selection_sort, test_cases)
@@ -207,7 +218,6 @@ def merge_sort(data: list[int]) -> list[int]:
     right = merge_sort(data[mid:])
     return _merge(left, right)
 
-
 def _merge(left: list[int], right: list[int]) -> list[int]:
     result: list[int] = []
     i = j = 0
@@ -222,9 +232,7 @@ def _merge(left: list[int], right: list[int]) -> list[int]:
     result.extend(right[j:])
     return result
 
-
 verify_sort("merge", merge_sort, test_cases)
-
 
 def merge_sort_records(records: list[dict[str, int | str]]) -> list[dict[str, int | str]]:
     if len(records) <= 1:
@@ -233,7 +241,6 @@ def merge_sort_records(records: list[dict[str, int | str]]) -> list[dict[str, in
     left = merge_sort_records(records[:mid])
     right = merge_sort_records(records[mid:])
     return merge_records(left, right)
-
 
 def merge_records(left, right):
     merged = []
@@ -248,7 +255,6 @@ def merge_records(left, right):
     merged.extend(left[i:])
     merged.extend(right[j:])
     return merged
-
 
 stable_records = merge_sort_records(records)
 assert [record["name"] for record in stable_records if record["score"] == 75] == ["Joon", "Luca"]
@@ -271,7 +277,6 @@ def quick_sort(data: list[int]) -> list[int]:
     right = [x for x in data if x > pivot]
     return quick_sort(left) + middle + quick_sort(right)
 
-
 verify_sort("quick", quick_sort, test_cases)
 ```
 
@@ -282,7 +287,6 @@ Quick sort partitions around a pivot. It is often fast, but poor pivot choice ca
 ```python
 import random
 import time
-
 
 def benchmark_sort(n: int) -> list[tuple[str, float, bool]]:
     data = [random.randint(0, n) for _ in range(n)]
@@ -304,7 +308,6 @@ def benchmark_sort(n: int) -> list[tuple[str, float, bool]]:
         is_correct = actual == sorted(data)
         results.append((name, elapsed, is_correct))
     return results
-
 
 for n in [1_000, 5_000]:
     print(f"n={n:,}")
@@ -367,10 +370,21 @@ Still, knowing the principles matters. Understanding "why this sort is slow," "w
 
 The point of learning sorting is not memorizing every algorithm equally. It is understanding that the production default is usually `sorted(..., key=...)`, while classic algorithms give you the contrast needed to reason about complexity, stability, and debugging. O(n^2) sorts are easy to understand but impractical for large datasets, and O(n log n) sorts such as merge sort and quick sort show the divide-and-conquer pattern that we explore more deeply in the next article.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Sorting Algorithms?**
+  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Sorting Algorithms?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
 - **Sorting Algorithms (current)**
 - Recursion and Divide and Conquer (upcoming)
 - Dynamic Programming Basics (upcoming)
@@ -378,6 +392,7 @@ The point of learning sorting is not memorizing every algorithm equally. It is u
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

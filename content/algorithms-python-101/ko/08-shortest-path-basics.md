@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 8
-title: 최단 경로 기초
+title: "Algorithms with Python 101 (8/10): 최단 경로 기초"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 가중치 그래프 최단 경로를 찾는 다익스트라 알
 last_reviewed: '2026-05-12'
 ---
 
-# 최단 경로 기초
+# Algorithms with Python 101 (8/10): 최단 경로 기초
 
 경로 계획, 네트워크 지연, 물류 최적화는 모두 결국 같은 질문으로 모입니다. 여기서 저기까지 가는 가장 싼 길은 무엇인가라는 질문입니다.
 
@@ -28,12 +28,21 @@ last_reviewed: '2026-05-12'
 
 간선 가중치가 중요해지는 순간 BFS만으로는 부족합니다. 다음에 볼 후보 경로를 우선순위로 관리해야 하고, 그 지점에서 다익스트라 알고리즘이 힘을 발휘합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 가중치 그래프의 최단 경로 문제는 어떻게 정의할까요?
 - 다익스트라 알고리즘은 어떤 원리로 동작할까요?
 - Python의 `heapq`로 우선순위 큐를 어떻게 구현할까요?
-- 경로 복원은 어떻게 하고, 음수 가중치는 왜 문제가 될까요?
+
+## 큰 그림
+
+![Algorithms with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
+
+*Algorithms with Python 101 8장 흐름 개요*
+
+이 그림에서는 최단 경로 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 최단 경로 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -58,10 +67,6 @@ C --5-- E
 A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 ```
-
-![다익스트라의 우선순위 큐와 거리 갱신 흐름](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
-
-*다익스트라는 가장 가까운 후보를 먼저 꺼내고, 더 짧은 경로를 찾을 때마다 거리와 우선순위 큐를 갱신합니다.*
 
 ## 핵심 개념
 
@@ -140,7 +145,6 @@ for node, neighbors in graph.items():
 ```python
 import heapq
 
-
 def dijkstra(
     graph: dict[str, list[tuple[str, int]]], start: str
 ) -> dict[str, int]:
@@ -177,7 +181,6 @@ for node, d in sorted(distances.items()):
 
 ```python
 import heapq
-
 
 def dijkstra_with_path(
     graph: dict[str, list[tuple[str, int]]], start: str
@@ -220,7 +223,6 @@ for node in sorted(paths):
 
 ```python
 import heapq
-
 
 def grid_shortest_path(grid: list[list[int]]) -> int:
     """Minimum-cost path from top-left to bottom-right in a grid."""
@@ -328,17 +330,29 @@ for condition, algorithm in comparison:
 
 다익스트라는 음수 가중치가 없는 그래프에서 `O((V+E) log V)`로 최단 경로를 구합니다. 핵심은 우선순위 큐로 가장 가까운 미확정 노드를 먼저 처리하는 데 있습니다. 다음 글에서는 매 단계의 지역 최적 선택이 핵심인 그리디 알고리즘을 살펴봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **가중치 그래프의 최단 경로 문제는 어떻게 정의할까요?**
+  - 본문의 기준은 최단 경로 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **다익스트라 알고리즘은 어떤 원리로 동작할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Python의 `heapq`로 우선순위 큐를 어떻게 구현할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
-- [시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
-- [선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
-- [정렬 알고리즘](./04-sorting-algorithms.md)
-- [재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
-- [동적 계획법 기초](./06-dynamic-programming-basics.md)
-- [그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
+## 시리즈 목차
+
+- [Algorithms with Python 101 (1/10): 알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): 시간 복잡도와 Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): 선형 탐색과 이진 탐색](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): 정렬 알고리즘](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): 재귀와 분할 정복](./05-recursion-and-divide-and-conquer.md)
+- [Algorithms with Python 101 (6/10): 동적 계획법 기초](./06-dynamic-programming-basics.md)
+- [Algorithms with Python 101 (7/10): 그래프 탐색 — BFS와 DFS](./07-graph-traversal-bfs-dfs.md)
 - **최단 경로 기초 (현재 글)**
 - 그리디 알고리즘 (예정)
 - 코딩 테스트 문제 접근법 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

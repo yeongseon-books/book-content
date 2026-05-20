@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Time Complexity and Big-O</title>
+<title>Algorithms with Python 101 (2/10): Time Complexity and Big-O</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Time Complexity and Big-O</h1>
+<h1>Algorithms with Python 101 (2/10): Time Complexity and Big-O</h1>
 <p>Wall-clock time on your laptop is not a reliable way to judge an algorithm. Hardware, runtime, and test data all change, but the growth pattern of the algorithm stays the same.</p>
 <p>Big-O gives you a practical language for comparing that growth before the code ever reaches production or an interview whiteboard.</p>
 <p>This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Time Complexity and Big-O?</li>
+<li>Which signal should the example or diagram make visible for Time Complexity and Big-O?</li>
+<li>What failure should be prevented first when Time Complexity and Big-O reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 2 flow overview</em></p>
+<p>This picture places Time Complexity and Big-O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Time Complexity and Big-O is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What time complexity means and why wall-clock time is insufficient</li>
@@ -74,7 +87,7 @@
 <blockquote>
 <p>Big-O = upper bound on the growth rate of an algorithm's running time</p>
 </blockquote>
-<pre><code>Input Size vs Operations (approximate):
+<pre><code class="language-text">Input Size vs Operations (approximate):
 n=1,000  | O(1): 1       | O(log n): 10    | O(n): 1,000
          | O(n log n): 10,000 | O(n^2): 1,000,000 | O(2^n): ∞
 </code></pre>
@@ -254,8 +267,18 @@ for n in sizes:
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Time complexity and Big-O notation give you a precise way to compare algorithm performance. The most important classes to remember are O(1), O(log n), O(n), O(n log n), and O(n^2). In the next article, we implement and compare two fundamental search algorithms: linear search and binary search.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
+<li><strong>What boundary should you inspect first when applying Time Complexity and Big-O?</strong></li>
+<li>The article treats Time Complexity and Big-O as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Time Complexity and Big-O?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Time Complexity and Big-O reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
 <li><strong>Time Complexity and Big-O (current)</strong></li>
 <li>Linear Search and Binary Search (upcoming)</li>
 <li>Sorting Algorithms (upcoming)</li>

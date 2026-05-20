@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 6
-title: Dynamic Programming Basics
+title: "Algorithms with Python 101 (6/10): Dynamic Programming Basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Learn top-down and bottom-up dynamic programming in Python with
 last_reviewed: '2026-05-04'
 ---
 
-# Dynamic Programming Basics
+# Algorithms with Python 101 (6/10): Dynamic Programming Basics
 
 Some problems stay hopelessly slow if you solve the same subproblem again and again. Dynamic programming matters because it turns that waste into reusable work.
 
 This topic also shows up constantly in interviews and competitive programming, but the real value is learning to recognize overlapping subproblems and reusable state.
 
 This is post 6 in the Algorithms with Python 101 series. Here, we'll introduce dynamic programming through memoization, tabulation, and a set of classic Python examples.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Dynamic Programming Basics?
+- Which signal should the example or diagram make visible for Dynamic Programming Basics?
+- What failure should be prevented first when Dynamic Programming Basics reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.en.png)
+
+*Algorithms with Python 101 chapter 6 flow overview*
+
+This picture places Dynamic Programming Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dynamic Programming Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -56,10 +72,6 @@ fib(5) → fib(4) + fib(3)
 After DP: each fib(n) computed only once
 fib(1)=1 → fib(2)=1 → fib(3)=2 → fib(4)=3 → fib(5)=5
 ```
-
-![Naive recursion versus DP state reuse](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.en.png)
-
-*Naive recursion recomputes the same states, while DP fills each state once and reuses it.*
 
 ## Key Concepts
 
@@ -102,7 +114,6 @@ def fibonacci(n):
 ```python
 from functools import lru_cache
 
-
 @lru_cache(maxsize=None)
 def fib_top_down(n: int) -> int:
     """Top-down Fibonacci — O(n)."""
@@ -140,7 +151,6 @@ def fib_bottom_up(n: int) -> int:
     return dp[n]
 
 print(fib_bottom_up(50))  # 12586269025
-
 
 def fib_optimized(n: int) -> int:
     """Space-optimized Fibonacci — O(n), O(1) space."""
@@ -279,17 +289,29 @@ In coding interviews, when you see a DP problem, define the recurrence first and
 
 Dynamic programming eliminates redundant computation, turning exponential problems into polynomial ones. The key is defining the recurrence relation. In the next article, we explore graph traversal with BFS and DFS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Dynamic Programming Basics?**
+  - The article treats Dynamic Programming Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Dynamic Programming Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Dynamic Programming Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
-- [Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
-- [Linear Search and Binary Search](./03-linear-and-binary-search.md)
-- [Sorting Algorithms](./04-sorting-algorithms.md)
-- [Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
+- [Algorithms with Python 101 (2/10): Time Complexity and Big-O](./02-time-complexity-and-big-o.md)
+- [Algorithms with Python 101 (3/10): Linear Search and Binary Search](./03-linear-and-binary-search.md)
+- [Algorithms with Python 101 (4/10): Sorting Algorithms](./04-sorting-algorithms.md)
+- [Algorithms with Python 101 (5/10): Recursion and Divide and Conquer](./05-recursion-and-divide-and-conquer.md)
 - **Dynamic Programming Basics (current)**
 - Graph Traversal — BFS and DFS (upcoming)
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References

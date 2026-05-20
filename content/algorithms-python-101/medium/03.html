@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Linear Search and Binary Search</title>
+<title>Algorithms with Python 101 (3/10): Linear Search and Binary Search</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Linear Search and Binary Search</h1>
+<h1>Algorithms with Python 101 (3/10): Linear Search and Binary Search</h1>
 <p>Searching is one of the most common operations in programming. On a small list, a linear scan is fine. On a large sorted list, cutting the search space in half each step changes the problem completely.</p>
 <p>That is why binary search shows up far beyond textbook examples. The same pattern appears whenever you need the first value that satisfies a condition, not just an exact match.</p>
 <p>This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Linear Search and Binary Search?</li>
+<li>Which signal should the example or diagram make visible for Linear Search and Binary Search?</li>
+<li>What failure should be prevented first when Linear Search and Binary Search reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 3 flow overview</em></p>
+<p>This picture places Linear Search and Binary Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Linear Search and Binary Search is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How linear search works and its limitations</li>
@@ -277,9 +290,19 @@ for n in [10_000, 100_000, 1_000_000]:
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Linear search is O(n); binary search is O(log n). Binary search only works on sorted data, but the performance gap is dramatic as data grows. In the next article, we cover the core algorithms that sort data.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
+<li><strong>What boundary should you inspect first when applying Linear Search and Binary Search?</strong></li>
+<li>The article treats Linear Search and Binary Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Linear Search and Binary Search?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Linear Search and Binary Search reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Algorithms with Python 101 (2/10): Time Complexity and Big-O</a></li>
 <li><strong>Linear Search and Binary Search (current)</strong></li>
 <li>Sorting Algorithms (upcoming)</li>
 <li>Recursion and Divide and Conquer (upcoming)</li>

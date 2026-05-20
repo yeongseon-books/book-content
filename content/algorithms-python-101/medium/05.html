@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Recursion and Divide and Conquer</title>
+<title>Algorithms with Python 101 (5/10): Recursion and Divide and Conquer</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Recursion and Divide and Conquer</h1>
+<h1>Algorithms with Python 101 (5/10): Recursion and Divide and Conquer</h1>
 <p>Recursion is one of those ideas that looks simple on the surface and confusing in practice. Once it clicks, though, a lot of algorithm patterns start to feel much more consistent.</p>
 <p>Divide and conquer is one of the most important of those patterns. It shows up in binary search, merge sort, quick sort, and many problems that become manageable only after you split them into smaller parts.</p>
 <p>This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Recursion and Divide and Conquer?</li>
+<li>Which signal should the example or diagram make visible for Recursion and Divide and Conquer?</li>
+<li>What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 5 flow overview</em></p>
+<p>This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Recursion and Divide and Conquer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How recursive functions work and what the call stack looks like</li>
@@ -281,11 +294,21 @@ print(f&quot;Max recursion depth: {sys.getrecursionlimit()}&quot;)  # default 10
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Recursion is a technique where a function calls itself; divide and conquer is a strategy that uses recursion to systematically break down problems. In the next article, we tackle the redundant computation problem with dynamic programming.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><strong>What boundary should you inspect first when applying Recursion and Divide and Conquer?</strong></li>
+<li>The article treats Recursion and Divide and Conquer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Recursion and Divide and Conquer?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Algorithms with Python 101 (2/10): Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Algorithms with Python 101 (3/10): Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Algorithms with Python 101 (4/10): Sorting Algorithms</a></li>
 <li><strong>Recursion and Divide and Conquer (current)</strong></li>
 <li>Dynamic Programming Basics (upcoming)</li>
 <li>Graph Traversal — BFS and DFS (upcoming)</li>

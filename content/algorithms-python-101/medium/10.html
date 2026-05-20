@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Coding Test Problem-Solving Strategies</title>
+<title>Algorithms with Python 101 (10/10): Coding Test Problem-Solving Strategies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,15 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Coding Test Problem-Solving Strategies</h1>
-<p>Knowing algorithms is not the same as applying them under time pressure. In a coding test, the real challenge is reading constraints quickly and mapping the problem to the right pattern before you get lost in implementation.</p>
-<p>A repeatable approach matters because it saves time, reduces avoidable mistakes, and helps you recover even when the problem is unfamiliar.</p>
-<p>This is the final post in the Algorithms with Python 101 series. Here, we'll connect the ideas from earlier posts into a practical framework for analyzing and solving coding test problems.</p>
+<h1>Algorithms with Python 101 (10/10): Coding Test Problem-Solving Strategies</h1>
+<p>This is the final post in the Algorithms with Python 101 series. Knowing algorithms is not the same as applying them under time pressure, and in a coding test the real challenge is reading constraints quickly and mapping the problem to the right pattern before you get lost in implementation.</p>
+<p>This chapter connects the earlier posts through one continuous flow: read constraints first, reject the wrong complexity first, then carry the problem all the way through implementation and verification. A repeatable approach matters because it saves time, reduces avoidable mistakes, and helps you recover even when the problem is unfamiliar.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?</li>
+<li>Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?</li>
+<li>What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Algorithms with Python 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.en.png"></p>
+<p><em>Algorithms with Python 101 chapter 10 flow overview</em></p>
+<p>This picture places Coding Test Problem-Solving Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Coding Test Problem-Solving Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
+<li>How to reject the wrong algorithm from constraints alone</li>
 <li>How to map problem types to algorithms</li>
-<li>How to choose algorithms based on input size constraints</li>
-<li>A systematic four-step problem-solving framework</li>
+<li>How to carry one problem through understand → plan → implement → verify</li>
 <li>Common patterns and Python coding tips for timed tests</li>
 </ul>
 <h2>Why It Matters</h2>
@@ -111,130 +123,129 @@ def solve(data):
     # ... O(N) scan
 </code></pre>
 <h2>Hands-On Steps</h2>
-<p><strong>Step 1: The Four-Step Framework</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-Four steps for solving any problem:
+<p><strong>Step 1: Read the constraints before touching the code</strong></p>
+<pre><code class="language-python">problem = {
+    &quot;name&quot;: &quot;Two Sum to Target&quot;,
+    &quot;input&quot;: &quot;integer array nums, integer target&quot;,
+    &quot;goal&quot;: &quot;return the indices of two numbers whose sum equals target, or None&quot;,
+    &quot;constraints&quot;: {
+        &quot;n_max&quot;: 200_000,
+        &quot;time_limit_seconds&quot;: 1,
+        &quot;values&quot;: &quot;negative values and duplicates are allowed&quot;,
+    },
+}
 
-1. Understand
-   - Check input/output format
-   - Check constraints (range of N, time limit)
-   - Trace through examples by hand
-
-2. Plan
-   - Reverse-engineer allowed complexity from input size
-   - Classify the problem type (search, sort, DP, graph, etc.)
-   - Outline the key idea
-
-3. Implement
-   - Write pseudocode first
-   - Implement one step at a time, verifying intermediate results
-   - Handle edge cases
-
-4. Verify
-   - Test with provided examples
-   - Test edge cases: empty input, minimum, maximum, duplicates
-   - Re-check time complexity
-&quot;&quot;&quot;
+print(problem)
 </code></pre>
-<p><strong>Step 2: Two Pointers Pattern</strong></p>
-<pre><code class="language-python">def two_sum_sorted(nums: list[int], target: int) -&gt; tuple[int, int] | None:
-    &quot;&quot;&quot;Find two numbers in a sorted array that sum to target — O(N)&quot;&quot;&quot;
-    left, right = 0, len(nums) - 1
+<p>When <code>N = 200,000</code>, an O(N²) double loop is disqualified immediately. A 1-second limit means you should reject billions of comparisons before writing a single implementation detail.</p>
+<p><strong>Step 2: Reject the wrong approach on purpose</strong></p>
+<pre><code class="language-python">def wrong_two_sum(nums: list[int], target: int) -&gt; tuple[int, int] | None:
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] + nums[j] == target:
+                return (i, j)
+    return None
+</code></pre>
+<p>This code can still be correct on small input, which is exactly why coding tests are tricky. The important habit is not merely saying "this is slow" but deciding "this is invalid under the stated constraints."</p>
+<p><strong>Step 3: Classify the problem and choose the target complexity</strong></p>
+<p><strong>Is the array already sorted?</strong><br>
+- Answer for this problem: No<br>
+- Meaning: Sorting may be part of the plan</p>
+<p><strong>Are we combining two values to hit a target?</strong><br>
+- Answer for this problem: Yes<br>
+- Meaning: Two pointers is a strong candidate</p>
+<p><strong>Must we inspect every pair explicitly?</strong><br>
+- Answer for this problem: No<br>
+- Meaning: Brute force is unnecessary</p>
+<p><strong>What complexity do we need?</strong><br>
+- Answer for this problem: <code>O(N log N)</code> or better<br>
+- Meaning: Sort + linear scan fits</p>
+<p>This is not DP and not a graph problem. There is no state transition to optimize and no node/edge structure to traverse. The strongest signal is "two values + target sum + sortable input," which points to sorting plus two pointers.</p>
+<p><strong>Step 4: Implement sorting + two pointers</strong></p>
+<pre><code class="language-python">def solve_two_sum(nums: list[int], target: int) -&gt; tuple[int, int] | None:
+    indexed = sorted((value, index) for index, value in enumerate(nums))
+    left, right = 0, len(indexed) - 1
 
     while left &lt; right:
-        current_sum = nums[left] + nums[right]
-        if current_sum == target:
-            return (left, right)
-        elif current_sum &lt; target:
+        current = indexed[left][0] + indexed[right][0]
+        if current == target:
+            i, j = indexed[left][1], indexed[right][1]
+            return tuple(sorted((i, j)))
+        if current &lt; target:
             left += 1
         else:
             right -= 1
 
     return None
 
-nums = [1, 2, 4, 6, 8, 10]
-print(two_sum_sorted(nums, 10))  # (1, 4) → 2+8=10
+sample_nums = [7, 1, 11, 2, 9]
+sample_target = 10
+sample_answer = solve_two_sum(sample_nums, sample_target)
 
-def remove_duplicates(nums: list[int]) -&gt; int:
-    &quot;&quot;&quot;Remove duplicates from a sorted array in place — O(N)&quot;&quot;&quot;
-    if not nums:
-        return 0
-    write = 1
-    for read in range(1, len(nums)):
-        if nums[read] != nums[read - 1]:
-            nums[write] = nums[read]
-            write += 1
-    return write
-
-nums = [1, 1, 2, 2, 3, 4, 4, 5]
-k = remove_duplicates(nums)
-print(nums[:k])  # [1, 2, 3, 4, 5]
+print(sample_answer)
+assert sample_answer == (0, 3)
 </code></pre>
-<p><strong>Step 3: Sliding Window Pattern</strong></p>
-<pre><code class="language-python">def max_subarray_sum(nums: list[int], k: int) -&gt; int:
-    &quot;&quot;&quot;Maximum sum of a contiguous subarray of length k — O(N)&quot;&quot;&quot;
-    if len(nums) &lt; k:
-        return 0
+<p>Three implementation details matter here.</p>
+<ol>
+<li>We sort <code>(value, original_index)</code> pairs so that we do not lose the required output format.</li>
+<li>When the sum is too small, we move the left pointer rightward; when it is too large, we move the right pointer leftward.</li>
+<li>We normalize the answer with <code>tuple(sorted((i, j)))</code> so the output order stays predictable.</li>
+</ol>
+<p>If even the sample fails, inspect whether you lost the original indices during sorting before anything else.</p>
+<p><strong>Step 5: Close the loop with edge-case verification</strong></p>
+<pre><code class="language-python">verification_cases = [
+    {
+        &quot;name&quot;: &quot;sample&quot;,
+        &quot;nums&quot;: [7, 1, 11, 2, 9],
+        &quot;target&quot;: 10,
+        &quot;expected&quot;: (0, 3),
+        &quot;inspect_first&quot;: &quot;check whether original indices were preserved after sorting&quot;,
+    },
+    {
+        &quot;name&quot;: &quot;no_solution&quot;,
+        &quot;nums&quot;: [1, 4, 8],
+        &quot;target&quot;: 20,
+        &quot;expected&quot;: None,
+        &quot;inspect_first&quot;: &quot;check the while left &lt; right termination path and the final None return&quot;,
+    },
+    {
+        &quot;name&quot;: &quot;duplicates&quot;,
+        &quot;nums&quot;: [3, 3, 4, 5],
+        &quot;target&quot;: 6,
+        &quot;expected&quot;: (0, 1),
+        &quot;inspect_first&quot;: &quot;check that duplicates are allowed and that left &lt; right prevents reusing one element twice&quot;,
+    },
+    {
+        &quot;name&quot;: &quot;negative_values&quot;,
+        &quot;nums&quot;: [-5, -1, 2, 8],
+        &quot;target&quot;: 3,
+        &quot;expected&quot;: (0, 3),
+        &quot;inspect_first&quot;: &quot;check whether the pointer-movement rule still follows sum comparison with negative values&quot;,
+    },
+    {
+        &quot;name&quot;: &quot;minimal_input&quot;,
+        &quot;nums&quot;: [42],
+        &quot;target&quot;: 42,
+        &quot;expected&quot;: None,
+        &quot;inspect_first&quot;: &quot;check that the while loop exits immediately when fewer than two elements exist&quot;,
+    },
+]
 
-    window_sum = sum(nums[:k])
-    max_sum = window_sum
-
-    for i in range(k, len(nums)):
-        window_sum += nums[i] - nums[i - k]
-        max_sum = max(max_sum, window_sum)
-
-    return max_sum
-
-nums = [2, 1, 5, 1, 3, 2]
-print(max_subarray_sum(nums, 3))  # 9 (5+1+3)
-
-def longest_unique_substring(s: str) -&gt; int:
-    &quot;&quot;&quot;Longest substring without repeating characters — O(N)&quot;&quot;&quot;
-    char_index: dict[str, int] = {}
-    max_len = 0
-    left = 0
-
-    for right, char in enumerate(s):
-        if char in char_index and char_index[char] &gt;= left:
-            left = char_index[char] + 1
-        char_index[char] = right
-        max_len = max(max_len, right - left + 1)
-
-    return max_len
-
-print(longest_unique_substring(&quot;abcabcbb&quot;))  # 3 (&quot;abc&quot;)
-print(longest_unique_substring(&quot;pwwkew&quot;))    # 3 (&quot;wke&quot;)
+for case in verification_cases:
+    actual = solve_two_sum(case[&quot;nums&quot;], case[&quot;target&quot;])
+    print(f&quot;{case['name']:&gt;14} | expected={case['expected']} | actual={actual}&quot;)
+    assert actual == case[&quot;expected&quot;], (
+        f&quot;{case['name']} failed. Inspect first: {case['inspect_first']}&quot;
+    )
 </code></pre>
-<p><strong>Step 4: Problem Type Identification Checklist</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-Problem type identification checklist:
-
-[Search / Sort]
-- &quot;Find ~&quot; + sorted data → binary search
-- &quot;Sort ~&quot; → sorted() or custom comparator
-- &quot;k-th largest/smallest&quot; → sorting or heapq.nlargest
-
-[DP]
-- &quot;Find minimum/maximum&quot; + &quot;number of ways&quot; → DP
-- &quot;Number of ways to ~&quot; → DP
-- Recurrence relation visible → DP
-
-[Graph]
-- &quot;Is it connected?&quot; → BFS/DFS
-- &quot;Shortest path&quot; + unweighted → BFS
-- &quot;Shortest path&quot; + weighted → Dijkstra
-- &quot;Cycle detection&quot; → DFS
-
-[Greedy]
-- &quot;Minimum/maximum of ~&quot; + solvable by sorting → greedy
-- Each choice does not affect future choices → greedy
-
-[String]
-- &quot;Substring&quot; → sliding window or two pointers
-- &quot;Pattern matching&quot; → KMP or regex
-&quot;&quot;&quot;
-</code></pre>
-<p><strong>Step 5: Essential Python Tips for Coding Tests</strong></p>
+<p>The purpose of this loop is not just to add more tests. It is to make failure diagnosis faster.</p>
+<ul>
+<li>If a no-solution case returns something anyway, inspect termination logic first.</li>
+<li>If the duplicates case fails, inspect whether you accidentally reused the same element or mishandled equal values.</li>
+<li>If negative values fail, re-check pointer movement in terms of sum comparison rather than intuition about sign.</li>
+<li>If minimal input crashes, inspect boundary handling before the main algorithm.</li>
+</ul>
+<p><strong>Step 6: Essential Python Tips for Coding Tests</strong></p>
 <pre><code class="language-python">import sys
 from collections import Counter, defaultdict, deque
 from itertools import combinations, permutations
@@ -276,26 +287,27 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Reverse-engineering time complexity from input size is the starting point for algorithm selection</li>
-<li>Two pointers and sliding window are the key patterns for reducing O(N²) to O(N)</li>
+<li>Two pointers are the key pattern here because sorting turns an impossible O(N²) search into an O(N log N) workflow</li>
+<li>After implementation, the safest verification order is sample → no solution → duplicates → negative values → minimal input</li>
 <li>Python standard library tools like defaultdict, Counter, and heapq save significant implementation time</li>
 <li>The <code>[[0]*n]*m</code> 2D array initialization bug is extremely common</li>
 </ul>
 <h2>5 Common Mistakes</h2>
 <p><strong>Not checking input size</strong><br>
 - Why It Is a Problem: Algorithm with wrong complexity causes time limit exceeded<br>
-- Fix: Check the range of N first</p>
+- Fix: Check the range of N first and eliminate invalid approaches early</p>
 <p><strong>Ignoring edge cases</strong><br>
 - Why It Is a Problem: Empty input or N=1 causes runtime errors<br>
 - Fix: Handle boundary conditions first</p>
-<p><strong>Not starting with brute force</strong><br>
-- Why It Is a Problem: No baseline to optimize from<br>
-- Fix: Start brute force → then optimize</p>
-<p><strong>Coding without pseudocode</strong><br>
-- Why It Is a Problem: Logic errors discovered too late<br>
-- Fix: Write pseudocode first</p>
-<p><strong>Submitting without testing</strong><br>
-- Why It Is a Problem: Misses trivial bugs<br>
-- Fix: Test all examples and edge cases</p>
+<p><strong>Coding before classifying the problem</strong><br>
+- Why It Is a Problem: You drift toward DP, graph, or brute force without evidence<br>
+- Fix: Write down sorted/unsorted state, target operation, and allowed complexity first</p>
+<p><strong>Losing original indices after sorting</strong><br>
+- Why It Is a Problem: Values are correct but the answer format is wrong<br>
+- Fix: Sort <code>(value, index)</code> pairs instead of raw values</p>
+<p><strong>Submitting without diagnostic tests</strong><br>
+- Why It Is a Problem: Trivial bugs survive to submission<br>
+- Fix: Test examples and edge cases, and decide what to inspect first for each failure class</p>
 <h2>Real-World Applications</h2>
 <ul>
 <li>Coding interviews evaluate algorithm problem-solving ability</li>
@@ -305,7 +317,7 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <li>System design interviews require complexity analysis skills</li>
 </ul>
 <h2>How Senior Engineers Think About This</h2>
-<p>The essence of a coding test is "choosing the right algorithm and implementing it correctly within a time limit." Solving many problems matters, but systematizing your approach is far more effective.</p>
+<p>The essence of a coding test is "choosing the right algorithm and implementing it correctly within a time limit." Solving many problems matters, but building the habit of reading constraints first and rejecting the wrong complexity early is even more effective.</p>
 <p>The same mindset applies in production work. "Is this algorithm fast enough for this data size?" is a fundamental question in system design.</p>
 <h2>Why this matters beyond interviews</h2>
 <ul>
@@ -317,9 +329,9 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <ul>
 <li>[ ] I can reverse-engineer allowed time complexity from input size</li>
 <li>[ ] I can classify a problem as search, DP, graph, or greedy</li>
-<li>[ ] I can apply two pointers and sliding window patterns</li>
+<li>[ ] I can reject a wrong O(N²) approach before implementing a two-pointers solution</li>
 <li>[ ] I can leverage Python standard library for fast implementation</li>
-<li>[ ] I can systematically test edge cases</li>
+<li>[ ] I can systematically test edge cases and know what to inspect first when one fails</li>
 </ul>
 <h2>Exercises</h2>
 <ol>
@@ -328,17 +340,27 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <li>Find the minimum-cost path from (0,0) to (N-1,N-1) in an N×N grid.</li>
 </ol>
 <h2>Summary and Next Steps</h2>
-<p>The most important skill in coding tests is identifying the problem type at a glance. Once you internalize the flow — input size → time complexity → algorithm choice — you can approach any problem systematically. The search, sorting, recursion, DP, graph, and greedy techniques covered in this series form the core toolkit for coding tests.</p>
+<p>The most important skill in coding tests is identifying the problem type quickly and discarding the approaches that cannot possibly meet the constraints. Once you internalize the full flow — input size → time complexity → algorithm choice → implementation → verification — you can approach unfamiliar problems systematically. The search, sorting, recursion, DP, graph, and greedy techniques in this series form the toolkit, but the final level of reliability comes from the verification loop.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">What Are Algorithms?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Time Complexity and Big-O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Linear Search and Binary Search</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Dynamic Programming Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Graph Traversal — BFS and DFS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/08-shortest-path-basics.md">Shortest Path Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/09-greedy-algorithms.md">Greedy Algorithms</a></li>
+<li><strong>What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?</strong></li>
+<li>The article treats Coding Test Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/01-what-are-algorithms.md">Algorithms with Python 101 (1/10): What Are Algorithms?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/02-time-complexity-and-big-o.md">Algorithms with Python 101 (2/10): Time Complexity and Big-O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/03-linear-and-binary-search.md">Algorithms with Python 101 (3/10): Linear Search and Binary Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/04-sorting-algorithms.md">Algorithms with Python 101 (4/10): Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/05-recursion-and-divide-and-conquer.md">Algorithms with Python 101 (5/10): Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/06-dynamic-programming-basics.md">Algorithms with Python 101 (6/10): Dynamic Programming Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/07-graph-traversal-bfs-dfs.md">Algorithms with Python 101 (7/10): Graph Traversal — BFS and DFS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/08-shortest-path-basics.md">Algorithms with Python 101 (8/10): Shortest Path Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-python-101/en/09-greedy-algorithms.md">Algorithms with Python 101 (9/10): Greedy Algorithms</a></li>
 <li><strong>Coding Test Problem-Solving Strategies (current)</strong></li>
 </ul>
 <h2>References</h2>

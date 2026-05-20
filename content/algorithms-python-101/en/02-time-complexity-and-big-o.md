@@ -1,7 +1,7 @@
 ---
 series: algorithms-python-101
 episode: 2
-title: Time Complexity and Big-O
+title: "Algorithms with Python 101 (2/10): Time Complexity and Big-O"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Understand time complexity and Big-O notation to analyze and co
 last_reviewed: '2026-05-04'
 ---
 
-# Time Complexity and Big-O
+# Algorithms with Python 101 (2/10): Time Complexity and Big-O
 
 Wall-clock time on your laptop is not a reliable way to judge an algorithm. Hardware, runtime, and test data all change, but the growth pattern of the algorithm stays the same.
 
 Big-O gives you a practical language for comparing that growth before the code ever reaches production or an interview whiteboard.
 
 This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Time Complexity and Big-O?
+- Which signal should the example or diagram make visible for Time Complexity and Big-O?
+- What failure should be prevented first when Time Complexity and Big-O reaches a real system?
+
+## Big Picture
+
+![Algorithms with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.en.png)
+
+*Algorithms with Python 101 chapter 2 flow overview*
+
+This picture places Time Complexity and Big-O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Time Complexity and Big-O is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -180,12 +196,10 @@ print(sorted_data[:5])
 ```python
 import time
 
-
 def measure(func, *args) -> float:
     start = time.perf_counter()
     func(*args)
     return time.perf_counter() - start
-
 
 sizes = [1_000, 5_000, 10_000]
 for n in sizes:
@@ -251,8 +265,19 @@ In code reviews, a senior engineer spots nested loops over large data and immedi
 
 Time complexity and Big-O notation give you a precise way to compare algorithm performance. The most important classes to remember are O(1), O(log n), O(n), O(n log n), and O(n^2). In the next article, we implement and compare two fundamental search algorithms: linear search and binary search.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Time Complexity and Big-O?**
+  - The article treats Time Complexity and Big-O as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Time Complexity and Big-O?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Time Complexity and Big-O reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Are Algorithms?](./01-what-are-algorithms.md)
+## In this series
+
+- [Algorithms with Python 101 (1/10): What Are Algorithms?](./01-what-are-algorithms.md)
 - **Time Complexity and Big-O (current)**
 - Linear Search and Binary Search (upcoming)
 - Sorting Algorithms (upcoming)
@@ -262,6 +287,7 @@ Time complexity and Big-O notation give you a precise way to compare algorithm p
 - Shortest Path Basics (upcoming)
 - Greedy Algorithms (upcoming)
 - Coding Test Problem-Solving Strategies (upcoming)
+
 <!-- toc:end -->
 
 ## References
