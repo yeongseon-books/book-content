@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 1
-title: What Is MLOps?
+title: "MLOps 101 (1/10): What Is MLOps?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Understand MLOps as an operational loop for data, training, dep
 last_reviewed: '2026-05-15'
 ---
 
-# What Is MLOps?
+# MLOps 101 (1/10): What Is MLOps?
 
 Training one good model and running that model in production for months are very different jobs. A model can look great inside a notebook, then become hard to reproduce after deployment, drift when the input shape changes, or lose performance with no trace of when the decline started.
 
@@ -29,6 +29,22 @@ Many teams make the same assumption at this point: if model quality improves, op
 This is the first post in the MLOps 101 series.
 
 Here, we will treat MLOps not as a list of tool names, but as the operational loop that lets a model stay alive in production.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is MLOps??
+- Which signal should the example or diagram make visible for What Is MLOps??
+- What failure should be prevented first when What Is MLOps? reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png)
+
+*mlops 101 chapter 1 flow overview*
+
+This picture places What Is MLOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is MLOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ That is why the starting point for MLOps is not buying a larger platform. It is 
 
 ## See the Loop First
 
-![See the Loop First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png)
-
-*See the Loop First*
 This loop is the shortest useful picture of MLOps. Data and code feed a training pipeline, the trained model moves into a registry, deployment sends that version into production, and monitoring feeds real operating signals back into the next training cycle.
 
 The important detail is that this is not a one-time delivery pipeline. Models age, input distributions change, and production conditions keep moving. MLOps exists to make that change manageable.
@@ -157,7 +170,18 @@ Recommendation systems and fraud detection live in fast-changing data and requir
 
 MLOps is a system, not a single line of model code. Next, experiment tracking begins the journey.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is MLOps??**
+  - The article treats What Is MLOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is MLOps??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is MLOps? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is MLOps? (current)**
 - Experiment Tracking (upcoming)
 - Data Versioning (upcoming)
@@ -168,6 +192,7 @@ MLOps is a system, not a single line of model code. Next, experiment tracking be
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

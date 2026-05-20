@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model Monitoring</title>
+<title>MLOps 101 (6/10): Model Monitoring</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Model Monitoring</h1>
+<h1>MLOps 101 (6/10): Model Monitoring</h1>
 <p>Once a model is deployed, it can look calm from the outside. Requests still succeed and responses still come back, but latency may be climbing, the prediction mix may be skewing, or downstream business results may already be weakening.</p>
 <p>That is why model monitoring is not an optional operations add-on. It is the layer that tells you not only whether the model is alive, but what kind of state it is alive in right now and whether a problem is already forming.</p>
 <p>This is post 6 in the MLOps 101 series.</p>
 <p>Here, we will treat monitoring as the observation layer where system metrics, model metrics, and business metrics meet, starting from a practical Prometheus-based baseline.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Model Monitoring?</li>
+<li>Which signal should the example or diagram make visible for Model Monitoring?</li>
+<li>What failure should be prevented first when Model Monitoring reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png"></p>
+<p><em>mlops 101 chapter 6 flow overview</em></p>
+<p>This picture places Model Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Model Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>Why is accuracy alone too slow as a production signal?</li>
 <li>How should you think about metrics, logs, and traces?</li>
@@ -73,9 +86,7 @@
 <p>Accuracy usually arrives late, especially when labels are delayed. Latency, error rate, input distribution, and prediction-class balance often move first. That means a live model cannot be judged by one metric alone.</p>
 <p>Without monitoring, deployment is close to driving with your eyes closed. The team cannot tell when the abnormal behavior started, which version it started on, or whether the issue belongs to the runtime, the model, or the business process around it.</p>
 <h2>See the Flow First</h2>
-<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png"></p>
-<p><em>See the Flow First</em><br>
-This is the smallest useful monitoring shape. The application exposes time-series metrics on <code>/metrics</code>, Prometheus scrapes them, Grafana visualizes them, and Alertmanager routes meaningful threshold crossings to humans.</p>
+<p>This is the smallest useful monitoring shape. The application exposes time-series metrics on <code>/metrics</code>, Prometheus scrapes them, Grafana visualizes them, and Alertmanager routes meaningful threshold crossings to humans.</p>
 <p>The critical idea is that collection has to be automatic. A dashboard that depends on someone remembering to open it is a habit, not an operations system.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -186,12 +197,22 @@ def record(p: int):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Monitoring is the <em>prerequisite</em> for drift detection. The next post tackles <em>Data Drift and Model Drift</em> directly.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">Model Deployment</a></li>
+<li><strong>What boundary should you inspect first when applying Model Monitoring?</strong></li>
+<li>The article treats Model Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Model Monitoring?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Model Monitoring reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">MLOps 101 (1/10): What Is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">MLOps 101 (2/10): Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">MLOps 101 (3/10): Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">MLOps 101 (4/10): Model Training Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">MLOps 101 (5/10): Model Deployment</a></li>
 <li><strong>Model Monitoring (current)</strong></li>
 <li>Data Drift and Model Drift (upcoming)</li>
 <li>Retraining (upcoming)</li>

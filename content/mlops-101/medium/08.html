@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Retraining</title>
+<title>MLOps 101 (8/10): Retraining</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Retraining</h1>
+<h1>MLOps 101 (8/10): Retraining</h1>
 <p>Deploying a model once is not the end of the job. Input distributions move, user behavior changes, and performance targets change. At some point, the team has to train again. The hard part is deciding who should trigger that retraining and on what evidence.</p>
 <p>If retraining depends only on human instinct, it becomes slow and inconsistent. One team retrains on a schedule, another retrains only after an incident, and another swaps in a new model without proving it is actually better.</p>
 <p>This is post 8 in the MLOps 101 series.</p>
 <p>Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Retraining?</li>
+<li>Which signal should the example or diagram make visible for Retraining?</li>
+<li>What failure should be prevented first when Retraining reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png"></p>
+<p><em>mlops 101 chapter 8 flow overview</em></p>
+<p>This picture places Retraining inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Retraining is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>Which signals should trigger retraining in the first place?</li>
 <li>How do schedule-based, drift-based, and performance-based triggers differ?</li>
@@ -73,9 +86,7 @@
 <p>Without retraining, a model ages quietly. But a fully automatic retraining loop is not automatically safe either. If the policy is weak, the system may replace models too often and trade stability for false momentum.</p>
 <p>That is why the real problem is policy, not automation for its own sake. The team has to define what starts retraining, how much better the challenger must be, and what path exists if the decision was wrong.</p>
 <h2>See the Flow First</h2>
-<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png"></p>
-<p><em>See the Flow First</em><br>
-This structure explains retraining well. A trigger fires, a challenger is trained, the challenger is evaluated against the champion, and the system either promotes it or rejects it.</p>
+<p>This structure explains retraining well. A trigger fires, a challenger is trained, the challenger is evaluated against the champion, and the system either promotes it or rejects it.</p>
 <p>So retraining is not just about running training again. It is about adding comparison and promotion policy around the training run.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -165,14 +176,24 @@ print(promote_decision(&quot;drift&quot;, 0.82, 0.80))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Retraining is only clean if features are consistent across train and serve. The next post covers the <em>Feature Store</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">Model Deployment</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/06-model-monitoring.md">Model Monitoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/07-data-and-model-drift.md">Data Drift and Model Drift</a></li>
+<li><strong>What boundary should you inspect first when applying Retraining?</strong></li>
+<li>The article treats Retraining as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Retraining?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Retraining reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">MLOps 101 (1/10): What Is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">MLOps 101 (2/10): Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">MLOps 101 (3/10): Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">MLOps 101 (4/10): Model Training Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">MLOps 101 (5/10): Model Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/06-model-monitoring.md">MLOps 101 (6/10): Model Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/07-data-and-model-drift.md">MLOps 101 (7/10): Data Drift and Model Drift</a></li>
 <li><strong>Retraining (current)</strong></li>
 <li>Feature Store (upcoming)</li>
 <li>Building a Production ML System (upcoming)</li>

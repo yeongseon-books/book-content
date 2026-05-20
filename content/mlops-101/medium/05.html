@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model Deployment</title>
+<title>MLOps 101 (5/10): Model Deployment</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Model Deployment</h1>
+<h1>MLOps 101 (5/10): Model Deployment</h1>
 <p>Finishing model training does not automatically create a service. If nobody has defined which process loads the model file, how input is validated, or what environment the code runs in, even a strong model becomes unstable the moment it leaves the notebook.</p>
 <p>When engineers say deployment is hard, they are usually not describing the model itself. They are describing environment drift, missing version traceability, and the lack of a safe rollback path. That is why model deployment is really about a reproducible runtime plus a controlled release policy.</p>
 <p>This is post 5 in the MLOps 101 series.</p>
 <p>Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Model Deployment?</li>
+<li>Which signal should the example or diagram make visible for Model Deployment?</li>
+<li>What failure should be prevented first when Model Deployment reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png"></p>
+<p><em>mlops 101 chapter 5 flow overview</em></p>
+<p>This picture places Model Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Model Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>How do you connect a trained model file to a real user request?</li>
 <li>How should you distinguish online, batch, and streaming inference?</li>
@@ -73,9 +86,7 @@
 <p>Many teams blame deployment failures on model complexity, but the more common source is environment mismatch and rollback chaos. The model works locally, then breaks in the server because the library version changed. A bad release goes live, and no one can cleanly return to the previous version.</p>
 <p>That is why deployment is not the final training step. It is the first operating step. The team has to know which version is live, how much traffic it should receive, and exactly how to back out if the release starts misbehaving.</p>
 <h2>See the Flow First</h2>
-<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png"></p>
-<p><em>See the Flow First</em><br>
-This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.</p>
+<p>This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.</p>
 <p>In other words, deployment is the bundle of model + serving code + runtime environment + rollout policy.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -189,11 +200,21 @@ curl -X POST localhost:8000/predict -H &quot;Content-Type: application/json&quot
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Deployment is the start, not the end — <em>monitoring</em> is where real life begins. The next post covers <em>model monitoring</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
+<li><strong>What boundary should you inspect first when applying Model Deployment?</strong></li>
+<li>The article treats Model Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Model Deployment?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Model Deployment reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">MLOps 101 (1/10): What Is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">MLOps 101 (2/10): Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">MLOps 101 (3/10): Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">MLOps 101 (4/10): Model Training Pipeline</a></li>
 <li><strong>Model Deployment (current)</strong></li>
 <li>Model Monitoring (upcoming)</li>
 <li>Data Drift and Model Drift (upcoming)</li>

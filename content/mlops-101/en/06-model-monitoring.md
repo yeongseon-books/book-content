@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 6
-title: Model Monitoring
+title: "MLOps 101 (6/10): Model Monitoring"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Track latency, error rate, and prediction distribution so produ
 last_reviewed: '2026-05-15'
 ---
 
-# Model Monitoring
+# MLOps 101 (6/10): Model Monitoring
 
 Once a model is deployed, it can look calm from the outside. Requests still succeed and responses still come back, but latency may be climbing, the prediction mix may be skewing, or downstream business results may already be weakening.
 
@@ -29,6 +29,22 @@ That is why model monitoring is not an optional operations add-on. It is the lay
 This is post 6 in the MLOps 101 series.
 
 Here, we will treat monitoring as the observation layer where system metrics, model metrics, and business metrics meet, starting from a practical Prometheus-based baseline.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Model Monitoring?
+- Which signal should the example or diagram make visible for Model Monitoring?
+- What failure should be prevented first when Model Monitoring reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 6 flow overview*
+
+This picture places Model Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Model Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ Without monitoring, deployment is close to driving with your eyes closed. The te
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 This is the smallest useful monitoring shape. The application exposes time-series metrics on `/metrics`, Prometheus scrapes them, Grafana visualizes them, and Alertmanager routes meaningful threshold crossings to humans.
 
 The critical idea is that collection has to be automatic. A dashboard that depends on someone remembering to open it is a habit, not an operations system.
@@ -203,17 +216,29 @@ A payments fraud model emits metrics every minute. When fraud rate crosses an SL
 
 Monitoring is the *prerequisite* for drift detection. The next post tackles *Data Drift and Model Drift* directly.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Model Monitoring?**
+  - The article treats Model Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Model Monitoring?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Model Monitoring reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
-- [Model Training Pipeline](./04-training-pipeline.md)
-- [Model Deployment](./05-model-deployment.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
+- [MLOps 101 (4/10): Model Training Pipeline](./04-training-pipeline.md)
+- [MLOps 101 (5/10): Model Deployment](./05-model-deployment.md)
 - **Model Monitoring (current)**
 - Data Drift and Model Drift (upcoming)
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

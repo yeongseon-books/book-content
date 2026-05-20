@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 2
-title: Experiment Tracking
+title: "MLOps 101 (2/10): Experiment Tracking"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Record runs, parameters, metrics, and artifacts so ML experimen
 last_reviewed: '2026-05-15'
 ---
 
-# Experiment Tracking
+# MLOps 101 (2/10): Experiment Tracking
 
 Once a team trains a model a few times, memory usually fails before compute does. File names alone do not explain which parameter set won last week, which data version produced the result, or why today's score moved.
 
@@ -29,6 +29,22 @@ The problem gets worse when multiple people are involved. One person leaves metr
 This is post 2 in the MLOps 101 series.
 
 Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Experiment Tracking?
+- Which signal should the example or diagram make visible for Experiment Tracking?
+- What failure should be prevented first when Experiment Tracking reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 2 flow overview*
+
+This picture places Experiment Tracking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Experiment Tracking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ When every run is recorded, the process becomes an asset in its own right. Faile
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.
 
 The key point is not storage by itself, but comparability. The run table matters only when different runs can be read side by side with consistent names and metadata.
@@ -169,8 +182,19 @@ Hyperparameter sweeps and weekly reviews use MLflow or W&B as shared memory.
 
 Experiment tracking is the team's short-term memory. Next, data versioning provides the long-term memory.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Experiment Tracking?**
+  - The article treats Experiment Tracking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Experiment Tracking?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Experiment Tracking reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is MLOps?](./01-what-is-mlops.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
 - **Experiment Tracking (current)**
 - Data Versioning (upcoming)
 - Model Training Pipeline (upcoming)
@@ -180,6 +204,7 @@ Experiment tracking is the team's short-term memory. Next, data versioning provi
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is MLOps?</title>
+<title>MLOps 101 (1/10): What Is MLOps?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>What Is MLOps?</h1>
+<h1>MLOps 101 (1/10): What Is MLOps?</h1>
 <p>Training one good model and running that model in production for months are very different jobs. A model can look great inside a notebook, then become hard to reproduce after deployment, drift when the input shape changes, or lose performance with no trace of when the decline started.</p>
 <p>Many teams make the same assumption at this point: if model quality improves, operations will take care of themselves. In practice, the opposite is usually true. In production, the model, data, code, deployment path, monitoring, and retraining loop all have to move together.</p>
 <p>This is the first post in the MLOps 101 series.</p>
 <p>Here, we will treat MLOps not as a list of tool names, but as the operational loop that lets a model stay alive in production.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is MLOps??</li>
+<li>Which signal should the example or diagram make visible for What Is MLOps??</li>
+<li>What failure should be prevented first when What Is MLOps? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png"></p>
+<p><em>mlops 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is MLOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is MLOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>What makes MLOps different from simply attaching DevOps habits to ML?</li>
 <li>Why do even accurate models break down quickly in real production systems?</li>
@@ -73,9 +86,7 @@
 <p>Most ML projects fail first at the operating model, not at the model metric. Teams cannot rerun last week's best experiment, cannot tell which data trained the live model, and cannot explain why performance is slipping because the evidence was never captured.</p>
 <p>That is why the starting point for MLOps is not buying a larger platform. It is deciding whether the same inputs can produce the same result again, whether the live model can be observed, and whether the team knows which part of the loop to revisit when something goes wrong.</p>
 <h2>See the Loop First</h2>
-<p><img alt="See the Loop First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png"></p>
-<p><em>See the Loop First</em><br>
-This loop is the shortest useful picture of MLOps. Data and code feed a training pipeline, the trained model moves into a registry, deployment sends that version into production, and monitoring feeds real operating signals back into the next training cycle.</p>
+<p>This loop is the shortest useful picture of MLOps. Data and code feed a training pipeline, the trained model moves into a registry, deployment sends that version into production, and monitoring feeds real operating signals back into the next training cycle.</p>
 <p>The important detail is that this is not a one-time delivery pipeline. Models age, input distributions change, and production conditions keep moving. MLOps exists to make that change manageable.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -156,6 +167,16 @@ print(&quot;log:&quot;, log)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>MLOps is a system, not a single line of model code. Next, experiment tracking begins the journey.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is MLOps??</strong></li>
+<li>The article treats What Is MLOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is MLOps??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is MLOps? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is MLOps? (current)</strong></li>
 <li>Experiment Tracking (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Experiment Tracking</title>
+<title>MLOps 101 (2/10): Experiment Tracking</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Experiment Tracking</h1>
+<h1>MLOps 101 (2/10): Experiment Tracking</h1>
 <p>Once a team trains a model a few times, memory usually fails before compute does. File names alone do not explain which parameter set won last week, which data version produced the result, or why today's score moved.</p>
 <p>The problem gets worse when multiple people are involved. One person leaves metrics in Slack, another stores only the best model, and someone else never records failed runs at all. At that point, reconstructing the past becomes harder than improving the model.</p>
 <p>This is post 2 in the MLOps 101 series.</p>
 <p>Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Experiment Tracking?</li>
+<li>Which signal should the example or diagram make visible for Experiment Tracking?</li>
+<li>What failure should be prevented first when Experiment Tracking reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png"></p>
+<p><em>mlops 101 chapter 2 flow overview</em></p>
+<p>This picture places Experiment Tracking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Experiment Tracking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>Why does the same model become hard to reproduce without run tracking?</li>
 <li>Which pieces of metadata must always be captured: params, metrics, artifacts, environment, or data version?</li>
@@ -73,9 +86,7 @@
 <p>Without experiment tracking, training continues but knowledge does not accumulate. When a new score appears, the team cannot tell whether the gain came from the data change, the parameter change, or pure luck.</p>
 <p>When every run is recorded, the process becomes an asset in its own right. Failed runs prevent repeated mistakes, and successful runs become promotion candidates that can be defended with evidence.</p>
 <h2>See the Flow First</h2>
-<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png"></p>
-<p><em>See the Flow First</em><br>
-This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.</p>
+<p>This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.</p>
 <p>The key point is not storage by itself, but comparability. The run table matters only when different runs can be read side by side with consistent names and metadata.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -168,8 +179,18 @@ for r in runs[:3]:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Experiment tracking is the team's short-term memory. Next, data versioning provides the long-term memory.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What Is MLOps?</a></li>
+<li><strong>What boundary should you inspect first when applying Experiment Tracking?</strong></li>
+<li>The article treats Experiment Tracking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Experiment Tracking?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Experiment Tracking reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">MLOps 101 (1/10): What Is MLOps?</a></li>
 <li><strong>Experiment Tracking (current)</strong></li>
 <li>Data Versioning (upcoming)</li>
 <li>Model Training Pipeline (upcoming)</li>

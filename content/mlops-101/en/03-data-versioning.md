@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 3
-title: Data Versioning
+title: "MLOps 101 (3/10): Data Versioning"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Version data with pointers, hashes, and remote storage so ML pi
 last_reviewed: '2026-05-15'
 ---
 
-# Data Versioning
+# MLOps 101 (3/10): Data Versioning
 
 Teams usually remember to keep code in git and sometimes remember to save model files. The largest input of all—the data—is often the least controlled. When yesterday's training run works and today's result shifts unexpectedly, this is where the investigation usually begins.
 
@@ -29,6 +29,22 @@ The same code with different data produces a different model. That means MLOps w
 This is post 3 in the MLOps 101 series.
 
 Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Versioning?
+- Which signal should the example or diagram make visible for Data Versioning?
+- What failure should be prevented first when Data Versioning reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 3 flow overview*
+
+This picture places Data Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ That is why experiment tracking alone is not enough. A high metric becomes hard 
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 This picture explains why a tool such as DVC exists. The git repository stores a pointer file instead of the large dataset itself, the real data lives in remote storage, and the pipeline reads the pointer to recover the exact input state.
 
 The pointer and the remote have to move together. If either side is missing, reproducibility breaks.
@@ -163,9 +176,20 @@ Vision datasets and large text corpora outgrow git-LFS quickly; DVC with an S3 b
 
 Data versioning is the precondition for reproduction. Next, the training pipeline automates the loop.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Versioning?**
+  - The article treats Data Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Versioning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Versioning reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
 - **Data Versioning (current)**
 - Model Training Pipeline (upcoming)
 - Model Deployment (upcoming)
@@ -174,6 +198,7 @@ Data versioning is the precondition for reproduction. Next, the training pipelin
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

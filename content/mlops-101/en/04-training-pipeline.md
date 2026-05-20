@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 4
-title: Model Training Pipeline
+title: "MLOps 101 (4/10): Model Training Pipeline"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Break ML training into explicit ingest, preprocess, train, eval
 last_reviewed: '2026-05-15'
 ---
 
-# Model Training Pipeline
+# MLOps 101 (4/10): Model Training Pipeline
 
 Scheduling one `train.py` file does not automatically give you an operable training system. When ingest, preprocessing, training, evaluation, and registration are fused into one script, failures are hard to localize and partial re-runs become expensive.
 
@@ -29,6 +29,22 @@ The more the training process depends on manual steps, the faster reproducibilit
 This is post 4 in the MLOps 101 series.
 
 Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Model Training Pipeline?
+- Which signal should the example or diagram make visible for Model Training Pipeline?
+- What failure should be prevented first when Model Training Pipeline reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 4 flow overview*
+
+This picture places Model Training Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Model Training Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ When stages are split cleanly, the team can narrow the failure immediately and r
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 The most important part of this diagram is not the stage names, but the boundaries between them. Ingest, preprocess, train, evaluate, and register have to be separate if the team wants partial re-runs and faster root-cause analysis.
 
 The goal of a training pipeline is not fancy scheduling. It is clear stage boundaries.
@@ -173,10 +186,21 @@ A nightly Airflow DAG runs data, train, register. The weekly report is just the 
 
 Pipelines provide repeatability. Next, model deployment turns trained artifacts into live services.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Model Training Pipeline?**
+  - The article treats Model Training Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Model Training Pipeline?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Model Training Pipeline reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
 - **Model Training Pipeline (current)**
 - Model Deployment (upcoming)
 - Model Monitoring (upcoming)
@@ -184,6 +208,7 @@ Pipelines provide repeatability. Next, model deployment turns trained artifacts 
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

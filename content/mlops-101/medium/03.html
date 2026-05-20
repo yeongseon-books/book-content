@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Versioning</title>
+<title>MLOps 101 (3/10): Data Versioning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,12 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Data Versioning</h1>
+<h1>MLOps 101 (3/10): Data Versioning</h1>
 <p>Teams usually remember to keep code in git and sometimes remember to save model files. The largest input of all—the data—is often the least controlled. When yesterday's training run works and today's result shifts unexpectedly, this is where the investigation usually begins.</p>
 <p>The same code with different data produces a different model. That means MLOps without data versioning is only half built. You might be able to reproduce the code path, but you still cannot reproduce the outcome.</p>
 <p>This is post 3 in the MLOps 101 series.</p>
 <p>Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.</p>
-<h2>What This Post Answers</h2>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Versioning?</li>
+<li>Which signal should the example or diagram make visible for Data Versioning?</li>
+<li>What failure should be prevented first when Data Versioning reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="mlops 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png"></p>
+<p><em>mlops 101 chapter 3 flow overview</em></p>
+<p>This picture places Data Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
 <ul>
 <li>Why can code versioning alone never reproduce an ML result?</li>
 <li>How should you think about DVC versus git-LFS?</li>
@@ -73,9 +86,7 @@
 <p>One of the most common mistakes in ML systems is assuming the model came from the code. In practice, the model comes from the combination of code and data. When the input changes, the result changes, even if the repository did not.</p>
 <p>That is why experiment tracking alone is not enough. A high metric becomes hard to explain, and an older model becomes impossible to rebuild, if the training data state was never preserved.</p>
 <h2>See the Flow First</h2>
-<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png"></p>
-<p><em>See the Flow First</em><br>
-This picture explains why a tool such as DVC exists. The git repository stores a pointer file instead of the large dataset itself, the real data lives in remote storage, and the pipeline reads the pointer to recover the exact input state.</p>
+<p>This picture explains why a tool such as DVC exists. The git repository stores a pointer file instead of the large dataset itself, the real data lives in remote storage, and the pipeline reads the pointer to recover the exact input state.</p>
 <p>The pointer and the remote have to move together. If either side is missing, reproducibility breaks.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -162,9 +173,19 @@ print(&quot;changed:&quot;, new_h != h)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Data versioning is the precondition for reproduction. Next, the training pipeline automates the loop.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What Is MLOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
+<li><strong>What boundary should you inspect first when applying Data Versioning?</strong></li>
+<li>The article treats Data Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Versioning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Versioning reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">MLOps 101 (1/10): What Is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">MLOps 101 (2/10): Experiment Tracking</a></li>
 <li><strong>Data Versioning (current)</strong></li>
 <li>Model Training Pipeline (upcoming)</li>
 <li>Model Deployment (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 5
-title: Model Deployment
+title: "MLOps 101 (5/10): Model Deployment"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Wrap a trained model in FastAPI and Docker, then ship it with h
 last_reviewed: '2026-05-15'
 ---
 
-# Model Deployment
+# MLOps 101 (5/10): Model Deployment
 
 Finishing model training does not automatically create a service. If nobody has defined which process loads the model file, how input is validated, or what environment the code runs in, even a strong model becomes unstable the moment it leaves the notebook.
 
@@ -29,6 +29,22 @@ When engineers say deployment is hard, they are usually not describing the model
 This is post 5 in the MLOps 101 series.
 
 Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Model Deployment?
+- Which signal should the example or diagram make visible for Model Deployment?
+- What failure should be prevented first when Model Deployment reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 5 flow overview*
+
+This picture places Model Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Model Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ That is why deployment is not the final training step. It is the first operating
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.
 
 In other words, deployment is the bundle of model + serving code + runtime environment + rollout policy.
@@ -209,17 +222,29 @@ Recommendation models often run as FastAPI in Docker on Kubernetes. Weekly repor
 
 Deployment is the start, not the end — *monitoring* is where real life begins. The next post covers *model monitoring*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Model Deployment?**
+  - The article treats Model Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Model Deployment?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Model Deployment reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
-- [Model Training Pipeline](./04-training-pipeline.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
+- [MLOps 101 (4/10): Model Training Pipeline](./04-training-pipeline.md)
 - **Model Deployment (current)**
 - Model Monitoring (upcoming)
 - Data Drift and Model Drift (upcoming)
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: mlops-101
 episode: 7
-title: Data Drift and Model Drift
+title: "MLOps 101 (7/10): Data Drift and Model Drift"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Separate input-distribution drift from model-quality drift with
 last_reviewed: '2026-05-15'
 ---
 
-# Data Drift and Model Drift
+# MLOps 101 (7/10): Data Drift and Model Drift
 
 When a live model stops feeling as reliable as it used to, the cause is rarely one thing. The input distribution may have changed, or the inputs may look similar while the relationship between input and label has shifted underneath the model.
 
@@ -29,6 +29,22 @@ Teams often notice the problem only after a business metric drops. In practice, 
 This is post 7 in the MLOps 101 series.
 
 Here, we will separate data drift from model drift and connect statistical signals such as PSI and KS to concrete operating thresholds.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Drift and Model Drift?
+- Which signal should the example or diagram make visible for Data Drift and Model Drift?
+- What failure should be prevented first when Data Drift and Model Drift reaches a real system?
+
+## Big Picture
+
+![mlops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.en.png)
+
+*mlops 101 chapter 7 flow overview*
+
+This picture places Data Drift and Model Drift inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Drift and Model Drift is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,9 +64,6 @@ Without drift detection, the loss accumulates quietly. Only later do accuracy or
 
 ## See the Flow First
 
-![See the Flow First](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.en.png)
-
-*See the Flow First*
 This diagram captures the core workflow. A training-time distribution becomes the baseline, live inputs are compared against it with statistical tests, and the system emits a warning when the difference crosses the operating threshold.
 
 The most important design choice is the baseline. If the baseline moves carelessly, drift itself becomes difficult to detect.
@@ -164,17 +177,29 @@ A risk-scoring model computes PSI nightly. If it crosses 0.2, the model is autom
 
 Once you see drift, the next question is what to do. The next post covers *retraining automation*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Drift and Model Drift?**
+  - The article treats Data Drift and Model Drift as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Drift and Model Drift?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Drift and Model Drift reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is MLOps?](./01-what-is-mlops.md)
-- [Experiment Tracking](./02-experiment-tracking.md)
-- [Data Versioning](./03-data-versioning.md)
-- [Model Training Pipeline](./04-training-pipeline.md)
-- [Model Deployment](./05-model-deployment.md)
-- [Model Monitoring](./06-model-monitoring.md)
+## In this series
+
+- [MLOps 101 (1/10): What Is MLOps?](./01-what-is-mlops.md)
+- [MLOps 101 (2/10): Experiment Tracking](./02-experiment-tracking.md)
+- [MLOps 101 (3/10): Data Versioning](./03-data-versioning.md)
+- [MLOps 101 (4/10): Model Training Pipeline](./04-training-pipeline.md)
+- [MLOps 101 (5/10): Model Deployment](./05-model-deployment.md)
+- [MLOps 101 (6/10): Model Monitoring](./06-model-monitoring.md)
 - **Data Drift and Model Drift (current)**
 - Retraining (upcoming)
 - Feature Store (upcoming)
 - Building a Production ML System (upcoming)
+
 <!-- toc:end -->
 
 ## References
