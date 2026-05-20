@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</title>
+<title>SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</h1>
+<h1>SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</h1>
 <p>The most common complaint about ORMs always lands in the same place: "Why am I seeing 100 SELECTs?" The answer is usually the N+1 query pattern. The <code>relationship()</code> we built in Ep6 defaults to lazy loading, so accessing a child attribute on each of N parent objects fires N additional SELECTs. This article shows how N+1 actually arises (with <code>echo=True</code> logs you can read line by line), and how to prevent or expose it with <code>joinedload</code>, <code>selectinload</code>, and <code>raiseload</code>.</p>
 <p>This is the 7th article in the SQLAlchemy 101 series.</p>
 <p><img alt="Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.en.png"></p>
 <p><em>Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin</em></p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What code, exactly, produces an N+1 query pattern?</li>
 <li>How do <code>lazy="select"</code> (the default), <code>joinedload</code>, and <code>selectinload</code> differ at the SQL level?</li>
 <li>Why is <code>selectinload</code> typically the safer default for collections (one-to-many, many-to-many)?</li>
-<li>How do you spot the row-explosion (Cartesian) problem caused by <code>joinedload</code>?</li>
-<li>What tool catches N+1 automatically in production?</li>
-<li>When is <code>lazy="raise"</code> a good idea, and what are its trade-offs?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sqlalchemy 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-02-why-it-matters.en.png"></p>
+<p><em>sqlalchemy 101 chapter 7 flow overview</em></p>
+<p>This picture places Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
-<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-02-why-it-matters.en.png"></p>
-<p><em>Why it matters</em><br>
-Lazy loading makes ORM code readable. You write <code>user.orders</code> and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:</p>
+<p>Lazy loading makes ORM code readable. You write <code>user.orders</code> and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:</p>
 <ul>
 <li>A handler that fetches 100 users and prints each user's most recent order time: 1 + 100 = 101 SELECTs.</li>
 <li>A response listing 50 posts and each post's tags: 1 + 50 = 51 SELECTs.</li>
@@ -281,18 +283,27 @@ users = session.scalars(stmt, options=selectinload(User.orders)).all()   # wrong
 <li>Apply <code>joinedload</code> to <code>User.orders</code> and intentionally skip <code>unique()</code>. What happens to the result list? Which data is duplicated and how?</li>
 <li>Apply <code>raiseload</code> to every relationship and exercise a typical handler. Which lines blow up? Which N+1 candidates do those failures expose?</li>
 </ol>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What code, exactly, produces an N+1 query pattern?</strong></li>
+<li>The article treats Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do <code>lazy="select"</code> (the default), <code>joinedload</code>, and <code>selectinload</code> differ at the SQL level?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is <code>selectinload</code> typically the safer default for collections (one-to-many, many-to-many)?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
-<li><strong>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (current)</strong></li>
-<li>Events, hybrid_property, and custom types (upcoming)</li>
-<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
-<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
+<li><strong>SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (current)</strong></li>
+<li>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)</li>
+<li>SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

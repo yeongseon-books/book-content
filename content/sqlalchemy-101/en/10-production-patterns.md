@@ -1,5 +1,5 @@
 ---
-title: 'Production patterns: pools, observability, migrations, and deploys'
+title: "SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys"
 series: sqlalchemy-101
 episode: 10
 language: en
@@ -22,7 +22,7 @@ seo_description: Production SQLAlchemy has three knobs. The pool sets concurrenc
   and tail latency. Observability tells you where slow is.
 ---
 
-# Production patterns: pools, observability, migrations, and deploys
+# SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys
 
 Production SQLAlchemy has three knobs: the pool, observability, and deployment sequencing. This post focuses on the decisions in those areas that most often turn into real incidents.
 
@@ -31,20 +31,25 @@ This is the final article in the SQLAlchemy 101 series.
 ![Production patterns: pools, observability, migrations, and deploys](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png)
 
 *Production patterns: pools, observability, migrations, and deploys*
-## What you will learn
 
-- The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)
-- How to choose between `QueuePool`, `NullPool`, and `StaticPool`, especially for SQLite
-- How to wire SQL queries into traces with OpenTelemetry
-- How to catch slow queries and N+1 in production
-- How to sequence migrations and code deploys safely (blue/green rules)
-- The boundary for retrying transient errors
+## Questions to Keep in Mind
+
+- The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)?
+- How to choose between `QueuePool`, `NullPool`, and `StaticPool`, especially for SQLite?
+- How to wire SQL queries into traces with OpenTelemetry?
+
+## Big Picture
+
+![sqlalchemy 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
+
+*sqlalchemy 101 chapter 10 flow overview*
+
+This picture places Production patterns: pools, observability, migrations, and deploys inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Production patterns: pools, observability, migrations, and deploys is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
-![Why this matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
-
-*Why this matters*
 Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.
 
 This article is about that layer. The examples use SQLite, but most of the patterns apply equally to PostgreSQL and MySQL.
@@ -229,19 +234,28 @@ Production decisions converge on three axes: pool, observability, and migration 
 
 This series ends here. The next series, **alembic-101**, turns the migration policy in this article into concrete commands and workflows: `autogenerate`, branches and merges, data migrations, and a usable downgrade strategy.
 
+## Answering the Opening Questions
+
+- **The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)?**
+  - The article treats Production patterns: pools, observability, migrations, and deploys as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to choose between `QueuePool`, `NullPool`, and `StaticPool`, especially for SQLite?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How to wire SQL queries into traces with OpenTelemetry?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
-- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
-- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
-- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
-- [Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
-- [Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
-- [Async SQLAlchemy with aiosqlite and AsyncSession](./09-async-aiosqlite.md)
-- **Production patterns: pools, observability, migrations, and deploys (current)**
+- [SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- [SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
+- [SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
+- [SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession](./09-async-aiosqlite.md)
+- **SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (current)**
 
 <!-- toc:end -->
 

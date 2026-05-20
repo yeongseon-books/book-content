@@ -1,5 +1,5 @@
 ---
-title: SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
+title: "SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기"
 series: sqlalchemy-101
 episode: 2
 language: ko
@@ -21,7 +21,7 @@ last_reviewed: '2026-05-12'
 seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모델링하는 방법을 설명합니다
 ---
 
-# SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
+# SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
 
 테이블 설계를 문자열 SQL로만 관리하면 애플리케이션 코드와 실제 스키마가 언제 어긋났는지 늦게 알아차리기 쉽습니다. 컬럼 이름 하나를 바꿨는데 런타임에서야 `no such column`이 터지는 식입니다.
 
@@ -32,19 +32,25 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 ![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
-## 이 글에서 다룰 문제
+
+## 먼저 던지는 질문
 
 - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
 - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
 - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
-- `create_all`, `drop_all`, reflection은 언제 유용할까요?
-- `ForeignKey`, 제약 조건, 인덱스를 Core에서 어떻게 선언해야 할까요?
+
+## 큰 그림
+
+![SQLAlchemy 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
+
+*SQLAlchemy 101 2장 흐름 개요*
+
+이 그림에서는 SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
-
-*핵심 개념*
 raw SQL로 schema를 관리하면 한 가지 큰 문제가 생깁니다. application code 안의 INSERT/SELECT 문에 적힌 컬럼 이름이 실제 schema와 어긋나도 컴파일 시점에 알 수 없습니다. 운영 중에 갑자기 `no such column` 같은 오류가 발생하고, IDE는 컬럼 이름 자동완성도 해주지 못합니다.
 
 SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체를 통해 SQL을 빌드할 수 있습니다. 컬럼 이름이 typo라면 import 시점에 `AttributeError`로 잡히고, IDE는 `users.c.name`을 자동완성합니다. 같은 정의가 Alembic의 autogenerate, Pandas의 `read_sql`, FastAPI의 SQL 빌딩에 그대로 재사용됩니다.
@@ -452,19 +458,28 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 
 다음 글에서는 이 schema 객체로 본격적으로 SQL을 빌드합니다. `select()`, `insert()`, `update()`, `delete()`의 2.x style을 다루고, `Result`와 `Row`를 다루는 법을 정리합니다. 그 다음 4편부터 ORM이 등장하는데, 거기서 보게 될 `mapped_column`은 사실 이 글의 `Column`과 거의 같은 객체입니다.
 
+## 처음 질문으로 돌아가기
+
+- **`MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?**
+  - 본문의 기준은 SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- **SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (현재 글)**
-- SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
-- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
-- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
-- ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- **SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (현재 글)**
+- SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
+- SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 

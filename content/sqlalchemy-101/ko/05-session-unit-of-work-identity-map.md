@@ -1,5 +1,5 @@
 ---
-title: 'Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리'
+title: "SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리"
 series: sqlalchemy-101
 episode: 5
 language: ko
@@ -21,7 +21,7 @@ last_reviewed: '2026-05-12'
 seo_description: Session, Unit of Work, Identity Map이 어떻게 함께 동작하는지 설명합니다
 ---
 
-# Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리
+# SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리
 
 ORM 모델을 정의했다고 해서 곧바로 안전한 데이터 작업이 되는 것은 아닙니다. 객체를 언제 INSERT하고, 변경을 언제 UPDATE로 모으고, 같은 행을 왜 같은 객체로 취급하는지 이해하려면 `Session`을 먼저 알아야 합니다.
 
@@ -33,19 +33,24 @@ ORM 모델을 정의했다고 해서 곧바로 안전한 데이터 작업이 되
 
 *Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?
 - Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?
 - `flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?
-- Identity Map은 왜 같은 PK를 같은 객체로 보장할까요?
-- `expire_on_commit`, detached 객체, 세션 범위는 어디서 자주 사고가 날까요?
+
+## 큰 그림
+
+![SQLAlchemy 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.ko.png)
+
+*SQLAlchemy 101 5장 흐름 개요*
+
+이 그림에서는 Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.ko.png)
-
-*핵심 개념*
 Session을 잘 이해하지 못한 채로 ORM을 쓰면 정체불명의 동작에 자주 부딪칩니다. 대표적인 예를 들면 다음과 같습니다.
 
 - "분명히 `commit()`했는데 다른 함수에서 같은 객체의 속성에 접근하니 추가 SELECT가 한 번 더 나갑니다." → `expire_on_commit` 동작입니다.
@@ -308,19 +313,28 @@ with Session(engine) as session:
 - [ ] 벌크 작업에서는 ORM 객체 대신 stmt 기반 INSERT를 검토했는가?
 - [ ] `sessionmaker`로 Session 생성 정책을 한곳에 모았는가?
 
+## 처음 질문으로 돌아가기
+
+- **`Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?**
+  - 본문의 기준은 Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
-- [ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
-- **Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (현재 글)**
-- ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
+- [SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
+- **SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (현재 글)**
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 

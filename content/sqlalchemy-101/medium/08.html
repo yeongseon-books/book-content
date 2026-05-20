@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Events, hybrid_property, and custom types</title>
+<title>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,23 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Events, hybrid_property, and custom types</h1>
+<h1>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types</h1>
 <p>It helps to think about SQLAlchemy extension points as three layers: types, attributes, and events. This post uses that frame to connect events, <code>hybrid_property</code>, and custom types.</p>
 <p>This is the 8th article in the SQLAlchemy 101 series.</p>
 <p><img alt="Events, hybrid_property, and custom types" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-01-events-hybrid-property-and-custom-types.en.png"></p>
 <p><em>Events, hybrid_property, and custom types</em></p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system</li>
-<li>How to validate inputs with <code>@validates</code></li>
-<li>How to define <code>hybrid_property</code> so the same attribute works in Python and in SQL</li>
-<li>How to use <code>TypeDecorator</code> to wrap a column type for transparent encryption, normalization, or JSON serialization</li>
-<li>Rules for using these extension points safely in production</li>
+<li>How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system?</li>
+<li>How to validate inputs with <code>@validates</code>?</li>
+<li>How to define <code>hybrid_property</code> so the same attribute works in Python and in SQL?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sqlalchemy 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-02-why-this-matters.en.png"></p>
+<p><em>sqlalchemy 101 chapter 8 flow overview</em></p>
+<p>This picture places Events, hybrid_property, and custom types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Events, hybrid_property, and custom types is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
-<p><img alt="Why this matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-02-why-this-matters.en.png"></p>
-<p><em>Why this matters</em><br>
-When you first reach for an ORM, a model is just a table. Once the domain grows, you need email normalization, password hashing, audit columns, derived attributes, and encrypted fields. If every handler does this work itself, the same code is scattered everywhere and tests become painful.</p>
+<p>When you first reach for an ORM, a model is just a table. Once the domain grows, you need email normalization, password hashing, audit columns, derived attributes, and encrypted fields. If every handler does this work itself, the same code is scattered everywhere and tests become painful.</p>
 <p>SQLAlchemy's event system, <code>hybrid_property</code>, and <code>TypeDecorator</code> are the official extension points that let domain rules live close to the model. Used well, the rules collect in one place. Used carelessly, your codebase becomes a mystery: nobody can tell where data is being transformed. This article draws the lines.</p>
 <h2>Mental model</h2>
 <p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-03-mental-model.en.png"></p>
@@ -271,18 +274,27 @@ def _emit_outbox(session, flush_context, instances):
 <h2>Wrap-up and what is next</h2>
 <p>The event system, <code>hybrid_property</code>, and <code>TypeDecorator</code> are SQLAlchemy's official extension points for keeping domain rules near the model. Choosing the right layer in advance, and keeping side effects out of the wrong ones, makes it possible to track where data is being transformed.</p>
 <p>The next episode moves the same patterns to async. We will use the <code>aiosqlite</code> driver with <code>AsyncSession</code>, and explain why lazy loading is even more dangerous in async code.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system?</strong></li>
+<li>The article treats Events, hybrid_property, and custom types as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to validate inputs with <code>@validates</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How to define <code>hybrid_property</code> so the same attribute works in Python and in SQL?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/07-loading-strategies-n-plus-one.md">Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</a></li>
-<li><strong>Events, hybrid_property, and custom types (current)</strong></li>
-<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
-<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/05-session-unit-of-work-identity-map.md">SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/06-relationships-back-populates.md">SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/07-loading-strategies-n-plus-one.md">SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin</a></li>
+<li><strong>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (current)</strong></li>
+<li>SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

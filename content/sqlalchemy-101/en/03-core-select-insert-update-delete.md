@@ -1,5 +1,5 @@
 ---
-title: SQLAlchemy Core - select, insert, update, delete in 2.x Style
+title: "SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style"
 series: sqlalchemy-101
 episode: 3
 language: en
@@ -22,7 +22,7 @@ seo_description: In 2.x style, building SQL means stacking clauses through metho
   chaining.
 ---
 
-# SQLAlchemy Core - select, insert, update, delete in 2.x Style
+# SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style
 
 In 2.x style, you build SQL by stacking clauses through method chaining. This post turns that idea into concrete `select`, `insert`, `update`, and `delete` patterns.
 
@@ -39,31 +39,25 @@ This post walks through SQLAlchemy 2.x style `select()`, `insert()`, `update()`,
 ![SQLAlchemy core - select, insert, update, delete in 2.x style](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.en.png)
 
 *SQLAlchemy core - select, insert, update, delete in 2.x style*
-## What you will learn
 
-- The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`
-- The `Result` object and the meaning of `.all()`, `.first()`, `.one()`, `.one_or_none()`, `.scalars()`, `.mappings()`
-- `insert(table).values(...)` and the `executemany`-style list-of-dicts form
-- Receiving new PKs via `inserted_primary_key` and composing INSERT-SELECT with `Insert.from_select()`
-- `update(table).where(...).values(...)` and using RETURNING (SQLite 3.35+)
-- Safe patterns for `delete(table).where(...)` and the danger of "delete everything"
-- Two ways to express JOIN: `select.join()` and `select(...).select_from(a.join(b))`
-- Subqueries, CTEs (`select.cte()`), and basic use of `func.*` aggregate functions
+## Questions to Keep in Mind
 
-## Questions this post answers
+- The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`?
+- The `Result` object and the meaning of `.all()`, `.first()`, `.one()`, `.one_or_none()`, `.scalars()`, `.mappings()`?
+- `insert(table).values(...)` and the `executemany`-style list-of-dicts form?
 
-- How does 1.x `select([users])` differ from 2.x `select(users)`?
-- Does `Result.all()` return `list[Row]` or `list[tuple]`?
-- Where does the new ID go after an INSERT?
-- What's the SQLite-friendly way to UPDATE with a LIMIT?
-- What happens if I leave the WHERE off a DELETE?
-- What's the most concise 2.x way to write a JOIN?
+## Big Picture
+
+![sqlalchemy 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.en.png)
+
+*sqlalchemy 101 chapter 3 flow overview*
+
+This picture places SQLAlchemy Core - select, insert, update, delete in 2.x Style inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SQLAlchemy Core - select, insert, update, delete in 2.x Style is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
-![Why this matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.en.png)
-
-*Why this matters*
 Working with raw SQL strings adds three kinds of cost over time. First, every column rename forces a project-wide grep. Second, the same SQL gets copied with subtle differences in many places, leading to subtle behavioral drift. Third, you handle dialect differences yourself.
 
 Core SQL expressions reduce the first two costs to almost zero. A column rename in the schema affects every expression at import time. You can wrap a `select` in a function and reuse it. Dialect differences are handled by SQLAlchemy's compiler.
@@ -517,19 +511,28 @@ In this post we treated SQLAlchemy Core's SQL expressions as a small working man
 
 The ORM enters in the next post. Post 4 covers `DeclarativeBase` and `mapped_column`, mapping Python classes to database rows. The `users.c.name` from this post becomes `User.name` in ORM, and `select(users)` becomes `select(User)`. Understanding Core first lets you debug the ORM's "magic" when something goes sideways.
 
+## Answering the Opening Questions
+
+- **The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`?**
+  - The article treats SQLAlchemy Core - select, insert, update, delete in 2.x Style as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The `Result` object and the meaning of `.all()`, `.first()`, `.one()`, `.one_or_none()`, `.scalars()`, `.mappings()`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **`insert(table).values(...)` and the `executemany`-style list-of-dicts form?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
-- **SQLAlchemy Core - select, insert, update, delete in 2.x Style (current)**
-- ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
-- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
-- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
-- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
-- Events, hybrid_property, and custom types (upcoming)
-- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
-- Production patterns: pools, observability, migrations, and deploys (upcoming)
+- [SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- **SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style (current)**
+- SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)
+- SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)
+- SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)
 
 <!-- toc:end -->
 

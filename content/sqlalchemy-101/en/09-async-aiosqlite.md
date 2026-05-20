@@ -1,5 +1,5 @@
 ---
-title: Async SQLAlchemy with aiosqlite and AsyncSession
+title: "SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession"
 series: sqlalchemy-101
 episode: 9
 language: en
@@ -22,7 +22,7 @@ seo_description: Async SQLAlchemy is a thin awaitable wrapper around the existin
   ORM. Internally it does not run the sync ORM on a thread pool; it uses a…
 ---
 
-# Async SQLAlchemy with aiosqlite and AsyncSession
+# SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession
 
 Async SQLAlchemy is a thin awaitable wrapper around the existing ORM stack. This post shows what stays familiar, and what changes, when you move to `AsyncSession` and `aiosqlite`.
 
@@ -31,19 +31,25 @@ This is the 9th article in the SQLAlchemy 101 series.
 ![Async SQLAlchemy with aiosqlite and AsyncSession](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.en.png)
 
 *Async SQLAlchemy with aiosqlite and AsyncSession*
-## What you will learn
 
-- The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`
-- How to wire the `aiosqlite` driver to use SQLite from async code
-- A one-to-one mapping from sync patterns to async (`session.execute`, `session.scalars`)
-- Why lazy loading is more dangerous in async, and how to avoid it
-- Session lifecycle in async web frameworks like FastAPI
+## Questions to Keep in Mind
+
+- The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`?
+- How to wire the `aiosqlite` driver to use SQLite from async code?
+- A one-to-one mapping from sync patterns to async (`session.execute`, `session.scalars`)?
+
+## Big Picture
+
+![sqlalchemy 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.en.png)
+
+*sqlalchemy 101 chapter 9 flow overview*
+
+This picture places Async SQLAlchemy with aiosqlite and AsyncSession inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Async SQLAlchemy with aiosqlite and AsyncSession is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
-![Why this matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.en.png)
-
-*Why this matters*
 Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the `aiosqlite` driver.
 
 Async, however, has a few sharp edges that the sync API hides. Lazy loading in particular: in sync code it is just one extra SELECT, but in async it tries to call sync IO from an async context and raises immediately. This article makes those differences explicit.
@@ -266,19 +272,28 @@ Async SQLAlchemy is the awaitable version of the sync API, but it requires a rea
 
 The next episode covers production patterns: pool sizing, pre-ping, observability, slow-query logging, and how migrations and deploys should be sequenced.
 
+## Answering the Opening Questions
+
+- **The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`?**
+  - The article treats Async SQLAlchemy with aiosqlite and AsyncSession as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How to wire the `aiosqlite` driver to use SQLite from async code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **A one-to-one mapping from sync patterns to async (`session.execute`, `session.scalars`)?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
-- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
-- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
-- [ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
-- [Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
-- [Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
-- **Async SQLAlchemy with aiosqlite and AsyncSession (current)**
-- Production patterns: pools, observability, migrations, and deploys (upcoming)
+- [SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- [SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates](./06-relationships-back-populates.md)
+- [SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin](./07-loading-strategies-n-plus-one.md)
+- [SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types](./08-events-hybrid-types.md)
+- **SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (current)**
+- SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)
 
 <!-- toc:end -->
 

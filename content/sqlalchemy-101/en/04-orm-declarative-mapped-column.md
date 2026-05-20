@@ -1,5 +1,5 @@
 ---
-title: 'ORM Basics: Defining Models with DeclarativeBase and mapped_column'
+title: "SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column"
 series: sqlalchemy-101
 episode: 4
 language: en
@@ -22,7 +22,7 @@ seo_description: An ORM model class is the marriage of "a Python class plus a Co
   Table." DeclarativeBase is the container (a MetaData) for those bindings, and…
 ---
 
-# ORM Basics: Defining Models with DeclarativeBase and mapped_column
+# SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column
 
 In Core we worked directly with `Table` and `select()` to compose SQL expressions. The ORM lays one more layer on top: it maps rows to Python objects, tracks attribute changes, and emits SQL at the right moment. SQLAlchemy 2.x's ORM lets you express almost any model with three tools - `DeclarativeBase`, `Mapped[T]`, and `mapped_column(...)`. This article focuses on those three and shows, in concrete terms, how an ORM model is wired to a Core `Table`.
 
@@ -31,20 +31,25 @@ This is the 4th article in the SQLAlchemy 101 series.
 ![ORM Basics: defining models with DeclarativeBase and mapped_column](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.en.png)
 
 *ORM Basics: defining models with DeclarativeBase and mapped_column*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - What is `DeclarativeBase`, and how does it relate to Core's `MetaData`?
 - What is the difference between `Mapped[int]` and `Mapped[str | None]`?
 - How does `mapped_column(...)` differ from Core's `Column(...)`?
-- What roles do `__tablename__` and `__table_args__` play?
-- Can `Base.metadata.create_all()` build the schema from ORM models?
-- When do you reach for the ORM, and when is plain Core a better fit?
+
+## Big Picture
+
+![sqlalchemy 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
+
+*sqlalchemy 101 chapter 4 flow overview*
+
+This picture places ORM Basics: Defining Models with DeclarativeBase and mapped_column inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ORM Basics: Defining Models with DeclarativeBase and mapped_column is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
-![Why it matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
-
-*Why it matters*
 Core alone is enough to talk to a database. But as an application grows, several costs add up quickly.
 
 - Hand-rolling row dicts gets painful. `user.email` is safer and easier to read than `row["email"]`.
@@ -336,19 +341,28 @@ If you define a `User` ORM class and also create `Table("users", metadata, ...)`
 2. Add a unique constraint on `(name, price)` to the model from exercise 1. Place a `UniqueConstraint` inside `__table_args__` and INSERT the same `(name, price)` twice. What happens?
 3. Take a column declared as `Mapped[str]` and try to INSERT `None`. What error appears? Copy the message verbatim and decide whether the error originates in Python or in the database engine.
 
+## Answering the Opening Questions
+
+- **What is `DeclarativeBase`, and how does it relate to Core's `MetaData`?**
+  - The article treats ORM Basics: Defining Models with DeclarativeBase and mapped_column as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between `Mapped[int]` and `Mapped[str | None]`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does `mapped_column(...)` differ from Core's `Column(...)`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
-- **ORM Basics: Defining Models with DeclarativeBase and mapped_column (current)**
-- Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
-- ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
-- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
-- Events, hybrid_property, and custom types (upcoming)
-- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
-- Production patterns: pools, observability, migrations, and deploys (upcoming)
+- [SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- **SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column (current)**
+- SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)
+- SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)
+- SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)
+- SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)
 
 <!-- toc:end -->
 

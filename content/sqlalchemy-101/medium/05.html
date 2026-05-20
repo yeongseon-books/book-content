@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Session in Depth: How Unit of Work and Identity Map Actually Work</title>
+<title>SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,26 @@
 </style>
 </head>
 <body>
-<h1>Session in Depth: How Unit of Work and Identity Map Actually Work</h1>
+<h1>SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work</h1>
 <p>The ORM models from Ep4 do nothing on their own. To push instances back to the database and to read rows back as objects, you need a <code>Session</code>. SQLAlchemy's <code>Session</code> is more than a connection wrapper - it is a Unit of Work manager that tracks which objects are new, which were modified, and which are scheduled for deletion. It also maintains an Identity Map so that, within a single session, the same primary key always corresponds to the same Python object. This article walks through both mechanisms with real code.</p>
 <p>This is the 5th article in the SQLAlchemy 101 series.</p>
 <p><img alt="Session in Depth: how unit of work and identity map actually work" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png"></p>
 <p><em>Session in Depth: how unit of work and identity map actually work</em></p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How does a <code>Session</code> relate to connections and transactions?</li>
 <li>What is the Unit of Work, and when is SQL actually emitted?</li>
 <li>How are <code>flush()</code> and <code>commit()</code> different?</li>
-<li>What does the Identity Map guarantee? Do two lookups for the same PK return the same object?</li>
-<li>What is the impact of <code>expire_on_commit=True</code> (the default)?</li>
-<li>Why do we need <code>sessionmaker</code>?</li>
-<li>How do ORM objects move between transient/pending/persistent/detached states?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sqlalchemy 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png"></p>
+<p><em>sqlalchemy 101 chapter 5 flow overview</em></p>
+<p>This picture places Session in Depth: How Unit of Work and Identity Map Actually Work inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Session in Depth: How Unit of Work and Identity Map Actually Work is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why it matters</h2>
-<p><img alt="Why it matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png"></p>
-<p><em>Why it matters</em><br>
-If you use the ORM without understanding the Session, you bump into mysterious behavior often:</p>
+<p>If you use the ORM without understanding the Session, you bump into mysterious behavior often:</p>
 <ul>
 <li>"I committed, but reading an attribute on the same object in another function fires another SELECT." That's <code>expire_on_commit</code>.</li>
 <li>"I fetched a user with <code>select</code> here, and another <code>select</code> over there - they came back as different objects." Different sessions, or the same session that was already closed.</li>
@@ -228,7 +229,7 @@ if __name__ == &quot;__main__&quot;:
 <p>With <code>echo=True</code>, you can see exactly when SQL is emitted. Early on, leave it on and walk through each line, lining up your intent against the SQL that comes out.</p>
 <h2>Common mistakes</h2>
 <p><strong>1) Sharing a module-level Session</strong></p>
-<pre><code class="language-python">session = Session(engine)         # built once at import time
+<pre><code class="language-text">session = Session(engine)         # built once at import time
 
 def handler(...):
     user = session.get(User, 1)   # concurrent requests share the Session - dangerous
@@ -282,18 +283,27 @@ print(user.email)        # potential DetachedInstanceError
 <li>Compare two sessions: one with <code>expire_on_commit=False</code>, the other with the default <code>True</code>. After commit, read attributes and count the SQL emitted via <code>echo=True</code>. What is the difference?</li>
 <li>Open two different sessions on the same DB. In session A, fetch user PK 1, change email, commit. In session B (already opened, holding the same user), read the email. What value do you see, and at what moment do you see the new value?</li>
 </ol>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How does a <code>Session</code> relate to connections and transactions?</strong></li>
+<li>The article treats Session in Depth: How Unit of Work and Identity Map Actually Work as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the Unit of Work, and when is SQL actually emitted?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How are <code>flush()</code> and <code>commit()</code> different?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
-<li><strong>Session in Depth: How Unit of Work and Identity Map Actually Work (current)</strong></li>
-<li>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
-<li>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
-<li>Events, hybrid_property, and custom types (upcoming)</li>
-<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
-<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/02-core-metadata-table-types.md">SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/03-core-select-insert-update-delete.md">SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/04-orm-declarative-mapped-column.md">SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column</a></li>
+<li><strong>SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work (current)</strong></li>
+<li>SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
+<li>SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
+<li>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)</li>
+<li>SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

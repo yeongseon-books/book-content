@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</title>
+<title>SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</h1>
+<h1>SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column</h1>
 <p>MetaData is the catalog that holds the schema your application knows about. This post shows why that container becomes the starting point for SQLAlchemy Core.</p>
 <p>This is the 2nd article in the SQLAlchemy 101 series.</p>
 <blockquote>
@@ -64,29 +64,21 @@
 <p>This post covers the heart of SQLAlchemy Core: <code>MetaData</code>, <code>Table</code>, <code>Column</code>, and the type system. The schema objects you build here become the raw material for the select/insert/update/delete in post 3, and they evolve naturally into the ORM's <code>mapped_column</code> from post 4 onward. Even if you only plan to use the ORM, you need this layer to understand migrations and reflection.</p>
 <p><img alt="SQLAlchemy core - modeling schema as python objects with MetaData, Table, and column" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.en.png"></p>
 <p><em>SQLAlchemy core - modeling schema as python objects with MetaData, Table, and column</em></p>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What a <code>MetaData</code> object is and why it becomes the single source of truth for your schema</li>
-<li>How to declare a <code>Table</code> in Python, and the key <code>Column</code> options (primary_key, nullable, unique, index, default, server_default)</li>
-<li>How SQLAlchemy's generic types (<code>Integer</code>, <code>String</code>, <code>Text</code>, <code>Boolean</code>, <code>DateTime</code>, <code>Numeric</code>, <code>JSON</code>) map to SQLite affinities</li>
-<li>How to bootstrap and tear down schema with <code>metadata.create_all(engine)</code> / <code>drop_all(engine)</code></li>
-<li><code>ForeignKey</code> and <code>ForeignKeyConstraint</code>, plus what it takes to make <code>ON DELETE CASCADE</code> actually work on SQLite</li>
-<li>How to express composite keys, named constraints, and <code>Index</code> in Python</li>
-<li>How to pull a schema from an existing database via reflection (<code>Table(..., autoload_with=engine)</code>)</li>
+<li>What a <code>MetaData</code> object is and why it becomes the single source of truth for your schema?</li>
+<li>How to declare a <code>Table</code> in Python, and the key <code>Column</code> options (primary_key, nullable, unique, index, default, server_default)?</li>
+<li>How SQLAlchemy's generic types (<code>Integer</code>, <code>String</code>, <code>Text</code>, <code>Boolean</code>, <code>DateTime</code>, <code>Numeric</code>, <code>JSON</code>) map to SQLite affinities?</li>
 </ul>
-<h2>Questions this post answers</h2>
-<ul>
-<li>Is schema modeling worthwhile if I only use Core, no ORM?</li>
-<li>Should there be exactly one <code>MetaData</code> per app, or can I have several?</li>
-<li>What's the practical difference between <code>String</code> and <code>Text</code> on SQLite?</li>
-<li>When should I use <code>default</code> vs <code>server_default</code>?</li>
-<li>Why does <code>ON DELETE CASCADE</code> silently not work on SQLite?</li>
-<li>How do I read the schema of an existing database into SQLAlchemy?</li>
-</ul>
+<h2>Big Picture</h2>
+<p><img alt="sqlalchemy 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.en.png"></p>
+<p><em>sqlalchemy 101 chapter 2 flow overview</em></p>
+<p>This picture places SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
-<p><img alt="Why this matters" src="https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.en.png"></p>
-<p><em>Why this matters</em><br>
-Managing schema with raw SQL has one big problem: when the column names in your INSERT/SELECT statements drift from the actual schema, you don't find out until runtime. A <code>no such column</code> error suddenly appears in production, and your IDE can't even autocomplete column names.</p>
+<p>Managing schema with raw SQL has one big problem: when the column names in your INSERT/SELECT statements drift from the actual schema, you don't find out until runtime. A <code>no such column</code> error suddenly appears in production, and your IDE can't even autocomplete column names.</p>
 <p>SQLAlchemy Core keeps the schema as Python objects, so you can build SQL through those objects. A typo in a column name turns into an <code>AttributeError</code> at import time, your IDE autocompletes <code>users.c.name</code>, and the same definition is reused by Alembic's autogenerate, Pandas' <code>read_sql</code>, FastAPI's SQL building, and more.</p>
 <p>To handle types consistently across SQLite and other dialects, you also need a generic type system. When you write <code>String(255)</code>, it expands to <code>VARCHAR(255)</code> on PostgreSQL and to <code>VARCHAR(255)</code> (TEXT affinity in practice) on SQLite. That's the layer that lets the same code run on SQLite locally and PostgreSQL in production.</p>
 <p>Finally, the <code>MetaData</code> becomes Alembic's <code>target_metadata</code>, the basis for autogenerated migrations. The schema you define in this post is also the starting point for the alembic-101 series.</p>
@@ -389,7 +381,7 @@ print([(c.name, c.type) for c in users_r.columns])
 <p><strong>6. Leaving every <code>Column</code> as <code>nullable=True</code>.</strong> The default is <code>nullable=True</code>. If you don't actually want NULLs, write <code>nullable=False</code> explicitly.</p>
 <h2>Real-world application</h2>
 <p>In real apps, <code>MetaData</code> lives in a single module and <code>Table</code> definitions are split by domain.</p>
-<pre><code>app/
+<pre><code class="language-text">app/
   db/
     __init__.py        # metadata, engine, get_conn
     users.py           # users Table
@@ -420,18 +412,27 @@ print([(c.name, c.type) for c in users_r.columns])
 <h2>Wrap-up and next post</h2>
 <p>In this post we met SQLAlchemy Core's schema layer. <code>MetaData</code> is the catalog of your application's schema, <code>Table</code>/<code>Column</code> are its entries, and the generic type system rides on top of SQLite's affinity model. <code>create_all</code>/<code>drop_all</code> are quick ways to bootstrap, and reflection lets you import an existing database into SQLAlchemy.</p>
 <p>Next post we use these schema objects to build SQL for real. We'll cover 2.x style <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code>, and how to work with <code>Result</code> and <code>Row</code>. From post 4 onward, the ORM enters; the <code>mapped_column</code> you'll see there is essentially the same <code>Column</code> object from this post.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What a <code>MetaData</code> object is and why it becomes the single source of truth for your schema?</strong></li>
+<li>The article treats SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How to declare a <code>Table</code> in Python, and the key <code>Column</code> options (primary_key, nullable, unique, index, default, server_default)?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How SQLAlchemy's generic types (<code>Integer</code>, <code>String</code>, <code>Text</code>, <code>Boolean</code>, <code>DateTime</code>, <code>Numeric</code>, <code>JSON</code>) map to SQLite affinities?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
-<li><strong>SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (current)</strong></li>
-<li>SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)</li>
-<li>ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)</li>
-<li>Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)</li>
-<li>ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
-<li>Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
-<li>Events, hybrid_property, and custom types (upcoming)</li>
-<li>Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
-<li>Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified</a></li>
+<li><strong>SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column (current)</strong></li>
+<li>SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style (upcoming)</li>
+<li>SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column (upcoming)</li>
+<li>SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work (upcoming)</li>
+<li>SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (upcoming)</li>
+<li>SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)</li>
+<li>SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)</li>
+<li>SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)</li>
+<li>SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

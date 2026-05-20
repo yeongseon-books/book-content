@@ -1,5 +1,5 @@
 ---
-title: SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질
+title: "SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질"
 series: sqlalchemy-101
 episode: 1
 language: ko
@@ -21,7 +21,7 @@ last_reviewed: '2026-05-12'
 seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 SQLite 예제로 설명합니다
 ---
 
-# SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질
+# SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질
 
 처음 SQLAlchemy를 배울 때 ORM 모델부터 들어가면 코드가 돌아가는 이유보다 결과만 먼저 보게 됩니다. 그러면 연결이 언제 열리고, 트랜잭션이 어디서 시작되며, 실제 SQL이 어떤 객체를 통해 흘러가는지 놓치기 쉽습니다.
 
@@ -33,19 +33,24 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 
 *SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질*
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?
 - SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?
 - `connect()`와 `begin()`은 언제 구분해서 써야 할까요?
-- SQLite URL, dialect, DB-API 드라이버는 어떤 층위에서 만날까요?
-- 이후 Session과 ORM을 이해하려면 왜 이 계층부터 먼저 잡아야 할까요?
+
+## 큰 그림
+
+![SQLAlchemy 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
+
+*SQLAlchemy 101 1장 흐름 개요*
+
+이 그림에서는 SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
-
-*핵심 개념*
 많은 SQLAlchemy 입문 자료가 ORM의 `Base = declarative_base()`부터 시작합니다. 그 결과 ORM이 아닌 곳에서 문제가 발생했을 때, 예컨대 connection이 끊어졌거나 transaction이 의도와 다르게 commit되었을 때, 어디를 들여다봐야 할지 감을 잡기 어렵습니다. Engine과 Connection은 ORM의 Session을 받쳐주는 토대이고, Session 내부에서 문제가 생기면 결국 Connection 수준에서 디버깅해야 합니다.
 
 또한 production 환경에서 자주 등장하는 이슈, 예를 들면 SQLite의 `database is locked` 오류, `Lost connection` 재시도, connection pool exhaustion, autocommit 모드 차이 같은 문제는 모두 Engine 설정에서 시작합니다. 이 토대를 정확히 이해하지 못하면 ORM을 쓰면서도 `pool_size`, `pool_recycle`, `connect_args` 같은 옵션을 추측에 의존해 설정하게 됩니다.
@@ -381,19 +386,28 @@ def engine():
 
 다음 글에서는 한 단계 위로 올라가 **MetaData, Table, Column, type system**을 다룹니다. raw SQL 문자열 대신 Python 객체로 schema를 선언하는 Core의 진짜 매력이 본격적으로 등장합니다. ORM 이전 단계인 Core SQL expression이 어떤 모양인지를 이해하면, 4편 이후의 ORM이 훨씬 쉽게 읽힙니다.
 
+## 처음 질문으로 돌아가기
+
+- **`Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?**
+  - 본문의 기준은 SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`connect()`와 `begin()`은 언제 구분해서 써야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- **SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질 (현재 글)**
-- SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (예정)
-- SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
-- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
-- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
-- ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- **SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질 (현재 글)**
+- SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기 (예정)
+- SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (예정)
+- SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 

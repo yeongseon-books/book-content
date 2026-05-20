@@ -1,5 +1,5 @@
 ---
-title: 'ORM Relationships: Connecting Both Sides Safely with relationship and back_populates'
+title: "SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates"
 series: sqlalchemy-101
 episode: 6
 language: en
@@ -22,7 +22,7 @@ seo_description: ForeignKey is the SQL-level reference; relationship() is the ob
   navigation channel.
 ---
 
-# ORM Relationships: Connecting Both Sides Safely with relationship and back_populates
+# SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates
 
 One of the most common database tasks is "fetch the related rows together": a user's orders, a post's comments, a post tagged with several labels. SQL handles this with JOINs, but in the ORM you express it as attribute access (`user.orders`). The bridge that makes that work is `relationship()`, and `back_populates` is the device that keeps both sides of a bidirectional link consistent. This article walks through one-to-many, many-to-one, and many-to-many in turn, and lays down the patterns that keep both sides synchronized.
 
@@ -31,20 +31,25 @@ This is the 6th article in the SQLAlchemy 101 series.
 ![ORM Relationships: connecting both sides safely with relationship and back_populates](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png)
 
 *ORM Relationships: connecting both sides safely with relationship and back_populates*
-## Questions this post answers
+
+## Questions to Keep in Mind
 
 - What does `relationship()` actually do, and how does it relate to `ForeignKey`?
 - What is the difference between `back_populates` and `backref`, and why is `back_populates` preferred?
 - What happens when you append a new object to `User.orders`?
-- How do you define a many-to-many relationship? How does the association table show up in the ORM?
-- When is `cascade="all, delete-orphan"` the safe choice?
-- When does walking a relationship trigger an extra SELECT?
+
+## Big Picture
+
+![sqlalchemy 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
+
+*sqlalchemy 101 chapter 6 flow overview*
+
+This picture places ORM Relationships: Connecting Both Sides Safely with relationship and back_populates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ORM Relationships: Connecting Both Sides Safely with relationship and back_populates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why it matters
 
-![Why it matters](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
-
-*Why it matters*
 Misconfigured relationships create a familiar set of bugs:
 
 - "I added an object on one side but the other side's collection doesn't see it." A missing `back_populates` or mismatched names.
@@ -335,19 +340,28 @@ A plain association table only fits clean many-to-many mappings. The moment you 
 2. Define a `Post`-`Tag` many-to-many with an association table, then introduce a "tagged_at" column. Migrate to the association object pattern. How big is the diff?
 3. Add `order_by=Order.amount.desc()` to `User.orders`. With `echo=True`, confirm that the SELECT now carries an ORDER BY clause.
 
+## Answering the Opening Questions
+
+- **What does `relationship()` actually do, and how does it relate to `ForeignKey`?**
+  - The article treats ORM Relationships: Connecting Both Sides Safely with relationship and back_populates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between `back_populates` and `backref`, and why is `back_populates` preferred?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What happens when you append a new object to `User.orders`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
-- [SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
-- [ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
-- [Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
-- **ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (current)**
-- Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
-- Events, hybrid_property, and custom types (upcoming)
-- Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
-- Production patterns: pools, observability, migrations, and deploys (upcoming)
+- [SQLAlchemy 101 (1/10): Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column](./02-core-metadata-table-types.md)
+- [SQLAlchemy 101 (3/10): SQLAlchemy Core - select, insert, update, delete in 2.x Style](./03-core-select-insert-update-delete.md)
+- [SQLAlchemy 101 (4/10): ORM Basics: Defining Models with DeclarativeBase and mapped_column](./04-orm-declarative-mapped-column.md)
+- [SQLAlchemy 101 (5/10): Session in Depth: How Unit of Work and Identity Map Actually Work](./05-session-unit-of-work-identity-map.md)
+- **SQLAlchemy 101 (6/10): ORM Relationships: Connecting Both Sides Safely with relationship and back_populates (current)**
+- SQLAlchemy 101 (7/10): Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin (upcoming)
+- SQLAlchemy 101 (8/10): Events, hybrid_property, and custom types (upcoming)
+- SQLAlchemy 101 (9/10): Async SQLAlchemy with aiosqlite and AsyncSession (upcoming)
+- SQLAlchemy 101 (10/10): Production patterns: pools, observability, migrations, and deploys (upcoming)
 
 <!-- toc:end -->
 

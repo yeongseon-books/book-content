@@ -1,5 +1,5 @@
 ---
-title: SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
+title: "SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기"
 series: sqlalchemy-101
 episode: 3
 language: ko
@@ -21,7 +21,7 @@ last_reviewed: '2026-05-12'
 seo_description: select, insert, update, delete를 SQLAlchemy 2.x Core 스타일로 설명합니다
 ---
 
-# SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
+# SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
 
 SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL을 붙여 넣는 순간이 아니라, 스키마 객체를 바탕으로 쿼리를 조립하기 시작하는 순간입니다. 이 단계부터 컬럼 이름, 조건식, 결과 처리 방식이 더 예측 가능해집니다.
 
@@ -32,19 +32,25 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 ![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
 
 *SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기*
-## 이 글에서 다룰 문제
+
+## 먼저 던지는 질문
 
 - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
 - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
 - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
-- 문자열 SQL 대신 표현식 기반 쿼리를 쓰면 무엇이 달라질까요?
-- ORM으로 넘어가도 왜 Core 쿼리 감각이 계속 필요할까요?
+
+## 큰 그림
+
+![SQLAlchemy 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
+
+*SQLAlchemy 101 3장 흐름 개요*
+
+이 그림에서는 SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
-![핵심 개념](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
-
-*핵심 개념*
 raw SQL 문자열로만 작업하면 다음 세 가지 비용이 누적됩니다. 첫째, 컬럼 이름 변경이 발생할 때마다 application 전체 grep이 필요합니다. 둘째, 같은 SQL을 여러 곳에서 약간씩 다르게 적게 되어 동작이 미묘하게 달라집니다. 셋째, dialect 차이를 모두 손으로 처리해야 합니다.
 
 Core SQL expression은 schema 객체와 Python 표현식을 조합해 SQL을 구성하므로 첫 두 비용을 거의 0으로 만듭니다. 컬럼 이름 변경은 schema 한 곳만 바꾸면 import 시점에 영향을 받는 모든 expression이 자동으로 따라옵니다. 같은 select 객체를 함수로 캡슐화해 재사용할 수 있고, dialect 별 차이는 SQLAlchemy compiler가 알아서 풀어줍니다.
@@ -491,19 +497,28 @@ with engine.connect().execution_options(stream_results=True) as conn:
 
 다음 글부터 ORM이 등장합니다. 4편에서는 `DeclarativeBase`와 `mapped_column`으로 Python class를 데이터베이스 row와 매핑하는 방법을 다룹니다. 이 글에서 본 `users.c.name`이 ORM에서는 `User.name`으로 바뀌고, `select(users)`가 `select(User)`로 바뀌는 것이 핵심 차이입니다. Core를 정확히 이해하고 ORM으로 올라가야 ORM의 마법을 디버깅할 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**
+  - 본문의 기준은 SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
-- [SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
-- **SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (현재 글)**
-- ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
-- Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
-- ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
-- 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
-- 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
-- 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
-- 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
+- [SQLAlchemy 101 (1/10): SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질](./01-sqlalchemy-2x-engine-connection.md)
+- [SQLAlchemy 101 (2/10): SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](./02-core-metadata-table-types.md)
+- **SQLAlchemy 101 (3/10): SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기 (현재 글)**
+- SQLAlchemy 101 (4/10): ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기 (예정)
+- SQLAlchemy 101 (5/10): Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리 (예정)
+- SQLAlchemy 101 (6/10): ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기 (예정)
+- SQLAlchemy 101 (7/10): 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가 (예정)
+- SQLAlchemy 101 (8/10): 이벤트, hybrid_property, 그리고 커스텀 타입 (예정)
+- SQLAlchemy 101 (9/10): 비동기 SQLAlchemy: aiosqlite와 AsyncSession (예정)
+- SQLAlchemy 101 (10/10): 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (예정)
 
 <!-- toc:end -->
 
