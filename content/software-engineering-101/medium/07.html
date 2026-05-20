@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Documentation</title>
+<title>Software Engineering 101 (7/10): Documentation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Documentation</h1>
+<h1>Software Engineering 101 (7/10): Documentation</h1>
 <p>It is tempting to say that good code should make documentation unnecessary. Strong names, small modules, and readable tests do carry a lot of information. But code alone rarely explains why a decision was made, when an operator should follow a procedure, or where a new teammate should start on day one.</p>
 <p>The biggest failure mode of weak documentation is not inconvenience. It is dependency on specific people. Every unanswered question routes through memory, availability, and interruption cost. That is why documentation is not a side artifact. It is a core part of asynchronous engineering work.</p>
 <p>This is post 7 in the Software Engineering 101 series. In this chapter, we split documentation by reader need, then look at the minimum useful shapes for a README, ADR, runbook, docstring, and onboarding checklist.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Documentation?</li>
+<li>Which signal should the example or diagram make visible for Documentation?</li>
+<li>What failure should be prevented first when Documentation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 7 flow overview</em></p>
+<p>This picture places Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The minimum sections of a useful README</li>
@@ -71,8 +84,6 @@
 <p>Documentation is the infrastructure of async collaboration.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png"><br>
-<em>The Diataxis structure that separates docs by reader intent</em></p>
 <p>Diataxis splits docs by reader intent.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -196,13 +207,23 @@ def compute_invoice(amount: int, tax_rate: float) -&gt; int:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Documentation frees people. Next, we look at how those people work together — the collaboration process.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Testing Strategy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Version Control and Release</a></li>
+<li><strong>What boundary should you inspect first when applying Documentation?</strong></li>
+<li>The article treats Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Documentation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Documentation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">Software Engineering 101 (1/10): What Is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Software Engineering 101 (2/10): Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Software Engineering 101 (3/10): Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Software Engineering 101 (4/10): Code Review</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Software Engineering 101 (5/10): Testing Strategy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Software Engineering 101 (6/10): Version Control and Release</a></li>
 <li><strong>Documentation (current)</strong></li>
 <li>Collaboration Process (upcoming)</li>
 <li>Maintenance and Tech Debt (upcoming)</li>

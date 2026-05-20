@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 4
-title: Code Review
+title: "Software Engineering 101 (4/10): Code Review"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: The real purpose of code review, how to write a reviewable PR, 
 last_reviewed: '2026-05-15'
 ---
 
-# Code Review
+# Software Engineering 101 (4/10): Code Review
 
 Code review is one of the most common collaboration rituals in software teams, and one of the easiest to hollow out. The author wants to merge, the reviewer is busy, CI is already green, and the diff is hundreds of lines long. In that situation, review can quietly degrade into a formality that catches neither defects nor knowledge gaps.
 
 A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.
 
 This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Code Review?
+- Which signal should the example or diagram make visible for Code Review?
+- What failure should be prevented first when Code Review reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 4 flow overview*
+
+This picture places Code Review inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Code Review is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Code review shapes both code quality and the distribution of knowledge in a team
 > A review is a consensus, not a verdict.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
-*How automation and human review combine inside a pull request workflow*
 
 Automation first, humans focus on judgment.
 
@@ -210,10 +223,21 @@ GitHub-based teams rely on CODEOWNERS for auto-assignment, 1~2 required reviews,
 
 Code review does defect detection and knowledge distribution at the same time. Next, we move defect detection to where it belongs — testing strategy.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Code Review?**
+  - The article treats Code Review as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Code Review?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Code Review reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
 - **Code Review (current)**
 - Testing Strategy (upcoming)
 - Version Control and Release (upcoming)
@@ -221,6 +245,7 @@ Code review does defect detection and knowledge distribution at the same time. N
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

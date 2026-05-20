@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Code Review</title>
+<title>Software Engineering 101 (4/10): Code Review</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Code Review</h1>
+<h1>Software Engineering 101 (4/10): Code Review</h1>
 <p>Code review is one of the most common collaboration rituals in software teams, and one of the easiest to hollow out. The author wants to merge, the reviewer is busy, CI is already green, and the diff is hundreds of lines long. In that situation, review can quietly degrade into a formality that catches neither defects nor knowledge gaps.</p>
 <p>A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.</p>
 <p>This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Code Review?</li>
+<li>Which signal should the example or diagram make visible for Code Review?</li>
+<li>What failure should be prevented first when Code Review reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 4 flow overview</em></p>
+<p>This picture places Code Review inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Code Review is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The real purpose of code review</li>
@@ -71,8 +84,6 @@
 <p>A review is a consensus, not a verdict.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png"><br>
-<em>How automation and human review combine inside a pull request workflow</em></p>
 <p>Automation first, humans focus on judgment.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -199,10 +210,20 @@ jobs:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Code review does defect detection and knowledge distribution at the same time. Next, we move defect detection to where it belongs — testing strategy.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><strong>What boundary should you inspect first when applying Code Review?</strong></li>
+<li>The article treats Code Review as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Code Review?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Code Review reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">Software Engineering 101 (1/10): What Is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Software Engineering 101 (2/10): Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Software Engineering 101 (3/10): Design vs Implementation</a></li>
 <li><strong>Code Review (current)</strong></li>
 <li>Testing Strategy (upcoming)</li>
 <li>Version Control and Release (upcoming)</li>

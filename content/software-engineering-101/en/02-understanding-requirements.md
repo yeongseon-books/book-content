@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 2
-title: Understanding Requirements
+title: "Software Engineering 101 (2/10): Understanding Requirements"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A short, code-first guide to requirements — what makes one go
 last_reviewed: '2026-05-15'
 ---
 
-# Understanding Requirements
+# Software Engineering 101 (2/10): Understanding Requirements
 
 Requirements often sound obvious at first. "Add search." "Improve response time." "Let users reset passwords." The danger is that everyone hears familiar words and imagines a different finish line. Product, design, engineering, and operations can all agree with the same sentence while still carrying different assumptions about scope, risk, and success.
 
 That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.
 
 This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Understanding Requirements?
+- Which signal should the example or diagram make visible for Understanding Requirements?
+- What failure should be prevented first when Understanding Requirements reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 2 flow overview*
+
+This picture places Understanding Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding Requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Over half of code defects originate at the requirements stage. The later you fin
 > The most expensive code is code you rewrite.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
-*How user needs become acceptance criteria and tests*
 
 Requirements only become real when they map to tests.
 
@@ -203,8 +216,19 @@ PM, designers, and engineers run a discovery meeting and capture requirements in
 
 Good requirements are measurable. Next we look at the step before code — design vs implementation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Understanding Requirements?**
+  - The article treats Understanding Requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Understanding Requirements?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Understanding Requirements reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Engineering?](./01-what-is-software-engineering.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
 - **Understanding Requirements (current)**
 - Design vs Implementation (upcoming)
 - Code Review (upcoming)
@@ -214,6 +238,7 @@ Good requirements are measurable. Next we look at the step before code — desig
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

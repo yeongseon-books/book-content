@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 9
-title: 유지보수와 기술부채
+title: "Software Engineering 101 (9/10): 유지보수와 기술부채"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 기술부채의 4가지 유형, 갚는 우선순위, 안전한 
 last_reviewed: '2026-05-15'
 ---
 
-# 유지보수와 기술부채
+# Software Engineering 101 (9/10): 유지보수와 기술부채
 
 어떤 코드베이스든 시간이 지나면 불편한 부분이 생깁니다. 급하게 넣은 분기, 중복된 로직, 오래된 인터페이스, 테스트하기 어려운 구조가 하나씩 쌓입니다. 이때 많은 팀이 “언젠가 크게 리팩터링하면 된다”고 생각하지만, 대개 그 언젠가는 오지 않거나 사고와 함께 찾아옵니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Software Engineering 101 시리즈의 아홉 번째 글입니다. 여기서는 기술부채의 네 가지 유형, 상환 우선순위, 안전한 리팩터링 절차, 단계적 deprecation, 그리고 부채를 지표로 다루는 방법을 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 기술부채는 언제 도구이고, 언제 사고의 씨앗이 될까요?
 - Martin Fowler의 네 가지 기술부채 분류는 실무에 어떤 도움을 줄까요?
 - 부채 상환 우선순위는 어떻게 정해야 할까요?
-- 큰 폭발형 리팩터링 대신 안전하게 구조를 바꾸려면 어떻게 해야 할까요?
-- deprecation은 왜 단계별로 진행해야 할까요?
 
-> 부채 자체보다 무의식적인 부채가 더 위험합니다.
+## 큰 그림
+
+![Software Engineering 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Software Engineering 101 9장 흐름 개요*
+
+이 그림에서는 유지보수와 기술부채를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 유지보수와 기술부채의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 유지보수 단계에서는 작은 변경 하나도 전체 시스템에 영향을 줍니다. 이때 부채가 보이지 않으면 어떤 부분이 위험한지 우선순위를 잡기 어렵고, 결국 가장 시끄러운 문제만 대응하게 됩니다. 부채를 코드처럼 식별하고 관리해야 하는 이유입니다.
 
 ## 한눈에 보는 흐름
-
-![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
-*기술부채를 측정하고 우선순위를 매겨 상환하는 순환 구조*
 
 기술부채는 한 번 생기고 끝나는 사건이 아니라, 계속 관리해야 하는 순환입니다.
 
@@ -200,17 +203,29 @@ deprecation을 선언하자마자 바로 제거하는 습관도 위험합니다.
 
 다음 글에서는 시리즈를 마무리하면서 좋은 소프트웨어의 기준을 묶어 봅니다. 기능성, 신뢰성, 유지보수성, 단순성, 외부 신호를 어떤 균형으로 볼지 이어서 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **기술부채는 언제 도구이고, 언제 사고의 씨앗이 될까요?**
+  - 본문의 기준은 유지보수와 기술부채를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Martin Fowler의 네 가지 기술부채 분류는 실무에 어떤 도움을 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **부채 상환 우선순위는 어떻게 정해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 엔지니어링이란 무엇인가?](./01-what-is-software-engineering.md)
-- [요구사항 이해하기](./02-understanding-requirements.md)
-- [설계와 구현의 차이](./03-design-vs-implementation.md)
-- [코드 리뷰](./04-code-review.md)
-- [테스트 전략](./05-testing-strategy.md)
-- [버전 관리와 릴리스](./06-version-control-and-release.md)
-- [문서화](./07-documentation.md)
-- [협업 프로세스](./08-collaboration-process.md)
+## 시리즈 목차
+
+- [Software Engineering 101 (1/10): 소프트웨어 엔지니어링이란 무엇인가?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): 요구사항 이해하기](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): 설계와 구현의 차이](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): 코드 리뷰](./04-code-review.md)
+- [Software Engineering 101 (5/10): 테스트 전략](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): 버전 관리와 릴리스](./06-version-control-and-release.md)
+- [Software Engineering 101 (7/10): 문서화](./07-documentation.md)
+- [Software Engineering 101 (8/10): 협업 프로세스](./08-collaboration-process.md)
 - **유지보수와 기술부채 (현재 글)**
 - 좋은 소프트웨어의 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

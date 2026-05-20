@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding Requirements</title>
+<title>Software Engineering 101 (2/10): Understanding Requirements</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Understanding Requirements</h1>
+<h1>Software Engineering 101 (2/10): Understanding Requirements</h1>
 <p>Requirements often sound obvious at first. "Add search." "Improve response time." "Let users reset passwords." The danger is that everyone hears familiar words and imagines a different finish line. Product, design, engineering, and operations can all agree with the same sentence while still carrying different assumptions about scope, risk, and success.</p>
 <p>That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.</p>
 <p>This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Understanding Requirements?</li>
+<li>Which signal should the example or diagram make visible for Understanding Requirements?</li>
+<li>What failure should be prevented first when Understanding Requirements reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 2 flow overview</em></p>
+<p>This picture places Understanding Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Understanding Requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What makes a requirement good</li>
@@ -71,8 +84,6 @@
 <p>The most expensive code is code you rewrite.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>How user needs become acceptance criteria and tests</em></p>
 <p>Requirements only become real when they map to tests.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -192,8 +203,18 @@ I can quickly recover account access.
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Good requirements are measurable. Next we look at the step before code — design vs implementation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What Is Software Engineering?</a></li>
+<li><strong>What boundary should you inspect first when applying Understanding Requirements?</strong></li>
+<li>The article treats Understanding Requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Understanding Requirements?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Understanding Requirements reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">Software Engineering 101 (1/10): What Is Software Engineering?</a></li>
 <li><strong>Understanding Requirements (current)</strong></li>
 <li>Design vs Implementation (upcoming)</li>
 <li>Code Review (upcoming)</li>

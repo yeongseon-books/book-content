@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Makes Good Software</title>
+<title>Software Engineering 101 (10/10): What Makes Good Software</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Makes Good Software</h1>
+<h1>Software Engineering 101 (10/10): What Makes Good Software</h1>
 <p>A working feature and good software are not the same thing. Shipping the feature is only the opening move. The harder question is whether the system still behaves well when requirements change, teammates rotate, traffic grows, and incidents force trade-offs under pressure.</p>
 <p>Teams often judge quality first by style or abstraction. Those signals matter, but the stronger truth usually appears outside the code: lead time, recovery speed, onboarding friction, user trust, and the ease of safe change. Quality lives at the intersection of internal structure and external behavior.</p>
 <p>This is the final post in the Software Engineering 101 series. In this chapter, we tie the series together by looking at quality attributes, practical readings of SOLID, and the operational signals senior engineers use when they say a system is healthy.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Makes Good Software?</li>
+<li>Which signal should the example or diagram make visible for What Makes Good Software?</li>
+<li>What failure should be prevented first when What Makes Good Software reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 10 flow overview</em></p>
+<p>This picture places What Makes Good Software inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Makes Good Software is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Quality attributes (a short take on ISO/IEC 25010)</li>
@@ -71,8 +84,6 @@
 <p>What is simple lasts.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png"><br>
-<em>How quality attributes balance each other to define software health</em></p>
 <p>Quality is not one axis but a balance across many.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -185,16 +196,26 @@ git log --pretty='%H %as' -- app/ | head
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Good software is simple, measurable, and grows the people who maintain it. This series ends here, but the principles from these ten essays deepen further in the next series — Clean Code, Design Patterns, API Design, and beyond.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Testing Strategy</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Version Control and Release</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/07-documentation.md">Documentation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/08-collaboration-process.md">Collaboration Process</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/09-maintenance-and-tech-debt.md">Maintenance and Tech Debt</a></li>
+<li><strong>What boundary should you inspect first when applying What Makes Good Software?</strong></li>
+<li>The article treats What Makes Good Software as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Makes Good Software?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Makes Good Software reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">Software Engineering 101 (1/10): What Is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Software Engineering 101 (2/10): Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Software Engineering 101 (3/10): Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Software Engineering 101 (4/10): Code Review</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Software Engineering 101 (5/10): Testing Strategy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Software Engineering 101 (6/10): Version Control and Release</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/07-documentation.md">Software Engineering 101 (7/10): Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/08-collaboration-process.md">Software Engineering 101 (8/10): Collaboration Process</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/09-maintenance-and-tech-debt.md">Software Engineering 101 (9/10): Maintenance and Tech Debt</a></li>
 <li><strong>What Makes Good Software (current)</strong></li>
 </ul>
 <h2>References</h2>

@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 8
-title: Collaboration Process
+title: "Software Engineering 101 (8/10): Collaboration Process"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: How to write RFCs, async-first decision making, decision logs, 
 last_reviewed: '2026-05-15'
 ---
 
-# Collaboration Process
+# Software Engineering 101 (8/10): Collaboration Process
 
 Products are never built by code alone. Requirements, design decisions, risk checks, rollout timing, and support handoffs all pull multiple people into the same system. When the process is weak, decisions start following habit, hierarchy, or who spoke last instead of what the evidence says.
 
 More meetings do not solve that problem. They often make it worse by consuming the most expensive resource in the team at the same time: focused human hours. Strong collaboration processes protect that resource by making discussion searchable, narrowing sync time to actual decisions, and leaving a trail that survives time zones and handoffs.
 
 This is post 8 in the Software Engineering 101 series. In this chapter, we treat RFCs, async comments, decision logs, and handoff notes as concrete engineering tools rather than management overhead.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Collaboration Process?
+- Which signal should the example or diagram make visible for Collaboration Process?
+- What failure should be prevented first when Collaboration Process reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 8 flow overview*
+
+This picture places Collaboration Process inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Collaboration Process is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Code can be written alone, but products are not. Without a process, technical de
 > A good process protects people.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)
-*The collaboration flow from RFC draft to async discussion and decision log*
 
 Async-first; sync only at the moment of decision.
 
@@ -203,17 +216,29 @@ Distributed teams (GitLab, Stripe, etc.) standardize on RFC + decision log + sho
 
 Process gives time back to people. Next we look at what every long-lived system meets — maintenance and tech debt.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Collaboration Process?**
+  - The article treats Collaboration Process as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Collaboration Process?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Collaboration Process reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
-- [Version Control and Release](./06-version-control-and-release.md)
-- [Documentation](./07-documentation.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): Version Control and Release](./06-version-control-and-release.md)
+- [Software Engineering 101 (7/10): Documentation](./07-documentation.md)
 - **Collaboration Process (current)**
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

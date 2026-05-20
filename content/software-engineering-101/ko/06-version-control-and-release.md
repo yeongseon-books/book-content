@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 6
-title: 버전 관리와 릴리스
+title: "Software Engineering 101 (6/10): 버전 관리와 릴리스"
 status: content-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: git 브랜치 전략, 시맨틱 버저닝, 체인지로그, 안
 last_reviewed: '2026-05-15'
 ---
 
-# 버전 관리와 릴리스
+# Software Engineering 101 (6/10): 버전 관리와 릴리스
 
 코드를 잘 작성하고 테스트도 통과했는데, 릴리스 단계에서 사고가 나면 사용자는 그 앞의 노력을 알지 못합니다. 서비스는 결국 배포된 버전으로 평가받습니다. 그래서 버전 관리와 릴리스는 개발의 마지막 절차가 아니라, 사용자 신뢰가 실제로 형성되는 접점입니다.
 
@@ -29,15 +29,21 @@ last_reviewed: '2026-05-15'
 
 이 글은 Software Engineering 101 시리즈의 여섯 번째 글입니다. 여기서는 브랜치 전략, 시맨틱 버저닝, 자동 체인지로그, 카나리 배포, 롤백까지 포함한 안전한 릴리스 흐름을 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 브랜치 전략은 언제 trunk-based가 맞고, 언제 Git Flow가 맞을까요?
 - 버전 1.4.2 같은 숫자는 사용자에게 무엇을 약속할까요?
 - 체인지로그는 어떻게 자동화할 수 있을까요?
-- 카나리와 롤백은 릴리스 안전성에 어떤 차이를 만들까요?
-- 릴리스 노트는 개발자 언어가 아니라 사용자 언어로 왜 써야 할까요?
 
-> 시맨틱 버저닝은 버전 표기가 아니라 약속의 표기법입니다. 그 약속이 깨지면 신뢰가 먼저 무너집니다.
+## 큰 그림
+
+![Software Engineering 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Software Engineering 101 6장 흐름 개요*
+
+이 그림에서는 버전 관리와 릴리스를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 버전 관리와 릴리스의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -46,9 +52,6 @@ last_reviewed: '2026-05-15'
 안정적인 릴리스 문화는 기술 스택보다 운영 습관에서 나옵니다. 버전 결정이 자동화되어 있는지, 체인지로그가 사용자 관점으로 정리되는지, 롤백이 분 단위로 가능한지, 사람 손이 많이 타는 수동 단계가 줄어드는지가 더 중요합니다.
 
 ## 한눈에 보는 흐름
-
-![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
-*기능 브랜치부터 카나리와 프로덕션까지 이어지는 릴리스 흐름*
 
 단계를 잘게 나누면 이상 신호가 생겼을 때 회수 비용도 같이 줄어듭니다.
 
@@ -195,17 +198,29 @@ kubectl rollout undo deployment/api
 
 다음 글에서는 이 신뢰를 글로 남기는 방법, 곧 문서화를 다룹니다. 코드가 설명하지 못하는 왜와 언제를 어떻게 기록해야 하는지 이어서 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **브랜치 전략은 언제 trunk-based가 맞고, 언제 Git Flow가 맞을까요?**
+  - 본문의 기준은 버전 관리와 릴리스를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **버전 1.4.2 같은 숫자는 사용자에게 무엇을 약속할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **체인지로그는 어떻게 자동화할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [소프트웨어 엔지니어링이란 무엇인가?](./01-what-is-software-engineering.md)
-- [요구사항 이해하기](./02-understanding-requirements.md)
-- [설계와 구현의 차이](./03-design-vs-implementation.md)
-- [코드 리뷰](./04-code-review.md)
-- [테스트 전략](./05-testing-strategy.md)
+## 시리즈 목차
+
+- [Software Engineering 101 (1/10): 소프트웨어 엔지니어링이란 무엇인가?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): 요구사항 이해하기](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): 설계와 구현의 차이](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): 코드 리뷰](./04-code-review.md)
+- [Software Engineering 101 (5/10): 테스트 전략](./05-testing-strategy.md)
 - **버전 관리와 릴리스 (현재 글)**
 - 문서화 (예정)
 - 협업 프로세스 (예정)
 - 유지보수와 기술부채 (예정)
 - 좋은 소프트웨어의 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

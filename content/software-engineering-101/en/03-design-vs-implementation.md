@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 3
-title: Design vs Implementation
+title: "Software Engineering 101 (3/10): Design vs Implementation"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A short, code-first take on design vs implementation, capturing
 last_reviewed: '2026-05-15'
 ---
 
-# Design vs Implementation
+# Software Engineering 101 (3/10): Design vs Implementation
 
 Sometimes you review a change and think, "The code is clean, but the structure still feels fragile." Other times the code itself is ordinary, yet the boundaries are so clear that the system looks like it will survive years of change. That difference usually comes from design quality more than implementation polish.
 
 Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.
 
 This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Design vs Implementation?
+- Which signal should the example or diagram make visible for Design vs Implementation?
+- What failure should be prevented first when Design vs Implementation reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 3 flow overview*
+
+This picture places Design vs Implementation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Design vs Implementation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Design decisions outlive code. Bad design cannot be hidden under good code.
 > Code can be rewritten; the trace of decisions follows you forever.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
-*How design decisions flow into implementation and back through observation*
 
 Design sets the ceiling for implementation.
 
@@ -205,9 +218,20 @@ Large organizations keep ADRs in git and change them via PR. System diagrams (C4
 
 Design and implementation are different jobs done with different tools. Next we look at the last quality gate before merge — code review.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Design vs Implementation?**
+  - The article treats Design vs Implementation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Design vs Implementation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Design vs Implementation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
 - **Design vs Implementation (current)**
 - Code Review (upcoming)
 - Testing Strategy (upcoming)
@@ -216,6 +240,7 @@ Design and implementation are different jobs done with different tools. Next we 
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

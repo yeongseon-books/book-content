@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 7
-title: Documentation
+title: "Software Engineering 101 (7/10): Documentation"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: README, ADR, docstring, and runbook roles, plus the Diataxis fo
 last_reviewed: '2026-05-15'
 ---
 
-# Documentation
+# Software Engineering 101 (7/10): Documentation
 
 It is tempting to say that good code should make documentation unnecessary. Strong names, small modules, and readable tests do carry a lot of information. But code alone rarely explains why a decision was made, when an operator should follow a procedure, or where a new teammate should start on day one.
 
 The biggest failure mode of weak documentation is not inconvenience. It is dependency on specific people. Every unanswered question routes through memory, availability, and interruption cost. That is why documentation is not a side artifact. It is a core part of asynchronous engineering work.
 
 This is post 7 in the Software Engineering 101 series. In this chapter, we split documentation by reader need, then look at the minimum useful shapes for a README, ADR, runbook, docstring, and onboarding checklist.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Documentation?
+- Which signal should the example or diagram make visible for Documentation?
+- What failure should be prevented first when Documentation reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 7 flow overview*
+
+This picture places Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Without docs, every question routes through a person. The moment a person become
 > Documentation is the infrastructure of async collaboration.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
-*The Diataxis structure that separates docs by reader intent*
 
 Diataxis splits docs by reader intent.
 
@@ -207,17 +220,29 @@ Mature teams use docs-as-code (markdown in the repo, change via PR, build in CI)
 
 Documentation frees people. Next, we look at how those people work together — the collaboration process.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Documentation?**
+  - The article treats Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Documentation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Documentation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
-- [Testing Strategy](./05-testing-strategy.md)
-- [Version Control and Release](./06-version-control-and-release.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
+- [Software Engineering 101 (5/10): Testing Strategy](./05-testing-strategy.md)
+- [Software Engineering 101 (6/10): Version Control and Release](./06-version-control-and-release.md)
 - **Documentation (current)**
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

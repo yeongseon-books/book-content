@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Design vs Implementation</title>
+<title>Software Engineering 101 (3/10): Design vs Implementation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Design vs Implementation</h1>
+<h1>Software Engineering 101 (3/10): Design vs Implementation</h1>
 <p>Sometimes you review a change and think, "The code is clean, but the structure still feels fragile." Other times the code itself is ordinary, yet the boundaries are so clear that the system looks like it will survive years of change. That difference usually comes from design quality more than implementation polish.</p>
 <p>Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.</p>
 <p>This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Design vs Implementation?</li>
+<li>Which signal should the example or diagram make visible for Design vs Implementation?</li>
+<li>What failure should be prevented first when Design vs Implementation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 3 flow overview</em></p>
+<p>This picture places Design vs Implementation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Design vs Implementation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Definitions of design and implementation</li>
@@ -71,8 +84,6 @@
 <p>Code can be rewritten; the trace of decisions follows you forever.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>How design decisions flow into implementation and back through observation</em></p>
 <p>Design sets the ceiling for implementation.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -194,9 +205,19 @@ class EmailNotifier:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Design and implementation are different jobs done with different tools. Next we look at the last quality gate before merge — code review.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What Is Software Engineering?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><strong>What boundary should you inspect first when applying Design vs Implementation?</strong></li>
+<li>The article treats Design vs Implementation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Design vs Implementation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Design vs Implementation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">Software Engineering 101 (1/10): What Is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Software Engineering 101 (2/10): Understanding Requirements</a></li>
 <li><strong>Design vs Implementation (current)</strong></li>
 <li>Code Review (upcoming)</li>
 <li>Testing Strategy (upcoming)</li>

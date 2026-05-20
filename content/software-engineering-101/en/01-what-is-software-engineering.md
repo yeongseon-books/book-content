@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 1
-title: What Is Software Engineering?
+title: "Software Engineering 101 (1/10): What Is Software Engineering?"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: A short, code-first take on the difference between coding and s
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Software Engineering?
+# Software Engineering 101 (1/10): What Is Software Engineering?
 
 When you first learn programming, it is natural to think the job ends when the code runs. A small script reads an input, prints an output, and the goal feels complete. That instinct is fine for learning. It breaks down the moment the code must survive handoffs, incidents, changing requirements, and years of maintenance.
 
 In real teams, the important question is no longer "Can we write code?" but "Can we keep this system operable as time, traffic, and people change?" The same function now has to live inside requirements, tests, deployment, observability, documentation, and shared ownership. That is the boundary where coding turns into engineering.
 
 This is the first post in the Software Engineering 101 series. In this chapter, we use that boundary as the starting mental model: software engineering is not just producing code, but building a system that stays understandable and changeable over time.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Software Engineering??
+- Which signal should the example or diagram make visible for What Is Software Engineering??
+- What failure should be prevented first when What Is Software Engineering? reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 1 flow overview*
+
+This picture places What Is Software Engineering? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Software Engineering? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Most learning stops at "how to write code". Real work is code + collaboration + 
 > Code that runs once and a system that survives five years are different things.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
-*The engineering loop from requirements to operations and maintenance*
 
 Engineering is a loop that does not break.
 
@@ -210,7 +223,18 @@ Large organizations record decisions through RFCs and ADRs. SRE is collaboration
 
 Engineering is not just another word for code. Next up, where everything starts — understanding requirements.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Software Engineering??**
+  - The article treats What Is Software Engineering? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Software Engineering??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Software Engineering? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Software Engineering? (current)**
 - Understanding Requirements (upcoming)
 - Design vs Implementation (upcoming)
@@ -221,6 +245,7 @@ Engineering is not just another word for code. Next up, where everything starts 
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

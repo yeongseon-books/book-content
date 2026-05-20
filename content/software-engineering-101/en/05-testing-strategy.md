@@ -1,7 +1,7 @@
 ---
 series: software-engineering-101
 episode: 5
-title: Testing Strategy
+title: "Software Engineering 101 (5/10): Testing Strategy"
 status: content-ready
 targets:
   tistory: false
@@ -21,13 +21,29 @@ seo_description: The roles of unit, integration, and E2E tests, the test pyramid
 last_reviewed: '2026-05-15'
 ---
 
-# Testing Strategy
+# Software Engineering 101 (5/10): Testing Strategy
 
 Most teams agree that tests matter. Disagreement starts immediately after that. Should you invest harder in unit tests, rely on integration tests, or trust end-to-end coverage because it looks closest to production? Without a strategy, test suites grow in the most expensive direction: slower feedback, shakier trust, and harder debugging.
 
 The real problem is not test quantity. It is test placement. A healthy test system tells you where to look when something breaks, keeps PR feedback short enough to preserve flow, and treats flaky tests as defects in the delivery system rather than background noise.
 
 This is post 5 in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Testing Strategy?
+- Which signal should the example or diagram make visible for Testing Strategy?
+- What failure should be prevented first when Testing Strategy reaches a real system?
+
+## Big Picture
+
+![software engineering 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
+
+*software engineering 101 chapter 5 flow overview*
+
+This picture places Testing Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Testing Strategy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Tests determine the cost of change. Good tests let you refactor without fear; ba
 > Code without tests is, in practice, frozen code.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
-*The test pyramid as a balance between speed, cost, and confidence*
 
 The pyramid balances cost against speed.
 
@@ -214,17 +227,29 @@ Fast teams gate every PR on unit and integration tests, run E2E on main merge or
 
 Tests determine the cost of change. Next we look at how to ship tested code safely to users — version control and release.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Testing Strategy?**
+  - The article treats Testing Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Testing Strategy?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Testing Strategy reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Software Engineering?](./01-what-is-software-engineering.md)
-- [Understanding Requirements](./02-understanding-requirements.md)
-- [Design vs Implementation](./03-design-vs-implementation.md)
-- [Code Review](./04-code-review.md)
+## In this series
+
+- [Software Engineering 101 (1/10): What Is Software Engineering?](./01-what-is-software-engineering.md)
+- [Software Engineering 101 (2/10): Understanding Requirements](./02-understanding-requirements.md)
+- [Software Engineering 101 (3/10): Design vs Implementation](./03-design-vs-implementation.md)
+- [Software Engineering 101 (4/10): Code Review](./04-code-review.md)
 - **Testing Strategy (current)**
 - Version Control and Release (upcoming)
 - Documentation (upcoming)
 - Collaboration Process (upcoming)
 - Maintenance and Tech Debt (upcoming)
 - What Makes Good Software (upcoming)
+
 <!-- toc:end -->
 
 ## References

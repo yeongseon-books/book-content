@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Software Engineering?</title>
+<title>Software Engineering 101 (1/10): What Is Software Engineering?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is Software Engineering?</h1>
+<h1>Software Engineering 101 (1/10): What Is Software Engineering?</h1>
 <p>When you first learn programming, it is natural to think the job ends when the code runs. A small script reads an input, prints an output, and the goal feels complete. That instinct is fine for learning. It breaks down the moment the code must survive handoffs, incidents, changing requirements, and years of maintenance.</p>
 <p>In real teams, the important question is no longer "Can we write code?" but "Can we keep this system operable as time, traffic, and people change?" The same function now has to live inside requirements, tests, deployment, observability, documentation, and shared ownership. That is the boundary where coding turns into engineering.</p>
 <p>This is the first post in the Software Engineering 101 series. In this chapter, we use that boundary as the starting mental model: software engineering is not just producing code, but building a system that stays understandable and changeable over time.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Software Engineering??</li>
+<li>Which signal should the example or diagram make visible for What Is Software Engineering??</li>
+<li>What failure should be prevented first when What Is Software Engineering? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="software engineering 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>software engineering 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Software Engineering? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Software Engineering? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between coding and software engineering</li>
@@ -71,8 +84,6 @@
 <p>Code that runs once and a system that survives five years are different things.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>The engineering loop from requirements to operations and maintenance</em></p>
 <p>Engineering is a loop that does not break.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -199,6 +210,16 @@ def test_sum_to_negative():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Engineering is not just another word for code. Next up, where everything starts — understanding requirements.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Software Engineering??</strong></li>
+<li>The article treats What Is Software Engineering? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Software Engineering??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Software Engineering? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Software Engineering? (current)</strong></li>
 <li>Understanding Requirements (upcoming)</li>
