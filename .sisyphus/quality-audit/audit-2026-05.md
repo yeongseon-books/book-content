@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:42:13+00:00
+Generated: 2026-05-20T11:43:35+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **46**
-- Series at or above 5 issues: **34**
-- Total issues: **363**
-  - BadImg: **363**
+- Series with any issue: **45**
+- Series at or above 5 issues: **33**
+- Total issues: **355**
+  - BadImg: **355**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -65,28 +65,27 @@ Warnings:
 | 22 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 23 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 24 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 25 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 26 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 27 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 30 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 31 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 32 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 33 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 34 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 35 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 36 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 37 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 38 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 39 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 42 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 43 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 44 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 45 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 46 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 25 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 29 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 30 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 31 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 32 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 33 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 34 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 35 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 36 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 37 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 38 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 39 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 40 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 41 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 42 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 43 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 44 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 45 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -374,18 +373,6 @@ Warnings:
 - `assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.en.png:1` — PNG height 67px <= 100px (size=935x67)
 - `assets/rag-benchmark-101/04/04-02-boundary-between-embedding-and-search-ti.ko.png:1` — PNG height 67px <= 100px (size=796x67)
 - `assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png:1` — PNG height 67px <= 100px (size=862x67)
-- ... 3 more
-
-## serverless-101 — Total 8
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/serverless-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=759x67)
-- `assets/serverless-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=759x67)
-- `assets/serverless-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=881x67)
-- `assets/serverless-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=881x67)
-- `assets/serverless-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=700x67)
 - ... 3 more
 
 ## software-design-101 — Total 8

@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:42:13+00:00",
+  "generated_at": "2026-05-20T11:43:35+00:00",
   "series_count": 92,
-  "problem_series_count": 46,
-  "series_with_5_plus": 34,
+  "problem_series_count": 45,
+  "series_with_5_plus": 33,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 363,
+    "BadImg": 355,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 363
+    "all": 355
   },
   "results": [
     {
@@ -6763,234 +6763,6 @@
       }
     },
     {
-      "series": "serverless-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 8
-      },
-      "total": 8,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 759,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 759,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 881,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 881,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 700,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/03/03-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.ko.png",
-            "width": 700,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 717,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 717,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 759,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/01/01-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.ko.png",
-            "width": 759,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/02/02-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.en.png",
-            "width": 881,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/02/02-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-concept-at-a-glance.ko.png",
-            "width": 881,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/03/03-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.en.png",
-            "width": 700,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/03/03-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "03-01-concept-at-a-glance.ko.png",
-            "width": 700,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 717,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/serverless-101/04/04-01-concept-at-a-glance.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.ko.png",
-            "width": 717,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "software-design-101",
       "counts": {
         "Synt": 0,
@@ -10532,6 +10304,20 @@
     },
     {
       "series": "rag-deep-dive",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "serverless-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
