@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:26:20+00:00
+Generated: 2026-05-20T11:26:40+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **56**
 - Series at or above 5 issues: **42**
-- Total issues: **538**
+- Total issues: **537**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **6**
+  - Shrt: **5**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -77,8 +77,8 @@ Warnings:
 | 34 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 35 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 36 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 37 | `machine-learning-101` | 7 | 6 | 0 | 0 | 1 | 0 |
-| 38 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 37 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 38 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 39 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 40 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 41 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
@@ -534,21 +534,6 @@ Warnings:
 - `assets/sre-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=781x67)
 - ... 3 more
 
-## machine-learning-101 — Total 7
-
-- BadImg=6 Synt=0 BrkLink=0 Shrt=1 NoEn=0
-
-### BadImg
-- `assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=750x67)
-- `assets/machine-learning-101/01/01-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=740x67)
-- `assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=748x67)
-- `assets/machine-learning-101/04/04-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=694x67)
-- `assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=815x67)
-- ... 1 more
-
-### Shrt
-- `content/machine-learning-101/en/01-what-is-machine-learning.md:22` — markdown body has 148 lines (< 150)
-
 ## cloud-computing-101 — Total 6
 
 - BadImg=6 Synt=0 BrkLink=0 Shrt=0 NoEn=0
@@ -559,6 +544,18 @@ Warnings:
 - `assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=763x67)
 - `assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=763x67)
 - `assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=893x67)
+- ... 1 more
+
+## machine-learning-101 — Total 6
+
+- BadImg=6 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=750x67)
+- `assets/machine-learning-101/01/01-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=740x67)
+- `assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=748x67)
+- `assets/machine-learning-101/04/04-01-diagram.ko.png:1` — PNG height 67px <= 100px (size=694x67)
+- `assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=815x67)
 - ... 1 more
 
 ## mlops-101 — Total 6

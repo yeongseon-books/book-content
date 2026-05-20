@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Logistic Regression</title>
+<title>Machine Learning 101 (5/10): Logistic Regression</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Logistic Regression</h1>
+<h1>Machine Learning 101 (5/10): Logistic Regression</h1>
 <p>Beginner confusion around logistic regression is healthy because the name really is misleading at first glance. It predicts classes in practice, but it does that by assigning probabilities first. The probability layer is where the useful operational decisions live.</p>
 <p>This is post 5 in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>If the output is 0 or 1, why is the model called regression?</li>
 <li>How does the sigmoid turn a linear score into a probability?</li>
 <li>Why is <code>0.5</code> only a default threshold, not a law?</li>
-<li>What do precision, recall, and F1 tell you that accuracy cannot?</li>
-<li>How should you think about the multiclass extension?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 5 flow overview</em></p>
+<p>This picture places Logistic Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Logistic regression predicts a continuous probability first, then turns that probability into a class with a threshold. Once you see a classifier as a probability engine instead of a scoreboard, the downstream decision rules start to make sense.</p>
+<p>The core of Logistic Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Logistic regression turns a linear score into a probability, then turns that probability into a class decision with a threshold.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Sigmoid</strong>: maps any real number to (0, 1).</li>
@@ -155,11 +155,21 @@ for t in [0.3, 0.5, 0.7]:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Logistic regression is the foundation of classification. Next, we cover decision trees and random forests for nonlinear modeling.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
+<li><strong>If the output is 0 or 1, why is the model called regression?</strong></li>
+<li>The article treats Logistic Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How does the sigmoid turn a linear score into a probability?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is <code>0.5</code> only a default threshold, not a law?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Machine Learning 101 (3/10): Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Machine Learning 101 (4/10): Linear Regression</a></li>
 <li><strong>Logistic Regression (current)</strong></li>
 <li>Decision Tree and Random Forest (upcoming)</li>
 <li>Clustering (upcoming)</li>

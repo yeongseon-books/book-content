@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 8
-title: Overfitting과 Regularization
+title: "Machine Learning 101 (8/10): Overfitting과 Regularization"
 status: publish-ready
 targets:
   tistory: true
@@ -20,31 +20,33 @@ seo_description: 과적합과 과소적합의 신호, 편향-분산, Ridge·Lass
 last_reviewed: '2026-05-15'
 ---
 
-# Overfitting과 Regularization
+# Machine Learning 101 (8/10): Overfitting과 Regularization
 
 훈련 점수는 99%인데 테스트 점수는 60%라면 모델이 똑똑한 것인지, 아니면 데이터를 외운 것인지부터 의심해야 합니다. 머신러닝에서 성능 개선의 절반은 더 강한 모델을 찾는 일이 아니라, 모델이 어디서 잡음을 외우고 있는지 진단하는 일에 가깝습니다. 과적합과 과소적합을 구분하지 못하면 점수가 좋아 보여도 실제 일반화는 오히려 나빠질 수 있습니다.
 
 이 글은 Machine Learning 101 시리즈의 여덟 번째 글입니다. 여기서는 과적합과 과소적합의 신호, 편향-분산 트레이드오프, Ridge·Lasso·ElasticNet 같은 정규화 기법이 일반화를 어떻게 되찾아 주는지 살펴보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 과적합과 과소적합은 어떤 신호로 구분할까요?
 - 편향-분산 트레이드오프는 무엇을 뜻할까요?
 - Ridge, Lasso, ElasticNet은 어떻게 다를까요?
-- 학습 곡선은 어떤 식으로 문제를 진단할까요?
-- 정규화를 쓸 때 가장 흔한 실수는 무엇일까요?
 
-> 과적합은 잡음을 외운 상태입니다. 정규화는 모델 자유도를 줄여서 일반화를 다시 되찾게 하는 장치입니다.
+## 큰 그림
+
+![Machine Learning 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
+
+*Machine Learning 101 8장 흐름 개요*
+
+이 그림에서는 Overfitting과 Regularization를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Overfitting과 Regularization의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
 모델 개선의 절반은 정규화라고 해도 과장이 아닙니다. 모델 용량이 클수록 정규화가 모델을 살려 줍니다.
 
 ## 한눈에 보는 개념
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
-
-*모델 자유도가 너무 낮으면 과소적합, 너무 높으면 과적합으로 흐르고, 정규화는 그 균형점을 다시 찾게 돕습니다.*
 
 ## 핵심 용어
 
@@ -161,17 +163,29 @@ for a in np.logspace(-3, 2, 6):
 
 다음 글에서는 이런 모델을 올바른 지표로 비교하는 Model Evaluation을 다루겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **과적합과 과소적합은 어떤 신호로 구분할까요?**
+  - 본문의 기준은 Overfitting과 Regularization를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **편향-분산 트레이드오프는 무엇을 뜻할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Ridge, Lasso, ElasticNet은 어떻게 다를까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
-- [지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree와 Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
+## 시리즈 목차
+
+- [Machine Learning 101 (1/10): Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): 지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree와 Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
 - **Overfitting과 Regularization (현재 글)**
 - Model Evaluation (예정)
 - ML 프로젝트 전체 흐름 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

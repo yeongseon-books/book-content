@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Machine Learning?</title>
+<title>Machine Learning 101 (1/10): What Is Machine Learning?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>What Is Machine Learning?</h1>
+<h1>Machine Learning 101 (1/10): What Is Machine Learning?</h1>
 <p>Recommendation systems, fraud filters, and medical triage tools all get called “machine learning,” but that label hides the real operating question. Are you writing smarter rules, doing statistics with a new library, or building a system that learns a reusable function from data? If that distinction stays fuzzy, every later discussion about models, metrics, and deployment turns into memorizing API names.</p>
 <p>This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What exactly is the model learning when we say “machine learning”?</li>
 <li>Why is generalization different from scoring well on the training set?</li>
 <li>Where does machine learning diverge from statistics and rule-based code?</li>
-<li>What do <code>fit</code>, <code>predict</code>, and <code>score</code> really mean in scikit-learn?</li>
-<li>Which beginner mistakes break this mental model first?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Machine Learning? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>The core of machine learning is not the model name. The starting point is to first build the operating picture in your head: learn a function <code>f</code> from data, then apply that function to inputs it has never seen.</p>
+<p>The core of What Is Machine Learning? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Recommendation, medicine, finance, autonomous driving — <em>every industry</em> is being <em>reshaped</em> by ML. Weak fundamentals make <em>every model collapse</em> later.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Machine learning starts by fitting a function on data, then reuses that function on inputs the model has never seen before.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Learning</strong>: <em>estimating a function</em> from data.</li>
@@ -148,6 +148,16 @@ model = LogisticRegression(max_iter=1000)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>ML is <em>a function learned from data</em>. Next we cover <em>supervised vs unsupervised learning</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What exactly is the model learning when we say “machine learning”?</strong></li>
+<li>The article treats What Is Machine Learning? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is generalization different from scoring well on the training set?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where does machine learning diverge from statistics and rule-based code?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Machine Learning? (current)</strong></li>
 <li>Supervised and Unsupervised Learning (upcoming)</li>

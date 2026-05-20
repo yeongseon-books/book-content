@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 6
-title: Decision Tree and Random Forest
+title: "Machine Learning 101 (6/10): Decision Tree and Random Forest"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: How decision trees split the feature space, why a single tree o
 last_reviewed: '2026-05-15'
 ---
 
-# Decision Tree and Random Forest
+# Machine Learning 101 (6/10): Decision Tree and Random Forest
 
 On tabular data, a stack of well-chosen `if-else` rules often beats more fashionable models. That feels counterintuitive until you remember what trees do well: they capture nonlinear structure, handle mixed feature behavior naturally, and produce a baseline that is hard to embarrass.
 
 This is post 6 in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - How does a decision tree split the feature space?
 - What do Gini and entropy actually measure?
 - Why does a single deep tree overfit so quickly?
-- What does bagging fix when we move to a random forest?
-- How far can you trust feature importance numbers?
 
-> A decision tree is an interpretable nonlinear model. A random forest is what you get when you collect many such trees and trade their individual volatility for a sturdier ensemble.
+## Big Picture
+
+![machine learning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 6 flow overview*
+
+This picture places Decision Tree and Random Forest inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Decision Tree and Random Forest is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Random forests and gradient-boosted trees still dominate tabular data. They belong in every baseline before you reach for deep learning.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
-
-*A single deep tree can overfit quickly, while a random forest reduces that variance by averaging many differently sampled trees.*
 
 ## Key Terms
 
@@ -151,17 +153,29 @@ Credit scoring, click prediction, and recommender features all run on tree ensem
 
 Trees and forests are the workhorse of tabular ML. Next we explore unsupervised learning through clustering.
 
+## Answering the Opening Questions
+
+- **How does a decision tree split the feature space?**
+  - The article treats Decision Tree and Random Forest as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do Gini and entropy actually measure?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does a single deep tree overfit so quickly?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
 - **Decision Tree and Random Forest (current)**
 - Clustering (upcoming)
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

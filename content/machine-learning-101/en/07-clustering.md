@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 7
-title: Clustering
+title: "Machine Learning 101 (7/10): Clustering"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: When to use KMeans versus DBSCAN, how to pick K with the elbow 
 last_reviewed: '2026-05-15'
 ---
 
-# Clustering
+# Machine Learning 101 (7/10): Clustering
 
 Clustering feels less certain than classification because there is no answer sheet waiting in the test set. That uncertainty is exactly why teams misuse it. A clean-looking cluster plot can tempt you into believing you discovered truth when you may only have discovered the geometry created by scaling choices.
 
 This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Without labels, how do you judge whether the clusters are any good?
 - When should you prefer KMeans over DBSCAN?
 - How do you choose `K` without pretending the metric picks it for you?
-- Why does standardization change the result so dramatically?
-- Why should cluster labels be treated as hypotheses rather than truth?
 
-> Clustering exposes the latent structure in data through similarity. But validation does not end with a metric; the result only becomes meaningful when the numbers and the interpretation agree.
+## Big Picture
+
+![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 7 flow overview*
+
+This picture places Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Clustering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
-
-*Once the inputs are standardized, KMeans and DBSCAN expose different kinds of structure: centroid-based groups versus density-based regions.*
 
 ## Key Terms
 
@@ -152,17 +154,29 @@ Customer segmentation, color quantization, and anomaly detection all rely on clu
 
 Clustering exposes hidden structure. Next, we examine overfitting and regularization, the limits of model fitting.
 
+## Answering the Opening Questions
+
+- **Without labels, how do you judge whether the clusters are any good?**
+  - The article treats Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you prefer KMeans over DBSCAN?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you choose `K` without pretending the metric picks it for you?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
 - **Clustering (current)**
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

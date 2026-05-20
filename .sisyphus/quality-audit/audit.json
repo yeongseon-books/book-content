@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:26:20+00:00",
+  "generated_at": "2026-05-20T11:26:40+00:00",
   "series_count": 92,
   "problem_series_count": 56,
   "series_with_5_plus": 42,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 6,
+    "Shrt": 5,
     "NoEn": 0,
-    "all": 538
+    "all": 537
   },
   "results": [
     {
@@ -11102,212 +11102,6 @@
       }
     },
     {
-      "series": "machine-learning-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 1,
-        "NoEn": 0,
-        "BadImg": 6
-      },
-      "total": 7,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/machine-learning-101/en/01-what-is-machine-learning.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "01-what-is-machine-learning.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 750,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/01/01-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram.ko.png",
-            "width": 740,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 748,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 694,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 815,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/05/05-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-diagram.ko.png",
-            "width": 865,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/machine-learning-101/en/01-what-is-machine-learning.md",
-            "line": 22,
-            "message": "markdown body has 148 lines (< 150)",
-            "article": "01-what-is-machine-learning.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-concept-at-a-glance.en.png",
-            "width": 750,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/01/01-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-diagram.ko.png",
-            "width": 740,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-concept-at-a-glance.en.png",
-            "width": 748,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/04/04-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-01-diagram.ko.png",
-            "width": 694,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-concept-at-a-glance.en.png",
-            "width": 815,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/machine-learning-101/05/05-01-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-diagram.ko.png",
-            "width": 865,
-            "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "cloud-computing-101",
       "counts": {
         "Synt": 0,
@@ -11477,6 +11271,182 @@
             "code": null,
             "image": "06-01-concept-at-a-glance.ko.png",
             "width": 893,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "machine-learning-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 6
+      },
+      "total": 6,
+      "max_issue_kind": "BadImg",
+      "examples": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 750,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/01/01-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-diagram.ko.png",
+            "width": 740,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 748,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/04/04-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-diagram.ko.png",
+            "width": 694,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 815,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/05/05-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-diagram.ko.png",
+            "width": 865,
+            "height": 67,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "BadImg": [
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-concept-at-a-glance.en.png",
+            "width": 750,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/01/01-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "01-01-diagram.ko.png",
+            "width": 740,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-concept-at-a-glance.en.png",
+            "width": 748,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/04/04-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "04-01-diagram.ko.png",
+            "width": 694,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-concept-at-a-glance.en.png",
+            "width": 815,
+            "height": 67,
+            "repo": null
+          },
+          {
+            "kind": "BadImg",
+            "path": "assets/machine-learning-101/05/05-01-diagram.ko.png",
+            "line": 1,
+            "message": "PNG height 67px <= 100px",
+            "article": null,
+            "lang": null,
+            "code": null,
+            "image": "05-01-diagram.ko.png",
+            "width": 865,
             "height": 67,
             "repo": null
           }

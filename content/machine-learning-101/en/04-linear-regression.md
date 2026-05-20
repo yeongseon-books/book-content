@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 4
-title: Linear Regression
+title: "Machine Learning 101 (4/10): Linear Regression"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: The intuition behind linear regression, the least-squares loss,
 last_reviewed: '2026-05-15'
 ---
 
-# Linear Regression
+# Machine Learning 101 (4/10): Linear Regression
 
 When people call linear regression “too simple,” they usually mean “easy to underestimate.” A straight line that explains most of the variation is already an operationally strong baseline, and it often teaches you more about the data than a more complex model that scores slightly higher but hides why.
 
 This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - How does the linear regression equation produce a prediction?
 - What does least squares actually minimize?
 - What does `R^2` explain, and what does it hide?
-- Why are residuals the fastest way to test the model story?
-- Which failure modes show up before you ever need a more complex model?
 
-> Linear regression is the simplest model and still one of the strongest baselines. It also remains one of the most trustworthy reference points when interpretability matters.
+## Big Picture
+
+![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 4 flow overview*
+
+This picture places Linear Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Linear Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Linear regression is interpretable, fast, and surprisingly strong. Always run it first. Without a baseline, no complex model is justified.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
-
-*Linear regression combines features into a prediction, then adjusts the weights by minimizing a loss such as mean squared error.*
 
 ## Key Terms
 
@@ -150,10 +152,21 @@ Pricing, demand modeling, and A/B effect estimation lean on linear regression be
 
 Linear regression is the starting point for every regression task. Next, we move to logistic regression for classification.
 
+## Answering the Opening Questions
+
+- **How does the linear regression equation produce a prediction?**
+  - The article treats Linear Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does least squares actually minimize?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does `R^2` explain, and what does it hide?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
 - **Linear Regression (current)**
 - Logistic Regression (upcoming)
 - Decision Tree and Random Forest (upcoming)
@@ -161,6 +174,7 @@ Linear regression is the starting point for every regression task. Next, we move
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

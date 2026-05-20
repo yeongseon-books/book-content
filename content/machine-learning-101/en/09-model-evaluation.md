@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 9
-title: Model Evaluation
+title: "Machine Learning 101 (9/10): Model Evaluation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: How to choose the right metric for classification and regressio
 last_reviewed: '2026-05-15'
 ---
 
-# Model Evaluation
+# Machine Learning 101 (9/10): Model Evaluation
 
 “Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.
 
 This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Which metrics belong to classification versus regression?
 - What does each cell of the confusion matrix tell you operationally?
 - When should PR outrank ROC in your analysis?
-- Why do MAE, RMSE, and `R^2` answer different questions?
-- Which evaluation mistakes quietly leak into model selection?
 
-> Model evaluation is a procedure you prove with code. One lesson here is that choosing the metric comes before choosing the model.
+## Big Picture
+
+![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 9 flow overview*
+
+This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Model Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
-
-*Predicted classes feed confusion-matrix metrics, while probability outputs support threshold-free views such as ROC-AUC and PR-AUC.*
 
 ## Key Terms
 
@@ -158,17 +160,29 @@ A/B testing, model gates, and MLOps monitoring all rest on the metric definition
 
 Evaluation is the language of model selection. Next, we close the series with the end-to-end ML project workflow.
 
+## Answering the Opening Questions
+
+- **Which metrics belong to classification versus regression?**
+  - The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does each cell of the confusion matrix tell you operationally?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When should PR outrank ROC in your analysis?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
-- [Overfitting and Regularization](./08-overfitting-and-regularization.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
+- [Machine Learning 101 (8/10): Overfitting and Regularization](./08-overfitting-and-regularization.md)
 - **Model Evaluation (current)**
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

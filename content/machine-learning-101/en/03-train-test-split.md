@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 3
-title: Train/Test Split
+title: "Machine Learning 101 (3/10): Train/Test Split"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: Why train and test splits measure generalization, plus leakage,
 last_reviewed: '2026-05-15'
 ---
 
-# Train/Test Split
+# Machine Learning 101 (3/10): Train/Test Split
 
 A model can brag about 99% training accuracy and still be useless the moment it sees live traffic. That gap is not a minor detail. It is the core reason ML teams separate fitting from evaluation and guard the test set so aggressively.
 
 This is post 3 in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What do the train, validation, and test sets each protect?
 - Why should `random_state` be fixed even in small experiments?
 - How does `stratify` help on imbalanced classes?
-- When does K-fold cross-validation add signal over a single split?
-- Which leakage patterns usually show up before model tuning even begins?
 
-> A train/test split is not just cutting the data in two. It is the minimum experimental setup for measuring how the model behaves on data it has not seen yet.
+## Big Picture
+
+![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 3 flow overview*
+
+This picture places Train/Test Split inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Train/Test Split is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
-
-*Separating training, tuning, and final evaluation is what lets you measure generalization instead of self-confirmation.*
 
 ## Key Terms
 
@@ -150,9 +152,20 @@ A/B experiments, model comparison, and MLOps gating all hinge on a sound split s
 
 A correct split is the prerequisite for every measurement that follows. Next, we cover linear regression as the foundation of supervised learning.
 
+## Answering the Opening Questions
+
+- **What do the train, validation, and test sets each protect?**
+  - The article treats Train/Test Split as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should `random_state` be fixed even in small experiments?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does `stratify` help on imbalanced classes?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
 - **Train/Test Split (current)**
 - Linear Regression (upcoming)
 - Logistic Regression (upcoming)
@@ -161,6 +174,7 @@ A correct split is the prerequisite for every measurement that follows. Next, we
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

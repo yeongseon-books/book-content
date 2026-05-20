@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 10
-title: The ML Project Workflow
+title: "Machine Learning 101 (10/10): The ML Project Workflow"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: From problem framing to data, modeling, evaluation, deployment,
 last_reviewed: '2026-05-15'
 ---
 
-# The ML Project Workflow
+# Machine Learning 101 (10/10): The ML Project Workflow
 
 Many ML projects die after the notebook victory lap. The score looked good, the demo worked, and then the real system exposed everything the notebook had hidden: missing reproducibility, scattered preprocessing, undefined monitoring, and no clear path from experiment to deployment.
 
 This is the final post in the Machine Learning 101 series. Here we will connect problem framing, data preparation, modeling, evaluation, deployment, and monitoring into one workflow so the model score becomes only one checkpoint in a larger loop.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Why do so many ML projects fail even after promising offline scores?
 - Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?
 - How does `Pipeline` protect you from preprocessing leakage?
-- Why do reproducibility and model cards matter after the experiment phase?
-- Why is monitoring the beginning of operations rather than the end of modeling?
 
-> ML success does not come from maximizing a score alone. Real success means completing the loop from problem definition through monitoring.
+## Big Picture
+
+![machine learning 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 10 flow overview*
+
+This picture places The ML Project Workflow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The ML Project Workflow is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 A 0.95 score in a notebook is worth zero if the model never reaches users. Owning the full loop is what creates impact.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
-
-*An ML project is a loop, not a notebook milestone: problem framing, data, modeling, deployment, and monitoring all feed back into each other.*
 
 ## Key Terms
 
@@ -158,17 +160,29 @@ Recommendation, fraud detection, and search teams compete on how well they autom
 
 Congratulations — you finished Machine Learning 101. Continue with Model Evaluation 101 and MLOps 101 for deeper material.
 
+## Answering the Opening Questions
+
+- **Why do so many ML projects fail even after promising offline scores?**
+  - The article treats The ML Project Workflow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does `Pipeline` protect you from preprocessing leakage?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
-- [Overfitting and Regularization](./08-overfitting-and-regularization.md)
-- [Model Evaluation](./09-model-evaluation.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
+- [Machine Learning 101 (8/10): Overfitting and Regularization](./08-overfitting-and-regularization.md)
+- [Machine Learning 101 (9/10): Model Evaluation](./09-model-evaluation.md)
 - **The ML Project Workflow (current)**
+
 <!-- toc:end -->
 
 ## References

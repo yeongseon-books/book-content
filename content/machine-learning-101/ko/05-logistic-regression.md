@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 5
-title: Logistic Regression
+title: "Machine Learning 101 (5/10): Logistic Regression"
 status: publish-ready
 targets:
   tistory: true
@@ -20,31 +20,33 @@ seo_description: 로지스틱 회귀가 선형 점수를 확률로 바꾸는 방
 last_reviewed: '2026-05-15'
 ---
 
-# Logistic Regression
+# Machine Learning 101 (5/10): Logistic Regression
 
 0 또는 1을 예측하는데 왜 이름은 회귀인지, 입문 단계에서 가장 많이 받는 질문 중 하나입니다. 이 혼란은 자연스럽습니다. 로지스틱 회귀는 클래스를 곧바로 내놓는 모델처럼 보이지만, 실제로는 먼저 연속적인 확률을 계산한 뒤 임계값을 기준으로 분류를 결정합니다. 그래서 분류 문제를 다루지만 내부 동작은 확률 모델로 이해하는 편이 맞습니다.
 
 이 글은 Machine Learning 101 시리즈의 다섯 번째 글입니다. 여기서는 시그모이드 함수, 임계값, 정밀도·재현율·F1의 의미를 함께 보면서 로지스틱 회귀를 분류의 가장 기본적인 기준선으로 정리해 보겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 0 또는 1을 예측하는데 왜 이름은 회귀일까요?
 - 시그모이드는 선형 점수를 어떻게 확률로 바꿀까요?
 - 왜 0.5 임계값을 항상 정답처럼 쓰면 안 될까요?
-- 정밀도, 재현율, F1은 각각 무엇을 말해 줄까요?
-- 다중 클래스 분류로는 어떻게 확장할 수 있을까요?
 
-> 로지스틱 회귀는 먼저 연속적인 확률을 예측하고, 그다음 임계값으로 클래스를 결정합니다. 분류 모델을 점수판이 아니라 확률 엔진으로 봐야 이후 판단 기준도 자연스럽게 정리됩니다.
+## 큰 그림
+
+![Machine Learning 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
+
+*Machine Learning 101 5장 흐름 개요*
+
+이 그림에서는 Logistic Regression를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Logistic Regression의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
 로지스틱 회귀는 분류 문제의 표준 베이스라인입니다. 해석이 가능하고 빠르며, 임계값을 조정하면 불균형 데이터에서도 꽤 경쟁력 있게 동작합니다.
 
 ## 한눈에 보는 개념
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
-
-*로지스틱 회귀는 선형 점수를 먼저 만들고, 이를 확률로 바꾼 뒤 임계값으로 최종 클래스를 정합니다.*
 
 ## 핵심 용어
 
@@ -157,17 +159,29 @@ for t in [0.3, 0.5, 0.7]:
 
 다음 글에서는 비선형 모델의 대표 예시인 Decision Tree와 Random Forest를 살펴보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **0 또는 1을 예측하는데 왜 이름은 회귀일까요?**
+  - 본문의 기준은 Logistic Regression를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **시그모이드는 선형 점수를 어떻게 확률로 바꿀까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **왜 0.5 임계값을 항상 정답처럼 쓰면 안 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
-- [지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
+## 시리즈 목차
+
+- [Machine Learning 101 (1/10): Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): 지도학습과 비지도학습](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
 - **Logistic Regression (현재 글)**
 - Decision Tree와 Random Forest (예정)
 - Clustering (예정)
 - Overfitting과 Regularization (예정)
 - Model Evaluation (예정)
 - ML 프로젝트 전체 흐름 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

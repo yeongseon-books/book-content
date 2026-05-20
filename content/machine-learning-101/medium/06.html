@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Decision Tree and Random Forest</title>
+<title>Machine Learning 101 (6/10): Decision Tree and Random Forest</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Decision Tree and Random Forest</h1>
+<h1>Machine Learning 101 (6/10): Decision Tree and Random Forest</h1>
 <p>On tabular data, a stack of well-chosen <code>if-else</code> rules often beats more fashionable models. That feels counterintuitive until you remember what trees do well: they capture nonlinear structure, handle mixed feature behavior naturally, and produce a baseline that is hard to embarrass.</p>
 <p>This is post 6 in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How does a decision tree split the feature space?</li>
 <li>What do Gini and entropy actually measure?</li>
 <li>Why does a single deep tree overfit so quickly?</li>
-<li>What does bagging fix when we move to a random forest?</li>
-<li>How far can you trust feature importance numbers?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 6 flow overview</em></p>
+<p>This picture places Decision Tree and Random Forest inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A decision tree is an interpretable nonlinear model. A random forest is what you get when you collect many such trees and trade their individual volatility for a sturdier ensemble.</p>
+<p>The core of Decision Tree and Random Forest is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Random forests and gradient-boosted trees still dominate tabular data. They belong in every baseline before you reach for deep learning.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A single deep tree can overfit quickly, while a random forest reduces that variance by averaging many differently sampled trees.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Split</strong>: separates data using a feature and threshold.</li>
@@ -153,12 +153,22 @@ print(&quot;top:&quot;, order)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Trees and forests are the workhorse of tabular ML. Next we explore unsupervised learning through clustering.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
+<li><strong>How does a decision tree split the feature space?</strong></li>
+<li>The article treats Decision Tree and Random Forest as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What do Gini and entropy actually measure?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does a single deep tree overfit so quickly?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Machine Learning 101 (3/10): Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Machine Learning 101 (4/10): Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Machine Learning 101 (5/10): Logistic Regression</a></li>
 <li><strong>Decision Tree and Random Forest (current)</strong></li>
 <li>Clustering (upcoming)</li>
 <li>Overfitting and Regularization (upcoming)</li>

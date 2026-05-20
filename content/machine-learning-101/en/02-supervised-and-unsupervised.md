@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 2
-title: Supervised and Unsupervised Learning
+title: "Machine Learning 101 (2/10): Supervised and Unsupervised Learning"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: When to use supervised vs unsupervised learning, the difference
 last_reviewed: '2026-05-15'
 ---
 
-# Supervised and Unsupervised Learning
+# Machine Learning 101 (2/10): Supervised and Unsupervised Learning
 
 Most beginner ML mistakes are not model mistakes. They are framing mistakes. Teams jump into logistic regression or KMeans before agreeing on the more important question: do we have labels, do we need a numeric prediction, or are we only trying to surface structure in the data?
 
 This is post 2 in the Machine Learning 101 series. Here we will separate supervised learning from unsupervised learning and use that split to clarify where classification, regression, and clustering actually belong.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - When labels are present versus absent, do we reach for the same algorithms?
 - How do classification and regression differ if both are supervised learning?
 - Why is clustering not just “classification without labels”?
-- What should you do when only part of the dataset is labeled?
-- Which framing checks belong at the beginning of the project?
 
-> Supervised learning fits a function from `(X, y)` pairs, while unsupervised learning discovers structure from `X` alone. Even under the same machine learning umbrella, once the starting question changes, the evaluation method and success criteria change with it.
+## Big Picture
+
+![machine learning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 2 flow overview*
+
+This picture places Supervised and Unsupervised Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Supervised and Unsupervised Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
-
-*The first branch in the workflow is whether labels exist; that choice determines whether you are predicting targets or discovering structure.*
 
 ## Key Terms
 
@@ -151,8 +153,19 @@ Spam and fraud rely on classification, pricing and demand forecasting on regress
 
 Picking the paradigm sets the ceiling on model performance. Next, we measure generalization with train/test splits.
 
+## Answering the Opening Questions
+
+- **When labels are present versus absent, do we reach for the same algorithms?**
+  - The article treats Supervised and Unsupervised Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do classification and regression differ if both are supervised learning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is clustering not just “classification without labels”?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
 - **Supervised and Unsupervised Learning (current)**
 - Train/Test Split (upcoming)
 - Linear Regression (upcoming)
@@ -162,6 +175,7 @@ Picking the paradigm sets the ceiling on model performance. Next, we measure gen
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

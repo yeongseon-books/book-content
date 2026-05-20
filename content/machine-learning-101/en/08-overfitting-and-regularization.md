@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 8
-title: Overfitting and Regularization
+title: "Machine Learning 101 (8/10): Overfitting and Regularization"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: How to spot overfitting versus underfitting, the bias-variance 
 last_reviewed: '2026-05-15'
 ---
 
-# Overfitting and Regularization
+# Machine Learning 101 (8/10): Overfitting and Regularization
 
 When the train score soars and the test score collapses, “the model is smart” is usually the wrong interpretation. More often, the model found ways to memorize noise, shortcut the split, or overreact to feature quirks that do not survive new data.
 
 This is post 8 in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Which signals separate overfitting from underfitting?
 - What does the bias-variance trade-off actually mean in practice?
 - How do Ridge, Lasso, and ElasticNet differ?
-- What can learning curves tell you that one score cannot?
-- Which regularization mistakes show up first in beginner workflows?
 
-> Overfitting means the model has memorized noise. Regularization is the mechanism that reduces model freedom so it can recover generalization.
+## Big Picture
+
+![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 8 flow overview*
+
+This picture places Overfitting and Regularization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Overfitting and Regularization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Half of every model improvement is regularization. The more capacity a model has, the more regularization keeps it alive.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
-
-*Too little capacity underfits, too much capacity overfits, and regularization helps move the model back toward a generalizing middle ground.*
 
 ## Key Terms
 
@@ -157,17 +159,29 @@ Ad CTR, search ranking, and genomics rely on Lasso and ElasticNet for feature se
 
 Regularization is a core lever for generalization. Next, we cover proper model evaluation.
 
+## Answering the Opening Questions
+
+- **Which signals separate overfitting from underfitting?**
+  - The article treats Overfitting and Regularization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does the bias-variance trade-off actually mean in practice?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do Ridge, Lasso, and ElasticNet differ?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
-- [Logistic Regression](./05-logistic-regression.md)
-- [Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
-- [Clustering](./07-clustering.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
+- [Machine Learning 101 (5/10): Logistic Regression](./05-logistic-regression.md)
+- [Machine Learning 101 (6/10): Decision Tree and Random Forest](./06-decision-tree-and-random-forest.md)
+- [Machine Learning 101 (7/10): Clustering](./07-clustering.md)
 - **Overfitting and Regularization (current)**
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

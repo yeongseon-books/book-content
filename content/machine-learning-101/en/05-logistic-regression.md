@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 5
-title: Logistic Regression
+title: "Machine Learning 101 (5/10): Logistic Regression"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: How logistic regression turns linear scores into probabilities,
 last_reviewed: '2026-05-15'
 ---
 
-# Logistic Regression
+# Machine Learning 101 (5/10): Logistic Regression
 
 Beginner confusion around logistic regression is healthy because the name really is misleading at first glance. It predicts classes in practice, but it does that by assigning probabilities first. The probability layer is where the useful operational decisions live.
 
 This is post 5 in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - If the output is 0 or 1, why is the model called regression?
 - How does the sigmoid turn a linear score into a probability?
 - Why is `0.5` only a default threshold, not a law?
-- What do precision, recall, and F1 tell you that accuracy cannot?
-- How should you think about the multiclass extension?
 
-> Logistic regression predicts a continuous probability first, then turns that probability into a class with a threshold. Once you see a classifier as a probability engine instead of a scoreboard, the downstream decision rules start to make sense.
+## Big Picture
+
+![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 5 flow overview*
+
+This picture places Logistic Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Logistic Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
-
-*Logistic regression turns a linear score into a probability, then turns that probability into a class decision with a threshold.*
 
 ## Key Terms
 
@@ -153,17 +155,29 @@ Spam filtering, fraud detection, and churn modeling all rely on probability outp
 
 Logistic regression is the foundation of classification. Next, we cover decision trees and random forests for nonlinear modeling.
 
+## Answering the Opening Questions
+
+- **If the output is 0 or 1, why is the model called regression?**
+  - The article treats Logistic Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the sigmoid turn a linear score into a probability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is `0.5` only a default threshold, not a law?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Machine Learning?](./01-what-is-machine-learning.md)
-- [Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
-- [Train/Test Split](./03-train-test-split.md)
-- [Linear Regression](./04-linear-regression.md)
+## In this series
+
+- [Machine Learning 101 (1/10): What Is Machine Learning?](./01-what-is-machine-learning.md)
+- [Machine Learning 101 (2/10): Supervised and Unsupervised Learning](./02-supervised-and-unsupervised.md)
+- [Machine Learning 101 (3/10): Train/Test Split](./03-train-test-split.md)
+- [Machine Learning 101 (4/10): Linear Regression](./04-linear-regression.md)
 - **Logistic Regression (current)**
 - Decision Tree and Random Forest (upcoming)
 - Clustering (upcoming)
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

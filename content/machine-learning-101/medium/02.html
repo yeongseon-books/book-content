@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Supervised and Unsupervised Learning</title>
+<title>Machine Learning 101 (2/10): Supervised and Unsupervised Learning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Supervised and Unsupervised Learning</h1>
+<h1>Machine Learning 101 (2/10): Supervised and Unsupervised Learning</h1>
 <p>Most beginner ML mistakes are not model mistakes. They are framing mistakes. Teams jump into logistic regression or KMeans before agreeing on the more important question: do we have labels, do we need a numeric prediction, or are we only trying to surface structure in the data?</p>
 <p>This is post 2 in the Machine Learning 101 series. Here we will separate supervised learning from unsupervised learning and use that split to clarify where classification, regression, and clustering actually belong.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When labels are present versus absent, do we reach for the same algorithms?</li>
 <li>How do classification and regression differ if both are supervised learning?</li>
 <li>Why is clustering not just “classification without labels”?</li>
-<li>What should you do when only part of the dataset is labeled?</li>
-<li>Which framing checks belong at the beginning of the project?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 2 flow overview</em></p>
+<p>This picture places Supervised and Unsupervised Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Supervised learning fits a function from <code>(X, y)</code> pairs, while unsupervised learning discovers structure from <code>X</code> alone. Even under the same machine learning umbrella, once the starting question changes, the evaluation method and success criteria change with it.</p>
+<p>The core of Supervised and Unsupervised Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>The first branch in the workflow is whether labels exist; that choice determines whether you are predicting targets or discovering structure.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Supervised learning</strong>: learn a function from <code>(X, y)</code> pairs.</li>
@@ -153,8 +153,18 @@ print(&quot;inertia:&quot;, km.inertia_)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Picking the paradigm sets the ceiling on model performance. Next, we measure generalization with train/test splits.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><strong>When labels are present versus absent, do we reach for the same algorithms?</strong></li>
+<li>The article treats Supervised and Unsupervised Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do classification and regression differ if both are supervised learning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is clustering not just “classification without labels”?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
 <li><strong>Supervised and Unsupervised Learning (current)</strong></li>
 <li>Train/Test Split (upcoming)</li>
 <li>Linear Regression (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Clustering</title>
+<title>Machine Learning 101 (7/10): Clustering</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Clustering</h1>
+<h1>Machine Learning 101 (7/10): Clustering</h1>
 <p>Clustering feels less certain than classification because there is no answer sheet waiting in the test set. That uncertainty is exactly why teams misuse it. A clean-looking cluster plot can tempt you into believing you discovered truth when you may only have discovered the geometry created by scaling choices.</p>
 <p>This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Without labels, how do you judge whether the clusters are any good?</li>
 <li>When should you prefer KMeans over DBSCAN?</li>
 <li>How do you choose <code>K</code> without pretending the metric picks it for you?</li>
-<li>Why does standardization change the result so dramatically?</li>
-<li>Why should cluster labels be treated as hypotheses rather than truth?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 7 flow overview</em></p>
+<p>This picture places Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Clustering exposes the latent structure in data through similarity. But validation does not end with a metric; the result only becomes meaningful when the numbers and the interpretation agree.</p>
+<p>The core of Clustering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Once the inputs are standardized, KMeans and DBSCAN expose different kinds of structure: centroid-based groups versus density-based regions.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>KMeans</strong>: K centroids minimizing within-cluster distance.</li>
@@ -154,13 +154,23 @@ print(&quot;labels:&quot;, set(db.labels_))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Clustering exposes hidden structure. Next, we examine overfitting and regularization, the limits of model fitting.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
+<li><strong>Without labels, how do you judge whether the clusters are any good?</strong></li>
+<li>The article treats Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you prefer KMeans over DBSCAN?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do you choose <code>K</code> without pretending the metric picks it for you?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Machine Learning 101 (3/10): Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Machine Learning 101 (4/10): Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Machine Learning 101 (5/10): Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Machine Learning 101 (6/10): Decision Tree and Random Forest</a></li>
 <li><strong>Clustering (current)</strong></li>
 <li>Overfitting and Regularization (upcoming)</li>
 <li>Model Evaluation (upcoming)</li>

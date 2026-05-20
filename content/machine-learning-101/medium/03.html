@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Train/Test Split</title>
+<title>Machine Learning 101 (3/10): Train/Test Split</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Train/Test Split</h1>
+<h1>Machine Learning 101 (3/10): Train/Test Split</h1>
 <p>A model can brag about 99% training accuracy and still be useless the moment it sees live traffic. That gap is not a minor detail. It is the core reason ML teams separate fitting from evaluation and guard the test set so aggressively.</p>
 <p>This is post 3 in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What do the train, validation, and test sets each protect?</li>
 <li>Why should <code>random_state</code> be fixed even in small experiments?</li>
 <li>How does <code>stratify</code> help on imbalanced classes?</li>
-<li>When does K-fold cross-validation add signal over a single split?</li>
-<li>Which leakage patterns usually show up before model tuning even begins?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 3 flow overview</em></p>
+<p>This picture places Train/Test Split inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A train/test split is not just cutting the data in two. It is the minimum experimental setup for measuring how the model behaves on data it has not seen yet.</p>
+<p>The core of Train/Test Split is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Separating training, tuning, and final evaluation is what lets you measure generalization instead of self-confirmation.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Train</strong>: data used for fitting the model.</li>
@@ -152,9 +152,19 @@ print(cross_val_score(model, X, y, cv=5).mean())
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A correct split is the prerequisite for every measurement that follows. Next, we cover linear regression as the foundation of supervised learning.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
+<li><strong>What do the train, validation, and test sets each protect?</strong></li>
+<li>The article treats Train/Test Split as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why should <code>random_state</code> be fixed even in small experiments?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does <code>stratify</code> help on imbalanced classes?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
 <li><strong>Train/Test Split (current)</strong></li>
 <li>Linear Regression (upcoming)</li>
 <li>Logistic Regression (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Model Evaluation</title>
+<title>Machine Learning 101 (9/10): Model Evaluation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>Model Evaluation</h1>
+<h1>Machine Learning 101 (9/10): Model Evaluation</h1>
 <p>“Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.</p>
 <p>This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Which metrics belong to classification versus regression?</li>
 <li>What does each cell of the confusion matrix tell you operationally?</li>
 <li>When should PR outrank ROC in your analysis?</li>
-<li>Why do MAE, RMSE, and <code>R^2</code> answer different questions?</li>
-<li>Which evaluation mistakes quietly leak into model selection?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 9 flow overview</em></p>
+<p>This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Model evaluation is a procedure you prove with code. One lesson here is that choosing the metric comes before choosing the model.</p>
+<p>The core of Model Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>Predicted classes feed confusion-matrix metrics, while probability outputs support threshold-free views such as ROC-AUC and PR-AUC.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>TP / FP / FN / TN</strong>: the four quadrants of the confusion matrix.</li>
@@ -160,15 +160,25 @@ print(&quot;R^2:&quot;, r2_score(yt, yp))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Evaluation is the language of model selection. Next, we close the series with the end-to-end ML project workflow.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Clustering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Overfitting and Regularization</a></li>
+<li><strong>Which metrics belong to classification versus regression?</strong></li>
+<li>The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does each cell of the confusion matrix tell you operationally?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When should PR outrank ROC in your analysis?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Machine Learning 101 (3/10): Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Machine Learning 101 (4/10): Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Machine Learning 101 (5/10): Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Machine Learning 101 (6/10): Decision Tree and Random Forest</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Machine Learning 101 (7/10): Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Machine Learning 101 (8/10): Overfitting and Regularization</a></li>
 <li><strong>Model Evaluation (current)</strong></li>
 <li>The ML Project Workflow (upcoming)</li>
 </ul>

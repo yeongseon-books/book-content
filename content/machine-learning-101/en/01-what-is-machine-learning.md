@@ -1,7 +1,7 @@
 ---
 series: machine-learning-101
 episode: 1
-title: What Is Machine Learning?
+title: "Machine Learning 101 (1/10): What Is Machine Learning?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,31 +20,33 @@ seo_description: A clear intro to machine learning — what learning, generaliza
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Machine Learning?
+# Machine Learning 101 (1/10): What Is Machine Learning?
 
 Recommendation systems, fraud filters, and medical triage tools all get called “machine learning,” but that label hides the real operating question. Are you writing smarter rules, doing statistics with a new library, or building a system that learns a reusable function from data? If that distinction stays fuzzy, every later discussion about models, metrics, and deployment turns into memorizing API names.
 
 This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What exactly is the model learning when we say “machine learning”?
 - Why is generalization different from scoring well on the training set?
 - Where does machine learning diverge from statistics and rule-based code?
-- What do `fit`, `predict`, and `score` really mean in scikit-learn?
-- Which beginner mistakes break this mental model first?
 
-> The core of machine learning is not the model name. The starting point is to first build the operating picture in your head: learn a function `f` from data, then apply that function to inputs it has never seen.
+## Big Picture
+
+![machine learning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
+
+*machine learning 101 chapter 1 flow overview*
+
+This picture places What Is Machine Learning? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Machine Learning? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
 Recommendation, medicine, finance, autonomous driving — *every industry* is being *reshaped* by ML. Weak fundamentals make *every model collapse* later.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
-
-*Machine learning starts by fitting a function on data, then reuses that function on inputs the model has never seen before.*
 
 ## Key Terms
 
@@ -146,7 +148,18 @@ Recommendation, fraud detection, demand forecasting, image recognition, NLP chat
 
 ML is *a function learned from data*. Next we cover *supervised vs unsupervised learning*.
 
+## Answering the Opening Questions
+
+- **What exactly is the model learning when we say “machine learning”?**
+  - The article treats What Is Machine Learning? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is generalization different from scoring well on the training set?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does machine learning diverge from statistics and rule-based code?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Machine Learning? (current)**
 - Supervised and Unsupervised Learning (upcoming)
 - Train/Test Split (upcoming)
@@ -157,6 +170,7 @@ ML is *a function learned from data*. Next we cover *supervised vs unsupervised 
 - Overfitting and Regularization (upcoming)
 - Model Evaluation (upcoming)
 - The ML Project Workflow (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The ML Project Workflow</title>
+<title>Machine Learning 101 (10/10): The ML Project Workflow</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,25 +53,25 @@
 </style>
 </head>
 <body>
-<h1>The ML Project Workflow</h1>
+<h1>Machine Learning 101 (10/10): The ML Project Workflow</h1>
 <p>Many ML projects die after the notebook victory lap. The score looked good, the demo worked, and then the real system exposed everything the notebook had hidden: missing reproducibility, scattered preprocessing, undefined monitoring, and no clear path from experiment to deployment.</p>
 <p>This is the final post in the Machine Learning 101 series. Here we will connect problem framing, data preparation, modeling, evaluation, deployment, and monitoring into one workflow so the model score becomes only one checkpoint in a larger loop.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do so many ML projects fail even after promising offline scores?</li>
 <li>Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?</li>
 <li>How does <code>Pipeline</code> protect you from preprocessing leakage?</li>
-<li>Why do reproducibility and model cards matter after the experiment phase?</li>
-<li>Why is monitoring the beginning of operations rather than the end of modeling?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="machine learning 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>machine learning 101 chapter 10 flow overview</em></p>
+<p>This picture places The ML Project Workflow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>ML success does not come from maximizing a score alone. Real success means completing the loop from problem definition through monitoring.</p>
+<p>The core of The ML Project Workflow is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>A 0.95 score in a notebook is worth zero if the model never reaches users. Owning the full loop is what creates impact.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>An ML project is a loop, not a notebook milestone: problem framing, data, modeling, deployment, and monitoring all feed back into each other.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Pipeline</strong>: a single object combining preprocessing and model.</li>
@@ -160,16 +160,26 @@ print(&quot;drifted:&quot;, loaded.score(fresh, yte))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Congratulations — you finished Machine Learning 101. Continue with Model Evaluation 101 and MLOps 101 for deeper material.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Clustering</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Overfitting and Regularization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/09-model-evaluation.md">Model Evaluation</a></li>
+<li><strong>Why do so many ML projects fail even after promising offline scores?</strong></li>
+<li>The article treats The ML Project Workflow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does <code>Pipeline</code> protect you from preprocessing leakage?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">Machine Learning 101 (1/10): What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Machine Learning 101 (2/10): Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Machine Learning 101 (3/10): Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Machine Learning 101 (4/10): Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Machine Learning 101 (5/10): Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Machine Learning 101 (6/10): Decision Tree and Random Forest</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Machine Learning 101 (7/10): Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Machine Learning 101 (8/10): Overfitting and Regularization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/09-model-evaluation.md">Machine Learning 101 (9/10): Model Evaluation</a></li>
 <li><strong>The ML Project Workflow (current)</strong></li>
 </ul>
 <h2>References</h2>
