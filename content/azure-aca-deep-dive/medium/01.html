@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>ACA architecture — what Microsoft layered on a hidden Kubernetes</title>
+<title>Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>ACA architecture — what Microsoft layered on a hidden Kubernetes</h1>
+<h1>Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes</h1>
 <p>The public story for Azure Container Apps is intentionally simple. You push a container, turn on ingress, Dapr, or scale rules, and Microsoft runs the platform.</p>
 <p>That simplicity is useful, but it also makes the internals easy to blur together. Container Apps is not a raw Kubernetes service, and it is not just AKS with nicer defaults either.</p>
 <p>This is the first post in the Azure Container Apps Deep Dive series. Here, I start with the full map of what Azure Container Apps adds on top of Microsoft-managed Kubernetes.</p>
@@ -69,22 +69,24 @@
 <li><strong>Inferred from upstream behavior</strong>: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.</li>
 <li><strong>Out of bounds</strong>: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.</li>
 </ul>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What abstractions does ACA stack on top of which abstractions, exactly?</li>
 <li>Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?</li>
 <li>ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?</li>
-<li>If the control plane fails, what does your app look like, and how does it recover?</li>
-<li>Inside one environment, where does isolation end and where does it leak?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps deep dive chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png"></p>
+<p><em>azure container apps deep dive chapter 1 flow overview</em></p>
+<p>This picture places ACA architecture — what Microsoft layered on a hidden Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of ACA architecture — what Microsoft layered on a hidden Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The big picture — one Container Apps environment</h2>
 <p>This is the map for the whole series.<br>
 Every later post expands one box from this picture.<br>
 Get the shape first, then the platform behaviors stop looking like isolated features.</p>
-<p><img alt="Request path and hidden substrate layers" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png"></p>
-<p><em>Request path and hidden substrate layers</em><br>
-The left edge is the user-facing path.<br>
+<p>The left edge is the user-facing path.<br>
 The middle is the runtime surface you configure as Container Apps.<br>
 The dotted boundary is the Kubernetes layer you do not directly control.<br>
 The right edge is where images and telemetry leave the request path.</p>
@@ -311,14 +313,23 @@ az containerapp env workload-profile list \
 <li>[ ] Confirmed the upgrade policy for managed components (KEDA, Dapr, Envoy)</li>
 <li>[ ] Catalogued changes that require environment recreation (VNet, log workspace)</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What abstractions does ACA stack on top of which abstractions, exactly?</strong></li>
+<li>The article treats ACA architecture — what Microsoft layered on a hidden Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>ACA architecture — what Microsoft layered on a hidden Kubernetes (current)</strong></li>
-<li>Environment internals — the network, observability, and Dapr scope boundary (upcoming)</li>
-<li>Revisions and traffic splitting — where Envoy weights come from (upcoming)</li>
-<li>KEDA inside ACA — what a scale rule actually creates (upcoming)</li>
-<li>Dapr sidecar internals — the Go process that lives next to your container (upcoming)</li>
-<li>The Envoy ingress path — how the first request reaches your container (upcoming)</li>
+<li><strong>Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes (current)</strong></li>
+<li>Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary (upcoming)</li>
+<li>Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from (upcoming)</li>
+<li>Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (upcoming)</li>
+<li>Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)</li>
+<li>Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

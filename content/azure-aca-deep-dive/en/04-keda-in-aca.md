@@ -16,10 +16,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: KEDA inside ACA — what a scale rule actually creates
+title: "Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates"
 ---
 
-# KEDA inside ACA — what a scale rule actually creates
+# Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates
 
 At the product surface, scaling in Azure Container Apps is only a handful of fields. You set `minReplicas`, set `maxReplicas`, add an HTTP, TCP, or custom rule, and the platform handles the rest.
 
@@ -42,15 +42,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: those rules most likely materialize as KEDA/HPA-style control loops behind the service boundary.
 - **Out of bounds**: the exact managed KEDA deployment shape and private wiring Microsoft uses inside ACA.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What is the same and what is restricted between ACA's KEDA and stock KEDA?
 - Where is the boundary between triggers that scale to zero and triggers that cannot?
 - How do polling interval, cooldown, and max replicas trade cost against latency?
-- When multiple scalers attach to one app, how is priority resolved?
-- Where can you verify KEDA scaler metrics, and what do you suspect when they vanish?
+
+## Big Picture
+
+![azure container apps deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
+
+*azure container apps deep dive chapter 4 flow overview*
+
+This picture places KEDA inside ACA — what a scale rule actually creates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of KEDA inside ACA — what a scale rule actually creates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The short version: a scale rule is not the scaler itself
 
@@ -61,9 +67,6 @@ The platform has to translate that rule into something KEDA can reconcile.
 
 The right mental model is this.
 
-![ACA rule to hidden scaler object mapping](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
-
-*ACA rule to hidden scaler object mapping*
 You never see the hidden object directly.
 You still need to understand it, because the behavior you observe is downstream of that translation.
 
@@ -394,15 +397,24 @@ This is the quickest hands-on proof that scaling belongs to immutable revision s
 - [ ] Documented priority and aggregation when stacking multiple scalers
 - [ ] Monitor consistency between KEDA metrics and actual replica count
 
+## Answering the Opening Questions
+
+- **What is the same and what is restricted between ACA's KEDA and stock KEDA?**
+  - The article treats KEDA inside ACA — what a scale rule actually creates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where is the boundary between triggers that scale to zero and triggers that cannot?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do polling interval, cooldown, and max replicas trade cost against latency?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
-- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
-- **KEDA inside ACA — what a scale rule actually creates (current)**
-- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- **Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (current)**
+- Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

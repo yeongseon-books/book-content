@@ -16,10 +16,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: The Envoy ingress path — how the first request reaches your container
+title: "Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container"
 ---
 
-# The Envoy ingress path — how the first request reaches your container
+# Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container
 
 The public story for ingress in Azure Container Apps is concise. Enable ingress, get an FQDN, receive HTTPS traffic, and optionally split traffic across revisions.
 
@@ -42,24 +42,27 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: Envoy-style routing and Kubernetes-style service hops from ingress state to ready revision replicas.
 - **Out of bounds**: the exact private 0 -> 1 request path, buffering behavior, and hidden ingress control-plane topology.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Is ACA's ingress just one layer of Envoy, or is there another proxy on top?
 - How does the same hostname split between external and internal ingress?
 - Where does TLS terminate, and how is mTLS to the backend actually guaranteed?
-- Where do header rewriting, sticky sessions, and websockets each unlock or hit a wall?
-- What do 5xx codes at the ingress mean, and which metric flags them first?
+
+## Big Picture
+
+![azure container apps deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
+
+*azure container apps deep dive chapter 6 flow overview*
+
+This picture places The Envoy ingress path — how the first request reaches your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Envoy ingress path — how the first request reaches your container is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Start with the full path, not with the app
 
 The first mistake in ingress debugging is to start at the user container.
 The request has already crossed several platform layers before that point.
 
-![End-to-end ingress path to the pod](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
-
-*End-to-end ingress path to the pod*
 If you keep this order in your head, ingress incidents become easier to localize.
 
 - No connection at all may be outside the pod entirely.
@@ -367,15 +370,24 @@ az containerapp hostname list -n my-app -g my-rg -o table
 - [ ] Separated alerts for ingress 5xx rate and p95 latency
 - [ ] Simulated traffic-split behaviour when backend health checks fail
 
+## Answering the Opening Questions
+
+- **Is ACA's ingress just one layer of Envoy, or is there another proxy on top?**
+  - The article treats The Envoy ingress path — how the first request reaches your container as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does the same hostname split between external and internal ingress?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does TLS terminate, and how is mTLS to the backend actually guaranteed?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
-- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
-- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
-- [Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
-- **The Envoy ingress path — how the first request reaches your container (current)**
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- [Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+- [Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container](./05-dapr-sidecar-internals.md)
+- **Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (current)**
 
 <!-- toc:end -->
 

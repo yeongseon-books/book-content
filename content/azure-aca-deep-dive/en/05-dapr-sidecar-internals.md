@@ -16,10 +16,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Dapr sidecar internals — the Go process that lives next to your container
+title: "Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container"
 ---
 
-# Dapr sidecar internals — the Go process that lives next to your container
+# Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container
 
 When you first enable Dapr in Azure Container Apps, the feature looks deceptively light. You check a box or fill in a few fields, an app ID appears, and your service suddenly starts talking to localhost on port 3500 or 50001.
 
@@ -42,15 +42,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: sidecar injection details, port behavior, and mTLS/control-plane plumbing follow upstream Dapr patterns unless ACA documents otherwise.
 - **Out of bounds**: ACA-specific webhook internals, hidden cert distribution details, and private runtime arguments Microsoft does not publish.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What lifecycle does the Dapr sidecar have in ACA, and how does it stay in sync with the app container?
 - Service invocation gives you mTLS, retry, and timeout 'for free' — where does the bill actually land?
 - Are state-store and pub/sub component definitions environment-scoped or app-scoped?
-- How does traceability differ between calling the Dapr API directly versus via the SDK?
-- If Dapr dies or slows down, how is the app container's readiness signalled?
+
+## Big Picture
+
+![azure container apps deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
+
+*azure container apps deep dive chapter 5 flow overview*
+
+This picture places Dapr sidecar internals — the Go process that lives next to your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Dapr sidecar internals — the Go process that lives next to your container is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The shortest accurate sentence
 
@@ -63,9 +69,6 @@ Second, enabling Dapr is not merely adding metadata to your app.
 
 It changes the pod shape.
 
-![Local app calls and outward sidecar calls](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
-
-*Local app calls and outward sidecar calls*
 The app talks locally.
 The sidecar talks outward.
 That is the basic contract.
@@ -426,15 +429,24 @@ az containerapp env dapr-component set \
 - [ ] Wired Dapr traces into Application Insights
 - [ ] Defined a fallback path (direct call, queue bypass) when Dapr fails
 
+## Answering the Opening Questions
+
+- **What lifecycle does the Dapr sidecar have in ACA, and how does it stay in sync with the app container?**
+  - The article treats Dapr sidecar internals — the Go process that lives next to your container as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Service invocation gives you mTLS, retry, and timeout 'for free' — where does the bill actually land?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Are state-store and pub/sub component definitions environment-scoped or app-scoped?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
-- [Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
-- [KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
-- **Dapr sidecar internals — the Go process that lives next to your container (current)**
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- [Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from](./03-revision-and-traffic-split.md)
+- [Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates](./04-keda-in-aca.md)
+- **Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (current)**
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

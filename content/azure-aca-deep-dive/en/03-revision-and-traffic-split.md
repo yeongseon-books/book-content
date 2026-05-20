@@ -16,10 +16,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Revisions and traffic splitting — where Envoy weights come from
+title: "Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from"
 ---
 
-# Revisions and traffic splitting — where Envoy weights come from
+# Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from
 
 Azure Container Apps makes rollout mechanics look gentler than they are. You update an image, ACA creates a revision, you move some percentage of traffic, and the app keeps serving.
 
@@ -42,15 +42,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: those weights most plausibly become Envoy-style weighted upstream routing rules.
 - **Out of bounds**: the exact private config objects ACA generates to express revision routing internally.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Revisions are immutable — exactly which field changes spawn a new revision?
 - Where in the ingress layer does traffic split happen, and can it be session-sticky?
 - Where does the cap on simultaneously active revisions come from, and why that number?
-- What is the safest blue/green and canary recipe in ACA, command by command?
-- Is rolling back to 100% on the old revision really enough?
+
+## Big Picture
+
+![azure container apps deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
+
+*azure container apps deep dive chapter 3 flow overview*
+
+This picture places Revisions and traffic splitting — where Envoy weights come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Revisions and traffic splitting — where Envoy weights come from is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## A revision is an immutable runtime snapshot
 
@@ -62,9 +68,6 @@ That one sentence is the operational heart of ACA.
 It means the running unit you shift traffic to is not a mutable deployment slot.
 It is a distinct snapshot produced from a specific revision-scope template.
 
-![Immutable revision snapshots as traffic targets](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
-
-*Immutable revision snapshots as traffic targets*
 This explains several product behaviors that otherwise look unrelated.
 
 - Changing the image creates a new revision.
@@ -410,15 +413,24 @@ This chapter intentionally separates ACA product facts from the hidden routing i
 - [ ] Defined canary stage percentages plus auto-promote/rollback criteria
 - [ ] Cross-checked rollback against downstream compatibility (DB schema, queued messages)
 
+## Answering the Opening Questions
+
+- **Revisions are immutable — exactly which field changes spawn a new revision?**
+  - The article treats Revisions and traffic splitting — where Envoy weights come from as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Where in the ingress layer does traffic split happen, and can it be session-sticky?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does the cap on simultaneously active revisions come from, and why that number?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- [Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
-- **Revisions and traffic splitting — where Envoy weights come from (current)**
-- KEDA inside ACA — what a scale rule actually creates (upcoming)
-- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- [Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary](./02-environment-internals.md)
+- **Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from (current)**
+- Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (upcoming)
+- Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

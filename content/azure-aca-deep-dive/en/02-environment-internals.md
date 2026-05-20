@@ -17,10 +17,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: Environment internals — the network, observability, and Dapr scope boundary
+title: "Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary"
 ---
 
-# Environment internals — the network, observability, and Dapr scope boundary
+# Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary
 
 Episode 1 drew the stack. This episode narrows the focus to one resource that looks administrative from the outside and architectural from the inside: the Container Apps environment.
 
@@ -43,15 +43,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: how those documented boundaries most likely map onto runtime isolation and sidecar scoping.
 - **Out of bounds**: the exact private cluster layout and non-public control-plane implementation inside an ACA environment.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How does a managed environment map internally to node pools and namespaces?
 - Can you explain how many IPs the infrastructure subnet needs, and exactly why?
 - If you swap the Log Analytics workspace, who breaks and what falls silent?
-- How does a workload profile change not just pricing but the isolation model?
-- What is an environment-level outbound IP, and how do you advertise it to external systems?
+
+## Big Picture
+
+![azure container apps deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png)
+
+*azure container apps deep dive chapter 2 flow overview*
+
+This picture places Environment internals — the network, observability, and Dapr scope boundary inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Environment internals — the network, observability, and Dapr scope boundary is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The environment is the platform's isolation unit
 
@@ -67,9 +73,6 @@ Apps inside the same environment can share:
 
 Apps outside the environment do not automatically share those things.
 
-![Environment-scoped isolation and shared planes](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png)
-
-*Environment-scoped isolation and shared planes*
 The operational consequence is straightforward.
 If two apps belong to the same blast radius and observability plane, one environment can make sense.
 If they require hard separation of network, logging, or Dapr configuration, split them.
@@ -377,15 +380,24 @@ That table is a fast reality check against the most common mistake in ACA archit
 - [ ] Tabulated cost vs isolation trade-offs across workload profiles
 - [ ] Aligned the internal/external ingress decision with the DNS strategy
 
+## Answering the Opening Questions
+
+- **How does a managed environment map internally to node pools and namespaces?**
+  - The article treats Environment internals — the network, observability, and Dapr scope boundary as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Can you explain how many IPs the infrastructure subnet needs, and exactly why?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **If you swap the Log Analytics workspace, who breaks and what falls silent?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
-- **Environment internals — the network, observability, and Dapr scope boundary (current)**
-- Revisions and traffic splitting — where Envoy weights come from (upcoming)
-- KEDA inside ACA — what a scale rule actually creates (upcoming)
-- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- [Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes](./01-aca-architecture.md)
+- **Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary (current)**
+- Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from (upcoming)
+- Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (upcoming)
+- Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 

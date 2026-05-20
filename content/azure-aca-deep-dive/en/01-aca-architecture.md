@@ -16,10 +16,10 @@ targets:
   medium: true
   mkdocs: true
   tistory: false
-title: ACA architecture — what Microsoft layered on a hidden Kubernetes
+title: "Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes"
 ---
 
-# ACA architecture — what Microsoft layered on a hidden Kubernetes
+# Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes
 
 The public story for Azure Container Apps is intentionally simple. You push a container, turn on ingress, Dapr, or scale rules, and Microsoft runs the platform.
 
@@ -42,15 +42,21 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.
 - **Out of bounds**: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What abstractions does ACA stack on top of which abstractions, exactly?
 - Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?
 - ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?
-- If the control plane fails, what does your app look like, and how does it recover?
-- Inside one environment, where does isolation end and where does it leak?
+
+## Big Picture
+
+![azure container apps deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
+
+*azure container apps deep dive chapter 1 flow overview*
+
+This picture places ACA architecture — what Microsoft layered on a hidden Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of ACA architecture — what Microsoft layered on a hidden Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — one Container Apps environment
 
@@ -58,9 +64,6 @@ This is the map for the whole series.
 Every later post expands one box from this picture.
 Get the shape first, then the platform behaviors stop looking like isolated features.
 
-![Request path and hidden substrate layers](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
-
-*Request path and hidden substrate layers*
 The left edge is the user-facing path.
 The middle is the runtime surface you configure as Container Apps.
 The dotted boundary is the Kubernetes layer you do not directly control.
@@ -379,15 +382,24 @@ Together, these commands turn the big-picture diagram into an operator check: en
 - [ ] Confirmed the upgrade policy for managed components (KEDA, Dapr, Envoy)
 - [ ] Catalogued changes that require environment recreation (VNet, log workspace)
 
+## Answering the Opening Questions
+
+- **What abstractions does ACA stack on top of which abstractions, exactly?**
+  - The article treats ACA architecture — what Microsoft layered on a hidden Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **ACA architecture — what Microsoft layered on a hidden Kubernetes (current)**
-- Environment internals — the network, observability, and Dapr scope boundary (upcoming)
-- Revisions and traffic splitting — where Envoy weights come from (upcoming)
-- KEDA inside ACA — what a scale rule actually creates (upcoming)
-- Dapr sidecar internals — the Go process that lives next to your container (upcoming)
-- The Envoy ingress path — how the first request reaches your container (upcoming)
+- **Azure Container Apps Deep Dive (1/6): ACA architecture — what Microsoft layered on a hidden Kubernetes (current)**
+- Azure Container Apps Deep Dive (2/6): Environment internals — the network, observability, and Dapr scope boundary (upcoming)
+- Azure Container Apps Deep Dive (3/6): Revisions and traffic splitting — where Envoy weights come from (upcoming)
+- Azure Container Apps Deep Dive (4/6): KEDA inside ACA — what a scale rule actually creates (upcoming)
+- Azure Container Apps Deep Dive (5/6): Dapr sidecar internals — the Go process that lives next to your container (upcoming)
+- Azure Container Apps Deep Dive (6/6): The Envoy ingress path — how the first request reaches your container (upcoming)
 
 <!-- toc:end -->
 
