@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Clean Code?</title>
+<title>Clean Code 101 (1/10): What Is Clean Code?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>What Is Clean Code?</h1>
+<h1>Clean Code 101 (1/10): What Is Clean Code?</h1>
 <p>Most code problems do not show up when the code first runs. They show up a few weeks later, when someone tries to change it without breaking a nearby path.</p>
 <p>This is the first post in the Clean Code 101 series.</p>
 <p>Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of clean code and four signals</li>
-<li>Working vs readable vs cheap-to-change</li>
-<li>How small principles compound</li>
-<li>The objective markers of "clean"</li>
-<li>The map of this whole series</li>
+<li>What boundary should you inspect first when applying What Is Clean Code??</li>
+<li>Which signal should the example or diagram make visible for What Is Clean Code??</li>
+<li>What failure should be prevented first when What Is Clean Code? reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Clean Code? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Clean Code? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What signals should you inspect first when deciding whether code is clean?</li>
+<li>What separates working code from readable code, and readable code from code that stays easy to change?</li>
+<li>Why do small principles create such a large difference in real maintenance cost?</li>
+<li>How far can the feeling that code is "clean" be turned into objective criteria?</li>
+<li>How does the rest of this series build on that foundation?</li>
+</ul>
+<blockquote>
+<p>Working code is the starting point. Clean code is the discipline of making the next person faster at understanding and changing it.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Code is written once and read a hundred times. Readability decides the cost of change.</p>
 <blockquote>
 <p>Clean code is the act of saving the next person's time.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="What Is Clean Code?" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Core clean-code flow: working code becomes readable code, then code that stays easy to change.</em></p>
 <p>Working is the start, trust is the end.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -182,6 +195,16 @@ ruff check app/
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Clean code is the sum of small, measurable principles. Next, we look at the single highest-leverage one — naming.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Clean Code??</strong></li>
+<li>The article treats What Is Clean Code? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Clean Code??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Clean Code? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Clean Code? (current)</strong></li>
 <li>Naming (upcoming)</li>

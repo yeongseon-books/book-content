@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 2
-title: Naming
+title: "Clean Code 101 (2/10): Naming"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Six signals of a good name, naming variables vs functions vs cl
 last_reviewed: '2026-05-15'
 ---
 
-# Naming
+# Clean Code 101 (2/10): Naming
 
 Bad names waste time before any logic is understood. A reviewer pauses at `data`, guesses what it means, and rereads the same block twice.
 
@@ -29,7 +29,21 @@ This is post 2 in the Clean Code 101 series.
 
 Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Naming?
+- Which signal should the example or diagram make visible for Naming?
+- What failure should be prevented first when Naming reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 2 flow overview*
+
+This picture places Naming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Naming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ Names are the most-read element of code. Pick a wrong one and you keep saying it
 > A searchable name is the start of maintainability.
 
 ## Concept at a Glance
-
-![Naming](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
-
-*Naming flow: once intent is visible in the name, search, reading, and documentation all get easier.*
 
 The name lifts intent into view.
 
@@ -192,8 +202,19 @@ Mature teams keep a domain glossary in the repo and enforce consistency in PRs. 
 
 Naming is the single highest-leverage readability tool. Next we shrink the unit those names point at — small functions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Naming?**
+  - The article treats Naming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Naming?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Naming reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
 - **Naming (current)**
 - Small Functions (upcoming)
 - Simplifying Conditionals (upcoming)
@@ -203,6 +224,7 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

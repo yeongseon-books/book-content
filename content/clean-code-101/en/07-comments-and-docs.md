@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 7
-title: Comments and Documentation
+title: "Clean Code 101 (7/10): Comments and Documentation"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Learn when not to comment, how to write intent comments and doc
 last_reviewed: '2026-05-15'
 ---
 
-# Comments and Documentation
+# Clean Code 101 (7/10): Comments and Documentation
 
 Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.
 
@@ -29,7 +29,21 @@ This is post 7 in the Clean Code 101 series.
 
 Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Comments and Documentation?
+- Which signal should the example or diagram make visible for Comments and Documentation?
+- What failure should be prevented first when Comments and Documentation reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 7 flow overview*
+
+This picture places Comments and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Comments and Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ Comments tend to lie. Code changes; comments rarely follow.
 > The best comment is the one you no longer need.
 
 ## Concept at a Glance
-
-![Comments and Documentation](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
-
-*Commenting flow: code should explain what, while comments and docs explain why, risk, and contract.*
 
 If something needs explaining, fix the code first.
 
@@ -217,17 +227,29 @@ Strong teams require docstrings on public APIs and allow only intent comments in
 
 Good comments are few and accurate. Next we tackle what truly decides a codebase's fate: testable code.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Comments and Documentation?**
+  - The article treats Comments and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Comments and Documentation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Comments and Documentation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
 - **Comments and Documentation (current)**
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

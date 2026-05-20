@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Naming</title>
+<title>Clean Code 101 (2/10): Naming</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Naming</h1>
+<h1>Clean Code 101 (2/10): Naming</h1>
 <p>Bad names waste time before any logic is understood. A reviewer pauses at <code>data</code>, guesses what it means, and rereads the same block twice.</p>
 <p>This is post 2 in the Clean Code 101 series.</p>
 <p>Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Six signals of a good name</li>
-<li>The differences between variable, function, and class names</li>
-<li>Bringing domain terms into code</li>
-<li>The most common naming mistakes</li>
-<li>A safe procedure for renaming</li>
+<li>What boundary should you inspect first when applying Naming?</li>
+<li>Which signal should the example or diagram make visible for Naming?</li>
+<li>What failure should be prevented first when Naming reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 2 flow overview</em></p>
+<p>This picture places Naming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Naming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What signals tell you a name is actually a good one?</li>
+<li>How should variable, function, and class names differ in the role they play?</li>
+<li>How do you bring domain language into code without making it sound forced?</li>
+<li>What naming mistakes show up again and again in real codebases?</li>
+<li>What is the safest order for a rename?</li>
+</ul>
+<blockquote>
+<p>Good names do not make code shorter. They make intent visible sooner.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Names are the most-read element of code. Pick a wrong one and you keep saying it forever.</p>
 <blockquote>
 <p>A searchable name is the start of maintainability.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Naming" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Naming flow: once intent is visible in the name, search, reading, and documentation all get easier.</em></p>
 <p>The name lifts intent into view.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -176,8 +189,18 @@ python -m pytest -q tests/test_naming_examples.py
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Naming is the single highest-leverage readability tool. Next we shrink the unit those names point at — small functions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><strong>What boundary should you inspect first when applying Naming?</strong></li>
+<li>The article treats Naming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Naming?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Naming reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
 <li><strong>Naming (current)</strong></li>
 <li>Small Functions (upcoming)</li>
 <li>Simplifying Conditionals (upcoming)</li>

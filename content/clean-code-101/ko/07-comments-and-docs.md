@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 7
-title: 주석과 문서화
+title: "Clean Code 101 (7/10): 주석과 문서화"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 코드가 스스로 설명하게 만드는 기법과 좋은 주
 last_reviewed: '2026-05-15'
 ---
 
-# 주석과 문서화
+# Clean Code 101 (7/10): 주석과 문서화
 
 주석은 친절해 보이지만, 잘못 쓰이면 가장 빨리 낡는 설명이 됩니다.
 
@@ -29,17 +29,21 @@ last_reviewed: '2026-05-15'
 
 여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 언제 주석을 쓰지 않는 편이 더 좋을까요?
 - 의도 주석과 경고 주석은 어떤 차이가 있을까요?
 - Python docstring은 어떤 규칙으로 쓰는 편이 좋을까요?
-- 공개 API는 무엇까지 문서화해야 할까요?
-- TODO와 FIXME는 어떻게 관리해야 추적 가능할까요?
 
-> 좋은 주석은 코드가 보여 줄 수 없는 "왜"만 설명하고, "무엇"은 코드 자체가 드러내게 해야 합니다.
+## 큰 그림
+
+![Clean Code 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Clean Code 101 7장 흐름 개요*
+
+이 그림에서는 주석과 문서화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 주석과 문서화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -48,10 +52,6 @@ last_reviewed: '2026-05-15'
 그렇다고 문서화가 불필요한 것은 아닙니다. 공개 API의 계약, 외부 시스템의 이상한 동작 배경, 호출자가 다칠 수 있는 경고는 코드만으로 충분히 표현되지 않는 경우가 많습니다. 핵심은 주석이 맡아야 할 역할을 좁고 분명하게 유지하는 것입니다.
 
 ## 한눈에 보는 개념
-
-![주석과 문서화](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
-
-*주석과 문서화의 흐름: 코드는 무엇을 설명하고, 주석과 문서는 왜와 계약을 설명합니다.*
 
 무언가를 설명해야 한다면, 먼저 코드를 고칠 수 있는지 보고 그다음에만 주석을 써야 합니다.
 
@@ -217,17 +217,29 @@ python -m pytest -q tests/test_public_api_docs.py
 
 좋은 주석은 적고 정확합니다. 다음 글에서는 코드베이스의 운명을 크게 좌우하는 테스트 가능성, 즉 테스트 가능한 코드를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **언제 주석을 쓰지 않는 편이 더 좋을까요?**
+  - 본문의 기준은 주석과 문서화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **의도 주석과 경고 주석은 어떤 차이가 있을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Python docstring은 어떤 규칙으로 쓰는 편이 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Clean Code란 무엇인가?](./01-what-is-clean-code.md)
-- [이름 짓기](./02-naming.md)
-- [함수 작게 만들기](./03-small-functions.md)
-- [조건문 줄이기](./04-simplifying-conditionals.md)
-- [중복 제거](./05-removing-duplication.md)
-- [오류 처리](./06-error-handling.md)
+## 시리즈 목차
+
+- [Clean Code 101 (1/10): Clean Code란 무엇인가?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): 이름 짓기](./02-naming.md)
+- [Clean Code 101 (3/10): 함수 작게 만들기](./03-small-functions.md)
+- [Clean Code 101 (4/10): 조건문 줄이기](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): 중복 제거](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): 오류 처리](./06-error-handling.md)
 - **주석과 문서화 (현재 글)**
 - 테스트 가능한 코드 (예정)
 - 리팩토링 기초 (예정)
 - 좋은 코드 리뷰 기준 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 9
-title: Refactoring Basics
+title: "Clean Code 101 (9/10): Refactoring Basics"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Apply safe refactoring steps, the Fowler catalog, characterizat
 last_reviewed: '2026-05-15'
 ---
 
-# Refactoring Basics
+# Clean Code 101 (9/10): Refactoring Basics
 
 Refactoring looks risky when it is approached as a rewrite. It becomes manageable when every step is small enough that a failing test can tell you exactly where the move went wrong.
 
@@ -29,7 +29,21 @@ This is post 9 in the Clean Code 101 series.
 
 Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Refactoring Basics?
+- Which signal should the example or diagram make visible for Refactoring Basics?
+- What failure should be prevented first when Refactoring Basics reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 9 flow overview*
+
+This picture places Refactoring Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Refactoring Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ Refactoring is not rewriting. It improves internal structure while preserving ex
 > Refactoring is an investment that lowers the cost of the next change.
 
 ## Concept at a Glance
-
-![Refactoring Basics](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
-
-*Refactoring rhythm: move from one green test state to the next through small, reversible steps.*
 
 Small steps between green and green.
 
@@ -208,17 +218,29 @@ Strong teams require a refactoring PR to be merged before each feature PR. Featu
 
 Refactoring is an investment that lowers the next change's cost. The final episode wraps the series with good code review standards.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Refactoring Basics?**
+  - The article treats Refactoring Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Refactoring Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Refactoring Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
-- [Error Handling](./06-error-handling.md)
-- [Comments and Documentation](./07-comments-and-docs.md)
-- [Testable Code](./08-testable-code.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
+- [Clean Code 101 (6/10): Error Handling](./06-error-handling.md)
+- [Clean Code 101 (7/10): Comments and Documentation](./07-comments-and-docs.md)
+- [Clean Code 101 (8/10): Testable Code](./08-testable-code.md)
 - **Refactoring Basics (current)**
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

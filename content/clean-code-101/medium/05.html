@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Removing Duplication</title>
+<title>Clean Code 101 (5/10): Removing Duplication</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Removing Duplication</h1>
+<h1>Clean Code 101 (5/10): Removing Duplication</h1>
 <p>Duplication is expensive, but wrong abstractions are expensive in a different way. The hard part is not spotting repetition. It is proving that the same knowledge really changes together.</p>
 <p>This is post 5 in the Clean Code 101 series.</p>
 <p>Here we will separate shared change reasons from accidental similarity, then verify when extraction, parameterization, or a data table actually reduces future maintenance cost.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The real meaning of DRY</li>
-<li>Coincidental versus essential duplication</li>
-<li>Extract and parameterize techniques</li>
-<li>Removing data duplication via tables</li>
-<li>The cost of premature abstraction</li>
+<li>What boundary should you inspect first when applying Removing Duplication?</li>
+<li>Which signal should the example or diagram make visible for Removing Duplication?</li>
+<li>What failure should be prevented first when Removing Duplication reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 5 flow overview</em></p>
+<p>This picture places Removing Duplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Removing Duplication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What does DRY actually mean?</li>
+<li>How do you tell accidental similarity from essential duplication?</li>
+<li>In what order should you apply extraction and parameterization?</li>
+<li>How can you move data duplication into tables?</li>
+<li>Why does premature abstraction create a more expensive form of coupling?</li>
+</ul>
+<blockquote>
+<p>Once the same knowledge starts living in two places, it eventually drifts apart.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Duplication multiplies bugs. Fix one site and you forget the other.</p>
 <blockquote>
 <p>When the same knowledge lives in two places, they will diverge.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Removing Duplication" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Duplication-removal flow: only knowledge that changes for the same reason should move into a single source.</em></p>
 <p>Extract only when the change reason is shared.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -191,11 +204,21 @@ ruff check app/
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>DRY is about a single source of change. Next, we tidy up another rotting place: error handling.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
+<li><strong>What boundary should you inspect first when applying Removing Duplication?</strong></li>
+<li>The article treats Removing Duplication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Removing Duplication?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Removing Duplication reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Clean Code 101 (2/10): Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Clean Code 101 (3/10): Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Clean Code 101 (4/10): Simplifying Conditionals</a></li>
 <li><strong>Removing Duplication (current)</strong></li>
 <li>Error Handling (upcoming)</li>
 <li>Comments and Documentation (upcoming)</li>

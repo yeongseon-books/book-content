@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Testable Code</title>
+<title>Clean Code 101 (8/10): Testable Code</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Testable Code</h1>
+<h1>Clean Code 101 (8/10): Testable Code</h1>
 <p>Some code takes one line to test and some code fights back with clocks, networks, databases, and hidden globals. That difference is usually a design decision, not a testing-library problem.</p>
 <p>This is post 8 in the Clean Code 101 series.</p>
 <p>Here we will push time, IO, and randomness to the boundaries, then use seams, fakes, and adapters to make tests fast enough that they can guide everyday refactoring.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Separating pure logic from side effects</li>
-<li>Creating seams with dependency injection</li>
-<li>Fakes and spies as test doubles</li>
-<li>Handling non-deterministic dependencies (time, randomness)</li>
-<li>Refactorings that improve testability</li>
+<li>What boundary should you inspect first when applying Testable Code?</li>
+<li>Which signal should the example or diagram make visible for Testable Code?</li>
+<li>What failure should be prevented first when Testable Code reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 8 flow overview</em></p>
+<p>This picture places Testable Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Testable Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How should you separate pure logic from side effects?</li>
+<li>How does dependency injection create seams for testing?</li>
+<li>When should you use a fake, and when should you use a spy?</li>
+<li>How do you handle non-deterministic dependencies such as time and randomness?</li>
+<li>Which refactorings directly improve testability?</li>
+</ul>
+<blockquote>
+<p>Testability is not an after-the-fact outcome. It is a byproduct of design, shaped by how well you push side effects and dependencies outward.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Hard-to-test code is a sign of hard-to-change structure. Testability is a measure of design quality.</p>
 <blockquote>
 <p>Testability is not an outcome. It is a result of design.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Testable Code" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Testability flow: separate pure logic from IO boundaries so unit tests and integration tests each get the right job.</em></p>
 <p>A pure core surrounded by thin adapters.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -200,14 +213,24 @@ python -m pytest -q tests/test_http_adapter.py
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Testability mirrors design. Next: how to safely change code — refactoring basics.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Comments and Documentation</a></li>
+<li><strong>What boundary should you inspect first when applying Testable Code?</strong></li>
+<li>The article treats Testable Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Testable Code?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Testable Code reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Clean Code 101 (2/10): Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Clean Code 101 (3/10): Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Clean Code 101 (4/10): Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Clean Code 101 (5/10): Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Clean Code 101 (6/10): Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Clean Code 101 (7/10): Comments and Documentation</a></li>
 <li><strong>Testable Code (current)</strong></li>
 <li>Refactoring Basics (upcoming)</li>
 <li>Good Code Review Standards (upcoming)</li>

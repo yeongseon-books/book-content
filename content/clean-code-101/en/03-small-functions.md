@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 3
-title: Small Functions
+title: "Clean Code 101 (3/10): Small Functions"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Why small functions help, doing one thing only, the extract fun
 last_reviewed: '2026-05-15'
 ---
 
-# Small Functions
+# Clean Code 101 (3/10): Small Functions
 
 Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.
 
@@ -29,7 +29,21 @@ This is post 3 in the Clean Code 101 series.
 
 Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Small Functions?
+- Which signal should the example or diagram make visible for Small Functions?
+- What failure should be prevented first when Small Functions reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 3 flow overview*
+
+This picture places Small Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Small Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ A small function explains itself by name. A large function asks for comments, an
 > When functions shrink, names do the work.
 
 ## Concept at a Glance
-
-![Small Functions](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
-
-*Small-function flow: extraction enables names, and names enable reuse and testing.*
 
 Extraction enables names; names enable reuse.
 
@@ -207,9 +217,20 @@ Strong teams gate function length, arg count, and cyclomatic complexity via lint
 
 Small functions enable names and tests. Next, the chief reason for big functions — conditionals.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Small Functions?**
+  - The article treats Small Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Small Functions?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Small Functions reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
 - **Small Functions (current)**
 - Simplifying Conditionals (upcoming)
 - Removing Duplication (upcoming)
@@ -218,6 +239,7 @@ Small functions enable names and tests. Next, the chief reason for big functions
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

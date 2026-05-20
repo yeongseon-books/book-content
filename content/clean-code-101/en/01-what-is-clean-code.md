@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 1
-title: What Is Clean Code?
+title: "Clean Code 101 (1/10): What Is Clean Code?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: What clean code actually means, the link between readability, i
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Clean Code?
+# Clean Code 101 (1/10): What Is Clean Code?
 
 Most code problems do not show up when the code first runs. They show up a few weeks later, when someone tries to change it without breaking a nearby path.
 
@@ -29,7 +29,21 @@ This is the first post in the Clean Code 101 series.
 
 Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Clean Code??
+- Which signal should the example or diagram make visible for What Is Clean Code??
+- What failure should be prevented first when What Is Clean Code? reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 1 flow overview*
+
+This picture places What Is Clean Code? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Clean Code? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ Code is written once and read a hundred times. Readability decides the cost of c
 > Clean code is the act of saving the next person's time.
 
 ## Concept at a Glance
-
-![defining clean code](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
-
-*Core clean-code flow: working code becomes readable code, then code that stays easy to change.*
 
 Working is the start, trust is the end.
 
@@ -198,7 +208,18 @@ Strong teams put thresholds on length, complexity, and naming into a code review
 
 Clean code is the sum of small, measurable principles. Next, we look at the single highest-leverage one — naming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is Clean Code??**
+  - The article treats What Is Clean Code? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Clean Code??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Clean Code? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Clean Code? (current)**
 - Naming (upcoming)
 - Small Functions (upcoming)
@@ -209,6 +230,7 @@ Clean code is the sum of small, measurable principles. Next, we look at the sing
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

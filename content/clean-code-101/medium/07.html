@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Comments and Documentation</title>
+<title>Clean Code 101 (7/10): Comments and Documentation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Comments and Documentation</h1>
+<h1>Clean Code 101 (7/10): Comments and Documentation</h1>
 <p>Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.</p>
 <p>This is post 7 in the Clean Code 101 series.</p>
 <p>Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>When not to write a comment</li>
-<li>Intent comments and warning comments</li>
-<li>Docstring conventions in Python</li>
-<li>Documenting public APIs</li>
-<li>Managing TODO and FIXME</li>
+<li>What boundary should you inspect first when applying Comments and Documentation?</li>
+<li>Which signal should the example or diagram make visible for Comments and Documentation?</li>
+<li>What failure should be prevented first when Comments and Documentation reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 7 flow overview</em></p>
+<p>This picture places Comments and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Comments and Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>When is it better not to write a comment at all?</li>
+<li>What is the difference between an intent comment and a warning comment?</li>
+<li>What rules make Python docstrings effective?</li>
+<li>How much of a public API should you document?</li>
+<li>How should TODO and FIXME items be managed so they stay traceable?</li>
+</ul>
+<blockquote>
+<p>Good comments explain only the "why" that code cannot show on its own. The "what" should stay visible in the code.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Comments tend to lie. Code changes; comments rarely follow.</p>
 <blockquote>
 <p>The best comment is the one you no longer need.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Comments and Documentation" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Commenting flow: code should explain what, while comments and docs explain why, risk, and contract.</em></p>
 <p>If something needs explaining, fix the code first.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -201,13 +214,23 @@ python -m pytest -q tests/test_public_api_docs.py
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Good comments are few and accurate. Next we tackle what truly decides a codebase's fate: testable code.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
+<li><strong>What boundary should you inspect first when applying Comments and Documentation?</strong></li>
+<li>The article treats Comments and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Comments and Documentation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Comments and Documentation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Clean Code 101 (2/10): Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Clean Code 101 (3/10): Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Clean Code 101 (4/10): Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Clean Code 101 (5/10): Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Clean Code 101 (6/10): Error Handling</a></li>
 <li><strong>Comments and Documentation (current)</strong></li>
 <li>Testable Code (upcoming)</li>
 <li>Refactoring Basics (upcoming)</li>

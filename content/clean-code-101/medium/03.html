@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Small Functions</title>
+<title>Clean Code 101 (3/10): Small Functions</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Small Functions</h1>
+<h1>Clean Code 101 (3/10): Small Functions</h1>
 <p>Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.</p>
 <p>This is post 3 in the Clean Code 101 series.</p>
 <p>Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Four effects of small functions</li>
-<li>The Extract Function procedure</li>
-<li>Patterns that remove side effects</li>
-<li>Command-Query Separation</li>
-<li>Parameter objects to simplify signatures</li>
+<li>What boundary should you inspect first when applying Small Functions?</li>
+<li>Which signal should the example or diagram make visible for Small Functions?</li>
+<li>What failure should be prevented first when Small Functions reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 3 flow overview</em></p>
+<p>This picture places Small Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Small Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What do you gain when functions stay small?</li>
+<li>In what order should you apply Extract Function to keep the refactor safe?</li>
+<li>What common patterns help reduce side effects?</li>
+<li>Why does Command-Query Separation cut debugging time?</li>
+<li>When is it worth introducing a parameter object?</li>
+</ul>
+<blockquote>
+<p>As functions get smaller, names do more of the work than comments, and tests become much easier to write.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A small function explains itself by name. A large function asks for comments, and comments turn into lies.</p>
 <blockquote>
 <p>When functions shrink, names do the work.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Small Functions" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Small-function flow: extraction enables names, and names enable reuse and testing.</em></p>
 <p>Extraction enables names; names enable reuse.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -191,9 +204,19 @@ python -m pytest -q tests/test_checkout.py
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Small functions enable names and tests. Next, the chief reason for big functions — conditionals.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><strong>What boundary should you inspect first when applying Small Functions?</strong></li>
+<li>The article treats Small Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Small Functions?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Small Functions reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Clean Code 101 (2/10): Naming</a></li>
 <li><strong>Small Functions (current)</strong></li>
 <li>Simplifying Conditionals (upcoming)</li>
 <li>Removing Duplication (upcoming)</li>

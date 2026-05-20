@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 6
-title: Error Handling
+title: "Clean Code 101 (6/10): Error Handling"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Choose between exceptions and return values, fail fast, use err
 last_reviewed: '2026-05-15'
 ---
 
-# Error Handling
+# Clean Code 101 (6/10): Error Handling
 
 Error handling becomes dangerous when it is everywhere and nowhere at the same time. The code catches broadly, logs vaguely, and leaves the caller guessing which failures still matter.
 
@@ -29,7 +29,21 @@ This is post 6 in the Clean Code 101 series.
 
 Here we will set boundaries for validation, typed exceptions, return-value failures, and retries so that robustness increases without letting the happy path disappear.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Error Handling?
+- Which signal should the example or diagram make visible for Error Handling?
+- What failure should be prevented first when Error Handling reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 6 flow overview*
+
+This picture places Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ When error handling code outweighs business logic, the code stops being readable
 > Error handling is a first-class citizen, but never the lead role.
 
 ## Concept at a Glance
-
-![Error Handling](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
-
-*Error-handling flow: validate early, return values for expected failures, chain exceptions, and catch broadly only at boundaries.*
 
 Validate up front; raise only when control is lost.
 
@@ -227,17 +237,29 @@ In an API server the handler is the boundary. Domain logic raises typed exceptio
 
 Treat errors as first-class but never as the lead role. Next: an often misused tool — comments and documentation.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Error Handling?**
+  - The article treats Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Error Handling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Error Handling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
-- [Removing Duplication](./05-removing-duplication.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
+- [Clean Code 101 (5/10): Removing Duplication](./05-removing-duplication.md)
 - **Error Handling (current)**
 - Comments and Documentation (upcoming)
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References

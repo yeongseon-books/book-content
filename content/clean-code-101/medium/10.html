@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Good Code Review Standards</title>
+<title>Clean Code 101 (10/10): Good Code Review Standards</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,27 +53,40 @@
 </style>
 </head>
 <body>
-<h1>Good Code Review Standards</h1>
+<h1>Clean Code 101 (10/10): Good Code Review Standards</h1>
 <p>A code review slows down when the reviewer must rediscover the author’s intent, rerun basic style checks by eye, and guess which comments are mandatory. Good reviews depend on design, but they also depend on process.</p>
 <p>This is the final post in the Clean Code 101 series.</p>
 <p>Here we will convert the themes from the series into a practical review checklist, then connect them to CI, PR sizing, comment labels, and measurable team feedback loops.</p>
-<hr>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>PR size and reviewability</li>
-<li>A clean-code review checklist</li>
-<li>The shape of a good review comment</li>
-<li>Roles of the reviewer and the author</li>
-<li>What to push into automation</li>
+<li>What boundary should you inspect first when applying Good Code Review Standards?</li>
+<li>Which signal should the example or diagram make visible for Good Code Review Standards?</li>
+<li>What failure should be prevented first when Good Code Review Standards reaches a real system?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="clean code 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>clean code 101 chapter 10 flow overview</em></p>
+<p>This picture places Good Code Review Standards inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Good Code Review Standards is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What size makes a PR realistically reviewable?</li>
+<li>What belongs on a clean-code review checklist?</li>
+<li>What does a strong review comment actually look like?</li>
+<li>What responsibilities belong to the reviewer, and which belong to the author?</li>
+<li>What should be pushed into automation, and what still needs human judgment?</li>
+</ul>
+<blockquote>
+<p>A good review is not just time spent catching defects. It is the moment the team turns intent and structure into a better answer than automation can produce alone.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Review is the last quality gate and the largest learning channel a team has.</p>
 <blockquote>
 <p>Review is not where defects are caught. It is where the team finds a better answer together.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Good Code Review Standards" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Review flow: automation handles toil so reviewers can focus on intent, structure, and risk.</em></p>
 <p>Automation handles chores. Humans look at intent.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -188,16 +201,26 @@ GIT_PAGER=cat git diff --stat HEAD~1..HEAD
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A good review is a mirror of clean code. Names, functions, branches, duplication, errors, comments, tests, refactoring, and reviews — every topic in this series points to one thing: code that the next person can change more easily. The next series scales these principles to a larger unit — software design.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Comments and Documentation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/08-testable-code.md">Testable Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/09-refactoring-basics.md">Refactoring Basics</a></li>
+<li><strong>What boundary should you inspect first when applying Good Code Review Standards?</strong></li>
+<li>The article treats Good Code Review Standards as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Good Code Review Standards?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Good Code Review Standards reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">Clean Code 101 (1/10): What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Clean Code 101 (2/10): Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Clean Code 101 (3/10): Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Clean Code 101 (4/10): Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Clean Code 101 (5/10): Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Clean Code 101 (6/10): Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Clean Code 101 (7/10): Comments and Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/08-testable-code.md">Clean Code 101 (8/10): Testable Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/09-refactoring-basics.md">Clean Code 101 (9/10): Refactoring Basics</a></li>
 <li><strong>Good Code Review Standards (current)</strong></li>
 </ul>
 <h2>References</h2>

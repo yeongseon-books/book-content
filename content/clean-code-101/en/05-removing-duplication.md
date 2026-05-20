@@ -1,7 +1,7 @@
 ---
 series: clean-code-101
 episode: 5
-title: Removing Duplication
+title: "Clean Code 101 (5/10): Removing Duplication"
 status: publish-ready
 targets:
   tistory: false
@@ -21,7 +21,7 @@ seo_description: Apply DRY, extract function, parameterize, and table-driven tec
 last_reviewed: '2026-05-15'
 ---
 
-# Removing Duplication
+# Clean Code 101 (5/10): Removing Duplication
 
 Duplication is expensive, but wrong abstractions are expensive in a different way. The hard part is not spotting repetition. It is proving that the same knowledge really changes together.
 
@@ -29,7 +29,21 @@ This is post 5 in the Clean Code 101 series.
 
 Here we will separate shared change reasons from accidental similarity, then verify when extraction, parameterization, or a data table actually reduces future maintenance cost.
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Removing Duplication?
+- Which signal should the example or diagram make visible for Removing Duplication?
+- What failure should be prevented first when Removing Duplication reaches a real system?
+
+## Big Picture
+
+![clean code 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png)
+
+*clean code 101 chapter 5 flow overview*
+
+This picture places Removing Duplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Removing Duplication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -48,10 +62,6 @@ Duplication multiplies bugs. Fix one site and you forget the other.
 > When the same knowledge lives in two places, they will diverge.
 
 ## Concept at a Glance
-
-![Removing Duplication](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png)
-
-*Duplication-removal flow: only knowledge that changes for the same reason should move into a single source.*
 
 Extract only when the change reason is shared.
 
@@ -207,17 +217,29 @@ Most policy branches — API routes, form validation, pricing tiers — can move
 
 DRY is about a single source of change. Next, we tidy up another rotting place: error handling.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Removing Duplication?**
+  - The article treats Removing Duplication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Removing Duplication?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Removing Duplication reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Clean Code?](./01-what-is-clean-code.md)
-- [Naming](./02-naming.md)
-- [Small Functions](./03-small-functions.md)
-- [Simplifying Conditionals](./04-simplifying-conditionals.md)
+## In this series
+
+- [Clean Code 101 (1/10): What Is Clean Code?](./01-what-is-clean-code.md)
+- [Clean Code 101 (2/10): Naming](./02-naming.md)
+- [Clean Code 101 (3/10): Small Functions](./03-small-functions.md)
+- [Clean Code 101 (4/10): Simplifying Conditionals](./04-simplifying-conditionals.md)
 - **Removing Duplication (current)**
 - Error Handling (upcoming)
 - Comments and Documentation (upcoming)
 - Testable Code (upcoming)
 - Refactoring Basics (upcoming)
 - Good Code Review Standards (upcoming)
+
 <!-- toc:end -->
 
 ## References
