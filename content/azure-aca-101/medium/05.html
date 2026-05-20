@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scaling — KEDA scalers and zero-to-N</title>
+<title>Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Scaling — KEDA scalers and zero-to-N</h1>
+<h1>Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N</h1>
 <p>Scaling in ACA is not just about adding replicas. The moment you decide which signals matter and whether the platform can scale to zero, you are also setting your cost policy and your latency policy.</p>
 <p>This is post 5 in the Azure Container Apps 101 series. Here, we'll unpack KEDA scalers and the zero-to-N model from an operational angle.</p>
 <h2>What you'll learn</h2>
@@ -63,14 +63,19 @@
 <li>When <code>min-replicas 0</code> (scale-to-zero) is safe and when it is dangerous.</li>
 <li>How to configure both an HTTP API and a Service Bus queue worker using <code>az containerapp</code> commands.</li>
 </ul>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What signals does Azure Container Apps use to decide replica counts, and where is the decision made?</li>
 <li>When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?</li>
 <li>When is <code>min-replicas 0</code> (scale-to-zero) safe, and when is it dangerous?</li>
-<li>Why must Service Bus queue workers be scaled with KEDA scalers rather than HTTP rules?</li>
-<li>How do you measure and accept the cold-start trade-off against your SLO?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png"></p>
+<p><em>azure container apps 101 chapter 5 flow overview</em></p>
+<p>This picture places Scaling — KEDA scalers and zero-to-N inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scaling — KEDA scalers and zero-to-N is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>The core ACA value proposition is "running containers without the weight of Kubernetes."<br>
 Scaling is where that promise becomes most visible.<br>
@@ -91,8 +96,6 @@ Scaling rules are simultaneously a cost policy and an SLO policy.</p>
 </ol>
 <p>Signal → Rule → Bounds. Once those three are set, ACA does the rest.<br>
 You don't write YAML or imperative scaling code — you declare "if this signal arrives, scale up to N."</p>
-<p><img alt="Scale signals changing replica counts" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png"></p>
-<p><em>Scale signals changing replica counts</em></p>
 <h2>Core concepts</h2>
 <p><strong>1. Three rule categories</strong></p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
@@ -235,15 +238,24 @@ Empty queue scales to zero; 50 queued messages scale to 10 replicas (the max).</
 </ul>
 <p>Next post covers <strong>Dapr integration</strong> — how a sidecar gives you distributed-system building blocks like service invocation, pub/sub, and state store without library lock-in.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What signals does Azure Container Apps use to decide replica counts, and where is the decision made?</strong></li>
+<li>The article treats Scaling — KEDA scalers and zero-to-N as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When is <code>min-replicas 0</code> (scale-to-zero) safe, and when is it dangerous?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Environment, Container App, Revision — ACA in three words</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Your first deploy — Python/FastAPI</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Ingress and traffic splitting — revision-based deployment strategies</a></li>
-<li><strong>Scaling — KEDA scalers and zero-to-N (current)</strong></li>
-<li>Dapr integration — what you get from a sidecar (upcoming)</li>
-<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies</a></li>
+<li><strong>Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N (current)</strong></li>
+<li>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (upcoming)</li>
+<li>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is Azure Container Apps? — running containers without Kubernetes</title>
+<title>Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What is Azure Container Apps? — running containers without Kubernetes</h1>
+<h1>Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</h1>
 <p>At first glance, Azure Container Apps looks like the missing middle ground between App Service and AKS. To use it well, you need a clear mental model of what the platform abstracts away and what still belongs to you.</p>
 <p>This is the first post in the Azure Container Apps 101 series. Here, we'll place ACA on the Azure container map and define the workloads it fits best.</p>
-<hr>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How Azure Container Apps (ACA) differs from the other Azure container services (App Service, AKS, Functions)</li>
-<li>The role of ACA's three core building blocks: Environment, Container App, and Revision</li>
-<li>Which workloads belong on ACA, and which workloads belong somewhere else</li>
-<li>How the seven episodes of this series will progressively zoom into each part of ACA</li>
+<li>How Azure Container Apps (ACA) differs from the other Azure container services (App Service, AKS, Functions)?</li>
+<li>The role of ACA's three core building blocks: Environment, Container App, and Revision?</li>
+<li>Which workloads belong on ACA, and which workloads belong somewhere else?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png"></p>
+<p><em>azure container apps 101 chapter 1 flow overview</em></p>
+<p>This picture places What is Azure Container Apps? — running containers without Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is Azure Container Apps? — running containers without Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Anyone can build a container. It runs fine on a laptop. The hard part is everything that comes after.</p>
 <blockquote>
@@ -89,8 +94,6 @@
 <li>Dapr: episode 6</li>
 <li>Observability: episode 7</li>
 </ul>
-<p><img alt="Ingress and app layout in one ACA environment" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png"></p>
-<p><em>Ingress and app layout in one ACA environment</em></p>
 <h2>Core concept 1 — a one-sentence definition</h2>
 <p>ACA is a <strong>managed serverless container platform</strong>. It runs on a Microsoft-operated Kubernetes foundation with KEDA-backed scaling, optional Dapr integration, and managed ingress baked in — but you never see or control the cluster itself.</p>
 <ul>
@@ -251,15 +254,24 @@ az containerapp env create \
 </ul>
 <h2>Next up</h2>
 <p>The next post zooms into ACA's operational model through three words: Environment, Container App, and Revision.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How Azure Container Apps (ACA) differs from the other Azure container services (App Service, AKS, Functions)?</strong></li>
+<li>The article treats What is Azure Container Apps? — running containers without Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The role of ACA's three core building blocks: Environment, Container App, and Revision?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which workloads belong on ACA, and which workloads belong somewhere else?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>What is Azure Container Apps? — running containers without Kubernetes (current)</strong></li>
-<li>Environment, Container App, Revision — ACA in three words (upcoming)</li>
-<li>Your first deploy — Python/FastAPI (upcoming)</li>
-<li>Ingress and traffic splitting — revision-based deployment strategies (upcoming)</li>
-<li>Scaling — KEDA scalers and zero-to-N (upcoming)</li>
-<li>Dapr integration — what you get from a sidecar (upcoming)</li>
-<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+<li><strong>Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes (current)</strong></li>
+<li>Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words (upcoming)</li>
+<li>Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI (upcoming)</li>
+<li>Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies (upcoming)</li>
+<li>Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N (upcoming)</li>
+<li>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (upcoming)</li>
+<li>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

@@ -1,5 +1,5 @@
 ---
-title: 모니터링과 운영 — Log Analytics와 Application Insights
+title: "Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights"
 series: azure-aca-101
 episode: 7
 language: ko
@@ -20,18 +20,27 @@ last_reviewed: '2026-05-12'
 seo_description: ACA 관측성은 플랫폼, 애플리케이션, 사이드카라는 세 계층으로 나뉩니다.
 ---
 
-# 모니터링과 운영 — Log Analytics와 Application Insights
+# Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights
 
 운영 사고에서 어려운 지점은 데이터가 있느냐보다, 어느 계층이 답을 가지고 있느냐를 아는 일입니다. ACA는 로그, 트레이스, 메트릭을 서로 다른 시스템에 나눠 두고, 그 경계를 이해하느냐가 프로덕션 문제를 얼마나 빨리 진단하는지를 좌우합니다.
 
 이 글은 Azure Container Apps 101 시리즈의 마지막 글입니다. 여기서는 Log Analytics와 Application Insights를 중심으로 그 계층을 지도처럼 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - ACA 관측성은 어떤 계층 구조로 나뉠까요?
 - `ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?
 - Log Analytics에서 Revision 기준으로 로그를 묶는 KQL 쿼리는 어떻게 작성할까요?
-- OpenTelemetry를 통해 FastAPI 앱을 Application Insights에 연결하는 가장 짧은 경로는 무엇일까요?
+
+## 큰 그림
+
+![Azure Container Apps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
+
+*Azure Container Apps 101 7장 흐름 개요*
+
+이 그림에서는 모니터링과 운영 — Log Analytics와 Application Insights를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 모니터링과 운영 — Log Analytics와 Application Insights의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글이 답할 질문
 
@@ -63,10 +72,6 @@ ACA 관측성은 세 개의 독립된 계층으로 나뉩니다.
 중요한 규율은 항상 "이 신호는 어느 계층에서 왔는가?"를 아는 것입니다.
 
 > 관측성에서 가장 먼저 할 일은 데이터를 더 모으는 것이 아니라, 지금 보고 있는 신호가 플랫폼 로그인지, 앱 트레이스인지, 사이드카 텔레메트리인지 먼저 구분하는 일입니다.
-
-![Where logs and traces converge](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
-
-*Where logs and traces converge*
 
 ## 핵심 개념
 
@@ -257,16 +262,25 @@ def root():
 
 ---
 
+## 처음 질문으로 돌아가기
+
+- **ACA 관측성은 어떤 계층 구조로 나뉠까요?**
+  - 본문의 기준은 모니터링과 운영 — Log Analytics와 Application Insights를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Log Analytics에서 Revision 기준으로 로그를 묶는 KQL 쿼리는 어떻게 작성할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
-- [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-- [첫 배포하기 — Python/FastAPI](./03-first-deploy.md)
-- [Ingress와 트래픽 분할 — revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
-- [스케일링 — KEDA scaler와 zero-to-N](./05-scaling-with-keda.md)
-- [Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
-- **모니터링과 운영 — Log Analytics와 Application Insights (현재 글)**
+- [Azure Container Apps 101 (1/7): Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
+- [Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- [Azure Container Apps 101 (3/7): 첫 배포하기 — Python/FastAPI](./03-first-deploy.md)
+- [Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략](./04-ingress-and-traffic-split.md)
+- [Azure Container Apps 101 (5/7): 스케일링 — KEDA scaler와 zero-to-N](./05-scaling-with-keda.md)
+- [Azure Container Apps 101 (6/7): Dapr 통합 — 사이드카로 얻는 것](./06-dapr-integration.md)
+- **Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights (현재 글)**
 
 <!-- toc:end -->
 

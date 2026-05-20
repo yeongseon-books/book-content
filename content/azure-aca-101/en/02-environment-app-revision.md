@@ -1,5 +1,5 @@
 ---
-title: Environment, Container App, Revision — ACA in three words
+title: "Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words"
 series: azure-aca-101
 episode: 2
 language: en
@@ -22,20 +22,27 @@ seo_description: Environment is "the building," Container App is "the office," R
   is "today's seating arrangement."
 ---
 
-# Environment, Container App, Revision — ACA in three words
+# Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words
 
 Environment, Container App, and Revision show up everywhere in ACA. The names sound close, but they carry different lifetimes and responsibilities, and that distinction drives how you deploy and operate the platform.
 
 This is post 2 in the Azure Container Apps 101 series. Here, we'll separate those three terms from an operator's point of view.
 
----
+## Questions to Keep in Mind
 
-## What you will learn
+- The exact responsibilities of ACA's three operational units — Environment, Container App, and Revision?
+- Which changes create a new Revision and which do not?
+- The difference between Single Revision mode and Multiple Revision mode, and when each fits?
 
-- The exact responsibilities of ACA's three operational units — Environment, Container App, and Revision
-- Which changes create a new Revision and which do not
-- The difference between Single Revision mode and Multiple Revision mode, and when each fits
-- How to run canary, Blue-Green, and instant rollback at the Revision level
+## Big Picture
+
+![azure container apps 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
+
+*azure container apps 101 chapter 2 flow overview*
+
+This picture places Environment, Container App, Revision — ACA in three words inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Environment, Container App, Revision — ACA in three words is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -63,10 +70,6 @@ The seating (Revision) is a snapshot of the office at one point in time. Move a 
 ## Start with the hierarchy
 
 Environment is a boundary. Container App is a logical service. Revision is an immutable snapshot of image and configuration.
-
-![environment, container app, and revision hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
-
-*environment, container app, and revision hierarchy*
 
 The cardinality is:
 
@@ -261,16 +264,25 @@ The following changes **do not create a new Revision**:
 
 The next post puts this model into your hands. We deploy a Python/FastAPI app to ACA for the first time and watch a Container App and its Revision get created step by step.
 
+## Answering the Opening Questions
+
+- **The exact responsibilities of ACA's three operational units — Environment, Container App, and Revision?**
+  - The article treats Environment, Container App, Revision — ACA in three words as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which changes create a new Revision and which do not?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The difference between Single Revision mode and Multiple Revision mode, and when each fits?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
-- **Environment, Container App, Revision — ACA in three words (current)**
-- Your first deploy — Python/FastAPI (upcoming)
-- Ingress and traffic splitting — revision-based deployment strategies (upcoming)
-- Scaling — KEDA scalers and zero-to-N (upcoming)
-- Dapr integration — what you get from a sidecar (upcoming)
-- Monitoring and ops — Log Analytics and Application Insights (upcoming)
+- [Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
+- **Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words (current)**
+- Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI (upcoming)
+- Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies (upcoming)
+- Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N (upcoming)
+- Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (upcoming)
+- Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)
 
 <!-- toc:end -->
 

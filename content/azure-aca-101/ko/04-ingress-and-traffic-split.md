@@ -1,5 +1,5 @@
 ---
-title: Ingress와 트래픽 분할 — revision 기반 배포 전략
+title: "Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략"
 series: azure-aca-101
 episode: 4
 language: ko
@@ -21,20 +21,27 @@ last_reviewed: '2026-05-12'
 seo_description: Ingress는 ACA의 정문이고, 트래픽 가중치는 엘리베이터 배차 비율로 이해하면 쉽습니다.
 ---
 
-# Ingress와 트래픽 분할 — revision 기반 배포 전략
+# Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략
 
 Ingress와 트래픽 분할은 ACA에서 가장 중요한 운영 레버 두 개입니다. 설정 한 줄만 바뀌어도 외부 노출 방식과 배포 안전성이 함께 달라지므로, 둘은 따로보다 함께 볼 때 더 잘 이해됩니다.
 
 이 글은 Azure Container Apps 101 시리즈의 4번째 글입니다. 여기서는 ingress 설계와 revision 기반 배포 전략을 하나의 흐름으로 연결해 보겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?
 - `external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?
 - Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?
-- Revision 가중치로 canary와 blue-green을 구현하고, 문제 시 즉시 rollback하려면 어떻게 할까요?
+
+## 큰 그림
+
+![Azure Container Apps 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.ko.png)
+
+*Azure Container Apps 101 4장 흐름 개요*
+
+이 그림에서는 Ingress와 트래픽 분할 — revision 기반 배포 전략를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Ingress와 트래픽 분할 — revision 기반 배포 전략의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -60,10 +67,6 @@ ACA의 가장 강력한 프로덕션 기능 중 하나가 revision 기반 traffi
 ## 요청 경로
 
 ACA의 관리형 Ingress 레이어는 정문 역할을 하고, 그 뒤에서 가중치에 따라 active Revision으로 트래픽을 보냅니다.
-
-![Ingress routing requests to active Revisions](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.ko.png)
-
-*Ingress routing requests to active Revisions*
 
 핵심 단계는 다음과 같습니다.
 
@@ -248,16 +251,25 @@ ACA traffic split은 비율 기반입니다. "이 user-agent만 v2로 보내기"
 
 다음 글에서는 KEDA 기반 스케일링을 다룹니다. HTTP 트래픽뿐 아니라 큐 길이, CPU, 사용자 정의 메트릭까지 신호로 삼아 0-to-N 스케일링을 구성해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?**
+  - 본문의 기준은 Ingress와 트래픽 분할 — revision 기반 배포 전략를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
-- [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-- [첫 배포하기 — Python/FastAPI](./03-first-deploy.md)
-- **Ingress와 트래픽 분할 — revision 기반 배포 전략 (현재 글)**
-- 스케일링 — KEDA scaler와 zero-to-N (예정)
-- Dapr 통합 — 사이드카로 얻는 것 (예정)
-- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
+- [Azure Container Apps 101 (1/7): Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
+- [Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- [Azure Container Apps 101 (3/7): 첫 배포하기 — Python/FastAPI](./03-first-deploy.md)
+- **Azure Container Apps 101 (4/7): Ingress와 트래픽 분할 — revision 기반 배포 전략 (현재 글)**
+- Azure Container Apps 101 (5/7): 스케일링 — KEDA scaler와 zero-to-N (예정)
+- Azure Container Apps 101 (6/7): Dapr 통합 — 사이드카로 얻는 것 (예정)
+- Azure Container Apps 101 (7/7): 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 

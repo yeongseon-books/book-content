@@ -1,5 +1,5 @@
 ---
-title: Your first deploy — Python/FastAPI
+title: "Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI"
 series: azure-aca-101
 episode: 3
 language: en
@@ -22,20 +22,27 @@ seo_description: A first deploy on ACA is like calling a taxi — you need an or
   before the taxi can leave.
 ---
 
-# Your first deploy — Python/FastAPI
+# Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI
 
 A first deploy is where ACA stops being a diagram and starts becoming an operating model. You only really see the service boundaries after you push an image, wire the dependencies, and watch a Revision come alive.
 
 This is post 3 in the Azure Container Apps 101 series. Here, we'll walk a Python/FastAPI app through that full path.
 
----
+## Questions to Keep in Mind
 
-## What you will learn
+- The full path from local FastAPI code to a live ACA Revision?
+- That ACA does not build images for you — and what that means for division of responsibility?
+- The four-step dependency chain: ACR → ACA Environment → Container App → Revision?
 
-- The full path from local FastAPI code to a live ACA Revision
-- That ACA does not build images for you — and what that means for division of responsibility
-- The four-step dependency chain: ACR → ACA Environment → Container App → Revision
-- How to verify a successful first deploy from the **CLI**, not the portal
+## Big Picture
+
+![azure container apps 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
+
+*azure container apps 101 chapter 3 flow overview*
+
+This picture places Your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Your first deploy — Python/FastAPI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -59,10 +66,6 @@ So a first deploy flows in this order: image build → registry push → ACA cre
 ## See the path first
 
 Seeing the route makes the deploy feel much simpler.
-
-![End-to-end path from local code to an ACA deploy](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
-
-*End-to-end path from local code to an ACA deploy*
 
 Critical dependencies:
 
@@ -273,16 +276,25 @@ A production first-deploy checklist:
 
 The next post goes deep on ingress and traffic splitting. We create two Revisions, run a 90/10 canary, and practice the instant flip back to 100/0 when something goes wrong.
 
+## Answering the Opening Questions
+
+- **The full path from local FastAPI code to a live ACA Revision?**
+  - The article treats Your first deploy — Python/FastAPI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **That ACA does not build images for you — and what that means for division of responsibility?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The four-step dependency chain: ACR → ACA Environment → Container App → Revision?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
-- [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-- **Your first deploy — Python/FastAPI (current)**
-- Ingress and traffic splitting — revision-based deployment strategies (upcoming)
-- Scaling — KEDA scalers and zero-to-N (upcoming)
-- Dapr integration — what you get from a sidecar (upcoming)
-- Monitoring and ops — Log Analytics and Application Insights (upcoming)
+- [Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes](./01-what-is-aca.md)
+- [Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
+- **Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI (current)**
+- Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies (upcoming)
+- Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N (upcoming)
+- Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (upcoming)
+- Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)
 
 <!-- toc:end -->
 

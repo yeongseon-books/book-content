@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Monitoring and ops — Log Analytics and Application Insights</title>
+<title>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Monitoring and ops — Log Analytics and Application Insights</h1>
+<h1>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights</h1>
 <p>During an incident, the hard part is not whether data exists but knowing which layer holds the answer. ACA spreads logs, traces, and metrics across different systems, and that boundary determines how fast you can diagnose production problems.</p>
 <p>This is the final post in the Azure Container Apps 101 series. Here, we'll map those layers through Log Analytics and Application Insights.</p>
 <h2>What you'll learn</h2>
@@ -63,14 +63,19 @@
 <li>How to write KQL queries that group logs by Revision in Log Analytics.</li>
 <li>How to wire Application Insights into a FastAPI app via OpenTelemetry.</li>
 </ul>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What three layers does ACA observability split into, and what does each layer own?</li>
 <li>What events does <code>ContainerAppConsoleLogs_CL</code> capture compared to <code>ContainerAppSystemLogs_CL</code>?</li>
 <li>How do you write a KQL query that groups logs by Revision in Log Analytics?</li>
-<li>What is the shortest path to wire Application Insights into a FastAPI app via OpenTelemetry?</li>
-<li>Where is the boundary between observability ACA gives you for free and what you must instrument yourself?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png"></p>
+<p><em>azure container apps 101 chapter 7 flow overview</em></p>
+<p>This picture places Monitoring and ops — Log Analytics and Application Insights inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Monitoring and ops — Log Analytics and Application Insights is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Imagine your production ACA app starts emitting 5xx errors.<br>
 First question: "Which revision?" — <code>RevisionName_s</code> in Log Analytics answers it.<br>
@@ -90,8 +95,6 @@ Miss this boundary and you spend an hour during an incident asking "why don't I 
 </ol>
 <p>The three layers can land in the same Application Insights instance or stay separate.<br>
 The discipline is to always know "which layer does this signal come from?"</p>
-<p><img alt="Where logs and traces converge" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png"></p>
-<p><em>Where logs and traces converge</em></p>
 <h2>Core concepts</h2>
 <p><strong>1. Two platform log tables</strong></p>
 <p><strong><code>ContainerAppConsoleLogs_CL</code></strong><br>
@@ -247,15 +250,24 @@ def root():
 We covered the concept (Ep 1), structure (Ep 2), first deploy (Ep 3), traffic splitting (Ep 4), scaling (Ep 5), Dapr integration (Ep 6), and now observability.</p>
 <p>Natural next steps: compare the same approach across <strong>Azure App Service 101</strong>, <strong>Azure AKS 101</strong>, and <strong>Azure Functions 101</strong> to understand the trade-offs of serverless container platforms.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What three layers does ACA observability split into, and what does each layer own?</strong></li>
+<li>The article treats Monitoring and ops — Log Analytics and Application Insights as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What events does <code>ContainerAppConsoleLogs_CL</code> capture compared to <code>ContainerAppSystemLogs_CL</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do you write a KQL query that groups logs by Revision in Log Analytics?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Environment, Container App, Revision — ACA in three words</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Your first deploy — Python/FastAPI</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Ingress and traffic splitting — revision-based deployment strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/05-scaling-with-keda.md">Scaling — KEDA scalers and zero-to-N</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/06-dapr-integration.md">Dapr integration — what you get from a sidecar</a></li>
-<li><strong>Monitoring and ops — Log Analytics and Application Insights (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/05-scaling-with-keda.md">Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/06-dapr-integration.md">Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar</a></li>
+<li><strong>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (current)</strong></li>
 </ul>
 <hr>
 <h2>References</h2>

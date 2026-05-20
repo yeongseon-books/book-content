@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Dapr integration — what you get from a sidecar</title>
+<title>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Dapr integration — what you get from a sidecar</h1>
+<h1>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar</h1>
 <p>Dapr removes a lot of repeated plumbing in microservices, but it does not erase architectural trade-offs. You need to keep App-level settings separate from Environment-level components to see where the platform ends and your design begins.</p>
 <p>This is post 6 in the Azure Container Apps 101 series. Here, we'll examine what the sidecar gives you on ACA and what it asks you to own.</p>
 <h2>What you'll learn</h2>
@@ -63,14 +63,19 @@
 <li>The role of the four core building blocks: Service invocation, Pub/Sub, State store, Secret store.</li>
 <li>How to configure a real Dapr integration with <code>--enable-dapr</code> and component YAML.</li>
 </ul>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Where exactly does the Dapr sidecar attach inside an ACA pod, and what endpoint does the app call?</li>
 <li>Why are App-level <code>--enable-dapr</code> settings separated from Environment-level components?</li>
 <li>What problems do Service invocation, Pub/Sub, State store, and Secret store each solve?</li>
-<li>What is the decisive difference between running Dapr on AKS versus on ACA?</li>
-<li>Why is "enabling Dapr from day one" often cited as an anti-pattern?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png"></p>
+<p><em>azure container apps 101 chapter 6 flow overview</em></p>
+<p>This picture places Dapr integration — what you get from a sidecar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Dapr integration — what you get from a sidecar is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>Microservices keep posing the same problems.<br>
 Service A calling Service B needs service discovery; sending messages between them needs a broker SDK; storing state needs a Redis or Cosmos DB SDK.<br>
@@ -89,8 +94,6 @@ Adding <code>--enable-dapr true</code> to your app injects the sidecar automatic
 </ol>
 <p>App level is <strong>per-app opt-in</strong>. Environment level is a <strong>shared infrastructure catalog</strong>.<br>
 Register one component on the Environment, and many apps in the same Environment can share it through scope settings.</p>
-<p><img alt="Dapr sidecar next to the app and connections to external services" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png"></p>
-<p><em>Dapr sidecar next to the app and connections to external services</em></p>
 <h2>Core concepts</h2>
 <p><strong>1. The sidecar model</strong></p>
 <p><code>--enable-dapr true</code> makes ACA spin up a <code>daprd</code> sidecar next to your app container.<br>
@@ -236,15 +239,24 @@ requests.post(
 </ul>
 <p>Next post wraps up the series with <strong>Monitoring and ops</strong> — connecting Log Analytics and Application Insights to ACA, collecting logs/metrics/traces, and configuring operational alerts.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Where exactly does the Dapr sidecar attach inside an ACA pod, and what endpoint does the app call?</strong></li>
+<li>The article treats Dapr integration — what you get from a sidecar as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why are App-level <code>--enable-dapr</code> settings separated from Environment-level components?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What problems do Service invocation, Pub/Sub, State store, and Secret store each solve?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Environment, Container App, Revision — ACA in three words</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Your first deploy — Python/FastAPI</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Ingress and traffic splitting — revision-based deployment strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/05-scaling-with-keda.md">Scaling — KEDA scalers and zero-to-N</a></li>
-<li><strong>Dapr integration — what you get from a sidecar (current)</strong></li>
-<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/04-ingress-and-traffic-split.md">Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/05-scaling-with-keda.md">Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N</a></li>
+<li><strong>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (current)</strong></li>
+<li>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

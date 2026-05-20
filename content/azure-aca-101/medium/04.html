@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Ingress and traffic splitting — revision-based deployment strategies</title>
+<title>Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Ingress and traffic splitting — revision-based deployment strategies</h1>
+<h1>Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies</h1>
 <p>Ingress and traffic splitting are two of the most important operational levers in ACA. A small configuration change can alter both exposure and rollout safety, so they make more sense together than apart.</p>
 <p>This is post 4 in the Azure Container Apps 101 series. Here, we'll connect ingress design to revision-based deployment strategy.</p>
-<hr>
-<h2>What you will learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not</li>
-<li>The exact difference between <code>external</code>, <code>internal</code>, and <code>disabled</code> ingress modes</li>
-<li>How Single mode and Multiple mode change traffic distribution behavior</li>
-<li>How to implement canary and Blue-Green via Revision weights, and roll back instantly</li>
+<li>What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not?</li>
+<li>The exact difference between <code>external</code>, <code>internal</code>, and <code>disabled</code> ingress modes?</li>
+<li>How Single mode and Multiple mode change traffic distribution behavior?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure container apps 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png"></p>
+<p><em>azure container apps 101 chapter 4 flow overview</em></p>
+<p>This picture places Ingress and traffic splitting — revision-based deployment strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Ingress and traffic splitting — revision-based deployment strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this matters</h2>
 <p>One of ACA's most powerful production features is revision-based traffic split. Using it correctly first requires getting ingress right.</p>
 <p>Common incidents:</p>
@@ -82,8 +87,6 @@
 <p>These two stages are separate, so you can manage "external exposure" and "version distribution" independently.</p>
 <h2>The request path</h2>
 <p>ACA's managed Ingress layer plays the front door, then dispatches traffic to active Revisions according to weights.</p>
-<p><img alt="Ingress routing requests to active Revisions" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png"></p>
-<p><em>Ingress routing requests to active Revisions</em></p>
 <p>Key steps:</p>
 <ol>
 <li>Client hits <code>https://&lt;app&gt;.&lt;env-id&gt;.&lt;region&gt;.azurecontainerapps.io</code></li>
@@ -249,15 +252,24 @@ az containerapp ingress traffic set --name $APP --resource-group $RG \
 </ul>
 <h2>Next up</h2>
 <p>The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven not just by HTTP traffic but also by queue length, CPU, and custom metrics.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not?</strong></li>
+<li>The article treats Ingress and traffic splitting — revision-based deployment strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>The exact difference between <code>external</code>, <code>internal</code>, and <code>disabled</code> ingress modes?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How Single mode and Multiple mode change traffic distribution behavior?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">What is Azure Container Apps? — running containers without Kubernetes</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Environment, Container App, Revision — ACA in three words</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Your first deploy — Python/FastAPI</a></li>
-<li><strong>Ingress and traffic splitting — revision-based deployment strategies (current)</strong></li>
-<li>Scaling — KEDA scalers and zero-to-N (upcoming)</li>
-<li>Dapr integration — what you get from a sidecar (upcoming)</li>
-<li>Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/01-what-is-aca.md">Azure Container Apps 101 (1/7): What is Azure Container Apps? — running containers without Kubernetes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/02-environment-app-revision.md">Azure Container Apps 101 (2/7): Environment, Container App, Revision — ACA in three words</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-aca-101/en/03-first-deploy.md">Azure Container Apps 101 (3/7): Your first deploy — Python/FastAPI</a></li>
+<li><strong>Azure Container Apps 101 (4/7): Ingress and traffic splitting — revision-based deployment strategies (current)</strong></li>
+<li>Azure Container Apps 101 (5/7): Scaling — KEDA scalers and zero-to-N (upcoming)</li>
+<li>Azure Container Apps 101 (6/7): Dapr integration — what you get from a sidecar (upcoming)</li>
+<li>Azure Container Apps 101 (7/7): Monitoring and ops — Log Analytics and Application Insights (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>
