@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:24:23+00:00
+Generated: 2026-05-20T11:24:43+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,13 +27,13 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **57**
-- Series at or above 5 issues: **43**
-- Total issues: **549**
+- Series with any issue: **56**
+- Series at or above 5 issues: **42**
+- Total issues: **544**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **17**
+  - Shrt: **12**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -83,21 +83,20 @@ Warnings:
 | 40 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 41 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
 | 42 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 43 | `statistics-101` | 5 | 0 | 0 | 0 | 5 | 0 |
-| 44 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 45 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 46 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 47 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 48 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 49 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 50 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 51 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 52 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 53 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
-| 54 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 55 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 56 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 57 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 43 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 44 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 45 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 46 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 47 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 48 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 49 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 50 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 51 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 52 | `model-evaluation-101` | 3 | 0 | 0 | 0 | 3 | 0 |
+| 53 | `ai-agent-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 54 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 55 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 56 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## python-dbapi-101 — Total 42
 
@@ -621,17 +620,6 @@ Warnings:
 - `assets/git-github-101/06/06-01-mental-model.en.png:1` — PNG height 88px <= 100px (size=828x88)
 - `assets/git-github-101/06/06-01-mental-model.ko.png:1` — PNG height 88px <= 100px (size=735x88)
 - `assets/git-github-101/10/10-01-mental-model.ko.png:1` — PNG height 75px <= 100px (size=1384x75)
-
-## statistics-101 — Total 5
-
-- BadImg=0 Synt=0 BrkLink=0 Shrt=5 NoEn=0
-
-### Shrt
-- `content/statistics-101/en/01-what-is-statistics.md:22` — markdown body has 149 lines (< 150)
-- `content/statistics-101/en/02-mean-median-variance.md:22` — markdown body has 146 lines (< 150)
-- `content/statistics-101/en/03-distributions.md:22` — markdown body has 144 lines (< 150)
-- `content/statistics-101/en/04-sample-and-population.md:22` — markdown body has 143 lines (< 150)
-- `content/statistics-101/en/05-estimation.md:22` — markdown body has 144 lines (< 150)
 
 ## alembic-101 — Total 4
 

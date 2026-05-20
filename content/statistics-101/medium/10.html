@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Statistical Thinking</title>
+<title>Statistics 101 (10/10): Statistical Thinking</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Statistical Thinking</h1>
+<h1>Statistics 101 (10/10): Statistical Thinking</h1>
 <p>When you learn statistics chapter by chapter, means, variances, distributions, hypothesis tests, and p-values can feel like separate tools. In real work, they rarely move separately. A single question leads into data collection, distribution checks, estimation, testing, and finally a decision.</p>
 <p>So the last step in the series is not one more formula. It is seeing how the earlier pieces connect into one repeatable flow from question to action.</p>
 <p>This is the final post in the Statistics 101 series. Here we will rewrite the series as a mindset rather than a list of tools and walk once more through the practical flow from question to decision.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Is statistics a collection of formulas or a way of thinking?</li>
 <li>How do question, data, distribution, estimation, and testing connect?</li>
 <li>How should p-value, effect size, and business cost come together in one decision?</li>
-<li>What should we document to improve data-driven decisions over time?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 10 flow overview</em></p>
+<p>This picture places Statistical Thinking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Statistical thinking is not a trick for producing numbers. It is a flow for making decisions under uncertainty.</p>
+<p>The core of Statistical Thinking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Knowing the tools is meaningless without knowing <em>when and how to use them</em>. <em>Statistical thinking</em> is the <em>bridge from data to decisions</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>Statistics is the grammar of evidence.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Statistical thinking is one connected flow: question, data, distribution, estimation, testing, effect size, then decision.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Question-first</strong>: <em>Sharpen the question</em> before <em>touching the data</em>.</li>
@@ -153,16 +154,26 @@ print(decision)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Statistics is the <em>language of uncertainty</em>, and statistical thinking is the <em>flow from data to decisions</em>. The next steps are <em>Probability 101</em> and <em>Machine Learning 101</em>, where this thinking expands into <em>prediction</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Hypothesis Testing</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/08-correlation-and-regression.md">Correlation and Regression</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/09-understanding-p-value.md">Understanding p-value</a></li>
+<li><strong>Is statistics a collection of formulas or a way of thinking?</strong></li>
+<li>The article treats Statistical Thinking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do question, data, distribution, estimation, and testing connect?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should p-value, effect size, and business cost come together in one decision?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Statistics 101 (2/10): Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Statistics 101 (3/10): Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Statistics 101 (4/10): Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Statistics 101 (5/10): Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Statistics 101 (6/10): Confidence Interval</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Statistics 101 (7/10): Hypothesis Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/08-correlation-and-regression.md">Statistics 101 (8/10): Correlation and Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/09-understanding-p-value.md">Statistics 101 (9/10): Understanding p-value</a></li>
 <li><strong>Statistical Thinking (current)</strong></li>
 </ul>
 <h2>References</h2>

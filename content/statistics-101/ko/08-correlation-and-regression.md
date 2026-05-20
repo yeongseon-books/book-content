@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 8
-title: 상관과 회귀
+title: "Statistics 101 (8/10): 상관과 회귀"
 status: content-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 상관계수의 한계와 단순 선형 회귀로 변수 관계
 last_reviewed: '2026-05-12'
 ---
 
-# 상관과 회귀
+# Statistics 101 (8/10): 상관과 회귀
 
 두 변수가 함께 움직이면 사람은 곧바로 이유를 찾고 싶어 합니다. 광고비가 늘면 매출이 오르는지, 공부 시간이 길면 점수가 오르는지, 가격이 내려가면 수요가 늘어나는지 같은 질문은 분석의 출발점이 됩니다.
 
@@ -28,14 +28,21 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 8번째 글입니다. 여기서는 상관계수와 단순 선형 회귀를 나란히 놓고, R²와 잔차가 왜 중요한지, 그리고 왜 상관과 인과를 절대 섞어 읽으면 안 되는지 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 상관계수는 무엇을 말하고 무엇은 말하지 못할까요?
 - 회귀식은 상관계수보다 어떤 정보를 더 줄까요?
 - R²는 어떤 범위에서 어떻게 읽어야 할까요?
-- 잔차를 보지 않으면 어떤 문제를 놓치게 될까요?
 
-> 상관은 함께 움직임을 말하고, 회귀는 그 움직임을 예측 가능한 식으로 정리합니다.
+## 큰 그림
+
+![Statistics 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
+
+*Statistics 101 8장 흐름 개요*
+
+이 그림에서는 상관과 회귀를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 상관과 회귀의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -47,9 +54,6 @@ last_reviewed: '2026-05-12'
 
 상관은 두 변수가 같은 방향으로 움직이는지와 그 강도를 보여 줍니다. 회귀는 그 관계를 식으로 적어, x가 바뀔 때 y가 어떻게 달라지는지 예측 가능한 형태로 만듭니다. 마지막으로 R²와 잔차는 그 식이 데이터를 얼마나 설명하는지 점검하게 합니다.
 
-![멘탈 모델](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
-
-*상관은 방향과 강도를 요약하고, 회귀는 그 관계를 식으로 바꾼 뒤 R²와 잔차로 모델을 점검합니다.*
 이 흐름을 이해하면 상관계수는 요약 지표이고, 회귀는 모델이며, 잔차 진단은 모델 검토 단계라는 점이 분명해집니다.
 
 ## 핵심 용어
@@ -162,17 +166,29 @@ plt.scatter(model.predict(X), resid); plt.axhline(0); plt.show()
 
 다음 글에서는 p-value를 따로 떼어 더 깊게 다룹니다. 많은 보고서가 결론을 p < 0.05 한 줄로 적는 이유와, 그 문장이 왜 자주 잘못 읽히는지 정리해 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **상관계수는 무엇을 말하고 무엇은 말하지 못할까요?**
+  - 본문의 기준은 상관과 회귀를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **회귀식은 상관계수보다 어떤 정보를 더 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **R²는 어떤 범위에서 어떻게 읽어야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [통계란 무엇인가?](./01-what-is-statistics.md)
-- [평균, 중앙값, 분산](./02-mean-median-variance.md)
-- [분포](./03-distributions.md)
-- [표본과 모집단](./04-sample-and-population.md)
-- [추정](./05-estimation.md)
-- [신뢰구간](./06-confidence-interval.md)
-- [가설검정](./07-hypothesis-testing.md)
+## 시리즈 목차
+
+- [Statistics 101 (1/10): 통계란 무엇인가?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): 평균, 중앙값, 분산](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): 분포](./03-distributions.md)
+- [Statistics 101 (4/10): 표본과 모집단](./04-sample-and-population.md)
+- [Statistics 101 (5/10): 추정](./05-estimation.md)
+- [Statistics 101 (6/10): 신뢰구간](./06-confidence-interval.md)
+- [Statistics 101 (7/10): 가설검정](./07-hypothesis-testing.md)
 - **상관과 회귀 (현재 글)**
 - p-value 이해하기 (예정)
 - 통계적 사고방식 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 1
-title: What Is Statistics?
+title: "Statistics 101 (1/10): What Is Statistics?"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: An introduction to descriptive and inferential statistics and t
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Statistics?
+# Statistics 101 (1/10): What Is Statistics?
 
 As data accumulates, so do numbers. But more numbers do not automatically produce better judgment. Monthly revenue is up, conversion changed, survey satisfaction looks high—those statements all contain numbers, but they do not say whether the conclusion is stable enough to trust.
 
@@ -28,14 +28,21 @@ Statistics is the tool that closes that gap. It is not just a way to format numb
 
 This is the first post in the Statistics 101 series. Here we will split statistics into its two major branches—descriptive and inferential statistics—and build the basic flow that connects data to a decision.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What does statistics actually study?
 - How are descriptive statistics and inferential statistics different?
 - How does statistics connect numbers to decision-making?
-- In what order should we read a statistical result?
 
-> Statistics is the shared language that lets us make decisions in uncertain situations.
+## Big Picture
+
+![statistics 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 1 flow overview*
+
+This picture places What Is Statistics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Statistics? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ As data piles up, the question *“is this really true?”* shows up more and mo
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
-
-*The basic flow of statistics: summarize the data, infer beyond the sample, then write the decision.*
 ## Key Terms
 
 - **Descriptive Statistics**: statistics that *summarize* data (mean, variance, etc.).
@@ -147,7 +151,18 @@ A/B testing, revenue forecasting, anomaly detection, quality control — *every 
 
 Statistics is the tool that moves *uncertainty* into *decisions*. The next episode dives into the most basic summary tools — *mean, median, and variance*.
 
+## Answering the Opening Questions
+
+- **What does statistics actually study?**
+  - The article treats What Is Statistics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How are descriptive statistics and inferential statistics different?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does statistics connect numbers to decision-making?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Statistics? (current)**
 - Mean, Median, and Variance (upcoming)
 - Distributions (upcoming)
@@ -158,6 +173,7 @@ Statistics is the tool that moves *uncertainty* into *decisions*. The next episo
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

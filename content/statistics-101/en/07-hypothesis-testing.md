@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 7
-title: Hypothesis Testing
+title: "Statistics 101 (7/10): Hypothesis Testing"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A walkthrough of null and alternative hypotheses, the t-test fo
 last_reviewed: '2026-05-04'
 ---
 
-# Hypothesis Testing
+# Statistics 101 (7/10): Hypothesis Testing
 
 In statistical work, we constantly run into questions about differences. Did the new button lift conversion? Is the new treatment better than the old one? Is the model improvement real, or just noise in the sample?
 
@@ -28,14 +28,21 @@ Hypothesis testing exists because visible differences are not automatically mean
 
 This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - How far can data support the claim that a difference exists?
 - What do H0 and H1 actually mean?
 - Why is p-value alone not enough?
-- How are sample size and statistical power connected?
 
-> Hypothesis testing turns chance into something we can reason about before we rush into a conclusion.
+## Big Picture
+
+![statistics 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 7 flow overview*
+
+This picture places Hypothesis Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Hypothesis Testing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ This is post 7 in the Statistics 101 series. Here we will define the null and al
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
-
-*Hypothesis testing starts from a no-difference world, measures how unusual the observed data would be there, and then compares that result to a threshold.*
 ## Key Terms
 
 - **H0 (Null Hypothesis)**: *no difference*.
@@ -152,17 +156,29 @@ A/B test result pages, *model performance comparisons*, *clinical trials* — th
 
 Hypothesis testing is the *standard language of decisions*. The next episode looks at the *relationship between variables* — *correlation and regression*.
 
+## Answering the Opening Questions
+
+- **How far can data support the claim that a difference exists?**
+  - The article treats Hypothesis Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do H0 and H1 actually mean?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is p-value alone not enough?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
 - **Hypothesis Testing (current)**
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

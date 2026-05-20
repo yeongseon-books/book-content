@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Confidence Interval</title>
+<title>Statistics 101 (6/10): Confidence Interval</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Confidence Interval</h1>
+<h1>Statistics 101 (6/10): Confidence Interval</h1>
 <p>The phrase “95% confidence interval” shows up everywhere in statistical reporting, but it is also one of the most frequently misread phrases in the field. Many readers hear it as “there is a 95% probability the true value is inside this interval,” even though classical confidence intervals do not mean that.</p>
 <p>Confidence belongs to the procedure that generated the interval, not to the one interval you happen to be looking at. Keeping that distinction clear prevents a lot of later confusion about significance, uncertainty, and effect interpretation.</p>
 <p>This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does a 95% confidence interval really mean?</li>
 <li>Why should we switch to the t-distribution on small samples?</li>
 <li>What can we use when the distribution is skewed?</li>
-<li>What can we conclude when a confidence interval contains zero?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 6 flow overview</em></p>
+<p>This picture places Confidence Interval inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Confidence belongs to the hit rate of the method, not to the single interval on the page.</p>
+<p>The core of Confidence Interval is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Confidence intervals are the <em>most common tool</em> for showing uncertainty — and the <em>most commonly misread</em>. Knowing the <em>exact meaning</em> is what produces <em>exact decisions</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>A 95% CI is the </em>hit rate of the method<em>, not the probability of </em>this<em> particular interval.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A confidence interval combines an estimate, its standard error, and a critical value; the confidence belongs to that procedure.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Confidence Interval</strong>: an interval such that, if the <em>procedure</em> were repeated infinitely, <em>95% of intervals</em> would contain the parameter.</li>
@@ -153,12 +154,22 @@ print(&quot;Bootstrap CI:&quot;, np.percentile(boots, [2.5, 97.5]))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Confidence intervals are the tool for <em>visualizing uncertainty</em>. The next episode covers <em>hypothesis testing</em> — asking <em>whether a difference exists</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
+<li><strong>What does a 95% confidence interval really mean?</strong></li>
+<li>The article treats Confidence Interval as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why should we switch to the t-distribution on small samples?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What can we use when the distribution is skewed?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Statistics 101 (2/10): Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Statistics 101 (3/10): Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Statistics 101 (4/10): Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Statistics 101 (5/10): Estimation</a></li>
 <li><strong>Confidence Interval (current)</strong></li>
 <li>Hypothesis Testing (upcoming)</li>
 <li>Correlation and Regression (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 5
-title: Estimation
+title: "Statistics 101 (5/10): Estimation"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: How sample means turn into estimates of population means, compa
 last_reviewed: '2026-05-04'
 ---
 
-# Estimation
+# Statistics 101 (5/10): Estimation
 
 Computing a sample mean is not the end of the analysis. The more important question is how far that number might be from the true value in the population. Estimation is the part of statistics that turns that gap into something we can talk about explicitly.
 
@@ -28,14 +28,21 @@ That is why a good estimate never reports only the value. It reports the value t
 
 This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - How well can a sample mean stand in for a population mean?
 - What is the difference between point estimation and interval estimation?
 - How is standard error different from standard deviation?
-- What changes when the sample size grows?
 
-> An estimate is not a single number. It is a pair: value and error.
+## Big Picture
+
+![statistics 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 5 flow overview*
+
+This picture places Estimation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Estimation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ Reporting a mean is not the end. *How close it is* must be reported *together* s
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
-
-*Point estimates become interval estimates only after you add the estimator's uncertainty through standard error.*
 ## Key Terms
 
 - **Point Estimate**: a *single value* estimate of a parameter (x̄).
@@ -142,17 +146,29 @@ Conversion rate in A/B tests, monthly revenue averages, p95 latency — every *d
 
 Estimation is the act of *writing uncertainty as a number*. The next episode looks at the *true meaning* of a *95% CI*.
 
+## Answering the Opening Questions
+
+- **How well can a sample mean stand in for a population mean?**
+  - The article treats Estimation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the difference between point estimation and interval estimation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is standard error different from standard deviation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
 - **Estimation (current)**
 - Confidence Interval (upcoming)
 - Hypothesis Testing (upcoming)
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

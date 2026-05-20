@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 10
-title: Statistical Thinking
+title: "Statistics 101 (10/10): Statistical Thinking"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A capstone on statistical thinking that ties question, data, di
 last_reviewed: '2026-05-04'
 ---
 
-# Statistical Thinking
+# Statistics 101 (10/10): Statistical Thinking
 
 When you learn statistics chapter by chapter, means, variances, distributions, hypothesis tests, and p-values can feel like separate tools. In real work, they rarely move separately. A single question leads into data collection, distribution checks, estimation, testing, and finally a decision.
 
@@ -28,14 +28,21 @@ So the last step in the series is not one more formula. It is seeing how the ear
 
 This is the final post in the Statistics 101 series. Here we will rewrite the series as a mindset rather than a list of tools and walk once more through the practical flow from question to decision.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Is statistics a collection of formulas or a way of thinking?
 - How do question, data, distribution, estimation, and testing connect?
 - How should p-value, effect size, and business cost come together in one decision?
-- What should we document to improve data-driven decisions over time?
 
-> Statistical thinking is not a trick for producing numbers. It is a flow for making decisions under uncertainty.
+## Big Picture
+
+![statistics 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 10 flow overview*
+
+This picture places Statistical Thinking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Statistical Thinking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ Knowing the tools is meaningless without knowing *when and how to use them*. *St
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
-
-*Statistical thinking is one connected flow: question, data, distribution, estimation, testing, effect size, then decision.*
 ## Key Terms
 
 - **Question-first**: *Sharpen the question* before *touching the data*.
@@ -149,17 +153,29 @@ Product experiments, pricing decisions, drug approvals, policy evaluations — *
 
 Statistics is the *language of uncertainty*, and statistical thinking is the *flow from data to decisions*. The next steps are *Probability 101* and *Machine Learning 101*, where this thinking expands into *prediction*.
 
+## Answering the Opening Questions
+
+- **Is statistics a collection of formulas or a way of thinking?**
+  - The article treats Statistical Thinking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do question, data, distribution, estimation, and testing connect?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should p-value, effect size, and business cost come together in one decision?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
-- [Correlation and Regression](./08-correlation-and-regression.md)
-- [Understanding p-value](./09-understanding-p-value.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
+- [Statistics 101 (8/10): Correlation and Regression](./08-correlation-and-regression.md)
+- [Statistics 101 (9/10): Understanding p-value](./09-understanding-p-value.md)
 - **Statistical Thinking (current)**
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 2
-title: Mean, Median, and Variance
+title: "Statistics 101 (2/10): Mean, Median, and Variance"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A practical comparison of mean, median, and variance, with rule
 last_reviewed: '2026-05-04'
 ---
 
-# Mean, Median, and Variance
+# Statistics 101 (2/10): Mean, Median, and Variance
 
 The moment you compress a dataset into one or two numbers, you are already shaping the story the report will tell. Whether you write down only the mean, add the median, or explain spread with variance and standard deviation changes the reader's interpretation.
 
@@ -28,14 +28,21 @@ That choice becomes especially important when the data has outliers or a long ta
 
 This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - When should we use the mean, and when should we use the median?
 - What do variance and standard deviation tell us that the mean cannot?
 - What happens to summary statistics when one extreme outlier appears?
-- When is IQR the safer measure of spread?
 
-> A good summary statistic is not a pretty compression of the data. It is the number that fits the question.
+## Big Picture
+
+![statistics 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 2 flow overview*
+
+This picture places Mean, Median, and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Mean, Median, and Variance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ Data has *thousands of rows*, but humans decide with *one or two numbers*. *Whic
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
-
-*A useful summary needs both a center metric and a spread metric, not just one representative number.*
 ## Key Terms
 
 - **Mean**: sum / count. *Sensitive to outliers*.
@@ -144,8 +148,19 @@ Revenue, response time, ad cost — all of these tend to be *long-tail*, so *med
 
 Summary statistics is a tool for *briefly conveying the shape* of data. The next episode goes one level deeper into the *shape itself* — *distributions*.
 
+## Answering the Opening Questions
+
+- **When should we use the mean, and when should we use the median?**
+  - The article treats Mean, Median, and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What do variance and standard deviation tell us that the mean cannot?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What happens to summary statistics when one extreme outlier appears?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
 - **Mean, Median, and Variance (current)**
 - Distributions (upcoming)
 - Sample and Population (upcoming)
@@ -155,6 +170,7 @@ Summary statistics is a tool for *briefly conveying the shape* of data. The next
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

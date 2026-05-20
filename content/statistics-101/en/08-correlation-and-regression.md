@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 8
-title: Correlation and Regression
+title: "Statistics 101 (8/10): Correlation and Regression"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A side-by-side look at correlation coefficients and simple line
 last_reviewed: '2026-05-04'
 ---
 
-# Correlation and Regression
+# Statistics 101 (8/10): Correlation and Regression
 
 When two variables move together, people immediately want an explanation. Does more ad spend increase revenue? Does more study time improve the score? Does a lower price increase demand? Those are natural questions, but the first pattern you see is not automatically a proof of causation.
 
@@ -28,14 +28,21 @@ Correlation describes direction and strength. Regression writes the relationship
 
 This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What does a correlation coefficient tell us, and what does it not tell us?
 - What extra information does a regression equation provide?
 - How should we interpret R²?
-- What do residuals reveal that the fitted line alone cannot?
 
-> Correlation tells you that variables move together. Regression organizes that movement into a model you can inspect.
+## Big Picture
+
+![statistics 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 8 flow overview*
+
+This picture places Correlation and Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Correlation and Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ This is post 8 in the Statistics 101 series. Here we will compare correlation co
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
-
-*Correlation summarizes movement together, while regression turns that movement into an equation and then checks the fit with R² and residuals.*
 ## Key Terms
 
 - **Pearson r**: strength of *linear correlation* (-1 to +1).
@@ -150,17 +154,29 @@ Revenue forecasting, price ~ demand, ads ~ conversion, usage ~ churn — used ev
 
 Correlation and regression are the most basic tools for *expressing relationships as numbers*. The next episode goes deep into the *true meaning of the p-value*.
 
+## Answering the Opening Questions
+
+- **What does a correlation coefficient tell us, and what does it not tell us?**
+  - The article treats Correlation and Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What extra information does a regression equation provide?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should we interpret R²?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
 - **Correlation and Regression (current)**
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

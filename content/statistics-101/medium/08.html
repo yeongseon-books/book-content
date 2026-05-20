@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Correlation and Regression</title>
+<title>Statistics 101 (8/10): Correlation and Regression</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Correlation and Regression</h1>
+<h1>Statistics 101 (8/10): Correlation and Regression</h1>
 <p>When two variables move together, people immediately want an explanation. Does more ad spend increase revenue? Does more study time improve the score? Does a lower price increase demand? Those are natural questions, but the first pattern you see is not automatically a proof of causation.</p>
 <p>Correlation describes direction and strength. Regression writes the relationship as an equation you can inspect and use for prediction. They are closely related, but they do not answer the same question.</p>
 <p>This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does a correlation coefficient tell us, and what does it not tell us?</li>
 <li>What extra information does a regression equation provide?</li>
 <li>How should we interpret R²?</li>
-<li>What do residuals reveal that the fitted line alone cannot?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 8 flow overview</em></p>
+<p>This picture places Correlation and Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Correlation tells you that variables move together. Regression organizes that movement into a model you can inspect.</p>
+<p>The core of Correlation and Regression is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p><em>Revenue ~ ad spend</em>, <em>study time ~ score</em> — <em>relationships</em> are the <em>start of all analysis</em>. Correlation and regression are the tools that <em>put a relationship into numbers</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>Correlation is not causation.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Correlation summarizes movement together, while regression turns that movement into an equation and then checks the fit with R² and residuals.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Pearson r</strong>: strength of <em>linear correlation</em> (-1 to +1).</li>
@@ -151,14 +152,24 @@ plt.scatter(model.predict(X), resid); plt.axhline(0); plt.show()
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Correlation and regression are the most basic tools for <em>expressing relationships as numbers</em>. The next episode goes deep into the <em>true meaning of the p-value</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Hypothesis Testing</a></li>
+<li><strong>What does a correlation coefficient tell us, and what does it not tell us?</strong></li>
+<li>The article treats Correlation and Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What extra information does a regression equation provide?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should we interpret R²?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Statistics 101 (2/10): Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Statistics 101 (3/10): Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Statistics 101 (4/10): Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Statistics 101 (5/10): Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Statistics 101 (6/10): Confidence Interval</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Statistics 101 (7/10): Hypothesis Testing</a></li>
 <li><strong>Correlation and Regression (current)</strong></li>
 <li>Understanding p-value (upcoming)</li>
 <li>Statistical Thinking (upcoming)</li>

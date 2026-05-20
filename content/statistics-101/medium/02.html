@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Mean, Median, and Variance</title>
+<title>Statistics 101 (2/10): Mean, Median, and Variance</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Mean, Median, and Variance</h1>
+<h1>Statistics 101 (2/10): Mean, Median, and Variance</h1>
 <p>The moment you compress a dataset into one or two numbers, you are already shaping the story the report will tell. Whether you write down only the mean, add the median, or explain spread with variance and standard deviation changes the reader's interpretation.</p>
 <p>That choice becomes especially important when the data has outliers or a long tail. In those cases, the mean can move far away from what most observations actually look like.</p>
 <p>This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>When should we use the mean, and when should we use the median?</li>
 <li>What do variance and standard deviation tell us that the mean cannot?</li>
 <li>What happens to summary statistics when one extreme outlier appears?</li>
-<li>When is IQR the safer measure of spread?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 2 flow overview</em></p>
+<p>This picture places Mean, Median, and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A good summary statistic is not a pretty compression of the data. It is the number that fits the question.</p>
+<p>The core of Mean, Median, and Variance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Data has <em>thousands of rows</em>, but humans decide with <em>one or two numbers</em>. <em>Which number you pick</em> determines the <em>quality of the decision</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>One wrong mean writes one wrong decision.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>A useful summary needs both a center metric and a spread metric, not just one representative number.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Mean</strong>: sum / count. <em>Sensitive to outliers</em>.</li>
@@ -148,8 +149,18 @@ Decision: report the median, not the mean.
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Summary statistics is a tool for <em>briefly conveying the shape</em> of data. The next episode goes one level deeper into the <em>shape itself</em> — <em>distributions</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><strong>When should we use the mean, and when should we use the median?</strong></li>
+<li>The article treats Mean, Median, and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What do variance and standard deviation tell us that the mean cannot?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What happens to summary statistics when one extreme outlier appears?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
 <li><strong>Mean, Median, and Variance (current)</strong></li>
 <li>Distributions (upcoming)</li>
 <li>Sample and Population (upcoming)</li>

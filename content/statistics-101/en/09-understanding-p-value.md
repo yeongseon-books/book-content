@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 9
-title: Understanding p-value
+title: "Statistics 101 (9/10): Understanding p-value"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A clear definition of the p-value, the five most common misread
 last_reviewed: '2026-05-04'
 ---
 
-# Understanding p-value
+# Statistics 101 (9/10): Understanding p-value
 
 If you read enough statistical reports, you will keep running into lines like p < 0.05. The problem is that this single line is often overloaded. Some readers treat it as the probability that the hypothesis is true, others treat it as the size of the effect, and others read p > 0.05 as proof that nothing is happening.
 
@@ -28,14 +28,21 @@ The p-value does none of those jobs. It only answers one question: assuming the 
 
 This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What does the p-value actually mean?
 - Why is it so often misread?
 - How is p-value different from effect size?
-- Why does repeated peeking at the data create trouble?
 
-> A p-value is not the truth probability of a hypothesis. It is a measure of how surprising the data would be under the null.
+## Big Picture
+
+![statistics 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 9 flow overview*
+
+This picture places Understanding p-value inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Understanding p-value is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ Most papers and reports collapse a *conclusion* into one line: *p < 0.05*. Yet *
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
-
-*A p-value measures how surprising the observed data would be if the null hypothesis were true.*
 ## Key Terms
 
 - **p-value**: under the *assumption that H0 is true*, the probability of seeing a *result at least as extreme* as the observed one.
@@ -151,17 +155,29 @@ A/B tests, clinical trials, quality control — production reports always pair *
 
 A p-value is *not proof*; it is a *measure of surprise*. The next episode wraps everything together as a *statistical mindset*.
 
+## Answering the Opening Questions
+
+- **What does the p-value actually mean?**
+  - The article treats Understanding p-value as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is it so often misread?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is p-value different from effect size?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
-- [Confidence Interval](./06-confidence-interval.md)
-- [Hypothesis Testing](./07-hypothesis-testing.md)
-- [Correlation and Regression](./08-correlation-and-regression.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
+- [Statistics 101 (6/10): Confidence Interval](./06-confidence-interval.md)
+- [Statistics 101 (7/10): Hypothesis Testing](./07-hypothesis-testing.md)
+- [Statistics 101 (8/10): Correlation and Regression](./08-correlation-and-regression.md)
 - **Understanding p-value (current)**
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References

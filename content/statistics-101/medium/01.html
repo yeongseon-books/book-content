@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Statistics?</title>
+<title>Statistics 101 (1/10): What Is Statistics?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What Is Statistics?</h1>
+<h1>Statistics 101 (1/10): What Is Statistics?</h1>
 <p>As data accumulates, so do numbers. But more numbers do not automatically produce better judgment. Monthly revenue is up, conversion changed, survey satisfaction looks high—those statements all contain numbers, but they do not say whether the conclusion is stable enough to trust.</p>
 <p>Statistics is the tool that closes that gap. It is not just a way to format numbers neatly. It is a way to move from observation to a decision while keeping uncertainty visible.</p>
 <p>This is the first post in the Statistics 101 series. Here we will split statistics into its two major branches—descriptive and inferential statistics—and build the basic flow that connects data to a decision.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does statistics actually study?</li>
 <li>How are descriptive statistics and inferential statistics different?</li>
 <li>How does statistics connect numbers to decision-making?</li>
-<li>In what order should we read a statistical result?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Statistics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Statistics is the shared language that lets us make decisions in uncertain situations.</p>
+<p>The core of What Is Statistics? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>As data piles up, the question <em>“is this really true?”</em> shows up more and more often. Statistics is the tool that <em>links hypothesis to evidence in numbers</em> — making <em>uncertain decisions less uncertain</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>Good statistical thinking produces decisions, not numbers.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The basic flow of statistics: summarize the data, infer beyond the sample, then write the decision.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Descriptive Statistics</strong>: statistics that <em>summarize</em> data (mean, variance, etc.).</li>
@@ -148,6 +149,16 @@ print(ttest_ind(a, b, equal_var=False))
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Statistics is the tool that moves <em>uncertainty</em> into <em>decisions</em>. The next episode dives into the most basic summary tools — <em>mean, median, and variance</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What does statistics actually study?</strong></li>
+<li>The article treats What Is Statistics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How are descriptive statistics and inferential statistics different?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does statistics connect numbers to decision-making?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Statistics? (current)</strong></li>
 <li>Mean, Median, and Variance (upcoming)</li>

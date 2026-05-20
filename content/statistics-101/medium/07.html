@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Hypothesis Testing</title>
+<title>Statistics 101 (7/10): Hypothesis Testing</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Hypothesis Testing</h1>
+<h1>Statistics 101 (7/10): Hypothesis Testing</h1>
 <p>In statistical work, we constantly run into questions about differences. Did the new button lift conversion? Is the new treatment better than the old one? Is the model improvement real, or just noise in the sample?</p>
 <p>Hypothesis testing exists because visible differences are not automatically meaningful differences. Samples always wobble. Without a formal procedure, it is easy to mistake random fluctuation for evidence.</p>
 <p>This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How far can data support the claim that a difference exists?</li>
 <li>What do H0 and H1 actually mean?</li>
 <li>Why is p-value alone not enough?</li>
-<li>How are sample size and statistical power connected?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 7 flow overview</em></p>
+<p>This picture places Hypothesis Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Hypothesis testing turns chance into something we can reason about before we rush into a conclusion.</p>
+<p>The core of Hypothesis Testing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p><em>A/B testing, campaign effects, model comparisons</em> — <em>half</em> of all <em>decisions</em> run on hypothesis testing. Asking <em>correctly</em> avoids both <em>overclaiming</em> and <em>underclaiming</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>Asking the right question matters more than the answer.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>Hypothesis testing starts from a no-difference world, measures how unusual the observed data would be there, and then compares that result to a threshold.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>H0 (Null Hypothesis)</strong>: <em>no difference</em>.</li>
@@ -153,13 +154,23 @@ print(&quot;Cohen's d:&quot;, diff / pooled)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Hypothesis testing is the <em>standard language of decisions</em>. The next episode looks at the <em>relationship between variables</em> — <em>correlation and regression</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
+<li><strong>How far can data support the claim that a difference exists?</strong></li>
+<li>The article treats Hypothesis Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What do H0 and H1 actually mean?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why is p-value alone not enough?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Statistics 101 (2/10): Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Statistics 101 (3/10): Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Statistics 101 (4/10): Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Statistics 101 (5/10): Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Statistics 101 (6/10): Confidence Interval</a></li>
 <li><strong>Hypothesis Testing (current)</strong></li>
 <li>Correlation and Regression (upcoming)</li>
 <li>Understanding p-value (upcoming)</li>

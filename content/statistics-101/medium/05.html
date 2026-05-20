@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Estimation</title>
+<title>Statistics 101 (5/10): Estimation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Estimation</h1>
+<h1>Statistics 101 (5/10): Estimation</h1>
 <p>Computing a sample mean is not the end of the analysis. The more important question is how far that number might be from the true value in the population. Estimation is the part of statistics that turns that gap into something we can talk about explicitly.</p>
 <p>That is why a good estimate never reports only the value. It reports the value together with its uncertainty. Once the error disappears from the report, the estimate starts to look more certain than it really is.</p>
 <p>This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.</p>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How well can a sample mean stand in for a population mean?</li>
 <li>What is the difference between point estimation and interval estimation?</li>
 <li>How is standard error different from standard deviation?</li>
-<li>What changes when the sample size grows?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="statistics 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>statistics 101 chapter 5 flow overview</em></p>
+<p>This picture places Estimation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An estimate is not a single number. It is a pair: value and error.</p>
+<p>The core of Estimation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Reporting a mean is not the end. <em>How close it is</em> must be reported <em>together</em> so decision makers can read the <em>risk</em>.</p>
@@ -73,8 +76,6 @@
 <p><em>An estimate always carries error with it.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Point estimates become interval estimates only after you add the estimator's uncertainty through standard error.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Point Estimate</strong>: a <em>single value</em> estimate of a parameter (x̄).</li>
@@ -146,11 +147,21 @@ print(f&quot;95% CI: [{lower:.1f}, {upper:.1f}]&quot;)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Estimation is the act of <em>writing uncertainty as a number</em>. The next episode looks at the <em>true meaning</em> of a <em>95% CI</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><strong>How well can a sample mean stand in for a population mean?</strong></li>
+<li>The article treats Estimation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the difference between point estimation and interval estimation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How is standard error different from standard deviation?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">Statistics 101 (1/10): What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Statistics 101 (2/10): Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Statistics 101 (3/10): Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Statistics 101 (4/10): Sample and Population</a></li>
 <li><strong>Estimation (current)</strong></li>
 <li>Confidence Interval (upcoming)</li>
 <li>Hypothesis Testing (upcoming)</li>

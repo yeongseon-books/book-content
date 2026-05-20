@@ -1,7 +1,7 @@
 ---
 series: statistics-101
 episode: 6
-title: Confidence Interval
+title: "Statistics 101 (6/10): Confidence Interval"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: What a 95 percent confidence interval really means, common misc
 last_reviewed: '2026-05-04'
 ---
 
-# Confidence Interval
+# Statistics 101 (6/10): Confidence Interval
 
 The phrase “95% confidence interval” shows up everywhere in statistical reporting, but it is also one of the most frequently misread phrases in the field. Many readers hear it as “there is a 95% probability the true value is inside this interval,” even though classical confidence intervals do not mean that.
 
@@ -28,14 +28,21 @@ Confidence belongs to the procedure that generated the interval, not to the one 
 
 This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What does a 95% confidence interval really mean?
 - Why should we switch to the t-distribution on small samples?
 - What can we use when the distribution is skewed?
-- What can we conclude when a confidence interval contains zero?
 
-> Confidence belongs to the hit rate of the method, not to the single interval on the page.
+## Big Picture
+
+![statistics 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
+
+*statistics 101 chapter 6 flow overview*
+
+This picture places Confidence Interval inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Confidence Interval is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -45,9 +52,6 @@ Confidence intervals are the *most common tool* for showing uncertainty — and 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
-
-*A confidence interval combines an estimate, its standard error, and a critical value; the confidence belongs to that procedure.*
 ## Key Terms
 
 - **Confidence Interval**: an interval such that, if the *procedure* were repeated infinitely, *95% of intervals* would contain the parameter.
@@ -152,17 +156,29 @@ A/B test results, regression coefficients, effect sizes — every *inference rep
 
 Confidence intervals are the tool for *visualizing uncertainty*. The next episode covers *hypothesis testing* — asking *whether a difference exists*.
 
+## Answering the Opening Questions
+
+- **What does a 95% confidence interval really mean?**
+  - The article treats Confidence Interval as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should we switch to the t-distribution on small samples?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What can we use when the distribution is skewed?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Statistics?](./01-what-is-statistics.md)
-- [Mean, Median, and Variance](./02-mean-median-variance.md)
-- [Distributions](./03-distributions.md)
-- [Sample and Population](./04-sample-and-population.md)
-- [Estimation](./05-estimation.md)
+## In this series
+
+- [Statistics 101 (1/10): What Is Statistics?](./01-what-is-statistics.md)
+- [Statistics 101 (2/10): Mean, Median, and Variance](./02-mean-median-variance.md)
+- [Statistics 101 (3/10): Distributions](./03-distributions.md)
+- [Statistics 101 (4/10): Sample and Population](./04-sample-and-population.md)
+- [Statistics 101 (5/10): Estimation](./05-estimation.md)
 - **Confidence Interval (current)**
 - Hypothesis Testing (upcoming)
 - Correlation and Regression (upcoming)
 - Understanding p-value (upcoming)
 - Statistical Thinking (upcoming)
+
 <!-- toc:end -->
 
 ## References
