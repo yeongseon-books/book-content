@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 8
-title: Logging and Analysis
+title: "DevOps 101 (8/10): Logging and Analysis"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Structured logs, central collection, search, and analysis. A pr
 last_reviewed: '2026-05-15'
 ---
 
-# Logging and Analysis
+# DevOps 101 (8/10): Logging and Analysis
 
 Logs become valuable long after they are written. When an incident starts at 3 AM or a customer reports a failure from last week, the real question is whether your team can search across services, correlate one request, and find the useful lines quickly.
 
 That is why logging is not just about emitting more text. It is about structure, retention, central collection, and the fields that make later investigation possible.
 
 This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Logging and Analysis?
+- Which signal should the example or diagram make visible for Logging and Analysis?
+- What failure should be prevented first when Logging and Analysis reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 8 flow overview*
+
+This picture places Logging and Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Logging and Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ The era of *ssh-ing* into a single server and running *grep* is over. In distrib
 > You read logs *three weeks later* far more often than you do *right now*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -162,17 +174,29 @@ Mature teams keep *trace_id* as a *common key* across *logs, metrics, and traces
 
 Logs are a *time-machine for your system*. In the next post we combine every signal to *respond to incidents*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Logging and Analysis?**
+  - The article treats Logging and Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Logging and Analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Logging and Analysis reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is DevOps?](./01-what-is-devops.md)
-- [The CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [Containers and Builds](./06-containers-and-build.md)
-- [Monitoring and Alerting](./07-monitoring-and-alerting.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): Containers and Build](./06-containers-and-build.md)
+- [DevOps 101 (7/10): Monitoring and Alerting](./07-monitoring-and-alerting.md)
 - **Logging and Analysis (current)**
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

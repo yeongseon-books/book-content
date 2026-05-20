@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 3
-title: CD and Deployment Strategies
+title: "DevOps 101 (3/10): CD and Deployment Strategies"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Compare Rolling, Blue-Green, and Canary deployments and design 
 last_reviewed: '2026-05-15'
 ---
 
-# CD and Deployment Strategies
+# DevOps 101 (3/10): CD and Deployment Strategies
 
 Many teams say they fear deployment, but the deeper fear is usually rollback. If a release goes bad, how quickly can you stop the blast radius, restore service, and explain what changed? Without a good answer, every deployment feels like a gamble.
 
 That is why continuous delivery is not just about automation. It is about making releases small, observable, and reversible so production changes become a routine operating motion instead of a high-drama event.
 
 This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying CD and Deployment Strategies?
+- Which signal should the example or diagram make visible for CD and Deployment Strategies?
+- What failure should be prevented first when CD and Deployment Strategies reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 3 flow overview*
+
+This picture places CD and Deployment Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of CD and Deployment Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Deployment is *the most dangerous moment*. A good strategy *shrinks the blast ra
 > *Deployability* and *feature activation* must be *separated*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -188,9 +200,20 @@ Large services automate *Canary Analysis (CAA)* with tools that compare metrics 
 
 CD is *a stream of small, reversible changes*. In the next post we cover *configuration management* across environments.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying CD and Deployment Strategies?**
+  - The article treats CD and Deployment Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for CD and Deployment Strategies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when CD and Deployment Strategies reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
 - **CD and Deployment Strategies (current)**
 - Environments and Configuration (upcoming)
 - Infrastructure as Code (upcoming)
@@ -199,6 +222,7 @@ CD is *a stream of small, reversible changes*. In the next post we cover *config
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

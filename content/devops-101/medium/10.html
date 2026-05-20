@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>An Operable DevOps Flow</title>
+<title>DevOps 101 (10/10): An Operable DevOps Flow</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>An Operable DevOps Flow</h1>
+<h1>DevOps 101 (10/10): An Operable DevOps Flow</h1>
 <p>It is possible to have CI, CD, dashboards, and postmortems and still not have an actual DevOps system. The missing piece is often the loop between them: what ships, what breaks, what gets measured, and how that knowledge changes the next release.</p>
 <p>Operational maturity appears when those parts stop behaving like isolated tools and start behaving like one learning system. That is where DORA metrics, team rituals, and platform choices become more than reporting overhead.</p>
 <p>This is the final post in the DevOps 101 series. Here we connect the earlier chapters into one operable feedback loop and show how a team can measure, review, and improve the whole path from pull request to postmortem.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying An Operable DevOps Flow?</li>
+<li>Which signal should the example or diagram make visible for An Operable DevOps Flow?</li>
+<li>What failure should be prevented first when An Operable DevOps Flow reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="devops 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>devops 101 chapter 10 flow overview</em></p>
+<p>This picture places An Operable DevOps Flow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of An Operable DevOps Flow is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>whole flow</em> that ties this series together</li>
@@ -70,8 +83,6 @@
 <p>What is <em>not measured</em> is <em>not improved</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DORA metrics</strong>: the <em>four metrics</em> from Google's research.</li>
@@ -177,16 +188,26 @@ Days 61-90  Lock weekly deploy review and monthly postmortems, automate one repe
 <blockquote>
 <p><em>DevOps</em> is not a <em>collection of tools</em> but <em>the way a team learns</em>.</p>
 </blockquote>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What is DevOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">The CI Pipeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">Containers and Builds</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">Monitoring and Alerting</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">Logging and Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/09-incident-and-oncall.md">Incident Response and On-Call</a></li>
+<li><strong>What boundary should you inspect first when applying An Operable DevOps Flow?</strong></li>
+<li>The article treats An Operable DevOps Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for An Operable DevOps Flow?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when An Operable DevOps Flow reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">DevOps 101 (1/10): What Is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">DevOps 101 (2/10): CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">DevOps 101 (3/10): CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">DevOps 101 (4/10): Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">DevOps 101 (5/10): Infrastructure as Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">DevOps 101 (6/10): Containers and Build</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">DevOps 101 (7/10): Monitoring and Alerting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">DevOps 101 (8/10): Logging and Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/09-incident-and-oncall.md">DevOps 101 (9/10): Incident Response and On-Call</a></li>
 <li><strong>An Operable DevOps Flow (current)</strong></li>
 </ul>
 <h2>References</h2>

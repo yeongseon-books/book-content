@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 1
-title: What Is DevOps?
+title: "DevOps 101 (1/10): What Is DevOps?"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: The definition, principles, and first practical steps for DevOp
 last_reviewed: '2026-05-15'
 ---
 
-# What Is DevOps?
+# DevOps 101 (1/10): What Is DevOps?
 
 Most teams do not fail because they lack tools. They fail because code review, deployment, monitoring, and incident response all live in different conversations. One team says the feature is done. Another team says production is unstable. The handoff itself becomes the bottleneck.
 
 DevOps is the attempt to remove that handoff cost. It gives one team a shared feedback loop for building, shipping, operating, and learning, so deployment speed and operational stability stop pulling in opposite directions.
 
 This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is DevOps??
+- Which signal should the example or diagram make visible for What Is DevOps??
+- What failure should be prevented first when What Is DevOps? reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 1 flow overview*
+
+This picture places What Is DevOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is DevOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Software produces no value when *only built*. It must be *deployed* and *operate
 > *Fast deploys* and *stable operations* are *not in conflict*. They go together.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -169,7 +181,18 @@ Successful teams start *small*. Auto tests on PRs -> auto deploy -> monitoring -
 
 DevOps is a *cultural shift*. In the next post we go deep on its first lever — the *CI pipeline*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is DevOps??**
+  - The article treats What Is DevOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is DevOps??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is DevOps? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is DevOps? (current)**
 - CI Pipeline (upcoming)
 - CD and Deployment Strategies (upcoming)
@@ -180,6 +203,7 @@ DevOps is a *cultural shift*. In the next post we go deep on its first lever —
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

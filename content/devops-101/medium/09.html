@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Incident Response and On-Call</title>
+<title>DevOps 101 (9/10): Incident Response and On-Call</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Incident Response and On-Call</h1>
+<h1>DevOps 101 (9/10): Incident Response and On-Call</h1>
 <p>Incidents rarely become chaotic because the engineers are weak. They become chaotic because roles are unclear, runbooks are missing, and the same person tries to diagnose, mitigate, communicate, and document at the same time.</p>
 <p>A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.</p>
 <p>This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>How to classify <em>severity (SEV)</em></li>
-<li>How to design an <em>on-call rotation</em></li>
-<li>How to write a <em>runbook</em></li>
-<li>How to run a <em>blameless postmortem</em></li>
-<li>The meaning of <em>MTTR/MTTD</em></li>
+<li>What boundary should you inspect first when applying Incident Response and On-Call?</li>
+<li>Which signal should the example or diagram make visible for Incident Response and On-Call?</li>
+<li>What failure should be prevented first when Incident Response and On-Call reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="devops 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>devops 101 chapter 9 flow overview</em></p>
+<p>This picture places Incident Response and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Incident Response and On-Call is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>When an <em>alert</em> fires at <em>3 AM</em>, who should do what first?</li>
+<li>How should teams define incident <em>severity (SEV)</em> levels so everyone responds with the same language?</li>
+<li>Why is an <em>on-call rotation</em> an operating design decision rather than just a schedule?</li>
+<li>How do <em>runbooks</em> and the <em>incident commander</em> role change real recovery speed?</li>
+<li>How does a <em>blameless postmortem</em> actually connect to preventing recurrence?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Incidents are an <em>organizational</em> problem more than a <em>technical</em> one. Without <em>roles</em> and <em>procedures</em>, people <em>panic</em> and <em>repeat</em> the same mistakes.</p>
@@ -71,8 +84,6 @@
 <p><em>Process</em> is a substitute for <em>memory</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SEV1 to SEV4</strong>: severity from <em>1 (company-wide outage)</em> to <em>4 (minor)</em>.</li>
@@ -186,15 +197,25 @@ SEV4: low-impact bug          | backlog
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Incident response is a combined <em>technical and organizational</em> skill. The final post wraps the whole DevOps flow into a single picture.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What is DevOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">The CI Pipeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">Containers and Builds</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">Monitoring and Alerting</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">Logging and Analysis</a></li>
+<li><strong>What boundary should you inspect first when applying Incident Response and On-Call?</strong></li>
+<li>The article treats Incident Response and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Incident Response and On-Call?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Incident Response and On-Call reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">DevOps 101 (1/10): What Is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">DevOps 101 (2/10): CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">DevOps 101 (3/10): CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">DevOps 101 (4/10): Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">DevOps 101 (5/10): Infrastructure as Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">DevOps 101 (6/10): Containers and Build</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">DevOps 101 (7/10): Monitoring and Alerting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">DevOps 101 (8/10): Logging and Analysis</a></li>
 <li><strong>Incident Response and On-Call (current)</strong></li>
 <li>An Operable DevOps Flow (upcoming)</li>
 </ul>

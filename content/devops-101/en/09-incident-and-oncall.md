@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 9
-title: Incident Response and On-Call
+title: "DevOps 101 (9/10): Incident Response and On-Call"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Severity levels, on-call rotations, runbooks, and blameless pos
 last_reviewed: '2026-05-15'
 ---
 
-# Incident Response and On-Call
+# DevOps 101 (9/10): Incident Response and On-Call
 
 Incidents rarely become chaotic because the engineers are weak. They become chaotic because roles are unclear, runbooks are missing, and the same person tries to diagnose, mitigate, communicate, and document at the same time.
 
 A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.
 
 This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Incident Response and On-Call?
+- Which signal should the example or diagram make visible for Incident Response and On-Call?
+- What failure should be prevented first when Incident Response and On-Call reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 9 flow overview*
+
+This picture places Incident Response and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Incident Response and On-Call is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Incidents are an *organizational* problem more than a *technical* one. Without *
 > *Process* is a substitute for *memory*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -192,17 +204,29 @@ Mature teams attach a *runbook URL* to every alert so on-call engineers start th
 
 Incident response is a combined *technical and organizational* skill. The final post wraps the whole DevOps flow into a single picture.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Incident Response and On-Call?**
+  - The article treats Incident Response and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Incident Response and On-Call?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Incident Response and On-Call reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is DevOps?](./01-what-is-devops.md)
-- [The CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [Containers and Builds](./06-containers-and-build.md)
-- [Monitoring and Alerting](./07-monitoring-and-alerting.md)
-- [Logging and Analysis](./08-logging-and-analysis.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): Containers and Build](./06-containers-and-build.md)
+- [DevOps 101 (7/10): Monitoring and Alerting](./07-monitoring-and-alerting.md)
+- [DevOps 101 (8/10): Logging and Analysis](./08-logging-and-analysis.md)
 - **Incident Response and On-Call (current)**
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

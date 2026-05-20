@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 4
-title: Environments and Configuration
+title: "DevOps 101 (4/10): Environments and Configuration"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Safe patterns for separating dev, stage, and prod environments 
 last_reviewed: '2026-05-15'
 ---
 
-# Environments and Configuration
+# DevOps 101 (4/10): Environments and Configuration
 
 Teams usually notice configuration discipline only after it breaks. The application works in development, then stage uses a different secret, production needs a different domain, and suddenly the same code requires a different build for every environment.
 
 Good configuration management prevents that drift. The code stays the same, the build artifact stays the same, and only environment-specific values change. That is what makes deployments repeatable instead of fragile.
 
 This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Environments and Configuration?
+- Which signal should the example or diagram make visible for Environments and Configuration?
+- What failure should be prevented first when Environments and Configuration reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 4 flow overview*
+
+This picture places Environments and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Environments and Configuration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ This is post 4 in the DevOps 101 series. Here we look at how to separate code fr
 > *Build once, run anywhere*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -168,10 +180,21 @@ Large teams keep secrets in *Vault* or *AWS Secrets Manager* and use the *Extern
 
 Config management is the start of *environment independence*. In the next post we treat *infrastructure itself as code* with *IaC*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Environments and Configuration?**
+  - The article treats Environments and Configuration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Environments and Configuration?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Environments and Configuration reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
 - **Environments and Configuration (current)**
 - Infrastructure as Code (upcoming)
 - Containers and Build (upcoming)
@@ -179,6 +202,7 @@ Config management is the start of *environment independence*. In the next post w
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

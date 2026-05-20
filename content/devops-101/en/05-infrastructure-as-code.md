@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 5
-title: Infrastructure as Code
+title: "DevOps 101 (5/10): Infrastructure as Code"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Treat infrastructure as code with Terraform so changes are vers
 last_reviewed: '2026-05-15'
 ---
 
-# Infrastructure as Code
+# DevOps 101 (5/10): Infrastructure as Code
 
 Console-built infrastructure feels fast right up until you need the same environment again. Then you discover that the real system lives partly in screenshots, partly in memory, and partly in one person's habits.
 
 Infrastructure as Code fixes that by moving cloud changes into the same review-and-history model we already expect from application code. The value is not the syntax itself. The value is repeatability, visibility, and safer change control.
 
 This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Infrastructure as Code?
+- Which signal should the example or diagram make visible for Infrastructure as Code?
+- What failure should be prevented first when Infrastructure as Code reaches a real system?
+
+## Big Picture
+
+![devops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)
+
+*devops 101 chapter 5 flow overview*
+
+This picture places Infrastructure as Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Infrastructure as Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -43,10 +59,6 @@ Console-built infrastructure exists *only in memory*. Replicating it elsewhere r
 > *Code is the single source of truth (SSOT)*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)
-
-*Concept at a Glance*
 
 ## Key Terms
 
@@ -198,17 +210,29 @@ Mature teams automate *PR-based plan/apply* with *Terraform Cloud* or *Atlantis*
 
 IaC is *reproducible infrastructure*. In the next post we cover *containers*, which deliver reproducibility for the *application*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Infrastructure as Code?**
+  - The article treats Infrastructure as Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Infrastructure as Code?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Infrastructure as Code reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is DevOps?](./01-what-is-devops.md)
-- [CI Pipeline](./02-ci-pipeline.md)
-- [CD and Deployment Strategies](./03-cd-and-deployment.md)
-- [Environments and Configuration](./04-environments-and-config.md)
+## In this series
+
+- [DevOps 101 (1/10): What Is DevOps?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI Pipeline](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD and Deployment Strategies](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): Environments and Configuration](./04-environments-and-config.md)
 - **Infrastructure as Code (current)**
 - Containers and Build (upcoming)
 - Monitoring and Alerting (upcoming)
 - Logging and Analysis (upcoming)
 - Incident Response and On-Call (upcoming)
 - An Operable DevOps Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

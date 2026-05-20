@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Containers and Build</title>
+<title>DevOps 101 (6/10): Containers and Build</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Containers and Build</h1>
+<h1>DevOps 101 (6/10): Containers and Build</h1>
 <p>"It works on my laptop" is usually an environment problem wearing an application mask. If the runtime libraries, OS packages, and process entrypoints differ between local and production, deployment quality depends on luck more than engineering.</p>
 <p>Containers reduce that gap by freezing the runtime environment into an image. Once the image becomes the deployable unit, teams can reason about versioning, rollback, and promotion much more cleanly.</p>
 <p>This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The difference between <em>containers</em> and <em>VMs</em></li>
-<li>The core <em>Dockerfile</em> commands</li>
-<li>Shrinking images with <em>multi-stage builds</em></li>
-<li>Leveraging <em>layer caching</em></li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying Containers and Build?</li>
+<li>Which signal should the example or diagram make visible for Containers and Build?</li>
+<li>What failure should be prevented first when Containers and Build reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="devops 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>devops 101 chapter 6 flow overview</em></p>
+<p>This picture places Containers and Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Containers and Build is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How are <em>containers</em> different from <em>VMs</em>, and why do they improve deployment repeatability?</li>
+<li>Which basic <em>Dockerfile</em> instructions do you need to understand first?</li>
+<li>How do <em>multi-stage builds</em> change image size and security?</li>
+<li>Why does a <em>Dockerfile</em> that uses <em>layer caching</em> well also speed up development?</li>
+<li>What traps commonly appear when <em>container images</em> move into production?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>The same build artifact must <em>behave the same</em> in <em>every environment</em>. Containers bundle <em>OS libraries, dependencies, and code</em> into <em>a single unit</em>.</p>
@@ -71,8 +84,6 @@
 <p>Containers realize <em>Build once, run anywhere</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Image</strong>: an <em>immutable executable package</em>.</li>
@@ -163,12 +174,22 @@ USER appuser
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A container is <em>a frozen environment</em>. In the next post we cover how to <em>monitor</em> containers in production.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What Is DevOps?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">CI Pipeline</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
+<li><strong>What boundary should you inspect first when applying Containers and Build?</strong></li>
+<li>The article treats Containers and Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Containers and Build?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Containers and Build reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">DevOps 101 (1/10): What Is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">DevOps 101 (2/10): CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">DevOps 101 (3/10): CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">DevOps 101 (4/10): Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">DevOps 101 (5/10): Infrastructure as Code</a></li>
 <li><strong>Containers and Build (current)</strong></li>
 <li>Monitoring and Alerting (upcoming)</li>
 <li>Logging and Analysis (upcoming)</li>

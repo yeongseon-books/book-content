@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>CI Pipeline</title>
+<title>DevOps 101 (2/10): CI Pipeline</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>CI Pipeline</h1>
+<h1>DevOps 101 (2/10): CI Pipeline</h1>
 <p>A pull request without a reliable CI pipeline is still a guess. Reviewers can catch logic issues, but they should not be the only layer standing between a typo, a broken import, or a vulnerable dependency and your main branch.</p>
 <p>A strong CI pipeline turns quality rules into an executable contract. Every PR sees the same checks in the same order, so the team argues less about process and spends more time fixing real failures.</p>
 <p>This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition and stages of a <em>CI pipeline</em></li>
-<li><em>Separation of responsibility</em> per stage (build/test/lint/scan)</li>
-<li>Designing for <em>fast feedback</em></li>
-<li>Clear signals for <em>failed builds</em></li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying CI Pipeline?</li>
+<li>Which signal should the example or diagram make visible for CI Pipeline?</li>
+<li>What failure should be prevented first when CI Pipeline reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="devops 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>devops 101 chapter 2 flow overview</em></p>
+<p>This picture places CI Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of CI Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>How is a <em>CI pipeline</em> different from simple <em>test automation</em>?</li>
+<li>Why should <em>build</em>, <em>test</em>, <em>lint</em>, and <em>scan</em> be combined into one <em>flow</em>?</li>
+<li>In what order should you design a pipeline to deliver <em>fast feedback</em>?</li>
+<li>What does it take for a <em>failed build</em> to send a clear signal to the whole team?</li>
+<li>What are the common ways <em>CI</em> still breaks down in day-to-day work even after adoption?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Tests alone are not enough. <em>Lint, type checks, and security scans</em> must be bundled into <em>one flow</em> so <em>opinions</em> do not creep in.</p>
@@ -71,8 +84,6 @@
 <p>A PR without CI is <em>wishful thinking</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Pipeline</strong>: an <em>ordered sequence of stages</em>.</li>
@@ -164,8 +175,18 @@ steps:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>A CI pipeline is <em>the encoded passing line</em>. In the next post we cover how to <em>deploy</em> the <em>passed code</em> <em>safely</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What Is DevOps?</a></li>
+<li><strong>What boundary should you inspect first when applying CI Pipeline?</strong></li>
+<li>The article treats CI Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for CI Pipeline?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when CI Pipeline reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">DevOps 101 (1/10): What Is DevOps?</a></li>
 <li><strong>CI Pipeline (current)</strong></li>
 <li>CD and Deployment Strategies (upcoming)</li>
 <li>Environments and Configuration (upcoming)</li>

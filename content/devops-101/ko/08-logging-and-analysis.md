@@ -1,7 +1,7 @@
 ---
 series: devops-101
 episode: 8
-title: 로그 수집과 분석
+title: "DevOps 101 (8/10): 로그 수집과 분석"
 status: publish-ready
 targets:
   tistory: true
@@ -20,19 +20,25 @@ seo_description: 구조화 로그와 중앙 수집으로 디버깅 속도를 높
 last_reviewed: '2026-05-12'
 ---
 
-# 로그 수집과 분석
+# DevOps 101 (8/10): 로그 수집과 분석
 
 이 글은 DevOps 101 시리즈의 여덟 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 구조화 로그와 비구조화 로그는 실무에서 무엇이 다를까요?
 - 여러 서버의 로그를 한곳에 모아야 하는 이유는 무엇일까요?
 - Loki와 ELK는 어떤 관점에서 비교하면 좋을까요?
-- correlation ID는 왜 분산 시스템 디버깅의 기본이라고 할까요?
-- 로깅 전략을 세울 때 팀이 가장 자주 놓치는 실수는 무엇일까요?
 
-> **멘탈 모델**: 로그는 남기는 것만으로 가치가 생기지 않습니다. 나중에 검색 가능하고, 여러 인스턴스에서 연결 가능하고, 요청 단위로 추적 가능해야 비로소 운영 신호가 됩니다.
+## 큰 그림
+
+![DevOps 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-diagram.ko.png)
+
+*DevOps 101 8장 흐름 개요*
+
+이 그림에서는 로그 수집과 분석를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 로그 수집과 분석의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -43,10 +49,6 @@ last_reviewed: '2026-05-12'
 > 로그는 지금보다 몇 주 뒤에 더 자주 읽히는 운영 기록입니다.
 
 ## 한눈에 보는 개념
-
-![한눈에 보는 개념](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-diagram.ko.png)
-
-*한눈에 보는 개념*
 
 애플리케이션은 stdout으로 로그를 내보내고, 수집 에이전트가 이를 중앙 저장소로 보내며, 운영자는 Grafana나 Kibana에서 검색합니다. 이 구조가 갖춰져야 "어디서 어떤 에러가 났는가"를 한 번에 찾을 수 있습니다.
 
@@ -184,17 +186,29 @@ scrape_configs:
 
 로그는 시스템을 시간을 거슬러 읽게 해 주는 기록입니다. 다음 글에서는 로그와 메트릭, 절차를 묶어 실제 장애에 대응하는 방법을 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **구조화 로그와 비구조화 로그는 실무에서 무엇이 다를까요?**
+  - 본문의 기준은 로그 수집과 분석를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **여러 서버의 로그를 한곳에 모아야 하는 이유는 무엇일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Loki와 ELK는 어떤 관점에서 비교하면 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [DevOps란 무엇인가?](./01-what-is-devops.md)
-- [CI 파이프라인](./02-ci-pipeline.md)
-- [CD와 배포 전략](./03-cd-and-deployment.md)
-- [환경 분리와 설정 관리](./04-environments-and-config.md)
-- [Infrastructure as Code](./05-infrastructure-as-code.md)
-- [컨테이너와 빌드](./06-containers-and-build.md)
-- [모니터링과 알림](./07-monitoring-and-alerting.md)
+## 시리즈 목차
+
+- [DevOps 101 (1/10): DevOps란 무엇인가?](./01-what-is-devops.md)
+- [DevOps 101 (2/10): CI 파이프라인](./02-ci-pipeline.md)
+- [DevOps 101 (3/10): CD와 배포 전략](./03-cd-and-deployment.md)
+- [DevOps 101 (4/10): 환경 분리와 설정 관리](./04-environments-and-config.md)
+- [DevOps 101 (5/10): Infrastructure as Code](./05-infrastructure-as-code.md)
+- [DevOps 101 (6/10): 컨테이너와 빌드](./06-containers-and-build.md)
+- [DevOps 101 (7/10): 모니터링과 알림](./07-monitoring-and-alerting.md)
 - **로그 수집과 분석 (현재 글)**
 - 장애 대응과 on-call (예정)
 - 운영 가능한 DevOps 흐름 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

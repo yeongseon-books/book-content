@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is DevOps?</title>
+<title>DevOps 101 (1/10): What Is DevOps?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,17 +53,30 @@
 </style>
 </head>
 <body>
-<h1>What Is DevOps?</h1>
+<h1>DevOps 101 (1/10): What Is DevOps?</h1>
 <p>Most teams do not fail because they lack tools. They fail because code review, deployment, monitoring, and incident response all live in different conversations. One team says the feature is done. Another team says production is unstable. The handoff itself becomes the bottleneck.</p>
 <p>DevOps is the attempt to remove that handoff cost. It gives one team a shared feedback loop for building, shipping, operating, and learning, so deployment speed and operational stability stop pulling in opposite directions.</p>
 <p>This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.</p>
-<h2>What You Will Learn</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>The definition of <em>DevOps</em> and the context that produced it</li>
-<li>The <em>pain</em> of the era when <em>Dev</em> and <em>Ops</em> were separated</li>
-<li>The <em>three principles</em> of DevOps</li>
-<li>The <em>minimum tools</em> to start with</li>
-<li>Five common pitfalls</li>
+<li>What boundary should you inspect first when applying What Is DevOps??</li>
+<li>Which signal should the example or diagram make visible for What Is DevOps??</li>
+<li>What failure should be prevented first when What Is DevOps? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="devops 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>devops 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is DevOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is DevOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>What is <em>DevOps</em>, and why did treating <em>development</em> and <em>operations</em> as separate worlds start to hit its limits?</li>
+<li>Why is <em>DevOps</em> described as a <em>culture</em> rather than just a collection of <em>tools</em>?</li>
+<li>What roles do terms like <em>CI</em>, <em>CD</em>, and <em>SRE</em> play inside the <em>DevOps</em> flow?</li>
+<li>If you want to start <em>DevOps</em> in practice, which kinds of <em>automation</em> should you usually add first?</li>
+<li>What are the most common traps that make teams think they are doing <em>DevOps</em> when they are not?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Software produces no value when <em>only built</em>. It must be <em>deployed</em> and <em>operated</em> to reach users. <em>DevOps</em> is the practice of keeping that flow <em>unbroken</em>.</p>
@@ -71,8 +84,6 @@
 <p><em>Fast deploys</em> and <em>stable operations</em> are <em>not in conflict</em>. They go together.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Dev</strong>: <em>Development</em>.</li>
@@ -167,6 +178,16 @@ def health(): return {&quot;status&quot;: &quot;ok&quot;}
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>DevOps is a <em>cultural shift</em>. In the next post we go deep on its first lever — the <em>CI pipeline</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is DevOps??</strong></li>
+<li>The article treats What Is DevOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is DevOps??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is DevOps? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is DevOps? (current)</strong></li>
 <li>CI Pipeline (upcoming)</li>
