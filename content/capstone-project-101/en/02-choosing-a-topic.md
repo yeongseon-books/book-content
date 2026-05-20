@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 2
-title: Choosing a Topic
+title: "Capstone Project 101 (2/10): Choosing a Topic"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of choosing a capstone topic covering 
 last_reviewed: '2026-05-14'
 ---
 
-# Choosing a Topic
+# Capstone Project 101 (2/10): Choosing a Topic
 
 It is easy to generate impressive ideas. It is much harder to find an idea a student team can actually carry through one semester with a convincing demo.
 
@@ -28,16 +28,21 @@ A good capstone topic is not the flashiest topic. It is the one your team can ex
 
 This is post 2 in the Capstone Project 101 series. It explains how to compare candidate topics and how to shrink an attractive idea into a semester-sized project.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What qualities make a topic strong enough for a capstone?
 - How do you separate a trendy idea from a deliverable one?
 - Which shared criteria should the team use when comparing options?
-- How do you shrink a topic that is obviously too large?
-- What should you record when the final pick is made?
 
-> A strong topic is not merely interesting. It is a topic already reduced to a size the team can explain, build, and defend in time.
+## Big Picture
 
+![capstone project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 2 flow overview*
+
+This picture places Choosing a Topic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Choosing a Topic is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ When the topic is fuzzy, later requirements and scheduling become unstable too. 
 A shared comparison method makes those conversations faster. Instead of arguing from preference, the team can discuss impact, feasibility, risk, and demo clarity using the same rubric.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
-*Filtering topic candidates into a final decision*
 
 ## Practical artifact: a topic comparison matrix
 
@@ -167,8 +169,19 @@ Product *priority meetings* use *similar matrices*.
 
 Topic selection is a delivery decision, not a popularity contest. When you score candidates by shared criteria and choose the option with the fastest demo payoff, later scoping becomes much easier. The next post turns that topic into a sharp problem statement.
 
+## Answering the Opening Questions
+
+- **What qualities make a topic strong enough for a capstone?**
+  - The article treats Choosing a Topic as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you separate a trendy idea from a deliverable one?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which shared criteria should the team use when comparing options?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
 - **Choosing a Topic (current)**
 - Defining the Problem (upcoming)
 - Organizing Requirements (upcoming)
@@ -178,6 +191,7 @@ Topic selection is a delivery decision, not a popularity contest. When you score
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

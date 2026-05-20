@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 3
-title: Defining the Problem
+title: "Capstone Project 101 (3/10): Defining the Problem"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of defining a capstone problem coverin
 last_reviewed: '2026-05-14'
 ---
 
-# Defining the Problem
+# Capstone Project 101 (3/10): Defining the Problem
 
 When the problem statement is weak, the team keeps changing solutions without knowing what it is optimizing for. Features multiply while the explanation gets thinner.
 
@@ -28,16 +28,21 @@ A good problem statement becomes the project's anchor. Requirements, MVP scope, 
 
 This is post 3 in the Capstone Project 101 series. It separates feature talk from problem definition and shows how to build a problem card with users, assumptions, and metrics.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does an unclear problem statement destabilize the solution?
 - How is a problem definition different from feature description?
 - How much detail do users and assumptions need?
-- Why should metrics appear from the start?
-- When does rewriting the problem signal learning rather than failure?
 
-> The problem statement is not the first line of a feature list. It is the sentence that holds later requirements and priorities together.
+## Big Picture
 
+![capstone project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 3 flow overview*
+
+This picture places Defining the Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Defining the Problem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ A clear statement lets the team ask the same question whenever a new feature app
 Writing assumptions and metrics next to the problem also strengthens the eventual demo and retrospective. The team can compare what it believed at kickoff with what it later observed.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
-*Connecting the problem statement to users, assumptions, and metrics*
 
 ## Practical artifact: a problem card
 
@@ -166,9 +168,20 @@ The *first section* of a PRD is the *problem statement*.
 
 Problem definition is the decision anchor for the whole project. Once users, assumptions, and metrics are written down together, later requirement and MVP cuts become much easier to justify. The next post turns that anchor into an actual requirements document.
 
+## Answering the Opening Questions
+
+- **Why does an unclear problem statement destabilize the solution?**
+  - The article treats Defining the Problem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How is a problem definition different from feature description?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How much detail do users and assumptions need?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
 - **Defining the Problem (current)**
 - Organizing Requirements (upcoming)
 - Splitting Team Roles (upcoming)
@@ -177,6 +190,7 @@ Problem definition is the decision anchor for the whole project. Once users, ass
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

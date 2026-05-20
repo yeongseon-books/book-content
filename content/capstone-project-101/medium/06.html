@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Designing the MVP</title>
+<title>Capstone Project 101 (6/10): Designing the MVP</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Designing the MVP</h1>
+<h1>Capstone Project 101 (6/10): Designing the MVP</h1>
 <p>Many teams describe an MVP as building fewer features. That usually leads to half-finished surfaces everywhere and no fully working core flow.</p>
 <p>An MVP is better understood as the cheapest meaningful test of the project's main hypothesis. That means the cut list is often more important than the feature list.</p>
 <p>This is post 6 in the Capstone Project 101 series. It designs the MVP as a package of one core flow, an explicit out-of-scope list, a demo bar, and a feedback loop.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is an MVP closer to a learning tool than a small product?</li>
 <li>What does picking one core flow force the team to remove?</li>
 <li>Why must the out-of-scope list be documented?</li>
-<li>How do demo criteria connect to success criteria?</li>
-<li>Why should feedback collection be part of the MVP itself?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="capstone project 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png"></p>
+<p><em>capstone project 101 chapter 6 flow overview</em></p>
+<p>This picture places Designing the MVP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>The goal of an MVP is not to shrink feature count for its own sake. It is to complete one critical user flow deeply enough that the team can actually learn from it.</p>
+<p>The core of Designing the MVP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -80,8 +82,6 @@
 <p>An MVP with one complete flow is also stronger on demo day. A user who can sign in, act, and see a result tells a much better story than a project that exposes many shallow screens.</p>
 <p>The out-of-scope list protects that flow. Naming postponed items such as payments, admin tools, or internationalization keeps the team from quietly rebuilding the project every week.</p>
 <h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png"><br>
-<em>An MVP structure that links hypothesis, demo bar, and feedback</em></p>
 <h2>Practical artifact: an MVP contract</h2>
 <p>One of the best tools for protecting scope is a short MVP contract that states the current boundary in plain language.</p>
 <pre><code class="language-text">Core flow: sign in → enter timetable → calculate conflicts → view results
@@ -163,12 +163,22 @@ Feedback prompts: was the flow clear, was it fast enough, would you use it in re
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>An MVP is a small experiment, not a small product. When the core flow, cut list, demo bar, and feedback prompts live together, the team can protect what matters even when the semester gets noisy. The next post chooses a tech stack that fits that MVP.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Splitting Team Roles</a></li>
+<li><strong>Why is an MVP closer to a learning tool than a small product?</strong></li>
+<li>The article treats Designing the MVP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What does picking one core flow force the team to remove?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why must the out-of-scope list be documented?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">Capstone Project 101 (1/10): What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Capstone Project 101 (2/10): Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Capstone Project 101 (3/10): Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Capstone Project 101 (4/10): Organizing Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Capstone Project 101 (5/10): Splitting Team Roles</a></li>
 <li><strong>Designing the MVP (current)</strong></li>
 <li>Choosing the Tech Stack (upcoming)</li>
 <li>Schedule Management (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 10
-title: Project Retrospective
+title: "Capstone Project 101 (10/10): Project Retrospective"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of capstone retrospectives using KPT, 
 last_reviewed: '2026-05-14'
 ---
 
-# Project Retrospective
+# Capstone Project 101 (10/10): Project Retrospective
 
 When the project ends, relief arrives before reflection. If the team disperses at that moment, most of the semester's learning stays trapped in individual memory.
 
@@ -28,16 +28,21 @@ A retrospective is valuable because it converts feelings into facts, causes, and
 
 This is the final post in the Capstone Project 101 series. It shows how to combine KPT, data, cause analysis, and next actions into a retrospective that the next project can actually use.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What keeps a retrospective from turning into blame allocation?
 - Why does the KPT format work well for beginner teams?
 - How does data make retrospective discussion more stable?
-- When does cause analysis support system improvement rather than personal blame?
-- What makes next actions likely to be executed later?
 
-> A strong retrospective is not a blame document. It is the first document of the next project because it records facts, causes, and changes worth carrying forward.
+## Big Picture
 
+![capstone project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 10 flow overview*
+
+This picture places Project Retrospective inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Project Retrospective is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ A simple format such as KPT keeps the conversation grounded. Separating what to 
 Data and next actions strengthen the discussion further. Metrics such as bug counts, review latency, or rehearsal attempts make the team's pain points concrete, while owned actions turn insight into change.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
-*Turning a retrospective into input for the next project*
 
 ## Practical artifact: a retrospective action log
 
@@ -166,17 +168,29 @@ Companies run *sprint retrospectives* and *postmortems*.
 
 A retrospective is both the final document of this project and the first document of the next one. When KPT, data, cause analysis, and next actions are captured together, the semester's failures and wins become durable project memory. This concludes the Capstone Project 101 series.
 
+## Answering the Opening Questions
+
+- **What keeps a retrospective from turning into blame allocation?**
+  - The article treats Project Retrospective as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does the KPT format work well for beginner teams?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does data make retrospective discussion more stable?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
-- [Designing the MVP](./06-designing-the-mvp.md)
-- [Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
-- [Schedule Management](./08-schedule-management.md)
-- [Building Presentation Materials](./09-presentation-materials.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): Designing the MVP](./06-designing-the-mvp.md)
+- [Capstone Project 101 (7/10): Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
+- [Capstone Project 101 (8/10): Schedule Management](./08-schedule-management.md)
+- [Capstone Project 101 (9/10): Building Presentation Materials](./09-presentation-materials.md)
 - **Project Retrospective (current)**
+
 <!-- toc:end -->
 
 ## References

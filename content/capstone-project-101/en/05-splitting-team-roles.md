@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 5
-title: Splitting Team Roles
+title: "Capstone Project 101 (5/10): Splitting Team Roles"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of splitting capstone team roles, mapp
 last_reviewed: '2026-05-14'
 ---
 
-# Splitting Team Roles
+# Capstone Project 101 (5/10): Splitting Team Roles
 
 Teams with fuzzy roles often look busy while moving slowly. Work circulates because nobody is sure who owns the final decision or who can safely take over when someone gets blocked.
 
@@ -28,16 +28,21 @@ In a capstone, role splitting is not about drawing boxes around people. It is ab
 
 This is post 5 in the Capstone Project 101 series. It outlines a simple role model that uses primary owners, backups, and explicit decision rights to keep collaboration moving.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do overlapping roles slow decisions down?
 - How should teams assign primary owners and backups?
 - How is a lead different from a code owner?
-- Why should QA and deployment ownership be visible from the start?
-- How should role changes be recorded?
 
-> Role splitting is not about categorizing people. It is about deciding in advance who makes the call and who can continue the work when delivery stalls.
+## Big Picture
 
+![capstone project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 5 flow overview*
+
+This picture places Splitting Team Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Splitting Team Roles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ Clear primary ownership speeds up decisions because the team knows exactly where
 Backup ownership matters just as much. Student teams are vulnerable to exams, interviews, and conflicting schedules, so a single absent owner can quickly turn into a project-wide slowdown.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
-*A simple structure that connects the lead with domain owners*
 
 ## Practical artifact: a responsibility matrix
 
@@ -166,17 +168,29 @@ Company teams use *RACI* to clarify decision rights every week.
 
 Role splitting is a bottleneck-reduction design, not an org-chart exercise. Primary ownership, backup coverage, and explicit decision rights make the team far more resilient under capstone pressure. The next post shows how that structure supports MVP scoping.
 
+## Answering the Opening Questions
+
+- **Why do overlapping roles slow decisions down?**
+  - The article treats Splitting Team Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should teams assign primary owners and backups?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How is a lead different from a code owner?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
 - **Splitting Team Roles (current)**
 - Designing the MVP (upcoming)
 - Choosing the Tech Stack (upcoming)
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

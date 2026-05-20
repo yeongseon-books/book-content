@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 1
-title: What is a Capstone Project
+title: "Capstone Project 101 (1/10): What is a Capstone Project"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of the capstone project covering goals
 last_reviewed: '2026-05-14'
 ---
 
-# What is a Capstone Project
+# Capstone Project 101 (1/10): What is a Capstone Project
 
 Many teams introduce a capstone project as 'the big final team assignment.' That description is not wrong, but it does not explain why some teams finish with a coherent demo while others spend the semester chasing loosely connected features.
 
@@ -28,16 +28,21 @@ A capstone is better understood as a small product-delivery exercise. The team d
 
 This is the first post in the Capstone Project 101 series. It defines what separates a capstone from ordinary coursework and establishes the delivery flow used throughout the series.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How is a capstone project different from a regular class assignment?
 - Why do some teams build features but still finish with a weak project story?
 - What should you evaluate besides feature count?
-- Why must topic, requirements, MVP, and demo stay connected?
-- How does the rest of this series build on this definition?
 
-> A capstone is not a feature-collection exercise. It is a small product-delivery loop that connects problem definition, scope, MVP, demo, and retrospective.
+## Big Picture
 
+![capstone project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 1 flow overview*
+
+This picture places What is a Capstone Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is a Capstone Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ The framing in this post affects every later project document. Once a team treat
 The same pattern appears in real product work. Teams define the problem, commit to a narrow flow, prepare a demo, and capture lessons for the next iteration. Treating the capstone this way makes the bridge from school to delivery much shorter.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
-*The core capstone flow from problem definition to retrospective*
 
 ## Practical artifact: a one-page project brief
 
@@ -167,7 +169,18 @@ A new hire's *onboarding project* looks *almost the same* as a capstone.
 
 A capstone starts with a delivery frame, not a feature list. When problem definition, requirements, MVP, demo, and retrospective stay connected, the rest of the project becomes easier to steer. The next post focuses on choosing a topic that can survive that full flow.
 
+## Answering the Opening Questions
+
+- **How is a capstone project different from a regular class assignment?**
+  - The article treats What is a Capstone Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do some teams build features but still finish with a weak project story?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should you evaluate besides feature count?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is a Capstone Project (current)**
 - Choosing a Topic (upcoming)
 - Defining the Problem (upcoming)
@@ -178,6 +191,7 @@ A capstone starts with a delivery frame, not a feature list. When problem defini
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

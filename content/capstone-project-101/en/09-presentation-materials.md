@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 9
-title: Building Presentation Materials
+title: "Capstone Project 101 (9/10): Building Presentation Materials"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of capstone presentation materials wit
 last_reviewed: '2026-05-14'
 ---
 
-# Building Presentation Materials
+# Capstone Project 101 (9/10): Building Presentation Materials
 
 Presentation decks usually become bloated because teams try to show every feature they built. Audiences, however, care much more about why the project mattered and what changed as a result.
 
@@ -28,16 +28,21 @@ A strong deck is not a catalog of screens. It is a concise story about the probl
 
 This is post 9 in the Capstone Project 101 series. It uses a problem-solution-result arc for the deck and folds in demo fallback planning plus Q&A preparation.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do feature-list presentations lose attention quickly?
 - What should survive on each slide?
 - Why does the demo need a written script?
-- How should demo fallback material be prepared?
-- How does Q&A preparation raise the quality of the talk?
 
-> A good presentation is not the place to show everything. It is the place to compress problem, choice, and result into a story the audience can grasp immediately.
+## Big Picture
 
+![capstone project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 9 flow overview*
+
+This picture places Building Presentation Materials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building Presentation Materials is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ A problem-solution-result arc gives the audience context immediately, which mean
 Separating demo planning and Q&A planning also makes the talk more resilient. Presentation-week failures are often caused less by missing features than by broken flow, time overruns, or unprepared questions.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
-*A presentation narrative from problem to next step*
 
 ## Practical artifact: a presentation run sheet
 
@@ -167,17 +169,29 @@ Investor pitches also use the *problem solution result* arc.
 
 The job of presentation materials is not to show everything but to create understanding quickly. When the story arc, demo script, fallback assets, and Q&A evidence are prepared together, the talk becomes far more resilient. The next post closes the project with a retrospective.
 
+## Answering the Opening Questions
+
+- **Why do feature-list presentations lose attention quickly?**
+  - The article treats Building Presentation Materials as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What should survive on each slide?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does the demo need a written script?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
-- [Designing the MVP](./06-designing-the-mvp.md)
-- [Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
-- [Schedule Management](./08-schedule-management.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): Designing the MVP](./06-designing-the-mvp.md)
+- [Capstone Project 101 (7/10): Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
+- [Capstone Project 101 (8/10): Schedule Management](./08-schedule-management.md)
 - **Building Presentation Materials (current)**
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Choosing the Tech Stack</title>
+<title>Capstone Project 101 (7/10): Choosing the Tech Stack</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Choosing the Tech Stack</h1>
+<h1>Capstone Project 101 (7/10): Choosing the Tech Stack</h1>
 <p>Tech-stack decisions in capstones usually mix two different desires: the urge to try something new and the obligation to finish the semester with a stable demo.</p>
 <p>Those goals often pull in opposite directions. The right stack is therefore not the most impressive one, but the one your team can operate without burning the schedule on tooling friction.</p>
 <p>This is post 7 in the Capstone Project 101 series. It defines a practical stack-selection rubric built on familiarity, learning cost, operational burden, and documentation strength.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is the newest technology not automatically the best choice?</li>
 <li>How does familiarity map directly to schedule risk?</li>
 <li>How should teams separate learning cost from operational burden?</li>
-<li>How much alternative comparison is enough?</li>
-<li>Why should the decision be recorded in writing?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="capstone project 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png"></p>
+<p><em>capstone project 101 chapter 7 flow overview</em></p>
+<p>This picture places Choosing the Tech Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A good tech stack is not the flashiest combination. It is the combination the team can learn, build, and operate inside the semester.</p>
+<p>The core of Choosing the Tech Stack is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -80,8 +82,6 @@
 <p>Trying new technology is not inherently bad. The risk appears when the team treats learning time as if it were outside the project schedule. Unfamiliar frameworks increase debugging, deployment, and documentation-reading time together.</p>
 <p>Operational burden matters separately too. A tool that feels simple on a laptop may become fragile in a demo environment. Deployment steps, configuration drift, and error handling all belong in the decision.</p>
 <h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png"><br>
-<em>A stack-selection flow that ends in a written ADR</em></p>
 <h2>Practical artifact: a lightweight ADR</h2>
 <p>Stack decisions get revisited constantly when they only exist in conversation. A short ADR like the one below preserves the context.</p>
 <pre><code class="language-text">Title: choose Flask as the backend framework
@@ -164,13 +164,23 @@ Review trigger: reconsider if authentication, async APIs, or admin features expa
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Tech-stack selection is risk shaping, not taste ranking. When familiarity, learning cost, operational burden, and written rationale stay together, the stack starts serving the project instead of dominating it. The next post turns those decisions into an executable schedule.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Splitting Team Roles</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/06-designing-the-mvp.md">Designing the MVP</a></li>
+<li><strong>Why is the newest technology not automatically the best choice?</strong></li>
+<li>The article treats Choosing the Tech Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How does familiarity map directly to schedule risk?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should teams separate learning cost from operational burden?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">Capstone Project 101 (1/10): What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Capstone Project 101 (2/10): Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Capstone Project 101 (3/10): Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Capstone Project 101 (4/10): Organizing Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Capstone Project 101 (5/10): Splitting Team Roles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/06-designing-the-mvp.md">Capstone Project 101 (6/10): Designing the MVP</a></li>
 <li><strong>Choosing the Tech Stack (current)</strong></li>
 <li>Schedule Management (upcoming)</li>
 <li>Building Presentation Materials (upcoming)</li>

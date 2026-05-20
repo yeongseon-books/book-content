@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Splitting Team Roles</title>
+<title>Capstone Project 101 (5/10): Splitting Team Roles</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Splitting Team Roles</h1>
+<h1>Capstone Project 101 (5/10): Splitting Team Roles</h1>
 <p>Teams with fuzzy roles often look busy while moving slowly. Work circulates because nobody is sure who owns the final decision or who can safely take over when someone gets blocked.</p>
 <p>In a capstone, role splitting is not about drawing boxes around people. It is about preventing decision bottlenecks and making sure the project can keep moving under schedule pressure.</p>
 <p>This is post 5 in the Capstone Project 101 series. It outlines a simple role model that uses primary owners, backups, and explicit decision rights to keep collaboration moving.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do overlapping roles slow decisions down?</li>
 <li>How should teams assign primary owners and backups?</li>
 <li>How is a lead different from a code owner?</li>
-<li>Why should QA and deployment ownership be visible from the start?</li>
-<li>How should role changes be recorded?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="capstone project 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png"></p>
+<p><em>capstone project 101 chapter 5 flow overview</em></p>
+<p>This picture places Splitting Team Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Role splitting is not about categorizing people. It is about deciding in advance who makes the call and who can continue the work when delivery stalls.</p>
+<p>The core of Splitting Team Roles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What You Will Learn</h2>
 <ul>
@@ -80,8 +82,6 @@
 <p>Clear primary ownership speeds up decisions because the team knows exactly where questions and approvals should go.</p>
 <p>Backup ownership matters just as much. Student teams are vulnerable to exams, interviews, and conflicting schedules, so a single absent owner can quickly turn into a project-wide slowdown.</p>
 <h2>The flow at a glance</h2>
-<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png"><br>
-<em>A simple structure that connects the lead with domain owners</em></p>
 <h2>Practical artifact: a responsibility matrix</h2>
 <p>Even a small team benefits from writing responsibility lines like these before implementation starts.</p>
 <pre><code class="language-text">Workstream | Primary owner | Backup | Decision right
@@ -163,11 +163,21 @@ Deployment check | Backend owner | Frontend owner | Must follow deployment check
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Role splitting is a bottleneck-reduction design, not an org-chart exercise. Primary ownership, backup coverage, and explicit decision rights make the team far more resilient under capstone pressure. The next post shows how that structure supports MVP scoping.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
+<li><strong>Why do overlapping roles slow decisions down?</strong></li>
+<li>The article treats Splitting Team Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How should teams assign primary owners and backups?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How is a lead different from a code owner?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">Capstone Project 101 (1/10): What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Capstone Project 101 (2/10): Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Capstone Project 101 (3/10): Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Capstone Project 101 (4/10): Organizing Requirements</a></li>
 <li><strong>Splitting Team Roles (current)</strong></li>
 <li>Designing the MVP (upcoming)</li>
 <li>Choosing the Tech Stack (upcoming)</li>

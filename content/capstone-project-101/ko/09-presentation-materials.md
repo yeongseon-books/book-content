@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 9
-title: 발표 자료 만들기
+title: "Capstone Project 101 (9/10): 발표 자료 만들기"
 status: publish-ready
 targets:
   tistory: true
@@ -19,7 +19,7 @@ seo_description: 캡스톤 프로젝트 발표 자료를 문제·해결·결과 
 last_reviewed: '2026-05-14'
 ---
 
-# 발표 자료 만들기
+# Capstone Project 101 (9/10): 발표 자료 만들기
 
 발표 자료가 길어지는 가장 흔한 이유는, 팀이 만든 모든 기능을 다 보여 주려 하기 때문입니다. 하지만 청중은 보통 기능 개수보다 왜 이 프로젝트가 의미 있었는지부터 알고 싶어 합니다.
 
@@ -29,14 +29,21 @@ last_reviewed: '2026-05-14'
 
 > 멘탈 모델: 좋은 발표는 만든 기능을 다 보여 주는 자리가 아니라, 문제와 선택과 결과를 짧은 서사로 묶어 청중이 바로 이해하게 만드는 자리입니다.
 
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 기능 목록 중심 발표는 지루해질까요?
 - 문제·해결·결과 구조는 왜 전달력이 높을까요?
 - 슬라이드는 어떻게 구성해야 한 장당 메시지가 선명할까요?
-- 데모 각본은 왜 미리 써야 할까요?
-- Q&A와 시간 배분은 어떻게 준비해야 할까요?
+
+## 큰 그림
+
+![Capstone Project 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.ko.png)
+
+*Capstone Project 101 9장 흐름 개요*
+
+이 그림에서는 발표 자료 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 발표 자료 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -53,9 +60,6 @@ last_reviewed: '2026-05-14'
 실무 발표나 투자자 발표도 문제, 해결, 결과 구조를 자주 사용합니다. 듣는 사람은 기능 개수보다 어떤 문제를 풀었고 어떤 변화가 있었는지에 더 빠르게 반응합니다.
 
 ## 한눈에 보는 흐름
-
-![한눈에 보는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.ko.png)
-*문제에서 다음 단계까지 이어지는 발표 서사 구조*
 
 ## 실전 문서 예시: 발표 운영 시트
 
@@ -177,17 +181,29 @@ minutes = {"talk": 8, "demo": 5, "qna": 7}
 
 발표 자료의 핵심은 많이 보여 주는 것이 아니라 빨리 이해시키는 것입니다. 문제·해결·결과 구조, 데모 각본, 백업 자료, Q&A 근거를 함께 준비하면 발표가 훨씬 단단해집니다. 다음 글에서는 프로젝트를 마친 뒤 학습을 남기는 회고를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **왜 기능 목록 중심 발표는 지루해질까요?**
+  - 본문의 기준은 발표 자료 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **문제·해결·결과 구조는 왜 전달력이 높을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **슬라이드는 어떻게 구성해야 한 장당 메시지가 선명할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
-- [주제 선정](./02-choosing-a-topic.md)
-- [문제 정의](./03-defining-the-problem.md)
-- [요구사항 정리](./04-organizing-requirements.md)
-- [팀 역할 나누기](./05-splitting-team-roles.md)
-- [MVP 설계](./06-designing-the-mvp.md)
-- [기술 스택 선택](./07-choosing-the-tech-stack.md)
-- [일정 관리](./08-schedule-management.md)
+## 시리즈 목차
+
+- [Capstone Project 101 (1/10): 캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): 주제 선정](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): 문제 정의](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): 요구사항 정리](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): 팀 역할 나누기](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): MVP 설계](./06-designing-the-mvp.md)
+- [Capstone Project 101 (7/10): 기술 스택 선택](./07-choosing-the-tech-stack.md)
+- [Capstone Project 101 (8/10): 일정 관리](./08-schedule-management.md)
 - **발표 자료 만들기 (현재 글)**
 - 프로젝트 회고 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

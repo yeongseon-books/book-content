@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 6
-title: Designing the MVP
+title: "Capstone Project 101 (6/10): Designing the MVP"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of designing a capstone MVP by picking
 last_reviewed: '2026-05-14'
 ---
 
-# Designing the MVP
+# Capstone Project 101 (6/10): Designing the MVP
 
 Many teams describe an MVP as building fewer features. That usually leads to half-finished surfaces everywhere and no fully working core flow.
 
@@ -28,16 +28,21 @@ An MVP is better understood as the cheapest meaningful test of the project's mai
 
 This is post 6 in the Capstone Project 101 series. It designs the MVP as a package of one core flow, an explicit out-of-scope list, a demo bar, and a feedback loop.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is an MVP closer to a learning tool than a small product?
 - What does picking one core flow force the team to remove?
 - Why must the out-of-scope list be documented?
-- How do demo criteria connect to success criteria?
-- Why should feedback collection be part of the MVP itself?
 
-> The goal of an MVP is not to shrink feature count for its own sake. It is to complete one critical user flow deeply enough that the team can actually learn from it.
+## Big Picture
 
+![capstone project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 6 flow overview*
+
+This picture places Designing the MVP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Designing the MVP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ An MVP with one complete flow is also stronger on demo day. A user who can sign 
 The out-of-scope list protects that flow. Naming postponed items such as payments, admin tools, or internationalization keeps the team from quietly rebuilding the project every week.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
-*An MVP structure that links hypothesis, demo bar, and feedback*
 
 ## Practical artifact: an MVP contract
 
@@ -166,17 +168,29 @@ Startups also start with a *one-line happy path*.
 
 An MVP is a small experiment, not a small product. When the core flow, cut list, demo bar, and feedback prompts live together, the team can protect what matters even when the semester gets noisy. The next post chooses a tech stack that fits that MVP.
 
+## Answering the Opening Questions
+
+- **Why is an MVP closer to a learning tool than a small product?**
+  - The article treats Designing the MVP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does picking one core flow force the team to remove?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why must the out-of-scope list be documented?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
 - **Designing the MVP (current)**
 - Choosing the Tech Stack (upcoming)
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

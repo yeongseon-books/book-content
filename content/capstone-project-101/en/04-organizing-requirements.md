@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 4
-title: Organizing Requirements
+title: "Capstone Project 101 (4/10): Organizing Requirements"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of organizing capstone requirements th
 last_reviewed: '2026-05-14'
 ---
 
-# Organizing Requirements
+# Capstone Project 101 (4/10): Organizing Requirements
 
 A feature list alone does not help when the schedule slips. It does not tell the team what can be cut first or what done actually means.
 
@@ -28,16 +28,21 @@ A useful requirements document behaves more like a compact delivery contract. It
 
 This is post 4 in the Capstone Project 101 series. It turns the problem statement into implementable requirements and explicit verification criteria.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is a feature list alone not enough?
 - How should user stories pair with acceptance criteria?
 - Why should non-functional constraints live in a separate table?
-- How do priority labels help scheduling decisions?
-- What does requirement traceability make easier later?
 
-> A requirements document is not storage for feature ideas. It is a traceable agreement about what will be built and how it will be verified.
+## Big Picture
 
+![capstone project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 4 flow overview*
+
+This picture places Organizing Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Organizing Requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ Without acceptance criteria, teams can finish implementation and still disagree 
 Non-functional constraints deserve their own space too. Requirements such as mobile usability, no-sign-up flow, or response-time targets disappear quickly when they are buried inside generic feature bullets.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
-*Connecting requirements to criteria, priority, and trace links*
 
 ## Practical artifact: a requirements sheet
 
@@ -167,10 +169,21 @@ Startup PMs use *Must/Should/Could* labels every week.
 
 Requirement organization is about traceable scope, not prettier feature bullets. Once stories, criteria, non-functional needs, and priority labels live together, design and schedule decisions get much faster. The next post shows how that work should be split across the team.
 
+## Answering the Opening Questions
+
+- **Why is a feature list alone not enough?**
+  - The article treats Organizing Requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should user stories pair with acceptance criteria?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should non-functional constraints live in a separate table?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
 - **Organizing Requirements (current)**
 - Splitting Team Roles (upcoming)
 - Designing the MVP (upcoming)
@@ -178,6 +191,7 @@ Requirement organization is about traceable scope, not prettier feature bullets.
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

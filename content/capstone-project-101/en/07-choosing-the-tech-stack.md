@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 7
-title: Choosing the Tech Stack
+title: "Capstone Project 101 (7/10): Choosing the Tech Stack"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of choosing a capstone tech stack by w
 last_reviewed: '2026-05-14'
 ---
 
-# Choosing the Tech Stack
+# Capstone Project 101 (7/10): Choosing the Tech Stack
 
 Tech-stack decisions in capstones usually mix two different desires: the urge to try something new and the obligation to finish the semester with a stable demo.
 
@@ -28,16 +28,21 @@ Those goals often pull in opposite directions. The right stack is therefore not 
 
 This is post 7 in the Capstone Project 101 series. It defines a practical stack-selection rubric built on familiarity, learning cost, operational burden, and documentation strength.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is the newest technology not automatically the best choice?
 - How does familiarity map directly to schedule risk?
 - How should teams separate learning cost from operational burden?
-- How much alternative comparison is enough?
-- Why should the decision be recorded in writing?
 
-> A good tech stack is not the flashiest combination. It is the combination the team can learn, build, and operate inside the semester.
+## Big Picture
 
+![capstone project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 7 flow overview*
+
+This picture places Choosing the Tech Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Choosing the Tech Stack is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ Trying new technology is not inherently bad. The risk appears when the team trea
 Operational burden matters separately too. A tool that feels simple on a laptop may become fragile in a demo environment. Deployment steps, configuration drift, and error handling all belong in the decision.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
-*A stack-selection flow that ends in a written ADR*
 
 ## Practical artifact: a lightweight ADR
 
@@ -167,17 +169,29 @@ Companies record decisions in *ADRs*.
 
 Tech-stack selection is risk shaping, not taste ranking. When familiarity, learning cost, operational burden, and written rationale stay together, the stack starts serving the project instead of dominating it. The next post turns those decisions into an executable schedule.
 
+## Answering the Opening Questions
+
+- **Why is the newest technology not automatically the best choice?**
+  - The article treats Choosing the Tech Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does familiarity map directly to schedule risk?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should teams separate learning cost from operational burden?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
-- [Designing the MVP](./06-designing-the-mvp.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): Designing the MVP](./06-designing-the-mvp.md)
 - **Choosing the Tech Stack (current)**
 - Schedule Management (upcoming)
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References

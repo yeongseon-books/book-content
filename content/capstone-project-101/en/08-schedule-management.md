@@ -1,7 +1,7 @@
 ---
 series: capstone-project-101
 episode: 8
-title: Schedule Management
+title: "Capstone Project 101 (8/10): Schedule Management"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly tour of capstone schedule management with m
 last_reviewed: '2026-05-14'
 ---
 
-# Schedule Management
+# Capstone Project 101 (8/10): Schedule Management
 
 Most capstone schedules do not collapse in the final week without warning. They drift gradually, and the team notices too late because nothing made the gap visible early enough.
 
@@ -28,16 +28,21 @@ A good schedule is not a beautiful timeline. It is a system that repeatedly expo
 
 This is post 8 in the Capstone Project 101 series. It explains how to combine milestones, weekly planning, standups, and risk buffer into a realistic execution rhythm.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do polished-looking plans still fail in practice?
 - How do milestones differ from weekly plans?
 - Why should blockers be exposed as early as possible?
-- How much risk buffer is reasonable?
-- Why should progress be measured numerically?
 
-> A good schedule is not perfect prediction. It is an operating rhythm that reveals drift quickly enough to allow correction.
+## Big Picture
 
+![capstone project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
+
+*capstone project 101 chapter 8 flow overview*
+
+This picture places Schedule Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Schedule Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -54,9 +59,6 @@ Milestones without weekly plans stay abstract, while weekly plans without milest
 Buffer matters because student projects absorb many external shocks at once: exams, conflicting calendars, and surprise bugs. Without spare capacity, small slips turn into schedule-wide failure very quickly.
 
 ## The flow at a glance
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
-*A scheduling loop from milestones to buffer adjustment*
 
 ## Practical artifact: a weekly execution board
 
@@ -166,17 +168,29 @@ Company teams use *two-week sprints* and *burndown* charts.
 
 Schedule management is about surfacing drift, not documenting busyness. When milestones, weekly plans, blockers, and buffer are managed together, late-semester uncertainty becomes far easier to absorb. The next post shows how to turn that work into presentation materials.
 
+## Answering the Opening Questions
+
+- **Why do polished-looking plans still fail in practice?**
+  - The article treats Schedule Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do milestones differ from weekly plans?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why should blockers be exposed as early as possible?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a Capstone Project](./01-what-is-capstone.md)
-- [Choosing a Topic](./02-choosing-a-topic.md)
-- [Defining the Problem](./03-defining-the-problem.md)
-- [Organizing Requirements](./04-organizing-requirements.md)
-- [Splitting Team Roles](./05-splitting-team-roles.md)
-- [Designing the MVP](./06-designing-the-mvp.md)
-- [Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
+## In this series
+
+- [Capstone Project 101 (1/10): What is a Capstone Project](./01-what-is-capstone.md)
+- [Capstone Project 101 (2/10): Choosing a Topic](./02-choosing-a-topic.md)
+- [Capstone Project 101 (3/10): Defining the Problem](./03-defining-the-problem.md)
+- [Capstone Project 101 (4/10): Organizing Requirements](./04-organizing-requirements.md)
+- [Capstone Project 101 (5/10): Splitting Team Roles](./05-splitting-team-roles.md)
+- [Capstone Project 101 (6/10): Designing the MVP](./06-designing-the-mvp.md)
+- [Capstone Project 101 (7/10): Choosing the Tech Stack](./07-choosing-the-tech-stack.md)
 - **Schedule Management (current)**
 - Building Presentation Materials (upcoming)
 - Project Retrospective (upcoming)
+
 <!-- toc:end -->
 
 ## References
