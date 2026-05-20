@@ -1,5 +1,5 @@
 ---
-title: LangGraph 완성
+title: "LangGraph 101 (6/6): LangGraph 완성"
 series: langgraph-101
 episode: 6
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어 운영 가능한 완성형 에이전트 구조를 정리합니다
 ---
 
-# LangGraph 완성
+# LangGraph 101 (6/6): LangGraph 완성
 
 시리즈를 여기까지 따라오면 질문이 바뀝니다. 노드와 엣지를 그릴 수 있는가, 체크포인트를 붙일 수 있는가, 도구를 호출할 수 있는가를 각각 묻는 단계는 이미 지났습니다. 이제 더 중요한 질문은 이것입니다. 이 조각들을 한 그래프 안에 합쳤을 때도 여전히 설명 가능하고, 복구 가능하고, 운영 가능한가입니다.
 
@@ -30,28 +30,31 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 
 여기서는 **직접 답변 경로와 도구 경로를 분리하고, 그 전체 대화를 같은 상태 타임라인 위에 저장하는 구조**를 읽어 보겠습니다. 완성형 LangGraph를 볼 때 먼저 확인할 것은 세 가지입니다. 어떤 요청이 굳이 도구로 가는지, tool loop가 어디서 끝나는지, 그리고 다음 턴이 시작될 때 이전 판단과 결과가 어떤 상태로 되살아나는지입니다. 이 세 가지가 선명하면 그래프는 커져도 읽힙니다.
 
-## 이 글에서 다룰 문제
-- routing, tool calling, checkpoint를 한 그래프 안에서 어떻게 결합할 수 있을까요?
-- 직접 설명으로 끝내야 할 질문과 도구를 반드시 거쳐야 할 질문은 어디서 분리해야 할까요?
-- 같은 `thread_id` 아래에서 첫 턴의 개념 설명과 두 번째 턴의 계산 요청은 어떻게 하나의 대화로 이어질까요?
-- `tool_agent -> ToolNode -> tool_agent` 루프는 어떤 요청에서만 열리고, 어디서 명시적으로 끝나야 할까요?
-- 체크포인트가 붙어 있어도 route 설계가 약하면 어떤 종류의 혼선이 반복될까요?
-- “이제 production-ready한 골격이다”라고 말하기 전에 최소한 무엇을 검증해야 할까요?
+## 먼저 던지는 질문
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
-*이 글에서 답할 질문*
+- 완성형 LangGraph 앱은 왜 하나의 거대한 프롬프트가 아니라 협력하는 상태 기계로 봐야 할까요?
+- 체크포인트, 분기, tool call, 멀티턴 이력을 붙여도 어떤 state 계약은 끝까지 유지해야 할까요?
+- 운영에서 그래프 실행을 설명하려면 어떤 로그와 검증 지점을 남겨야 할까요?
 
-## 왜 이 글이 중요한가
+## 큰 그림
+
+![supervisor와 tool loop가 결합된 통합 그래프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
+
+*supervisor와 tool loop가 결합된 통합 그래프*
+
+이 그림에서는 state, checkpoint, conditional edge, tool node, 최종 응답이 하나의 실행 그래프로 연결되는 흐름을 봅니다. 완성형 LangGraph의 기준은 기능 수가 아니라 각 경계가 관찰 가능하고 복구 가능한지입니다.
+
+> 완성형 에이전트의 기준은 기능을 모두 붙였는지가 아니라, 경로 선택과 도구 실행과 상태 복구를 각각 설명할 수 있는지입니다.
+
+## 왜 이 구조가 중요한가
 완성형 예제가 중요한 이유를 “기능이 다 들어 있으니까” 정도로 설명하면 충분하지 않습니다. 더 현실적인 이유는 운영 경계가 여기서 한꺼번에 만난다는 점입니다. routing이 잘못되면 필요 없는 tool loop가 열리고, tool loop가 과하면 비용과 지연이 늘고, checkpoint 설계가 약하면 다음 턴에서 왜 그런 판단이 나왔는지 재구성하기 어려워집니다. 각 요소를 따로 배울 때는 보이지 않던 문제가, 합치는 순간 드러납니다.
 
 예를 들어 사용자가 먼저 LangGraph의 상태 모델을 물었다가, 다음 턴에서 `sqrt(81) + 5`를 계산해 달라고 요청한다고 해 보겠습니다. 이때 첫 번째 질문은 직접 설명 경로로 가는 편이 낫고, 두 번째 질문은 도구 경로로 가야 안전합니다. 그런데 분리가 약하면 두 질문이 모두 같은 프롬프트 안에서 처리되거나, 반대로 둘 다 도구를 거치게 됩니다. 전자는 통제 불가능한 답변을 만들고, 후자는 과한 실행 비용을 만듭니다.
 
 저는 팀들이 이 완성형 조합을 너무 늦게 검토해서, 개별 기능은 다 잘 동작하는데 전체 시스템은 설명하기 어려운 상태를 자주 봤습니다. checkpoint는 있는데 왜 맥락이 흐리지, tool calling은 있는데 왜 필요 없는 요청에도 도구를 부르지, route는 있는데 왜 supervisor가 실제 답까지 하려고 들지 같은 문제가 여기서 한꺼번에 튀어나옵니다. 그래서 이 글의 목표는 “LangGraph 기능 종합본”이 아니라, **상태, 분기, 도구 실행, 재개 가능한 대화를 하나의 운영 모델로 읽는 감각**을 만드는 데 있습니다.
 
-## LangGraph를 이해하는 가장 좋은 방법: 완성형 에이전트는 하나의 거대한 프롬프트가 아니라, 협력하는 상태 기계다
+## 완성형 그래프를 운영 모델로 읽기
 마지막 글에서 가장 먼저 잡아야 할 문장은 이것입니다. **완성형 LangGraph 에이전트는 하나의 거대한 프롬프트가 아니라, supervisor 성격의 분기 로직·tool loop·checkpoint가 명시적 전이로 협력하는 상태 기계**입니다.
-
-> 완성형 에이전트의 핵심은 기능 수가 아닙니다. 어떤 요청을 직접 답하고, 어떤 요청을 도구로 보내며, 그 전체 대화를 어떤 상태 타임라인에 남길지가 분리돼 있어야 운영 가능한 시스템이 됩니다.
 
 많은 입문자가 마지막 단계에서 다시 프롬프트 중심 사고로 돌아갑니다. “강한 모델 하나에 규칙을 다 넣으면 되지 않을까?”라는 생각입니다. 짧은 데모에서는 가능해 보일 수 있습니다. 하지만 운영에서는 직접 답변 경로, 계산·카운팅 같은 도구 경로, 다음 턴 재개를 위한 상태 저장이 서로 다른 책임을 가집니다. 이를 한곳에 뭉개면 어느 지점에서 비용이 생기고, 어느 경로에서 실패했는지, 왜 다음 턴이 이전 맥락을 그렇게 읽었는지가 흐려집니다.
 
@@ -59,9 +62,6 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 
 ## 최소 실행 예제
 이제 시리즈에서 다룬 요소를 하나로 묶어 보겠습니다. 예제는 두 경로를 모두 보여 줍니다. 첫 번째 턴에서는 LangGraph 개념 질문에 직접 답하고, 두 번째 턴에서는 계산 요청을 tool loop로 보냅니다. 그리고 두 턴 모두 같은 `thread_id` 아래에서 저장해, 마지막에 checkpoint 상태를 확인합니다.
-
-![supervisor와 tool loop가 결합된 통합 그래프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
-*supervisor와 tool loop가 결합된 통합 그래프*
 
 ```python
 import ast
@@ -291,15 +291,24 @@ if __name__ == "__main__":
 - [ ] 도구는 안전한 입력 파서와 회귀 테스트 케이스를 갖추고 있다
 - [ ] human review 또는 fallback 경로를 포함한 종료 전략을 운영 문서에 남겼다
 
+## 처음 질문으로 돌아가기
+
+- **완성형 LangGraph 앱은 왜 하나의 거대한 프롬프트가 아니라 협력하는 상태 기계로 봐야 할까요?**
+  - 거대한 프롬프트는 책임 경계를 흐리지만 상태 기계는 routing, tool loop, checkpoint가 각각 어떤 전이를 맡는지 드러냅니다.
+- **체크포인트, 분기, tool call, 멀티턴 이력을 붙여도 어떤 state 계약은 끝까지 유지해야 할까요?**
+  - 메시지 이력, route 판단, tool 결과, thread 기준처럼 다음 턴에서 다시 읽어야 할 필드는 일관된 이름과 의미로 유지되어야 합니다.
+- **운영에서 그래프 실행을 설명하려면 어떤 로그와 검증 지점을 남겨야 할까요?**
+  - 각 노드의 입력과 출력, 선택된 route, tool call과 결과, checkpoint thread id, 종료 조건을 로그와 테스트에서 확인할 수 있어야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LangGraph 소개와 그래프 기초](./01-graph-basics.md)
-- [상태 관리와 체크포인트](./02-state-and-checkpoints.md)
-- [조건부 엣지와 분기 흐름](./03-conditional-edges.md)
-- [도구 호출 에이전트](./04-tool-calling-agent.md)
-- [멀티 에이전트 시스템](./05-multi-agent.md)
-- **LangGraph 완성 (현재 글)**
+- [LangGraph 101 (1/6): LangGraph 소개와 그래프 기초](./01-graph-basics.md)
+- [LangGraph 101 (2/6): 상태 관리와 체크포인트](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): 조건부 엣지와 분기 흐름](./03-conditional-edges.md)
+- [LangGraph 101 (4/6): 도구 호출 에이전트](./04-tool-calling-agent.md)
+- [LangGraph 101 (5/6): 멀티 에이전트 시스템](./05-multi-agent.md)
+- **LangGraph 101 (6/6): LangGraph 완성 (현재 글)**
 
 <!-- toc:end -->
 

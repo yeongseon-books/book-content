@@ -1,5 +1,5 @@
 ---
-title: Multi-agent systems
+title: "LangGraph 101 (5/6): Multi-agent systems"
 series: langgraph-101
 episode: 5
 language: en
@@ -19,7 +19,7 @@ seo_description: A multi-agent graph is not just more LLM calls. It is a delegat
   structure where roles, handoffs, and state boundaries stay explicit.
 ---
 
-# Multi-agent systems
+# LangGraph 101 (5/6): Multi-agent systems
 
 If you keep pushing every task into one agent, the setup often feels efficient at first. One prompt, one model, one answer. Then the request grows. Now the system needs to write code, explain concepts, inspect failures, and maybe coordinate tool output too. Once all of that lives inside one prompt, role boundaries blur fast, and the graph becomes much harder to reason about than it first appeared.
 
@@ -31,17 +31,23 @@ This is the fifth article in the LangGraph 101 series. Here I want to frame mult
 
 Once that lens is in place, the final chapter becomes easier too. A complete LangGraph system is really just state, branching, tool use, and multi-agent orchestration combined into one operational graph. If multi-agent still feels like “a lot of agents doing things,” the supervisor design and shared-state boundaries stay vague much longer than they should.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- What role-separation structure does multi-agent design require beyond connecting several models?
+- What should be limited when each agent node reads and writes shared state?
+- What operational problem appears when handoff or supervisor boundaries are blurry?
 
-- How do you express the supervisor-worker pattern in LangGraph?
-- What should a supervisor node decide before handing work to a worker?
-- How much shared state should multiple agents actually share?
-- How does a supervisor-less multi-agent graph fail in production?
-- What boundaries need to be set first if you want the graph to stay readable as workers are added?
+## Big Picture
 
-## Why this matters
+![Supervisor worker delegation structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
+
+*Supervisor worker delegation structure*
+
+This picture shows role-specific agent nodes cooperating through shared state while a supervisor or routing boundary chooses the next worker. Multi-agent design is less about parallelism than about clear responsibility and handoff.
+
+> The quality of a multi-agent graph comes from clear responsibilities and handoff state, not from the number of agents.
+
+## Why this structure matters
 
 It is too weak to say multi-agent systems matter because “specialized roles can improve quality.” The stronger reason is explainable delegation. As requests become more complex, the team needs to answer practical questions: why did this request go to that worker, who owns the final response, and where should execution stop or recover when the system goes wrong?
 
@@ -53,11 +59,9 @@ So the goal of this post is not merely to show how to spawn multiple workers. Th
 
 ---
 
-## The best way to understand LangGraph: multi-agent is a cluster of role-separated graph nodes
+## Reading Multi-agent Design as Role Separation
 
 The sentence worth anchoring on is this: **multi-agent is a cluster of role-separated graph nodes.** I keep using that phrasing because it keeps the focus where it belongs. A supervisor decides delegation. Workers execute within their role. A finalizer assembles the result. The important fact is not that multiple models exist, but that **responsibility boundaries are visible in the structure.**
-
-> A multi-agent system is a cluster of role-separated graph nodes coordinated by an explicit supervisor. Skip the supervisor, and you may watch agents hand work around forever while nobody clearly owns the decision in production.
 
 Many first-time readers start from the hope that “more agents must mean better results.” That is only half true. The more operationally useful question is whether handoffs and ownership stay explicit. Without that, adding workers often increases cost and ambiguity faster than it increases quality.
 
@@ -75,19 +79,11 @@ That table matters because these are the questions operators actually ask. Why d
 
 In practice, I look for three things first in a multi-agent graph: whether the supervisor really behaves like a supervisor, whether workers avoid mutating too much shared state, and whether the finalizer absorbs final-output responsibility. Once those three are clear, you can add workers without losing the shape of the system.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-
 ---
 
 ## Minimal runnable example
 
 Start with the smallest supervisor-worker example that still resembles a real multi-agent skeleton. The supervisor reads the request and chooses either a `research` worker or a `code` worker. The worker writes only its dedicated result. A finalizer then assembles the response format. The example is deliberately small, but it already contains the structural bones that matter later.
-
-![Supervisor worker delegation structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
-
-*Supervisor worker delegation structure*
 
 ```python
 import os
@@ -269,15 +265,24 @@ In the next post, we will assemble the series into one complete LangGraph exampl
 - [ ] Does the finalizer absorb response-format and completion responsibility
 - [ ] Can trace boundaries stay readable even as more workers are added
 
+## Answering the Opening Questions
+
+- **What role-separation structure does multi-agent design require beyond connecting several models?**
+  - Multi-agent design splits responsibilities such as planner, researcher, and writer, then records the handoff contract in shared state.
+- **What should be limited when each agent node reads and writes shared state?**
+  - Each node should update only the fields and result shapes it owns. Otherwise agents overwrite the evidence needed by other stages.
+- **What operational problem appears when handoff or supervisor boundaries are blurry?**
+  - Blurry boundaries let supervisors do worker jobs or agents overwrite each other, making failure points and cost drivers hard to trace.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangGraph introduction and graph basics](./01-graph-basics.md)
-- [State management and checkpoints](./02-state-and-checkpoints.md)
-- [Conditional edges and branching](./03-conditional-edges.md)
-- [Tool-calling agents](./04-tool-calling-agent.md)
-- **Multi-agent systems (current)**
-- Completing LangGraph (upcoming)
+- [LangGraph 101 (1/6): LangGraph introduction and graph basics](./01-graph-basics.md)
+- [LangGraph 101 (2/6): State management and checkpoints](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): Conditional edges and branching](./03-conditional-edges.md)
+- [LangGraph 101 (4/6): Tool-calling agents](./04-tool-calling-agent.md)
+- **LangGraph 101 (5/6): Multi-agent systems (current)**
+- LangGraph 101 (6/6): Completing LangGraph (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: LangGraph introduction and graph basics
+title: "LangGraph 101 (1/6): LangGraph introduction and graph basics"
 series: langgraph-101
 episode: 1
 language: en
@@ -19,7 +19,7 @@ seo_description: StateGraph is a blueprint that turns node functions plus transi
   rules into an executable workflow over shared state.
 ---
 
-# LangGraph introduction and graph basics
+# LangGraph 101 (1/6): LangGraph introduction and graph basics
 
 When teams wire their first LangChain-style agent together, they usually hit the same wall. Change the prompt, and the answer changes. Change one helper function, and some requests improve while others get worse. The system still runs, but nobody can explain clearly why it behaved the way it did. What looks like “the model being flaky” is often just hidden control flow.
 
@@ -31,17 +31,23 @@ Once that click happens, the later pieces start to make more sense. Checkpointin
 
 I've seen that difference decide whether LangGraph feels obvious or frustrating. Memorizing `StateGraph`, `add_node()`, `add_edge()`, and `invoke()` is not the same thing as understanding why a graph is easier to operate. The real win is learning to read where state changes, why the next step was selected, and which stage to inspect when the final answer looks wrong.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why is LangGraph easier to reason about as an explicit state machine than as a longer chain?
+- What responsibilities do nodes, edges, and state each carry in the execution flow?
+- After running the first graph, which state values should be checked before trusting the final prose?
 
-- What exactly does `StateGraph` define in LangGraph?
-- How should you connect nodes and edges so the workflow stays readable?
-- What happens to state when you call `invoke()`, and what comes back out?
-- Why do teams that start from plain LangChain chains often get stuck on state visibility?
-- What should you inspect in a first graph if you want confidence that the structure will survive later growth?
+## Big Picture
 
-## Why this matters
+![Basic graph flow from START to END](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
+
+*Basic graph flow from START to END*
+
+This picture shows input state being updated by nodes while edges choose the next execution point. The core of LangGraph is not a bigger prompt; it is making state transitions explicit in code.
+
+> LangGraph is not valuable because the graph has a shape; it is valuable because state changes and next-step choices stay visible in code.
+
+## Why this structure matters
 
 If you describe LangGraph only as “a graph-based agent framework,” the description is technically correct and practically weak. The more useful answer is this: once an agent has multiple steps, the team needs a structure that can explain itself. Not eventually. Immediately.
 
@@ -53,9 +59,7 @@ So the purpose of this post is not merely to get a first graph to execute. It is
 
 ---
 
-## The best way to understand LangGraph: the explicit state machine mental model
-
-> The point of LangGraph is not the shape of the graph. It is that the state, the nodes that mutate it, and the rules that pick the next step are all visible in code.
+## Reading LangGraph as a State Machine
 
 The most useful sentence I know for LangGraph is this: **LangGraph is an explicit state machine.** I keep coming back to that wording because it stays useful even as the workflow grows. Nodes read state and update part of it. Edges define how execution moves forward. `invoke()` drives the transitions and gives you the final state after the graph is done.
 
@@ -75,19 +79,11 @@ That table matters because it answers the questions people actually ask while op
 
 In practice, I see two kinds of teams. One group compares only the final output string. The other inspects state fields and transition order together. The first group debugs symptoms. The second group debugs causes. LangGraph is valuable because it nudges you toward the second habit.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-
 ---
 
 ## Minimal runnable example
 
 Start with the smallest graph that still shows the core idea. A user request comes in, one node chooses a topic, another builds an outline, and a final node assembles the answer text. The example is deliberately plain, but it already contains the parts that matter later.
-
-![Basic graph flow from START to END](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
-
-*Basic graph flow from START to END*
 
 ```python
 from typing import TypedDict
@@ -314,15 +310,24 @@ In the next post, we will keep that state alive across calls with checkpoints an
 - [ ] Would this field structure still make sense once checkpointing is added
 - [ ] Would the current node names and edges still hold up once branching or loops appear
 
+## Answering the Opening Questions
+
+- **Why is LangGraph easier to reason about as an explicit state machine than as a longer chain?**
+  - A chain mostly extends order; LangGraph exposes where state changes and how the next step is chosen, which makes failures easier to localize.
+- **What responsibilities do nodes, edges, and state each carry in the execution flow?**
+  - Nodes read and update state, edges decide the next node, and state is the shared execution record across the graph.
+- **After running the first graph, which state values should be checked before trusting the final prose?**
+  - Check input fields, intermediate fields, selected paths, and accumulated messages before trusting the final text.
+
 <!-- toc:begin -->
 ## In this series
 
-- **LangGraph introduction and graph basics (current)**
-- State management and checkpoints (upcoming)
-- Conditional edges and branching (upcoming)
-- Tool-calling agents (upcoming)
-- Multi-agent systems (upcoming)
-- Completing LangGraph (upcoming)
+- **LangGraph 101 (1/6): LangGraph introduction and graph basics (current)**
+- LangGraph 101 (2/6): State management and checkpoints (upcoming)
+- LangGraph 101 (3/6): Conditional edges and branching (upcoming)
+- LangGraph 101 (4/6): Tool-calling agents (upcoming)
+- LangGraph 101 (5/6): Multi-agent systems (upcoming)
+- LangGraph 101 (6/6): Completing LangGraph (upcoming)
 
 <!-- toc:end -->
 

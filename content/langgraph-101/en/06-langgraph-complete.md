@@ -1,5 +1,5 @@
 ---
-title: Completing LangGraph
+title: "LangGraph 101 (6/6): Completing LangGraph"
 series: langgraph-101
 episode: 6
 language: en
@@ -19,7 +19,7 @@ seo_description: A complete LangGraph agent is not one giant prompt. It is a sta
   machine where supervisor logic, tool execution, and checkpointing cooperate…
 ---
 
-# Completing LangGraph
+# LangGraph 101 (6/6): Completing LangGraph
 
 By the time teams reach a “complete” agent example, they often expect one last trick. Maybe a better prompt. Maybe a smarter model. Maybe a more elaborate tool wrapper. In practice, the thing that usually makes the system feel complete is more structural than magical: state survives across turns, routing decisions stay explicit, and tool usage happens only when the request actually deserves it.
 
@@ -29,44 +29,41 @@ This is the final post in the LangGraph 101 series.
 
 So this chapter is not about adding one more feature. It is about combining the ideas from the earlier posts into one operational skeleton. Checkpoints remember context. A supervisor decides whether the request needs a direct answer or a tool path. The tool loop stays isolated instead of infecting the whole graph. That combination is what starts to feel usable outside a tutorial.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
-- How do you combine checkpoints, routing, and tool calling inside one LangGraph?
-- When should a supervisor send a request to a direct-answer path instead of a tool loop?
-- Why does a complete graph need state discipline even when the example looks small?
-- What parts of the graph should stay simple if you want debugging to remain possible later?
-- Which production mistakes show up when teams wire memory and tools together too casually?
-- What should you verify first before calling a combined LangGraph example “ready” for serious prototyping?
+- Why should a complete LangGraph app be read as a cooperating state machine instead of one giant prompt?
+- What state contract must remain stable even after checkpoints, routing, tool calls, and multi-turn history are combined?
+- What logs and verification points make graph execution explainable in production?
 
-## Why this matters
+## Big Picture
+
+![Combined graph with supervisor and tool loop](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
+
+*Combined graph with supervisor and tool loop*
+
+This picture shows state, checkpoints, conditional edges, tool nodes, and the final response connected as one execution graph. A complete LangGraph is judged less by feature count than by whether each boundary is observable and recoverable.
+
+> A complete agent is not defined by having every feature attached; it is defined by explainable routing, tool execution, and state recovery.
+
+## Why this structure matters
 
 Individually, checkpoints, branching, and tools all look manageable. The operational trouble starts when they meet. Now you are no longer asking whether a node works in isolation. You are asking whether the whole graph still behaves predictably when one turn is conceptual, the next turn requires math, and the third turn depends on the earlier conversation still being present.
 
 That is where many early agent systems get weaker than expected. One request should have been answered directly, but the graph routes it into a tool loop and adds avoidable latency. Another request should have used a tool, but the model improvises the answer from memory and returns something plausible but wrong. A third request should have resumed prior state, but the thread boundary was never treated as a real contract. The individual parts existed. The operating model did not.
 
-## The best way to understand a complete LangGraph
+## Reading the Complete Graph as an Operating Model
 
 The most useful mental model is this: **a complete LangGraph is a small operating system for request handling, not a large prompt with accessories attached.** State tells the graph what has happened so far. The supervisor decides what kind of work this turn requires. The tool loop performs narrow external work when necessary. Checkpointing makes the whole sequence resumable.
-
-> A complete LangGraph agent is not one giant prompt. It is a state machine where supervisor logic, tool execution, and checkpointing cooperate through explicit transitions.
 
 That framing matters because it stops you from treating completeness as feature count. I have seen teams say a graph is “complete” because it has memory, tools, and branching in the same repository. That is not enough. The question is whether those parts cooperate without blurring responsibility. Who decides the route? Which node is allowed to call tools? What state must survive? Where does the loop stop?
 
 If you keep those questions visible, the combined graph becomes easier to understand than it first appears. It is just a direct-answer lane, a tool lane, and a persisted conversation history held together by explicit transitions.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
 
 ## Minimal runnable example
 
 Start with the smallest graph that still feels like a real agent skeleton. This example does four things that belong together: it persists conversation state with `MemorySaver`, classifies the latest request through a supervisor node, answers conceptual questions directly, and routes calculation or counting work into a tool-enabled loop. That is enough to demonstrate the shape of a serious prototype without hiding the important edges behind framework magic.
 
 If you read the code with one goal in mind, make it this: notice how the graph does not treat all requests the same. That is where completeness starts to become operational rather than decorative.
-
-![Combined graph with supervisor and tool loop](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
-
-*Combined graph with supervisor and tool loop*
 
 ```python
 import ast
@@ -315,15 +312,24 @@ If you carry one idea forward, make it this: the best LangGraph systems are read
 - [ ] Can you inspect why a given turn ended directly or entered the tool loop
 - [ ] Do regression tests cover both remembered context and tool-routed follow-up turns
 
+## Answering the Opening Questions
+
+- **Why should a complete LangGraph app be read as a cooperating state machine instead of one giant prompt?**
+  - A giant prompt blurs responsibility. A state machine exposes which transition is owned by routing, the tool loop, and checkpointing.
+- **What state contract must remain stable even after checkpoints, routing, tool calls, and multi-turn history are combined?**
+  - Fields that the next turn must read again—message history, route decisions, tool results, and the thread boundary—must keep stable names and meaning.
+- **What logs and verification points make graph execution explainable in production?**
+  - Logs and tests should expose each node input and output, the selected route, tool calls and results, checkpoint thread id, and the stop condition.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangGraph introduction and graph basics](./01-graph-basics.md)
-- [State management and checkpoints](./02-state-and-checkpoints.md)
-- [Conditional edges and branching](./03-conditional-edges.md)
-- [Tool-calling agents](./04-tool-calling-agent.md)
-- [Multi-agent systems](./05-multi-agent.md)
-- **Completing LangGraph (current)**
+- [LangGraph 101 (1/6): LangGraph introduction and graph basics](./01-graph-basics.md)
+- [LangGraph 101 (2/6): State management and checkpoints](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): Conditional edges and branching](./03-conditional-edges.md)
+- [LangGraph 101 (4/6): Tool-calling agents](./04-tool-calling-agent.md)
+- [LangGraph 101 (5/6): Multi-agent systems](./05-multi-agent.md)
+- **LangGraph 101 (6/6): Completing LangGraph (current)**
 
 <!-- toc:end -->
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Conditional edges and branching</title>
+<title>LangGraph 101 (3/6): Conditional edges and branching</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,32 +53,33 @@
 </style>
 </head>
 <body>
-<h1>Conditional edges and branching</h1>
+<h1>LangGraph 101 (3/6): Conditional edges and branching</h1>
 <p>If an agent always follows one path, the graph stays deceptively simple. Real systems almost never do. Some requests should go to code generation, some to conceptual explanation, and others to debugging. If that branching logic stays buried inside a long <code>if/elif/else</code>, the workflow may still run, but the reason it took one path instead of another becomes harder to explain right when you need that explanation most.</p>
 <p>The uglier version shows up when branching fails quietly. One route label comes back empty. One unexpected string slips through. One graph has no default path, so an edge dead-ends only for a small slice of traffic. From the outside, the system looks like it “sometimes fails on weird inputs.” In practice, the deeper problem is often a weak routing contract rather than a weak model.</p>
 <p>Add loops on top of that, and the cost grows faster. A bad route can bounce execution between nodes that should never repeat, or keep a workflow moving when it should have stopped. I have seen teams describe this as model unpredictability, but in production the underlying issue is often simpler: the routing rules were never made explicit enough to operate safely.</p>
 <p>This is the third article in the LangGraph 101 series. Here I want to frame conditional edges not as a convenient syntax feature, but as <strong>the decision points that let a graph choose its next node in the open</strong>. That distinction matters. <strong>A conditional edge reads state, translates that state into a route, and makes the routing boundary visible instead of hiding it inside execution code.</strong></p>
 <p>Once that perspective is clear, the next chapter on tool-calling agents becomes much easier to read. Tool loops are still just “look at the current state, then choose the next behavior.” If branching stays mentally downgraded to a small runtime <code>if</code>, fallback routes, loop termination, and observability never feel as central as they actually are.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>When should you use <code>add_conditional_edges()</code>?</li>
-<li>What job should the routing function do, and what should it avoid?</li>
-<li>How do you keep branch-heavy graphs from turning into unbounded loops?</li>
-<li>What failure mode appears in production when no default path exists?</li>
-<li>How does saved routing evidence improve debugging and observability?</li>
+<li>How does a conditional edge control graph execution differently from an ordinary if statement?</li>
+<li>What failure appears when the routing function returns an unexpected value?</li>
+<li>What debugging becomes easier when the default route is explicit in code?</li>
 </ul>
-<h2>Why this matters</h2>
+<h2>Big Picture</h2>
+<p><img alt="Three way branch from classify node" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png"></p>
+<p><em>Three way branch from classify node</em></p>
+<p>This picture shows a routing function reading state, choosing the next node, and changing the execution path through an edge. A conditional edge turns the decision after model output into an explicit routing contract.</p>
+<blockquote>
+<p>A conditional edge is not prettier branching syntax; it is the routing contract that explains why the graph took a path.</p>
+</blockquote>
+<h2>Why this structure matters</h2>
 <p>It is too weak to say conditional edges matter because “a graph can branch.” The stronger reason is explainable routing. Once an agent takes on multiple roles, the team needs to answer a very practical question: why did this request go to this node?</p>
 <p>Suppose one class of question should route to code writing, another to concept explanation, and another to debugging. You can absolutely bury that judgment inside a single node. The code will still run. But the moment somebody asks, “Why did this go to debug?”, “Why did this fall into concept?”, or “Why did this loop instead of terminate?”, the abstraction starts leaking quickly.</p>
 <p>I have seen teams underestimate this and then spend far too long staring at tracing dashboards that still do not tell the full story. Observability tools help, but if the routing contract itself is hidden, interpretation remains hard. When routing evidence is left in state and the branch map is explicit in code, logs and state snapshots become enough to reconstruct the decision path.</p>
 <p>So the goal of this post is not just to teach the <code>add_conditional_edges()</code> API. The more important goal is to show why lifting branch logic into graph structure lowers operational ambiguity later.</p>
 <hr>
-<h2>The best way to understand LangGraph: a conditional edge is the graph’s decision point</h2>
+<h2>Reading Conditional Edges as Routing Contracts</h2>
 <p>The most useful sentence here is this: <strong>a conditional edge is the graph’s decision point.</strong> I keep using that phrase because it stays practical. One node produces routing evidence in state, a router reads that state, and the conditional edge turns the decision into the next step. The branching rule is no longer hidden inside execution code. It becomes part of the graph itself.</p>
-<blockquote>
-<p>A conditional edge is your graph’s decision point. The node produces state, the router reads that state, and the edge turns that judgment into the next path. Get that boundary wrong, and an agent can silently dead-end in production.</p>
-</blockquote>
 <p>Many introductions explain conditional edges as “how to express <code>if/else</code> in a graph.” That is half right. The missing half is that routing outcomes become explicit in both structure and state. That is what makes fallback routes, loop guards, and observability part of the same model instead of scattered implementation details.</p>
 <p>At the simplest level, the model looks like this.</p>
 <p><strong>Classifier node</strong><br>
@@ -98,13 +99,9 @@
 - Why it matters in practice: You protect the graph from runaway branching cost</p>
 <p>That table matters because these are the questions operators actually ask. Why did the router choose debug? Where does an unknown route go? What happens if there is no fallback? Where is loop termination guaranteed? Those questions only become answerable once you treat conditional edges as decision boundaries rather than as minor syntax.</p>
 <p>In practice, I look for three things first in a branching graph: whether routing evidence is preserved in state, whether unexpected inputs have a default path, and whether loop control is separated from route choice. Once those three are visible, “it only fails on some strange requests” becomes much easier to interpret.</p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <hr>
 <h2>Minimal runnable example</h2>
 <p>Start with the smallest branch that still looks like a real routing skeleton. The graph reads the user’s question, classifies it as <code>code</code>, <code>concept</code>, or <code>debug</code>, and uses a conditional edge to choose the next node. The example is intentionally plain, but the structure is already close to what real agents use.</p>
-<p><img alt="Three way branch from classify node" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png"></p>
-<p><em>Three way branch from classify node</em></p>
 <pre><code class="language-python">from typing import Literal, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -285,6 +282,15 @@ Answer: Route: fallback. The classifier returned an unknown label, so the graph 
 <li>[ ] Are loop termination rules and recursion limits defined together</li>
 <li>[ ] Can branch outcomes be reconstructed from state or logs</li>
 <li>[ ] Is there a validation point that catches route-contract drift before it turns into runtime chaos</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>How does a conditional edge control graph execution differently from an ordinary if statement?</strong></li>
+<li>An ordinary if statement hides control flow inside a function. A conditional edge leaves the state-reading router and route names in the graph structure.</li>
+<li><strong>What failure appears when the routing function returns an unexpected value?</strong></li>
+<li>An unexpected route can fail before the final answer by pointing to no node or to the wrong path, so the routing step becomes the first place to inspect.</li>
+<li><strong>What debugging becomes easier when the default route is explicit in code?</strong></li>
+<li>An explicit default route makes ambiguous input visible in logs and state, which narrows branch failures quickly.</li>
 </ul>
 <h2>In this series</h2>
 <ul>

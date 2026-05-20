@@ -1,5 +1,5 @@
 ---
-title: Tool-calling agents
+title: "LangGraph 101 (4/6): Tool-calling agents"
 series: langgraph-101
 episode: 4
 language: en
@@ -19,7 +19,7 @@ seo_description: ToolNode and tools_condition make the tool loop explicit, so an
   can request tools inside a controllable graph execution envelope.
 ---
 
-# Tool-calling agents
+# LangGraph 101 (4/6): Tool-calling agents
 
 Tool-using agents always look smart in demos. If a question needs arithmetic, the model calls a calculator. If it needs counting, the model reaches for a text tool. The answer comes back with the glow of external grounding, and everyone feels better about the system. In production, though, the questions change quickly. Why did this request call the tool three times? Why did the model ask for a tool that does not even exist? Why did it read a failed tool result and then ask for the same tool again?
 
@@ -27,17 +27,23 @@ The real issue is usually not that the model can use tools. The issue is whether
 
 This is the fourth article in the LangGraph 101 series. Here I want to frame a tool-calling agent not as “a model that knows how to use tools,” but as **a safe execution envelope that separates LLM judgment from actual tool execution**. That distinction matters. **A tool-calling agent is a control loop built from an LLM node, a ToolNode, and explicit termination rules.**
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- Why should a LangGraph tool-calling agent be read as an LLM plus a separate tool execution envelope?
+- When tool calls repeat, what execution trace should remain in state?
+- What risk appears when tool calls run without a safe dispatcher?
 
-- What responsibility does `ToolNode` take inside a LangGraph agent?
-- How do `ChatGroq.bind_tools()` and conditional edges work together?
-- How does the graph know when the tool loop should stop and return a final answer?
-- How do you control a model that requests the wrong tool or keeps calling the same one?
-- What safety controls matter first when a tool can trigger external side effects?
+## Big Picture
 
-## Why this matters
+![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
+
+*Tool loop between agent and tools*
+
+This picture shows an LLM node producing a tool call, a tool execution node running only validated calls, and the result returning to state. The safety of a LangGraph agent comes less from autonomy than from the boundary around execution.
+
+> The core of a tool-calling agent is not that the model knows tools; it is that tool execution repeats inside a boundary you can validate.
+
+## Why this structure matters
 
 It is too weak to say tool-calling agents matter because “an LLM can now do calculations or search.” The stronger reason is grounded execution with controllable loops. The moment a model starts outsourcing work to external capabilities, the team needs to answer practical questions: why was this tool called, did the tool succeed, and when should the loop stop?
 
@@ -47,11 +53,9 @@ So the goal of this post is not to help you memorize the `ToolNode` API. The mor
 
 ---
 
-## The best way to understand LangGraph: a tool-calling agent is an LLM inside a safe execution envelope
+## Reading a Tool-calling Agent as an Execution Boundary
 
 The sentence worth anchoring on is this: **a tool-calling agent is an LLM inside a safe execution envelope.** I keep using that phrasing because it is operationally useful. The model decides whether a tool is needed. `ToolNode` performs the execution and creates the result message. A conditional edge decides whether the loop continues or stops.
-
-> A tool-calling agent is an LLM wrapped in a safe execution envelope. Strip away that envelope, and you will watch the system burn API budget chasing hallucinated tool names or repeated tool calls in production.
 
 Many first-time readers treat tool calling as “the option that lets an LLM reach outside itself.” That is only half the story. The more important half is that tool requests and tool execution become **separate layers**. Once those layers are separated, you can attach permission checks, logging, fallback behavior, and retry policy outside the prompt instead of trying to smuggle all of it into model instructions.
 
@@ -67,19 +71,11 @@ At the simplest level, the model looks like this.
 
 That table matters because these are the questions operators actually ask. Why did the model request this tool? Did the tool really succeed? Why did the system call it again after failure? When should execution stop instead of looping? Those questions become answerable only when tool calling is treated as an execution envelope rather than as an LLM party trick.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-
 ---
 
 ## Minimal runnable example
 
 Start with the smallest tool loop that still resembles a real tool-using agent. The model reads a question, requests a tool when necessary, `ToolNode` performs the execution, and the model reads the result before producing the final answer. The example is intentionally small, but it already contains the whole control loop.
-
-![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
-
-*Tool loop between agent and tools*
 
 ```python
 import ast
@@ -272,15 +268,24 @@ In the next post, we will extend the series from branching into supervisor-worke
 - [ ] Can `ToolNode` execution logs and model tool-call requests be traced separately
 - [ ] Is there a validation process that keeps schema quality and stop rules consistent as more tools are added
 
+## Answering the Opening Questions
+
+- **Why should a LangGraph tool-calling agent be read as an LLM plus a separate tool execution envelope?**
+  - The LLM proposes intent; the envelope controls names, arguments, allowed scope, and how results return to state. Keeping them separate makes responsibility and failure points visible.
+- **When tool calls repeat, what execution trace should remain in state?**
+  - State should retain model messages, tool calls, tool results, and the accumulated messages used for the next decision so the loop can be replayed.
+- **What risk appears when tool calls run without a safe dispatcher?**
+  - Without a dispatcher, unapproved tools or invalid arguments can run directly, increasing security, cost, and data-integrity risk.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangGraph introduction and graph basics](./01-graph-basics.md)
-- [State management and checkpoints](./02-state-and-checkpoints.md)
-- [Conditional edges and branching](./03-conditional-edges.md)
-- **Tool-calling agents (current)**
-- Multi-agent systems (upcoming)
-- Completing LangGraph (upcoming)
+- [LangGraph 101 (1/6): LangGraph introduction and graph basics](./01-graph-basics.md)
+- [LangGraph 101 (2/6): State management and checkpoints](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): Conditional edges and branching](./03-conditional-edges.md)
+- **LangGraph 101 (4/6): Tool-calling agents (current)**
+- LangGraph 101 (5/6): Multi-agent systems (upcoming)
+- LangGraph 101 (6/6): Completing LangGraph (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: State management and checkpoints
+title: "LangGraph 101 (2/6): State management and checkpoints"
 series: langgraph-101
 episode: 2
 language: en
@@ -19,7 +19,7 @@ seo_description: A checkpointer snapshots graph state so the next invocation can
   from the same conversation timeline instead of starting from zero.
 ---
 
-# State management and checkpoints
+# LangGraph 101 (2/6): State management and checkpoints
 
 You can get away with hand-waving state when an agent handles one request and disappears. That stops working the moment the workflow has to survive a second turn. Now it matters what the user said earlier, which tool results are still relevant, how many turns already happened, and whether the graph can resume from something real instead of pretending it remembers.
 
@@ -31,17 +31,23 @@ This is the second article in the LangGraph 101 series. Here I want to frame che
 
 Once that model is clear, the next chapter becomes easier too. Conditional edges stop looking like isolated branching logic and start looking like routing decisions made from saved state. Tool loops become repeated state transitions on top of the same timeline. If checkpointing remains a fuzzy “memory-like thing,” `thread_id`, merge rules, replay, and time travel all stay fuzzier than they should.
 
----
+## Questions to Keep in Mind
 
-## Questions this post answers
+- What bugs become easier to avoid when state is the single source of truth in LangGraph?
+- How is a checkpoint different from in-memory state, and when does it become a recovery boundary?
+- What limit appears if the MemorySaver example is mistaken for production storage?
 
-- What does a LangGraph checkpointer actually store?
-- How do `MemorySaver` and `thread_id` let a graph continue a prior conversation?
-- How do you inspect restored state after another turn finishes?
-- What goes wrong in production when a team implements retries without checkpoints?
-- Which fields should accumulate, which should overwrite, and where should that rule live?
+## Big Picture
 
-## Why this matters
+![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
+
+*Resume flow through thread_id*
+
+This picture shows state being updated during graph execution while checkpoints persist it between calls. Separating state from checkpoints makes multi-turn execution and recovery boundaries clear.
+
+> State is the contract for the current run; a checkpoint is the storage boundary that lets the next call resume that contract.
+
+## Why this structure matters
 
 If checkpointing is explained only as “memory for a conversation,” you get at most half the value. The stronger reason is recovery and reproducibility. The moment an agent stops being single-shot and starts continuing across invocations, state persistence becomes part user experience and part reliability engineering.
 
@@ -53,11 +59,9 @@ That is why the goal of this post is not simply to show how `MemorySaver` works.
 
 ---
 
-## The best way to understand LangGraph: State is the single source of truth, checkpoints are where it lives between calls
+## Separating State from Checkpoints
 
 The sentence worth anchoring on is this: **State is the graph’s single source of truth, and a checkpoint is the storage layer that preserves it.** I keep using that wording because it captures persistence in a way that stays useful once workflows become more operationally serious.
-
-> State is the single source of truth for your graph. Every node reads it, mutates it, and passes it forward. A checkpoint stores that state between invocations so the graph can resume on the same timeline instead of pretending to start fresh.
 
 Many first-time readers think of a checkpointer as “the option that adds memory.” In practice, that framing is too soft. A checkpointer saves a state snapshot and later feeds that snapshot back into the graph when the same session identifier (`thread_id`) returns. That is not memory magic. It is a resumable execution context.
 
@@ -75,19 +79,11 @@ That table matters because these are the questions operators actually ask. Why d
 
 In practice, I look for three things first when a graph uses checkpoints: how much state is persisted, how trustworthy the session key is, and whether merge behavior matches the shape of each field. Once you can answer those three, the system stops feeling like “it remembers” or “it does not remember” and starts feeling understandable.
 
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-
 ---
 
 ## Minimal runnable example
 
 Start with the smallest possible resume example. The first invocation saves the user message. The second invocation uses the same `thread_id` to continue from the earlier conversation state. Then `get_state()` is used to inspect what was actually persisted.
-
-![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
-
-*Resume flow through thread_id*
 
 ```python
 from typing import Annotated
@@ -306,15 +302,24 @@ In the next post, we will use that saved state to decide which node should run n
 - [ ] Did you document the resume point after a partial failure
 - [ ] Do you have a procedure for inspecting saved state with `get_state()`
 
+## Answering the Opening Questions
+
+- **What bugs become easier to avoid when state is the single source of truth in LangGraph?**
+  - Centralized state reduces missing messages, mismatched fields, and lost intermediate results because nodes no longer invent separate local truth.
+- **How is a checkpoint different from in-memory state, and when does it become a recovery boundary?**
+  - A checkpoint is not the in-run memory itself. It is the saved boundary that lets the graph reload state across calls, failures, and multi-turn sessions.
+- **What limit appears if the MemorySaver example is mistaken for production storage?**
+  - MemorySaver is an in-process teaching tool. It does not guarantee restart safety, multi-instance coordination, or long-term retention; production graphs need an external saver.
+
 <!-- toc:begin -->
 ## In this series
 
-- [LangGraph introduction and graph basics](./01-graph-basics.md)
-- **State management and checkpoints (current)**
-- Conditional edges and branching (upcoming)
-- Tool-calling agents (upcoming)
-- Multi-agent systems (upcoming)
-- Completing LangGraph (upcoming)
+- [LangGraph 101 (1/6): LangGraph introduction and graph basics](./01-graph-basics.md)
+- **LangGraph 101 (2/6): State management and checkpoints (current)**
+- LangGraph 101 (3/6): Conditional edges and branching (upcoming)
+- LangGraph 101 (4/6): Tool-calling agents (upcoming)
+- LangGraph 101 (5/6): Multi-agent systems (upcoming)
+- LangGraph 101 (6/6): Completing LangGraph (upcoming)
 
 <!-- toc:end -->
 

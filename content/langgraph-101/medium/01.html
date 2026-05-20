@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LangGraph introduction and graph basics</title>
+<title>LangGraph 101 (1/6): LangGraph introduction and graph basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,31 +53,32 @@
 </style>
 </head>
 <body>
-<h1>LangGraph introduction and graph basics</h1>
+<h1>LangGraph 101 (1/6): LangGraph introduction and graph basics</h1>
 <p>When teams wire their first LangChain-style agent together, they usually hit the same wall. Change the prompt, and the answer changes. Change one helper function, and some requests improve while others get worse. The system still runs, but nobody can explain clearly why it behaved the way it did. What looks like “the model being flaky” is often just hidden control flow.</p>
 <p>That problem gets louder once you start operating the thing instead of demoing it. One request finishes cleanly, another calls the same tool twice, a third cannot be reproduced because the intermediate state never got captured anywhere. Teams I've worked with often describe this as “the agent feels unstable,” but in production the deeper issue is usually simpler: the workflow is real, yet the workflow is not visible in the code structure.</p>
 <p>This is the first article in the LangGraph 101 series. Here I want to frame LangGraph not as a convenient agent utility, but as a <strong>graph runtime where state moves explicitly from step to step</strong>. That is the mental shift that matters. <strong>LangGraph is less about writing clever prompts and more about refusing to hide state transitions.</strong></p>
 <p>Once that click happens, the later pieces start to make more sense. Checkpointing stops looking like “memory magic” and starts reading like state snapshot storage. Conditional edges stop looking like a dressed-up <code>if</code> statement and start reading like runtime routing rules. Tool loops change too. Teams that separate node, edge, and state tend to debug by tracing stages. Teams that keep thinking in one long chain usually jump straight to the final string.</p>
 <p>I've seen that difference decide whether LangGraph feels obvious or frustrating. Memorizing <code>StateGraph</code>, <code>add_node()</code>, <code>add_edge()</code>, and <code>invoke()</code> is not the same thing as understanding why a graph is easier to operate. The real win is learning to read where state changes, why the next step was selected, and which stage to inspect when the final answer looks wrong.</p>
-<hr>
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What exactly does <code>StateGraph</code> define in LangGraph?</li>
-<li>How should you connect nodes and edges so the workflow stays readable?</li>
-<li>What happens to state when you call <code>invoke()</code>, and what comes back out?</li>
-<li>Why do teams that start from plain LangChain chains often get stuck on state visibility?</li>
-<li>What should you inspect in a first graph if you want confidence that the structure will survive later growth?</li>
+<li>Why is LangGraph easier to reason about as an explicit state machine than as a longer chain?</li>
+<li>What responsibilities do nodes, edges, and state each carry in the execution flow?</li>
+<li>After running the first graph, which state values should be checked before trusting the final prose?</li>
 </ul>
-<h2>Why this matters</h2>
+<h2>Big Picture</h2>
+<p><img alt="Basic graph flow from START to END" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png"></p>
+<p><em>Basic graph flow from START to END</em></p>
+<p>This picture shows input state being updated by nodes while edges choose the next execution point. The core of LangGraph is not a bigger prompt; it is making state transitions explicit in code.</p>
+<blockquote>
+<p>LangGraph is not valuable because the graph has a shape; it is valuable because state changes and next-step choices stay visible in code.</p>
+</blockquote>
+<h2>Why this structure matters</h2>
 <p>If you describe LangGraph only as “a graph-based agent framework,” the description is technically correct and practically weak. The more useful answer is this: once an agent has multiple steps, the team needs a structure that can explain itself. Not eventually. Immediately.</p>
 <p>Imagine a flow that receives a request, chooses a topic, builds an outline, and assembles a final answer. You can absolutely write that as a sequence of ordinary functions. It will run. But the moment someone asks, “Why did this step happen first?”, “Which stage changed this field?”, or “Where should we debug when the final answer looks off?”, the abstraction starts leaking. In production, that loss of explainability turns directly into maintenance cost.</p>
 <p>I have seen teams underestimate this because the first prototype is small. A short chain feels fine while there is only one route and one obvious output. Then a tool call gets added, then conversation state, then branching, and suddenly the workflow that used to fit in one person’s head becomes a guessing game. LangGraph pays off right there, because it leaves the flow in the structure instead of leaving it in your memory.</p>
 <p>So the purpose of this post is not merely to get a first graph to execute. It is to make the state-machine lens feel natural, because that lens is what makes checkpointing, branching, and tool loops feel like extensions of one system rather than unrelated features.</p>
 <hr>
-<h2>The best way to understand LangGraph: the explicit state machine mental model</h2>
-<blockquote>
-<p>The point of LangGraph is not the shape of the graph. It is that the state, the nodes that mutate it, and the rules that pick the next step are all visible in code.</p>
-</blockquote>
+<h2>Reading LangGraph as a State Machine</h2>
 <p>The most useful sentence I know for LangGraph is this: <strong>LangGraph is an explicit state machine.</strong> I keep coming back to that wording because it stays useful even as the workflow grows. Nodes read state and update part of it. Edges define how execution moves forward. <code>invoke()</code> drives the transitions and gives you the final state after the graph is done.</p>
 <p>Many introductions phrase LangGraph as “a way to compose chains into a graph.” That is not wrong, but it is not enough. It explains shape, not operational value. The practical difference is not the number of calls. The practical difference is that <strong>state and transitions are made explicit instead of implied.</strong></p>
 <p>At the simplest level, the model looks like this.</p>
@@ -98,13 +99,9 @@
 - Why it matters in practice: You validate the full workflow result, not just one function output</p>
 <p>That table matters because it answers the questions people actually ask while operating agents. Which node chose the wrong route? Why did the workflow stop there? When did the state first drift away from expectation? Those are not model-quality questions. They are Node, Edge, and State questions.</p>
 <p>In practice, I see two kinds of teams. One group compares only the final output string. The other inspects state fields and transition order together. The first group debugs symptoms. The second group debugs causes. LangGraph is valuable because it nudges you toward the second habit.</p>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
 <hr>
 <h2>Minimal runnable example</h2>
 <p>Start with the smallest graph that still shows the core idea. A user request comes in, one node chooses a topic, another builds an outline, and a final node assembles the answer text. The example is deliberately plain, but it already contains the parts that matter later.</p>
-<p><img alt="Basic graph flow from START to END" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png"></p>
-<p><em>Basic graph flow from START to END</em></p>
 <pre><code class="language-python">from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -284,6 +281,15 @@ print(result)
 <li>[ ] Does the team validate intermediate state, not just the final answer</li>
 <li>[ ] Would this field structure still make sense once checkpointing is added</li>
 <li>[ ] Would the current node names and edges still hold up once branching or loops appear</li>
+</ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is LangGraph easier to reason about as an explicit state machine than as a longer chain?</strong></li>
+<li>A chain mostly extends order; LangGraph exposes where state changes and how the next step is chosen, which makes failures easier to localize.</li>
+<li><strong>What responsibilities do nodes, edges, and state each carry in the execution flow?</strong></li>
+<li>Nodes read and update state, edges decide the next node, and state is the shared execution record across the graph.</li>
+<li><strong>After running the first graph, which state values should be checked before trusting the final prose?</strong></li>
+<li>Check input fields, intermediate fields, selected paths, and accumulated messages before trusting the final text.</li>
 </ul>
 <h2>In this series</h2>
 <ul>

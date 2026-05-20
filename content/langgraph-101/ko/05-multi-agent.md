@@ -1,5 +1,5 @@
 ---
-title: 멀티 에이전트 시스템
+title: "LangGraph 101 (5/6): 멀티 에이전트 시스템"
 series: langgraph-101
 episode: 5
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-11'
 seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티 에이전트 그래프 구성을 정리합니다
 ---
 
-# 멀티 에이전트 시스템
+# LangGraph 101 (5/6): 멀티 에이전트 시스템
 
 복잡한 요청을 하나의 에이전트에 계속 밀어 넣다 보면 처음에는 편해 보입니다. 프롬프트 하나, 모델 하나, 응답 하나면 되기 때문입니다. 그런데 요청이 길어지고 역할이 늘어나는 순간부터 문제가 드러납니다. 코드 작성도 해야 하고, 개념 설명도 해야 하고, 실패 분석도 해야 하는데, 이 모든 걸 한 프롬프트 안에 넣어 두면 역할 경계가 금방 흐려집니다.
 
@@ -30,17 +30,23 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 이 관점을 잡아 두면 마지막 글도 훨씬 쉬워집니다. 완성형 LangGraph는 결국 상태, 분기, 도구 호출, 멀티 에이전트를 하나의 운영 가능한 그래프로 합친 구조이기 때문입니다. 반대로 멀티 에이전트를 단지 “agent를 여러 개 쓰는 것” 정도로 보면, supervisor 설계와 shared state 경계가 왜 핵심인지 끝까지 흐릿하게 남습니다.
 
----
+## 먼저 던지는 질문
 
-## 이 글에서 다룰 문제
+- 멀티 에이전트는 여러 모델을 붙이는 일이 아니라 어떤 책임 분리 구조일까요?
+- 각 에이전트 노드가 공유 state를 읽고 쓸 때 무엇을 제한해야 할까요?
+- handoff나 supervisor 경계가 흐리면 어떤 운영 문제가 생길까요?
 
-- LangGraph에서 supervisor-worker 패턴을 어떻게 표현할 수 있을까요?
-- supervisor 노드는 worker에게 일을 넘기기 전에 무엇을 결정해야 할까요?
-- 여러 에이전트가 공유하는 상태는 어느 정도까지 열어 두는 편이 좋을까요?
-- supervisor가 없는 멀티 에이전트 구조는 운영에서 어떤 식으로 무너질까요?
-- worker가 늘어나도 그래프가 읽히게 유지하려면 어떤 경계를 먼저 정해야 할까요?
+## 큰 그림
 
-## 왜 이 글이 중요한가
+![supervisor가 worker에게 위임하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
+
+*supervisor가 worker에게 위임하는 구조*
+
+이 그림에서는 역할이 다른 에이전트 노드들이 공유 state를 통해 협력하고, supervisor나 routing 경계가 다음 작업자를 고르는 흐름을 봅니다. 멀티 에이전트 설계는 병렬성보다 책임과 handoff를 명확히 나누는 일입니다.
+
+> Multi-agent의 품질은 에이전트 수가 아니라, 각 노드가 맡은 책임과 넘겨주는 state가 얼마나 분명한지에서 갈립니다.
+
+## 왜 이 구조가 중요한가
 
 멀티 에이전트를 배우는 이유를 “역할을 나눠서 더 똑똑하게 만들 수 있으니까”라고만 설명하면 너무 약합니다. 더 현실적인 이유는 설명 가능한 위임입니다. 요청이 복잡해질수록 팀은 반드시 “왜 이 요청이 이 worker에게 갔는가”, “누가 최종 답을 책임지는가”, “실패했을 때 어디서 멈추고 어디서 복구할 것인가”를 설명할 수 있어야 합니다.
 
@@ -52,11 +58,9 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 ---
 
-## LangGraph를 이해하는 가장 좋은 방법: Multi-agent는 책임 분리된 그래프 노드 클러스터다
+## Multi-agent를 책임 분리로 읽기
 
 멀티 에이전트에서 가장 먼저 잡아야 할 문장은 이것입니다. **Multi-agent는 책임 분리된 그래프 노드 클러스터**입니다. 저는 이 표현이 가장 실용적이라고 생각합니다. supervisor는 위임을 결정하고, worker는 자기 역할만 수행하고, finalizer는 최종 응답을 조립합니다. 즉, 여러 모델이 있다는 사실보다 **누가 무엇을 책임지는가가 구조로 드러나는 것**이 더 중요합니다.
-
-> 멀티 에이전트 그래프의 핵심은 agent 수가 아닙니다. supervisor가 위임 경계를 지키고, worker가 역할을 넘지 않으며, shared state가 최소 계약으로 유지될 때 비로소 운영 가능한 시스템이 됩니다.
 
 많은 입문자가 멀티 에이전트를 “한 agent보다 agent가 여러 개면 더 잘하겠지”라는 기대에서 시작합니다. 절반은 맞지만, 절반은 놓칩니다. 중요한 차이는 결과 품질보다 **책임 경계와 handoff가 명시적으로 남는가**에 있습니다. 이게 있어야 worker를 늘려도 구조가 무너지지 않고, 어떤 agent가 어떤 필드를 읽고 썼는지도 추적할 수 있습니다.
 
@@ -74,19 +78,11 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 현업에서 저는 멀티 에이전트 그래프를 볼 때 먼저 세 가지를 봅니다. supervisor가 실제로 supervisor 역할만 하는가, worker가 shared state를 과하게 건드리지 않는가, finalizer가 출력 책임을 흡수하는가. 이 세 가지를 먼저 읽으면, agent 수가 늘어도 구조가 어디서부터 흔들릴지 빨리 감이 옵니다.
 
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-
 ---
 
 ## 최소 실행 예제
 
 가장 작은 supervisor-worker 예제로 보겠습니다. supervisor가 요청을 읽고 `research` 또는 `code` worker 중 하나를 선택하고, worker는 자신의 전용 결과를 남기며, 마지막에 finalizer가 출력 형식을 정리합니다. 구조는 단순하지만 멀티 에이전트의 핵심 뼈대가 모두 들어 있습니다.
-
-![supervisor가 worker에게 위임하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
-
-*supervisor가 worker에게 위임하는 구조*
 
 ```python
 import os
@@ -268,15 +264,24 @@ def build_graph():
 - [ ] finalizer가 응답 형식과 종료 책임을 흡수하도록 설계했다
 - [ ] worker가 늘어나도 추적 가능한 로그/상태 경계를 유지할 수 있게 만들었다
 
+## 처음 질문으로 돌아가기
+
+- **멀티 에이전트는 여러 모델을 붙이는 일이 아니라 어떤 책임 분리 구조일까요?**
+  - 멀티 에이전트는 모델을 많이 붙이는 구조가 아니라 planner, researcher, writer처럼 책임을 나누고 handoff 계약을 state로 남기는 구조입니다.
+- **각 에이전트 노드가 공유 state를 읽고 쓸 때 무엇을 제한해야 할까요?**
+  - 각 노드는 자신이 소유한 필드와 결과 형식만 갱신하도록 제한해야 합니다. 그래야 다른 노드의 판단 근거를 덮어쓰지 않습니다.
+- **handoff나 supervisor 경계가 흐리면 어떤 운영 문제가 생길까요?**
+  - 경계가 흐리면 supervisor가 실제 작업까지 끌어안거나 agent가 서로의 결과를 덮어써서 실패 지점과 비용 원인을 추적하기 어려워집니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [LangGraph 소개와 그래프 기초](./01-graph-basics.md)
-- [상태 관리와 체크포인트](./02-state-and-checkpoints.md)
-- [조건부 엣지와 분기 흐름](./03-conditional-edges.md)
-- [도구 호출 에이전트](./04-tool-calling-agent.md)
-- **멀티 에이전트 시스템 (현재 글)**
-- LangGraph 완성 (예정)
+- [LangGraph 101 (1/6): LangGraph 소개와 그래프 기초](./01-graph-basics.md)
+- [LangGraph 101 (2/6): 상태 관리와 체크포인트](./02-state-and-checkpoints.md)
+- [LangGraph 101 (3/6): 조건부 엣지와 분기 흐름](./03-conditional-edges.md)
+- [LangGraph 101 (4/6): 도구 호출 에이전트](./04-tool-calling-agent.md)
+- **LangGraph 101 (5/6): 멀티 에이전트 시스템 (현재 글)**
+- LangGraph 101 (6/6): LangGraph 완성 (예정)
 
 <!-- toc:end -->
 
