@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 4
-title: Error Budget
+title: "SRE 101 (4/10): Error Budget"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to error budgets covering the definit
 last_reviewed: '2026-05-14'
 ---
 
-# Error Budget
+# SRE 101 (4/10): Error Budget
 
 As soon as a team writes down an SLO, the next practical question shows up: how much failure are we willing to tolerate while we keep shipping changes? Without a clear answer, every incident becomes a fresh argument between “move faster” and “slow everything down.”
 
@@ -28,13 +28,21 @@ The error budget is useful because it turns that argument into policy. It gives 
 
 This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does an error budget become the common language between speed and stability?
 - How do you calculate the allowed failure from an SLO target?
 - Why do total budget spend and burn rate answer different operating questions?
-- What should change when the budget is disappearing too quickly?
-- Why does the budget stop helping if teams use it as a blame mechanism?
+
+## Big Picture
+
+![sre 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 4 flow overview*
+
+This picture places Error Budget inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Error Budget is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ With a budget, the discussion becomes more precise. If the service still has roo
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
-
-*An error budget matters only when actual failure spend changes release behavior.*
 ## Key Terms
 
 - **error budget**: the *allowed amount of failure*.
@@ -147,10 +152,21 @@ If the *budget* has room, you *experiment*. Once it is *spent*, you *focus on st
 
 Next, we cover the *fundamentals of monitoring*.
 
+## Answering the Opening Questions
+
+- **Why does an error budget become the common language between speed and stability?**
+  - The article treats Error Budget as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do you calculate the allowed failure from an SLO target?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do total budget spend and burn rate answer different operating questions?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
 - **Error Budget (current)**
 - Monitoring (upcoming)
 - Incident Response (upcoming)
@@ -158,6 +174,7 @@ Next, we cover the *fundamentals of monitoring*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is SRE?</title>
+<title>SRE 101 (1/10): What is SRE?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What is SRE?</h1>
+<h1>SRE 101 (1/10): What is SRE?</h1>
 <p>Teams usually meet reliability through pain first: midnight pages, releases that suddenly feel dangerous, and a few people carrying too much operational knowledge in their heads. When that happens, adding more effort or more meetings rarely fixes the underlying problem.</p>
 <p>SRE starts by changing the frame. Instead of treating operations as heroics, it treats reliability as an engineering system with measurable goals, automation, feedback loops, and explicit trade-offs.</p>
 <p>This is the first post in the SRE 101 series. It sets up the mental model for the rest of the series: reliability is part of the product, and operating it well requires code, metrics, and deliberate policies.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does SRE actually mean beyond “the people who handle incidents”?</li>
 <li>How is SRE different from DevOps even though the two ideas often overlap?</li>
 <li>Why does SRE treat reliability work as a software problem instead of a staffing problem?</li>
-<li>How do SLOs, error budgets, toil reduction, and postmortems fit into one operating model?</li>
-<li>Where should a beginner start if their team has never worked this way before?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 1 flow overview</em></p>
+<p>This picture places What is SRE? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is SRE? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>You can ship features quickly, but if the service keeps going down customers leave. Reliability is part of the product, not a clean-up task after the product ships.</p>
 <p>Teams that ignore this usually become dependent on memory, heroics, and manual recovery. Teams that adopt the SRE frame turn those same problems into measurable indicators, automation work, and explicit operating rules.</p>
@@ -72,8 +77,6 @@
 <p>SRE is the discipline that treats operations as a software problem.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The SRE feedback loop turns production signals back into engineering decisions.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>reliability</strong>: the <em>fraction</em> of time the system behaves as <em>expected</em>.</li>
@@ -144,6 +147,16 @@ indicator = &quot;http_2xx / http_total&quot;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we look at the <em>definition</em> and <em>models</em> of <em>reliability</em>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What does SRE actually mean beyond “the people who handle incidents”?</strong></li>
+<li>The article treats What is SRE? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How is SRE different from DevOps even though the two ideas often overlap?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does SRE treat reliability work as a software problem instead of a staffing problem?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is SRE? (current)</strong></li>
 <li>Reliability (upcoming)</li>

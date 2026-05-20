@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 3
-title: SLI, SLO, SLA
+title: "SRE 101 (3/10): SLI, SLO, SLA"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to SLI, SLO, and SLA covering their d
 last_reviewed: '2026-05-14'
 ---
 
-# SLI, SLO, SLA
+# SRE 101 (3/10): SLI, SLO, SLA
 
 The moment a reliability conversation becomes serious, three acronyms show up: SLI, SLO, and SLA. Because they all involve numbers, teams often compress them into one vague statement like “we promise 99.9%,” which is exactly where confusion starts.
 
@@ -28,13 +28,21 @@ What matters operationally is the separation. You need one layer that defines wh
 
 This is post 3 in the SRE 101 series. Here we separate measurement, internal objective, and external agreement so later error-budget and alerting decisions have a clean contract underneath them.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Where exactly is the line between an indicator, an objective, and an external agreement?
 - Why should internal targets and customer-facing promises almost never be the same document?
 - What information makes an SLO operational instead of decorative?
-- Why does a metric become dangerous if its data source or time window is unclear?
-- What turns a reliability target into a real SLA instead of a slide-deck number?
+
+## Big Picture
+
+![sre 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 3 flow overview*
+
+This picture places SLI, SLO, SLA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of SLI, SLO, SLA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ Separating them makes ownership and consequences clearer. The indicator tells yo
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png)
-
-*Indicators feed internal objectives, and only a subset of those objectives should become external promises.*
 ## Key Terms
 
 - **SLI**: a *service-level indicator*.
@@ -183,9 +188,20 @@ In *B2B contracts* the *SLA* becomes a legal *document*; *internally*, the *SLO*
 
 Next, we cover the *error budget*.
 
+## Answering the Opening Questions
+
+- **Where exactly is the line between an indicator, an objective, and an external agreement?**
+  - The article treats SLI, SLO, SLA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should internal targets and customer-facing promises almost never be the same document?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What information makes an SLO operational instead of decorative?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
 - **SLI, SLO, SLA (current)**
 - Error Budget (upcoming)
 - Monitoring (upcoming)
@@ -194,6 +210,7 @@ Next, we cover the *error budget*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

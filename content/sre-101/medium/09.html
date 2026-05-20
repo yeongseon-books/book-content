@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Capacity Planning</title>
+<title>SRE 101 (9/10): Capacity Planning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Capacity Planning</h1>
+<h1>SRE 101 (9/10): Capacity Planning</h1>
 <p>Capacity conversations often start with the last traffic graph because it is the easiest artifact to reach for. But planning is not about copying the past. It is about estimating future demand, checking what the system can really sustain, and leaving enough room for mistakes, spikes, and lead times.</p>
 <p>That is why capacity planning belongs with reliability, not just cost control. If you wait until traffic has already risen, the most important decision has already been made for you by production behavior.</p>
 <p>This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is capacity planning a future-demand problem instead of a past-usage replay?</li>
 <li>Why is headroom closer to insurance than to waste?</li>
 <li>How should load tests be used to correct a forecast model?</li>
-<li>Why do node count and monthly cost belong in the same calculation?</li>
-<li>What kinds of failure show up when lead time is ignored?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 9 flow overview</em></p>
+<p>This picture places Capacity Planning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Capacity Planning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Without a forecast, the next traffic spike usually gets handled too late. By the time the team is discussing more instances or more budget, users may already be feeling the impact.</p>
 <p>At the same time, excess capacity is not free. Good planning explains how much uncertainty the team wants to absorb and what that protection costs.</p>
@@ -72,8 +77,6 @@
 <p>Capacity planning is the work of aligning supply with demand using numbers.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>Capacity planning combines demand forecasts, load tests, provisioning, and monitoring into one loop.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>demand forecast</strong>: predicted <em>future demand</em>.</li>
@@ -165,15 +168,25 @@ monthly_cost = cost(required_nodes, monthly_per_node=180)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The final episode is <em>Building Operable Systems</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">Postmortem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">Reducing Toil</a></li>
+<li><strong>Why is capacity planning a future-demand problem instead of a past-usage replay?</strong></li>
+<li>The article treats Capacity Planning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is headroom closer to insurance than to waste?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should load tests be used to correct a forecast model?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">SRE 101 (4/10): Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">SRE 101 (5/10): Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">SRE 101 (6/10): Incident Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">SRE 101 (7/10): Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">SRE 101 (8/10): Reducing Toil</a></li>
 <li><strong>Capacity Planning (current)</strong></li>
 <li>Building Operable Systems (upcoming)</li>
 </ul>

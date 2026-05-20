@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Incident Response</title>
+<title>SRE 101 (6/10): Incident Response</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Incident Response</h1>
+<h1>SRE 101 (6/10): Incident Response</h1>
 <p>When an outage starts, the technical problem is only half the problem. The other half is human coordination: who decides priorities, who works the fix, who updates customers, and who keeps the timeline coherent enough for later learning.</p>
 <p>Teams that decide those things during the outage usually lose time in confusion. Teams that decide them beforehand recover faster because the response structure is already available when stress is highest.</p>
 <p>This is post 6 in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why does incident response depend so heavily on team structure instead of only on technical skill?</li>
 <li>Why should severity be defined by impact rather than intuition?</li>
 <li>What should an Incident Commander do directly, and what should they deliberately avoid doing?</li>
-<li>Why do recovery work and stakeholder communication have to move in parallel?</li>
-<li>What goes wrong when closure and handover rules stay vague?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 6 flow overview</em></p>
+<p>This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Incident Response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Chaos magnifies impact. A technically recoverable issue can become a prolonged incident when decisions stall and communication lags behind the actual state of the system.</p>
 <p>The response process also shapes trust. Customers, leadership, and the team itself all experience the incident through the quality of updates, coordination, and follow-through.</p>
@@ -72,8 +77,6 @@
 <p>Incident response is a team activity with fixed roles and a fixed order.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A healthy incident process moves from detection to triage, mitigation, resolution, and learning in order.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>incident</strong>: an <em>abnormal</em> condition with <em>impact</em>.</li>
@@ -149,12 +152,22 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover <em>postmortems</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><strong>Why does incident response depend so heavily on team structure instead of only on technical skill?</strong></li>
+<li>The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why should severity be defined by impact rather than intuition?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What should an Incident Commander do directly, and what should they deliberately avoid doing?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">SRE 101 (4/10): Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">SRE 101 (5/10): Monitoring</a></li>
 <li><strong>Incident Response (current)</strong></li>
 <li>Postmortem (upcoming)</li>
 <li>Reducing Toil (upcoming)</li>

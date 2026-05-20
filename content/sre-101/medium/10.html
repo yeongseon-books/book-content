@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building Operable Systems</title>
+<title>SRE 101 (10/10): Building Operable Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Building Operable Systems</h1>
+<h1>SRE 101 (10/10): Building Operable Systems</h1>
 <p>Many systems treat operability as something to bolt on after the first incidents arrive. Logs are added later, rollback gets documented later, and automation only appears after people have already repeated the same painful task enough times to feel forced into it.</p>
 <p>That delay is expensive because operability compounds. Systems that are easy to observe, change safely, recover, and automate become easier to improve; systems that are not become progressively harder to trust.</p>
 <p>This is the final post in the SRE 101 series. It gathers the earlier ideas into one design lens: observability, safe change, resilience, and automation should be built into the system the same way functional behavior is.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is operability a design property instead of a post-launch enhancement?</li>
 <li>Why do observability, automation, safe change, and resilience need to be judged together?</li>
 <li>What should a team ask first when auditing whether a system is truly operable?</li>
-<li>How do you stop partial failures from becoming full-service failures?</li>
-<li>How do the earlier SRE topics connect into one operating design rather than a list of tools?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 10 flow overview</em></p>
+<p>This picture places Building Operable Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building Operable Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>A feature without operability returns as debt. It may ship successfully once, but every later change, incident, and debugging session becomes more expensive than it needed to be.</p>
 <p>Strong teams therefore design the operational path on purpose. They ask not only “does this feature work?” but also “can we understand it, roll it back, recover it, and automate it?”</p>
@@ -72,8 +77,6 @@
 <p>Operability should be designed in like a feature, not bolted on later.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>Operability emerges when observability, automation, safe change, and resilience are designed together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>operability</strong>: how <em>easy</em> it is to <em>operate</em> the system.</li>
@@ -145,16 +148,26 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Congrats on finishing the series. Next, head into <em>Incident Response 101</em> and dive deeper into the <em>operations floor</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">Postmortem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">Reducing Toil</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/09-capacity-planning.md">Capacity Planning</a></li>
+<li><strong>Why is operability a design property instead of a post-launch enhancement?</strong></li>
+<li>The article treats Building Operable Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why do observability, automation, safe change, and resilience need to be judged together?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What should a team ask first when auditing whether a system is truly operable?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">SRE 101 (4/10): Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">SRE 101 (5/10): Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">SRE 101 (6/10): Incident Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">SRE 101 (7/10): Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">SRE 101 (8/10): Reducing Toil</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/09-capacity-planning.md">SRE 101 (9/10): Capacity Planning</a></li>
 <li><strong>Building Operable Systems (current)</strong></li>
 </ul>
 <h2>References</h2>

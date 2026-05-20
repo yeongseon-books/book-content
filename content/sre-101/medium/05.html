@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Monitoring</title>
+<title>SRE 101 (5/10): Monitoring</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Monitoring</h1>
+<h1>SRE 101 (5/10): Monitoring</h1>
 <p>Early in an operations journey, teams often feel safer when they collect everything. CPU, memory, queue depth, request counts, logs, traces, and every possible warning all look useful because maybe one of them will matter later.</p>
 <p>But monitoring gets better when it becomes more selective, not more crowded. A metric is valuable when it helps someone decide what to do next, and an alert is valuable when it changes behavior quickly enough to reduce user impact.</p>
 <p>This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How is monitoring different from simply collecting a large amount of telemetry?</li>
 <li>Why do latency, traffic, errors, and saturation have to be read together?</li>
 <li>What questions do metrics answer better than logs, and where does that boundary flip?</li>
-<li>What makes an alert useful enough to wake a human up?</li>
-<li>Why do many dashboards become harder to use as more graphs get added?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 5 flow overview</em></p>
+<p>This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>A flood of alerts drowns the real problem. When every threshold pages someone, the urgent signal and the background noise start to sound the same.</p>
 <p>Good monitoring reduces decision time. It tells the team whether there is user impact, whether the system is recovering, and what to check first before a broad incident turns into a longer one.</p>
@@ -72,8 +77,6 @@
 <p>Monitoring is measurement that leads to action.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Monitoring is useful when telemetry flows into alerts, dashboards, and concrete operator action.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>golden signals</strong>: <em>latency, traffic, errors, saturation</em>.</li>
@@ -167,11 +170,21 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover <em>incident response</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><strong>How is monitoring different from simply collecting a large amount of telemetry?</strong></li>
+<li>The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why do latency, traffic, errors, and saturation have to be read together?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What questions do metrics answer better than logs, and where does that boundary flip?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">SRE 101 (4/10): Error Budget</a></li>
 <li><strong>Monitoring (current)</strong></li>
 <li>Incident Response (upcoming)</li>
 <li>Postmortem (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Error Budget</title>
+<title>SRE 101 (4/10): Error Budget</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Error Budget</h1>
+<h1>SRE 101 (4/10): Error Budget</h1>
 <p>As soon as a team writes down an SLO, the next practical question shows up: how much failure are we willing to tolerate while we keep shipping changes? Without a clear answer, every incident becomes a fresh argument between “move faster” and “slow everything down.”</p>
 <p>The error budget is useful because it turns that argument into policy. It gives the team a shared number for how much reliability risk remains, and that number should change release behavior before emotions do.</p>
 <p>This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why does an error budget become the common language between speed and stability?</li>
 <li>How do you calculate the allowed failure from an SLO target?</li>
 <li>Why do total budget spend and burn rate answer different operating questions?</li>
-<li>What should change when the budget is disappearing too quickly?</li>
-<li>Why does the budget stop helping if teams use it as a blame mechanism?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 4 flow overview</em></p>
+<p>This picture places Error Budget inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Error Budget is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Speed and stability are not enemies, but they do need a shared decision rule. Otherwise every outage triggers a different reaction depending on who is loudest in the room.</p>
 <p>With a budget, the discussion becomes more precise. If the service still has room, the team can take measured risk. If the budget is burning too fast, stability work moves to the front of the queue.</p>
@@ -72,8 +77,6 @@
 <p>An error budget is the allowed distance between the reliability goal and actual behavior.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>An error budget matters only when actual failure spend changes release behavior.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>error budget</strong>: the <em>allowed amount of failure</em>.</li>
@@ -149,10 +152,20 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover the <em>fundamentals of monitoring</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><strong>Why does an error budget become the common language between speed and stability?</strong></li>
+<li>The article treats Error Budget as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do you calculate the allowed failure from an SLO target?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why do total budget spend and burn rate answer different operating questions?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
 <li><strong>Error Budget (current)</strong></li>
 <li>Monitoring (upcoming)</li>
 <li>Incident Response (upcoming)</li>

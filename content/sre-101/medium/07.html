@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Postmortem</title>
+<title>SRE 101 (7/10): Postmortem</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,18 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Postmortem</h1>
+<h1>SRE 101 (7/10): Postmortem</h1>
 <p>Once an incident is mitigated, teams feel relief first. That is natural, but it also creates the risk that recovery becomes the end of the story even when the same weakness is still sitting in the system.</p>
 <p>Postmortems matter because they capture what was visible, what was missing, why decisions made sense at the time, and what has to change so the next incident is smaller or easier to resolve.</p>
 <p>This is post 7 in the SRE 101 series. Here we treat postmortems as a learning system built from blameless analysis, reusable structure, and tracked follow-up work.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is a postmortem closer to an organizational learning tool than to a simple report?</li>
 <li>Why does blame suppress the very context a team needs to improve?</li>
 <li>What sections should a useful postmortem always contain?</li>
-<li>Why do action items matter more than the document alone?</li>
-<li>How do you make incident lessons survive beyond the memory of the people involved?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="sre 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>sre 101 chapter 7 flow overview</em></p>
+<p>This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Postmortem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why this topic matters</h2>
 <p>Repeated outages are often the result of missing learning, not missing effort. If the team cannot preserve the timeline, causes, and follow-up changes, the next incident starts from the same weak foundation.</p>
 <p>Good postmortems turn one painful event into shared operating knowledge. That is how incident response becomes better over time instead of merely familiar.</p>
@@ -72,8 +77,6 @@
 <p>A postmortem is a learning system, not a document.</p>
 </blockquote>
 <h2>Concept at a glance</h2>
-<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>A postmortem becomes valuable when the incident record turns into tracked follow-up work.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>postmortem</strong>: a <em>post-incident analysis</em> document.</li>
@@ -152,13 +155,23 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover <em>reducing toil</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
+<li><strong>Why is a postmortem closer to an organizational learning tool than to a simple report?</strong></li>
+<li>The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why does blame suppress the very context a team needs to improve?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What sections should a useful postmortem always contain?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">SRE 101 (1/10): What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">SRE 101 (2/10): Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SRE 101 (3/10): SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">SRE 101 (4/10): Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">SRE 101 (5/10): Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">SRE 101 (6/10): Incident Response</a></li>
 <li><strong>Postmortem (current)</strong></li>
 <li>Reducing Toil (upcoming)</li>
 <li>Capacity Planning (upcoming)</li>

@@ -17,10 +17,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: Error Budget
+title: "SRE 101 (4/10): Error Budget"
 ---
 
-# Error Budget
+# SRE 101 (4/10): Error Budget
 
 신뢰성 목표를 세우고 나면 곧바로 현실적인 질문이 따라옵니다. 그러면 어느 정도 실패까지는 허용할 것인가 하는 질문입니다. 목표가 있다는 말이 곧 실패를 0으로 만들겠다는 뜻은 아닙니다.
 
@@ -28,15 +28,21 @@ title: Error Budget
 
 이 글은 SRE 101 시리즈의 4번째 글입니다. 여기서는 에러 버짓이 무엇인지, SLO에서 어떻게 계산하는지, burn rate를 왜 같이 봐야 하는지, 그리고 버짓이 실제 릴리스 정책을 어떻게 바꾸는지 설명합니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 에러 버짓은 왜 속도와 안정성 사이의 공통 언어가 될까요?
 - SLO를 세운 뒤 허용 가능한 실패 범위는 어떻게 계산할까요?
 - 누적 소진량과 burn rate는 왜 다른 질문에 답할까요?
-- 버짓이 빠르게 소모될 때 팀은 어떤 정책으로 움직여야 할까요?
-- 에러 버짓을 벌점표처럼 쓰면 왜 운영 문화가 나빠질까요?
+
+## 큰 그림
+
+![SRE 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
+
+*SRE 101 4장 흐름 개요*
+
+이 그림에서는 Error Budget를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Error Budget의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -50,9 +56,6 @@ title: Error Budget
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
-
-*SLO에서 나온 허용 실패량이 실제 오류와 만나 릴리스 정책을 바꾸는 흐름입니다.*
 이 그림은 에러 버짓이 단지 계산식이 아니라 의사결정 체계라는 점을 보여 줍니다. 목표에서 버짓이 나오고, 실제 오류가 그 버짓을 소모하며, 남은 정도에 따라 팀의 릴리스 속도와 우선순위가 바뀝니다.
 
 ## 핵심 용어 먼저 정리
@@ -163,10 +166,21 @@ def alert(burn):
 
 다음 글에서는 monitoring을 다룹니다. 어떤 신호를 봐야 지금 움직여야 하는지 판단할 수 있는지, 그리고 알림 피로 없이 시스템 상태를 읽는 방법을 이어서 정리하겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **에러 버짓은 왜 속도와 안정성 사이의 공통 언어가 될까요?**
+  - 본문의 기준은 Error Budget를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **SLO를 세운 뒤 허용 가능한 실패 범위는 어떻게 계산할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **누적 소진량과 burn rate는 왜 다른 질문에 답할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [SRE란 무엇인가?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
+## 시리즈 목차
+
+- [SRE 101 (1/10): SRE란 무엇인가?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
 - **Error Budget (현재 글)**
 - Monitoring (예정)
 - Incident Response (예정)
@@ -174,6 +188,7 @@ def alert(burn):
 - Toil 줄이기 (예정)
 - Capacity Planning (예정)
 - 운영 가능한 시스템 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

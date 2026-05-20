@@ -17,10 +17,10 @@ targets:
   medium: false
   mkdocs: true
   tistory: true
-title: 운영 가능한 시스템 만들기
+title: "SRE 101 (10/10): 운영 가능한 시스템 만들기"
 ---
 
-# 운영 가능한 시스템 만들기
+# SRE 101 (10/10): 운영 가능한 시스템 만들기
 
 많은 시스템은 기능 요구사항은 자세히 적지만, 운영 요구사항은 나중 문제로 남겨 둡니다. 서비스가 커지고 장애가 생긴 뒤에야 로그를 더 남기고, 롤백 절차를 만들고, 자동화를 붙이기 시작합니다. 그런데 운영성은 뒤늦게 덧붙일수록 비용이 더 큽니다.
 
@@ -28,15 +28,21 @@ title: 운영 가능한 시스템 만들기
 
 이 글은 SRE 101 시리즈의 마지막 글입니다. 여기서는 operability를 기능과 함께 설계해야 하는 품질로 보고, 관측성, 자동화, 안전한 변경, 회복력을 한 시스템 안에서 어떻게 묶어 볼지 정리합니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - operability는 왜 기능 뒤에 붙이는 옵션이 아니라 설계 요소일까요?
 - 관측성, 자동화, 안전한 변경, 회복력은 왜 함께 봐야 할까요?
 - 운영 가능한 시스템을 점검할 때 어떤 질문부터 던져야 할까요?
-- 부분 실패가 전체 장애로 번지는 것을 막으려면 무엇이 필요할까요?
-- SRE 101에서 다룬 개념들은 어떻게 하나의 운영 설계로 묶일까요?
+
+## 큰 그림
+
+![SRE 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.ko.png)
+
+*SRE 101 10장 흐름 개요*
+
+이 그림에서는 운영 가능한 시스템 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 운영 가능한 시스템 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -50,9 +56,6 @@ title: 운영 가능한 시스템 만들기
 
 ## 한눈에 보는 구조
 
-![한눈에 보는 구조](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.ko.png)
-
-*관측성, 자동화, 안전한 변경, 회복력이 함께 있어야 운영 가능한 시스템이 완성됩니다.*
 운영 가능한 시스템은 한 가지 도구로 만들어지지 않습니다. 관측성, 자동화, 안전한 변경, 회복력이 함께 맞물려야 운영성이 생기고, 그 운영성이 결국 고객 신뢰로 이어집니다.
 
 ## 핵심 용어 먼저 정리
@@ -159,17 +162,29 @@ def score(obs, deploy, resil, auto):
 
 이로써 SRE 101 시리즈를 마칩니다. 다음에는 더 깊은 장애 대응이나 서비스별 운영 주제로 들어가며, 여기서 다룬 기본 원칙을 더 구체적인 사례에 적용하게 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **operability는 왜 기능 뒤에 붙이는 옵션이 아니라 설계 요소일까요?**
+  - 본문의 기준은 운영 가능한 시스템 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **관측성, 자동화, 안전한 변경, 회복력은 왜 함께 봐야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **운영 가능한 시스템을 점검할 때 어떤 질문부터 던져야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [SRE란 무엇인가?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
-- [Toil 줄이기](./08-reducing-toil.md)
-- [Capacity Planning](./09-capacity-planning.md)
+## 시리즈 목차
+
+- [SRE 101 (1/10): SRE란 무엇인가?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Toil 줄이기](./08-reducing-toil.md)
+- [SRE 101 (9/10): Capacity Planning](./09-capacity-planning.md)
 - **운영 가능한 시스템 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:21:30+00:00
+Generated: 2026-05-20T11:21:49+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **58**
 - Series at or above 5 issues: **43**
-- Total issues: **557**
+- Total issues: **552**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **25**
+  - Shrt: **20**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -53,30 +53,30 @@ Warnings:
 | 10 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
 | 11 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
 | 12 | `data-science-101` | 13 | 12 | 0 | 0 | 1 | 0 |
-| 13 | `sre-101` | 13 | 8 | 0 | 0 | 5 | 0 |
-| 14 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 15 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 16 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 17 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 18 | `secure-coding-101` | 12 | 10 | 0 | 0 | 2 | 0 |
-| 19 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
-| 20 | `probability-101` | 11 | 8 | 0 | 0 | 3 | 0 |
-| 21 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 22 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 23 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 24 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 25 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 26 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 27 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 28 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 29 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 33 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 34 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 35 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 36 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 13 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 14 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 16 | `azure-aks-deep-dive` | 12 | 10 | 0 | 0 | 2 | 0 |
+| 17 | `secure-coding-101` | 12 | 10 | 0 | 0 | 2 | 0 |
+| 18 | `linear-algebra-101` | 11 | 10 | 0 | 0 | 1 | 0 |
+| 19 | `probability-101` | 11 | 8 | 0 | 0 | 3 | 0 |
+| 20 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 21 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 22 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 23 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 24 | `llm-api-production-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 25 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 26 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 27 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
+| 28 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 32 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 33 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 34 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 35 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 36 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 37 | `machine-learning-101` | 7 | 6 | 0 | 0 | 1 | 0 |
 | 38 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 39 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
@@ -246,25 +246,6 @@ Warnings:
 
 ### Shrt
 - `content/data-science-101/en/02-problem-to-data-problem.md:22` — markdown body has 149 lines (< 150)
-
-## sre-101 — Total 13
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=5 NoEn=0
-
-### BadImg
-- `assets/sre-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=577x67)
-- `assets/sre-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=577x67)
-- `assets/sre-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=773x67)
-- `assets/sre-101/06/06-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=773x67)
-- `assets/sre-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=781x67)
-- ... 3 more
-
-### Shrt
-- `content/sre-101/en/01-what-is-sre.md:22` — markdown body has 144 lines (< 150)
-- `content/sre-101/en/04-error-budget.md:22` — markdown body has 149 lines (< 150)
-- `content/sre-101/en/06-incident-response.md:22` — markdown body has 149 lines (< 150)
-- `content/sre-101/en/08-reducing-toil.md:22` — markdown body has 145 lines (< 150)
-- `content/sre-101/en/10-building-operable-systems.md:22` — markdown body has 145 lines (< 150)
 
 ## docker-101 — Total 12
 
@@ -559,6 +540,18 @@ Warnings:
 - `assets/software-design-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/07/07-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=721x67)
 - `assets/software-design-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=811x67)
+- ... 3 more
+
+## sre-101 — Total 8
+
+- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/sre-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=577x67)
+- `assets/sre-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=577x67)
+- `assets/sre-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=773x67)
+- `assets/sre-101/06/06-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=773x67)
+- `assets/sre-101/07/07-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=781x67)
 - ... 3 more
 
 ## machine-learning-101 — Total 7

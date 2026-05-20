@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 10
-title: Building Operable Systems
+title: "SRE 101 (10/10): Building Operable Systems"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A capstone guide to building operable systems covering observab
 last_reviewed: '2026-05-14'
 ---
 
-# Building Operable Systems
+# SRE 101 (10/10): Building Operable Systems
 
 Many systems treat operability as something to bolt on after the first incidents arrive. Logs are added later, rollback gets documented later, and automation only appears after people have already repeated the same painful task enough times to feel forced into it.
 
@@ -28,13 +28,21 @@ That delay is expensive because operability compounds. Systems that are easy to 
 
 This is the final post in the SRE 101 series. It gathers the earlier ideas into one design lens: observability, safe change, resilience, and automation should be built into the system the same way functional behavior is.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is operability a design property instead of a post-launch enhancement?
 - Why do observability, automation, safe change, and resilience need to be judged together?
 - What should a team ask first when auditing whether a system is truly operable?
-- How do you stop partial failures from becoming full-service failures?
-- How do the earlier SRE topics connect into one operating design rather than a list of tools?
+
+## Big Picture
+
+![sre 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 10 flow overview*
+
+This picture places Building Operable Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building Operable Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ Strong teams therefore design the operational path on purpose. They ask not only
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
-
-*Operability emerges when observability, automation, safe change, and resilience are designed together.*
 ## Key Terms
 
 - **operability**: how *easy* it is to *operate* the system.
@@ -143,17 +148,29 @@ A *platform team* ships a *common operability* template; *product teams* focus o
 
 Congrats on finishing the series. Next, head into *Incident Response 101* and dive deeper into the *operations floor*.
 
+## Answering the Opening Questions
+
+- **Why is operability a design property instead of a post-launch enhancement?**
+  - The article treats Building Operable Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do observability, automation, safe change, and resilience need to be judged together?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should a team ask first when auditing whether a system is truly operable?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
-- [Reducing Toil](./08-reducing-toil.md)
-- [Capacity Planning](./09-capacity-planning.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Reducing Toil](./08-reducing-toil.md)
+- [SRE 101 (9/10): Capacity Planning](./09-capacity-planning.md)
 - **Building Operable Systems (current)**
+
 <!-- toc:end -->
 
 ## References

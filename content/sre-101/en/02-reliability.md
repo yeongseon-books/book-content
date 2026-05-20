@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 2
-title: Reliability
+title: "SRE 101 (2/10): Reliability"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to reliability covering availability,
 last_reviewed: '2026-05-14'
 ---
 
-# Reliability
+# SRE 101 (2/10): Reliability
 
 Many teams say a service feels stable until an outage or a slow release proves otherwise. That kind of language works in hallway conversation, but it does not help product, platform, and support teams make the same decision from the same evidence.
 
@@ -28,13 +28,21 @@ Reliability gets clearer when you stop treating it like mood and start treating 
 
 This is post 2 in the SRE 101 series. Here we break reliability into measurable dimensions so later topics like SLOs, error budgets, and monitoring rest on something more concrete than “it seems okay.”
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does it mean to describe reliability as a measurable property instead of a general sense of stability?
 - Why are availability and latency related but not interchangeable?
 - When do correctness and durability matter more than raw uptime?
-- Why do teams rely on p95 and p99 more than on average latency?
-- How should different systems choose different reliability dimensions?
+
+## Big Picture
+
+![sre 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 2 flow overview*
+
+This picture places Reliability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Reliability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ Once the dimensions are explicit, reliability becomes easier to discuss as produ
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
-
-*Reliability only becomes visible when availability, latency, correctness, and durability are read together.*
 ## Key Terms
 
 - **availability**: the *fraction of time* the system works.
@@ -148,8 +153,19 @@ A *payment service* prioritizes *correctness*. A *streaming service* prioritizes
 
 Next, we cover the difference between *SLI*, *SLO*, and *SLA*.
 
+## Answering the Opening Questions
+
+- **What does it mean to describe reliability as a measurable property instead of a general sense of stability?**
+  - The article treats Reliability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why are availability and latency related but not interchangeable?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When do correctness and durability matter more than raw uptime?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
 - **Reliability (current)**
 - SLI, SLO, SLA (upcoming)
 - Error Budget (upcoming)
@@ -159,6 +175,7 @@ Next, we cover the difference between *SLI*, *SLO*, and *SLA*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

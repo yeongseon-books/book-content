@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 9
-title: Capacity Planning
+title: "SRE 101 (9/10): Capacity Planning"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to capacity planning covering demand 
 last_reviewed: '2026-05-14'
 ---
 
-# Capacity Planning
+# SRE 101 (9/10): Capacity Planning
 
 Capacity conversations often start with the last traffic graph because it is the easiest artifact to reach for. But planning is not about copying the past. It is about estimating future demand, checking what the system can really sustain, and leaving enough room for mistakes, spikes, and lead times.
 
@@ -28,13 +28,21 @@ That is why capacity planning belongs with reliability, not just cost control. I
 
 This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is capacity planning a future-demand problem instead of a past-usage replay?
 - Why is headroom closer to insurance than to waste?
 - How should load tests be used to correct a forecast model?
-- Why do node count and monthly cost belong in the same calculation?
-- What kinds of failure show up when lead time is ignored?
+
+## Big Picture
+
+![sre 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 9 flow overview*
+
+This picture places Capacity Planning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Capacity Planning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ At the same time, excess capacity is not free. Good planning explains how much u
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
-
-*Capacity planning combines demand forecasts, load tests, provisioning, and monitoring into one loop.*
 ## Key Terms
 
 - **demand forecast**: predicted *future demand*.
@@ -168,17 +173,29 @@ A peak event like *Black Friday* is *modeled* months ahead.
 
 The final episode is *Building Operable Systems*.
 
+## Answering the Opening Questions
+
+- **Why is capacity planning a future-demand problem instead of a past-usage replay?**
+  - The article treats Capacity Planning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is headroom closer to insurance than to waste?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should load tests be used to correct a forecast model?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
-- [Monitoring](./05-monitoring.md)
-- [Incident Response](./06-incident-response.md)
-- [Postmortem](./07-postmortem.md)
-- [Reducing Toil](./08-reducing-toil.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
+- [SRE 101 (5/10): Monitoring](./05-monitoring.md)
+- [SRE 101 (6/10): Incident Response](./06-incident-response.md)
+- [SRE 101 (7/10): Postmortem](./07-postmortem.md)
+- [SRE 101 (8/10): Reducing Toil](./08-reducing-toil.md)
 - **Capacity Planning (current)**
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

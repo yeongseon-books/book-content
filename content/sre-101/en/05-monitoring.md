@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 5
-title: Monitoring
+title: "SRE 101 (5/10): Monitoring"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly guide to monitoring covering the four golde
 last_reviewed: '2026-05-14'
 ---
 
-# Monitoring
+# SRE 101 (5/10): Monitoring
 
 Early in an operations journey, teams often feel safer when they collect everything. CPU, memory, queue depth, request counts, logs, traces, and every possible warning all look useful because maybe one of them will matter later.
 
@@ -28,13 +28,21 @@ But monitoring gets better when it becomes more selective, not more crowded. A m
 
 This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How is monitoring different from simply collecting a large amount of telemetry?
 - Why do latency, traffic, errors, and saturation have to be read together?
 - What questions do metrics answer better than logs, and where does that boundary flip?
-- What makes an alert useful enough to wake a human up?
-- Why do many dashboards become harder to use as more graphs get added?
+
+## Big Picture
+
+![sre 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 5 flow overview*
+
+This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ Good monitoring reduces decision time. It tells the team whether there is user i
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)
-
-*Monitoring is useful when telemetry flows into alerts, dashboards, and concrete operator action.*
 ## Key Terms
 
 - **golden signals**: *latency, traffic, errors, saturation*.
@@ -166,17 +171,29 @@ You combine *Prometheus* metrics with *Loki* logs in a single *Grafana* view.
 
 Next, we cover *incident response*.
 
+## Answering the Opening Questions
+
+- **How is monitoring different from simply collecting a large amount of telemetry?**
+  - The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do latency, traffic, errors, and saturation have to be read together?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What questions do metrics answer better than logs, and where does that boundary flip?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is SRE?](./01-what-is-sre.md)
-- [Reliability](./02-reliability.md)
-- [SLI, SLO, SLA](./03-sli-slo-sla.md)
-- [Error Budget](./04-error-budget.md)
+## In this series
+
+- [SRE 101 (1/10): What is SRE?](./01-what-is-sre.md)
+- [SRE 101 (2/10): Reliability](./02-reliability.md)
+- [SRE 101 (3/10): SLI, SLO, SLA](./03-sli-slo-sla.md)
+- [SRE 101 (4/10): Error Budget](./04-error-budget.md)
 - **Monitoring (current)**
 - Incident Response (upcoming)
 - Postmortem (upcoming)
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References

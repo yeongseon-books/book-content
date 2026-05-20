@@ -1,7 +1,7 @@
 ---
 series: sre-101
 episode: 1
-title: What is SRE?
+title: "SRE 101 (1/10): What is SRE?"
 status: content-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: A beginner-friendly overview of Site Reliability Engineering, i
 last_reviewed: '2026-05-14'
 ---
 
-# What is SRE?
+# SRE 101 (1/10): What is SRE?
 
 Teams usually meet reliability through pain first: midnight pages, releases that suddenly feel dangerous, and a few people carrying too much operational knowledge in their heads. When that happens, adding more effort or more meetings rarely fixes the underlying problem.
 
@@ -28,13 +28,21 @@ SRE starts by changing the frame. Instead of treating operations as heroics, it 
 
 This is the first post in the SRE 101 series. It sets up the mental model for the rest of the series: reliability is part of the product, and operating it well requires code, metrics, and deliberate policies.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does SRE actually mean beyond “the people who handle incidents”?
 - How is SRE different from DevOps even though the two ideas often overlap?
 - Why does SRE treat reliability work as a software problem instead of a staffing problem?
-- How do SLOs, error budgets, toil reduction, and postmortems fit into one operating model?
-- Where should a beginner start if their team has never worked this way before?
+
+## Big Picture
+
+![sre 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
+
+*sre 101 chapter 1 flow overview*
+
+This picture places What is SRE? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is SRE? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this topic matters
 
@@ -46,9 +54,6 @@ Teams that ignore this usually become dependent on memory, heroics, and manual r
 
 ## Concept at a glance
 
-![Concept at a glance](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
-
-*The SRE feedback loop turns production signals back into engineering decisions.*
 ## Key Terms
 
 - **reliability**: the *fraction* of time the system behaves as *expected*.
@@ -142,7 +147,18 @@ An *SRE team* sits between *platform* and *product* teams and helps *negotiate* 
 
 Next, we look at the *definition* and *models* of *reliability*.
 
+## Answering the Opening Questions
+
+- **What does SRE actually mean beyond “the people who handle incidents”?**
+  - The article treats What is SRE? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How is SRE different from DevOps even though the two ideas often overlap?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does SRE treat reliability work as a software problem instead of a staffing problem?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is SRE? (current)**
 - Reliability (upcoming)
 - SLI, SLO, SLA (upcoming)
@@ -153,6 +169,7 @@ Next, we look at the *definition* and *models* of *reliability*.
 - Reducing Toil (upcoming)
 - Capacity Planning (upcoming)
 - Building Operable Systems (upcoming)
+
 <!-- toc:end -->
 
 ## References
