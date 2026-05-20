@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:40:28+00:00
+Generated: 2026-05-20T11:41:31+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **49**
-- Series at or above 5 issues: **37**
-- Total issues: **413**
-  - BadImg: **413**
+- Series with any issue: **48**
+- Series at or above 5 issues: **36**
+- Total issues: **395**
+  - BadImg: **395**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -43,53 +43,52 @@ Warnings:
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | `azure-app-service-deep-dive` | 18 | 18 | 0 | 0 | 0 | 0 |
 | 2 | `developer-career-101` | 18 | 18 | 0 | 0 | 0 | 0 |
-| 3 | `sqlalchemy-101` | 18 | 18 | 0 | 0 | 0 | 0 |
-| 4 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
-| 5 | `ai-web-dev-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 6 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 7 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 8 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 9 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 10 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 11 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 12 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 14 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 16 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 17 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 18 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 19 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 20 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 21 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 23 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 24 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 25 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 26 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 27 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 29 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 30 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 31 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 33 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 34 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 35 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 36 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 37 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 38 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 39 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 42 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 43 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 44 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 45 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 46 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 47 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 48 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 49 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 3 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
+| 4 | `ai-web-dev-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 5 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 6 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
+| 7 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 8 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 9 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 10 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
+| 11 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 13 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 14 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 15 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 16 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 18 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 19 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 20 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 22 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 23 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 24 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 25 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 28 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 30 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 32 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 33 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 34 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 35 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 36 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 37 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 38 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 39 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 40 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 41 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 42 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 43 | `functional-programming-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 44 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 45 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 46 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 47 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 48 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## azure-app-service-deep-dive — Total 18
 
@@ -113,18 +112,6 @@ Warnings:
 - `assets/developer-career-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 70px <= 100px (size=675x70)
 - `assets/developer-career-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 70px <= 100px (size=675x70)
 - `assets/developer-career-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 70px <= 100px (size=813x70)
-- ... 13 more
-
-## sqlalchemy-101 — Total 18
-
-- BadImg=18 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/sqlalchemy-101/01/01-02-why-this-matters.en.png:1` — PNG height 67px <= 100px (size=1142x67)
-- `assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png:1` — PNG height 67px <= 100px (size=1110x67)
-- `assets/sqlalchemy-101/01/01-03-mental-model.en.png:1` — PNG height 67px <= 100px (size=1289x67)
-- `assets/sqlalchemy-101/01/01-03-mental-model.ko.png:1` — PNG height 67px <= 100px (size=1237x67)
-- `assets/sqlalchemy-101/02/02-03-mental-model.en.png:1` — PNG height 67px <= 100px (size=976x67)
 - ... 13 more
 
 ## open-source-101 — Total 16
