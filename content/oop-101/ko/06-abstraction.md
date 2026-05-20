@@ -1,5 +1,5 @@
 ---
-title: 추상화
+title: "Object-Oriented Programming 101 (6/10): 추상화"
 series: oop-101
 episode: 6
 language: ko
@@ -20,25 +20,29 @@ last_reviewed: '2026-05-17'
 seo_description: ABC와 abstractmethod로 공통 인터페이스를 강제하는 Python 추상화 설계를 설명합니다.
 ---
 
-# 추상화
+# Object-Oriented Programming 101 (6/10): 추상화
 
 추상화가 진짜 필요해지는 순간은 구현체가 두세 개로 늘어나면서 호출부가 어떤 메서드 이름을 불러야 할지 추측하기 시작할 때입니다. 이 글은 OOP 101 시리즈의 6번째 글입니다.
 
 Python에서 추상화는 이론 용어로 끝나지 않습니다. 어떤 메서드를 반드시 구현해야 하는지, 어떤 단계는 부모가 공통으로 가져가야 하는지, 어디까지를 팀의 계약으로 강제할지를 정하는 실무 설계 문제에 더 가깝습니다.
 
-## 이 글에서 다룰 문제
-
-> 추상화는 구현을 지우는 작업이 아니라, 하나의 워크플로를 여러 구현체가 안전하게 공유할 수 있도록 최소 계약을 먼저 선명하게 만드는 작업입니다.
+## 먼저 던지는 질문
 
 - 덕 타이핑 관례만으로는 언제부터 부족해질까요?
 - 추상 클래스는 어떤 메서드와 프로퍼티를 반드시 강제해야 할까요?
 - 템플릿 메서드 패턴은 부모가 흐름을 지키고 자식이 세부 구현을 맡게 만드는 데 어떻게 도움이 될까요?
-- 외부 라이브러리까지 모두 상속시킬 수 없다면 언제 ABC 대신 Protocol로 넘어가야 할까요?
+
+## 큰 그림
+
+![Object-Oriented Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
+
+*Object-Oriented Programming 101 6장 흐름 개요*
+
+이 그림에서는 추상화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 추상화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 핵심 개념 잡기
-
-![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
-*호출부마다 다른 메서드 이름을 먼저 없애고, 그다음 명시적 상속이 필요한 계약인지 구조적 호환이면 충분한지 결정하면 추상화가 훨씬 실무적으로 보입니다.*
 
 계약이 없으면 어떤 구현체는 `read_file()`을 쓰고, 다른 구현체는 `fetch_rows()`를 쓰고, 또 다른 구현체는 `pull()`을 씁니다. 그러면 오케스트레이터는 구현체별 분기문 덩어리가 됩니다. 추상화의 첫 목적은 그 분기문을 없애는 공통 언어를 정하는 데 있습니다.
 
@@ -62,7 +66,6 @@ class CsvFeed:
     def read_file(self, path: str) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
 
-
 class WarehouseFeed:
     def fetch_rows(self, table: str) -> list[dict]:
         return [{"email": "bob@example.com", "active": False}]
@@ -71,7 +74,6 @@ class WarehouseFeed:
 ```python
 # after: 모든 구현체가 하나의 계약을 공유합니다
 from abc import ABC, abstractmethod
-
 
 class FeedSource(ABC):
     @property
@@ -93,20 +95,16 @@ class CsvFeed:
     def read_file(self, path: str) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
 
-
 class WarehouseFeed:
     def fetch_rows(self, table: str) -> list[dict]:
         return [{"email": "bob@example.com", "active": False}]
-
 
 class PartnerApiFeed:
     def pull(self) -> list[dict]:
         return [{"email": "carol@example.com", "active": True}]
 
-
 def ingest(source: object) -> list[dict]:
     return source.fetch_records()  # 호출부는 존재하지 않는 메서드를 가정합니다
-
 
 ingest(CsvFeed())
 ```
@@ -126,7 +124,6 @@ AttributeError: 'CsvFeed' object has no attribute 'fetch_records'
 ```python
 from abc import ABC, abstractmethod
 
-
 class FeedSource(ABC):
     @property
     @abstractmethod
@@ -137,7 +134,6 @@ class FeedSource(ABC):
     def fetch_records(self) -> list[dict]:
         """이 소스의 원시 고객 레코드를 반환합니다."""
 
-
 class CsvFeed(FeedSource):
     @property
     def source_name(self) -> str:
@@ -145,7 +141,6 @@ class CsvFeed(FeedSource):
 
     def fetch_records(self) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
-
 
 class WarehouseFeed(FeedSource):
     @property
@@ -167,7 +162,6 @@ class WarehouseFeed(FeedSource):
 
 ```python
 from abc import ABC, abstractmethod
-
 
 class IngestionPipeline(ABC):
     def run(self) -> list[dict]:
@@ -197,7 +191,6 @@ class IngestionPipeline(ABC):
     @abstractmethod
     def store(self, rows: list[dict]) -> None: ...
 
-
 class CsvCustomerPipeline(IngestionPipeline):
     @property
     def source_name(self) -> str:
@@ -212,7 +205,6 @@ class CsvCustomerPipeline(IngestionPipeline):
     def store(self, rows: list[dict]) -> None:
         for row in rows:
             print(f"store -> {row}")
-
 
 class PartnerApiPipeline(IngestionPipeline):
     @property
@@ -236,18 +228,15 @@ class PartnerApiPipeline(IngestionPipeline):
 ```python
 from abc import ABC, abstractmethod
 
-
 class FeedSource(ABC):
     @abstractmethod
     def fetch_records(self) -> list[dict]: ...
-
 
 class VendorSnapshot:
     """실제로는 외부 패키지에 있다고 가정합니다."""
 
     def fetch_records(self) -> list[dict]:
         return [{"email": "vendor@example.com", "active": True}]
-
 
 FeedSource.register(VendorSnapshot)
 
@@ -266,24 +255,19 @@ print(snapshot.fetch_records())
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-
 class InternalFeed(ABC):
     @abstractmethod
     def fetch_records(self) -> list[dict]: ...
 
-
 class FeedLike(Protocol):
     def fetch_records(self) -> list[dict]: ...
-
 
 class BackfillExport:
     def fetch_records(self) -> list[dict]:
         return [{"email": "backfill@example.com", "active": True}]
 
-
 def preview(feed: FeedLike) -> int:
     return len(feed.fetch_records())
-
 
 print(preview(BackfillExport()))
 ```
@@ -328,7 +312,6 @@ class BrokenPipeline(IngestionPipeline):
 
     def fetch_records(self) -> list[dict]:
         return []
-
 
 BrokenPipeline()
 ```
@@ -396,17 +379,29 @@ TypeError: Can't instantiate abstract class BrokenPipeline with abstract method 
 
 추상화는 하나의 워크플로에 여러 구현체가 들어오는 순간부터 가치가 커집니다. 팀 계약과 공통 기본 동작이 중요하면 ABC를 쓰고, 상속보다 호환성이 중요하면 Protocol을 선택하면 됩니다. 다음 글에서는 합성과 상속을 비교하면서, 이 계약을 어디에 배치하는 것이 더 자연스러운지 이어서 살펴봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **덕 타이핑 관례만으로는 언제부터 부족해질까요?**
+  - 본문의 기준은 추상화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **추상 클래스는 어떤 메서드와 프로퍼티를 반드시 강제해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **템플릿 메서드 패턴은 부모가 흐름을 지키고 자식이 세부 구현을 맡게 만드는 데 어떻게 도움이 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [객체지향이란 무엇인가?](./01-what-is-oop.md)
-- [클래스와 인스턴스](./02-classes-and-instances.md)
-- [캡슐화](./03-encapsulation.md)
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
+## 시리즈 목차
+
+- [Object-Oriented Programming 101 (1/10): 객체지향이란 무엇인가?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): 클래스와 인스턴스](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): 캡슐화](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): 상속](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): 다형성](./05-polymorphism.md)
 - **추상화 (현재 글)**
 - 합성과 상속 (예정)
 - SOLID 원칙 기초 (예정)
 - 객체지향 설계 예제 (예정)
 - 객체지향을 언제 피해야 할까? (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

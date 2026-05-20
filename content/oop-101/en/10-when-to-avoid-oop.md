@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 10
-title: When to Avoid OOP
+title: "Object-Oriented Programming 101 (10/10): When to Avoid OOP"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Learn when OOP is overkill and how to use functions, dataclasse
 last_reviewed: '2026-05-17'
 ---
 
-# When to Avoid OOP
+# Object-Oriented Programming 101 (10/10): When to Avoid OOP
 
 This is the final post in the Object-Oriented Programming 101 series.
 
 The hardest OOP decision is often not "which class should I add?" but "should this become a class at all?"
 
 Python gives you functions, modules, `dataclass`, `NamedTuple`, `TypedDict`, and callables for a reason. In this chapter, we will start with a class-heavy reporting mini-app, simplify it in stages, and then mark the exact point where a class becomes useful again.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying When to Avoid OOP?
+- Which signal should the example or diagram make visible for When to Avoid OOP?
+- What failure should be prevented first when When to Avoid OOP reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png)
+
+*Object-Oriented Programming 101 chapter 10 flow overview*
+
+This picture places When to Avoid OOP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of When to Avoid OOP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Article Answers
 
@@ -44,9 +60,6 @@ Python gives you functions, modules, `dataclass`, `NamedTuple`, `TypedDict`, and
 - How do you know when a function-first design has gone too far and should become a class again?
 
 ## Concept Overview
-
-![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png)
-*The goal is not to avoid classes forever. The goal is to reserve classes for places where state, invariants, and coordinated behavior truly move together.*
 
 The practical question is simple: does this behavior need persistent state and lifecycle coordination, or is it mostly a data transformation pipeline? If the answer is "pipeline," classes are often extra weight.
 
@@ -70,7 +83,6 @@ class TitleCleaner:
     def clean(self, title: str) -> str:
         return title.strip().title()
 
-
 class ScoreFilter:
     def keep(self, score: int, minimum: int) -> bool:
         return score >= minimum
@@ -80,7 +92,6 @@ class ScoreFilter:
 # after: functions and data structures carry the same workflow more directly
 def clean_title(title: str) -> str:
     return title.strip().title()
-
 
 def keep_score(score: int, minimum: int) -> bool:
     return score >= minimum
@@ -97,23 +108,19 @@ class TitleCleaner:
     def clean(self, title: str) -> str:
         return title.strip().title()
 
-
 class ScoreFilter:
     def keep(self, score: int, minimum: int) -> bool:
         return score >= minimum
 
-
 class CurrencyFormatter:
     def format(self, value: int) -> str:
         return f"${value:,.0f}"
-
 
 class ReportRow:
     def __init__(self, title: str, score: int, spend: int) -> None:
         self.title = title
         self.score = score
         self.spend = spend
-
 
 class ReportConfig:
     def __init__(self, minimum_score: int, currency: str) -> None:
@@ -131,10 +138,8 @@ If the code has no instance state and no lifecycle, module-level functions are u
 def clean_title(title: str) -> str:
     return title.strip().title()
 
-
 def keep_score(score: int, minimum: int) -> bool:
     return score >= minimum
-
 
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
@@ -168,18 +173,15 @@ The original `ReportRow` and `ReportConfig` classes mainly stored fields. That i
 from dataclasses import dataclass
 from typing import TypedDict
 
-
 @dataclass(frozen=True)
 class ReportRow:
     title: str
     score: int
     spend: int
 
-
 class ReportConfig(TypedDict):
     minimum_score: int
     channel: str
-
 
 config: ReportConfig = {"minimum_score": 80, "channel": "email"}
 row = ReportRow(title="Spring Launch", score=82, spend=12500)
@@ -210,18 +212,14 @@ Many strategy classes are really just named formatting functions.
 ```python
 from collections.abc import Callable
 
-
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
-
 
 def format_points(value: int) -> str:
     return f"{value} pts"
 
-
 def render_value(value: int, formatter: Callable[[int], str]) -> str:
     return formatter(value)
-
 
 print(render_value(12500, format_currency))
 print(render_value(82, format_points))
@@ -251,26 +249,21 @@ from dataclasses import dataclass
 from collections.abc import Callable
 from typing import TypedDict
 
-
 @dataclass(frozen=True)
 class ReportRow:
     title: str
     score: int
     spend: int
 
-
 class ReportConfig(TypedDict):
     minimum_score: int
     channel: str
 
-
 def clean_title(title: str) -> str:
     return title.strip().title()
 
-
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
-
 
 def normalize_rows(rows: list[dict]) -> list[ReportRow]:
     return [
@@ -282,25 +275,20 @@ def normalize_rows(rows: list[dict]) -> list[ReportRow]:
         for row in rows
     ]
 
-
 def filter_rows(rows: list[ReportRow], minimum_score: int) -> list[ReportRow]:
     return [row for row in rows if row.score >= minimum_score]
-
 
 def sort_rows(rows: list[ReportRow]) -> list[ReportRow]:
     return sorted(rows, key=lambda row: row.score, reverse=True)
 
-
 def render_report(rows: list[ReportRow], money: Callable[[int], str]) -> list[str]:
     return [f"{row.title} | score={row.score} | spend={money(row.spend)}" for row in rows]
-
 
 def build_report(raw_rows: list[dict], config: ReportConfig, money: Callable[[int], str]) -> list[str]:
     rows = normalize_rows(raw_rows)
     rows = filter_rows(rows, config["minimum_score"])
     rows = sort_rows(rows)
     return render_report(rows, money)
-
 
 raw_rows = [
     {"title": "  spring launch ", "score": 82, "spend": 12500},
@@ -399,17 +387,29 @@ That is why many Python codebases start with functions, then upgrade only the ho
 
 You should avoid OOP when classes add more ceremony than protection. In this reporting workflow, stateless helpers became functions, data holders became lightweight structures, trivial strategies became callables, and the whole process became a direct pipeline. Just as important, you now have a concrete threshold for moving back to classes when state and invariants start traveling together.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying When to Avoid OOP?**
+  - The article treats When to Avoid OOP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for When to Avoid OOP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when When to Avoid OOP reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): Inheritance](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): Polymorphism](./05-polymorphism.md)
+- [Object-Oriented Programming 101 (6/10): Abstraction](./06-abstraction.md)
+- [Object-Oriented Programming 101 (7/10): Composition vs Inheritance](./07-composition-vs-inheritance.md)
+- [Object-Oriented Programming 101 (8/10): SOLID Principles Basics](./08-solid-principles.md)
+- [Object-Oriented Programming 101 (9/10): OOP Design Example](./09-oop-design-example.md)
 - **When to Avoid OOP (current)**
+
 <!-- toc:end -->
 
 ## References

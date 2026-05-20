@@ -1,5 +1,5 @@
 ---
-title: SOLID 원칙 기초
+title: "Object-Oriented Programming 101 (8/10): SOLID 원칙 기초"
 series: oop-101
 episode: 8
 language: ko
@@ -20,25 +20,29 @@ last_reviewed: '2026-05-17'
 seo_description: SOLID 다섯 원칙을 Python 예제와 함께 실무적으로 적용하는 기준을 정리합니다.
 ---
 
-# SOLID 원칙 기초
+# Object-Oriented Programming 101 (8/10): SOLID 원칙 기초
 
 SOLID가 진짜 와닿는 순간은 서비스 하나가 계속 커지면서 새로운 요구사항이 들어올 때마다 엉뚱한 코드까지 함께 흔들릴 때입니다. 이 글은 OOP 101 시리즈의 8번째 글입니다.
 
 이번 글에서는 SOLID를 다섯 개의 슬로건으로 따로 외우지 않습니다. 하나의 주문 결제 워크플로를 단계적으로 리팩터링하면서, 각 원칙이 어떤 고장 신호에 대응하는지 연결해서 보겠습니다.
 
-## 이 글에서 다룰 문제
-
-> SOLID는 암기용 약자가 아니라, 반복해서 깨지는 워크플로를 보고 "이번에는 어떤 설계 질문을 먼저 꺼내야 하지?"를 판단하게 해 주는 기준입니다.
+## 먼저 던지는 질문
 
 - 지금 보이는 증상에 어떤 원칙이 연결되는지 어떻게 판단할까요?
 - SRP를 적용하면 무엇이 바뀌고, 무엇은 그대로여야 할까요?
 - OCP, LSP, ISP, DIP는 서로 경쟁하는 규칙이 아니라 어떻게 한 워크플로 위에서 이어질까요?
-- 코드가 아직 작을 때 SOLID를 너무 일찍 적용하면 왜 과한 설계가 될까요?
+
+## 큰 그림
+
+![Object-Oriented Programming 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.ko.png)
+
+*Object-Oriented Programming 101 8장 흐름 개요*
+
+이 그림에서는 SOLID 원칙 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> SOLID 원칙 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 핵심 개념 잡기
-
-![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.ko.png)
-*보이는 고장 모양을 먼저 잡고, 그다음 해당 원칙과 가장 작은 리팩터링 조치를 연결하면 SOLID를 훨씬 실무적으로 사용할 수 있습니다.*
 
 중요한 것은 약자를 외우는 것이 아니라, 눈앞의 실패 모양을 하나의 설계 교정과 연결하는 일입니다. 서비스가 너무 많은 이유로 자주 바뀐다면 SRP부터, 새 규칙이 생길 때마다 기존 분기문을 계속 고쳐야 한다면 OCP부터, 테스트를 위해 실제 인프라를 같이 띄워야 한다면 DIP부터 보는 식입니다.
 
@@ -112,21 +116,17 @@ class OrderValidator:
         if not order["items"]:
             raise ValueError("order must contain items")
 
-
 class OrderPricer:
     def calculate_total(self, order: dict) -> int:
         return sum(item["price"] for item in order["items"])
-
 
 class OrderRepository:
     def save(self, order: dict, total: int) -> None:
         print(f"saving order for {order['customer_email']} -> {total}")
 
-
 class ReceiptNotifier:
     def send(self, email: str, total: int) -> None:
         print(f"emailing receipt to {email} for {total}")
-
 
 class CheckoutService:
     def __init__(self) -> None:
@@ -176,20 +176,16 @@ emailing receipt to kim@example.com for 20000
 ```python
 from typing import Protocol
 
-
 class DiscountPolicy(Protocol):
     def apply(self, subtotal: int, order: dict) -> int: ...
-
 
 class NoDiscount:
     def apply(self, subtotal: int, order: dict) -> int:
         return subtotal
 
-
 class VipDiscount:
     def apply(self, subtotal: int, order: dict) -> int:
         return int(subtotal * 0.8) if order["customer_tier"] == "vip" else subtotal
-
 
 class ThresholdDiscount:
     def __init__(self, minimum: int, amount: int) -> None:
@@ -198,7 +194,6 @@ class ThresholdDiscount:
 
     def apply(self, subtotal: int, order: dict) -> int:
         return subtotal - self.amount if subtotal >= self.minimum else subtotal
-
 
 class OrderPricer:
     def __init__(self, discount: DiscountPolicy) -> None:
@@ -257,11 +252,9 @@ class PickupOnlyDiscount:
 class EligibilityRule(Protocol):
     def allows(self, order: dict) -> bool: ...
 
-
 class PickupEligibility:
     def allows(self, order: dict) -> bool:
         return order["delivery"] == "pickup"
-
 
 class FixedAmountDiscount:
     def __init__(self, amount: int) -> None:
@@ -269,7 +262,6 @@ class FixedAmountDiscount:
 
     def apply(self, subtotal: int, order: dict) -> int:
         return max(0, subtotal - self.amount)
-
 
 class ConditionalDiscount:
     def __init__(self, rule: EligibilityRule, inner: DiscountPolicy) -> None:
@@ -313,7 +305,6 @@ print(policy.apply(10000, delivery_order))
 ```python
 from typing import Protocol
 
-
 class OrderGateway(Protocol):
     def save(self, order: dict, total: int) -> None: ...
     def send_receipt(self, email: str, total: int) -> None: ...
@@ -326,20 +317,16 @@ class OrderGateway(Protocol):
 class OrderWriter(Protocol):
     def save(self, order: dict, total: int) -> None: ...
 
-
 class ReceiptSender(Protocol):
     def send_receipt(self, email: str, total: int) -> None: ...
-
 
 class OrderRepository:
     def save(self, order: dict, total: int) -> None:
         print(f"saving order for {order['customer_email']} -> {total}")
 
-
 class EmailNotifier:
     def send_receipt(self, email: str, total: int) -> None:
         print(f"emailing receipt to {email} for {total}")
-
 
 class CheckoutService:
     def __init__(self, writer: OrderWriter, sender: ReceiptSender, pricer: OrderPricer, validator: OrderValidator) -> None:
@@ -364,14 +351,11 @@ class CheckoutService:
 ```python
 from typing import Protocol
 
-
 class OrderWriter(Protocol):
     def save(self, order: dict, total: int) -> None: ...
 
-
 class ReceiptSender(Protocol):
     def send_receipt(self, email: str, total: int) -> None: ...
-
 
 class CheckoutService:
     def __init__(self, validator: OrderValidator, pricer: OrderPricer, writer: OrderWriter, sender: ReceiptSender) -> None:
@@ -387,7 +371,6 @@ class CheckoutService:
         self.sender.send_receipt(order["customer_email"], total)
         return total
 
-
 class FakeWriter:
     def __init__(self) -> None:
         self.saved: list[tuple[str, int]] = []
@@ -395,14 +378,12 @@ class FakeWriter:
     def save(self, order: dict, total: int) -> None:
         self.saved.append((order["customer_email"], total))
 
-
 class FakeSender:
     def __init__(self) -> None:
         self.messages: list[str] = []
 
     def send_receipt(self, email: str, total: int) -> None:
         self.messages.append(f"{email}:{total}")
-
 
 writer = FakeWriter()
 sender = FakeSender()
@@ -502,17 +483,29 @@ python solid_checkout.py
 
 SOLID는 다섯 슬로건을 따로 암기할 때보다, 하나의 취약한 워크플로에 순서대로 적용할 때 실용성이 훨씬 커집니다. 이번 결제 예제에서는 SRP가 책임을 나누고, OCP가 할인 규칙을 확장 가능하게 만들고, LSP가 계약을 정직하게 지키게 하고, ISP가 의존을 좁히고, DIP가 정책 테스트를 쉽게 만들었습니다. 다음 글에서는 이런 기준을 더 큰 설계 예제에 한 번에 적용해 봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **지금 보이는 증상에 어떤 원칙이 연결되는지 어떻게 판단할까요?**
+  - 본문의 기준은 SOLID 원칙 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **SRP를 적용하면 무엇이 바뀌고, 무엇은 그대로여야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **OCP, LSP, ISP, DIP는 서로 경쟁하는 규칙이 아니라 어떻게 한 워크플로 위에서 이어질까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [객체지향이란 무엇인가?](./01-what-is-oop.md)
-- [클래스와 인스턴스](./02-classes-and-instances.md)
-- [캡슐화](./03-encapsulation.md)
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
+## 시리즈 목차
+
+- [Object-Oriented Programming 101 (1/10): 객체지향이란 무엇인가?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): 클래스와 인스턴스](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): 캡슐화](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): 상속](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): 다형성](./05-polymorphism.md)
+- [Object-Oriented Programming 101 (6/10): 추상화](./06-abstraction.md)
+- [Object-Oriented Programming 101 (7/10): 합성과 상속](./07-composition-vs-inheritance.md)
 - **SOLID 원칙 기초 (현재 글)**
 - 객체지향 설계 예제 (예정)
 - 객체지향을 언제 피해야 할까? (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

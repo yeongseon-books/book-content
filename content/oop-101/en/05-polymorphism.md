@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 5
-title: Polymorphism
+title: "Object-Oriented Programming 101 (5/10): Polymorphism"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn how Python implements polymorphism through inheritance, d
 last_reviewed: '2026-05-04'
 ---
 
-# Polymorphism
+# Object-Oriented Programming 101 (5/10): Polymorphism
 
 This is post 5 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (5/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you handle objects of different types through a single interface?
 
 > Polymorphism means that a method with the same name behaves differently depending on the object's type. Python's duck typing enables polymorphism without inheritance. This article covers inheritance-based polymorphism, duck typing, and Python 3.8+ Protocol.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Polymorphism?
+- Which signal should the example or diagram make visible for Polymorphism?
+- What failure should be prevented first when Polymorphism reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/05/05-01-big-picture.en.png)
+
+*Object-Oriented Programming 101 chapter 5 flow overview*
+
+This picture places Polymorphism inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Polymorphism is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -176,25 +188,20 @@ save_data(ApiWriter(), "hello")        # Sending to API: hello
 ```python
 from typing import Protocol
 
-
 class Writable(Protocol):
     def write(self, data: str) -> None: ...
-
 
 class ConsoleWriter:
     def write(self, data: str) -> None:
         print(f"Console output: {data}")
 
-
 class NetworkWriter:
     def write(self, data: str) -> None:
         print(f"Network send: {data}")
 
-
 def save_all(writers: list[Writable], data: str) -> None:
     for writer in writers:
         writer.write(data)
-
 
 writers: list[Writable] = [ConsoleWriter(), NetworkWriter()]
 save_all(writers, "important data")
@@ -232,7 +239,6 @@ for member in team:
 
 ```python
 from functools import singledispatch
-
 
 @singledispatch
 def format_value(value) -> str:
@@ -305,17 +311,29 @@ For projects where type safety matters, use `Protocol` extensively. It has zero 
 
 Polymorphism increases code flexibility by calling different implementations through a single interface. Python supports polymorphism through duck typing, inheritance, and Protocol. In the next article, we explore abstraction — enforcing common interfaces through abstract base classes.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Polymorphism?**
+  - The article treats Polymorphism as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Polymorphism?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Polymorphism reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): Inheritance](./04-inheritance.md)
 - **Polymorphism (current)**
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Abstraction (upcoming)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

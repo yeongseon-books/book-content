@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 4
-title: Inheritance
+title: "Object-Oriented Programming 101 (4/10): Inheritance"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn Python inheritance basics including method overriding, su
 last_reviewed: '2026-05-15'
 ---
 
-# Inheritance
+# Object-Oriented Programming 101 (4/10): Inheritance
 
 This is post 4 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (4/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you reuse an existing class's functionality while adding new capabilities?
 
 > Inheritance lets a new class (child) receive attributes and methods from an existing class (parent). It reduces code duplication and expresses hierarchical relationships. This article covers single inheritance, method overriding, `super()`, and multiple inheritance with MRO.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Inheritance?
+- Which signal should the example or diagram make visible for Inheritance?
+- What failure should be prevented first when Inheritance reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png)
+
+*Object-Oriented Programming 101 chapter 4 flow overview*
+
+This picture places Inheritance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Inheritance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -67,9 +79,6 @@ Animal (parent class)
     └── speak() overridden
     └── purr() added
 ```
-
-![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png)
-*Inheritance centralizes shared behavior, but it also widens the blast radius of parent-class changes.*
 
 ## Key Concepts
 
@@ -143,7 +152,6 @@ class Animal:
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.name!r})"
 
-
 class Dog(Animal):
     def __init__(self, name: str) -> None:
         super().__init__(name, "woof")
@@ -151,14 +159,12 @@ class Dog(Animal):
     def fetch(self, item: str) -> str:
         return f"{self.name} fetches the {item}"
 
-
 class Cat(Animal):
     def __init__(self, name: str) -> None:
         super().__init__(name, "meow")
 
     def purr(self) -> str:
         return f"{self.name} is purring"
-
 
 dog = Dog("Buddy")
 cat = Cat("Whiskers")
@@ -177,7 +183,6 @@ class Logger:
     def error(self, message: str) -> None:
         print(f"[ERROR] {message}")
 
-
 class TimestampLogger(Logger):
     def log(self, message: str) -> None:
         from datetime import datetime
@@ -188,7 +193,6 @@ class TimestampLogger(Logger):
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] ERROR: {message}")
-
 
 logger = TimestampLogger()
 logger.log("Server started")    # [2026-05-04 12:00:00] Server started
@@ -207,7 +211,6 @@ class Vehicle:
     def info(self) -> str:
         return f"{self.year} {self.make} {self.model}"
 
-
 class ElectricVehicle(Vehicle):
     def __init__(self, make: str, model: str, year: int, battery_kwh: float) -> None:
         super().__init__(make, model, year)
@@ -216,7 +219,6 @@ class ElectricVehicle(Vehicle):
     def info(self) -> str:
         base = super().info()
         return f"{base} (Battery: {self.battery_kwh}kWh)"
-
 
 ev = ElectricVehicle("Tesla", "Model 3", 2026, 75.0)
 print(ev.info())  # 2026 Tesla Model 3 (Battery: 75.0kWh)
@@ -327,17 +329,29 @@ In practice, the trend favors composition over inheritance. Inheritance is mainl
 
 Inheritance is useful for code reuse and expressing hierarchical relationships, but overuse increases complexity. In the next article, we explore polymorphism — implementing different behaviors through a single interface.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Inheritance?**
+  - The article treats Inheritance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Inheritance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Inheritance reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
 - **Inheritance (current)**
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Polymorphism (upcoming)
+- Abstraction (upcoming)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

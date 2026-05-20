@@ -1,5 +1,5 @@
 ---
-title: 객체지향을 언제 피해야 할까?
+title: "Object-Oriented Programming 101 (10/10): 객체지향을 언제 피해야 할까?"
 series: oop-101
 episode: 10
 language: ko
@@ -20,25 +20,29 @@ last_reviewed: '2026-05-17'
 seo_description: 객체지향이 과한 상황과 함수, dataclass, 함수형 접근이 더 나은 경우를 설명합니다.
 ---
 
-# 객체지향을 언제 피해야 할까?
+# Object-Oriented Programming 101 (10/10): 객체지향을 언제 피해야 할까?
 
 가장 어려운 객체지향 결정은 종종 "어떤 클래스를 더 만들까?"가 아니라 "이걸 정말 클래스여야 하나?"입니다. 이 글은 OOP 101 시리즈의 마지막 글입니다.
 
 Python이 함수, 모듈, `dataclass`, `NamedTuple`, `TypedDict`, 콜러블을 함께 주는 이유가 있습니다. 이번 글에서는 클래스가 과하게 많은 리포트 미니 앱을 단계적으로 단순화하고, 다시 클래스를 도입해야 하는 임계점까지 분명하게 잡아 보겠습니다.
 
-## 이 글에서 다룰 문제
-
-> 좋은 설계는 클래스를 얼마나 많이 만들었는지가 아니라, 상태와 생명주기가 무겁지 않은 문제를 함수와 가벼운 데이터 구조로 어디까지 깔끔하게 끝낼 수 있는지에서 드러납니다.
+## 먼저 던지는 질문
 
 - 어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?
 - 어떤 종류의 클래스가 함수, `dataclass`, `NamedTuple`, `TypedDict`로 더 잘 바뀔까요?
 - 전략 클래스 전체 대신 콜백 하나면 충분한 순간은 언제일까요?
-- 함수 중심 설계가 너무 멀리 가서 다시 클래스로 올려야 하는 지점은 어떻게 판단할까요?
+
+## 큰 그림
+
+![Object-Oriented Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.ko.png)
+
+*Object-Oriented Programming 101 10장 흐름 개요*
+
+이 그림에서는 객체지향을 언제 피해야 할까?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 객체지향을 언제 피해야 할까?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 핵심 개념 잡기
-
-![핵심 개념 잡기](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.ko.png)
-*목표는 클래스를 영원히 피하는 것이 아니라, 상태·불변식·협력 수명주기가 실제로 함께 움직이는 지점에만 클래스를 남겨 두는 것입니다.*
 
 실무적인 질문은 단순합니다. 이 동작이 정말 상태와 수명주기 조정을 필요로 하는가, 아니면 대부분 데이터 변환 파이프라인인가? 후자라면 클래스는 종종 추가 무게일 뿐입니다.
 
@@ -62,7 +66,6 @@ class TitleCleaner:
     def clean(self, title: str) -> str:
         return title.strip().title()
 
-
 class ScoreFilter:
     def keep(self, score: int, minimum: int) -> bool:
         return score >= minimum
@@ -72,7 +75,6 @@ class ScoreFilter:
 # after: 함수와 데이터 구조가 같은 워크플로를 더 직접적으로 표현합니다
 def clean_title(title: str) -> str:
     return title.strip().title()
-
 
 def keep_score(score: int, minimum: int) -> bool:
     return score >= minimum
@@ -89,23 +91,19 @@ class TitleCleaner:
     def clean(self, title: str) -> str:
         return title.strip().title()
 
-
 class ScoreFilter:
     def keep(self, score: int, minimum: int) -> bool:
         return score >= minimum
 
-
 class CurrencyFormatter:
     def format(self, value: int) -> str:
         return f"${value:,.0f}"
-
 
 class ReportRow:
     def __init__(self, title: str, score: int, spend: int) -> None:
         self.title = title
         self.score = score
         self.spend = spend
-
 
 class ReportConfig:
     def __init__(self, minimum_score: int, currency: str) -> None:
@@ -123,10 +121,8 @@ class ReportConfig:
 def clean_title(title: str) -> str:
     return title.strip().title()
 
-
 def keep_score(score: int, minimum: int) -> bool:
     return score >= minimum
-
 
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
@@ -160,18 +156,15 @@ $12,500
 from dataclasses import dataclass
 from typing import TypedDict
 
-
 @dataclass(frozen=True)
 class ReportRow:
     title: str
     score: int
     spend: int
 
-
 class ReportConfig(TypedDict):
     minimum_score: int
     channel: str
-
 
 config: ReportConfig = {"minimum_score": 80, "channel": "email"}
 row = ReportRow(title="Spring Launch", score=82, spend=12500)
@@ -202,18 +195,14 @@ email
 ```python
 from collections.abc import Callable
 
-
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
-
 
 def format_points(value: int) -> str:
     return f"{value} pts"
 
-
 def render_value(value: int, formatter: Callable[[int], str]) -> str:
     return formatter(value)
-
 
 print(render_value(12500, format_currency))
 print(render_value(82, format_points))
@@ -243,26 +232,21 @@ from dataclasses import dataclass
 from collections.abc import Callable
 from typing import TypedDict
 
-
 @dataclass(frozen=True)
 class ReportRow:
     title: str
     score: int
     spend: int
 
-
 class ReportConfig(TypedDict):
     minimum_score: int
     channel: str
 
-
 def clean_title(title: str) -> str:
     return title.strip().title()
 
-
 def format_currency(value: int) -> str:
     return f"${value:,.0f}"
-
 
 def normalize_rows(rows: list[dict]) -> list[ReportRow]:
     return [
@@ -274,25 +258,20 @@ def normalize_rows(rows: list[dict]) -> list[ReportRow]:
         for row in rows
     ]
 
-
 def filter_rows(rows: list[ReportRow], minimum_score: int) -> list[ReportRow]:
     return [row for row in rows if row.score >= minimum_score]
-
 
 def sort_rows(rows: list[ReportRow]) -> list[ReportRow]:
     return sorted(rows, key=lambda row: row.score, reverse=True)
 
-
 def render_report(rows: list[ReportRow], money: Callable[[int], str]) -> list[str]:
     return [f"{row.title} | score={row.score} | spend={money(row.spend)}" for row in rows]
-
 
 def build_report(raw_rows: list[dict], config: ReportConfig, money: Callable[[int], str]) -> list[str]:
     rows = normalize_rows(raw_rows)
     rows = filter_rows(rows, config["minimum_score"])
     rows = sort_rows(rows)
     return render_report(rows, money)
-
 
 raw_rows = [
     {"title": "  spring launch ", "score": 82, "spend": 12500},
@@ -391,17 +370,29 @@ config = {"minimum_score": 80, "chnanel": "email"}  # dict 키 오타가 숨어 
 
 객체지향을 피해야 하는 순간은 클래스가 보호보다 의식을 더 많이 늘릴 때입니다. 이번 리포트 워크플로에서는 상태 없는 헬퍼를 함수로, 데이터 보관용 클래스를 가벼운 구조로, 사소한 전략을 콜러블로 바꾸면서 전체를 직접적인 파이프라인으로 만들었습니다. 동시에 상태와 불변식이 함께 움직이기 시작하면 다시 클래스로 올라가야 하는 기준도 얻었습니다.
 
+## 처음 질문으로 돌아가기
+
+- **어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?**
+  - 본문의 기준은 객체지향을 언제 피해야 할까?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **어떤 종류의 클래스가 함수, `dataclass`, `NamedTuple`, `TypedDict`로 더 잘 바뀔까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **전략 클래스 전체 대신 콜백 하나면 충분한 순간은 언제일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [객체지향이란 무엇인가?](./01-what-is-oop.md)
-- [클래스와 인스턴스](./02-classes-and-instances.md)
-- [캡슐화](./03-encapsulation.md)
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
+## 시리즈 목차
+
+- [Object-Oriented Programming 101 (1/10): 객체지향이란 무엇인가?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): 클래스와 인스턴스](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): 캡슐화](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): 상속](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): 다형성](./05-polymorphism.md)
+- [Object-Oriented Programming 101 (6/10): 추상화](./06-abstraction.md)
+- [Object-Oriented Programming 101 (7/10): 합성과 상속](./07-composition-vs-inheritance.md)
+- [Object-Oriented Programming 101 (8/10): SOLID 원칙 기초](./08-solid-principles.md)
+- [Object-Oriented Programming 101 (9/10): 객체지향 설계 예제](./09-oop-design-example.md)
 - **객체지향을 언제 피해야 할까? (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

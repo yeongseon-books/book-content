@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SOLID Principles Basics</title>
+<title>Object-Oriented Programming 101 (8/10): SOLID Principles Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>SOLID Principles Basics</h1>
+<h1>Object-Oriented Programming 101 (8/10): SOLID Principles Basics</h1>
 <p>This is post 8 in the Object-Oriented Programming 101 series.</p>
 <p>SOLID starts making sense when one service keeps growing until every new requirement shakes unrelated code.</p>
 <p>Rather than treating SOLID as five isolated slogans, we will use one checkout workflow and refactor it step by step. Each principle will answer a concrete design smell, not just define a rule.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying SOLID Principles Basics?</li>
+<li>Which signal should the example or diagram make visible for SOLID Principles Basics?</li>
+<li>What failure should be prevented first when SOLID Principles Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Object-Oriented Programming 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png"></p>
+<p><em>Object-Oriented Programming 101 chapter 8 flow overview</em></p>
+<p>This picture places SOLID Principles Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of SOLID Principles Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Article Answers</h2>
 <ul>
 <li>Which SOLID principle matches the failure shape I am seeing right now?</li>
@@ -74,8 +87,6 @@
 <li>When does applying SOLID too early become over-design?</li>
 </ul>
 <h2>Concept Overview</h2>
-<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png"><br>
-<em>Use the observable smell first, then choose the matching principle and the smallest refactor move instead of trying to apply all five rules at once.</em></p>
 <p>The key is not memorizing the acronym. The key is mapping one visible failure mode to one design correction. If the service has too many reasons to change, start with SRP. If every new rule edits old branching code, reach for OCP. If the system cannot swap dependencies cleanly, DIP is the more urgent fix.</p>
 <h2>Key Concepts</h2>
 <p><strong>SRP</strong><br>
@@ -442,17 +453,27 @@ print(sender.messages)
 </ul>
 <h2>Summary and Next Steps</h2>
 <p>SOLID becomes practical when you apply it to one brittle workflow instead of memorizing five slogans in isolation. In this checkout example, SRP split responsibilities, OCP made discount rules extensible, LSP kept the contract honest, ISP narrowed dependencies, and DIP made the policy testable. In the next article, we apply these ideas together in a fuller OOP design example.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
+<li><strong>What boundary should you inspect first when applying SOLID Principles Basics?</strong></li>
+<li>The article treats SOLID Principles Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for SOLID Principles Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when SOLID Principles Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Object-Oriented Programming 101 (2/10): Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Object-Oriented Programming 101 (3/10): Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Object-Oriented Programming 101 (4/10): Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Object-Oriented Programming 101 (5/10): Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Object-Oriented Programming 101 (6/10): Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Object-Oriented Programming 101 (7/10): Composition vs Inheritance</a></li>
 <li><strong>SOLID Principles Basics (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+<li>OOP Design Example (upcoming)</li>
+<li>When to Avoid OOP (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 7
-title: Composition vs Inheritance
+title: "Object-Oriented Programming 101 (7/10): Composition vs Inheritance"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Compare composition and inheritance, learn when to use each, an
 last_reviewed: '2026-05-15'
 ---
 
-# Composition vs Inheritance
+# Object-Oriented Programming 101 (7/10): Composition vs Inheritance
 
 This is post 7 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (7/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: When extending a class, should you choose inheritance or composition?
 
 > "Favor composition over inheritance" is a core principle from the GoF Design Patterns. Inheritance suits is-a relationships; composition suits has-a relationships. This article examines the structural differences and practical selection criteria.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Composition vs Inheritance?
+- Which signal should the example or diagram make visible for Composition vs Inheritance?
+- What failure should be prevented first when Composition vs Inheritance reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png)
+
+*Object-Oriented Programming 101 chapter 7 flow overview*
+
+This picture places Composition vs Inheritance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Composition vs Inheritance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -64,9 +76,6 @@ Inheritance (is-a)                Composition (has-a)
 └─────────────┘
 Tight coupling                 Loose coupling
 ```
-
-![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png)
-*The composition-versus-inheritance decision starts with substitutability and change radius, not with how much code you can reuse.*
 
 ## Key Concepts
 
@@ -125,11 +134,9 @@ class Engine:
         self.running = False
         return "Engine stopped"
 
-
 class GPS:
     def navigate(self, destination: str) -> str:
         return f"Navigating to {destination}"
-
 
 class Car:
     def __init__(self, engine: Engine, gps: GPS) -> None:
@@ -142,7 +149,6 @@ class Car:
 
     def park(self) -> None:
         print(self._engine.stop())
-
 
 car = Car(Engine(200), GPS())
 car.drive("downtown")
@@ -167,7 +173,6 @@ class Fax:
     def send_fax(self, number: str, content: str) -> None:
         print(f"Faxing to {number}: {content}")
 
-
 class MultiFunctionDevice:
     """Composition + delegation: each function delegated to an internal object"""
 
@@ -185,7 +190,6 @@ class MultiFunctionDevice:
     def send_fax(self, number: str, content: str) -> None:
         self._fax.send_fax(number, content)
 
-
 mfd = MultiFunctionDevice()
 mfd.print_document("Report")       # Printing: Report
 print(mfd.scan())                   # Scan complete
@@ -197,10 +201,8 @@ mfd.send_fax("02-1234", "Contract")  # Faxing to 02-1234: Contract
 ```python
 from typing import Protocol
 
-
 class SortStrategy(Protocol):
     def sort(self, data: list[int]) -> list[int]: ...
-
 
 class BubbleSort:
     def sort(self, data: list[int]) -> list[int]:
@@ -211,11 +213,9 @@ class BubbleSort:
                     arr[j], arr[j + 1] = arr[j + 1], arr[j]
         return arr
 
-
 class QuickSort:
     def sort(self, data: list[int]) -> list[int]:
         return sorted(data)
-
 
 class Sorter:
     def __init__(self, strategy: SortStrategy) -> None:
@@ -226,7 +226,6 @@ class Sorter:
 
     def execute(self, data: list[int]) -> list[int]:
         return self._strategy.sort(data)
-
 
 data = [5, 3, 8, 1, 9]
 sorter = Sorter(BubbleSort())
@@ -241,11 +240,9 @@ print(sorter.execute(data))  # [1, 3, 5, 8, 9]
 ```python
 from typing import Protocol
 
-
 class Database(Protocol):
     def save(self, data: dict) -> None: ...
     def find(self, key: str) -> dict | None: ...
-
 
 class InMemoryDB:
     def __init__(self) -> None:
@@ -257,7 +254,6 @@ class InMemoryDB:
     def find(self, key: str) -> dict | None:
         return self._store.get(key)
 
-
 class UserRepository:
     def __init__(self, db: Database) -> None:
         self._db = db  # injected from outside
@@ -267,7 +263,6 @@ class UserRepository:
 
     def get(self, user_id: str) -> dict | None:
         return self._db.find(user_id)
-
 
 db = InMemoryDB()
 repo = UserRepository(db)
@@ -292,7 +287,6 @@ class NotFoundError(HttpError):
 class UnauthorizedError(HttpError):
     def __init__(self) -> None:
         super().__init__(401, "Authentication required")
-
 
 try:
     raise NotFoundError("User")
@@ -359,17 +353,29 @@ The decision rule is simple: "Can a child object be used wherever a parent type 
 
 Composition provides loose coupling and runtime flexibility, making it more suitable than inheritance in most situations. Inheritance should be reserved for clear is-a relationships. In the next article, we explore SOLID principles — the fundamental guidelines for object-oriented design.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Composition vs Inheritance?**
+  - The article treats Composition vs Inheritance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Composition vs Inheritance?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Composition vs Inheritance reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): Inheritance](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): Polymorphism](./05-polymorphism.md)
+- [Object-Oriented Programming 101 (6/10): Abstraction](./06-abstraction.md)
 - **Composition vs Inheritance (current)**
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

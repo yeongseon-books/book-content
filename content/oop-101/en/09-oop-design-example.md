@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 9
-title: OOP Design Example
+title: "Object-Oriented Programming 101 (9/10): OOP Design Example"
 status: publish-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Apply OOP principles to a real-world online bookstore order sys
 last_reviewed: '2026-05-15'
 ---
 
-# OOP Design Example
+# Object-Oriented Programming 101 (9/10): OOP Design Example
 
 This is post 9 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (9/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: How do you integrate OOP principles into a real project?
 
 > Theory alone does not produce good design. This article incrementally designs an online bookstore order system, applying encapsulation, inheritance, polymorphism, composition, and SOLID principles in practice.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying OOP Design Example?
+- Which signal should the example or diagram make visible for OOP Design Example?
+- What failure should be prevented first when OOP Design Example reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png)
+
+*Object-Oriented Programming 101 chapter 9 flow overview*
+
+This picture places OOP Design Example inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of OOP Design Example is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -60,9 +72,6 @@ OrderService
 ├── PaymentGateway -> payment processing (DIP)
 └── OrderRepository -> order persistence (DIP)
 ```
-
-![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png)
-*The service does not do everything itself. It pushes discount, payment, and persistence concerns behind collaborators that can change independently.*
 
 ## Key Concepts
 
@@ -119,7 +128,6 @@ class OrderItem:
 ```python
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class Money:
     """Value object — represents monetary amounts"""
@@ -134,7 +142,6 @@ class Money:
     def apply_discount(self, percent: int) -> "Money":
         return Money(self.amount - (self.amount * percent // 100))
 
-
 @dataclass
 class Book:
     """Entity — identified by unique ID"""
@@ -146,7 +153,6 @@ class Book:
         if not isinstance(other, Book):
             return NotImplemented
         return self.book_id == other.book_id
-
 
 book = Book("B001", "Python Basics", Money(25000))
 print(book.price.amount)  # 25000
@@ -164,7 +170,6 @@ class CartItem:
     @property
     def total(self) -> Money:
         return self.book.price * self.quantity
-
 
 class Cart:
     def __init__(self) -> None:
@@ -195,7 +200,6 @@ class Cart:
     def item_count(self) -> int:
         return sum(item.quantity for item in self._items.values())
 
-
 cart = Cart()
 cart.add(Book("B001", "Python Basics", Money(25000)), 2)
 cart.add(Book("B002", "Django in Practice", Money(35000)))
@@ -208,10 +212,8 @@ print(f"Subtotal: ${cart.subtotal.amount}, {cart.item_count} books")
 ```python
 from typing import Protocol
 
-
 class DiscountPolicy(Protocol):
     def calculate(self, subtotal: Money) -> Money: ...
-
 
 class NoDiscount:
     def calculate(self, subtotal: Money) -> Money:
@@ -231,7 +233,6 @@ class BulkDiscount:
             return subtotal.apply_discount(10)
         return subtotal
 
-
 print(NoDiscount().calculate(Money(85000)).amount)       # 85000
 print(PercentDiscount(20).calculate(Money(85000)).amount) # 68000
 print(BulkDiscount().calculate(Money(85000)).amount)      # 76500
@@ -242,10 +243,8 @@ print(BulkDiscount().calculate(Money(85000)).amount)      # 76500
 ```python
 from typing import Protocol
 
-
 class PaymentGateway(Protocol):
     def charge(self, amount: Money) -> bool: ...
-
 
 class CardPayment:
     def charge(self, amount: Money) -> bool:
@@ -257,10 +256,8 @@ class BankTransfer:
         print(f"Bank transfer: ${amount.amount}")
         return True
 
-
 class OrderRepository(Protocol):
     def save(self, order_data: dict) -> str: ...
-
 
 class InMemoryOrderRepo:
     def __init__(self) -> None:
@@ -308,7 +305,6 @@ class OrderService:
             "total": final.amount,
         }
         return self._repo.save(order_data)
-
 
 # Assembly and execution
 cart = Cart()
@@ -392,17 +388,29 @@ Do not try to design everything perfectly from the start. Write simple working c
 
 Real-world design applies multiple OOP principles together, not in isolation. Start simple and improve incrementally when change demands it — this is the realistic approach. In the next article, we explore when you should not use object-oriented programming.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying OOP Design Example?**
+  - The article treats OOP Design Example as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for OOP Design Example?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when OOP Design Example reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): Inheritance](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): Polymorphism](./05-polymorphism.md)
+- [Object-Oriented Programming 101 (6/10): Abstraction](./06-abstraction.md)
+- [Object-Oriented Programming 101 (7/10): Composition vs Inheritance](./07-composition-vs-inheritance.md)
+- [Object-Oriented Programming 101 (8/10): SOLID Principles Basics](./08-solid-principles.md)
 - **OOP Design Example (current)**
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

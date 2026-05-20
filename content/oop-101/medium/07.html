@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Composition vs Inheritance</title>
+<title>Object-Oriented Programming 101 (7/10): Composition vs Inheritance</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Composition vs Inheritance</h1>
+<h1>Object-Oriented Programming 101 (7/10): Composition vs Inheritance</h1>
 <p>This is post 7 in the Object-Oriented Programming 101 series.</p>
 <blockquote>
 <p>Object-Oriented Programming 101 Series (7/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Key Question</strong>: When extending a class, should you choose inheritance or composition?</p>
 <blockquote>
 <p>"Favor composition over inheritance" is a core principle from the GoF Design Patterns. Inheritance suits is-a relationships; composition suits has-a relationships. This article examines the structural differences and practical selection criteria.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Composition vs Inheritance?</li>
+<li>Which signal should the example or diagram make visible for Composition vs Inheritance?</li>
+<li>What failure should be prevented first when Composition vs Inheritance reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Object-Oriented Programming 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png"></p>
+<p><em>Object-Oriented Programming 101 chapter 7 flow overview</em></p>
+<p>This picture places Composition vs Inheritance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Composition vs Inheritance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The structural difference between inheritance (is-a) and composition (has-a)</li>
@@ -93,8 +102,6 @@
 └─────────────┘
 Tight coupling                 Loose coupling
 </code></pre>
-<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png"><br>
-<em>The composition-versus-inheritance decision starts with substitutability and change radius, not with how much code you can reuse.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Composition</strong><br>
 - Description: An object contains other objects as attributes</p>
@@ -355,17 +362,27 @@ except HttpError as e:
 </ol>
 <h2>Summary and Next Steps</h2>
 <p>Composition provides loose coupling and runtime flexibility, making it more suitable than inheritance in most situations. Inheritance should be reserved for clear is-a relationships. In the next article, we explore SOLID principles — the fundamental guidelines for object-oriented design.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Abstraction</a></li>
+<li><strong>What boundary should you inspect first when applying Composition vs Inheritance?</strong></li>
+<li>The article treats Composition vs Inheritance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Composition vs Inheritance?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Composition vs Inheritance reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Object-Oriented Programming 101 (2/10): Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Object-Oriented Programming 101 (3/10): Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Object-Oriented Programming 101 (4/10): Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Object-Oriented Programming 101 (5/10): Polymorphism</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/06-abstraction.md">Object-Oriented Programming 101 (6/10): Abstraction</a></li>
 <li><strong>Composition vs Inheritance (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+<li>SOLID Principles Basics (upcoming)</li>
+<li>OOP Design Example (upcoming)</li>
+<li>When to Avoid OOP (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

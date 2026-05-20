@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 6
-title: Abstraction
+title: "Object-Oriented Programming 101 (6/10): Abstraction"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Learn how to design abstract classes with Python ABC and define
 last_reviewed: '2026-05-17'
 ---
 
-# Abstraction
+# Object-Oriented Programming 101 (6/10): Abstraction
 
 Abstraction matters the moment one workflow has multiple implementations and the caller starts guessing which method name to call. This article is the 6th post in the OOP 101 series.
 
 In Python, abstraction is not mainly about sounding theoretical. It is about deciding which methods are mandatory, which steps should stay shared, and when a team should require explicit inheritance instead of relying on "it probably has the right shape."
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Abstraction?
+- Which signal should the example or diagram make visible for Abstraction?
+- What failure should be prevented first when Abstraction reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png)
+
+*Object-Oriented Programming 101 chapter 6 flow overview*
+
+This picture places Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Abstraction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What This Article Tries to Solve
 
@@ -37,7 +53,6 @@ In Python, abstraction is not mainly about sounding theoretical. It is about dec
 
 ## Concept Overview
 
-![Concept Overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png)
 *Start by eliminating caller-specific method names, then decide whether the shared contract should be enforced through explicit inheritance (ABC) or structural compatibility (Protocol).* 
 
 Without a contract, one ingestion source exposes `read_file()`, another exposes `fetch_rows()`, and a third exposes `pull()`. The orchestrator becomes a bundle of `if` statements. With abstraction, the team agrees on a small contract first, then lets implementations vary behind it.
@@ -62,7 +77,6 @@ class CsvFeed:
     def read_file(self, path: str) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
 
-
 class WarehouseFeed:
     def fetch_rows(self, table: str) -> list[dict]:
         return [{"email": "bob@example.com", "active": False}]
@@ -71,7 +85,6 @@ class WarehouseFeed:
 ```python
 # after: every source agrees on one contract
 from abc import ABC, abstractmethod
-
 
 class FeedSource(ABC):
     @property
@@ -93,20 +106,16 @@ class CsvFeed:
     def read_file(self, path: str) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
 
-
 class WarehouseFeed:
     def fetch_rows(self, table: str) -> list[dict]:
         return [{"email": "bob@example.com", "active": False}]
-
 
 class PartnerApiFeed:
     def pull(self) -> list[dict]:
         return [{"email": "carol@example.com", "active": True}]
 
-
 def ingest(source: object) -> list[dict]:
     return source.fetch_records()  # caller assumes a method that does not exist
-
 
 ingest(CsvFeed())
 ```
@@ -126,7 +135,6 @@ The next move is not to add more `if isinstance(...)` branches. It is to make th
 ```python
 from abc import ABC, abstractmethod
 
-
 class FeedSource(ABC):
     @property
     @abstractmethod
@@ -137,7 +145,6 @@ class FeedSource(ABC):
     def fetch_records(self) -> list[dict]:
         """Return raw customer rows from this source."""
 
-
 class CsvFeed(FeedSource):
     @property
     def source_name(self) -> str:
@@ -145,7 +152,6 @@ class CsvFeed(FeedSource):
 
     def fetch_records(self) -> list[dict]:
         return [{"email": "alice@example.com", "active": True}]
-
 
 class WarehouseFeed(FeedSource):
     @property
@@ -167,7 +173,6 @@ Once several sources follow the same ingestion steps, the parent class should ow
 
 ```python
 from abc import ABC, abstractmethod
-
 
 class IngestionPipeline(ABC):
     def run(self) -> list[dict]:
@@ -197,7 +202,6 @@ class IngestionPipeline(ABC):
     @abstractmethod
     def store(self, rows: list[dict]) -> None: ...
 
-
 class CsvCustomerPipeline(IngestionPipeline):
     @property
     def source_name(self) -> str:
@@ -212,7 +216,6 @@ class CsvCustomerPipeline(IngestionPipeline):
     def store(self, rows: list[dict]) -> None:
         for row in rows:
             print(f"store -> {row}")
-
 
 class PartnerApiPipeline(IngestionPipeline):
     @property
@@ -236,18 +239,15 @@ Sometimes the workflow is good, but the class comes from another library. You ma
 ```python
 from abc import ABC, abstractmethod
 
-
 class FeedSource(ABC):
     @abstractmethod
     def fetch_records(self) -> list[dict]: ...
-
 
 class VendorSnapshot:
     """Pretend this class lives in a third-party package."""
 
     def fetch_records(self) -> list[dict]:
         return [{"email": "vendor@example.com", "active": True}]
-
 
 FeedSource.register(VendorSnapshot)
 
@@ -266,24 +266,19 @@ Not every integration should be forced into inheritance.
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-
 class InternalFeed(ABC):
     @abstractmethod
     def fetch_records(self) -> list[dict]: ...
 
-
 class FeedLike(Protocol):
     def fetch_records(self) -> list[dict]: ...
-
 
 class BackfillExport:
     def fetch_records(self) -> list[dict]:
         return [{"email": "backfill@example.com", "active": True}]
 
-
 def preview(feed: FeedLike) -> int:
     return len(feed.fetch_records())
-
 
 print(preview(BackfillExport()))
 ```
@@ -328,7 +323,6 @@ class BrokenPipeline(IngestionPipeline):
 
     def fetch_records(self) -> list[dict]:
         return []
-
 
 BrokenPipeline()
 ```
@@ -396,17 +390,29 @@ In practice, many Python codebases mix both styles: ABC for internal team-owned 
 
 Abstraction becomes useful when one workflow needs multiple implementations and the caller can no longer tolerate private naming conventions. Use ABC when your team needs an explicit contract and shared workflow defaults. Use Protocol when compatibility matters more than inheritance. In the next article, we compare composition and inheritance so you can choose where behavior should live in the first place.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Abstraction?**
+  - The article treats Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Abstraction?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Abstraction reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
-- [Encapsulation](./03-encapsulation.md)
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
+- [Object-Oriented Programming 101 (3/10): Encapsulation](./03-encapsulation.md)
+- [Object-Oriented Programming 101 (4/10): Inheritance](./04-inheritance.md)
+- [Object-Oriented Programming 101 (5/10): Polymorphism](./05-polymorphism.md)
 - **Abstraction (current)**
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References

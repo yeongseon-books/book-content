@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Abstraction</title>
+<title>Object-Oriented Programming 101 (6/10): Abstraction</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Abstraction</h1>
+<h1>Object-Oriented Programming 101 (6/10): Abstraction</h1>
 <p>Abstraction matters the moment one workflow has multiple implementations and the caller starts guessing which method name to call. This article is the 6th post in the OOP 101 series.</p>
 <p>In Python, abstraction is not mainly about sounding theoretical. It is about deciding which methods are mandatory, which steps should stay shared, and when a team should require explicit inheritance instead of relying on "it probably has the right shape."</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Abstraction?</li>
+<li>Which signal should the example or diagram make visible for Abstraction?</li>
+<li>What failure should be prevented first when Abstraction reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Object-Oriented Programming 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png"></p>
+<p><em>Object-Oriented Programming 101 chapter 6 flow overview</em></p>
+<p>This picture places Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Abstraction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What This Article Tries to Solve</h2>
 <blockquote>
 <p>Abstraction is not the act of removing implementation details. It is the act of making the minimum shared contract explicit before a workflow starts spreading across multiple classes.</p>
@@ -67,8 +80,7 @@
 <li>When should you switch from ABC to Protocol instead of forcing explicit inheritance?</li>
 </ul>
 <h2>Concept Overview</h2>
-<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png"><br>
-<em>Start by eliminating caller-specific method names, then decide whether the shared contract should be enforced through explicit inheritance (ABC) or structural compatibility (Protocol).</em> </p>
+<p><em>Start by eliminating caller-specific method names, then decide whether the shared contract should be enforced through explicit inheritance (ABC) or structural compatibility (Protocol).</em> </p>
 <p>Without a contract, one ingestion source exposes <code>read_file()</code>, another exposes <code>fetch_rows()</code>, and a third exposes <code>pull()</code>. The orchestrator becomes a bundle of <code>if</code> statements. With abstraction, the team agrees on a small contract first, then lets implementations vary behind it.</p>
 <h2>Key Concepts</h2>
 <p><strong>Abstract class</strong><br>
@@ -359,17 +371,27 @@ BrokenPipeline()
 </ul>
 <h2>Summary and Next Steps</h2>
 <p>Abstraction becomes useful when one workflow needs multiple implementations and the caller can no longer tolerate private naming conventions. Use ABC when your team needs an explicit contract and shared workflow defaults. Use Protocol when compatibility matters more than inheritance. In the next article, we compare composition and inheritance so you can choose where behavior should live in the first place.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">What Is Object-Oriented Programming?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Classes and Instances</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Encapsulation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Inheritance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Polymorphism</a></li>
+<li><strong>What boundary should you inspect first when applying Abstraction?</strong></li>
+<li>The article treats Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Abstraction?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Abstraction reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/01-what-is-oop.md">Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/02-classes-and-instances.md">Object-Oriented Programming 101 (2/10): Classes and Instances</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/03-encapsulation.md">Object-Oriented Programming 101 (3/10): Encapsulation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/04-inheritance.md">Object-Oriented Programming 101 (4/10): Inheritance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/05-polymorphism.md">Object-Oriented Programming 101 (5/10): Polymorphism</a></li>
 <li><strong>Abstraction (current)</strong></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/07-composition-vs-inheritance.md">Composition vs Inheritance</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/08-solid-principles.md">SOLID Principles Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/09-oop-design-example.md">OOP Design Example</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/oop-101/en/10-when-to-avoid-oop.md">When to Avoid OOP</a></li>
+<li>Composition vs Inheritance (upcoming)</li>
+<li>SOLID Principles Basics (upcoming)</li>
+<li>OOP Design Example (upcoming)</li>
+<li>When to Avoid OOP (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

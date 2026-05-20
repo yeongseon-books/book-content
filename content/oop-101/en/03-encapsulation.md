@@ -1,7 +1,7 @@
 ---
 series: oop-101
 episode: 3
-title: Encapsulation
+title: "Object-Oriented Programming 101 (3/10): Encapsulation"
 status: content-ready
 targets:
   tistory: false
@@ -20,19 +20,31 @@ seo_description: Learn how Python implements encapsulation through naming conven
 last_reviewed: '2026-05-04'
 ---
 
-# Encapsulation
+# Object-Oriented Programming 101 (3/10): Encapsulation
 
 This is post 3 in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (3/10)
 
-<!-- a-grade-intro:begin -->
-
 **Key Question**: Why and how should you protect an object's internal data?
 
 > Encapsulation shields an object's internal state from direct external modification, exposing it only through a controlled interface. Python has no enforced access control, but naming conventions and the property decorator provide effective encapsulation.
 
-<!-- a-grade-intro:end -->
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Encapsulation?
+- Which signal should the example or diagram make visible for Encapsulation?
+- What failure should be prevented first when Encapsulation reaches a real system?
+
+## Big Picture
+
+![Object-Oriented Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/03/03-01-big-picture.en.png)
+
+*Object-Oriented Programming 101 chapter 3 flow overview*
+
+This picture places Encapsulation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Encapsulation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -321,17 +333,29 @@ The most common pattern in practice is "start with public attributes, convert to
 
 Encapsulation protects an object's internal state and provides a safe interface. Python achieves this through underscore conventions and the property decorator. In the next article, we explore inheritance — extending existing classes with new functionality.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Encapsulation?**
+  - The article treats Encapsulation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Encapsulation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Encapsulation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Object-Oriented Programming?](./01-what-is-oop.md)
-- [Classes and Instances](./02-classes-and-instances.md)
+## In this series
+
+- [Object-Oriented Programming 101 (1/10): What Is Object-Oriented Programming?](./01-what-is-oop.md)
+- [Object-Oriented Programming 101 (2/10): Classes and Instances](./02-classes-and-instances.md)
 - **Encapsulation (current)**
-- [Inheritance](./04-inheritance.md)
-- [Polymorphism](./05-polymorphism.md)
-- [Abstraction](./06-abstraction.md)
-- [Composition vs Inheritance](./07-composition-vs-inheritance.md)
-- [SOLID Principles Basics](./08-solid-principles.md)
-- [OOP Design Example](./09-oop-design-example.md)
-- [When to Avoid OOP](./10-when-to-avoid-oop.md)
+- Inheritance (upcoming)
+- Polymorphism (upcoming)
+- Abstraction (upcoming)
+- Composition vs Inheritance (upcoming)
+- SOLID Principles Basics (upcoming)
+- OOP Design Example (upcoming)
+- When to Avoid OOP (upcoming)
+
 <!-- toc:end -->
 
 ## References
