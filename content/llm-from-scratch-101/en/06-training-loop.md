@@ -1,5 +1,5 @@
 ---
-title: Learning via Gradients
+title: "LLM from Scratch 101 (6/9): Learning via Gradients"
 series: llm-from-scratch-101
 episode: 6
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Once the model class is complete, training becomes the moment where every earlier module finally starts moving through real data.
 ---
 
-# Learning via Gradients
+# LLM from Scratch 101 (6/9): Learning via Gradients
 
 Once the model class is complete, training is the moment where everything starts to feel real. Until now, we have been assembling structure: embeddings, attention, blocks, and the GPT wrapper. The training loop is where those pieces finally meet data and start changing.
 
@@ -28,15 +28,21 @@ TinyShakespeare is especially helpful here because the numbers move quickly enou
 
 This is post 6 in the LLM from Scratch 101 series. Here we will build a compact but usable `train.py` with AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpoint saving.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What are the five lines at the heart of the training loop?
 - Why is AdamW usually easier to work with than SGD for Transformers?
 - What do warmup and cosine decay do for stability?
-- What kind of failure does gradient clipping prevent?
-- Why should train and validation loss always be read together?
 
-> Training is a closed loop that repeats the same correction over and over: show a batch, measure the error, flow gradients backward, and move the weights slightly in that direction.
+## Big Picture
+
+![LLM from Scratch 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
+
+*LLM from Scratch 101 chapter 6 flow overview*
+
+This picture places Learning via Gradients inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Learning via Gradients is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -59,10 +65,6 @@ That is why the loop is both simple and operational. It is a short core surround
 ### The center of the loop is five lines
 
 At its smallest, the loop is `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, and `step()`. Everything else is support code for scheduling, logging, validation, and saving.
-
-![Core training loop from forward to update](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
-
-*Core training loop from forward to update.*
 
 The most important detail here is what `backward()` actually does. Autograd walks the computation graph in reverse and fills the `grad` field on each parameter. The optimizer then consumes those gradients and updates the weights.
 
@@ -306,18 +308,27 @@ We also saw that training is less mysterious than it sounds. The core is just re
 
 In the next post, we will load `ckpt.pt` and turn the trained model into a generator, producing Shakespeare-like text one token at a time.
 
+## Answering the Opening Questions
+
+- **What are the five lines at the heart of the training loop?**
+  - The article treats Learning via Gradients as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is AdamW usually easier to work with than SGD for Transformers?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What do warmup and cosine decay do for stability?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- [From Integers to Vectors and Positions](./02-embedding.md)
-- [Deciding Which Tokens to Focus On](./03-attention.md)
-- [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
-- [Assembly: Completing the GPT Model Class](./05-gpt-model.md)
-- **Learning via Gradients (current)**
-- Sampling — Generating Text from a Trained Model (upcoming)
-- Adapting the Base Model to Specific Tasks (upcoming)
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): From Integers to Vectors and Positions](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On](./03-attention.md)
+- [LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+- [LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class](./05-gpt-model.md)
+- **LLM from Scratch 101 (6/9): Learning via Gradients (current)**
+- LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)
+- LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

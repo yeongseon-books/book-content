@@ -1,5 +1,5 @@
 ---
-title: 베이스 모델을 우리 작업에 맞추기
+title: "LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기"
 series: llm-from-scratch-101
 episode: 8
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-12'
 seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도 질문에 답하지는 못합니다.
 ---
 
-# 베이스 모델을 우리 작업에 맞추기
+# LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기
 
 지난 글까지 오면 모델은 분명히 텍스트를 생성합니다. 하지만 그 출력은 여전히 TinyShakespeare가 만든 리듬에 가깝습니다. 질문을 던진다고 해서 답을 잘해 주는 것은 아니고, instruction 형식을 안다고 보기도 어렵습니다.
 
@@ -32,13 +32,21 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 
 이제 출력 습관을 어떻게 바꾸는지 이해하면 마지막 글에서 이 모델을 브라우저와 대화형 인터페이스로 감싸는 일이 자연스럽게 이어집니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - pre-training, fine-tuning, RLHF는 각각 무엇을 바꾸는 단계일까요?
 - instruction 데이터 한 줄은 어떤 필드 구조를 가지면 충분할까요?
 - 작은 데이터셋 50개만으로도 출력 습관이 왜 바뀔 수 있을까요?
-- loss masking은 왜 instruction 부분을 학습 대상에서 제외할까요?
-- `train.py` 위에 `finetune.py`를 얹을 때 실제로 바뀌는 것은 무엇일까요?
+
+## 큰 그림
+
+![LLM from Scratch 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
+
+*LLM from Scratch 101 8장 흐름 개요*
+
+이 그림에서는 베이스 모델을 우리 작업에 맞추기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 베이스 모델을 우리 작업에 맞추기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -48,7 +56,7 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 
 운영적으로도 중요합니다. 파인튜닝 데이터 형식, label shifting, ignore index, learning rate 축소 같은 디테일은 모델이 질문을 복사할지, 답변 형식을 유지할지, 과도하게 붕괴할지를 좌우합니다. 작은 실험일수록 이 차이가 더 직접적으로 드러납니다.
 
-## 파인튜닝을 이해하는 가장 좋은 방법: 베이스 모델 위에 새로운 출력 습관을 얹는 얇은 적응층으로 보는 것입니다
+## 핵심 관점
 
 파인튜닝을 베이스 모델을 갈아엎는 작업으로 생각하면 기대가 과도해집니다. 더 현실적인 관점은 이렇습니다. **SFT는 베이스 모델의 기본 표현을 유지한 채, 작은 태스크 전용 데이터셋으로 출력 습관과 형식을 덧입히는 얇은 적응층**입니다.
 
@@ -63,10 +71,6 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 ### pre-training, SFT, RLHF는 역할이 다릅니다
 
 pre-training은 거대한 말뭉치에서 next-token prediction을 학습하는 단계입니다. SFT는 이미 학습된 모델을 instruction-response 형식에 맞추는 단계입니다. RLHF는 여기에 사람 선호 기반 신호를 더해 응답 정책을 더 조정하는 단계입니다.
-
-![사전학습, SFT, RLHF의 역할 비교](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.ko.png)
-
-*베이스 지식 형성, 형식 적응, 선호 정렬이 각각 어느 단계에서 일어나는지 비교한 그림입니다.*
 
 이번 시리즈는 RLHF까지 가지 않고 SFT까지만 다룹니다. 목표는 인간 선호 정렬이 아니라, base model 위에 instruction 형식을 얹는 메커니즘을 직접 확인하는 데 있습니다.
 
@@ -185,18 +189,27 @@ A: My lord, I serve thee with a faithful heart.
 
 다음 글에서는 이렇게 미세 조정한 모델을 FastAPI 서버와 브라우저 UI로 감쌉니다. 즉, 지금까지 만든 LLM을 실제로 대화할 수 있는 작은 챗봇 시스템으로 마무리하게 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **pre-training, fine-tuning, RLHF는 각각 무엇을 바꾸는 단계일까요?**
+  - 본문의 기준은 베이스 모델을 우리 작업에 맞추기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **instruction 데이터 한 줄은 어떤 필드 구조를 가지면 충분할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **작은 데이터셋 50개만으로도 출력 습관이 왜 바뀔 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [글자를 숫자로 바꾸기](./01-tokenizer.md)
-- [정수에서 벡터로, 그리고 위치](./02-embedding.md)
-- [어떤 토큰을 얼마나 볼지 스스로 정하기](./03-attention.md)
-- [블록 하나, 깊이의 단위](./04-transformer-block.md)
-- [조립: GPT 모델 클래스 완성](./05-gpt-model.md)
-- [기울기로 배우기](./06-training-loop.md)
-- [샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
-- **베이스 모델을 우리 작업에 맞추기 (현재 글)**
-- 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
+- [LLM from Scratch 101 (1/9): 글자를 숫자로 바꾸기](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): 정수에서 벡터로, 그리고 위치](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): 어떤 토큰을 얼마나 볼지 스스로 정하기](./03-attention.md)
+- [LLM from Scratch 101 (4/9): 블록 하나, 깊이의 단위](./04-transformer-block.md)
+- [LLM from Scratch 101 (5/9): 조립: GPT 모델 클래스 완성](./05-gpt-model.md)
+- [LLM from Scratch 101 (6/9): 기울기로 배우기](./06-training-loop.md)
+- [LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기](./07-inference.md)
+- **LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기 (현재 글)**
+- LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
 
 <!-- toc:end -->
 

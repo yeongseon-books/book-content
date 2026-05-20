@@ -1,5 +1,5 @@
 ---
-title: Adapting the Base Model to Specific Tasks
+title: "LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks"
 series: llm-from-scratch-101
 episode: 8
 language: en
@@ -19,7 +19,7 @@ seo_description: The model from the previous post can mimic Shakespearian rhythm
   but it can't answer questions.
 ---
 
-# Adapting the Base Model to Specific Tasks
+# LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks
 
 > LLM from Scratch 101 series (8/9)
 
@@ -33,24 +33,26 @@ This is the 8th article in the LLM from Scratch 101 series.
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## Key Questions
+## Questions to Keep in Mind
 
 - What separates pre-training, fine-tuning, and RLHF?
 - What fields make up a single instruction-data row?
 - Why does loss masking exclude the instruction portion from training?
-- Why does even 50 rows shift output habits?
 
-<!-- a-grade-intro:end -->
+## Big Picture
+
+![LLM from Scratch 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
+
+*LLM from Scratch 101 chapter 8 flow overview*
+
+This picture places Adapting the Base Model to Specific Tasks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Adapting the Base Model to Specific Tasks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
 
 Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.
 
-![Roles of pre-training, SFT, and RLHF](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
-
-*Roles of pre-training, SFT, and RLHF*
 ## Anatomy of an Instruction Data Row
 
 A single line in our `instructions.jsonl` follows a simple `{"instruction": ..., "response": ...}` structure. During training, we concatenate these into a `Q: {q}\nA: {a}` template.
@@ -151,18 +153,27 @@ In the final post, we'll wrap this model in a FastAPI server so you can talk to 
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What separates pre-training, fine-tuning, and RLHF?**
+  - The article treats Adapting the Base Model to Specific Tasks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What fields make up a single instruction-data row?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does loss masking exclude the instruction portion from training?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- [From Integers to Vectors and Positions](./02-embedding.md)
-- [Deciding Which Tokens to Focus On](./03-attention.md)
-- [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
-- [Assembly: Completing the GPT Model Class](./05-gpt-model.md)
-- [Learning via Gradients](./06-training-loop.md)
-- [Sampling — Generating Text from a Trained Model](./07-inference.md)
-- **Adapting the Base Model to Specific Tasks (current)**
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): From Integers to Vectors and Positions](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On](./03-attention.md)
+- [LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+- [LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class](./05-gpt-model.md)
+- [LLM from Scratch 101 (6/9): Learning via Gradients](./06-training-loop.md)
+- [LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model](./07-inference.md)
+- **LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (current)**
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

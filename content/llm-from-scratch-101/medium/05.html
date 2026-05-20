@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Assembly: Completing the GPT Model Class</title>
+<title>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Assembly: Completing the GPT Model Class</h1>
+<h1>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class</h1>
 <blockquote>
 <p>LLM from Scratch 101 series (5/9)</p>
 </blockquote>
@@ -63,22 +63,22 @@
 <p>The mental model for today is this: <strong>GPT is an autoregressive model that stacks blocks on top of embeddings and converts the final hidden states into the next token distribution.</strong></p>
 <p>This is the 5th article in the LLM from Scratch 101 series.</p>
 <hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>In what order does the GPT class call its components?</li>
 <li>Why does weight tying shrink parameters without hurting quality?</li>
 <li>Why does cross-entropy loss fit on one line?</li>
-<li>What do you gain by managing hyperparameters in a config dataclass?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 5 flow overview</em></p>
+<p>This picture places Assembly: Completing the GPT Model Class inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Assembly: Completing the GPT Model Class is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>The Forward Pass at a Glance</h2>
 <p>The input is a tensor of token IDs with shape <code>(B, T)</code>. We add token and position embeddings, then pass them through six blocks sequentially. After a final <code>ln_f</code> layer, we project to the vocab dimension via <code>lm_head</code> to produce logits of shape <code>(B, T, vocab_size)</code>.</p>
-<p><img alt="Full GPT forward-pass structure" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png"></p>
-<p><em>Full GPT forward-pass structure</em><br>
-All the components we created earlier appear here. The model class acts more as assembly code than a new algorithm.</p>
+<p>All the components we created earlier appear here. The model class acts more as assembly code than a new algorithm.</p>
 <h2>class GPT(nn.Module) — An 80-line Model</h2>
 <p>The code below completes our <code>model.py</code>. Assuming <code>Block</code> and <code>CausalSelfAttention</code> are available from previous posts, we wrap things up with <code>GPTConfig</code> and the <code>GPT</code> class itself.</p>
 <pre><code class="language-python">from dataclasses import dataclass
@@ -178,17 +178,26 @@ print(loss.item())
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>In what order does the GPT class call its components?</strong></li>
+<li>The article treats Assembly: Completing the GPT Model Class as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why does weight tying shrink parameters without hurting quality?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does cross-entropy loss fit on one line?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">From Integers to Vectors and Positions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">Deciding Which Tokens to Focus On</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">The Transformer Block: A Unit of Depth</a></li>
-<li><strong>Assembly: Completing the GPT Model Class (current)</strong></li>
-<li>Learning via Gradients (upcoming)</li>
-<li>Sampling — Generating Text from a Trained Model (upcoming)</li>
-<li>Adapting the Base Model to Specific Tasks (upcoming)</li>
-<li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">LLM from Scratch 101 (1/9): Turning Text into Numbers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">LLM from Scratch 101 (2/9): From Integers to Vectors and Positions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth</a></li>
+<li><strong>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (current)</strong></li>
+<li>LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)</li>
+<li>LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)</li>
+<li>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)</li>
+<li>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

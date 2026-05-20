@@ -1,5 +1,5 @@
 ---
-title: 기울기로 배우기
+title: "LLM from Scratch 101 (6/9): 기울기로 배우기"
 series: llm-from-scratch-101
 episode: 6
 language: ko
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이는 단계가 남습니다. 학습입니다.
 ---
 
-# 기울기로 배우기
+# LLM from Scratch 101 (6/9): 기울기로 배우기
 
 모델 클래스를 완성하고 나면 이제 정말 학습을 시작할 수 있습니다. 이름만 들으면 거대한 제어 시스템이 필요해 보이지만, 실제 PyTorch 코드로 내려오면 학습 루프의 핵심은 놀랄 만큼 짧습니다. 배치를 뽑고, loss를 계산하고, 역전파하고, optimizer가 한 걸음 움직이는 일이 반복될 뿐입니다.
 
@@ -28,15 +28,21 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 이 글은 LLM from Scratch 101 시리즈의 여섯 번째 글입니다. 여기서는 `train.py`를 만들어 AdamW, warmup, cosine decay, gradient clipping, 주기적 평가, 체크포인트 저장까지 포함한 최소 학습 루프를 구현합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 학습 루프를 움직이는 핵심 다섯 줄은 무엇일까요?
 - transformer 학습에서 AdamW는 왜 SGD보다 다루기 쉬울까요?
 - warmup과 cosine decay는 학습 안정성에 어떤 도움을 줄까요?
-- gradient clipping 한 줄은 어떤 종류의 사고를 줄여 줄까요?
-- train/val loss를 같이 보는 것이 왜 중요한 운영 습관일까요?
 
-> 학습은 같은 실수를 반복해서 조금씩 줄여 가는 폐루프입니다. 좋은 배치를 보여 주고, 틀린 만큼 기울기를 흘려 보내고, 그 방향으로 가중치를 조금 이동시키는 일이 계속 반복됩니다.
+## 큰 그림
+
+![LLM from Scratch 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
+
+*LLM from Scratch 101 6장 흐름 개요*
+
+이 그림에서는 기울기로 배우기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 기울기로 배우기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -46,7 +52,7 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 운영 감각 측면에서도 중요합니다. 학습률 스케줄링, gradient clipping, eval 주기, 체크포인트 저장은 모두 "나중에" 넣는 기능이 아니라 처음부터 품질과 디버깅 비용을 좌우하는 요소입니다. 작은 실험일수록 이런 기본기를 함께 가져가는 편이 훨씬 좋습니다.
 
-## 학습 루프를 이해하는 가장 좋은 방법: 같은 실수를 반복해서 조금씩 줄여 가는 폐루프로 보는 것입니다
+## 핵심 관점
 
 학습은 복잡한 마법이 아니라 **모델이 현재 예측을 내고, 정답과의 차이에서 기울기를 계산하고, 그 기울기 방향으로 가중치를 조금 이동시키는 폐루프**입니다. 이 루프가 수천 번 반복되면서 모델의 출력 습관이 천천히 바뀝니다.
 
@@ -59,10 +65,6 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 ### 학습 루프의 중심은 다섯 줄입니다
 
 학습 루프를 가장 작게 요약하면 `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, `step()`입니다. 나머지는 평가, 로그, 스케줄링, 저장 같은 운영 코드입니다. 즉, 핵심 자체는 매우 짧고 반복적입니다.
-
-![순전파에서 업데이트까지 이어지는 학습 루프](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
-
-*배치를 뽑고 loss를 계산한 뒤 gradient를 흘려 보내고 optimizer step을 밟는 핵심 루프입니다.*
 
 이 구조를 이해할 때 가장 중요한 점은 `backward()`가 자동미분 그래프를 역방향으로 순회하며 각 파라미터의 `grad`를 채운다는 사실입니다. optimizer는 그 `grad`를 읽고 파라미터를 조금 이동시킵니다. 결국 학습은 gradient를 계산하고 소비하는 반복입니다.
 
@@ -306,18 +308,27 @@ for step in range(200):
 
 이제 다음 글에서는 저장한 `ckpt.pt`를 불러와 생성 루프를 붙입니다. 즉, 지금까지 학습한 가중치를 사용해 실제로 셰익스피어풍 텍스트를 한 글자씩 뽑아내는 단계로 넘어갑니다.
 
+## 처음 질문으로 돌아가기
+
+- **학습 루프를 움직이는 핵심 다섯 줄은 무엇일까요?**
+  - 본문의 기준은 기울기로 배우기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **transformer 학습에서 AdamW는 왜 SGD보다 다루기 쉬울까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **warmup과 cosine decay는 학습 안정성에 어떤 도움을 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [글자를 숫자로 바꾸기](./01-tokenizer.md)
-- [정수에서 벡터로, 그리고 위치](./02-embedding.md)
-- [어떤 토큰을 얼마나 볼지 스스로 정하기](./03-attention.md)
-- [블록 하나, 깊이의 단위](./04-transformer-block.md)
-- [조립: GPT 모델 클래스 완성](./05-gpt-model.md)
-- **기울기로 배우기 (현재 글)**
-- 샘플링 — 학습된 모델에서 글 뽑아내기 (예정)
-- 베이스 모델을 우리 작업에 맞추기 (예정)
-- 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
+- [LLM from Scratch 101 (1/9): 글자를 숫자로 바꾸기](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): 정수에서 벡터로, 그리고 위치](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): 어떤 토큰을 얼마나 볼지 스스로 정하기](./03-attention.md)
+- [LLM from Scratch 101 (4/9): 블록 하나, 깊이의 단위](./04-transformer-block.md)
+- [LLM from Scratch 101 (5/9): 조립: GPT 모델 클래스 완성](./05-gpt-model.md)
+- **LLM from Scratch 101 (6/9): 기울기로 배우기 (현재 글)**
+- LLM from Scratch 101 (7/9): 샘플링 — 학습된 모델에서 글 뽑아내기 (예정)
+- LLM from Scratch 101 (8/9): 베이스 모델을 우리 작업에 맞추기 (예정)
+- LLM from Scratch 101 (9/9): 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍 (예정)
 
 <!-- toc:end -->
 

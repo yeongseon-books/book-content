@@ -1,5 +1,5 @@
 ---
-title: Sampling — Generating Text from a Trained Model
+title: "LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model"
 series: llm-from-scratch-101
 episode: 7
 language: en
@@ -19,7 +19,7 @@ seo_description: Once you've saved ckpt.pt, the immediate urge is to make the mo
   talk. However, simply calling model.eval() won't magically produce sentences.
 ---
 
-# Sampling — Generating Text from a Trained Model
+# LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model
 
 > LLM from Scratch 101 series (7/9)
 
@@ -33,24 +33,26 @@ This is the 7th article in the LLM from Scratch 101 series.
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## Key Questions
+## Questions to Keep in Mind
 
 - What does the autoregressive generation loop iterate over?
 - How do temperature, top-k, and top-p each manipulate the logits?
 - Why does greedy decoding produce monotonous text?
-- How should the model handle text longer than its context window?
 
-<!-- a-grade-intro:end -->
+## Big Picture
+
+![LLM from Scratch 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
+
+*LLM from Scratch 101 chapter 7 flow overview*
+
+This picture places Sampling — Generating Text from a Trained Model inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Sampling — Generating Text from a Trained Model is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Autoregressive Generation — One Token at a Time
 
 We input the current context `idx`, extract only the last step's logits, and then append the sampled token to the sequence.
 
-![Autoregressive loop with token-by-token appends](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
-
-*Autoregressive loop with token-by-token appends*
 ## Greedy Decoding — Why argmax is Boring
 
 Using `argmax` always picks the token with the highest probability. This often leads to repetitive and predictable loops. While technically correct, greedy decoding lacks the variety needed for natural-sounding text.
@@ -154,18 +156,27 @@ In the next post, we'll perform Supervised Fine-Tuning (SFT) by layering a small
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What does the autoregressive generation loop iterate over?**
+  - The article treats Sampling — Generating Text from a Trained Model as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How do temperature, top-k, and top-p each manipulate the logits?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does greedy decoding produce monotonous text?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- [From Integers to Vectors and Positions](./02-embedding.md)
-- [Deciding Which Tokens to Focus On](./03-attention.md)
-- [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
-- [Assembly: Completing the GPT Model Class](./05-gpt-model.md)
-- [Learning via Gradients](./06-training-loop.md)
-- **Sampling — Generating Text from a Trained Model (current)**
-- Adapting the Base Model to Specific Tasks (upcoming)
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): From Integers to Vectors and Positions](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On](./03-attention.md)
+- [LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+- [LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class](./05-gpt-model.md)
+- [LLM from Scratch 101 (6/9): Learning via Gradients](./06-training-loop.md)
+- **LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (current)**
+- LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

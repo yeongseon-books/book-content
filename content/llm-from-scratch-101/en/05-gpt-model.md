@@ -1,5 +1,5 @@
 ---
-title: 'Assembly: Completing the GPT Model Class'
+title: "LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class"
 series: llm-from-scratch-101
 episode: 5
 language: en
@@ -19,7 +19,7 @@ seo_description: We've built the input stage and attention mechanism, and in the
   post, we established the core transformer block.
 ---
 
-# Assembly: Completing the GPT Model Class
+# LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class
 
 > LLM from Scratch 101 series (5/9)
 
@@ -35,24 +35,26 @@ This is the 5th article in the LLM from Scratch 101 series.
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## Key Questions
+## Questions to Keep in Mind
 
 - In what order does the GPT class call its components?
 - Why does weight tying shrink parameters without hurting quality?
 - Why does cross-entropy loss fit on one line?
-- What do you gain by managing hyperparameters in a config dataclass?
 
-<!-- a-grade-intro:end -->
+## Big Picture
+
+![LLM from Scratch 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
+
+*LLM from Scratch 101 chapter 5 flow overview*
+
+This picture places Assembly: Completing the GPT Model Class inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Assembly: Completing the GPT Model Class is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The Forward Pass at a Glance
 
 The input is a tensor of token IDs with shape `(B, T)`. We add token and position embeddings, then pass them through six blocks sequentially. After a final `ln_f` layer, we project to the vocab dimension via `lm_head` to produce logits of shape `(B, T, vocab_size)`.
 
-![Full GPT forward-pass structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
-
-*Full GPT forward-pass structure*
 All the components we created earlier appear here. The model class acts more as assembly code than a new algorithm.
 
 ## class GPT(nn.Module) — An 80-line Model
@@ -180,18 +182,27 @@ The model core is finished. In the next post, we'll implement the training loop�
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **In what order does the GPT class call its components?**
+  - The article treats Assembly: Completing the GPT Model Class as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does weight tying shrink parameters without hurting quality?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does cross-entropy loss fit on one line?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- [From Integers to Vectors and Positions](./02-embedding.md)
-- [Deciding Which Tokens to Focus On](./03-attention.md)
-- [The Transformer Block: A Unit of Depth](./04-transformer-block.md)
-- **Assembly: Completing the GPT Model Class (current)**
-- Learning via Gradients (upcoming)
-- Sampling — Generating Text from a Trained Model (upcoming)
-- Adapting the Base Model to Specific Tasks (upcoming)
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): From Integers to Vectors and Positions](./02-embedding.md)
+- [LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On](./03-attention.md)
+- [LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth](./04-transformer-block.md)
+- **LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (current)**
+- LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)
+- LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)
+- LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Transformer Block: A Unit of Depth</title>
+<title>LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>The Transformer Block: A Unit of Depth</h1>
+<h1>LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth</h1>
 <blockquote>
 <p>LLM from Scratch 101 series (4/9)</p>
 </blockquote>
@@ -63,17 +63,19 @@
 <p>The mental model for today is simple: <strong>Attention mixes information across tokens, FeedForward transforms it within each token, and Residual connections wrap them both for stability.</strong></p>
 <p>This is the 4th article in the LLM from Scratch 101 series.</p>
 <hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is a 2-layer MLP enough for FeedForward?</li>
 <li>How do residual connections rescue training?</li>
 <li>What's the practical difference between pre-norm and post-norm?</li>
-<li>Where do most of a block's parameters live?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 4 flow overview</em></p>
+<p>This picture places The Transformer Block: A Unit of Depth inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of The Transformer Block: A Unit of Depth is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>FeedForward is Just a 2-layer MLP</h2>
 <p>Stacking only attention layers allows tokens to reference each other extensively, but the representational power doesn't grow as expected. Each position lacks sufficient non-linear transformation. To fix this, we add an MLP with the structure <code>Linear(C, 4C) -&gt; GELU -&gt; Linear(4C, C)</code> to every block.</p>
 <p>Expanding the intermediate dimension by four is a practical choice. This brief expansion allows the token to form richer combinations before projecting back to the original dimension in the final linear layer. Even in small models, the FeedForward network handles a significant portion of the heavy lifting.</p>
@@ -98,8 +100,6 @@ class FeedForward(nn.Module):
 <h2>LayerNorm — Pre-norm vs Post-norm</h2>
 <p>The original Transformer placed LayerNorm after the sub-layers, known as Post-norm. Since GPT-2, Pre-norm—placing it before the sub-layers—has become the standard. It provides much better stability during training as depth increases.</p>
 <p>We will use Pre-norm for this series. We normalize the input first, pass it through Attention and FeedForward, and then add the residual. It might look like a single-line change in code, but the training stability feels quite different.</p>
-<p><img alt="Pre-norm and post-norm LayerNorm placement" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png"></p>
-<p><em>Pre-norm and post-norm LayerNorm placement</em></p>
 <h2>Implementing a Single Block in PyTorch — 25 Lines</h2>
 <p>Now we add the block to <code>model.py</code>. Using the <code>CausalSelfAttention</code> from the previous post, we combine it with the <code>FeedForward</code> and two <code>LayerNorm</code> layers.</p>
 <pre><code class="language-python">import torch
@@ -143,17 +143,26 @@ for block in self.blocks:
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why is a 2-layer MLP enough for FeedForward?</strong></li>
+<li>The article treats The Transformer Block: A Unit of Depth as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do residual connections rescue training?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What's the practical difference between pre-norm and post-norm?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">From Integers to Vectors and Positions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">Deciding Which Tokens to Focus On</a></li>
-<li><strong>The Transformer Block: A Unit of Depth (current)</strong></li>
-<li>Assembly: Completing the GPT Model Class (upcoming)</li>
-<li>Learning via Gradients (upcoming)</li>
-<li>Sampling — Generating Text from a Trained Model (upcoming)</li>
-<li>Adapting the Base Model to Specific Tasks (upcoming)</li>
-<li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">LLM from Scratch 101 (1/9): Turning Text into Numbers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">LLM from Scratch 101 (2/9): From Integers to Vectors and Positions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</a></li>
+<li><strong>LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth (current)</strong></li>
+<li>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (upcoming)</li>
+<li>LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)</li>
+<li>LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)</li>
+<li>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)</li>
+<li>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

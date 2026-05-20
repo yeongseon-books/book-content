@@ -1,5 +1,5 @@
 ---
-title: From Integers to Vectors and Positions
+title: "LLM from Scratch 101 (2/9): From Integers to Vectors and Positions"
 series: llm-from-scratch-101
 episode: 2
 language: en
@@ -19,7 +19,7 @@ seo_description: After finishing the tokenizer, you might feel like you're done.
   have numbers as input, so everything should be fine, right?
 ---
 
-# From Integers to Vectors and Positions
+# LLM from Scratch 101 (2/9): From Integers to Vectors and Positions
 
 > LLM from Scratch 101 series (2/9)
 
@@ -35,16 +35,21 @@ This is the 2nd article in the LLM from Scratch 101 series.
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## Key Questions
+## Questions to Keep in Mind
 
 - What operation does nn.Embedding actually perform?
 - Why isn't token embedding alone enough?
 - How do sinusoidal and learned positional embeddings differ?
-- Why combine token and position into a single vector?
 
-<!-- a-grade-intro:end -->
+## Big Picture
+
+![LLM from Scratch 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.en.png)
+
+*LLM from Scratch 101 chapter 2 flow overview*
+
+This picture places From Integers to Vectors and Positions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of From Integers to Vectors and Positions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## nn.Embedding is Just a Lookup Table
 
@@ -89,9 +94,6 @@ This separation is quite useful in practice. Token meanings are reused across th
 
 The original Transformer paper used sine and cosine functions for positional encoding. Calculating coordinates with functions allows for easier generalization to different sequence lengths. However, many GPT-style models use learned positional embeddings, which is what we'll use in this series. It's concise and easier to visualize in smaller models.
 
-![Differences between sinusoidal and learned positional embeddings](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.en.png)
-
-*Differences between sinusoidal and learned positional embeddings*
 The structure simply carries both "what character" and "which position" information within a single token vector.
 
 ## Token Vector = token_emb + pos_emb
@@ -188,18 +190,27 @@ In the next post, we'll move on to Attention. We'll enable each token to score a
 
 <!-- a-grade-example:end -->
 
+## Answering the Opening Questions
+
+- **What operation does nn.Embedding actually perform?**
+  - The article treats From Integers to Vectors and Positions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why isn't token embedding alone enough?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do sinusoidal and learned positional embeddings differ?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- **From Integers to Vectors and Positions (current)**
-- Deciding Which Tokens to Focus On (upcoming)
-- The Transformer Block: A Unit of Depth (upcoming)
-- Assembly: Completing the GPT Model Class (upcoming)
-- Learning via Gradients (upcoming)
-- Sampling — Generating Text from a Trained Model (upcoming)
-- Adapting the Base Model to Specific Tasks (upcoming)
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- **LLM from Scratch 101 (2/9): From Integers to Vectors and Positions (current)**
+- LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On (upcoming)
+- LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth (upcoming)
+- LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (upcoming)
+- LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)
+- LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)
+- LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T00:09:39+00:00
+Generated: 2026-05-20T10:59:46+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **60**
 - Series at or above 5 issues: **45**
-- Total issues: **570**
+- Total issues: **569**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **38**
+  - Shrt: **37**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -69,12 +69,12 @@ Warnings:
 | 26 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 27 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
 | 28 | `calculus-for-ml-101` | 10 | 4 | 0 | 0 | 6 | 0 |
-| 29 | `llm-from-scratch-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 30 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
-| 31 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 32 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 33 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 34 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 29 | `sql-101` | 9 | 8 | 0 | 0 | 1 | 0 |
+| 30 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 31 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 32 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 33 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 34 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 35 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 36 | `serverless-101` | 8 | 8 | 0 | 0 | 0 | 0 |
 | 37 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
@@ -470,21 +470,6 @@ Warnings:
 - `content/calculus-for-ml-101/en/04-gradient.md:22` — markdown body has 149 lines (< 150)
 - ... 1 more
 
-## llm-from-scratch-101 — Total 9
-
-- BadImg=8 Synt=0 BrkLink=0 Shrt=1 NoEn=0
-
-### BadImg
-- `assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png:1` — PNG height 88px <= 100px (size=984x88)
-- `assets/llm-from-scratch-101/03/03-01-causal-mask.ko.png:1` — PNG height 88px <= 100px (size=984x88)
-- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png:1` — PNG height 95px <= 100px (size=1384x95)
-- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png:1` — PNG height 95px <= 100px (size=1384x95)
-- `assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png:1` — PNG height 67px <= 100px (size=877x67)
-- ... 3 more
-
-### Shrt
-- `content/llm-from-scratch-101/en/04-transformer-block.md:21` — markdown body has 147 lines (< 150)
-
 ## sql-101 — Total 9
 
 - BadImg=8 Synt=0 BrkLink=0 Shrt=1 NoEn=0
@@ -546,6 +531,18 @@ Warnings:
 - `assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=634x67)
 - `assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=634x67)
 - `assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=807x67)
+- ... 3 more
+
+## llm-from-scratch-101 — Total 8
+
+- BadImg=8 Synt=0 BrkLink=0 Shrt=0 NoEn=0
+
+### BadImg
+- `assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png:1` — PNG height 88px <= 100px (size=984x88)
+- `assets/llm-from-scratch-101/03/03-01-causal-mask.ko.png:1` — PNG height 88px <= 100px (size=984x88)
+- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png:1` — PNG height 95px <= 100px (size=1384x95)
+- `assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png:1` — PNG height 95px <= 100px (size=1384x95)
+- `assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png:1` — PNG height 67px <= 100px (size=877x67)
 - ... 3 more
 
 ## rag-benchmark-101 — Total 8

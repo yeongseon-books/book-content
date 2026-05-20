@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Turning Your LLM into a Chatbot — FastAPI + Streaming</title>
+<title>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Turning Your LLM into a Chatbot — FastAPI + Streaming</h1>
+<h1>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming</h1>
 <blockquote>
 <p>LLM from Scratch 101 series (9/9)</p>
 </blockquote>
@@ -62,21 +62,21 @@
 <p>Today's mental model is this: <strong>A chatbot isn't just a model. It's a small system that integrates conversation history, streaming I/O, and a user interface.</strong></p>
 <p>This is the final article in the LLM from Scratch 101 series.</p>
 <hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does a chatbot need beyond the model itself?</li>
 <li>Why design the multi-turn prompt format yourself?</li>
 <li>What do you gain by loading the model once via FastAPI lifespan?</li>
-<li>How does SSE streaming change the UX compared to a plain response?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 9 flow overview</em></p>
+<p>This picture places Turning Your LLM into a Chatbot — FastAPI + Streaming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Turning Your LLM into a Chatbot — FastAPI + Streaming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Chatbot = Model + History + Streaming + UI</h2>
 <p>To build a functional chatbot, we need four components working together: the model itself, a way to track the conversation, a streaming protocol, and a browser-based frontend.</p>
-<p><img alt="Chatbot pipeline across model, history, streaming, UI" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png"></p>
-<p><em>Chatbot pipeline across model, history, streaming, UI</em></p>
 <h2>Designing the Multi-turn Prompt Format</h2>
 <p>For this project, we'll concatenate the conversation history into a plain text block.</p>
 <pre><code class="language-text">User: Hello!
@@ -200,17 +200,26 @@ source.onmessage=e=&gt;out.textContent+=e.data;source.onerror=()=&gt;source.clos
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What does a chatbot need beyond the model itself?</strong></li>
+<li>The article treats Turning Your LLM into a Chatbot — FastAPI + Streaming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why design the multi-turn prompt format yourself?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What do you gain by loading the model once via FastAPI lifespan?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">From Integers to Vectors and Positions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">Deciding Which Tokens to Focus On</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">The Transformer Block: A Unit of Depth</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/05-gpt-model.md">Assembly: Completing the GPT Model Class</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/06-training-loop.md">Learning via Gradients</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/07-inference.md">Sampling — Generating Text from a Trained Model</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/08-finetuning.md">Adapting the Base Model to Specific Tasks</a></li>
-<li><strong>Turning Your LLM into a Chatbot — FastAPI + Streaming (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">LLM from Scratch 101 (1/9): Turning Text into Numbers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">LLM from Scratch 101 (2/9): From Integers to Vectors and Positions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/05-gpt-model.md">LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/06-training-loop.md">LLM from Scratch 101 (6/9): Learning via Gradients</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/07-inference.md">LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/08-finetuning.md">LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks</a></li>
+<li><strong>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (current)</strong></li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Adapting the Base Model to Specific Tasks</title>
+<title>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Adapting the Base Model to Specific Tasks</h1>
+<h1>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks</h1>
 <blockquote>
 <p>LLM from Scratch 101 series (8/9)</p>
 </blockquote>
@@ -62,21 +62,21 @@
 <p>Today's mental model is this: <strong>Fine-tuning isn't about discarding the base model. It's about painting over its output habits using a small, specialized dataset.</strong></p>
 <p>This is the 8th article in the LLM from Scratch 101 series.</p>
 <hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What separates pre-training, fine-tuning, and RLHF?</li>
 <li>What fields make up a single instruction-data row?</li>
 <li>Why does loss masking exclude the instruction portion from training?</li>
-<li>Why does even 50 rows shift output habits?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 8 flow overview</em></p>
+<p>This picture places Adapting the Base Model to Specific Tasks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Adapting the Base Model to Specific Tasks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Pre-training vs Fine-tuning vs RLHF — A Quick Summary</h2>
 <p>Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.</p>
-<p><img alt="Roles of pre-training, SFT, and RLHF" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png"></p>
-<p><em>Roles of pre-training, SFT, and RLHF</em></p>
 <h2>Anatomy of an Instruction Data Row</h2>
 <p>A single line in our <code>instructions.jsonl</code> follows a simple <code>{"instruction": ..., "response": ...}</code> structure. During training, we concatenate these into a <code>Q: {q}\nA: {a}</code> template.</p>
 <h2>Creating a Tiny Dataset — Are 50 Rows Enough?</h2>
@@ -156,17 +156,26 @@ A: My lord, I serve thee with a faithful heart.
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What separates pre-training, fine-tuning, and RLHF?</strong></li>
+<li>The article treats Adapting the Base Model to Specific Tasks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What fields make up a single instruction-data row?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does loss masking exclude the instruction portion from training?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">From Integers to Vectors and Positions</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">Deciding Which Tokens to Focus On</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">The Transformer Block: A Unit of Depth</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/05-gpt-model.md">Assembly: Completing the GPT Model Class</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/06-training-loop.md">Learning via Gradients</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/07-inference.md">Sampling — Generating Text from a Trained Model</a></li>
-<li><strong>Adapting the Base Model to Specific Tasks (current)</strong></li>
-<li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">LLM from Scratch 101 (1/9): Turning Text into Numbers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">LLM from Scratch 101 (2/9): From Integers to Vectors and Positions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/03-attention.md">LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/04-transformer-block.md">LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/05-gpt-model.md">LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/06-training-loop.md">LLM from Scratch 101 (6/9): Learning via Gradients</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/07-inference.md">LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model</a></li>
+<li><strong>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (current)</strong></li>
+<li>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

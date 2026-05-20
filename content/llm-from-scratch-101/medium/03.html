@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deciding Which Tokens to Focus On</title>
+<title>LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,21 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Deciding Which Tokens to Focus On</h1>
+<h1>LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On</h1>
 <p>Once embeddings are in place, every token is finally a vector. That still leaves the main question unanswered: how does one token know which other tokens matter? If the current character is part of a pronoun, a quote, or a repeated pattern, who decides which earlier positions it should consult?</p>
 <p>That is where attention enters. Humans do something similar when reading. We do not assign the same weight to every earlier word. We glance back to find the noun behind a pronoun, or we check the opening of a clause when the verb lands near the end. Transformer attention gives the model a numerical version of that behavior.</p>
 <p>In this post, we will add <code>CausalSelfAttention</code> to <code>model.py</code> and read it as a tensor pipeline rather than as a wall of symbols. For this series, traceability matters more than elegant shortcuts.</p>
 <p>This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do Q, K, and V come from the same input but play different roles?</li>
 <li>Why do attention scores use <code>Q · K^T / sqrt(d)</code>?</li>
 <li>What breaks in autoregressive training if the causal mask is missing?</li>
-<li>What does multi-head attention capture that a single head often misses?</li>
-<li>Can we build the full attention path with only <code>nn.Linear</code>, <code>reshape</code>, and <code>transpose</code>?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 3 flow overview</em></p>
+<p>This picture places Deciding Which Tokens to Focus On inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Attention is not a mechanism for blending all tokens equally. It is a dynamic lookup layer that lets the current token give more weight to the earlier positions it actually needs.</p>
+<p>The core of Deciding Which Tokens to Focus On is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why this matters</h2>
 <p>Attention is the component that makes a Transformer behave like a Transformer. Embeddings turn token IDs into vectors, but attention is what lets those vectors interact. This is the point where the model stops acting like isolated characters and starts behaving like a sequence model.</p>
@@ -86,8 +88,6 @@
 <p>That division is not cosmetic. Without it, softmax can become too sharp too early. A few entries dominate, everything else collapses toward zero, and training becomes harder to stabilize. <code>sqrt(d)</code> is one of those lines that looks small in code and carries real weight in practice.</p>
 <p><strong>The causal mask enforces the no-future rule</strong></p>
 <p>An autoregressive model learns next-token prediction. The current position must not peek at the answer to its right. We enforce that rule by masking the upper triangle of the score matrix and filling those entries with <code>-inf</code>, which softmax converts into zero probability.</p>
-<p><img alt="Causal mask blocking future-token attention" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png"></p>
-<p><em>Causal mask blocking future-token attention.</em></p>
 <p>This is not a minor implementation detail. If the mask is missing, the model can cheat during training by looking ahead, which produces deceptively good loss and disappointing generation.</p>
 <h2>Implementing attention step by step</h2>
 <p><strong>Step 1. Start with a single head and print the weight matrix</strong></p>
@@ -268,17 +268,26 @@ torch.Size([2, 4, 8, 8])
 <p>In this post, we framed attention as a dynamic lookup mechanism across tokens. Q, K, and V are different projections of the same input, and softmax over their scores lets each position retrieve the context it needs.</p>
 <p>We also saw why causal masking and multi-head structure matter so much. The mask preserves the autoregressive rule, while multiple heads let the model score different relationships in parallel. Together, they are what move GPT beyond simple local character prediction.</p>
 <p>In the next post, we will add FeedForward, residual connections, and LayerNorm to turn this attention module into a full Transformer block.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why do Q, K, and V come from the same input but play different roles?</strong></li>
+<li>The article treats Deciding Which Tokens to Focus On as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why do attention scores use <code>Q · K^T / sqrt(d)</code>?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What breaks in autoregressive training if the causal mask is missing?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">From Integers to Vectors and Positions</a></li>
-<li><strong>Deciding Which Tokens to Focus On (current)</strong></li>
-<li>The Transformer Block: A Unit of Depth (upcoming)</li>
-<li>Assembly: Completing the GPT Model Class (upcoming)</li>
-<li>Learning via Gradients (upcoming)</li>
-<li>Sampling — Generating Text from a Trained Model (upcoming)</li>
-<li>Adapting the Base Model to Specific Tasks (upcoming)</li>
-<li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">LLM from Scratch 101 (1/9): Turning Text into Numbers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/02-embedding.md">LLM from Scratch 101 (2/9): From Integers to Vectors and Positions</a></li>
+<li><strong>LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On (current)</strong></li>
+<li>LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth (upcoming)</li>
+<li>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (upcoming)</li>
+<li>LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)</li>
+<li>LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)</li>
+<li>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)</li>
+<li>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official Docs</strong></p>

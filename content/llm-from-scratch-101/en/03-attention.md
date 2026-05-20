@@ -1,5 +1,5 @@
 ---
-title: Deciding Which Tokens to Focus On
+title: "LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On"
 series: llm-from-scratch-101
 episode: 3
 language: en
@@ -18,7 +18,7 @@ last_reviewed: '2026-05-14'
 seo_description: Humans do not read every word with the same intensity. Attention gives a model a way to score which earlier tokens deserve focus.
 ---
 
-# Deciding Which Tokens to Focus On
+# LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On
 
 Once embeddings are in place, every token is finally a vector. That still leaves the main question unanswered: how does one token know which other tokens matter? If the current character is part of a pronoun, a quote, or a repeated pattern, who decides which earlier positions it should consult?
 
@@ -28,15 +28,21 @@ In this post, we will add `CausalSelfAttention` to `model.py` and read it as a t
 
 This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do Q, K, and V come from the same input but play different roles?
 - Why do attention scores use `Q · K^T / sqrt(d)`?
 - What breaks in autoregressive training if the causal mask is missing?
-- What does multi-head attention capture that a single head often misses?
-- Can we build the full attention path with only `nn.Linear`, `reshape`, and `transpose`?
 
-> Attention is not a mechanism for blending all tokens equally. It is a dynamic lookup layer that lets the current token give more weight to the earlier positions it actually needs.
+## Big Picture
+
+![LLM from Scratch 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
+
+*LLM from Scratch 101 chapter 3 flow overview*
+
+This picture places Deciding Which Tokens to Focus On inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deciding Which Tokens to Focus On is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -71,10 +77,6 @@ That division is not cosmetic. Without it, softmax can become too sharp too earl
 ### The causal mask enforces the no-future rule
 
 An autoregressive model learns next-token prediction. The current position must not peek at the answer to its right. We enforce that rule by masking the upper triangle of the score matrix and filling those entries with `-inf`, which softmax converts into zero probability.
-
-![Causal mask blocking future-token attention](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
-
-*Causal mask blocking future-token attention.*
 
 This is not a minor implementation detail. If the mask is missing, the model can cheat during training by looking ahead, which produces deceptively good loss and disappointing generation.
 
@@ -290,18 +292,27 @@ We also saw why causal masking and multi-head structure matter so much. The mask
 
 In the next post, we will add FeedForward, residual connections, and LayerNorm to turn this attention module into a full Transformer block.
 
+## Answering the Opening Questions
+
+- **Why do Q, K, and V come from the same input but play different roles?**
+  - The article treats Deciding Which Tokens to Focus On as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do attention scores use `Q · K^T / sqrt(d)`?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What breaks in autoregressive training if the causal mask is missing?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Turning Text into Numbers](./01-tokenizer.md)
-- [From Integers to Vectors and Positions](./02-embedding.md)
-- **Deciding Which Tokens to Focus On (current)**
-- The Transformer Block: A Unit of Depth (upcoming)
-- Assembly: Completing the GPT Model Class (upcoming)
-- Learning via Gradients (upcoming)
-- Sampling — Generating Text from a Trained Model (upcoming)
-- Adapting the Base Model to Specific Tasks (upcoming)
-- Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
+- [LLM from Scratch 101 (1/9): Turning Text into Numbers](./01-tokenizer.md)
+- [LLM from Scratch 101 (2/9): From Integers to Vectors and Positions](./02-embedding.md)
+- **LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On (current)**
+- LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth (upcoming)
+- LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (upcoming)
+- LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)
+- LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)
+- LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)
+- LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)
 
 <!-- toc:end -->
 

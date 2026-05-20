@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Turning Text into Numbers</title>
+<title>LLM from Scratch 101 (1/9): Turning Text into Numbers</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Turning Text into Numbers</h1>
+<h1>LLM from Scratch 101 (1/9): Turning Text into Numbers</h1>
 <blockquote>
 <p>LLM from Scratch 101 series (1/9)</p>
 </blockquote>
@@ -63,17 +63,19 @@
 <p>Today's mental model is simple: <strong>The model doesn't read text. It reads integer sequences created by the tokenizer.</strong></p>
 <p>This is the first article in the LLM from Scratch 101 series.</p>
 <hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do models take integers instead of raw text?</li>
 <li>What are the trade-offs between character, word, and subword tokenization?</li>
 <li>How does BPE actually build a vocabulary step by step?</li>
-<li>Why did this series pick character-level tokenization?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
+<h2>Big Picture</h2>
+<p><img alt="LLM from Scratch 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-word-level-vs-subword-the-trade-off.en.png"></p>
+<p><em>LLM from Scratch 101 chapter 1 flow overview</em></p>
+<p>This picture places Turning Text into Numbers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Turning Text into Numbers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Why Can't We Just Input Text?</h2>
 <p>Neural networks process tensors. You can't perform addition or matrix multiplication on a string. To process a line like "To be, or not to be," we first have to convert it into numbers. These numbers are called Token IDs.</p>
 <p>There's one crucial point to keep in mind: Token IDs don't carry inherent meaning. They're just indices. There's no guarantee that token 5 is semantically close to token 6, and they aren't alphabetically ordered in a meaningful way. We just map them to integers for now, and later, during the embedding stage, we'll assign vector meanings to those integers.</p>
@@ -100,9 +102,7 @@ print(decode(ids))
 <p>Running this code gives you an immediate sense of how text moves back and forth between characters and numbers. One caveat is that a char-level tokenizer can only encode characters already present in its vocabulary, so unsupported input is dropped with a warning.</p>
 <h2>Word-Level vs. Subword: The Trade-off</h2>
 <p>Character-level tokenization isn't always the answer. Word-level tokenization results in shorter sequences but causes the vocabulary size to explode and struggles with out-of-vocabulary (OOV) words. Subword tokenization aims for the middle ground.</p>
-<p><img alt="Trade-off between word and subword tokens" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-word-level-vs-subword-the-trade-off.en.png"></p>
-<p><em>Trade-off between word and subword tokens</em><br>
-This is why most production models use BPE (Byte Pair Encoding) variants. It provides a good balance between vocabulary size and representational power.</p>
+<p>This is why most production models use BPE (Byte Pair Encoding) variants. It provides a good balance between vocabulary size and representational power.</p>
 <h2>Doing BPE by Hand — No Magic Involved</h2>
 <p>BPE might sound intimidating, but the idea is actually quite humble. You repeatedly merge the most frequent pairs of characters or character sequences. If you have words like <code>low</code>, <code>lower</code>, and <code>lowest</code>, you might merge <code>l + o</code>, then <code>lo + w</code>, gradually building longer pieces. Frequent patterns are essentially "promoted" to the vocabulary.</p>
 <p>GPT-2 used a subword vocabulary of 50,257 tokens. It's not a black box; it's just a dictionary of text fragments optimized using statistics.</p>
@@ -182,17 +182,26 @@ print(decode(train_ids[:80].tolist()))
 </ul>
 <!-- a-grade-example:end -->
 
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Why do models take integers instead of raw text?</strong></li>
+<li>The article treats Turning Text into Numbers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What are the trade-offs between character, word, and subword tokenization?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does BPE actually build a vocabulary step by step?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>Turning Text into Numbers (current)</strong></li>
-<li>From Integers to Vectors and Positions (upcoming)</li>
-<li>Deciding Which Tokens to Focus On (upcoming)</li>
-<li>The Transformer Block: A Unit of Depth (upcoming)</li>
-<li>Assembly: Completing the GPT Model Class (upcoming)</li>
-<li>Learning via Gradients (upcoming)</li>
-<li>Sampling — Generating Text from a Trained Model (upcoming)</li>
-<li>Adapting the Base Model to Specific Tasks (upcoming)</li>
-<li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
+<li><strong>LLM from Scratch 101 (1/9): Turning Text into Numbers (current)</strong></li>
+<li>LLM from Scratch 101 (2/9): From Integers to Vectors and Positions (upcoming)</li>
+<li>LLM from Scratch 101 (3/9): Deciding Which Tokens to Focus On (upcoming)</li>
+<li>LLM from Scratch 101 (4/9): The Transformer Block: A Unit of Depth (upcoming)</li>
+<li>LLM from Scratch 101 (5/9): Assembly: Completing the GPT Model Class (upcoming)</li>
+<li>LLM from Scratch 101 (6/9): Learning via Gradients (upcoming)</li>
+<li>LLM from Scratch 101 (7/9): Sampling — Generating Text from a Trained Model (upcoming)</li>
+<li>LLM from Scratch 101 (8/9): Adapting the Base Model to Specific Tasks (upcoming)</li>
+<li>LLM from Scratch 101 (9/9): Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
