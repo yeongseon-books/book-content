@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 8
-title: Load Balancer
+title: "Computer Networks 101 (8/10): Load Balancer"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How a load balancer distributes traffic and isolates failures, 
 last_reviewed: '2026-05-15'
 ---
 
-# Load Balancer
+# Computer Networks 101 (8/10): Load Balancer
 
 > Computer Networks 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: With 100 servers behind one domain, how does the client always reach a "live and good enough" server?
 
 > A load balancer hides many backends behind one virtual IP, distributes traffic, and removes dead servers. An L4 LB balances based on IP and port. An L7 LB understands HTTP and routes by path or header. Both are the front door of modern services and the first line of reliability.
 
-<!-- a-grade-intro:end -->
-
 This is post 8 in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Load Balancer?
+- Which signal should the example or diagram make visible for Load Balancer?
+- What failure should be prevented first when Load Balancer reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 8 flow overview*
+
+This picture places Load Balancer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Load Balancer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,9 +61,6 @@ A load balancer is more than a distributor — it is the device that decides rel
 > A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.
 
 ## Concept at a Glance
-
-![How a load balancer keeps traffic on healthy backends](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
-*The load balancer is less a traffic splitter than a control point that keeps only healthy, ready backends in the active pool.*
 
 An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.
 
@@ -240,17 +249,29 @@ A load balancer does the simple job of "hide many servers behind one address and
 
 Next we move from request/response to bidirectional streams — WebSocket and real-time communication.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Load Balancer?**
+  - The article treats Load Balancer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Load Balancer?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Load Balancer reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS Basics](./06-tls-basics.md)
-- [Routing and NAT](./07-routing-and-nat.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): Routing and NAT](./07-routing-and-nat.md)
 - **Load Balancer (current)**
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

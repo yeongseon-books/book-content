@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TCP and UDP</title>
+<title>Computer Networks 101 (3/10): TCP and UDP</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>TCP and UDP</h1>
+<h1>Computer Networks 101 (3/10): TCP and UDP</h1>
 <blockquote>
 <p>Computer Networks 101 series (3/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Are TCP and UDP just a contrast of "reliable vs fast", or are they two designs that show two different ways to split responsibility?</p>
 <blockquote>
 <p>Both are transport-layer protocols on top of IP. TCP handles connection, order, retransmission, and flow and congestion control. UDP pushes all of that onto the application and just throws packets. There is no winner — there is only the right choice for a workload.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 3 in the Computer Networks 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying TCP and UDP?</li>
+<li>Which signal should the example or diagram make visible for TCP and UDP?</li>
+<li>What failure should be prevented first when TCP and UDP reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer networks 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>computer networks 101 chapter 3 flow overview</em></p>
+<p>This picture places TCP and UDP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of TCP and UDP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The four responsibilities of TCP (connection, order, retransmission, congestion control)</li>
@@ -82,8 +91,6 @@
 <blockquote>
 <p>TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.</p>
 </blockquote>
-<p><img alt="TCP and UDP split responsibility in different ways" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png"><br>
-<em>TCP puts reliability in the operating system, while UDP leaves it to the application so you can pay only for what the workload needs.</em></p>
 <h2>Key Terms</h2>
 <p><strong>3-way handshake</strong><br>
 - Meaning: TCP connection setup with SYN, SYN-ACK, ACK</p>
@@ -234,17 +241,27 @@ def send_reliable(sock, data, addr, retries=3, timeout=0.5):
 <h2>Wrap-up and Next Steps</h2>
 <p>TCP and UDP ride on the same IP but show two different ways to split responsibility. TCP puts reliability in the operating system; UDP puts it in the application. The point is to choose by workload.</p>
 <p>Next we look at how the human-readable domain name turns into an IP address — DNS.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
+<li><strong>What boundary should you inspect first when applying TCP and UDP?</strong></li>
+<li>The article treats TCP and UDP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for TCP and UDP?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when TCP and UDP reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">Computer Networks 101 (1/10): What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">Computer Networks 101 (2/10): IP and Subnet</a></li>
 <li><strong>TCP and UDP (current)</strong></li>
 <li>DNS (upcoming)</li>
 <li>HTTP and HTTPS (upcoming)</li>
-<li>TLS basics (upcoming)</li>
+<li>TLS Basics (upcoming)</li>
 <li>Routing and NAT (upcoming)</li>
 <li>Load Balancer (upcoming)</li>
-<li>WebSocket and real-time (upcoming)</li>
-<li>Debugging network problems (upcoming)</li>
+<li>WebSocket and Real-Time Communication (upcoming)</li>
+<li>Debugging Network Problems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

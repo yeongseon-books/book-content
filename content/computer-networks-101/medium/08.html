@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Load Balancer</title>
+<title>Computer Networks 101 (8/10): Load Balancer</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Load Balancer</h1>
+<h1>Computer Networks 101 (8/10): Load Balancer</h1>
 <blockquote>
 <p>Computer Networks 101 series (8/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: With 100 servers behind one domain, how does the client always reach a "live and good enough" server?</p>
 <blockquote>
 <p>A load balancer hides many backends behind one virtual IP, distributes traffic, and removes dead servers. An L4 LB balances based on IP and port. An L7 LB understands HTTP and routes by path or header. Both are the front door of modern services and the first line of reliability.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 8 in the Computer Networks 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Load Balancer?</li>
+<li>Which signal should the example or diagram make visible for Load Balancer?</li>
+<li>What failure should be prevented first when Load Balancer reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer networks 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>computer networks 101 chapter 8 flow overview</em></p>
+<p>This picture places Load Balancer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Load Balancer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between an L4 LB and an L7 LB</li>
@@ -79,8 +88,6 @@
 <p>A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="How a load balancer keeps traffic on healthy backends" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png"><br>
-<em>The load balancer is less a traffic splitter than a control point that keeps only healthy, ready backends in the active pool.</em></p>
 <p>An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.</p>
 <h2>Key Terms</h2>
 <p><strong>Virtual IP (VIP)</strong><br>
@@ -236,17 +243,27 @@ for i in 1 2 3 4; do curl -s localhost:8080/; done
 <h2>Wrap-up and Next Steps</h2>
 <p>A load balancer does the simple job of "hide many servers behind one address and pick a live one" in many variations. Health checks, deployment strategy, sticky-session cost, and TLS termination location — these four levers move reliability the most.</p>
 <p>Next we move from request/response to bidirectional streams — WebSocket and real-time communication.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">HTTP and HTTPS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">TLS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Routing and NAT</a></li>
+<li><strong>What boundary should you inspect first when applying Load Balancer?</strong></li>
+<li>The article treats Load Balancer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Load Balancer?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Load Balancer reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">Computer Networks 101 (1/10): What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">Computer Networks 101 (2/10): IP and Subnet</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">Computer Networks 101 (3/10): TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">Computer Networks 101 (4/10): DNS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">Computer Networks 101 (5/10): HTTP and HTTPS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">Computer Networks 101 (6/10): TLS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Computer Networks 101 (7/10): Routing and NAT</a></li>
 <li><strong>Load Balancer (current)</strong></li>
-<li>WebSocket and real-time (upcoming)</li>
-<li>Debugging network problems (upcoming)</li>
+<li>WebSocket and Real-Time Communication (upcoming)</li>
+<li>Debugging Network Problems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

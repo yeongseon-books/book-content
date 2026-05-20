@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 10
-title: Debugging Network Problems
+title: "Computer Networks 101 (10/10): Debugging Network Problems"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How to narrow a network problem layer by layer with ping, dig, 
 last_reviewed: '2026-05-15'
 ---
 
-# Debugging Network Problems
+# Computer Networks 101 (10/10): Debugging Network Problems
 
 > Computer Networks 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When the report is "the site is broken," what do you check first, and in what order, to find the cause as quickly as possible?
 
 > Network debugging is not guesswork. It is **walking down the layers and killing hypotheses one at a time**. Link → routing → DNS → TCP → TLS → HTTP. Five short commands usually decide which layer owns the problem within a minute. A good tool is one that quickly invalidates a wrong hypothesis, not one that gives you more output to stare at.
 
-<!-- a-grade-intro:end -->
-
 This is the final post in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Debugging Network Problems?
+- Which signal should the example or diagram make visible for Debugging Network Problems?
+- What failure should be prevented first when Debugging Network Problems reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 10 flow overview*
+
+This picture places Debugging Network Problems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Debugging Network Problems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,9 +61,6 @@ Under pressure, the first instinct is "what did we just change?" That is necessa
 > Debugging is less about finding what is broken and more about **confirming, one layer at a time, what is fine**.
 
 ## Concept at a Glance
-
-![Layer-by-layer order for narrowing a network incident](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
-*Start with the simplest tools, mark healthy layers off quickly, and leave packet capture for the few hypotheses that survive.*
 
 Each step you confirm as healthy cuts the hypothesis space roughly in half.
 
@@ -228,17 +237,29 @@ Network debugging is, in the end, **walking the layers and killing hypotheses**.
 
 That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS, HTTP, TLS, routing, load balancers, WebSocket, and now debugging — you have walked one full loop of what happens when you load a web page. The next time a pager fires at 3 a.m., I hope the first five commands come out without thinking.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Debugging Network Problems?**
+  - The article treats Debugging Network Problems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Debugging Network Problems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Debugging Network Problems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is a network?](./01-what-is-a-network.md)
-- [IP and subnets](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS basics](./06-tls-basics.md)
-- [Routing and NAT](./07-routing-and-nat.md)
-- [Load Balancer](./08-load-balancer.md)
-- [WebSocket and Real-Time Communication](./09-websocket-and-realtime.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): Routing and NAT](./07-routing-and-nat.md)
+- [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
+- [Computer Networks 101 (9/10): WebSocket and Real-Time Communication](./09-websocket-and-realtime.md)
 - **Debugging Network Problems (current)**
+
 <!-- toc:end -->
 
 ## References

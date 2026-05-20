@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 2
-title: IP and Subnet
+title: "Computer Networks 101 (2/10): IP and Subnet"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: IP addresses and subnets explained — how CIDR splits an addre
 last_reviewed: '2026-05-15'
 ---
 
-# IP and Subnet
+# Computer Networks 101 (2/10): IP and Subnet
 
 > Computer Networks 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Is an "IP address" just a number stuck on one computer, or is it a coordinate that also tells you which neighborhood the computer lives in?
 
 > An IP address has to be read as two parts — which network, and which host inside that network. The subnet mask defines that split, and CIDR is the short way to write it. Routing, NAT, firewall rules, and container networks all run on top of this split.
 
-<!-- a-grade-intro:end -->
-
 This is post 2 in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying IP and Subnet?
+- Which signal should the example or diagram make visible for IP and Subnet?
+- What failure should be prevented first when IP and Subnet reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 2 flow overview*
+
+This picture places IP and Subnet inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of IP and Subnet is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -51,9 +63,6 @@ If you memorize an IP address as "the number for one machine", routing, NAT, and
 ## Concept at a Glance
 
 > An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (`/24`, `/16`, etc.) writes the length of that ruler in bits.
-
-![How CIDR splits an address into network and host parts](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)
-*The prefix defines where the network part ends and where the host part begins, which is exactly what routers use to pick the next hop.*
 
 ## Key Terms
 
@@ -200,17 +209,29 @@ An IP address is not the coordinate of one computer. It is "the Nth host of whic
 
 Next we compare the two transport protocols that ride on top of IP — TCP and UDP.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying IP and Subnet?**
+  - The article treats IP and Subnet as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for IP and Subnet?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when IP and Subnet reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
 - **IP and Subnet (current)**
 - TCP and UDP (upcoming)
 - DNS (upcoming)
 - HTTP and HTTPS (upcoming)
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

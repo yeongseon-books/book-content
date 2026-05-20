@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is a Network?</title>
+<title>Computer Networks 101 (1/10): What Is a Network?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>What Is a Network?</h1>
+<h1>Computer Networks 101 (1/10): What Is a Network?</h1>
 <blockquote>
 <p>Computer Networks 101 series (1/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: When you hear the word "network", what picture should be in your head so that IP, TCP, DNS, and HTTP all sit on the same canvas later?</p>
 <blockquote>
 <p>A network is not cables. It is a bundle of agreements. Two computers exchange data only because they have agreed who speaks first, how to cut the data into pieces, and how to put it back together. Those agreements are protocols, and the way they stack on top of each other is the layered model. Before we start the series, draw that picture in your head.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is the first post in the Computer Networks 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is a Network??</li>
+<li>Which signal should the example or diagram make visible for What Is a Network??</li>
+<li>What failure should be prevented first when What Is a Network? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer networks 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>computer networks 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is a Network? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is a Network? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between a network and the Internet</li>
@@ -82,8 +91,6 @@
 <blockquote>
 <p>Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.</p>
 </blockquote>
-<p><img alt="Layered model and packet travel across a network" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png"><br>
-<em>Packets are encapsulated layer by layer, traverse intermediate devices, and are reassembled at the destination.</em></p>
 <h2>Key Terms</h2>
 <p><strong>Packet</strong><br>
 - Meaning: The basic unit of data flowing across a network</p>
@@ -204,17 +211,27 @@ loopback driver                      ← link + physical layer
 <h2>Wrap-up and Next Steps</h2>
 <p>A network is not cables but a bundle of agreements. Three words — packet, protocol, layered model — become the bookshelf for the entire series. Whenever a new word appears, the habit of asking "which shelf does this go on?" decides how fast you learn.</p>
 <p>Next we move to the most basic addressing system on the Internet — IP and subnet.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is a Network??</strong></li>
+<li>The article treats What Is a Network? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is a Network??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is a Network? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is a Network? (current)</strong></li>
-<li>IP and subnet (upcoming)</li>
+<li>IP and Subnet (upcoming)</li>
 <li>TCP and UDP (upcoming)</li>
 <li>DNS (upcoming)</li>
 <li>HTTP and HTTPS (upcoming)</li>
-<li>TLS basics (upcoming)</li>
+<li>TLS Basics (upcoming)</li>
 <li>Routing and NAT (upcoming)</li>
 <li>Load Balancer (upcoming)</li>
-<li>WebSocket and real-time (upcoming)</li>
-<li>Debugging network problems (upcoming)</li>
+<li>WebSocket and Real-Time Communication (upcoming)</li>
+<li>Debugging Network Problems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

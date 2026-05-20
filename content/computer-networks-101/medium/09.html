@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>WebSocket and Real-Time Communication</title>
+<title>Computer Networks 101 (9/10): WebSocket and Real-Time Communication</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>WebSocket and Real-Time Communication</h1>
+<h1>Computer Networks 101 (9/10): WebSocket and Real-Time Communication</h1>
 <blockquote>
 <p>Computer Networks 101 series (9/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: In an HTTP world where the server cannot speak first, how do chat messages and stock prices arrive in "real time"?</p>
 <blockquote>
 <p>WebSocket starts as an HTTP request and then turns the same TCP connection into a bidirectional frame stream. The server can push at any time, and you no longer pay the header cost on every message. The trade-off is that long-lived connections create new pressure on load balancers, deploys, and resource accounting.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 9 in the Computer Networks 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying WebSocket and Real-Time Communication?</li>
+<li>Which signal should the example or diagram make visible for WebSocket and Real-Time Communication?</li>
+<li>What failure should be prevented first when WebSocket and Real-Time Communication reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer networks 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>computer networks 101 chapter 9 flow overview</em></p>
+<p>This picture places WebSocket and Real-Time Communication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of WebSocket and Real-Time Communication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How a WebSocket connection is upgraded from HTTP</li>
@@ -79,8 +88,6 @@
 <p>"Real time" usually means "shorter than a human's patience." If 200 ms is fine, WebSocket only adds cost.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="From HTTP Upgrade to a long-lived WebSocket stream" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png"><br>
-<em>After the HTTP upgrade succeeds, the same TCP connection becomes a long-lived bidirectional frame channel.</em></p>
 <p>The pivot is <strong>101 Switching Protocols</strong>. The connection starts as HTTP and, after the response, behaves as a stream of WebSocket frames instead.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -232,17 +239,27 @@ asyncio.run(main())
 <h2>Wrap-up and Next Steps</h2>
 <p>WebSocket is a connection that "starts as HTTP and then stops being HTTP." You buy bidirectional, low-overhead messaging at the cost of operating long-lived connections. The most common traps are using it where you do not need it and keeping shared state in one instance's memory.</p>
 <p>In the final episode we close the series by looking at what to do when the network does not behave — where to look, in what order, and which tools to trust.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What is a network?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and subnets</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">HTTP and HTTPS</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">TLS basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Routing and NAT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/08-load-balancer.md">Load Balancer</a></li>
+<li><strong>What boundary should you inspect first when applying WebSocket and Real-Time Communication?</strong></li>
+<li>The article treats WebSocket and Real-Time Communication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for WebSocket and Real-Time Communication?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when WebSocket and Real-Time Communication reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">Computer Networks 101 (1/10): What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">Computer Networks 101 (2/10): IP and Subnet</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">Computer Networks 101 (3/10): TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">Computer Networks 101 (4/10): DNS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">Computer Networks 101 (5/10): HTTP and HTTPS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/06-tls-basics.md">Computer Networks 101 (6/10): TLS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/07-routing-and-nat.md">Computer Networks 101 (7/10): Routing and NAT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/08-load-balancer.md">Computer Networks 101 (8/10): Load Balancer</a></li>
 <li><strong>WebSocket and Real-Time Communication (current)</strong></li>
-<li>Debugging network problems (upcoming)</li>
+<li>Debugging Network Problems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

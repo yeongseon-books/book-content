@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 5
-title: HTTP and HTTPS
+title: "Computer Networks 101 (5/10): HTTP and HTTPS"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: HTTP request and response anatomy, methods and status codes, im
 last_reviewed: '2026-05-15'
 ---
 
-# HTTP and HTTPS
+# Computer Networks 101 (5/10): HTTP and HTTPS
 
 > Computer Networks 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: What shape of message is HTTP, and what exactly does the "S" add when it appears?
 
 > HTTP is a simple text-based request and response protocol. Method, path, headers, body — those four parts are enough to read every REST API and every website. HTTPS slips TLS underneath to stop eavesdropping, tampering, and impersonation. We cover TLS in detail in episode 6; today we just see its shadow.
 
-<!-- a-grade-intro:end -->
-
 This is post 5 in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying HTTP and HTTPS?
+- Which signal should the example or diagram make visible for HTTP and HTTPS?
+- What failure should be prevented first when HTTP and HTTPS reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 5 flow overview*
+
+This picture places HTTP and HTTPS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of HTTP and HTTPS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -50,9 +62,6 @@ HTTP is the common language of essentially every service — backend, frontend, 
 > HTTP is "the agreed shape of a text message", and REST is a style that organizes those agreements around resources.
 
 ## Concept at a Glance
-
-![HTTP request and the TLS layer that turns it into HTTPS](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
-*HTTP defines the message shape, while HTTPS adds TLS so the same message travels with confidentiality, integrity, and identity checks.*
 
 Both requests and responses are "start line + headers + blank line + body".
 
@@ -208,17 +217,29 @@ HTTP is an agreement about message shape, and REST is a style that organizes tha
 
 Next we open up the "S" — TLS basics.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying HTTP and HTTPS?**
+  - The article treats HTTP and HTTPS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for HTTP and HTTPS?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when HTTP and HTTPS reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
 - **HTTP and HTTPS (current)**
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

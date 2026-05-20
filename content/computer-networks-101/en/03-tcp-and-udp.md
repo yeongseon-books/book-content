@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 3
-title: TCP and UDP
+title: "Computer Networks 101 (3/10): TCP and UDP"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: TCP and UDP compared along four axes — reliability, order, co
 last_reviewed: '2026-05-15'
 ---
 
-# TCP and UDP
+# Computer Networks 101 (3/10): TCP and UDP
 
 > Computer Networks 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: Are TCP and UDP just a contrast of "reliable vs fast", or are they two designs that show two different ways to split responsibility?
 
 > Both are transport-layer protocols on top of IP. TCP handles connection, order, retransmission, and flow and congestion control. UDP pushes all of that onto the application and just throws packets. There is no winner — there is only the right choice for a workload.
 
-<!-- a-grade-intro:end -->
-
 This is post 3 in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying TCP and UDP?
+- Which signal should the example or diagram make visible for TCP and UDP?
+- What failure should be prevented first when TCP and UDP reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 3 flow overview*
+
+This picture places TCP and UDP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of TCP and UDP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -51,9 +63,6 @@ The transport-protocol choice directly affects system performance and user exper
 ## Concept at a Glance
 
 > TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.
-
-![TCP and UDP split responsibility in different ways](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
-*TCP puts reliability in the operating system, while UDP leaves it to the application so you can pay only for what the workload needs.*
 
 ## Key Terms
 
@@ -233,17 +242,29 @@ TCP and UDP ride on the same IP but show two different ways to split responsibil
 
 Next we look at how the human-readable domain name turns into an IP address — DNS.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying TCP and UDP?**
+  - The article treats TCP and UDP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for TCP and UDP?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when TCP and UDP reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
 - **TCP and UDP (current)**
 - DNS (upcoming)
 - HTTP and HTTPS (upcoming)
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 10
-title: 네트워크 문제 디버깅
+title: "Computer Networks 101 (10/10): 네트워크 문제 디버깅"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 계층별 진단 도구를 활용하여 네트워크 장애 원
 last_reviewed: '2026-05-15'
 ---
 
-# 네트워크 문제 디버깅
+# Computer Networks 101 (10/10): 네트워크 문제 디버깅
 
 이 글은 Computer Networks 101 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 네트워크 문제를 계층별로 어떻게 좁혀 가야 할까요?
 - `ping`, `dig`, `curl`, `ss`, `tcpdump`는 각각 무엇을 말해 줄까요?
 - timeout, reset, DNS 실패는 어떤 모양으로 구분할 수 있을까요?
-- 시리즈 전체에서 배운 내용은 장애 상황에서 어떻게 합쳐질까요?
 
-> 네트워크 디버깅은 감으로 찍는 작업이 아닙니다. 링크 → 라우팅 → DNS → TCP → TLS → HTTP 순서로 내려가며 가설을 하나씩 지우는 과정입니다. 짧은 명령 다섯 줄만으로도 1분 안에 어느 층이 문제인지 대개 판별할 수 있습니다.
+## 큰 그림
+
+![Computer Networks 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Computer Networks 101 10장 흐름 개요*
+
+이 그림에서는 네트워크 문제 디버깅를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 네트워크 문제 디버깅의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -41,9 +48,6 @@ last_reviewed: '2026-05-15'
 > 디버깅의 핵심은 고장 난 곳을 바로 찾는 것이 아니라, 멀쩡한 층을 하나씩 확정해 가는 일입니다.
 
 ## 핵심 그림
-
-![네트워크 장애를 계층별로 줄여 가는 진단 순서](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
-*간단한 도구부터 순서대로 써서 정상인 층을 빠르게 지우면, 마지막에 남는 층이 실제 장애 후보가 됩니다.*
 
 한 단계씩 정상으로 판정할 때마다 가능한 원인 후보가 크게 줄어듭니다.
 
@@ -164,7 +168,6 @@ curl -v https://api.example.com/health
 
 이 표의 목적은 정답을 외우는 데 있지 않습니다. **실패 메시지가 어느 층 언어로 쓰였는지 먼저 읽는 습관**을 만드는 데 있습니다. 그러면 `tcpdump`를 켜기 전에 이미 절반은 줄어듭니다.
 
-
 ## 이 코드에서 먼저 볼 점
 
 - 각 도구는 서로 다른 가설을 제거합니다. `ping`은 링크, `dig`는 이름, `nc`는 포트, `openssl`은 인증서, `curl`은 애플리케이션 동작을 확인합니다.
@@ -221,17 +224,29 @@ sudo tcpdump -i eth0 -n -s 0 'host api.example.com and tcp port 443' -w cap.pcap
 
 이로써 Computer Networks 101 시리즈를 마칩니다. 네트워크의 개념에서 시작해 IP, TCP, DNS, HTTP, TLS, 라우팅, 로드밸런서, WebSocket, 그리고 디버깅까지 한 바퀴를 돌았습니다. 다음에 새벽 호출이 오더라도, 첫 다섯 줄은 머뭇거리지 않고 떠올릴 수 있기를 바랍니다.
 
+## 처음 질문으로 돌아가기
+
+- **네트워크 문제를 계층별로 어떻게 좁혀 가야 할까요?**
+  - 본문의 기준은 네트워크 문제 디버깅를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **`ping`, `dig`, `curl`, `ss`, `tcpdump`는 각각 무엇을 말해 줄까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **timeout, reset, DNS 실패는 어떤 모양으로 구분할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [네트워크란 무엇인가?](./01-what-is-a-network.md)
-- [IP와 subnet](./02-ip-and-subnet.md)
-- [TCP와 UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP와 HTTPS](./05-http-and-https.md)
-- [TLS 기초](./06-tls-basics.md)
-- [라우팅과 NAT](./07-routing-and-nat.md)
-- [Load Balancer](./08-load-balancer.md)
-- [WebSocket과 실시간 통신](./09-websocket-and-realtime.md)
+## 시리즈 목차
+
+- [Computer Networks 101 (1/10): 네트워크란 무엇인가?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP와 subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP와 UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP와 HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): 라우팅과 NAT](./07-routing-and-nat.md)
+- [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
+- [Computer Networks 101 (9/10): WebSocket과 실시간 통신](./09-websocket-and-realtime.md)
 - **네트워크 문제 디버깅 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

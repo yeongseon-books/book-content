@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 7
-title: Routing and NAT
+title: "Computer Networks 101 (7/10): Routing and NAT"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: How packets cross the Internet through routers, and how NAT let
 last_reviewed: '2026-05-15'
 ---
 
-# Routing and NAT
+# Computer Networks 101 (7/10): Routing and NAT
 
 > Computer Networks 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: How does my laptop, sitting on a private IP, talk to a server out on the public Internet?
 
 > A router decides only the "next hop" for each packet. The routing table is the rule book for that decision. To reach the public Internet from a private IP, NAT rewrites the source IP and port into the router's public address. Half of the Internet is routing; the other half is NAT.
 
-<!-- a-grade-intro:end -->
-
 This is post 7 in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Routing and NAT?
+- Which signal should the example or diagram make visible for Routing and NAT?
+- What failure should be prevented first when Routing and NAT reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 7 flow overview*
+
+This picture places Routing and NAT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Routing and NAT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -49,9 +61,6 @@ Without routing, you cannot answer "why does it only fail on our corporate netwo
 > A router sees only one hop at a time. The Internet is the sum of those small decisions.
 
 ## Concept at a Glance
-
-![How routing and NAT move a private-IP packet onto the Internet](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
-*Routing chooses the next hop, while NAT rewrites private source addresses and ports so replies can find their way back to the original host.*
 
 ## Key Terms
 
@@ -203,17 +212,29 @@ Routers decide one hop at a time; NAT is the bridge that lets private IPs talk t
 
 Next we look at the device often sitting at the end of that route — the load balancer.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Routing and NAT?**
+  - The article treats Routing and NAT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Routing and NAT?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Routing and NAT reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is a Network?](./01-what-is-a-network.md)
-- [IP and Subnet](./02-ip-and-subnet.md)
-- [TCP and UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP and HTTPS](./05-http-and-https.md)
-- [TLS Basics](./06-tls-basics.md)
+## In this series
+
+- [Computer Networks 101 (1/10): What Is a Network?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP and Subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP and UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP and HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS Basics](./06-tls-basics.md)
 - **Routing and NAT (current)**
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References

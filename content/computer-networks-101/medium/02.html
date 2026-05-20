@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>IP and Subnet</title>
+<title>Computer Networks 101 (2/10): IP and Subnet</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,28 @@
 </style>
 </head>
 <body>
-<h1>IP and Subnet</h1>
+<h1>Computer Networks 101 (2/10): IP and Subnet</h1>
 <blockquote>
 <p>Computer Networks 101 series (2/10)</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
 <p><strong>Core question</strong>: Is an "IP address" just a number stuck on one computer, or is it a coordinate that also tells you which neighborhood the computer lives in?</p>
 <blockquote>
 <p>An IP address has to be read as two parts — which network, and which host inside that network. The subnet mask defines that split, and CIDR is the short way to write it. Routing, NAT, firewall rules, and container networks all run on top of this split.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <p>This is post 2 in the Computer Networks 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying IP and Subnet?</li>
+<li>Which signal should the example or diagram make visible for IP and Subnet?</li>
+<li>What failure should be prevented first when IP and Subnet reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="computer networks 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>computer networks 101 chapter 2 flow overview</em></p>
+<p>This picture places IP and Subnet inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of IP and Subnet is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between IPv4 and IPv6</li>
@@ -82,8 +91,6 @@
 <blockquote>
 <p>An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (<code>/24</code>, <code>/16</code>, etc.) writes the length of that ruler in bits.</p>
 </blockquote>
-<p><img alt="How CIDR splits an address into network and host parts" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png"><br>
-<em>The prefix defines where the network part ends and where the host part begins, which is exactly what routers use to pick the next hop.</em></p>
 <h2>Key Terms</h2>
 <p><strong>IPv4 / IPv6</strong><br>
 - Meaning: 32-bit / 128-bit address spaces</p>
@@ -208,17 +215,27 @@ for s in ['10.0.0.5', '172.16.3.4', '192.168.1.1', '8.8.8.8']:
 <h2>Wrap-up and Next Steps</h2>
 <p>An IP address is not the coordinate of one computer. It is "the Nth host of which network". Subnets and CIDR define that split, and routing, NAT, firewalls, and VPCs all run on top of it.</p>
 <p>Next we compare the two transport protocols that ride on top of IP — TCP and UDP.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><strong>What boundary should you inspect first when applying IP and Subnet?</strong></li>
+<li>The article treats IP and Subnet as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for IP and Subnet?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when IP and Subnet reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">Computer Networks 101 (1/10): What Is a Network?</a></li>
 <li><strong>IP and Subnet (current)</strong></li>
 <li>TCP and UDP (upcoming)</li>
 <li>DNS (upcoming)</li>
 <li>HTTP and HTTPS (upcoming)</li>
-<li>TLS basics (upcoming)</li>
+<li>TLS Basics (upcoming)</li>
 <li>Routing and NAT (upcoming)</li>
 <li>Load Balancer (upcoming)</li>
-<li>WebSocket and real-time (upcoming)</li>
-<li>Debugging network problems (upcoming)</li>
+<li>WebSocket and Real-Time Communication (upcoming)</li>
+<li>Debugging Network Problems (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 9
-title: WebSocket과 실시간 통신
+title: "Computer Networks 101 (9/10): WebSocket과 실시간 통신"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: WebSocket과 SSE, long-polling의 차이와 운영 포인트를
 last_reviewed: '2026-05-15'
 ---
 
-# WebSocket과 실시간 통신
+# Computer Networks 101 (9/10): WebSocket과 실시간 통신
 
 이 글은 Computer Networks 101 시리즈의 9번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?
 - WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?
 - ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?
-- 실시간 시스템은 여러 인스턴스로 어떻게 확장할까요?
 
-> WebSocket은 HTTP 요청으로 시작한 뒤, 같은 TCP 연결을 양방향 프레임 스트림으로 바꿉니다. 서버는 이제 먼저 말할 수 있고, 클라이언트도 매 메시지마다 새 헤더 비용을 내지 않습니다. 대신 오래 살아 있는 연결이 로드밸런서, 배포, 리소스 관리에 새로운 부담을 만듭니다.
+## 큰 그림
+
+![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Computer Networks 101 9장 흐름 개요*
+
+이 그림에서는 WebSocket과 실시간 통신를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> WebSocket과 실시간 통신의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -41,9 +48,6 @@ last_reviewed: '2026-05-15'
 > 실시간은 보통 "사람이 기다리기 전에 도착한다"는 뜻입니다. 5초 새로고침으로 충분한 화면에 WebSocket을 쓰면 운영 비용만 늘어납니다.
 
 ## 핵심 그림
-
-![HTTP 연결이 WebSocket 프레임 스트림으로 바뀌는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
-*HTTP 핸드셰이크가 끝나면 같은 TCP 연결이 장시간 유지되는 양방향 프레임 채널로 바뀝니다.*
 
 핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다.
 
@@ -235,17 +239,29 @@ WebSocket은 HTTP로 시작하지만, 응답 이후에는 더 이상 HTTP가 아
 
 다음 글에서는 시리즈를 마무리하며, 네트워크가 평소처럼 동작하지 않을 때 어디서부터 어떤 순서로 봐야 하는지 정리합니다.
 
+## 처음 질문으로 돌아가기
+
+- **WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?**
+  - 본문의 기준은 WebSocket과 실시간 통신를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [네트워크란 무엇인가?](./01-what-is-a-network.md)
-- [IP와 subnet](./02-ip-and-subnet.md)
-- [TCP와 UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP와 HTTPS](./05-http-and-https.md)
-- [TLS 기초](./06-tls-basics.md)
-- [라우팅과 NAT](./07-routing-and-nat.md)
-- [Load Balancer](./08-load-balancer.md)
+## 시리즈 목차
+
+- [Computer Networks 101 (1/10): 네트워크란 무엇인가?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP와 subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP와 UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP와 HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
+- [Computer Networks 101 (7/10): 라우팅과 NAT](./07-routing-and-nat.md)
+- [Computer Networks 101 (8/10): Load Balancer](./08-load-balancer.md)
 - **WebSocket과 실시간 통신 (현재 글)**
 - 네트워크 문제 디버깅 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

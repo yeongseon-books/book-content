@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 7
-title: 라우팅과 NAT
+title: "Computer Networks 101 (7/10): 라우팅과 NAT"
 status: publish-ready
 targets:
   tistory: true
@@ -21,18 +21,25 @@ seo_description: 라우팅 테이블의 결정 원리와 NAT가 사설 IP와 공
 last_reviewed: '2026-05-15'
 ---
 
-# 라우팅과 NAT
+# Computer Networks 101 (7/10): 라우팅과 NAT
 
 이 글은 Computer Networks 101 시리즈의 7번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 라우팅 테이블은 어떻게 읽어야 할까요?
 - default gateway와 longest-prefix match는 어떻게 동작할까요?
 - NAT는 출발지 IP와 포트를 어떻게 바꿀까요?
-- AS와 BGP는 인터넷 규모에서 어떤 역할을 할까요?
 
-> 라우터는 패킷마다 다음 홉 하나만 결정합니다. 라우팅 테이블은 그 결정을 위한 규칙집입니다. 사설 IP에서 공인 인터넷으로 나갈 때는 NAT가 출발지 IP와 포트를 라우터의 공인 주소로 바꿉니다. 인터넷의 절반은 라우팅이고, 나머지 절반은 NAT라고 생각해도 크게 틀리지 않습니다.
+## 큰 그림
+
+![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Computer Networks 101 7장 흐름 개요*
+
+이 그림에서는 라우팅과 NAT를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 라우팅과 NAT의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -41,9 +48,6 @@ last_reviewed: '2026-05-15'
 > 라우터는 전체 경로를 한 번에 아는 것이 아니라, 그 순간 필요한 다음 홉만 봅니다. 인터넷은 그 작은 결정들의 합입니다.
 
 ## 핵심 그림
-
-![라우팅과 NAT가 사설 IP를 인터넷으로 내보내는 과정](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
-*라우팅은 다음 홉을 고르고, NAT는 사설 IP와 포트를 공인 주소로 바꿔 응답이 다시 원래 호스트로 돌아오게 만듭니다.*
 
 ## 핵심 용어
 
@@ -143,7 +147,6 @@ ip route get 1.1.1.1
 
 이 명령은 "이 목적지로 지금 패킷을 보내면 어떤 인터페이스와 어떤 출발지 주소를 쓸까"를 바로 보여 줍니다. `traceroute`보다 앞에서, 운영 체제가 첫 번째 결정을 어떻게 내리는지 확인할 때 특히 유용합니다.
 
-
 ## 이 코드에서 먼저 볼 점
 
 - 라우팅 결정은 매 홉마다 독립적으로 내려집니다.
@@ -195,17 +198,29 @@ ip route get 1.1.1.1
 
 다음 글에서는 그 경로 끝에서 자주 만나는 장치, Load Balancer를 다룹니다.
 
+## 처음 질문으로 돌아가기
+
+- **라우팅 테이블은 어떻게 읽어야 할까요?**
+  - 본문의 기준은 라우팅과 NAT를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **default gateway와 longest-prefix match는 어떻게 동작할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **NAT는 출발지 IP와 포트를 어떻게 바꿀까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [네트워크란 무엇인가?](./01-what-is-a-network.md)
-- [IP와 subnet](./02-ip-and-subnet.md)
-- [TCP와 UDP](./03-tcp-and-udp.md)
-- [DNS](./04-dns.md)
-- [HTTP와 HTTPS](./05-http-and-https.md)
-- [TLS 기초](./06-tls-basics.md)
+## 시리즈 목차
+
+- [Computer Networks 101 (1/10): 네트워크란 무엇인가?](./01-what-is-a-network.md)
+- [Computer Networks 101 (2/10): IP와 subnet](./02-ip-and-subnet.md)
+- [Computer Networks 101 (3/10): TCP와 UDP](./03-tcp-and-udp.md)
+- [Computer Networks 101 (4/10): DNS](./04-dns.md)
+- [Computer Networks 101 (5/10): HTTP와 HTTPS](./05-http-and-https.md)
+- [Computer Networks 101 (6/10): TLS 기초](./06-tls-basics.md)
 - **라우팅과 NAT (현재 글)**
 - Load Balancer (예정)
 - WebSocket과 실시간 통신 (예정)
 - 네트워크 문제 디버깅 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

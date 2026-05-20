@@ -1,7 +1,7 @@
 ---
 series: computer-networks-101
 episode: 1
-title: What Is a Network?
+title: "Computer Networks 101 (1/10): What Is a Network?"
 status: publish-ready
 targets:
   tistory: false
@@ -21,19 +21,31 @@ seo_description: A network is not cables but a bundle of agreements. Learn the t
 last_reviewed: '2026-05-15'
 ---
 
-# What Is a Network?
+# Computer Networks 101 (1/10): What Is a Network?
 
 > Computer Networks 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
 
 **Core question**: When you hear the word "network", what picture should be in your head so that IP, TCP, DNS, and HTTP all sit on the same canvas later?
 
 > A network is not cables. It is a bundle of agreements. Two computers exchange data only because they have agreed who speaks first, how to cut the data into pieces, and how to put it back together. Those agreements are protocols, and the way they stack on top of each other is the layered model. Before we start the series, draw that picture in your head.
 
-<!-- a-grade-intro:end -->
-
 This is the first post in the Computer Networks 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is a Network??
+- Which signal should the example or diagram make visible for What Is a Network??
+- What failure should be prevented first when What Is a Network? reaches a real system?
+
+## Big Picture
+
+![computer networks 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
+
+*computer networks 101 chapter 1 flow overview*
+
+This picture places What Is a Network? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is a Network? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -51,9 +63,6 @@ Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, 
 ## Concept at a Glance
 
 > Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.
-
-![Layered model and packet travel across a network](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
-*Packets are encapsulated layer by layer, traverse intermediate devices, and are reassembled at the destination.*
 
 ## Key Terms
 
@@ -202,17 +211,29 @@ A network is not cables but a bundle of agreements. Three words — packet, prot
 
 Next we move to the most basic addressing system on the Internet — IP and subnet.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What Is a Network??**
+  - The article treats What Is a Network? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is a Network??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is a Network? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is a Network? (current)**
-- IP and subnet (upcoming)
+- IP and Subnet (upcoming)
 - TCP and UDP (upcoming)
 - DNS (upcoming)
 - HTTP and HTTPS (upcoming)
-- TLS basics (upcoming)
+- TLS Basics (upcoming)
 - Routing and NAT (upcoming)
 - Load Balancer (upcoming)
-- WebSocket and real-time (upcoming)
-- Debugging network problems (upcoming)
+- WebSocket and Real-Time Communication (upcoming)
+- Debugging Network Problems (upcoming)
+
 <!-- toc:end -->
 
 ## References
