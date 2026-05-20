@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deploy a Function App — From Localhost to Azure</title>
+<title>Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Deploy a Function App — From Localhost to Azure</h1>
+<h1>Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure</h1>
 <p>The opening chapters set up the mental model. This chapter is about execution: <strong>create a function locally, deploy it to Azure, and get back a real URL you can call</strong>.</p>
 <p>By the end, you'll have:</p>
 <ul>
@@ -65,15 +65,19 @@
 <p>The sample uses the Python v2 programming model. The overall flow is nearly identical for the other runtimes.</p>
 <p>One framing note before we start: this walkthrough uses <strong>Flex Consumption as the primary path</strong>. That matches current Azure guidance for new serverless apps. Classic Consumption still matters for legacy estates and the simplest throwaway demos, but it should no longer be the default mental model for a first production-shaped deployment.</p>
 <p>This is the fourth post in the Azure Functions 101 series. Here, we take a function from local development to a real Azure endpoint you can call.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Which parameters absolutely must be settled before the first Function App is created?</li>
 <li>Should you start with zip deploy, GitHub Actions, or VS Code direct deploy?</li>
 <li>How does the Function App bind to its associated Storage account, and why does it need one?</li>
-<li>What does function-key versus host-key management actually look like?</li>
-<li>What rollback path do you have if the first deploy is broken?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure functions 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png"></p>
+<p><em>azure functions 101 chapter 4 flow overview</em></p>
+<p>This picture places Deploy a Function App — From Localhost to Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Deploy a Function App — From Localhost to Azure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Tooling — three pieces</h2>
 <p>You need three tools.</p>
 <p><strong>Azure Functions Core Tools</strong><br>
@@ -93,8 +97,7 @@ python --version     # 3.11+
 </code></pre>
 <hr>
 <h2>The full flow on one page</h2>
-<p><img alt="Flow from local run to Azure" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png"></p>
-<h2><em>Flow from local run to Azure</em></h2>
+<hr>
 <h2>1. Create the project</h2>
 <p>Start from an empty directory.</p>
 <pre><code class="language-bash">mkdir hello-functions &amp;&amp; cd hello-functions
@@ -251,15 +254,24 @@ You should see something like this at the end.</p>
 <li>[ ] Validated health probes and usage metrics after the first deploy</li>
 <li>[ ] Rehearsed the rollback path (slots, previous zip)</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>Which parameters absolutely must be settled before the first Function App is created?</strong></li>
+<li>The article treats Deploy a Function App — From Localhost to Azure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Should you start with zip deploy, GitHub Actions, or VS Code direct deploy?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does the Function App bind to its associated Storage account, and why does it need one?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
-<li><strong>Deploy a Function App — From Localhost to Azure (current)</strong></li>
-<li>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
-<li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
-<li>Monitoring and Operations Fundamentals (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><strong>Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure (current)</strong></li>
+<li>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
+<li>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
+<li>Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

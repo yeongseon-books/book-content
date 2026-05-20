@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Azure Functions? — A World Where Events Call Your Code</title>
+<title>Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is Azure Functions? — A World Where Events Call Your Code</h1>
+<h1>Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</h1>
 <p>When developers first hear the word "serverless," the reaction is usually one of two things: "What do you mean there's no server?" or "The cloud is still running servers under the hood — isn't that the same thing?" Both reactions are half right and half wrong. There are servers. Serverless is just a model that <strong>lets you stop caring about them</strong>. Azure Functions is Azure's answer to that model.</p>
 <p>This series is an introductory guide for developers who are picking up Azure Functions for the first time. It starts with the most basic question: <strong>what exactly is Azure Functions, and why does this model matter?</strong> Once you have the right mental model, the later discussions about triggers, bindings, scaling, and deployment land much more easily.</p>
 <p>This is the first post in the Azure Functions 101 series. Here, we build the core mental model that makes the rest of the platform easier to reason about.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What model of serverless compute is Azure Functions, exactly?</li>
 <li>Does per-execution billing actually save money, and when does it backfire?</li>
 <li>Where does Functions sit in an event-driven architecture?</li>
-<li>How do Functions, Logic Apps, and Durable Functions split responsibilities?</li>
-<li>Which production scenarios are a sign that Functions is the wrong fit?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure functions 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png"></p>
+<p><em>azure functions 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Azure Functions? — A World Where Events Call Your Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Azure Functions? — A World Where Events Call Your Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"</h2>
 <p>Here's Azure Functions in a single line:</p>
 <blockquote>
@@ -99,9 +103,7 @@ def hello(request: func.HttpRequest) -&gt; func.HttpResponse:
 </ul>
 <p>There's no code to start a server, open a port, or configure a router. <strong>You only describe "when to wake up" and "what to do."</strong> Everything else is the Functions Host's job.</p>
 <p>The simplest picture of what happens between a request coming in and the response going out looks like this:</p>
-<p><img alt="HTTP request waking a function" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png"></p>
-<p><em>HTTP request waking a function</em><br>
-Everything that follows in this series is essentially the process of refining this picture. Later chapters expand it from three directions: non-HTTP triggers, the Host/Worker execution boundary, and the scaling behavior that adds instances when one is not enough.</p>
+<p>Everything that follows in this series is essentially the process of refining this picture. Later chapters expand it from three directions: non-HTTP triggers, the Host/Worker execution boundary, and the scaling behavior that adds instances when one is not enough.</p>
 <hr>
 <h2>How Is This Different From a Traditional Web App?</h2>
 <p>If you've ever deployed a web app to App Service or a VM, the following comparison will land fastest.</p>
@@ -196,15 +198,24 @@ def order_received(msg: func.QueueMessage) -&gt; None:
 <li>[ ] Decided connection-pooling policy for outbound dependencies (storage, DB)</li>
 <li>[ ] Captured 'do not use Functions for X' cases in an ADR</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What model of serverless compute is Azure Functions, exactly?</strong></li>
+<li>The article treats What Is Azure Functions? — A World Where Events Call Your Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Does per-execution billing actually save money, and when does it backfire?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Where does Functions sit in an event-driven architecture?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><strong>What Is Azure Functions? — A World Where Events Call Your Code (current)</strong></li>
-<li>Triggers and Bindings — Everything About Function I/O (upcoming)</li>
-<li>Host and Worker — Who Actually Runs Your Functions? (upcoming)</li>
-<li>Deploy a Function App — From Localhost to Azure (upcoming)</li>
-<li>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
-<li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
-<li>Monitoring and Operations Fundamentals (upcoming)</li>
+<li><strong>Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code (current)</strong></li>
+<li>Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O (upcoming)</li>
+<li>Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions? (upcoming)</li>
+<li>Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure (upcoming)</li>
+<li>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
+<li>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
+<li>Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

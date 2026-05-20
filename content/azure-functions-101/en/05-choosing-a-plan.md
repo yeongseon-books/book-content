@@ -1,5 +1,5 @@
 ---
-title: Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
+title: "Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated"
 series: azure-functions-101
 episode: 5
 language: en
@@ -19,7 +19,7 @@ seo_description: The deployment chapter created the app on Flex Consumption beca
   that is the current default candidate for new serverless work.
 ---
 
-# Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
+# Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated
 
 The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but current Microsoft Learn guidance recommends **evaluating Flex Consumption first for new serverless apps**.
 
@@ -29,15 +29,21 @@ The goal is simple: **understand what each plan gives you, what it constrains, a
 
 This is the fifth post in the Azure Functions 101 series. Here, we compare the hosting plans in terms of real workload trade-offs instead of product labels.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does each plan (Consumption, Premium, Dedicated) bill against?
 - When should cold-start tolerance drive the plan choice instead of price?
 - Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?
-- What is each plan's scale ceiling, and where does that hit your peak load?
-- How do you build a monthly cost simulation that does not lie?
+
+## Big Picture
+
+![azure functions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png)
+
+*azure functions 101 chapter 5 flow overview*
+
+This picture places Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## One-line definitions
 
@@ -54,9 +60,6 @@ If your mental shortcut has been “Functions = autoscale,” this is where that
 
 ## Big picture
 
-![Plan differences in billing, warm capacity, scaling](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png)
-
-*Plan differences in billing, warm capacity, scaling*
 Now put the differences on one table.
 
 ---
@@ -227,16 +230,25 @@ az functionapp plan create \
 - [ ] Compared per-plan scale ceilings against your workload peak
 - [ ] Simulated monthly cost across realistic scenarios
 
+## Answering the Opening Questions
+
+- **What does each plan (Consumption, Premium, Dedicated) bill against?**
+  - The article treats Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should cold-start tolerance drive the plan choice instead of price?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
-- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
-- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
-- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
-- **Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)**
-- Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
-- Monitoring and Operations Fundamentals (upcoming)
+- [Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- **Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)**
+- Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
+- Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

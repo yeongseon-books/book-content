@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Triggers and Bindings — Everything About Function I/O</title>
+<title>Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Triggers and Bindings — Everything About Function I/O</h1>
+<h1>Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O</h1>
 <p>The opening mental model established two key ideas: every function is wired to exactly one trigger, and bindings are a declarative way to connect inputs and outputs. Those two ideas are why Functions code can be so short. But for newcomers, the line between “what’s a trigger,” “what’s a binding,” and “where exactly does the magic start and end” tends to stay blurry.</p>
 <p>This chapter draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.</p>
 <p>This is the second post in the Azure Functions 101 series. Here, we make the boundary between triggers and bindings concrete so function I/O stops feeling magical.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is fundamentally different about a trigger versus a binding, and why are they split?</li>
 <li>How much code do input/output bindings remove, and what flexibility do you give up?</li>
 <li>Can multiple triggers attach to one function, and if not, why?</li>
-<li>Where should binding connection strings actually live to stay safe?</li>
-<li>How does trigger-message reprocessing (retry, poison queue) actually flow?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure functions 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png"></p>
+<p><em>azure functions 101 chapter 2 flow overview</em></p>
+<p>This picture places Triggers and Bindings — Everything About Function I/O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Triggers and Bindings — Everything About Function I/O is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>A trigger is the “cause” that wakes a function up</h2>
 <p>Let’s nail the definition first. <strong>A trigger is the external event that causes a function to run.</strong> An incoming HTTP request, a message landing in a queue, a file being uploaded to Blob storage, the top of every hour — those are all triggers.</p>
 <p>The rules are simple:</p>
@@ -74,8 +78,7 @@
 <li>A trigger both wakes the function and <strong>decides the function’s input payload</strong>. With an HTTP trigger you get the request object; with a Queue trigger you get the message body; with a Timer trigger you get schedule info.</li>
 </ul>
 <p>The point worth holding onto: a trigger decides both <em>when</em> and <em>with what</em>. Visually:</p>
-<p><img alt="Trigger deciding timing and input payload" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png"></p>
-<h2><em>Trigger deciding timing and input payload</em></h2>
+<hr>
 <h2>Trigger catalog — the ones you’ll actually use</h2>
 <p>The full list is in the official docs, but in practice 90%+ of real-world work falls into the table below.</p>
 <p><strong>HTTP / Webhook</strong><br>
@@ -231,15 +234,24 @@ When you write <code>connection: 'StorageConnection'</code>, it means “use the
 <li>[ ] Pinned the retry policy and the poison-queue path</li>
 <li>[ ] Added integration tests that catch regressions when bindings change</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What is fundamentally different about a trigger versus a binding, and why are they split?</strong></li>
+<li>The article treats Triggers and Bindings — Everything About Function I/O as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How much code do input/output bindings remove, and what flexibility do you give up?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Can multiple triggers attach to one function, and if not, why?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><strong>Triggers and Bindings — Everything About Function I/O (current)</strong></li>
-<li>Host and Worker — Who Actually Runs Your Functions? (upcoming)</li>
-<li>Deploy a Function App — From Localhost to Azure (upcoming)</li>
-<li>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
-<li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
-<li>Monitoring and Operations Fundamentals (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><strong>Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O (current)</strong></li>
+<li>Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions? (upcoming)</li>
+<li>Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure (upcoming)</li>
+<li>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)</li>
+<li>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
+<li>Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

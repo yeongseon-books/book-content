@@ -1,5 +1,5 @@
 ---
-title: 모니터링과 운영 기초
+title: "Azure Functions 101 (7/7): 모니터링과 운영 기초"
 series: azure-functions-101
 episode: 7
 language: ko
@@ -19,7 +19,7 @@ seo_description: 함수 앱을 배포한 뒤부터는 질문이 달라집니다.
   외부 의존성이…
 ---
 
-# 모니터링과 운영 기초
+# Azure Functions 101 (7/7): 모니터링과 운영 기초
 
 함수 앱을 배포하고 나면 질문이 달라집니다. “함수가 뜨는가”보다 “왜 실패율이 갑자기 올라갔는가”, “인스턴스 수가 왜 늘어났는가”, “지연은 함수 자체 문제인가, downstream 문제인가”, “비용은 어디서 새고 있는가” 같은 질문이 더 중요해집니다. 이 시점부터 Azure Functions는 코드 배포 대상이 아니라 **관측 가능한 운영 시스템**이어야 합니다.
 
@@ -31,15 +31,21 @@ Azure Functions 운영이 특히 어려워 보이는 이유는 이벤트 기반 
 
 이제 “무엇이 평소와 다른가”를 가장 빨리 드러내는 화면과 쿼리부터 정리하겠습니다.
 
----
-
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요?
 - 함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요?
 - Live Metrics와 stream logs는 언제 각각 더 유리할까요?
-- 비용이 튀기 전에 미리 볼 수 있는 메트릭은 무엇일까요?
-- 장애 대응 런북에는 최소 무엇이 반드시 들어가야 할까요?
+
+## 큰 그림
+
+![Azure Functions 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
+
+*Azure Functions 101 7장 흐름 개요*
+
+이 그림에서는 모니터링과 운영 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 모니터링과 운영 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -49,7 +55,7 @@ Azure Functions 운영이 특히 어려워 보이는 이유는 이벤트 기반 
 
 무엇보다 이 글은 시리즈 전체를 운영 관점에서 닫아 줍니다. 이벤트 기반 실행 모델, 트리거와 바인딩, Host와 Worker, 플랜 선택, 스케일링과 cold start까지 모두 이해해도, 실제로 무엇을 보고 대응해야 하는지 정리되지 않으면 시스템은 아직 운영 가능한 상태가 아닙니다. 이번 장은 그 마지막 연결을 담당합니다.
 
-## 운영을 이해하는 가장 좋은 방법: 기준선에서 벗어난 신호를 30초 안에 찾는 문제로 보는 것입니다
+## 핵심 관점
 
 Azure Functions 운영을 잘한다는 것은 결국 “지금 무엇이 평소와 다른가”를 아주 빠르게 찾는 능력에 가깝습니다. 요청량이 늘었는지, 실패율이 튀었는지, dependency 호출이 깨지는지, 인스턴스 수가 상한에 가까운지, 비용이 평소보다 빨리 증가하는지 같은 신호를 먼저 잡아야 합니다. 즉 좋은 운영 화면은 모든 것을 보여 주는 화면이 아니라, **평소와 다른 것을 가장 빨리 드러내는 화면**입니다.
 
@@ -92,10 +98,6 @@ az functionapp config appsettings set \
 ### 장애가 의심될 때 가장 먼저 볼 화면은 Live Metrics입니다
 
 실시간 상황에서는 **Application Insights → Live Metrics**가 가장 빠른 출발점입니다. 요청량, 실패율, 응답 시간 변화, 현재 활성 인스턴스 수 같은 신호를 거의 실시간으로 확인할 수 있기 때문입니다.
-
-![장애 초기에 보는 Live Metrics 신호](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
-
-*장애 초기에 보는 Live Metrics 신호*
 
 Live Metrics가 좋은 이유는 “지금 이 순간”의 변화를 빠르게 보여 주기 때문입니다. 다만 세부 인프라 카운터는 OS와 환경 차이를 같이 염두에 둬야 합니다. 인스턴스 활동과 요청 흐름은 폭넓게 유용하지만, CPU/메모리 같은 저수준 카운터는 항상 동일하지 않을 수 있습니다.
 
@@ -257,16 +259,25 @@ az monitor app-insights events show \
 
 시리즈의 끝에서 남는 실무 조언도 하나 덧붙일 수 있습니다. 운영은 완벽한 대시보드를 만드는 일이 아니라, 팀이 같은 기준선과 같은 대응 순서를 공유하게 만드는 일입니다. 그 기준이 잡혀 있으면 Azure Functions는 추상화가 강한 플랫폼이면서도 충분히 예측 가능한 운영 대상이 됩니다.
 
+## 처음 질문으로 돌아가기
+
+- **Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요?**
+  - 본문의 기준은 모니터링과 운영 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Live Metrics와 stream logs는 언제 각각 더 유리할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md)
-- [트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md)
-- [Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md)
-- [함수 하나 배포하기 — 로컬에서 Azure까지](./04-first-deploy.md)
-- [어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
-- [스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간](./06-scaling-and-cold-start.md)
-- **모니터링과 운영 기초 (현재 글)**
+- [Azure Functions 101 (1/7): Azure Functions란? — 이벤트가 함수를 호출하는 세상](./01-what-is-azure-functions.md)
+- [Azure Functions 101 (2/7): 트리거와 바인딩 — 함수 입출력의 모든 것](./02-triggers-and-bindings.md)
+- [Azure Functions 101 (3/7): Host와 Worker — 함수는 누가 실행하는가](./03-host-and-worker.md)
+- [Azure Functions 101 (4/7): 함수 하나 배포하기 — 로컬에서 Azure까지](./04-first-deploy.md)
+- [Azure Functions 101 (5/7): 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Azure Functions 101 (6/7): 스케일링과 콜드 스타트 — 서버리스가 빨라지는 순간과 느려지는 순간](./06-scaling-and-cold-start.md)
+- **Azure Functions 101 (7/7): 모니터링과 운영 기초 (현재 글)**
 
 <!-- toc:end -->
 

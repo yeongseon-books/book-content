@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</title>
+<title>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,23 +53,27 @@
 </style>
 </head>
 <body>
-<h1>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</h1>
+<h1>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</h1>
 <p>The deployment chapter created the app on Flex Consumption because that is the current default candidate for new serverless work. Classic Consumption still matters historically and operationally, but current Microsoft Learn guidance recommends <strong>evaluating Flex Consumption first for new serverless apps</strong>.</p>
 <p>That does not make Consumption irrelevant. You still need to understand all four hosting models to make a sound decision. This chapter covers <strong>Consumption / Flex Consumption / Premium / Dedicated (App Service Plan)</strong> side by side, with the current caveats left intact.</p>
 <p>The goal is simple: <strong>understand what each plan gives you, what it constrains, and which one fits your workload</strong>.</p>
 <p>This is the fifth post in the Azure Functions 101 series. Here, we compare the hosting plans in terms of real workload trade-offs instead of product labels.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does each plan (Consumption, Premium, Dedicated) bill against?</li>
 <li>When should cold-start tolerance drive the plan choice instead of price?</li>
 <li>Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?</li>
-<li>What is each plan's scale ceiling, and where does that hit your peak load?</li>
-<li>How do you build a monthly cost simulation that does not lie?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure functions 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png"></p>
+<p><em>azure functions 101 chapter 5 flow overview</em></p>
+<p>This picture places Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>One-line definitions</h2>
 <p><strong>Consumption</strong><br>
-- One-line definition: The simplest pay-per-use serverless plan. An older path, and Windows-first in practice.</p>
+- One-line definition: The original pay-per-use serverless plan. Important for existing apps, but now a legacy path for new applications.</p>
 <p><strong>Flex Consumption</strong><br>
 - One-line definition: Microsoft's recommended Linux-based pay-per-use plan for new serverless apps, with VNet support, selectable memory, and per-function scaling.</p>
 <p><strong>Premium</strong><br>
@@ -79,9 +83,7 @@
 <p>If your mental shortcut has been “Functions = autoscale,” this is where that model needs refinement. <strong>The scaling model and operating posture change quite a bit across these plans.</strong></p>
 <hr>
 <h2>Big picture</h2>
-<p><img alt="Plan differences in billing, warm capacity, scaling" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png"></p>
-<p><em>Plan differences in billing, warm capacity, scaling</em><br>
-Now put the differences on one table.</p>
+<p>Now put the differences on one table.</p>
 <hr>
 <h2>Comparison table</h2>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
@@ -98,7 +100,7 @@ Now put the differences on one table.</p>
 <tbody>
 <tr>
 <td><strong>Current status</strong></td>
-<td>Older path</td>
+<td>Legacy for new apps</td>
 <td>Default serverless recommendation</td>
 <td>Advanced serverless</td>
 <td>App Service family</td>
@@ -126,7 +128,7 @@ Now put the differences on one table.</p>
 </tr>
 <tr>
 <td><strong>OS</strong></td>
-<td>Windows-first; Linux Consumption availability varies by region</td>
+<td>Windows supported; Linux Consumption is retired</td>
 <td>Linux only</td>
 <td>Windows / Linux</td>
 <td>Windows / Linux</td>
@@ -141,7 +143,7 @@ Now put the differences on one table.</p>
 <tr>
 <td><strong>Max instances</strong></td>
 <td>Roughly 200; lower in some OS and platform cases</td>
-<td>Up to 1000, subject to regional 250-core default quota</td>
+<td>Default 100 per app; configurable up to 1000, still subject to regional 250-core default quota</td>
 <td>Roughly 20-100+, depending on OS, region, and restrictions</td>
 <td>Defined by App Service Plan SKU and autoscale rules</td>
 </tr>
@@ -169,7 +171,7 @@ Now put the differences on one table.</p>
 <tr>
 <td><strong>Deployment slots</strong></td>
 <td>Limited</td>
-<td>No; use the rolling update path</td>
+<td>No; only a rolling update path (preview, not recommended for production)</td>
 <td>Yes</td>
 <td>Yes</td>
 </tr>
@@ -201,10 +203,10 @@ Now put the differences on one table.</p>
 <li>Cold starts</li>
 <li>No VNet integration</li>
 <li>Fixed 1.5 GB memory</li>
-<li>Long-term migration risk if Microsoft guidance continues shifting away from this plan</li>
-<li>Linux Consumption availability varies by region, making it a less stable target for new architecture decisions</li>
+<li>Legacy positioning for new apps, so long-term platform direction is no longer centered on this plan</li>
+<li>Linux Consumption is retired, which removes it as a viable target for new Linux-based architecture decisions</li>
 </ul>
-<p>That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere.</p>
+<p>That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere. For new apps, treat classic Consumption as the legacy branch you choose deliberately, not the neutral default.</p>
 <hr>
 <h2>Flex Consumption — the default candidate for new serverless apps</h2>
 <p>Flex Consumption is the plan Microsoft now recommends for new serverless workloads. It keeps the economic shape of serverless while removing several of the platform limits that used to push teams toward Premium.</p>
@@ -214,13 +216,13 @@ Now put the differences on one table.</p>
 <li><strong>Selectable memory sizes</strong> at 512 MB, 2048 MB, and 4096 MB</li>
 <li><strong>Always Ready</strong> for keeping chosen function groups warm; the default is still 0</li>
 <li><strong>Per-function scaling</strong> instead of scaling the whole app as one unit</li>
-<li><strong>Large scale range</strong> up to 1000 instances per app, though regional core quota can become the real limit earlier</li>
+<li><strong>Default per-app cap of 100 instances</strong>, configurable up to 1000; regional core quota can still become the real limit earlier</li>
 </ul>
 <p><strong>Important caveats:</strong></p>
 <ul>
 <li>It is <strong>Linux only</strong>.</li>
 <li><strong>Blob trigger support requires the Event Grid source.</strong> Do not assume the same polling-based blob trigger behavior you may be used to on classic Consumption.</li>
-<li><strong>Some bindings and platform features have Flex-specific constraints.</strong> No deployment slots and no in-place migration from another hosting plan are examples.</li>
+<li><strong>Some bindings and platform features have Flex-specific constraints.</strong> No deployment slots, only a rolling update path that is still preview and not recommended for production, and no in-place migration from another hosting plan are examples.</li>
 <li><strong>Per-function scaling still uses scale groups.</strong> HTTP triggers scale together, Blob Event Grid triggers scale together, and Durable Functions scale together. It is not “every function always gets fully isolated scale behavior.”</li>
 </ul>
 <p><strong>Pick it when:</strong></p>
@@ -230,7 +232,7 @@ Now put the differences on one table.</p>
 <li>You want better scaling flexibility than classic Consumption</li>
 <li>Linux is acceptable</li>
 </ul>
-<p>This is the first candidate for a new build. The safe mental model is “Flex fixes many of Consumption's practical limits,” not “Flex removes every meaningful constraint.”</p>
+<p>This is the first candidate for a new build. The safe mental model is “Flex fixes many of Consumption's practical limits,” not “Flex removes every meaningful constraint.” If your production rollout depends on a mature slot-based swap workflow, treat that as a Premium or Dedicated requirement instead of assuming the Flex rolling update path is a production-ready substitute.</p>
 <hr>
 <h2>Premium — when cold-start control and Windows support both matter</h2>
 <p>Premium solves the problem by keeping baseline capacity ready. You pay for that baseline, but you gain much stronger control over startup latency.</p>
@@ -274,7 +276,7 @@ Dedicated sits outside the main path on purpose. It is not a bad plan. It is a p
 <ol>
 <li><strong>For a new serverless app, start with Flex Consumption.</strong> That is the current official direction.</li>
 <li><strong>If you need Windows or tighter cold-start control, evaluate Premium.</strong></li>
-<li><strong>Use Consumption only for the simplest demo path or for existing assets you are intentionally keeping.</strong></li>
+<li><strong>Use Consumption only for the simplest demo path, for Windows-specific legacy cases, or for existing assets you are intentionally keeping.</strong></li>
 </ol>
 <p>One more qualifier matters. Flex Consumption is strong, but <strong>Blob triggers require the Event Grid source, some bindings and features have Flex-specific constraints, and scaling behavior should be understood in terms of per-function scale groups.</strong> The accurate message is not “always use Flex.” It is “Flex is the default candidate, then validate the plan-specific constraints.”</p>
 <hr>
@@ -298,15 +300,24 @@ Dedicated sits outside the main path on purpose. It is not a bad plan. It is a p
 <li>[ ] Compared per-plan scale ceilings against your workload peak</li>
 <li>[ ] Simulated monthly cost across realistic scenarios</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What does each plan (Consumption, Premium, Dedicated) bill against?</strong></li>
+<li>The article treats Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should cold-start tolerance drive the plan choice instead of price?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/04-first-deploy.md">Deploy a Function App — From Localhost to Azure</a></li>
-<li><strong>Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)</strong></li>
-<li>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
-<li>Monitoring and Operations Fundamentals (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/04-first-deploy.md">Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure</a></li>
+<li><strong>Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (current)</strong></li>
+<li>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)</li>
+<li>Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

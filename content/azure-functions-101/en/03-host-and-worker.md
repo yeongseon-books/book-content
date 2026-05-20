@@ -1,5 +1,5 @@
 ---
-title: Host and Worker — Who Actually Runs Your Functions?
+title: "Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?"
 series: azure-functions-101
 episode: 3
 language: en
@@ -19,7 +19,7 @@ seo_description: 'Over the last two posts, we built up a mental model: triggers 
   your function, and bindings wire up its inputs and outputs.'
 ---
 
-# Host and Worker — Who Actually Runs Your Functions?
+# Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?
 
 Over the last two posts, we built up a mental model: triggers wake your function, and bindings wire up its inputs and outputs. But there's still one big question we haven't answered. **Who actually runs the Node.js, Python, or Java code you wrote?**
 
@@ -33,15 +33,21 @@ Let’s unpack that line with diagrams.
 
 This is the third post in the Azure Functions 101 series. Here, we trace how the Host and Worker split turns your code into a real execution model.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why are the Functions Host and the language worker separate processes?
 - What message flow runs over the gRPC channel between Host and worker?
 - How many function instances does one worker run concurrently?
-- What signals trigger a Host restart versus a worker restart?
-- What tradeoffs come with the out-of-process worker model versus in-process?
+
+## Big Picture
+
+![azure functions 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
+
+*azure functions 101 chapter 3 flow overview*
+
+This picture places Host and Worker — Who Actually Runs Your Functions? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Host and Worker — Who Actually Runs Your Functions? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## The big picture — two processes
 
@@ -52,9 +58,6 @@ Functions is different. **At a minimum, two processes are involved** in running 
 - **Host process** — the .NET runtime. Handles trigger detection, scale signals, logging, and binding resolution.
 - **Worker process** — a separate process running your language (Node.js, Python, Java, etc.). **This is where your function code actually executes.**
 
-![Host and worker role split](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
-
-*Host and worker role split*
 This split is the single most important design decision in Functions. So why was it done this way?
 
 ---
@@ -186,16 +189,25 @@ The earlier chapters established the mental model, triggers, and bindings; this 
 - [ ] Tested automatic recovery when a worker crashes
 - [ ] Managed key host.json settings via infrastructure IaC
 
+## Answering the Opening Questions
+
+- **Why are the Functions Host and the language worker separate processes?**
+  - The article treats Host and Worker — Who Actually Runs Your Functions? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What message flow runs over the gRPC channel between Host and worker?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How many function instances does one worker run concurrently?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
-- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
-- **Host and Worker — Who Actually Runs Your Functions? (current)**
-- Deploy a Function App — From Localhost to Azure (upcoming)
-- Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)
-- Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
-- Monitoring and Operations Fundamentals (upcoming)
+- [Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- **Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions? (current)**
+- Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure (upcoming)
+- Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)
+- Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
+- Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

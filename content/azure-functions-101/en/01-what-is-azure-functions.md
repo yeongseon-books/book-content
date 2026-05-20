@@ -1,5 +1,5 @@
 ---
-title: What Is Azure Functions? — A World Where Events Call Your Code
+title: "Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code"
 series: azure-functions-101
 episode: 1
 language: en
@@ -20,7 +20,7 @@ seo_description: 'When developers first hear the word "serverless," the reaction
   is…'
 ---
 
-# What Is Azure Functions? — A World Where Events Call Your Code
+# Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code
 
 When developers first hear the word "serverless," the reaction is usually one of two things: "What do you mean there's no server?" or "The cloud is still running servers under the hood — isn't that the same thing?" Both reactions are half right and half wrong. There are servers. Serverless is just a model that **lets you stop caring about them**. Azure Functions is Azure's answer to that model.
 
@@ -28,15 +28,21 @@ This series is an introductory guide for developers who are picking up Azure Fun
 
 This is the first post in the Azure Functions 101 series. Here, we build the core mental model that makes the rest of the platform easier to reason about.
 
----
-
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What model of serverless compute is Azure Functions, exactly?
 - Does per-execution billing actually save money, and when does it backfire?
 - Where does Functions sit in an event-driven architecture?
-- How do Functions, Logic Apps, and Durable Functions split responsibilities?
-- Which production scenarios are a sign that Functions is the wrong fit?
+
+## Big Picture
+
+![azure functions 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
+
+*azure functions 101 chapter 1 flow overview*
+
+This picture places What Is Azure Functions? — A World Where Events Call Your Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Azure Functions? — A World Where Events Call Your Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"
 
@@ -80,9 +86,6 @@ There's no code to start a server, open a port, or configure a router. **You onl
 
 The simplest picture of what happens between a request coming in and the response going out looks like this:
 
-![HTTP request waking a function](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
-
-*HTTP request waking a function*
 Everything that follows in this series is essentially the process of refining this picture. Later chapters expand it from three directions: non-HTTP triggers, the Host/Worker execution boundary, and the scaling behavior that adds instances when one is not enough.
 
 ---
@@ -204,16 +207,25 @@ The next concepts to internalize are **triggers and bindings**: what kinds of ev
 - [ ] Decided connection-pooling policy for outbound dependencies (storage, DB)
 - [ ] Captured 'do not use Functions for X' cases in an ADR
 
+## Answering the Opening Questions
+
+- **What model of serverless compute is Azure Functions, exactly?**
+  - The article treats What Is Azure Functions? — A World Where Events Call Your Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Does per-execution billing actually save money, and when does it backfire?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does Functions sit in an event-driven architecture?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **What Is Azure Functions? — A World Where Events Call Your Code (current)**
-- Triggers and Bindings — Everything About Function I/O (upcoming)
-- Host and Worker — Who Actually Runs Your Functions? (upcoming)
-- Deploy a Function App — From Localhost to Azure (upcoming)
-- Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)
-- Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
-- Monitoring and Operations Fundamentals (upcoming)
+- **Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code (current)**
+- Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O (upcoming)
+- Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions? (upcoming)
+- Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure (upcoming)
+- Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated (upcoming)
+- Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (upcoming)
+- Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)
 
 <!-- toc:end -->
 

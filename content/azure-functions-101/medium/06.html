@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</title>
+<title>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,30 @@
 </style>
 </head>
 <body>
-<h1>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</h1>
+<h1>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t</h1>
 <p>Serverless is usually sold with one sentence: it scales automatically, and you only pay for what you use. True, but incomplete. In production, that sentence only becomes useful once you ask what signals drive scale-out, how much concurrency a single instance can absorb, and why the first request after idle time is sometimes noticeably slower.</p>
 <p>This chapter revisits the hosting-plan decision from an operations angle. When traffic jumps abruptly, how do Consumption, Flex Consumption, Premium, and Dedicated react? Where does cold-start time actually go? And what should you change first if the first request is too slow?</p>
 <p>This is the sixth post in the Azure Functions 101 series. Here, we turn scaling and cold starts into concrete operational trade-offs.</p>
-<hr>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What signals does the Functions scale controller use to add instances?</li>
 <li>Where exactly does cold start happen, and what do you measure to see it?</li>
 <li>How much cold start does Premium's always-ready instances actually erase?</li>
-<li>What goes wrong when burst traffic scales instances too quickly?</li>
-<li>Which patterns put external dependencies (DB connections) on a collision course with scale?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="azure functions 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png"></p>
+<p><em>azure functions 101 chapter 6 flow overview</em></p>
+<p>This picture places Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Scaling Has Two Axes — Instance Count and In-Instance Concurrency</h2>
 <p>“Scaling” hides two different controls.</p>
 <ul>
 <li><strong>Horizontal scaling (scale out)</strong> — how many instances the app gets</li>
 <li><strong>In-instance concurrency</strong> — how many invocations one instance handles at the same time</li>
 </ul>
-<p><img alt="Two scaling axes: instances and concurrency" src="https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png"></p>
-<p><em>Two scaling axes: instances and concurrency</em><br>
-Plans differ in who controls those axes and how exposed they are.</p>
+<p>Plans differ in who controls those axes and how exposed they are.</p>
 <p><strong>Consumption</strong><br>
 - Scale-out model: Platform-managed automatic scaling. Depending on the trigger/extension, the platform may use event-driven or target-based decisions<br>
 - What actually distinguishes it: Instance count is abstracted away; concurrency is influenced mostly by runtime and trigger settings</p>
@@ -206,15 +208,24 @@ That is why operations work usually includes both of these:</p>
 <li>[ ] Sized DB connection pools alongside the function-instance ceiling</li>
 <li>[ ] Set max scale-out limits to throttle burst behavior</li>
 </ul>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What signals does the Functions scale controller use to add instances?</strong></li>
+<li>The article treats Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Where exactly does cold start happen, and what do you measure to see it?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How much cold start does Premium's always-ready instances actually erase?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">What Is Azure Functions? — A World Where Events Call Your Code</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Triggers and Bindings — Everything About Function I/O</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Host and Worker — Who Actually Runs Your Functions?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/04-first-deploy.md">Deploy a Function App — From Localhost to Azure</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/05-choosing-a-plan.md">Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</a></li>
-<li><strong>Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (current)</strong></li>
-<li>Monitoring and Operations Fundamentals (upcoming)</li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/01-what-is-azure-functions.md">Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/02-triggers-and-bindings.md">Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/03-host-and-worker.md">Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/04-first-deploy.md">Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en/05-choosing-a-plan.md">Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated</a></li>
+<li><strong>Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t (current)</strong></li>
+<li>Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (upcoming)</li>
 </ul>
 <hr>
 <h2>References</h2>

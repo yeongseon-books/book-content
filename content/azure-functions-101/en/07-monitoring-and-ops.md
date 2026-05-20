@@ -1,5 +1,5 @@
 ---
-title: Monitoring and Operations Fundamentals
+title: "Azure Functions 101 (7/7): Monitoring and Operations Fundamentals"
 series: azure-functions-101
 episode: 7
 language: en
@@ -19,7 +19,7 @@ seo_description: Once the app is deployed, the questions change. You stop asking
   the function runs at all and start asking why failure rate jumped, why…
 ---
 
-# Monitoring and Operations Fundamentals
+# Azure Functions 101 (7/7): Monitoring and Operations Fundamentals
 
 Once the app is deployed, the questions change. You stop asking whether the function runs at all and start asking why failure rate jumped, why instance count climbed, whether the bottleneck is downstream, and where cost is leaking. This chapter covers the screens, metrics, queries, and alert priorities that matter first when you operate Azure Functions.
 
@@ -31,13 +31,21 @@ This is the final post in the Azure Functions 101 series. Here, we focus on the 
 
 > 90% of operations is the ability to see 'what is different from baseline' inside 30 seconds.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How do Application Insights and Log Analytics divide responsibilities for Functions ops?
 - Which queries actually surface per-function latency, failure rate, and dependency calls?
 - When does Live Metrics beat stream logs, and vice versa?
-- Which metrics tell you cost is about to spike before the bill does?
-- What absolutely must be in the incident runbook?
+
+## Big Picture
+
+![azure functions 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
+
+*azure functions 101 chapter 7 flow overview*
+
+This picture places Monitoring and Operations Fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Monitoring and Operations Fundamentals is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Application Insights Is the Starting Point
 
@@ -69,9 +77,6 @@ One caveat matters here. Documentation examples often present **Performance Coun
 
 For a live situation, **Application Insights → Live Metrics** is the fastest starting point. It gives you near-real-time visibility into request volume, failure rate, latency movement, and the number of currently active instances.
 
-![Live Metrics signals for early triage](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
-
-*Live Metrics signals for early triage*
 Live Metrics answers the immediate question: what is happening right now? Just keep the Linux caveat in mind. Instance activity is useful broadly, but infrastructure counters such as CPU and memory depend on OS and environment support.
 
 ---
@@ -221,16 +226,25 @@ If you want to go deeper into the implementation, continue with [Deep Dive — S
 - [ ] Specified the first-five-minutes actions in the incident runbook
 - [ ] Shared Live Metrics access with the on-call team
 
+## Answering the Opening Questions
+
+- **How do Application Insights and Log Analytics divide responsibilities for Functions ops?**
+  - The article treats Monitoring and Operations Fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which queries actually surface per-function latency, failure rate, and dependency calls?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When does Live Metrics beat stream logs, and vice versa?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
-- [Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
-- [Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
-- [Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
-- [Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
-- [Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
-- **Monitoring and Operations Fundamentals (current)**
+- [Azure Functions 101 (1/7): What Is Azure Functions? — A World Where Events Call Your Code](./01-what-is-azure-functions.md)
+- [Azure Functions 101 (2/7): Triggers and Bindings — Everything About Function I/O](./02-triggers-and-bindings.md)
+- [Azure Functions 101 (3/7): Host and Worker — Who Actually Runs Your Functions?](./03-host-and-worker.md)
+- [Azure Functions 101 (4/7): Deploy a Function App — From Localhost to Azure](./04-first-deploy.md)
+- [Azure Functions 101 (5/7): Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated](./05-choosing-a-plan.md)
+- [Azure Functions 101 (6/7): Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t](./06-scaling-and-cold-start.md)
+- **Azure Functions 101 (7/7): Monitoring and Operations Fundamentals (current)**
 
 <!-- toc:end -->
 
