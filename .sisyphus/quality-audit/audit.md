@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:58:57+00:00
+Generated: 2026-05-20T11:59:17+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **17**
-- Series at or above 5 issues: **13**
-- Total issues: **134**
-  - BadImg: **134**
+- Series with any issue: **16**
+- Series at or above 5 issues: **12**
+- Total issues: **124**
+  - BadImg: **124**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -44,20 +44,19 @@ Warnings:
 | 1 | `open-source-101` | 16 | 16 | 0 | 0 | 0 | 0 |
 | 2 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 3 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
-| 4 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 5 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 6 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 7 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 8 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 9 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 10 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 11 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 12 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 13 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 14 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 15 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 16 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 17 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 4 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 5 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 6 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 7 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 8 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 9 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 10 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 11 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 12 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 13 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 14 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 15 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 16 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -94,18 +93,6 @@ Warnings:
 - `assets/llm-apps-ops-101/03/03-01-big-picture.ko.png:1` — PNG height 67px <= 100px (size=938x67)
 - `assets/llm-apps-ops-101/05/05-03-what-to-notice-in-this-code.en.png:1` — PNG height 87px <= 100px (size=1087x87)
 - ... 7 more
-
-## containers-101 — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/containers-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=737x67)
-- `assets/containers-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=737x67)
-- `assets/containers-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=802x67)
-- `assets/containers-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=802x67)
-- `assets/containers-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=714x67)
-- ... 5 more
 
 ## pandas-101 — Total 10
 
