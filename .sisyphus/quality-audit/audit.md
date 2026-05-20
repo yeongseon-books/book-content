@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:55:24+00:00
+Generated: 2026-05-20T11:55:44+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **24**
+- Series with any issue: **23**
 - Series at or above 5 issues: **17**
-- Total issues: **190**
-  - BadImg: **190**
+- Total issues: **186**
+  - BadImg: **186**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -60,11 +60,10 @@ Warnings:
 | 17 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
 | 18 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 19 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 20 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 21 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 22 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 23 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 24 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 20 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 21 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 22 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 23 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -289,16 +288,6 @@ Warnings:
 - `assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1148x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1148x67)
-
-## design-patterns-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=725x67)
-- `assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=725x67)
-- `assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=750x67)
-- `assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=750x67)
 
 ## programming-languages-101 — Total 4
 
