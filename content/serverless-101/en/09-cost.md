@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 9
-title: Cost
+title: "Serverless 101 (9/10): Cost"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A beginner-friendly guide to serverless cost components, invoca
 last_reviewed: '2026-05-04'
 ---
 
-# Cost
+# Serverless 101 (9/10): Cost
 
 Serverless often gets sold with the easiest line item to quote: the price per invocation. That number is memorable, but it rarely explains the bill you eventually pay. What surprises teams is usually everything wrapped around the call count.
 
 Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.
 
 This is post 9 in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cost?
+- Which signal should the example or diagram make visible for Cost?
+- What failure should be prevented first when Cost reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 9 flow overview*
+
+This picture places Cost inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cost is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ That is why cost belongs in architecture review, not just in monthly reporting. 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
-
-*A serverless bill is the sum of invocation, compute time, network transfer, and downstream service usage.*
 The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.
 
 ## Key Terms
@@ -164,17 +177,29 @@ A *FinOps* team feeds *margin per call* back into *product decisions* — pricin
 
 The final episode is *Designing a Serverless App*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cost?**
+  - The article treats Cost as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cost?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cost reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Triggers and Events](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
-- [Queues and Event-driven Architecture](./07-queue-and-event-driven.md)
-- [Observability](./08-observability.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
+- [Serverless 101 (7/10): Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
+- [Serverless 101 (8/10): Observability](./08-observability.md)
 - **Cost (current)**
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

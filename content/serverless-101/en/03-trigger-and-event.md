@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 3
-title: Trigger and Event
+title: "Serverless 101 (3/10): Trigger and Event"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A practical trigger guide following one HTTP-to-queue workflow 
 last_reviewed: '2026-05-16'
 ---
 
-# Trigger and Event
+# Serverless 101 (3/10): Trigger and Event
 
 This is the third post in the Serverless 101 series.
 
 Serverless functions do not wake themselves up. Something invokes them, possibly more than once, possibly as a batch, possibly after a delay, and possibly again after a failure. If you do not understand that invocation path, clean handler code still turns into duplicate side effects, invisible retries, and messy incident response.
 
 So this post avoids a taxonomy-only approach. Instead, we will follow one complete flow: **an HTTP request becomes a queue message, a consumer processes it, duplicates are blocked through an external idempotency store, repeated failures are routed to a DLQ, and operators replay from that payload**. Once this path is clear, trigger semantics stop feeling abstract.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Trigger and Event?
+- Which signal should the example or diagram make visible for Trigger and Event?
+- What failure should be prevented first when Trigger and Event reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 3 flow overview*
+
+This picture places Trigger and Event inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Trigger and Event is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,10 +60,6 @@ Beginners usually focus on the function body first. In production, the bigger so
 If you ignore those differences, code that looks perfectly reasonable in a single local run breaks down quickly in production. Real event systems introduce network delay, batch delivery, at-least-once redelivery, out-of-order arrival, and poison messages all at once.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.en.png)
-
-*The fastest debugging starts when you separate the event source, the invocation path, and the failure-isolation path instead of treating “the function” as one black box.*
 
 Operationally, this is about role separation. The HTTP endpoint accepts work. The queue creates the async boundary. The consumer performs the actual side effect. The DLQ preserves repeated failures as inspectable payloads. Troubleshooting gets faster when you narrow the problem down in that order.
 
@@ -73,9 +85,7 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-
 DB_PATH = "idempotency.db"
-
 
 def build_response(status_code: int, body: dict) -> dict:
     return {
@@ -83,7 +93,6 @@ def build_response(status_code: int, body: dict) -> dict:
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(body, ensure_ascii=False),
     }
-
 
 def init_store() -> None:
     with sqlite3.connect(DB_PATH) as conn:
@@ -97,7 +106,6 @@ def init_store() -> None:
             """
         )
 
-
 def already_processed(idempotency_key: str) -> bool:
     with sqlite3.connect(DB_PATH) as conn:
         row = conn.execute(
@@ -105,7 +113,6 @@ def already_processed(idempotency_key: str) -> bool:
             (idempotency_key,),
         ).fetchone()
     return row is not None
-
 
 def mark_processed(idempotency_key: str, order_id: str) -> None:
     with sqlite3.connect(DB_PATH) as conn:
@@ -115,17 +122,14 @@ def mark_processed(idempotency_key: str, order_id: str) -> None:
         )
         conn.commit()
 
-
 @dataclass
 class QueueMessage:
     message_id: str
     retry_count: int
     body: dict
 
-
 QUEUE: list[QueueMessage] = []
 DLQ: list[dict] = []
-
 
 def http_ingress_handler(event: dict, context) -> dict:
     payload = json.loads(event.get("body") or "{}")
@@ -156,11 +160,9 @@ def http_ingress_handler(event: dict, context) -> dict:
         },
     )
 
-
 def apply_fulfillment(order_id: str, items: list[dict]) -> None:
     if any(item["sku"] == "poison-pill" for item in items):
         raise RuntimeError("downstream inventory reservation failed")
-
 
 def send_to_dlq(message: QueueMessage, error: Exception) -> None:
     DLQ.append(
@@ -173,7 +175,6 @@ def send_to_dlq(message: QueueMessage, error: Exception) -> None:
             "failed_at": datetime.now(UTC).isoformat(),
         }
     )
-
 
 def queue_consumer_handler(event: dict, context) -> dict:
     processed = []
@@ -338,9 +339,20 @@ Understanding triggers and events is not about memorizing invocation syntax. It 
 
 The key pattern in this post is simple: accept quickly at the HTTP edge, move real work behind a queue, stop duplicates at the idempotency boundary, and preserve repeated failures as replayable DLQ payloads. In the next post, we will build on that path and look at why *cold start* changes latency expectations in serverless systems.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Trigger and Event?**
+  - The article treats Trigger and Event as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Trigger and Event?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Trigger and Event reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
 - **Trigger and Event (current)**
 - Cold Start (upcoming)
 - Scaling (upcoming)
@@ -349,6 +361,7 @@ The key pattern in this post is simple: accept quickly at the HTTP edge, move re
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

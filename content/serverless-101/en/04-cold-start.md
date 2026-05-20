@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 4
-title: Cold Start
+title: "Serverless 101 (4/10): Cold Start"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A beginner-friendly tour of cold start in serverless covering c
 last_reviewed: '2026-05-04'
 ---
 
-# Cold Start
+# Serverless 101 (4/10): Cold Start
 
 You usually notice *cold start* from the outside first. A function that feels fast most of the time suddenly takes seconds on the first request after idle time, during a burst, or right after deployment. The average looks fine, but the user experience does not.
 
 That is why cold start is one of the earliest serverless topics worth understanding well. It shapes *p99 latency*, user-visible reliability, and the cost you are willing to pay to keep latency stable.
 
 This is post 4 in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Cold Start?
+- Which signal should the example or diagram make visible for Cold Start?
+- What failure should be prevented first when Cold Start reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 4 flow overview*
+
+This picture places Cold Start inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Cold Start is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ The trap is that averages hide the problem. If warm invocations are common, the 
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
-
-*Cold start combines environment creation, runtime loading, and your own initialization code into one delay.*
 This diagram matters because it shows that *cold start* is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.
 
 ## Key Terms
@@ -184,10 +197,21 @@ Use *provisioning* on *latency-sensitive* paths like *payments, login*; *accept*
 
 Next, we look at *Scaling* and the *concurrency model*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Cold Start?**
+  - The article treats Cold Start as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Cold Start?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Cold Start reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
 - **Cold Start (current)**
 - Scaling (upcoming)
 - State Management (upcoming)
@@ -195,6 +219,7 @@ Next, we look at *Scaling* and the *concurrency model*.
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

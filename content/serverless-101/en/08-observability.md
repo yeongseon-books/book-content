@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 8
-title: Observability
+title: "Serverless 101 (8/10): Observability"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A beginner-friendly tour of serverless observability covering l
 last_reviewed: '2026-05-04'
 ---
 
-# Observability
+# Serverless 101 (8/10): Observability
 
 Serverless systems are short-lived and distributed. One user request may cross multiple functions, queues, and data stores before it finishes. That is why “just look at the logs” stops working earlier than many teams expect.
 
 Observability is the discipline that turns those short-lived hops into something you can still debug. In serverless, that means connecting logs, metrics, and traces well enough that you can reconstruct what happened after the fact.
 
 This is post 8 in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Observability?
+- Which signal should the example or diagram make visible for Observability?
+- What failure should be prevented first when Observability reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 8 flow overview*
+
+This picture places Observability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Observability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Observability is also a cost design problem. What you log, how long you retain i
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
-
-*Logs, metrics, and traces become operationally useful only when one investigation can cross all three.*
 The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.
 
 ## Key Terms
@@ -180,17 +193,29 @@ A standard like *OpenTelemetry* unifies the *three signals* into *one backend* v
 
 Next, we cover *Cost*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Observability?**
+  - The article treats Observability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Observability?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Observability reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
-- [Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
+- [Serverless 101 (7/10): Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
 - **Observability (current)**
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

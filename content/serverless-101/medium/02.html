@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Function as a Service</title>
+<title>Serverless 101 (2/10): Function as a Service</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,110 +53,214 @@
 </style>
 </head>
 <body>
-<h1>Function as a Service</h1>
-<p>Once <em>serverless</em> makes sense as a responsibility model, the next question becomes more concrete. How does a function actually run on the cloud? If you cannot answer that, <em>cold start</em>, <em>memory tuning</em>, and <em>concurrency</em> remain intuition games.</p>
-<p>FaaS is where serverless becomes operationally real. The platform packages code, prepares a runtime, invokes a handler, and tears the environment down or reuses it later depending on traffic.</p>
-<p>This is post 2 in the Serverless 101 series.</p>
+<h1>Serverless 101 (2/10): Function as a Service</h1>
+<p>This is the second post in the Serverless 101 series.</p>
+<p>Once serverless makes sense as a responsibility shift, the next question becomes concrete: <strong>what does that shift look like at the deployment-unit level?</strong> If you cannot answer that, <em>cold starts</em>, <em>package size</em>, <em>runtime choice</em>, and <em>memory tuning</em> remain intuition games.</p>
+<p>So this post is deliberately narrow. Instead of isolated packaging tips, we will follow one operator loop from start to finish: <strong>write the handler, package it, run the same event locally, inspect the artifact, and only then touch resource tuning</strong>. That loop is what makes FaaS operationally real.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Function as a Service?</li>
+<li>Which signal should the example or diagram make visible for Function as a Service?</li>
+<li>What failure should be prevented first when Function as a Service reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 2 flow overview</em></p>
+<p>This picture places Function as a Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Function as a Service is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
-<li>the <em>FaaS</em> execution model</li>
-<li><em>handler</em> signatures</li>
-<li><em>runtime</em> selection</li>
-<li><em>packaging</em> and the <em>deployment unit</em></li>
-<li><em>concurrency</em> and <em>isolation</em></li>
+<li>how the FaaS execution contract is formed by the <em>handler</em>, <em>runtime</em>, and <em>deployment package</em></li>
+<li>what file layout and command order make a first deployment reproducible</li>
+<li>why package size and dependency count affect runtime behavior directly</li>
+<li>how to troubleshoot the common case where the function works locally but behaves differently in the managed runtime</li>
 </ul>
+<blockquote>
+<p>FaaS is not a feature for uploading a few lines of code. It is a model that turns handler, runtime, and package into one execution contract.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>If you treat FaaS like “just upload a function,” your intuition will keep missing the real cost centers. Runtime initialization, package size, dependency loading, and concurrency limits are all part of the platform contract.</p>
-<p>That is why experienced teams do not tune only the handler body. They also tune packaging, runtime choice, initialization work, and the concurrency budget that the function can consume.</p>
+<p>Introductory explanations often make FaaS sound like “just upload a function.” Production reality is the opposite. The runtime initializes before your handler runs. The package is loaded before the event reaches the handler. Initialization cost becomes latency before the business logic even starts.</p>
+<p>That is why performance and reliability problems rarely live in the handler body alone. Heavy dependencies, unnecessary files, runtime-version drift, and missing environment variables matter just as much. To understand FaaS is to understand the whole deployment contract, not only the function body.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>Packaging and runtime initialization shape how a FaaS handler actually behaves in production.</em><br>
-This is the most useful mental model for FaaS in practice. You write a handler, but the production outcome is shaped by the package around it and by the runtime that has to load that package before the handler ever sees an event.</p>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>handler</strong>: the <em>entry point</em> function.</li>
-<li><strong>runtime</strong>: the <em>language environment</em> (Python, Node, etc.).</li>
-<li><strong>deployment package</strong>: a <em>zip</em> or <em>container image</em>.</li>
-<li><strong>concurrency</strong>: number of <em>parallel</em> <em>instances</em>.</li>
-<li><strong>memory size</strong>: <em>memory</em> and <em>CPU</em> are <em>coupled</em>.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: a <em>server</em> with a <em>process</em> under <em>systemd</em>.</p>
-<p><strong>After</strong>: upload a <em>zip</em>; the <em>platform</em> runs it.</p>
-<h2>Hands-on: Packaging and Execution</h2>
-<p><strong>Step 1 — Pin dependencies</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-requirements.txt:
-requests==2.32.0
-&quot;&quot;&quot;
+<p>In practical terms, the flow is simple. You write a handler, bundle its required files, and the platform loads that bundle inside a chosen runtime before invoking the handler. That means real-world FaaS behavior is always the combined result of <strong>handler code + package contents + runtime startup cost</strong>.</p>
+<h2>The example contract for this post</h2>
+<p>We will continue the order-ingest example from post 1. The goal changes, though. Post 1 was about getting the first invocation right. This post is about turning the same handler into a <strong>real FaaS deployment unit</strong>.</p>
+<p>Use a minimal layout like this:</p>
+<pre><code class="language-text">faas-demo/
+├── app.py
+├── smoke_test.py
+└── requirements.txt
 </code></pre>
-<p><strong>Step 2 — Write the handler</strong></p>
+<p><strong>requirements.txt</strong></p>
+<pre><code class="language-text">requests==2.32.3
+</code></pre>
+<p>The dependency list is intentionally small. The first lesson in FaaS packaging is control: know what you shipped, know why it is there, and notice immediately when the artifact gets heavier than expected.</p>
+<p><strong>app.py</strong></p>
+<pre><code class="language-python">import json
+from datetime import UTC, datetime
+
+def build_response(status_code: int, body: dict) -&gt; dict:
+    return {
+        &quot;statusCode&quot;: status_code,
+        &quot;headers&quot;: {&quot;Content-Type&quot;: &quot;application/json&quot;},
+        &quot;body&quot;: json.dumps(body, ensure_ascii=False),
+    }
+
+def handler(event: dict, context) -&gt; dict:
+    request_id = getattr(context, &quot;aws_request_id&quot;, &quot;local-request&quot;)
+    payload = json.loads(event.get(&quot;body&quot;) or &quot;{}&quot;)
+
+    order_id = payload.get(&quot;order_id&quot;)
+    items = payload.get(&quot;items&quot;, [])
+
+    if not order_id or not items:
+        return build_response(
+            400,
+            {
+                &quot;ok&quot;: False,
+                &quot;request_id&quot;: request_id,
+                &quot;error&quot;: &quot;order_id and items are required&quot;,
+            },
+        )
+
+    return build_response(
+        202,
+        {
+            &quot;ok&quot;: True,
+            &quot;request_id&quot;: request_id,
+            &quot;accepted_at&quot;: datetime.now(UTC).isoformat(),
+            &quot;order_id&quot;: order_id,
+            &quot;item_count&quot;: len(items),
+        },
+    )
+</code></pre>
+<p><strong>smoke_test.py</strong></p>
 <pre><code class="language-python">import json
 
-def handler(event, context):
-    return {&quot;statusCode&quot;: 200, &quot;body&quot;: json.dumps({&quot;ok&quot;: True})}
-</code></pre>
-<p><strong>Step 3 — Package</strong></p>
-<pre><code class="language-python">import zipfile, pathlib
+from app import handler
 
-def package(src_dir, out):
-    with zipfile.ZipFile(out, &quot;w&quot;) as z:
-        for p in pathlib.Path(src_dir).rglob(&quot;*&quot;):
-            z.write(p, p.relative_to(src_dir))
-</code></pre>
-<p><strong>Step 4 — Inspect memory effect</strong></p>
-<pre><code class="language-python">def memory_to_cpu(mb):
-    return mb / 1769  # ~1 vCPU at ~1769MB
-</code></pre>
-<p><strong>Step 5 — Simulate concurrency</strong></p>
-<pre><code class="language-python">import concurrent.futures as cf
+class LocalContext:
+    aws_request_id = &quot;req-smoke-001&quot;
 
-def burst(handler, n):
-    with cf.ThreadPoolExecutor(max_workers=n) as ex:
-        return list(ex.map(lambda i: handler({&quot;i&quot;: i}, None), range(n)))
+event = {
+    &quot;body&quot;: json.dumps(
+        {
+            &quot;order_id&quot;: &quot;ord-1001&quot;,
+            &quot;items&quot;: [
+                {&quot;sku&quot;: &quot;keyboard&quot;, &quot;quantity&quot;: 1},
+                {&quot;sku&quot;: &quot;mouse&quot;, &quot;quantity&quot;: 2},
+            ],
+        }
+    )
+}
+
+result = handler(event, LocalContext())
+print(json.dumps(result, ensure_ascii=False, indent=2))
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>Treat the <em>handler</em> like a <em>pure function</em>.</li>
-<li>On many platforms, <em>memory</em> sets <em>CPU</em>.</li>
-<li><em>Concurrency</em> balances <em>cost</em> and <em>latency</em>.</li>
-</ul>
-<h2>Five Common Mistakes</h2>
+<p>This separation matters. <code>app.py</code> is the deployment entry point. <code>smoke_test.py</code> is the smallest reproducible verifier for the same event contract. If those concerns stay mixed, debugging gets blurry very quickly.</p>
+<h2>The build → package → run → measure loop</h2>
+<p>This order is the heart of the post. Resist the urge to skip ahead to memory tuning.</p>
+<p><strong>Step 1 — Install dependencies into a packaging directory</strong></p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt -t package
+cp app.py package/
+</code></pre>
+<p>The important detail is <code>-t package</code>. A FaaS deployment artifact is ultimately just the exact set of files the runtime needs. You are not shipping your whole local environment. You are shipping a controlled execution bundle.</p>
+<p><strong>Step 2 — Create one zip artifact</strong></p>
+<pre><code class="language-bash">cd package
+zip -r ../function.zip .
+cd ..
+</code></pre>
+<p>Before you celebrate success, inspect intent. Which files actually ended up in the archive? Did you accidentally include test data, local notes, caches, or development-only assets?</p>
+<p><strong>Step 3 — Run a local smoke test with the same event contract</strong></p>
+<pre><code class="language-bash">python3 smoke_test.py
+</code></pre>
+<p>Expected output:</p>
+<pre><code class="language-json">{
+  &quot;statusCode&quot;: 202,
+  &quot;headers&quot;: {
+    &quot;Content-Type&quot;: &quot;application/json&quot;
+  },
+  &quot;body&quot;: &quot;{\&quot;ok\&quot;: true, \&quot;request_id\&quot;: \&quot;req-smoke-001\&quot;, \&quot;accepted_at\&quot;: \&quot;2026-05-16T10:00:00+00:00\&quot;, \&quot;order_id\&quot;: \&quot;ord-1001\&quot;, \&quot;item_count\&quot;: 2}&quot;
+}
+</code></pre>
+<p>If the handler fails here, deployment is not the next problem to solve. If this step passes, later differences in the managed runtime can be investigated as <strong>environment differences</strong> rather than basic handler bugs.</p>
+<p><strong>Step 4 — Inspect artifact size and contents</strong></p>
+<pre><code class="language-bash">ls -lh function.zip
+python3 -m zipfile -l function.zip | sed -n '1,20p'
+</code></pre>
+<p>An initial result might look like this:</p>
+<pre><code class="language-text">-rw-r--r--  1 user  staff    1.1M May 16 10:05 function.zip
+</code></pre>
+<pre><code class="language-text">File Name                                             Modified             Size
+app.py                                         2026-05-16 10:04:00         1034
+requests/__init__.py                           2026-05-16 10:04:00         4963
+requests/sessions.py                           2026-05-16 10:04:00        30373
+urllib3/__init__.py                            2026-05-16 10:04:00         6979
+...
+</code></pre>
+<p>This check matters more than many beginners expect. In practice, package obesity is often a better first target than memory tuning. Raising memory without understanding the artifact is like increasing engine power before removing unnecessary cargo.</p>
+<p><strong>Step 5 — Only after measuring do you tune memory and CPU</strong></p>
+<p>On many platforms, memory and CPU are coupled. More memory can reduce duration enough to lower total cost. But that is not a rule you memorize. It is a rule you test.</p>
+<p><strong>A decision flow for memory tuning</strong></p>
 <ol>
-<li><strong>Relying on <em>global state</em> for caching.</strong></li>
-<li><strong>Heavy <em>dependencies</em> worsening <em>cold start</em>.</strong></li>
-<li><strong>Setting <em>memory</em> too <em>low</em>.</strong></li>
-<li><strong>Not knowing the <em>concurrency limit</em>.</strong></li>
-<li><strong>Leaving the <em>runtime EOL</em> unaddressed.</strong></li>
+<li><strong>Trim dependencies first.</strong><br>
+   - Remove unused libraries, large SDKs, and development-only files.</li>
+<li><strong>Rebuild the package and inspect size again.</strong><br>
+   - If the artifact is unexpectedly large, fix that cause first.</li>
+<li><strong>Run the same local parity test again.</strong><br>
+   - Confirm that the contract is unchanged.</li>
+<li><strong>Then adjust memory and compare duration.</strong><br>
+   - Sometimes higher memory lowers total cost. Sometimes it does not.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>It is widely used for <em>HTTP APIs, S3 triggers, queue consumers</em> — any <em>short unit</em> of work.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li>Keep the <em>handler small</em>.</li>
-<li><em>Memory</em> tuning is the core of <em>cost reduction</em>.</li>
-<li>Consider <em>container image</em> options.</li>
-<li><em>Runtime updates</em> are <em>periodic chores</em>.</li>
-<li>View <em>concurrency</em> as a <em>budget</em>.</li>
-</ul>
+<p>That sequence matters because the first FaaS tuning tool is not the memory slider. It is usually <strong>smaller initialization cost and a lighter artifact</strong>.</p>
+<h2>When it works locally but not in the managed runtime</h2>
+<p>This is one of the most common first-response incidents in FaaS. The instinct is often to blame the platform. Usually the explanation is simpler.</p>
+<p><strong>First troubleshooting flow</strong></p>
+<ol>
+<li><strong>Is the runtime version the same?</strong><br>
+   - Local Python 3.12 and managed Python 3.11 can behave differently enough to matter.</li>
+<li><strong>Are environment variables and secrets really present?</strong><br>
+   - A local default may be hiding a missing managed setting.</li>
+<li><strong>Did the artifact include every required file?</strong><br>
+   - The handler may be present while config files or templates are missing.</li>
+<li><strong>Is the handler path configured correctly?</strong><br>
+   - The code may be valid but the runtime may be pointing to the wrong <code>module.function</code>.</li>
+</ol>
+<p>Running this checklist first usually separates “my code is broken” from “my deployment contract is broken” very quickly. The most dangerous debugging habit in FaaS is skipping verification order and jumping straight to retries or memory settings.</p>
+<h2>Common Confusions</h2>
+<p><strong>Is initialization outside the handler always bad?</strong></p>
+<p>No. Reusable clients and configuration loading often belong outside the handler. The catch is that this cost becomes part of cold start behavior, so it should be measured rather than assumed harmless.</p>
+<p><strong>Is a zip package always the right answer?</strong></p>
+<p>It is excellent for small simple functions. If you depend on system libraries or need stronger build reproducibility, a container image may be the better deployment unit. The real question is whether you can control artifact contents intentionally.</p>
+<p><strong>Is lower memory always cheaper?</strong></p>
+<p>No. If lower memory stretches execution time significantly, total cost can rise. That is why comparisons must use the same input, the same code, and the same measurement baseline.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Dependencies</em> minimized.</li>
-<li>[ ] <em>Memory/CPU</em> tuned.</li>
-<li>[ ] <em>Runtime</em> current.</li>
-<li>[ ] <em>Concurrency</em> limit known.</li>
+<li>[ ] <code>requirements.txt</code>, handler code, and smoke test are separated</li>
+<li>[ ] Artifact size and file contents are inspected before deployment</li>
+<li>[ ] Dependency trimming happens before memory tuning</li>
+<li>[ ] The first troubleshooting checks for managed-runtime drift are known</li>
 </ul>
-<h2>Practice Problems</h2>
-<ol>
-<li>In one line, the <em>handler</em> signature.</li>
-<li>In one line, the relation of <em>memory</em> and <em>CPU</em>.</li>
-<li>In one line, the relation of <em>concurrency</em> and <em>cost</em>.</li>
-</ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>FaaS is not merely a function runner. It is a standardized execution contract that includes the handler shape, the runtime, the deployment package, the resource model, and the concurrency rules around execution.</p>
-<p>Next, we look at <em>Triggers</em> and <em>Events</em>.</p>
+<p>FaaS is not just “running a function.” It is an operating contract that binds together <strong>handler, runtime, package, and measurement loop</strong>. Strong teams do not deploy immediately after the code compiles. They package, run the same event locally, inspect the artifact, and only then tune performance.</p>
+<p>In the next post, we will move from packaging to delivery semantics and follow a concrete path from <strong>HTTP request to queue, consumer, idempotency check, and DLQ replay</strong>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
+<li><strong>What boundary should you inspect first when applying Function as a Service?</strong></li>
+<li>The article treats Function as a Service as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Function as a Service?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Function as a Service reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">Serverless 101 (1/10): What is Serverless?</a></li>
 <li><strong>Function as a Service (current)</strong></li>
 <li>Trigger and Event (upcoming)</li>
 <li>Cold Start (upcoming)</li>
@@ -171,14 +275,15 @@ def burst(handler, n):
 <p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html">AWS Lambda Python handler</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/python-package.html">Lambda zip deployment packages</a></li>
 <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html">AWS Lambda container images</a></li>
-<li><a href="https://cloud.google.com/functions/docs/runtime-support">Google Cloud Functions runtime support</a></li>
 <li><a href="https://learn.microsoft.com/azure/azure-functions/functions-scale">Azure Functions hosting and scale</a></li>
 </ul>
 <p><strong>Code and Runtime Examples</strong></p>
 <ul>
 <li><a href="https://github.com/awsdocs/aws-lambda-developer-guide">AWS Lambda developer guide examples (GitHub)</a></li>
 <li><a href="https://github.com/Azure/azure-functions-python-worker">Azure Functions Python worker samples (GitHub)</a></li>
+<li><a href="https://cloud.google.com/functions/docs/building">Google Cloud Run functions build and deploy guide</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, FaaS, Lambda, Runtime, Cloud</p>
 </body>

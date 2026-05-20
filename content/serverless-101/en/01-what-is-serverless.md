@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 1
-title: What is Serverless?
+title: "Serverless 101 (1/10): What is Serverless?"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A practical introduction to serverless with a first-function wo
 last_reviewed: '2026-05-16'
 ---
 
-# What is Serverless?
+# Serverless 101 (1/10): What is Serverless?
 
 This is the first post in the Serverless 101 series.
 
 When people first hear *serverless*, they usually compress it into one shortcut: “so the servers are gone.” The shortcut is understandable, but it is wrong enough to distort the design decisions that follow. The servers do not disappear. **The default operational responsibility moves to the platform.**
 
 That is why the first question should not be “how do I write a function?” It should be **“is this workload a good candidate for serverless in the first place?”** Once that is clear, topics like *FaaS*, *triggers*, *cold starts*, and *cost* stop feeling like scattered caveats and start reading like one operating model.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What is Serverless??
+- Which signal should the example or diagram make visible for What is Serverless??
+- What failure should be prevented first when What is Serverless? reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 1 flow overview*
+
+This picture places What is Serverless? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What is Serverless? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -68,10 +84,6 @@ So the key framing for this first post is not “what became automatic?” but *
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
-
-*The platform sits between the incoming event and the function, which is why serverless is better understood as a responsibility shift than as a “no servers” slogan.*
-
 The platform is the key actor in this diagram. It creates the execution environment, decides how invocations scale, and applies retry or timeout behavior. The developer no longer provisions servers directly, but becomes more responsible for **input contracts, response shape, state boundaries, and log fields**.
 
 ## A first serverless workflow: accept one HTTP request correctly
@@ -84,14 +96,12 @@ Instead of walking through disconnected toy snippets, we will use one small exam
 import json
 from datetime import UTC, datetime
 
-
 def build_response(status_code: int, body: dict) -> dict:
     return {
         "statusCode": status_code,
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(body, ensure_ascii=False),
     }
-
 
 def handler(event: dict, context) -> dict:
     request_id = getattr(context, "aws_request_id", "local-request")
@@ -161,7 +171,6 @@ One of the easiest beginner mistakes is to focus on the handler body and leave t
 ```python
 class LocalContext:
     aws_request_id = "req-local-001"
-
 
 if __name__ == "__main__":
     result = handler(sample_event, LocalContext())
@@ -241,7 +250,18 @@ The core of serverless is not server removal. It is responsibility transfer. The
 
 Our first example was only a tiny HTTP order-ingest handler, but it already carried the core contract of a serverless system. In the next post, we will continue with the same example family and turn it into a **real build-package-run-measure FaaS workflow**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying What is Serverless??**
+  - The article treats What is Serverless? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What is Serverless??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What is Serverless? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What is Serverless? (current)**
 - Function as a Service (upcoming)
 - Trigger and Event (upcoming)
@@ -252,6 +272,7 @@ Our first example was only a tiny HTTP order-ingest handler, but it already carr
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

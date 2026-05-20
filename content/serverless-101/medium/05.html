@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Scaling</title>
+<title>Serverless 101 (5/10): Scaling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Scaling</h1>
+<h1>Serverless 101 (5/10): Scaling</h1>
 <p>Serverless often gets introduced with a seductive sentence: “it scales automatically.” That is directionally true, but in production it is also one of the most dangerous half-truths. Functions may scale quickly while the database, queue consumers, and third-party APIs behind them remain finite.</p>
 <p>That means scaling is not just a story about how far the platform can stretch. It is a story about how much downstream pressure your system can survive without turning a traffic spike into a reliability incident.</p>
 <p>This is post 5 in the Serverless 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Scaling?</li>
+<li>Which signal should the example or diagram make visible for Scaling?</li>
+<li>What failure should be prevented first when Scaling reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 5 flow overview</em></p>
+<p>This picture places Scaling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Scaling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>the <em>concurrency</em> model</li>
@@ -69,9 +82,7 @@
 <p>Serverless is strong at horizontal expansion, but that strength becomes a liability if you measure only function throughput. A rapid increase in concurrency can exhaust database connections, hit third-party API limits, or starve peer functions that share the same account-level budget.</p>
 <p>That is why experienced operators treat concurrency like a budget. The point is not to remove every limit. The point is to place limits deliberately so that the whole system stays healthy.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>Function elasticity is only safe when downstream systems can absorb the resulting parallelism.</em><br>
-The most important part of this diagram is what happens <em>after</em> the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.</p>
+<p>The most important part of this diagram is what happens <em>after</em> the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>concurrency</strong>: number of <em>parallel</em> <em>instances</em>.</li>
@@ -169,11 +180,21 @@ def drain(queue, handler, batch=10):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover <em>State Management</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
+<li><strong>What boundary should you inspect first when applying Scaling?</strong></li>
+<li>The article treats Scaling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Scaling?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Scaling reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">Serverless 101 (1/10): What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Serverless 101 (2/10): Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Serverless 101 (3/10): Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Serverless 101 (4/10): Cold Start</a></li>
 <li><strong>Scaling (current)</strong></li>
 <li>State Management (upcoming)</li>
 <li>Queue and Event-driven Architecture (upcoming)</li>

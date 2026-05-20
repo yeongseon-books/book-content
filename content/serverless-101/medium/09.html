@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cost</title>
+<title>Serverless 101 (9/10): Cost</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Cost</h1>
+<h1>Serverless 101 (9/10): Cost</h1>
 <p>Serverless often gets sold with the easiest line item to quote: the price per invocation. That number is memorable, but it rarely explains the bill you eventually pay. What surprises teams is usually everything wrapped around the call count.</p>
 <p>Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.</p>
 <p>This is post 9 in the Serverless 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Cost?</li>
+<li>Which signal should the example or diagram make visible for Cost?</li>
+<li>What failure should be prevented first when Cost reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 9 flow overview</em></p>
+<p>This picture places Cost inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cost is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>cost components</em> of serverless</li>
@@ -69,9 +82,7 @@
 <p>Serverless is not automatically cheaper. It can be extremely efficient for short and bursty work, and surprisingly expensive for long-running, high-volume, or network-heavy workloads.</p>
 <p>That is why cost belongs in architecture review, not just in monthly reporting. The same feature can land in a very different cost envelope depending on memory size, downstream calls, egress, and whether you pay an idle tax for provisioned capacity.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>A serverless bill is the sum of invocation, compute time, network transfer, and downstream service usage.</em><br>
-The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.</p>
+<p>The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>invocation cost</strong>: price <em>per call</em>.</li>
@@ -84,7 +95,8 @@ The useful lesson in this diagram is that the bill is a composition of multiple 
 <p><strong>Before</strong>: estimate cost from the <em>per-call price</em> alone.</p>
 <p><strong>After</strong>: compare alternatives using a <em>total cost of ownership</em> model.</p>
 <h2>Hands-on: Modeling Cost</h2>
-<p><strong>Step 1 — Invocation cost</strong></p>
+<p>The constants in the sample below are an <strong>AWS Lambda pricing example</strong>, not a provider-neutral serverless default. Azure Functions and Google Cloud Functions use different pricing rules, free tiers, and billing details, so treat the numbers as one worked example rather than a universal formula.</p>
+<p><strong>Step 1 — Invocation cost (AWS Lambda example)</strong></p>
 <pre><code class="language-python">def calls_cost(n, unit_price=0.0000002):
     return n * unit_price
 </code></pre>
@@ -92,11 +104,11 @@ The useful lesson in this diagram is that the bill is a composition of multiple 
 <pre><code class="language-python">def gb_seconds(memory_mb, duration_ms, n):
     return (memory_mb / 1024) * (duration_ms / 1000) * n
 </code></pre>
-<p><strong>Step 3 — Egress</strong></p>
+<p><strong>Step 3 — Egress (example rate)</strong></p>
 <pre><code class="language-python">def egress_cost(gb, price_per_gb=0.09):
     return gb * price_per_gb
 </code></pre>
-<p><strong>Step 4 — Scenario comparison</strong></p>
+<p><strong>Step 4 — Scenario comparison (AWS-shaped sample)</strong></p>
 <pre><code class="language-python">def total(n, mem_mb, dur_ms, gb_out):
     return (
         calls_cost(n)
@@ -126,13 +138,14 @@ for s in sizes:
 <p>This keeps the discussion anchored in workload shape instead of in isolated pricing units.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
+<li>The numeric constants are <strong>provider-specific example values</strong>, not universal serverless defaults.</li>
 <li><em>Memory</em> sets both <em>CPU</em> and <em>cost</em>.</li>
 <li><em>Data transfer</em> is a <em>hidden</em> line item.</li>
 <li>Compare alternatives at the <em>scenario</em> level, not the unit level.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Estimating <em>total cost</em> from the <em>per-call price</em> only.</strong></li>
+<li><strong>Treating one provider's published constants as if they were generic <em>serverless</em> defaults.</strong></li>
 <li><strong>Pinning <em>memory</em> at the <em>minimum</em> without measuring duration.</strong></li>
 <li><strong>Ignoring <em>egress</em>.</strong></li>
 <li><strong>Forgetting <em>DB</em> and <em>queue</em> charges.</strong></li>
@@ -163,15 +176,25 @@ for s in sizes:
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The final episode is <em>Designing a Serverless App</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Triggers and Events</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Scaling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">State Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/07-queue-and-event-driven.md">Queues and Event-driven Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/08-observability.md">Observability</a></li>
+<li><strong>What boundary should you inspect first when applying Cost?</strong></li>
+<li>The article treats Cost as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Cost?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Cost reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">Serverless 101 (1/10): What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Serverless 101 (2/10): Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Serverless 101 (3/10): Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Serverless 101 (4/10): Cold Start</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Serverless 101 (5/10): Scaling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">Serverless 101 (6/10): State Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/07-queue-and-event-driven.md">Serverless 101 (7/10): Queue and Event-driven Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/08-observability.md">Serverless 101 (8/10): Observability</a></li>
 <li><strong>Cost (current)</strong></li>
 <li>Designing a Serverless App (upcoming)</li>
 </ul>

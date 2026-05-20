@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 7
-title: Queue and Event-driven Architecture
+title: "Serverless 101 (7/10): Queue and Event-driven Architecture"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A beginner-friendly tour of queues and event-driven architectur
 last_reviewed: '2026-05-04'
 ---
 
-# Queue and Event-driven Architecture
+# Serverless 101 (7/10): Queue and Event-driven Architecture
 
 As systems grow, what gets heavy first is often not the code but the connections between services. A synchronous chain can look simple on a quiet day and turn brittle as soon as one dependency slows down or fails.
 
 Queues and event buses help because they separate responsibilities in both time and failure scope. In a serverless system, that separation is often what keeps a short function from turning into a long, fragile request path.
 
 This is post 7 in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Queue and Event-driven Architecture?
+- Which signal should the example or diagram make visible for Queue and Event-driven Architecture?
+- What failure should be prevented first when Queue and Event-driven Architecture reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 7 flow overview*
+
+This picture places Queue and Event-driven Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Queue and Event-driven Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Async messaging changes that shape. It lets producers publish facts and lets con
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
-
-*Queues and topics decouple producers from consumers across both time and failure boundaries.*
 The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.
 
 ## Key Terms
@@ -158,17 +171,29 @@ Event-driven design is valuable because it separates time, responsibility, and f
 
 Next, we cover *Observability*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Queue and Event-driven Architecture?**
+  - The article treats Queue and Event-driven Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Queue and Event-driven Architecture?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Queue and Event-driven Architecture reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
 - **Queue and Event-driven Architecture (current)**
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

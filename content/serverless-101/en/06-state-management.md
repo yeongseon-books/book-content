@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 6
-title: State Management
+title: "Serverless 101 (6/10): State Management"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A beginner-friendly tour of state in serverless covering extern
 last_reviewed: '2026-05-04'
 ---
 
-# State Management
+# Serverless 101 (6/10): State Management
 
 Sooner or later, serverless beginners hit the same objection. “If functions must stay stateless, where do sessions, carts, workflow progress, and deduplication state go?” If that question stays fuzzy, serverless feels like an arbitrary restriction instead of a usable design rule.
 
 The important distinction is simple: the business still has state, but the function process is not the place to trust that state. Once you accept that, the rest becomes an architecture exercise about choosing the right external stores.
 
 This is post 6 in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying State Management?
+- Which signal should the example or diagram make visible for State Management?
+- What failure should be prevented first when State Management reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 6 flow overview*
+
+This picture places State Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of State Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ State management is not a side concern in serverless. It determines where sessio
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
-
-*Functions do the work, while caches, databases, and workflow engines hold the durable state.*
 This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.
 
 ## Key Terms
@@ -162,17 +175,29 @@ The goal is not to erase state. The goal is to put each kind of state in the pla
 
 Next, we cover *Queues* and *Event-driven Architecture*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying State Management?**
+  - The article treats State Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for State Management?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when State Management reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Trigger and Event](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
 - **State Management (current)**
 - Queue and Event-driven Architecture (upcoming)
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References

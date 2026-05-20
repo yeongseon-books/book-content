@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 10
-title: Designing a Serverless App
+title: "Serverless 101 (10/10): Designing a Serverless App"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A capstone guide to serverless app design covering an image-pro
 last_reviewed: '2026-05-04'
 ---
 
-# Designing a Serverless App
+# Serverless 101 (10/10): Designing a Serverless App
 
 One function by itself is simple. A real product is not. It has an upload edge, background processing, retries, state updates, notifications, metrics, and a failure path that still has to be visible when something breaks. At that point, you are still designing a distributed system, even if every piece is “just a function.”
 
 That is why the capstone topic is not another isolated feature. It is composition. The challenge is deciding which responsibilities stay on the request path, which move behind queues, where state lives, and how failures become observable instead of silent.
 
 This is the final post in the Serverless 101 series.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Designing a Serverless App?
+- Which signal should the example or diagram make visible for Designing a Serverless App?
+- What failure should be prevented first when Designing a Serverless App reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 10 flow overview*
+
+This picture places Designing a Serverless App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Designing a Serverless App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,9 +60,6 @@ Strong boundaries make the system easier to scale, easier to retry safely, and e
 
 ## Concept at a Glance
 
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
-
-*A thin edge function, queued background work, and explicit state boundaries keep the app easier to scale and recover.*
 This shape captures the default serverless instinct worth keeping: keep the request-path function thin, push long work behind a queue, store durable state explicitly, and separate notification from the business-critical path.
 
 ## Key Terms
@@ -178,17 +191,29 @@ The point of serverless design is not to split everything into tiny pieces. It i
 
 Congratulations on finishing the series. Take the next step: design a *small distributed system* of your own, woven from *functions*, *queues*, and *triggers*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Designing a Serverless App?**
+  - The article treats Designing a Serverless App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Designing a Serverless App?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Designing a Serverless App reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
-- [Function as a Service](./02-function-as-a-service.md)
-- [Triggers and Events](./03-trigger-and-event.md)
-- [Cold Start](./04-cold-start.md)
-- [Scaling](./05-scaling.md)
-- [State Management](./06-state-management.md)
-- [Queues and Event-driven Architecture](./07-queue-and-event-driven.md)
-- [Observability](./08-observability.md)
-- [Cost](./09-cost.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
+- [Serverless 101 (2/10): Function as a Service](./02-function-as-a-service.md)
+- [Serverless 101 (3/10): Trigger and Event](./03-trigger-and-event.md)
+- [Serverless 101 (4/10): Cold Start](./04-cold-start.md)
+- [Serverless 101 (5/10): Scaling](./05-scaling.md)
+- [Serverless 101 (6/10): State Management](./06-state-management.md)
+- [Serverless 101 (7/10): Queue and Event-driven Architecture](./07-queue-and-event-driven.md)
+- [Serverless 101 (8/10): Observability](./08-observability.md)
+- [Serverless 101 (9/10): Cost](./09-cost.md)
 - **Designing a Serverless App (current)**
+
 <!-- toc:end -->
 
 ## References

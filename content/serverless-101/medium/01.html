@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What is Serverless?</title>
+<title>Serverless 101 (1/10): What is Serverless?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,103 +53,203 @@
 </style>
 </head>
 <body>
-<h1>What is Serverless?</h1>
-<p>When people first hear <em>serverless</em>, they usually land on the same shortcut. “So the servers are gone.” The direction is understandable, but the conclusion is wrong enough to distort every decision that follows.</p>
-<p>The servers do not disappear. The operational responsibility moves. Once you see that shift clearly, topics like <em>cold start</em>, <em>state management</em>, <em>observability</em>, and <em>cost</em> stop feeling like scattered caveats and start reading like one operating model.</p>
+<h1>Serverless 101 (1/10): What is Serverless?</h1>
 <p>This is the first post in the Serverless 101 series.</p>
+<p>When people first hear <em>serverless</em>, they usually compress it into one shortcut: “so the servers are gone.” The shortcut is understandable, but it is wrong enough to distort the design decisions that follow. The servers do not disappear. <strong>The default operational responsibility moves to the platform.</strong></p>
+<p>That is why the first question should not be “how do I write a function?” It should be <strong>“is this workload a good candidate for serverless in the first place?”</strong> Once that is clear, topics like <em>FaaS</em>, <em>triggers</em>, <em>cold starts</em>, and <em>cost</em> stop feeling like scattered caveats and start reading like one operating model.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What is Serverless??</li>
+<li>Which signal should the example or diagram make visible for What is Serverless??</li>
+<li>What failure should be prevented first when What is Serverless? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 1 flow overview</em></p>
+<p>This picture places What is Serverless? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What is Serverless? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
-<li>the definition of <em>serverless</em></li>
-<li>its relationship with <em>FaaS</em></li>
-<li><em>usage-based billing</em></li>
-<li>how <em>responsibility shifts</em></li>
-<li>which <em>workloads</em> fit and which do not</li>
+<li>what <em>serverless</em> really delegates to the platform</li>
+<li>what a first function should look like as an <em>input/output contract</em></li>
+<li>what has to stay aligned between <em>local invocation</em> and <em>deployment</em></li>
+<li>when <em>serverless</em> is a strong default and when it is the wrong one</li>
 </ul>
-<h2>Why It Matters</h2>
-<p><em>Serverless</em> is not a convenience toggle. It is an architectural choice. For a small team, it can be powerful because the platform absorbs patching, baseline scaling, and part of the runtime operations burden so the team can stay focused on product work.</p>
-<p>That benefit comes with a trade. Paying by usage does not automatically make the system cheap, and breaking logic into small functions does not make distributed-system complexity disappear. If you start with “who owns which responsibility now?” the rest of the series becomes much easier to reason about.</p>
-<h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The platform sits between events and function execution, which is why responsibility transfer matters more than the slogan “no servers.”</em><br>
-The key actor in this diagram is the <em>platform</em>, not the function. The platform decides when to create an execution environment, how to invoke the function, and what operational guarantees exist around scaling and retries. That is why a serverless design discussion usually starts with boundaries and responsibility, not with the function body itself.</p>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>Serverless</strong>: a model that <em>delegates server operation</em> to the <em>platform</em>.</li>
-<li><strong>FaaS</strong>: a <em>function-level</em> execution environment.</li>
-<li><strong>Event source</strong>: the <em>signal</em> that <em>wakes</em> a <em>function</em>.</li>
-<li><strong>Lifetime</strong>: the <em>short window</em> a <em>function</em> is <em>alive</em>.</li>
-<li><strong>Usage-based billing</strong>: pay only for <em>invocations</em>.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: a <em>24/7</em> <em>server</em>, <em>cost</em> even at <em>zero traffic</em>.</p>
-<p><strong>After</strong>: pay only for what is <em>invoked</em>; no <em>provisioning</em>.</p>
-<h2>Hands-on: the Smallest Function</h2>
-<p><strong>Step 1 — Write a Python function</strong></p>
-<pre><code class="language-python">def handler(event, context):
-    name = event.get(&quot;name&quot;, &quot;world&quot;)
-    return {&quot;message&quot;: f&quot;hello, {name}&quot;}
-</code></pre>
-<p><strong>Step 2 — Simulate invocation locally</strong></p>
-<pre><code class="language-python">def invoke_local(handler, event):
-    return handler(event, context=None)
-
-print(invoke_local(handler, {&quot;name&quot;: &quot;Alice&quot;}))
-</code></pre>
-<p><strong>Step 3 — Get used to event shapes</strong></p>
-<pre><code class="language-python">http_event = {&quot;path&quot;: &quot;/hello&quot;, &quot;method&quot;: &quot;GET&quot;, &quot;name&quot;: &quot;Bob&quot;}
-queue_event = {&quot;records&quot;: [{&quot;body&quot;: &quot;msg-1&quot;}, {&quot;body&quot;: &quot;msg-2&quot;}]}
-</code></pre>
-<p><strong>Step 4 — Be aware of timeouts</strong></p>
-<pre><code class="language-python">import time
-
-def slow_handler(event, context):
-    time.sleep(0.1)
-    return {&quot;ok&quot;: True}
-</code></pre>
-<p><strong>Step 5 — Standardize the response</strong></p>
-<pre><code class="language-python">def http_response(status, body):
-    return {&quot;statusCode&quot;: status, &quot;body&quot;: body}
-</code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>The <em>event</em> + <em>context</em> pair is the <em>common</em> signature.</li>
-<li>Functions should be <em>short and deterministic</em>.</li>
-<li><em>State</em> belongs <em>outside</em> the function.</li>
-</ul>
-<h2>Five Common Mistakes</h2>
+<blockquote>
+<p>Serverless is not a no-server model. It is a model where the platform takes over a meaningful part of server operation and execution control.</p>
+</blockquote>
+<h2>Start with the “wrong default” test</h2>
+<p>Many teams treat serverless as the quickest way to get started. Sometimes it is. Sometimes it creates more constraint work than it removes. The fastest way to stay honest is to run a simple decision ladder before you write the first handler.</p>
+<p><strong>When serverless is the wrong default: a decision ladder</strong></p>
 <ol>
-<li><strong>Building <em>long-running</em> tasks as <em>functions</em>.</strong></li>
-<li><strong>Storing state in <em>local files</em>.</strong></li>
-<li><strong>Ignoring <em>cold starts</em>.</strong></li>
-<li><strong>Estimating <em>cost</em> from <em>call count</em> alone.</strong></li>
-<li><strong>Operating without <em>observability</em>.</strong></li>
+<li><strong>Does the request finish within a short bounded runtime?</strong><br>
+   - Yes: continue.<br>
+   - No: long-running compute, persistent streaming, and session-heavy workloads are often simpler on an always-on runtime.</li>
+<li><strong>Can state live outside the process?</strong><br>
+   - Yes: continue.<br>
+   - No: if durable in-memory or local-disk state is central to correctness, serverless is already a poor fit.</li>
+<li><strong>Is traffic bursty or hard to predict?</strong><br>
+   - Yes: elastic scale is a real advantage.<br>
+   - No: steady sustained load may be cheaper and simpler on a continuously running service.</li>
+<li><strong>Can you accept platform constraints around timeout, packaging, and runtime control?</strong><br>
+   - Yes: serverless is a solid starting point.<br>
+   - No: choose containers or VMs when runtime control itself is part of the requirement.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>It fits <em>event handling, ETL, API backends, scheduled jobs</em> — work that is <em>short and self-contained</em>.</p>
-<h2>How a Senior Engineer Thinks</h2>
+<p>If one of those questions produces a strong early “no,” there is no prize for forcing a serverless shape anyway. Good architecture decisions are not about choosing the newest label. They are about choosing the execution model whose constraints are the least dishonest for the workload.</p>
+<h2>Why It Matters</h2>
+<p>Serverless is powerful for the same reason it is easy to misuse. The platform absorbs patching, baseline scaling, and part of the runtime operations burden, which is a major win for small teams. But the convenience can hide the real contract.</p>
+<p>Paying by usage does not automatically make the system cheap. Cost is shaped by invocation count, duration, memory, network transfer, and the managed services around the function. Breaking a service into functions does not remove distributed-system complexity either. It simply changes where the complexity shows up.</p>
+<p>So the key framing for this first post is not “what became automatic?” but <strong>“what do I still have to design explicitly?”</strong> In serverless, that answer usually includes event boundaries, runtime budgets, external state, and observability.</p>
+<h2>Concept at a Glance</h2>
+<p>The platform is the key actor in this diagram. It creates the execution environment, decides how invocations scale, and applies retry or timeout behavior. The developer no longer provisions servers directly, but becomes more responsible for <strong>input contracts, response shape, state boundaries, and log fields</strong>.</p>
+<h2>A first serverless workflow: accept one HTTP request correctly</h2>
+<p>Instead of walking through disconnected toy snippets, we will use one small example that will continue into the next posts: a minimal order-ingest function. The goal is straightforward: <strong>accept one HTTP-style event, validate it, and return a platform-friendly response</strong>.</p>
+<p><strong>Step 1 — Define the handler contract</strong></p>
+<pre><code class="language-python">import json
+from datetime import UTC, datetime
+
+def build_response(status_code: int, body: dict) -&gt; dict:
+    return {
+        &quot;statusCode&quot;: status_code,
+        &quot;headers&quot;: {&quot;Content-Type&quot;: &quot;application/json&quot;},
+        &quot;body&quot;: json.dumps(body, ensure_ascii=False),
+    }
+
+def handler(event: dict, context) -&gt; dict:
+    request_id = getattr(context, &quot;aws_request_id&quot;, &quot;local-request&quot;)
+    payload = json.loads(event.get(&quot;body&quot;) or &quot;{}&quot;)
+
+    order_id = payload.get(&quot;order_id&quot;)
+    customer_tier = payload.get(&quot;customer_tier&quot;, &quot;standard&quot;)
+    items = payload.get(&quot;items&quot;, [])
+
+    if not order_id or not items:
+        return build_response(
+            400,
+            {
+                &quot;ok&quot;: False,
+                &quot;request_id&quot;: request_id,
+                &quot;error&quot;: &quot;order_id and items are required&quot;,
+            },
+        )
+
+    total_quantity = sum(item[&quot;quantity&quot;] for item in items)
+
+    return build_response(
+        202,
+        {
+            &quot;ok&quot;: True,
+            &quot;request_id&quot;: request_id,
+            &quot;accepted_at&quot;: datetime.now(UTC).isoformat(),
+            &quot;order_id&quot;: order_id,
+            &quot;customer_tier&quot;: customer_tier,
+            &quot;total_quantity&quot;: total_quantity,
+            &quot;next_step&quot;: &quot;queued-for-fulfillment&quot;,
+        },
+    )
+</code></pre>
+<p>The point of this first function is not business sophistication. It is contract clarity.</p>
 <ul>
-<li><em>Serverless</em> is an <em>option</em>, not a <em>default</em>.</li>
-<li><em>Cost</em> equals <em>calls + duration + resources</em>.</li>
-<li>Put <em>state</em> in <em>external storage</em>.</li>
-<li><em>Cold start</em> is a <em>design variable</em>.</li>
-<li><em>Observability</em> is <em>half of debugging</em>.</li>
+<li>Input arrives through <code>event</code> and <code>context</code>.</li>
+<li>The actual business payload is JSON inside <code>event["body"]</code>.</li>
+<li>Validation failures still return a normalized HTTP response.</li>
+<li>Success explicitly tells the caller what happens next.</li>
 </ul>
+<p><strong>Step 2 — Freeze the event shape on paper</strong></p>
+<pre><code class="language-python">sample_event = {
+    &quot;httpMethod&quot;: &quot;POST&quot;,
+    &quot;path&quot;: &quot;/orders&quot;,
+    &quot;headers&quot;: {&quot;content-type&quot;: &quot;application/json&quot;},
+    &quot;body&quot;: json.dumps(
+        {
+            &quot;order_id&quot;: &quot;ord-1001&quot;,
+            &quot;customer_tier&quot;: &quot;gold&quot;,
+            &quot;items&quot;: [
+                {&quot;sku&quot;: &quot;keyboard&quot;, &quot;quantity&quot;: 1},
+                {&quot;sku&quot;: &quot;mouse&quot;, &quot;quantity&quot;: 2},
+            ],
+        }
+    ),
+}
+</code></pre>
+<p>One of the easiest beginner mistakes is to focus on the handler body and leave the event shape vague. In production, the event shape matters more than the function name. HTTP, queue, and scheduled events carry very different payload contracts and very different failure meanings.</p>
+<p><strong>Step 3 — Separate a local invocation path</strong></p>
+<pre><code class="language-python">class LocalContext:
+    aws_request_id = &quot;req-local-001&quot;
+
+if __name__ == &quot;__main__&quot;:
+    result = handler(sample_event, LocalContext())
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+</code></pre>
+<p>This is the right kind of “toy” step because it isolates the handler logic from deployment details. If the function fails later, you can more quickly tell whether the problem is in the handler itself or in the managed runtime configuration.</p>
+<pre><code class="language-bash">python3 app.py
+</code></pre>
+<p><strong>Step 4 — Write down the expected output</strong></p>
+<pre><code class="language-json">{
+  &quot;statusCode&quot;: 202,
+  &quot;headers&quot;: {
+    &quot;Content-Type&quot;: &quot;application/json&quot;
+  },
+  &quot;body&quot;: &quot;{\&quot;ok\&quot;: true, \&quot;request_id\&quot;: \&quot;req-local-001\&quot;, \&quot;accepted_at\&quot;: \&quot;2026-05-16T10:00:00+00:00\&quot;, \&quot;order_id\&quot;: \&quot;ord-1001\&quot;, \&quot;customer_tier\&quot;: \&quot;gold\&quot;, \&quot;total_quantity\&quot;: 3, \&quot;next_step\&quot;: \&quot;queued-for-fulfillment\&quot;}&quot;
+}
+</code></pre>
+<p>Expected output blocks are not just for readability. They define the success contract that the next posts will build on. Without that baseline, queue delivery, retries, and DLQs remain conceptually correct but operationally blurry.</p>
+<h2>The deployment contract already hiding inside this example</h2>
+<p>Even a tiny function stops being useful if it ends at “look, Python runs.” The moment you think about deploying it, four operational contracts are already present.</p>
+<p><strong>Event shape</strong><br>
+- Contract in this example: HTTP payload comes in as a JSON string under <code>body</code><br>
+- Why it matters: Local tests and managed-runtime input must agree</p>
+<p><strong>Timeout budget</strong><br>
+- Contract in this example: The function owns only short request-time work<br>
+- Why it matters: Long-running work pushed here becomes timeout and retry cost</p>
+<p><strong>State boundary</strong><br>
+- Contract in this example: Order state does not live inside the function process<br>
+- Why it matters: Process memory and local disk are not durable system state</p>
+<p><strong>Log fields</strong><br>
+- Contract in this example: <code>request_id</code>, <code>order_id</code>, and <code>next_step</code> must be recorded<br>
+- Why it matters: You need a trace handle before retries and async hops arrive</p>
+<p>That table is the real beginning of serverless design. A function body may look small, but production success usually hinges on <strong>event contract + runtime budget + external state boundary + observability discipline</strong>.</p>
+<h2>The operator checklist for a first function</h2>
+<p>You do not need a huge observability platform on day one. You do need a few early habits.</p>
+<ol>
+<li><strong>Document the event shape.</strong><br>
+   - Required and optional fields should be explicit.</li>
+<li><strong>Keep request-time work inside the timeout budget.</strong><br>
+   - Slow follow-up work should move to an async path.</li>
+<li><strong>Decide the external state boundary early.</strong><br>
+   - “We will keep it in memory for now” becomes technical debt almost immediately in serverless systems.</li>
+<li><strong>Standardize traceable log fields.</strong><br>
+   - Keys like <code>request_id</code>, <code>order_id</code>, and <code>event_type</code> are the minimum viable operating vocabulary.</li>
+</ol>
+<h2>Common Confusions</h2>
+<p><strong>Does serverless automatically lower cost?</strong></p>
+<p>No. Low traffic helps, but cost is still a function of duration, memory, transfer, and dependent services. Invocation count alone is an incomplete model.</p>
+<p><strong>If the function is small, does the architecture become simple automatically?</strong></p>
+<p>No. Small functions can still create a messy system if boundaries, retries, and state transitions are unclear. In serverless, <em>event boundaries</em> matter more than line count.</p>
+<p><strong>Is serverless the right default for every API backend?</strong></p>
+<p>It is strong for short independent requests, bursty traffic, and event-driven post-processing. It is a weaker default for long-lived connections, real-time sessions, continuous compute, or workloads that need tight runtime control.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Function is <em>short</em> and <em>deterministic</em>.</li>
-<li>[ ] <em>State</em> externalized.</li>
-<li>[ ] <em>Cost model</em> reviewed.</li>
-<li>[ ] <em>Observability</em> in place.</li>
+<li>[ ] The workload passes the serverless decision ladder</li>
+<li>[ ] The first function has an explicit event and response contract</li>
+<li>[ ] State is planned outside the function process</li>
+<li>[ ] Traceable log fields are defined up front</li>
 </ul>
-<h2>Practice Problems</h2>
-<ol>
-<li>In one line, why <em>serverless</em> does not mean <em>no servers</em>.</li>
-<li>In one line, the <em>unit</em> of <em>FaaS</em>.</li>
-<li>In one line, a workload that is a <em>poor fit</em>.</li>
-</ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>The core idea is not <em>server removal</em> but <em>responsibility transfer</em>. The platform takes over more of the operational surface, while you become more responsible for event boundaries, state placement, observability, and cost-aware design.</p>
-<p>The next post explores the <em>structure</em> and <em>usage patterns</em> of <em>FaaS</em>.</p>
+<p>The core of serverless is not server removal. It is responsibility transfer. The platform takes over more of the execution surface, while you become more responsible for event contracts, state boundaries, runtime budgets, and observability.</p>
+<p>Our first example was only a tiny HTTP order-ingest handler, but it already carried the core contract of a serverless system. In the next post, we will continue with the same example family and turn it into a <strong>real build-package-run-measure FaaS workflow</strong>.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What is Serverless??</strong></li>
+<li>The article treats What is Serverless? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What is Serverless??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What is Serverless? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is Serverless? (current)</strong></li>
 <li>Function as a Service (upcoming)</li>
@@ -169,10 +269,11 @@ def slow_handler(event, context):
 <li><a href="https://cloud.google.com/functions/docs">Google Cloud Functions overview</a></li>
 <li><a href="https://learn.microsoft.com/azure/azure-functions/functions-overview">Azure Functions overview</a></li>
 </ul>
-<p><strong>Architecture and Patterns</strong></p>
+<p><strong>Architecture and Operational Guidance</strong></p>
 <ul>
 <li><a href="https://martinfowler.com/articles/serverless.html">Serverless (Martin Fowler)</a></li>
 <li><a href="https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/welcome.html">AWS Serverless Lens</a></li>
+<li><a href="https://learn.microsoft.com/azure/well-architected/service-guides/azure-functions">Azure Well-Architected Framework for serverless workloads</a></li>
 </ul>
 <p><strong>Code and Related Reading</strong></p>
 <ul>

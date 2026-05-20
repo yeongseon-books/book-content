@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cold Start</title>
+<title>Serverless 101 (4/10): Cold Start</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Cold Start</h1>
+<h1>Serverless 101 (4/10): Cold Start</h1>
 <p>You usually notice <em>cold start</em> from the outside first. A function that feels fast most of the time suddenly takes seconds on the first request after idle time, during a burst, or right after deployment. The average looks fine, but the user experience does not.</p>
 <p>That is why cold start is one of the earliest serverless topics worth understanding well. It shapes <em>p99 latency</em>, user-visible reliability, and the cost you are willing to pay to keep latency stable.</p>
 <p>This is post 4 in the Serverless 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Cold Start?</li>
+<li>Which signal should the example or diagram make visible for Cold Start?</li>
+<li>What failure should be prevented first when Cold Start reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 4 flow overview</em></p>
+<p>This picture places Cold Start inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Cold Start is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>the definition of <em>Cold Start</em></li>
@@ -69,9 +82,7 @@
 <p>Cold start is not just “sometimes slower.” On login, payment, webhook, or synchronous API paths, a few cold invocations can dominate the latency story that users actually feel.</p>
 <p>The trap is that averages hide the problem. If warm invocations are common, the mean looks healthy while the tail still hurts real traffic. That makes cold start less of a micro-optimization topic and more of a design decision about where latency matters enough to spend money.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>Cold start combines environment creation, runtime loading, and your own initialization code into one delay.</em><br>
-This diagram matters because it shows that <em>cold start</em> is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.</p>
+<p>This diagram matters because it shows that <em>cold start</em> is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>cold start</strong>: <em>initialization latency</em> on the <em>first run</em>.</li>
@@ -178,10 +189,20 @@ curl -s https://example.com/hello
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we look at <em>Scaling</em> and the <em>concurrency model</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
+<li><strong>What boundary should you inspect first when applying Cold Start?</strong></li>
+<li>The article treats Cold Start as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Cold Start?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Cold Start reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">Serverless 101 (1/10): What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Serverless 101 (2/10): Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Serverless 101 (3/10): Trigger and Event</a></li>
 <li><strong>Cold Start (current)</strong></li>
 <li>Scaling (upcoming)</li>
 <li>State Management (upcoming)</li>

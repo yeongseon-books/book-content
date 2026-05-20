@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Observability</title>
+<title>Serverless 101 (8/10): Observability</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Observability</h1>
+<h1>Serverless 101 (8/10): Observability</h1>
 <p>Serverless systems are short-lived and distributed. One user request may cross multiple functions, queues, and data stores before it finishes. That is why “just look at the logs” stops working earlier than many teams expect.</p>
 <p>Observability is the discipline that turns those short-lived hops into something you can still debug. In serverless, that means connecting logs, metrics, and traces well enough that you can reconstruct what happened after the fact.</p>
 <p>This is post 8 in the Serverless 101 series.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Observability?</li>
+<li>Which signal should the example or diagram make visible for Observability?</li>
+<li>What failure should be prevented first when Observability reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="serverless 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>serverless 101 chapter 8 flow overview</em></p>
+<p>This picture places Observability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Observability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>the <em>three legs</em> of observability</li>
@@ -69,9 +82,7 @@
 <p>In a long-lived server process, one log stream can sometimes carry enough context. In a serverless system, execution hops between environments and often crosses asynchronous boundaries. If you do not preserve correlation across those boundaries, you are left with symptoms but not a path.</p>
 <p>Observability is also a cost design problem. What you log, how long you retain it, where you sample traces, and which metrics power alerts all change both your debugging speed and your bill.</p>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>Logs, metrics, and traces become operationally useful only when one investigation can cross all three.</em><br>
-The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.</p>
+<p>The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>structured log</strong>: <em>machine-readable</em> (e.g., JSON).</li>
@@ -175,14 +186,24 @@ downstream=db
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Next, we cover <em>Cost</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Function as a Service</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Trigger and Event</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Cold Start</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Scaling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">State Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/07-queue-and-event-driven.md">Queue and Event-driven Architecture</a></li>
+<li><strong>What boundary should you inspect first when applying Observability?</strong></li>
+<li>The article treats Observability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Observability?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Observability reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">Serverless 101 (1/10): What is Serverless?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/02-function-as-a-service.md">Serverless 101 (2/10): Function as a Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/03-trigger-and-event.md">Serverless 101 (3/10): Trigger and Event</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/04-cold-start.md">Serverless 101 (4/10): Cold Start</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/05-scaling.md">Serverless 101 (5/10): Scaling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/06-state-management.md">Serverless 101 (6/10): State Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/07-queue-and-event-driven.md">Serverless 101 (7/10): Queue and Event-driven Architecture</a></li>
 <li><strong>Observability (current)</strong></li>
 <li>Cost (upcoming)</li>
 <li>Designing a Serverless App (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: serverless-101
 episode: 2
-title: Function as a Service
+title: "Serverless 101 (2/10): Function as a Service"
 status: content-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A practical FaaS guide built around a real build-package-run-me
 last_reviewed: '2026-05-16'
 ---
 
-# Function as a Service
+# Serverless 101 (2/10): Function as a Service
 
 This is the second post in the Serverless 101 series.
 
 Once serverless makes sense as a responsibility shift, the next question becomes concrete: **what does that shift look like at the deployment-unit level?** If you cannot answer that, *cold starts*, *package size*, *runtime choice*, and *memory tuning* remain intuition games.
 
 So this post is deliberately narrow. Instead of isolated packaging tips, we will follow one operator loop from start to finish: **write the handler, package it, run the same event locally, inspect the artifact, and only then touch resource tuning**. That loop is what makes FaaS operationally real.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Function as a Service?
+- Which signal should the example or diagram make visible for Function as a Service?
+- What failure should be prevented first when Function as a Service reaches a real system?
+
+## Big Picture
+
+![serverless 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
+
+*serverless 101 chapter 2 flow overview*
+
+This picture places Function as a Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Function as a Service is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -44,10 +60,6 @@ Introductory explanations often make FaaS sound like “just upload a function.�
 That is why performance and reliability problems rarely live in the handler body alone. Heavy dependencies, unnecessary files, runtime-version drift, and missing environment variables matter just as much. To understand FaaS is to understand the whole deployment contract, not only the function body.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
-
-*In FaaS, production behavior is shaped as much by package structure and runtime initialization as by the handler itself.*
 
 In practical terms, the flow is simple. You write a handler, bundle its required files, and the platform loads that bundle inside a chosen runtime before invoking the handler. That means real-world FaaS behavior is always the combined result of **handler code + package contents + runtime startup cost**.
 
@@ -78,14 +90,12 @@ The dependency list is intentionally small. The first lesson in FaaS packaging i
 import json
 from datetime import UTC, datetime
 
-
 def build_response(status_code: int, body: dict) -> dict:
     return {
         "statusCode": status_code,
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(body, ensure_ascii=False),
     }
-
 
 def handler(event: dict, context) -> dict:
     request_id = getattr(context, "aws_request_id", "local-request")
@@ -123,10 +133,8 @@ import json
 
 from app import handler
 
-
 class LocalContext:
     aws_request_id = "req-smoke-001"
-
 
 event = {
     "body": json.dumps(
@@ -277,8 +285,19 @@ FaaS is not just “running a function.” It is an operating contract that bind
 
 In the next post, we will move from packaging to delivery semantics and follow a concrete path from **HTTP request to queue, consumer, idempotency check, and DLQ replay**.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Function as a Service?**
+  - The article treats Function as a Service as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Function as a Service?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Function as a Service reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What is Serverless?](./01-what-is-serverless.md)
+## In this series
+
+- [Serverless 101 (1/10): What is Serverless?](./01-what-is-serverless.md)
 - **Function as a Service (current)**
 - Trigger and Event (upcoming)
 - Cold Start (upcoming)
@@ -288,6 +307,7 @@ In the next post, we will move from packaging to delivery semantics and follow a
 - Observability (upcoming)
 - Cost (upcoming)
 - Designing a Serverless App (upcoming)
+
 <!-- toc:end -->
 
 ## References
