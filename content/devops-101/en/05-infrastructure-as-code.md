@@ -42,7 +42,7 @@ This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to ex
 
 This picture places Infrastructure as Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Infrastructure as Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Infrastructure becomes an *asset*—not a hero's memory—when it *lives in code*, *passes review*, and *stays in sync* with reality.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Console-built infrastructure exists *only in memory*. Replicating it elsewhere r
 > *Code is the single source of truth (SSOT)*.
 
 ## Concept at a Glance
+
+IaC means infrastructure—networks, servers, databases—lives in *version control* and *deploys via code*, not manual clicks. Changes are *reviewable*, *repeatable*, and *traceable*.
 
 ## Key Terms
 

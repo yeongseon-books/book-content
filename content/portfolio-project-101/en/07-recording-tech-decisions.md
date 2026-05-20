@@ -44,7 +44,7 @@ This is post 7 in the Portfolio Project 101 series. Here we will use a lightweig
 
 This picture places Recording Tech Decisions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Recording Tech Decisions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Recording technology choices shows why you picked each tool. Without explanation, you look like you chase trends. With explanation, you show judgment.
 
 ## Why It Matters
 

@@ -40,7 +40,6 @@ This is post 2 in the Machine Learning 101 series. Here we will separate supervi
 
 This picture places Supervised and Unsupervised Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
- at each boundary and which signal to keep.
 
 ## Why It Matters
 

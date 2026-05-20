@@ -42,7 +42,7 @@ This is post 3 in the DevOps 101 series. In this chapter, we compare deployment 
 
 This picture places CD and Deployment Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of CD and Deployment Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Safe deployment *shrinks the blast radius*: deploy often, *observe*, *expand gradually*, and *roll back instantly* when needed.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Deployment is *the most dangerous moment*. A good strategy *shrinks the blast ra
 > *Deployability* and *feature activation* must be *separated*.
 
 ## Concept at a Glance
+
+CD is the practice of *always having deployable code*. Deployment strategies—Rolling, Blue-Green, Canary—are not fancy tricks. They are ways to *reduce blast radius* and *make rollback fast*.
 
 ## Key Terms
 

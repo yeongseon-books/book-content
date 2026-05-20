@@ -42,7 +42,7 @@ This is post 2 in the DevOps 101 series. Here we focus on the first hard feedbac
 
 This picture places CI Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of CI Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A CI pipeline decides *what to verify*, *when*, and *how long to wait*—so quality depends on *system defaults*, not reviewer diligence.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Tests alone are not enough. *Lint, type checks, and security scans* must be bund
 > A PR without CI is *wishful thinking*.
 
 ## Concept at a Glance
+
+A CI pipeline is an automated sequence of checks that run every time code is pushed. It should be *fast* (fail early), *clear* (report exactly what broke), and *consistent* (same rules apply to everyone).
 
 ## Key Terms
 

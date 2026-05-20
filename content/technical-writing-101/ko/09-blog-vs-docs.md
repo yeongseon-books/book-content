@@ -212,6 +212,98 @@ title: "Technical Writing 101 (9/10): 블로그와 문서 차이"
 - [장애 회고: 2025년 5월 10일](https://blog.example.com/incident-2025-05-10)
 ```
 
+## 비교 예시: 같은 주제, 다른 역할
+
+동일한 FastAPI 인증 주제를 블로그와 문서로 어떻게 다르게 다루는지 보겠습니다.
+
+### 블로그 버전
+
+```markdown
+# 우리 팀이 JWT 대신 세션을 선택한 이유
+
+*2025년 10월 15일 작성*
+
+우리는 FastAPI 0.104 기반 API 서버에 인증을 추가하며 JWT와 세션 기반 인증을 비교했습니다. 최종적으로 세션을 선택했고, 그 결정 배경을 공유합니다.
+
+## 비교 과정
+
+- JWT: stateless, 확장성 좋음, 토큰 무효화 복잡
+- 세션: stateful, 무효화 쉽음, 서버 부하 증가
+
+## 결정 기준
+
+우리 서비스는 동시 사용자 1000명 이하였고, 토큰 무효화가 필수 요구사항이었습니다. 그래서 세션을 선택했습니다.
+
+## 참고
+
+현재 공식 인증 가이드는 [docs.example.com/auth](https://docs.example.com/auth)를 참고하세요.
+```
+
+### 문서 버전
+
+```markdown
+# 인증 방식
+
+*최종 업데이트: 2026-05-21*
+*버전: FastAPI 0.110, Python 3.11*
+
+이 프로젝트는 세션 기반 인증을 사용합니다.
+
+## 설정
+
+```python
+from fastapi import FastAPI, Depends
+from fastapi.security import HTTPBearer
+
+security = HTTPBearer()
+```
+
+## 세션 생성
+
+```python
+def create_session(user_id: str) -> str:
+    session_id = generate_session_id()
+    store_session(session_id, user_id)
+    return session_id
+```
+
+## 세션 검증
+
+```python
+def verify_session(session_id: str) -> bool:
+    return session_exists(session_id)
+```
+
+## 보안 요구사항
+
+- 세션 만료: 24시간
+- HTTPS 필수
+- CSRF 토큰 사용
+```
+
+블로그는 **결정 배경**을 설명하고, 문서는 **현재 구현법**을 명시합니다.
+
+## Diátaxis 네 구역 상세
+
+Diátaxis 프레임워크는 글을 네 가지 목적으로 분류합니다.
+
+| 구역 | 목적 | 독자 질문 | 톤 |
+| --- | --- | --- | --- |
+| **Tutorial** | 학습 | "어떻게 시작하나요?" | 경험을 만들기 |
+| **How-to** | 문제 해결 | "이걸 어떻게 하나요?" | 지시하기 |
+| **Reference** | 정보 | "이 함수는 무엇을 받나요?" | 설명하기 |
+| **Explanation** | 이해 | "왜 이렇게 되나요?" | 토론하기 |
+
+### 각 구역의 특징
+
+**Tutorial**: 초보자를 위한 학습 경험입니다. 단계별로 따라 하며 첫 성공을 얻게 합니다.
+
+**How-to**: 특정 문제를 푸는 지침서입니다. 독자는 이미 기초를 알고 특정 목표가 있습니다.
+
+**Reference**: API 명세서입니다. 정확하고 완전하며 일관된 포맷을 따릉니다.
+
+**Explanation**: 개념과 논리를 설명합니다. 기술적 배경과 설계 결정을 다룹니다.
+
 ### 아카이브 표시
 
 ```markdown

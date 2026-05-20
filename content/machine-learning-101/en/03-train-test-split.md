@@ -40,7 +40,6 @@ This is post 3 in the Machine Learning 101 series. Here we will use train/test s
 
 This picture places Train/Test Split inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
- at each boundary and which signal to keep.
 
 ## Why It Matters
 

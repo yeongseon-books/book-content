@@ -42,7 +42,7 @@ This is post 8 in the DevOps 101 series. Here we turn logs into an operational r
 
 This picture places Logging and Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Logging and Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Logs are your *time machine*: structure them so you can *replay* what went wrong *minutes* after it happened.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ The era of *ssh-ing* into a single server and running *grep* is over. In distrib
 > You read logs *three weeks later* far more often than you do *right now*.
 
 ## Concept at a Glance
+
+Logs capture *what happened and when*. Centralized log collection and analysis let you *replay events*, *find patterns*, and *debug* incidents hours or days later.
 
 ## Key Terms
 

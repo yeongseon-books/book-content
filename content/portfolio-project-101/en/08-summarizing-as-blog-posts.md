@@ -44,7 +44,7 @@ This is post 8 in the Portfolio Project 101 series. Here we will turn a project 
 
 This picture places Summarizing as Blog Posts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Summarizing as Blog Posts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The experience of building a project is your private asset. When you write it as an essay, it becomes a shareable asset for other developers.
 
 ## Why It Matters
 

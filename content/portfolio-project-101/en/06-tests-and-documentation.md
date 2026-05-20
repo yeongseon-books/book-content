@@ -44,7 +44,7 @@ This is post 6 in the Portfolio Project 101 series. Here we will look at the lev
 
 This picture places Tests and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Tests and Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Tests are your record of every verification you have ever done, run automatically. Documentation is the map that lets the next developer—or you—understand again.
 
 ## Why It Matters
 

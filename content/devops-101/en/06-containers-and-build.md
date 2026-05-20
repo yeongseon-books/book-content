@@ -42,7 +42,7 @@ This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer
 
 This picture places Containers and Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Containers and Build is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Containers solve *"it works on my laptop"* by making the deployment unit *consistent* across every machine.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ The same build artifact must *behave the same* in *every environment*. Container
 > Containers realize *Build once, run anywhere*.
 
 ## Concept at a Glance
+
+Containers package code and its *exact runtime* into one deployable unit. Build automation runs the same steps every time, so *"works on my laptop"* becomes impossible.
 
 ## Key Terms
 

@@ -40,7 +40,6 @@ This is post 8 in the Machine Learning 101 series. Here we will diagnose underfi
 
 This picture places Overfitting and Regularization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
- at each boundary and which signal to keep.
 
 ## Why It Matters
 

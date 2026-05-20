@@ -42,7 +42,7 @@ This is post 9 in the DevOps 101 series. In this chapter, we turn incident respo
 
 This picture places Incident Response and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Incident Response and On-Call is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> On-call teaches a team to *trust each other* and *learn together*—when both happen, incidents become *feedback*, not *blame*.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Incidents are an *organizational* problem more than a *technical* one. Without *
 > *Process* is a substitute for *memory*.
 
 ## Concept at a Glance
+
+On-call means someone is ready to *respond to failures*. Good on-call systems are *on-duty* (not always awake), *supported* (team responds together), and *learned from* (postmortems prevent repeats).
 
 ## Key Terms
 

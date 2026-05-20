@@ -42,7 +42,7 @@ This is the final post in the DevOps 101 series. Here we connect the earlier cha
 
 This picture places An Operable DevOps Flow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of An Operable DevOps Flow is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> DevOps is complete when *build*, *deploy*, *monitor*, and *respond to failure* form *one feedback loop* the whole team closes together.
 
 ## What You Will Learn
 
@@ -58,6 +58,8 @@ Adopting tools *one by one* creates *islands*. Only when they connect as a *flow
 > What is *not measured* is *not improved*.
 
 ## Concept at a Glance
+
+All the pieces—CI, CD, IaC, monitoring, on-call—work only when they *feed back* into each other. Fast deployment is safe when you monitor. Monitoring is useful when response is fast. The cycle closes when every team member owns the full path.
 
 ## Key Terms
 

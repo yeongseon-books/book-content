@@ -44,7 +44,7 @@ This is the final post in the Portfolio Project 101 series. Here we will walk th
 
 This picture places Portfolio Improvement Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Portfolio Improvement Checklist is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Portfolio improvement isn't about perfecting everything at once. Improving systematically—from problem statement through demo through documentation to deployment—is more realistic.
 
 ## Why It Matters
 

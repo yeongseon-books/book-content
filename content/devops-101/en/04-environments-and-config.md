@@ -42,7 +42,7 @@ This is post 4 in the DevOps 101 series. Here we look at how to separate code fr
 
 This picture places Environments and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Environments and Configuration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Environment drift kills confidence. *Code-defined environments* make failures *repeatable* and *fixable*.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ This picture places Environments and Configuration inside an operating flow. The
 > *Build once, run anywhere*.
 
 ## Concept at a Glance
+
+Environments (dev, staging, prod) exist to *test safety before production*. Configuration management ensures all three are *defined once* and *deployed identically*, not clicked by hand.
 
 ## Key Terms
 

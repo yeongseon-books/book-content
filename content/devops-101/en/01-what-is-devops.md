@@ -42,7 +42,7 @@ This is the first post in the DevOps 101 series. In this chapter, we set the men
 
 This picture places What Is DevOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is DevOps? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> DevOps succeeds when you treat *deployment speed* and *operational stability* as *one goal*, not opposing forces.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Software produces no value when *only built*. It must be *deployed* and *operate
 > *Fast deploys* and *stable operations* are *not in conflict*. They go together.
 
 ## Concept at a Glance
+
+DevOps is not a tool purchase or a team rename. It is a practice where development and operations share one feedback loop: write code → ship → run → learn → write code again.
 
 ## Key Terms
 

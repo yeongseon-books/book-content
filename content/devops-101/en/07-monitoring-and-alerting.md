@@ -42,7 +42,7 @@ This is post 7 in the DevOps 101 series. In this chapter, we build the operation
 
 This picture places Monitoring and Alerting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring and Alerting is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Effective monitoring *doesn't show everything*—it surfaces *the few signals* that let the team *act decisively*.
 
 ## Questions this article answers
 
@@ -59,6 +59,8 @@ Incidents *always come*. The difference is *how fast you know* and *how fast you
 > Operating without monitoring is *driving with eyes closed*.
 
 ## Concept at a Glance
+
+Monitoring collects metrics over time. Alerting triggers *when those metrics cross a boundary*. Together they answer: *Is it running? Is it healthy? What should I do right now?*
 
 ## Key Terms
 
