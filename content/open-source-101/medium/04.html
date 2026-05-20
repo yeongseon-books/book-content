@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Creating Pull Requests</title>
+<title>Open Source 101 (4/10): Creating Pull Requests</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Creating Pull Requests</h1>
+<h1>Open Source 101 (4/10): Creating Pull Requests</h1>
 <p>In open source, the pull request is the most visible output of contribution. That is why beginners often feel like the work is done once the PR is open. From a maintainer's point of view, though, a pull request is not a blob of code. It is a change proposal that must be easy to review, easy to trust, and safe to merge.</p>
 <p>This is post 4 in the Open Source 101 series.</p>
 <p>Here, we will walk through the full contribution path from fork and branch to commit history, description, review response, and post-merge cleanup.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What does a pull request that maintainers welcome actually look like?</li>
 <li>Why should fork, branch, commit, and PR each stay separate?</li>
 <li>What roles do commit messages and the PR description play?</li>
-<li>What should you explain, and what should you change, when review feedback arrives?</li>
-<li>Why does cleanup after merge still count as part of contribution?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="open source 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png"></p>
+<p><em>open source 101 chapter 4 flow overview</em></p>
+<p>This picture places Creating Pull Requests inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A pull request is not a button for uploading code. It is the conversation channel where you package a change into a reviewable unit.</p>
+<p>The core of Creating Pull Requests is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Correct code can still produce slow review if the pull request is hard to read. On the other hand, even a modest change becomes easier to merge when the branch is scoped well, the description is clear, and the verification path is obvious. For beginners, collaboration habits are often judged before technical depth.</p>
 <p>The same is true inside companies. Pull requests are the default unit of code review in many teams. The ability to take a small change and explain it as a crisp story travels well between open source and production work.</p>
 <h2>Put the Flow in Your Head First</h2>
-<p><img alt="Put the flow in your head first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png"></p>
-<p><em>The contribution flow from fork to review that keeps a change small, isolated, and reviewable</em><br>
-If you treat that flow as paperwork, every step feels annoying. If you see the role split, it starts to make sense. The fork is your private workspace. The branch is the change boundary. The commit is the history unit. The pull request is the request for review. Keeping them separate lowers confusion.</p>
+<p>If you treat that flow as paperwork, every step feels annoying. If you see the role split, it starts to make sense. The fork is your private workspace. The branch is the change boundary. The commit is the history unit. The pull request is the request for review. Keeping them separate lowers confusion.</p>
 <p>Good pull requests are not only well implemented. They are well shaped. When the branch is isolated, the scope is small, the related issue is linked, and the test path is visible, review gets much easier.</p>
 <h2>Five Concepts Worth Knowing</h2>
 <p>A <em>fork</em> is your safe personal copy of the upstream repository. A <em>branch</em> is a single-purpose change line. A <em>commit</em> is the smallest reliable history unit. A <em>pull request</em> is the formal request to merge into upstream. <em>Review</em> is not only correctness checking. It is also a check for clarity, safety, and fit with the repository's direction.</p>
@@ -159,10 +159,20 @@ Closes #42
 <h2>Wrap-up and Next Steps</h2>
 <p>In this post, we reframed pull requests as reviewable change proposals rather than code uploads. Well-shaped pull requests reduce collaboration cost before anyone debates implementation details.</p>
 <p>Next, we will move into README quality. In a repository that expects contributors, documentation is often as important as the code itself.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
+<li><strong>What does a pull request that maintainers welcome actually look like?</strong></li>
+<li>The article treats Creating Pull Requests as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why should fork, branch, commit, and PR each stay separate?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What roles do commit messages and the PR description play?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">Open Source 101 (1/10): What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Open Source 101 (2/10): Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Open Source 101 (3/10): Reading Issues</a></li>
 <li><strong>Creating Pull Requests (current)</strong></li>
 <li>A Good README (upcoming)</li>
 <li>Release and Versioning (upcoming)</li>

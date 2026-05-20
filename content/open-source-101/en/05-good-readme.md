@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 5
-title: A Good README
+title: "Open Source 101 (5/10): A Good README"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to write a README that helps a first-time visitor und
 last_reviewed: '2026-05-15'
 ---
 
-# A Good README
+# Open Source 101 (5/10): A Good README
 
 Even a strong project makes a weak first impression if the README is confusing. In open source, the README is the product page, installation guide, and often the first indicator of a maintainer's care. Most visitors read it before they read the code.
 
@@ -28,15 +28,21 @@ This is post 5 in the Open Source 101 series.
 
 Here, we will define a good README as the document that helps a first-time visitor understand and run the project within the first five minutes.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What information does a first-time visitor look for first?
 - Why are the title, one-line summary, installation, usage example, and license the core sections?
 - When do badges and screenshots help, and when do they get in the way?
-- Where is the boundary between the README and the contribution guide?
-- How do you design a document that helps people start quickly rather than admire the project from afar?
 
-> A README is not a repository introduction. It is an onboarding script for the first five minutes.
+## Big Picture
+
+![open source 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
+
+*open source 101 chapter 5 flow overview*
+
+This picture places A Good README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of A Good README is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ Good README quality lowers support cost and builds trust. Small projects especia
 
 ## Follow the Reader's Order
 
-![Follow the Reader's Order](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
-
-*The order most first-time visitors follow from title to install and usage when reading a README*
 That flow matters because the reader's attention usually moves in that order. First they want to know what the project is. Then whether it is installable. Then how to use it. License and contribution details come after that.
 
 Long READMEs are not automatically bad. The key is whether the first five minutes of necessary information live near the top. If you front-load architecture detail and internal design before the user can even run the tool, the README becomes a barrier instead of an entrance.
@@ -164,17 +167,29 @@ In this post, we reframed the README as a first-five-minutes onboarding document
 
 Next, we will look at release and versioning. Once people can start using your project, they also need a reliable way to understand updates.
 
+## Answering the Opening Questions
+
+- **What information does a first-time visitor look for first?**
+  - The article treats A Good README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why are the title, one-line summary, installation, usage example, and license the core sections?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When do badges and screenshots help, and when do they get in the way?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
 - **A Good README (current)**
 - Release and Versioning (upcoming)
 - Community Management (upcoming)
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

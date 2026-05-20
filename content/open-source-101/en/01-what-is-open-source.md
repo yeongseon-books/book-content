@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 1
-title: What Is Open Source
+title: "Open Source 101 (1/10): What Is Open Source"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Define open source beyond free code and learn how licenses, con
 last_reviewed: '2026-05-15'
 ---
 
-# What Is Open Source
+# Open Source 101 (1/10): What Is Open Source
 
 When people first hear *open source*, they often reduce it to price. Code that you can download for free is part of the story, but it does not explain why licenses matter, why issues and pull requests matter, or why a project's maintainers and community culture directly affect software quality.
 
@@ -28,15 +28,21 @@ This is the first post in the Open Source 101 series.
 
 Here, we will define open source not as code that happens to be public, but as a system of rights, responsibilities, and collaboration patterns that let people read, change, and redistribute software together.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does the “free code” definition keep creating misunderstandings?
 - How should you distinguish terms such as *free software*, *upstream*, *fork*, and *contributor*?
 - Why do docs, translations, and reproducible bug reports count as real contribution?
-- What should you read first when you open a new repository?
-- Why does a small first contribution lower the difficulty of the next one so much?
 
-> Open source is not just a public repository. It is a workshop where rights, responsibilities, and collaboration rules move together.
+## Big Picture
+
+![open source 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
+
+*open source 101 chapter 1 flow overview*
+
+This picture places What Is Open Source inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Open Source is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ This matters immediately in production work. When teams evaluate a library, they
 
 ## A Concept Map You Can Keep in Your Head
 
-![A concept map you can keep in your head](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
-
-*The basic participation loop where users, contributors, and maintainers grow the project together*
 If you read that diagram as a strict hierarchy, you only understand half of it. In practice it is a loop. A user can report a bug and become a contributor through one issue or one typo fix. A contributor can start reviewing other people's work and gradually grow into a maintainer role. The point is not that everyone has the same responsibilities. The point is that the participation path is open.
 
 That is why open source cannot be defined by code visibility alone. People must be able to read the code, modify it, and redistribute it under a license that permits those actions. Then the project still needs a working collaboration culture before it becomes a living project rather than a code dump.
@@ -156,7 +159,18 @@ In this post, we established the basic view that open source is not just free co
 
 Next, we will move into licenses. The moment you use open source, you are not making a technical choice alone. You are also accepting legal terms.
 
+## Answering the Opening Questions
+
+- **Why does the “free code” definition keep creating misunderstandings?**
+  - The article treats What Is Open Source as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How should you distinguish terms such as *free software*, *upstream*, *fork*, and *contributor*?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do docs, translations, and reproducible bug reports count as real contribution?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
+## In this series
+
 - **What Is Open Source (current)**
 - Understanding Licenses (upcoming)
 - Reading Issues (upcoming)
@@ -167,6 +181,7 @@ Next, we will move into licenses. The moment you use open source, you are not ma
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

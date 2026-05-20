@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Release and Versioning</title>
+<title>Open Source 101 (6/10): Release and Versioning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Release and Versioning</h1>
+<h1>Open Source 101 (6/10): Release and Versioning</h1>
 <p>When a project is new, it is easy to think that working code is enough. As soon as users appear, a new problem shows up. Does this release break compatibility? Is it only a bug fix? Is it safe to upgrade now? How do you communicate those answers clearly?</p>
 <p>This is post 6 in the Open Source 101 series.</p>
 <p>Here, we will connect semantic versioning, changelogs, tags, and release notes into one practical release discipline that users can actually trust.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What do the three numbers in semantic versioning actually signal to users?</li>
 <li>When should you use pre-release labels, and why does skipping them create risk?</li>
 <li>How should changelogs and release notes work together?</li>
-<li>Why is a tag different from a branch, and why does that difference matter for reproducibility?</li>
-<li>At what point does release automation stop being optional?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="open source 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png"></p>
+<p><em>open source 101 chapter 6 flow overview</em></p>
+<p>This picture places Release and Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>The version number tells users how large the change is. The changelog tells them what the change actually contains.</p>
+<p>The core of Release and Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>When version numbers are inconsistent, users become afraid to upgrade. If a breaking change ships as PATCH, or a new feature lands with no explanation, the project loses trust faster than it gains functionality. Ecosystems remember predictability.</p>
 <p>The same is true for internal libraries. As dependencies increase, versioning and change history become collaboration tools rather than cosmetic metadata. A version string is a contract with your users.</p>
 <h2>The Basic Release Map</h2>
-<p><img alt="The basic release map" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png"></p>
-<p><em>The basic map showing how MAJOR, MINOR, and PATCH communicate different levels of upgrade risk</em><br>
-Memorizing semantic versioning as a formula is not enough. The more useful framing is user-centered. MAJOR means “be careful.” MINOR means “new capability without breaking the main path.” PATCH means “small fix, lower upgrade anxiety.”</p>
+<p>Memorizing semantic versioning as a formula is not enough. The more useful framing is user-centered. MAJOR means “be careful.” MINOR means “new capability without breaking the main path.” PATCH means “small fix, lower upgrade anxiety.”</p>
 <p>Then the changelog makes the numbers concrete. Users use the version to estimate impact and the changelog to inspect the actual content. Both are necessary.</p>
 <h2>Five Concepts Worth Knowing</h2>
 <p>Semantic versioning expresses change with <code>MAJOR.MINOR.PATCH</code>. A <em>breaking change</em> no longer preserves the earlier usage contract. A <em>changelog</em> is the structured history of changes by version. A <em>tag</em> is an immutable pointer to a specific commit. A <em>pre-release</em> is a trial build before the official release.</p>
@@ -153,12 +153,22 @@ jobs:
 <h2>Wrap-up and Next Steps</h2>
 <p>In this post, we treated release and versioning as user trust management rather than pure deployment mechanics. When semantic versioning and change history move together, your project becomes easier to adopt and safer to upgrade.</p>
 <p>Next, we will move into community management. Once the code is public and releases are real, the project also needs an environment where people can keep participating.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Creating Pull Requests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">A Good README</a></li>
+<li><strong>What do the three numbers in semantic versioning actually signal to users?</strong></li>
+<li>The article treats Release and Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you use pre-release labels, and why does skipping them create risk?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How should changelogs and release notes work together?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">Open Source 101 (1/10): What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Open Source 101 (2/10): Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Open Source 101 (3/10): Reading Issues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Open Source 101 (4/10): Creating Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">Open Source 101 (5/10): A Good README</a></li>
 <li><strong>Release and Versioning (current)</strong></li>
 <li>Community Management (upcoming)</li>
 <li>The Maintainer Role (upcoming)</li>

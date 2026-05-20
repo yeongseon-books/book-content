@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 6
-title: Release and Versioning
+title: "Open Source 101 (6/10): Release and Versioning"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how semantic versioning, changelogs, tags, and release no
 last_reviewed: '2026-05-15'
 ---
 
-# Release and Versioning
+# Open Source 101 (6/10): Release and Versioning
 
 When a project is new, it is easy to think that working code is enough. As soon as users appear, a new problem shows up. Does this release break compatibility? Is it only a bug fix? Is it safe to upgrade now? How do you communicate those answers clearly?
 
@@ -28,15 +28,21 @@ This is post 6 in the Open Source 101 series.
 
 Here, we will connect semantic versioning, changelogs, tags, and release notes into one practical release discipline that users can actually trust.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What do the three numbers in semantic versioning actually signal to users?
 - When should you use pre-release labels, and why does skipping them create risk?
 - How should changelogs and release notes work together?
-- Why is a tag different from a branch, and why does that difference matter for reproducibility?
-- At what point does release automation stop being optional?
 
-> The version number tells users how large the change is. The changelog tells them what the change actually contains.
+## Big Picture
+
+![open source 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png)
+
+*open source 101 chapter 6 flow overview*
+
+This picture places Release and Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Release and Versioning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ The same is true for internal libraries. As dependencies increase, versioning an
 
 ## The Basic Release Map
 
-![The basic release map](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png)
-
-*The basic map showing how MAJOR, MINOR, and PATCH communicate different levels of upgrade risk*
 Memorizing semantic versioning as a formula is not enough. The more useful framing is user-centered. MAJOR means “be careful.” MINOR means “new capability without breaking the main path.” PATCH means “small fix, lower upgrade anxiety.”
 
 Then the changelog makes the numbers concrete. Users use the version to estimate impact and the changelog to inspect the actual content. Both are necessary.
@@ -168,17 +171,29 @@ In this post, we treated release and versioning as user trust management rather 
 
 Next, we will move into community management. Once the code is public and releases are real, the project also needs an environment where people can keep participating.
 
+## Answering the Opening Questions
+
+- **What do the three numbers in semantic versioning actually signal to users?**
+  - The article treats Release and Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you use pre-release labels, and why does skipping them create risk?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should changelogs and release notes work together?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
-- [A Good README](./05-good-readme.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): A Good README](./05-good-readme.md)
 - **Release and Versioning (current)**
 - Community Management (upcoming)
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

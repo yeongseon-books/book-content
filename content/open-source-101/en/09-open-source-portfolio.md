@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 9
-title: An Open Source Portfolio
+title: "Open Source 101 (9/10): An Open Source Portfolio"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to turn GitHub activity into an open source portfolio
 last_reviewed: '2026-05-15'
 ---
 
-# An Open Source Portfolio
+# Open Source 101 (9/10): An Open Source Portfolio
 
 Once you start contributing to open source, a new question appears: does your GitHub profile look like a random warehouse of repositories, or does it show how you choose problems and follow them through? A large number of contributions does not automatically become a strong portfolio. People trust context and continuity more than raw counts.
 
@@ -28,15 +28,21 @@ This is post 9 in the Open Source 101 series.
 
 Here, we will look at how to turn GitHub activity into a portfolio that shows problem selection, execution style, and sustained evidence rather than just activity noise.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How does open source contribution become a portfolio?
 - What should a profile README and pinned repositories each communicate?
 - Which pull requests are worth highlighting as representative work?
-- What does it mean to present both narrative and evidence?
-- Why is sustained activity often more convincing than one flashy event?
 
-> A portfolio is not a list of activity. It is a bundle of evidence that shows what problems you solve and how you work through them.
+## Big Picture
+
+![open source 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
+
+*open source 101 chapter 9 flow overview*
+
+This picture places An Open Source Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of An Open Source Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ The opposite is also true. A messy GitHub profile can work against you. If all p
 
 ## The Smallest Portfolio Structure
 
-![The smallest portfolio structure](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
-
-*A portfolio emerges when profile, representative work, evidence, and narrative are connected*
 That final step matters most. A page full of links is only a storage shelf. A page full of personal claims is only a self-introduction. A portfolio appears when evidence and explanation meet.
 
 ## Five Concepts Worth Knowing
@@ -157,17 +160,29 @@ In this post, we treated open source contribution as career evidence rather than
 
 Next, in the final post, we will walk through turning one small tool into your first actual open source project.
 
+## Answering the Opening Questions
+
+- **How does open source contribution become a portfolio?**
+  - The article treats An Open Source Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What should a profile README and pinned repositories each communicate?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which pull requests are worth highlighting as representative work?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
-- [A Good README](./05-good-readme.md)
-- [Release and Versioning](./06-release-and-versioning.md)
-- [Community Management](./07-community-management.md)
-- [The Maintainer Role](./08-maintainer-role.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): A Good README](./05-good-readme.md)
+- [Open Source 101 (6/10): Release and Versioning](./06-release-and-versioning.md)
+- [Open Source 101 (7/10): Community Management](./07-community-management.md)
+- [Open Source 101 (8/10): The Maintainer Role](./08-maintainer-role.md)
 - **An Open Source Portfolio (current)**
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

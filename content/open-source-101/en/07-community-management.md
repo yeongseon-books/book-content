@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 7
-title: Community Management
+title: "Open Source 101 (7/10): Community Management"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how a code of conduct, contribution guide, response norms
 last_reviewed: '2026-05-15'
 ---
 
-# Community Management
+# Open Source 101 (7/10): Community Management
 
 Open source projects are not sustained by code alone. At first, features and docs seem like the primary concern. Once users and contributors arrive, the way the community is run begins to shape the project's mood and long-term survival. Slow responses, unclear boundaries, and neglect of first-time contributors can drive people away even when the code is strong.
 
@@ -28,15 +28,21 @@ This is post 7 in the Open Source 101 series.
 
 Here, we will focus on the practical basics of community management: code of conduct, contribution guide, discussion spaces, response expectations, and visible welcome habits.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why does a project need a code of conduct?
 - What does a contribution guide do beyond listing steps?
 - Why is it useful to separate issues from general discussion?
-- How do response speed and welcome messages affect trust directly?
-- What is different about projects where first-time contributors stay?
 
-> Community management is not about controlling people. It is about making the participation path and the expectations visible in advance.
+## Big Picture
+
+![open source 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
+
+*open source 101 chapter 7 flow overview*
+
+This picture places Community Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Community Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ The same pattern appears in internal platforms and shared libraries. Clear docs,
 
 ## The Smallest Structure That Still Works
 
-![The smallest structure that still works](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
-
-*The minimum community system from code of conduct to onboarding and recognition*
 The last step is easy to underestimate. Rules and docs alone do not create a healthy community. A first-time contributor has to feel that they were actually received well. Otherwise the project still feels closed.
 
 That is why community management does not end with writing documents. Documents create the entrance, and responses prove that the entrance is real.
@@ -163,17 +166,29 @@ In this post, we framed community management as a sustainability problem rather 
 
 Next, we will look at the maintainer role. Once a community exists, someone still needs to set priorities, review work, and protect the boundaries.
 
+## Answering the Opening Questions
+
+- **Why does a project need a code of conduct?**
+  - The article treats Community Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does a contribution guide do beyond listing steps?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is it useful to separate issues from general discussion?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
-- [A Good README](./05-good-readme.md)
-- [Release and Versioning](./06-release-and-versioning.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): A Good README](./05-good-readme.md)
+- [Open Source 101 (6/10): Release and Versioning](./06-release-and-versioning.md)
 - **Community Management (current)**
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

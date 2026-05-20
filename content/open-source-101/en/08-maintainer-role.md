@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 8
-title: The Maintainer Role
+title: "Open Source 101 (8/10): The Maintainer Role"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how maintainers balance triage, review, delegation, and b
 last_reviewed: '2026-05-15'
 ---
 
-# The Maintainer Role
+# Open Source 101 (8/10): The Maintainer Role
 
 When people first look at open source, they often think a maintainer is simply the person who knows the code best. Technical judgment is part of the job, but the real role is wider. Maintainers triage issues, review contributions, cut releases, set community boundaries, and grow successors.
 
@@ -28,15 +28,21 @@ This is post 8 in the Open Source 101 series.
 
 Here, we will define the maintainer not as a heroic programmer who does everything alone, but as the operator who keeps project flow and responsibility sustainable over time.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What responsibilities does a maintainer really carry?
 - Why should triage, review, and release be seen as one operating loop?
 - Why are delegation and successor growth sustainability issues rather than optional extras?
-- What boundaries help prevent burnout?
-- What does a low bus factor actually put at risk?
 
-> A maintainer is not the developer who handles every task personally. They are closer to the conductor who keeps project flow and responsibility coordinated.
+## Big Picture
+
+![open source 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
+
+*open source 101 chapter 8 flow overview*
+
+This picture places The Maintainer Role inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of The Maintainer Role is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ Maintainers also become the reference point for project culture. Review tone, re
 
 ## The Maintainer Loop in One Line
 
-![The Maintainer Loop in One Line](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
-
-*The operating loop where triage, review, release, and delegation keep maintainership sustainable*
 That order matters because work accumulates along that path. Weak triage slows review. Slow review delays releases. Delayed releases attract even more demand to the maintainer. Without delegation, the whole loop clogs.
 
 That is why maintainership is not simply “more coding.” It is a separate operating role with boundaries and coordination built into it.
@@ -161,17 +164,29 @@ In this post, we reframed the maintainer as an operating owner rather than only 
 
 Next, we will turn that experience back toward your own career and discuss how open source work becomes a real portfolio.
 
+## Answering the Opening Questions
+
+- **What responsibilities does a maintainer really carry?**
+  - The article treats The Maintainer Role as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should triage, review, and release be seen as one operating loop?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why are delegation and successor growth sustainability issues rather than optional extras?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
-- [A Good README](./05-good-readme.md)
-- [Release and Versioning](./06-release-and-versioning.md)
-- [Community Management](./07-community-management.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): A Good README](./05-good-readme.md)
+- [Open Source 101 (6/10): Release and Versioning](./06-release-and-versioning.md)
+- [Open Source 101 (7/10): Community Management](./07-community-management.md)
 - **The Maintainer Role (current)**
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

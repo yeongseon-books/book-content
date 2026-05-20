@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 10
-title: My First Open Source Project
+title: "Open Source 101 (10/10): My First Open Source Project"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to release one small tool as your first open source p
 last_reviewed: '2026-05-15'
 ---
 
-# My First Open Source Project
+# Open Source 101 (10/10): My First Open Source Project
 
 By this point in the series, you have seen the definition of open source, licenses, issues, pull requests, README quality, releases, community management, and maintainership. The final question is simple and difficult at the same time: what should you actually publish? Many people stop here because the idea feels too small, or because the project does not yet feel “finished enough” to make public.
 
@@ -28,15 +28,21 @@ This is the final post in the Open Source 101 series.
 
 Here, we will walk through the smallest complete path from idea to MVP, docs, first release, and feedback loop for a first open source project.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How large should a first open source project be?
 - What order works well for idea, scope, MVP, docs, and release?
 - Why do docs and licensing become more important right before publication?
-- What should count as the minimum bar before the first release?
-- Why is collecting feedback part of the project rather than something that happens after it?
 
-> Your first open source project is not a museum display. It is the process of making one small tool usable by someone else.
+## Big Picture
+
+![open source 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
+
+*open source 101 chapter 10 flow overview*
+
+This picture places My First Open Source Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of My First Open Source Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ That process teaches a surprising amount of practical engineering. You practice 
 
 ## The Smallest Path to Publication
 
-![The Smallest Path to Publication](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
-
-*The minimum path from idea to docs, release, and announcement for a first public tool*
 The key insight is that publication does not happen only at the last second. As soon as you write docs with another user in mind, you have already started preparing for public use.
 
 Small projects benefit the most from respecting that order. Once the scope keeps expanding, shipping becomes harder, and unfinished projects do not create release experience.
@@ -171,17 +174,29 @@ In this final post, we treated a first open source project as a complete publica
 
 This series ends here. Your next move can be a first pull request or a first release. The key step is not learning one more concept. It is finishing one public unit of work end to end.
 
+## Answering the Opening Questions
+
+- **How large should a first open source project be?**
+  - The article treats My First Open Source Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What order works well for idea, scope, MVP, docs, and release?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do docs and licensing become more important right before publication?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
-- [Creating Pull Requests](./04-creating-pull-requests.md)
-- [A Good README](./05-good-readme.md)
-- [Release and Versioning](./06-release-and-versioning.md)
-- [Community Management](./07-community-management.md)
-- [The Maintainer Role](./08-maintainer-role.md)
-- [An Open Source Portfolio](./09-open-source-portfolio.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
+- [Open Source 101 (4/10): Creating Pull Requests](./04-creating-pull-requests.md)
+- [Open Source 101 (5/10): A Good README](./05-good-readme.md)
+- [Open Source 101 (6/10): Release and Versioning](./06-release-and-versioning.md)
+- [Open Source 101 (7/10): Community Management](./07-community-management.md)
+- [Open Source 101 (8/10): The Maintainer Role](./08-maintainer-role.md)
+- [Open Source 101 (9/10): An Open Source Portfolio](./09-open-source-portfolio.md)
 - **My First Open Source Project (current)**
+
 <!-- toc:end -->
 
 ## References

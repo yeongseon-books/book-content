@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Understanding Licenses</title>
+<title>Open Source 101 (2/10): Understanding Licenses</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Understanding Licenses</h1>
+<h1>Open Source 101 (2/10): Understanding Licenses</h1>
 <p>Beginners usually look at features first when they evaluate an open source project. They want to know whether it solves today's problem, whether installation is easy, and whether examples are good. In real production work, though, there is often one document you should read before all of that: the license. It defines what you may do, what notice you must keep, and how redistribution works.</p>
 <p>This is post 2 in the Open Source 101 series.</p>
 <p>Here, we will use MIT, Apache 2.0, and GPL as the main reference points and learn to read licenses as permission-and-obligation documents rather than brand names.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is the practical difference between <em>permissive</em> and <em>copyleft</em> licenses?</li>
 <li>How do MIT, Apache 2.0, and GPL v3 create different operational burdens?</li>
 <li>Why does an SPDX identifier matter for automation and compliance work?</li>
-<li>How should you read terms such as <em>public domain</em> and <em>dual license</em>?</li>
-<li>Why do companies run license scanners on dependency trees?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="open source 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png"></p>
+<p><em>open source 101 chapter 2 flow overview</em></p>
+<p>This picture places Understanding Licenses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A license is not decoration for a repository. It is the usage contract that defines how far you may go with the code.</p>
+<p>The core of Understanding Licenses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Licenses shape a project's future, not just its current usability. A library may run perfectly today, but later questions such as commercial distribution, derivative work obligations, and patent risk all depend on the license text.</p>
 <p>Open source choices are both technical choices and legal choices. A developer may think they selected a convenient library, but an organization also selected a redistribution burden and a compliance cost. That is why reading the license early is cheaper than discovering the constraints during release.</p>
 <h2>Draw the License Map First</h2>
-<p><img alt="Draw the license map first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png"></p>
-<p><em>A quick map for comparing permissive and copyleft license families before reading fine print</em><br>
-There is no reason to treat this split as a moral ranking. Permissive licenses make reuse easier. Copyleft licenses push sharing obligations harder. Neither side is universally better. The practical question is what kind of project behavior and distribution model you want to support.</p>
+<p>There is no reason to treat this split as a moral ranking. Permissive licenses make reuse easier. Copyleft licenses push sharing obligations harder. Neither side is universally better. The practical question is what kind of project behavior and distribution model you want to support.</p>
 <p>When you read a license, the name matters less than the questions you ask. Can I modify this code? Can I redistribute it? Must I keep the copyright notice? Must I publish source for derivative work? Is there explicit patent language? If you can answer those questions, you already understand the important part.</p>
 <h2>Five Concepts Worth Knowing</h2>
 <p>A <em>permissive</em> license broadly allows use, modification, distribution, and often commercial use. A <em>copyleft</em> license ties stronger sharing obligations to derivative work. <em>Public domain</em> aims to remove most copyright restriction, but legal treatment still differs across jurisdictions. A <em>dual license</em> offers the same software under two licensing models, often to balance open source distribution and commercial terms. <em>SPDX</em> is a short, standardized identifier that automated tools can read reliably.</p>
@@ -180,8 +180,18 @@ Requires: derivative works share their source
 <h2>Wrap-up and Next Steps</h2>
 <p>In this post, we treated licenses as the terms that define what you may do with open source code, not as a checkbox at the bottom of a repository. The important shift is that using open source means accepting its rules, not only its features.</p>
 <p>Next, we will move into issues. To contribute well, you need to know not only which problem to pick, but also how to interpret the problem statement already on the table.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
+<li><strong>What is the practical difference between <em>permissive</em> and <em>copyleft</em> licenses?</strong></li>
+<li>The article treats Understanding Licenses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How do MIT, Apache 2.0, and GPL v3 create different operational burdens?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why does an SPDX identifier matter for automation and compliance work?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">Open Source 101 (1/10): What Is Open Source</a></li>
 <li><strong>Understanding Licenses (current)</strong></li>
 <li>Reading Issues (upcoming)</li>
 <li>Creating Pull Requests (upcoming)</li>

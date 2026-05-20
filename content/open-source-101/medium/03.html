@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Reading Issues</title>
+<title>Open Source 101 (3/10): Reading Issues</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>Reading Issues</h1>
+<h1>Open Source 101 (3/10): Reading Issues</h1>
 <p>One of the most common beginner mistakes in open source is trying to fix a problem before understanding it. People read only the title, skip the full comment thread, or open a pull request without noticing that someone else is already working on the issue.</p>
 <p>This is post 3 in the Open Source 101 series.</p>
 <p>Here, we will treat a GitHub issue not as a generic to-do item, but as a shared record of problem definition, reproduction evidence, and team agreement.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why do contributions drift when you judge an issue by the title alone?</li>
 <li>What roles do labels, reproduction steps, assignees, and comment threads each play?</li>
 <li>When is a <code>good first issue</code> still a poor first contribution choice?</li>
-<li>How do you avoid repeating a discussion that is already settled in comments?</li>
-<li>How can you decide whether this issue is safe for you to take on right now?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="open source 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png"></p>
+<p><em>open source 101 chapter 3 flow overview</em></p>
+<p>This picture places Reading Issues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An issue is not just a bug report. It is a shared working record that defines the problem and narrows the solution space.</p>
+<p>The core of Reading Issues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>If you misread the issue, your pull request is likely to miss the point. When you start coding without reproducing the problem, it is easy to confuse symptoms with root cause. When you propose a fix without seeing the earlier decisions, you raise review cost for everyone involved.</p>
 <p>The upside is equally real. Once you can read issues patiently, even a small contribution lands more smoothly. You know what the problem is, who already discussed it, and where the scope ends. That skill transfers directly to internal trackers at work.</p>
 <h2>Fix the Reading Order First</h2>
-<p><img alt="Fix the reading order first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png"></p>
-<p><em>The safest reading order from title to comments when you want the full issue context</em><br>
-That order matters because issue information accumulates in that order. If you read only the title, you see a symptom. If you jump straight into comments, you lose the framing. Move from broad context to detailed context and you will make far fewer mistakes.</p>
+<p>That order matters because issue information accumulates in that order. If you read only the title, you see a symptom. If you jump straight into comments, you lose the framing. Move from broad context to detailed context and you will make far fewer mistakes.</p>
 <p>Once you adopt that view, an issue stops looking like a loose discussion post. You start noticing what information is missing, whose confirmation is still needed, and whether implementation is even the right next step.</p>
 <h2>Five Concepts Worth Knowing</h2>
 <p>An <em>issue</em> can be a bug, a feature request, a question, or a task. A <em>label</em> tells you how the project classifies the work by type, difficulty, or ownership. <em>Triage</em> is the process of sorting and prioritizing incoming work. A <em>repro</em> is the sequence that makes a bug happen again. An <em>assignee</em> shows whether someone has already taken responsibility.</p>
@@ -148,9 +148,19 @@ reporter: Safari 15.1 on macOS 12
 <h2>Wrap-up and Next Steps</h2>
 <p>In this post, we established a reliable order for reading issues and a better way to treat them: not as loose posts, but as shared engineering records. Once you read issues this way, you make fewer false starts and pick better contribution entry points.</p>
 <p>Next, we will turn that context into a pull request. The next step is learning how to package a small change so maintainers can actually review it cleanly.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
+<li><strong>Why do contributions drift when you judge an issue by the title alone?</strong></li>
+<li>The article treats Reading Issues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What roles do labels, reproduction steps, assignees, and comment threads each play?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>When is a <code>good first issue</code> still a poor first contribution choice?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">Open Source 101 (1/10): What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Open Source 101 (2/10): Understanding Licenses</a></li>
 <li><strong>Reading Issues (current)</strong></li>
 <li>Creating Pull Requests (upcoming)</li>
 <li>A Good README (upcoming)</li>

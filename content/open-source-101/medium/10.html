@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>My First Open Source Project</title>
+<title>Open Source 101 (10/10): My First Open Source Project</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,28 +53,28 @@
 </style>
 </head>
 <body>
-<h1>My First Open Source Project</h1>
+<h1>Open Source 101 (10/10): My First Open Source Project</h1>
 <p>By this point in the series, you have seen the definition of open source, licenses, issues, pull requests, README quality, releases, community management, and maintainership. The final question is simple and difficult at the same time: what should you actually publish? Many people stop here because the idea feels too small, or because the project does not yet feel “finished enough” to make public.</p>
 <p>This is the final post in the Open Source 101 series.</p>
 <p>Here, we will walk through the smallest complete path from idea to MVP, docs, first release, and feedback loop for a first open source project.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How large should a first open source project be?</li>
 <li>What order works well for idea, scope, MVP, docs, and release?</li>
 <li>Why do docs and licensing become more important right before publication?</li>
-<li>What should count as the minimum bar before the first release?</li>
-<li>Why is collecting feedback part of the project rather than something that happens after it?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="open source 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png"></p>
+<p><em>open source 101 chapter 10 flow overview</em></p>
+<p>This picture places My First Open Source Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Your first open source project is not a museum display. It is the process of making one small tool usable by someone else.</p>
+<p>The core of My First Open Source Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why It Matters</h2>
 <p>Learning closes differently once the work is public. There is a big gap between code that runs on your machine and a project that another person can realistically install, understand, and evaluate. README, LICENSE, CHANGELOG, release tags, and a feedback path are what turn code into a shareable artifact.</p>
 <p>That process teaches a surprising amount of practical engineering. You practice scoping, documentation priorities, packaging, release discipline, and user feedback collection all at once. For a first project, finishing matters more than scale.</p>
 <h2>The Smallest Path to Publication</h2>
-<p><img alt="The Smallest Path to Publication" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png"></p>
-<p><em>The minimum path from idea to docs, release, and announcement for a first public tool</em><br>
-The key insight is that publication does not happen only at the last second. As soon as you write docs with another user in mind, you have already started preparing for public use.</p>
+<p>The key insight is that publication does not happen only at the last second. As soon as you write docs with another user in mind, you have already started preparing for public use.</p>
 <p>Small projects benefit the most from respecting that order. Once the scope keeps expanding, shipping becomes harder, and unfinished projects do not create release experience.</p>
 <h2>Five Concepts Worth Knowing</h2>
 <p>An <em>MVP</em> is the smallest version that is still useful. <em>Scope</em> defines what is in and what is deliberately out. A <em>roadmap</em> gives future work a visible home rather than forcing it into the first release. An <em>announcement</em> is the public message that introduces the release. A <em>feedback loop</em> is the cycle that turns user response into the next improvement.</p>
@@ -160,16 +160,26 @@ gh release create v0.1.0 --generate-notes
 <h2>Wrap-up and Next Steps</h2>
 <p>In this final post, we treated a first open source project as a complete publication loop rather than a giant product launch. The important thing is not building something huge. It is carrying one useful tool all the way to a state another person can actually try.</p>
 <p>This series ends here. Your next move can be a first pull request or a first release. The key step is not learning one more concept. It is finishing one public unit of work end to end.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Creating Pull Requests</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">A Good README</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/06-release-and-versioning.md">Release and Versioning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/07-community-management.md">Community Management</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/08-maintainer-role.md">The Maintainer Role</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/09-open-source-portfolio.md">An Open Source Portfolio</a></li>
+<li><strong>How large should a first open source project be?</strong></li>
+<li>The article treats My First Open Source Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What order works well for idea, scope, MVP, docs, and release?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Why do docs and licensing become more important right before publication?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">Open Source 101 (1/10): What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Open Source 101 (2/10): Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Open Source 101 (3/10): Reading Issues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Open Source 101 (4/10): Creating Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">Open Source 101 (5/10): A Good README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/06-release-and-versioning.md">Open Source 101 (6/10): Release and Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/07-community-management.md">Open Source 101 (7/10): Community Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/08-maintainer-role.md">Open Source 101 (8/10): The Maintainer Role</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/09-open-source-portfolio.md">Open Source 101 (9/10): An Open Source Portfolio</a></li>
 <li><strong>My First Open Source Project (current)</strong></li>
 </ul>
 <h2>References</h2>

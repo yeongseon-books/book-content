@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 3
-title: Reading Issues
+title: "Open Source 101 (3/10): Reading Issues"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to read GitHub issues as shared problem statements so
 last_reviewed: '2026-05-15'
 ---
 
-# Reading Issues
+# Open Source 101 (3/10): Reading Issues
 
 One of the most common beginner mistakes in open source is trying to fix a problem before understanding it. People read only the title, skip the full comment thread, or open a pull request without noticing that someone else is already working on the issue.
 
@@ -28,15 +28,21 @@ This is post 3 in the Open Source 101 series.
 
 Here, we will treat a GitHub issue not as a generic to-do item, but as a shared record of problem definition, reproduction evidence, and team agreement.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why do contributions drift when you judge an issue by the title alone?
 - What roles do labels, reproduction steps, assignees, and comment threads each play?
 - When is a `good first issue` still a poor first contribution choice?
-- How do you avoid repeating a discussion that is already settled in comments?
-- How can you decide whether this issue is safe for you to take on right now?
 
-> An issue is not just a bug report. It is a shared working record that defines the problem and narrows the solution space.
+## Big Picture
+
+![open source 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
+
+*open source 101 chapter 3 flow overview*
+
+This picture places Reading Issues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Reading Issues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ The upside is equally real. Once you can read issues patiently, even a small con
 
 ## Fix the Reading Order First
 
-![Fix the reading order first](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
-
-*The safest reading order from title to comments when you want the full issue context*
 That order matters because issue information accumulates in that order. If you read only the title, you see a symptom. If you jump straight into comments, you lose the framing. Move from broad context to detailed context and you will make far fewer mistakes.
 
 Once you adopt that view, an issue stops looking like a loose discussion post. You start noticing what information is missing, whose confirmation is still needed, and whether implementation is even the right next step.
@@ -160,9 +163,20 @@ In this post, we established a reliable order for reading issues and a better wa
 
 Next, we will turn that context into a pull request. The next step is learning how to package a small change so maintainers can actually review it cleanly.
 
+## Answering the Opening Questions
+
+- **Why do contributions drift when you judge an issue by the title alone?**
+  - The article treats Reading Issues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What roles do labels, reproduction steps, assignees, and comment threads each play?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is a `good first issue` still a poor first contribution choice?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
 - **Reading Issues (current)**
 - Creating Pull Requests (upcoming)
 - A Good README (upcoming)
@@ -171,6 +185,7 @@ Next, we will turn that context into a pull request. The next step is learning h
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References

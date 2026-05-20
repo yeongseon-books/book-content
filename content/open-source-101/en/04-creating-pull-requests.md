@@ -1,7 +1,7 @@
 ---
 series: open-source-101
 episode: 4
-title: Creating Pull Requests
+title: "Open Source 101 (4/10): Creating Pull Requests"
 status: publish-ready
 targets:
   tistory: false
@@ -20,7 +20,7 @@ seo_description: Learn how to shape a small, reviewable pull request from fork a
 last_reviewed: '2026-05-15'
 ---
 
-# Creating Pull Requests
+# Open Source 101 (4/10): Creating Pull Requests
 
 In open source, the pull request is the most visible output of contribution. That is why beginners often feel like the work is done once the PR is open. From a maintainer's point of view, though, a pull request is not a blob of code. It is a change proposal that must be easy to review, easy to trust, and safe to merge.
 
@@ -28,15 +28,21 @@ This is post 4 in the Open Source 101 series.
 
 Here, we will walk through the full contribution path from fork and branch to commit history, description, review response, and post-merge cleanup.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What does a pull request that maintainers welcome actually look like?
 - Why should fork, branch, commit, and PR each stay separate?
 - What roles do commit messages and the PR description play?
-- What should you explain, and what should you change, when review feedback arrives?
-- Why does cleanup after merge still count as part of contribution?
 
-> A pull request is not a button for uploading code. It is the conversation channel where you package a change into a reviewable unit.
+## Big Picture
+
+![open source 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
+
+*open source 101 chapter 4 flow overview*
+
+This picture places Creating Pull Requests inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Creating Pull Requests is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why It Matters
 
@@ -46,9 +52,6 @@ The same is true inside companies. Pull requests are the default unit of code re
 
 ## Put the Flow in Your Head First
 
-![Put the flow in your head first](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
-
-*The contribution flow from fork to review that keeps a change small, isolated, and reviewable*
 If you treat that flow as paperwork, every step feels annoying. If you see the role split, it starts to make sense. The fork is your private workspace. The branch is the change boundary. The commit is the history unit. The pull request is the request for review. Keeping them separate lowers confusion.
 
 Good pull requests are not only well implemented. They are well shaped. When the branch is isolated, the scope is small, the related issue is linked, and the test path is visible, review gets much easier.
@@ -175,10 +178,21 @@ In this post, we reframed pull requests as reviewable change proposals rather th
 
 Next, we will move into README quality. In a repository that expects contributors, documentation is often as important as the code itself.
 
+## Answering the Opening Questions
+
+- **What does a pull request that maintainers welcome actually look like?**
+  - The article treats Creating Pull Requests as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why should fork, branch, commit, and PR each stay separate?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What roles do commit messages and the PR description play?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Open Source](./01-what-is-open-source.md)
-- [Understanding Licenses](./02-understanding-licenses.md)
-- [Reading Issues](./03-reading-issues.md)
+## In this series
+
+- [Open Source 101 (1/10): What Is Open Source](./01-what-is-open-source.md)
+- [Open Source 101 (2/10): Understanding Licenses](./02-understanding-licenses.md)
+- [Open Source 101 (3/10): Reading Issues](./03-reading-issues.md)
 - **Creating Pull Requests (current)**
 - A Good README (upcoming)
 - Release and Versioning (upcoming)
@@ -186,6 +200,7 @@ Next, we will move into README quality. In a repository that expects contributor
 - The Maintainer Role (upcoming)
 - An Open Source Portfolio (upcoming)
 - My First Open Source Project (upcoming)
+
 <!-- toc:end -->
 
 ## References
