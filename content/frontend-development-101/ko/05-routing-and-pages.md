@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 5
-title: 라우팅과 페이지
+title: "Frontend Development 101 (5/10): 라우팅과 페이지"
 status: publish-ready
 targets:
   tistory: true
@@ -20,21 +20,27 @@ seo_description: SPA 라우팅과 URL 매핑의 핵심 원리를 프론트엔드
 last_reviewed: '2026-05-12'
 ---
 
-# 라우팅과 페이지
+# Frontend Development 101 (5/10): 라우팅과 페이지
 
 한 화면짜리 앱은 비교적 단순합니다. 하지만 제품이 커지면 홈, 상세, 설정, 검색 결과처럼 여러 화면이 생기고, 사용자는 뒤로 가기와 새로고침과 링크 공유가 모두 자연스럽게 되기를 기대합니다. 이 기대를 만족시키는 핵심이 라우팅입니다.
 
 이 글은 Frontend Development 101 시리즈의 다섯 번째 글입니다. 여기서는 SPA가 여러 화면을 어떻게 표현하는지 URL 중심으로 설명합니다. URL은 단순한 주소가 아니라 현재 화면을 설명하는 상태이며, 라우터는 그 상태를 읽어 어떤 컴포넌트를 그릴지 결정하는 계층입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 단일 페이지 앱이 여러 화면을 보여 주는 원리는 무엇일까요?
 - 경로(path)는 컴포넌트와 어떤 식으로 매핑될까요?
 - 중첩 라우트와 동적 파라미터는 왜 필요한가요?
-- 쿼리 문자열은 어떤 상태를 담을 때 적합할까요?
-- 코드 스플리팅과 lazy loading은 왜 라우팅과 함께 다뤄야 할까요?
 
-> URL은 상태입니다. 라우터는 현재 URL을 읽고 지금 어떤 컴포넌트를 그려야 하는지 결정합니다.
+## 큰 그림
+
+![Frontend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-diagram.ko.png)
+
+*Frontend Development 101 5장 흐름 개요*
+
+이 그림에서는 라우팅과 페이지를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 라우팅과 페이지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -43,10 +49,6 @@ last_reviewed: '2026-05-12'
 좋은 라우팅은 URL만 보고도 현재 화면을 어느 정도 짐작할 수 있게 만듭니다. 반대로 URL이 화면 상태를 설명하지 못하면 검색, 필터, 상세 페이지 같은 기능이 곧바로 불편해집니다.
 
 ## 개념 한눈에 보기
-
-![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-diagram.ko.png)
-
-*URL을 읽은 라우터가 화면 컴포넌트를 고르는 SPA 라우팅 흐름*
 
 결국 라우팅은 URL 패턴을 해석해 컴포넌트 트리를 고르는 일입니다. 이 모델만 잡혀도 정적 경로, 동적 경로, 중첩 경로를 같은 방식으로 읽을 수 있습니다.
 
@@ -187,18 +189,29 @@ const Settings = lazy(() => import("./Settings"));
 
 다음 글에서는 프론트엔드가 서버에서 데이터를 가져오는 비동기 흐름을 살펴보겠습니다.
 
-<!-- toc:begin -->
-- [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
-- [HTML과 CSS 기본](./02-html-and-css-basics.md)
-- [JavaScript 기본](./03-javascript-basics.md)
-- [컴포넌트와 상태](./04-components-and-state.md)
-- **라우팅과 페이지 (현재 글)**
+## 처음 질문으로 돌아가기
 
+- **단일 페이지 앱이 여러 화면을 보여 주는 원리는 무엇일까요?**
+  - 본문의 기준은 라우팅과 페이지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **경로(path)는 컴포넌트와 어떤 식으로 매핑될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **중첩 라우트와 동적 파라미터는 왜 필요한가요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Frontend Development 101 (1/10): 프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML과 CSS 기본](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript 기본](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): 컴포넌트와 상태](./04-components-and-state.md)
+- **라우팅과 페이지 (현재 글)**
 - API 호출과 비동기 (예정)
 - 폼과 유효성 검사 (예정)
 - 스타일링과 디자인 시스템 (예정)
 - 빌드 도구와 번들링 (예정)
 - 작은 프론트엔드 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

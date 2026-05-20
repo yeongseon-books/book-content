@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Styling and Design Systems</title>
+<title>Frontend Development 101 (8/10): Styling and Design Systems</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Styling and Design Systems</h1>
+<h1>Frontend Development 101 (8/10): Styling and Design Systems</h1>
 <p>At the start of a project, it feels harmless to hand-pick one color for one button and one spacing value for one card. That convenience disappears as the project and the team grow. Tiny inconsistencies accumulate, dark mode becomes expensive, and the interface starts to feel unfinished even when the logic works.</p>
 <p>This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Styling and Design Systems?</li>
+<li>Which signal should the example or diagram make visible for Styling and Design Systems?</li>
+<li>What failure should be prevented first when Styling and Design Systems reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 8 flow overview</em></p>
+<p>This picture places Styling and Design Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Styling and Design Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A <em>comparison</em> of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)</li>
@@ -74,8 +87,6 @@
 <p>A great design system gets <em>designers and engineers speaking the same language</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>How design tokens, components, pages, and themes connect into one styling system</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Design token</strong>: an <em>atomic unit</em> of color/spacing/typography (e.g., <code>color.primary.500</code>).</li>
@@ -183,20 +194,26 @@ module.exports = {
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Even styling needs <em>shared vocabulary</em>. Next, we look at the build tools that turn your code into something <em>the browser can read</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
-<li>
-<p><strong>Styling and Design Systems (current)</strong></p>
-</li>
-<li>
-<p>Build Tools and Bundling (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying Styling and Design Systems?</strong></li>
+<li>The article treats Styling and Design Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Styling and Design Systems?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Styling and Design Systems reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">Frontend Development 101 (3/10): JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Frontend Development 101 (4/10): Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Frontend Development 101 (5/10): Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">Frontend Development 101 (6/10): API Calls and Async</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Frontend Development 101 (7/10): Forms and Validation</a></li>
+<li><strong>Styling and Design Systems (current)</strong></li>
+<li>Build Tools and Bundling (upcoming)</li>
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>

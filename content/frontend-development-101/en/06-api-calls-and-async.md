@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 6
-title: API Calls and Async
+title: "Frontend Development 101 (6/10): API Calls and Async"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: fetch, async/await, loading and error states, caching — the a
 last_reviewed: '2026-05-04'
 ---
 
-# API Calls and Async
+# Frontend Development 101 (6/10): API Calls and Async
 
 Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing `fetch`. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.
 
 This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying API Calls and Async?
+- Which signal should the example or diagram make visible for API Calls and Async?
+- What failure should be prevented first when API Calls and Async reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 6 flow overview*
+
+This picture places API Calls and Async inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of API Calls and Async is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ Async bugs make up *half of frontend defects*. They hide on a fast network and e
 > Good async code *assumes the worst network*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
-
-*The async UI state machine moving between idle, loading, success, and error*
 
 ## Key Terms
 
@@ -196,18 +208,29 @@ Most React apps standardize on *React Query (TanStack Query)* or *SWR*. Vue uses
 
 Async is *state*. Next, we look at handling *user input* via forms and validation.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- **API Calls and Async (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying API Calls and Async?**
+  - The article treats API Calls and Async as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for API Calls and Async?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when API Calls and Async reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- **API Calls and Async (current)**
 - Forms and Validation (upcoming)
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 9
-title: Build Tools and Bundling
+title: "Frontend Development 101 (9/10): Build Tools and Bundling"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Vite, esbuild, tree shaking, and bundle analysis — an introdu
 last_reviewed: '2026-05-04'
 ---
 
-# Build Tools and Bundling
+# Frontend Development 101 (9/10): Build Tools and Bundling
 
 During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.
 
 This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Build Tools and Bundling?
+- Which signal should the example or diagram make visible for Build Tools and Bundling?
+- What failure should be prevented first when Build Tools and Bundling reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 9 flow overview*
+
+This picture places Build Tools and Bundling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Build Tools and Bundling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -41,10 +57,6 @@ Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of 
 > A good bundle is *small, cacheable, and split*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
-
-*How source files move through resolve, transform, bundle, and output stages*
 
 ## Key Terms
 
@@ -175,18 +187,29 @@ Most new projects use a *Vite + esbuild + SWC* stack. Larger monorepos are gradu
 
 Build tools decide *how fast the first screen the user sees becomes interactive*. In the final post we will pull every concept so far into *a small frontend app*.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- [Forms and Validation](./07-forms-and-validation.md)
-- [Styling and Design Systems](./08-styling-and-design-system.md)
-- **Build Tools and Bundling (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying Build Tools and Bundling?**
+  - The article treats Build Tools and Bundling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Build Tools and Bundling?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Build Tools and Bundling reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): Forms and Validation](./07-forms-and-validation.md)
+- [Frontend Development 101 (8/10): Styling and Design Systems](./08-styling-and-design-system.md)
+- **Build Tools and Bundling (current)**
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

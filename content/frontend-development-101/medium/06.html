@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>API Calls and Async</title>
+<title>Frontend Development 101 (6/10): API Calls and Async</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>API Calls and Async</h1>
+<h1>Frontend Development 101 (6/10): API Calls and Async</h1>
 <p>Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing <code>fetch</code>. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.</p>
 <p>This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying API Calls and Async?</li>
+<li>Which signal should the example or diagram make visible for API Calls and Async?</li>
+<li>What failure should be prevented first when API Calls and Async reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 6 flow overview</em></p>
+<p>This picture places API Calls and Async inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of API Calls and Async is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>minimum usage</em> of <code>fetch</code> and <code>async/await</code></li>
@@ -74,8 +87,6 @@
 <p>Good async code <em>assumes the worst network</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>The async UI state machine moving between idle, loading, success, and error</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong><code>fetch</code></strong>: the browser-built-in HTTP client.</li>
@@ -198,18 +209,24 @@ function Users() {
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Async is <em>state</em>. Next, we look at handling <em>user input</em> via forms and validation.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
-<li>
-<p><strong>API Calls and Async (current)</strong></p>
-</li>
-<li>
-<p>Forms and Validation (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying API Calls and Async?</strong></li>
+<li>The article treats API Calls and Async as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for API Calls and Async?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when API Calls and Async reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">Frontend Development 101 (3/10): JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Frontend Development 101 (4/10): Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Frontend Development 101 (5/10): Routing and Pages</a></li>
+<li><strong>API Calls and Async (current)</strong></li>
+<li>Forms and Validation (upcoming)</li>
 <li>Styling and Design Systems (upcoming)</li>
 <li>Build Tools and Bundling (upcoming)</li>
 <li>Building a Small Frontend App (upcoming)</li>

@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 10
-title: Building a Small Frontend App
+title: "Frontend Development 101 (10/10): Building a Small Frontend App"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Pull the routing, components, API calls, forms, and styles from
 last_reviewed: '2026-05-04'
 ---
 
-# Building a Small Frontend App
+# Frontend Development 101 (10/10): Building a Small Frontend App
 
 Knowing each concept in isolation is very different from tying those concepts into one app that someone can actually open and use. Routing, forms, API calls, styling, and build steps all look manageable on their own. The challenge appears when you have to decide where files live, how pieces connect, and what the deployment path looks like end to end.
 
 This is the final post in the Frontend Development 101 series. Here we assemble a small notes app that pulls together the earlier chapters. The goal is not perfection. The goal is to turn separate concepts into one living product flow and ship it all the way to a public URL.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Building a Small Frontend App?
+- Which signal should the example or diagram make visible for Building a Small Frontend App?
+- What failure should be prevented first when Building a Small Frontend App reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 10 flow overview*
+
+This picture places Building a Small Frontend App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building a Small Frontend App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -40,10 +56,6 @@ Knowledge becomes *yours* only when it is *bound into a project*. The nine posts
 > Polish does not have to be high. The experience of *shipping all the way to deployment* is *more powerful than any book*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
-
-*The end-to-end picture that ties pages, components, APIs, styles, build, and deployment into one app*
 
 ## Key Terms
 
@@ -235,16 +247,27 @@ If you made it here, *frontend onboarding is done*. Good companion series to rea
 
 > Do not try to learn everything at once. *Add one thing at a time* to the app you just built.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Building a Small Frontend App?**
+  - The article treats Building a Small Frontend App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Building a Small Frontend App?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Building a Small Frontend App reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- [Forms and Validation](./07-forms-and-validation.md)
-- [Styling and Design Systems](./08-styling-and-design-system.md)
-- [Build Tools and Bundling](./09-build-tools-and-bundling.md)
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): Forms and Validation](./07-forms-and-validation.md)
+- [Frontend Development 101 (8/10): Styling and Design Systems](./08-styling-and-design-system.md)
+- [Frontend Development 101 (9/10): Build Tools and Bundling](./09-build-tools-and-bundling.md)
 - **Building a Small Frontend App (current)**
 
 <!-- toc:end -->

@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 8
-title: Styling and Design Systems
+title: "Frontend Development 101 (8/10): Styling and Design Systems"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: CSS Modules, Tailwind, design tokens — keep styling consisten
 last_reviewed: '2026-05-04'
 ---
 
-# Styling and Design Systems
+# Frontend Development 101 (8/10): Styling and Design Systems
 
 At the start of a project, it feels harmless to hand-pick one color for one button and one spacing value for one card. That convenience disappears as the project and the team grow. Tiny inconsistencies accumulate, dark mode becomes expensive, and the interface starts to feel unfinished even when the logic works.
 
 This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Styling and Design Systems?
+- Which signal should the example or diagram make visible for Styling and Design Systems?
+- What failure should be prevented first when Styling and Design Systems reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 8 flow overview*
+
+This picture places Styling and Design Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Styling and Design Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons t
 > A great design system gets *designers and engineers speaking the same language*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
-
-*How design tokens, components, pages, and themes connect into one styling system*
 
 ## Key Terms
 
@@ -178,18 +190,29 @@ Most teams catalog components in *Storybook* and unify styling with *Tailwind/CS
 
 Even styling needs *shared vocabulary*. Next, we look at the build tools that turn your code into something *the browser can read*.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- [Forms and Validation](./07-forms-and-validation.md)
-- **Styling and Design Systems (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying Styling and Design Systems?**
+  - The article treats Styling and Design Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Styling and Design Systems?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Styling and Design Systems reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): Forms and Validation](./07-forms-and-validation.md)
+- **Styling and Design Systems (current)**
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

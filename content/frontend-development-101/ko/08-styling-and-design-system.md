@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 8
-title: 스타일링과 디자인 시스템
+title: "Frontend Development 101 (8/10): 스타일링과 디자인 시스템"
 status: publish-ready
 targets:
   tistory: true
@@ -20,21 +20,27 @@ seo_description: 디자인 토큰과 컴포넌트 기반 스타일 일관성 전
 last_reviewed: '2026-05-12'
 ---
 
-# 스타일링과 디자인 시스템
+# Frontend Development 101 (8/10): 스타일링과 디자인 시스템
 
 초기 프로젝트에서는 버튼 하나쯤 직접 색을 주고 간격을 맞춰도 큰 문제가 없어 보입니다. 하지만 화면이 늘어나고 팀원이 늘어나면 작은 차이가 금방 누적됩니다. 페이지마다 파란색이 조금씩 다르고, 간격 기준이 섞이고, 다크 모드는 나중에 붙이려다 전체를 다시 만지게 됩니다.
 
 이 글은 Frontend Development 101 시리즈의 여덟 번째 글입니다. 여기서는 스타일링을 단순한 CSS 작성이 아니라 일관성을 운영하는 체계로 설명합니다. 색, 간격, 타이포그래피 같은 시각 규칙은 개별 컴포넌트 안에 흩어져 있으면 안 되고 토큰과 공용 컴포넌트 계층으로 모여 있어야 합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 글로벌 CSS, CSS Modules, CSS-in-JS, Tailwind는 어떤 차이를 가질까요?
 - 디자인 토큰은 왜 프로젝트가 커질수록 더 중요해질까요?
 - 컴포넌트 라이브러리는 어떤 구조로 운영되는 편이 좋을까요?
-- 다크 모드와 테마는 무엇을 바꾸는 문제일까요?
-- 스타일 일관성은 코드 리뷰만으로 충분할까요, 아니면 자동화가 필요할까요?
 
-> 디자인 시스템의 핵심은 디자이너와 개발자가 같은 단어로 같은 결정을 반복할 수 있게 만드는 데 있습니다. 색과 간격과 타이포그래피 선택이 한곳에 모여 있어야 합니다.
+## 큰 그림
+
+![Frontend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
+
+*Frontend Development 101 8장 흐름 개요*
+
+이 그림에서는 스타일링과 디자인 시스템를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 스타일링과 디자인 시스템의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -43,10 +49,6 @@ last_reviewed: '2026-05-12'
 좋은 디자인 시스템은 디자이너와 엔지니어가 같은 언어를 쓰게 만듭니다. “이 버튼은 primary인가 secondary인가”, “spacing token은 어느 단계인가” 같은 대화가 가능해지면 변경도 훨씬 빨라집니다.
 
 ## 개념 한눈에 보기
-
-![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
-
-*디자인 토큰, 컴포넌트, 페이지, 테마가 한 시스템으로 연결되는 구조*
 
 디자인 토큰이 가장 아래의 공통 규칙이고, 컴포넌트는 그 규칙을 구현하며, 페이지는 그 컴포넌트를 조합합니다. 다크 모드도 대개 구조 자체를 바꾸는 것이 아니라 토큰 값을 바꾸는 문제로 다뤄야 합니다.
 
@@ -188,18 +190,29 @@ function Button({ children, variant = "primary" }) {
 
 다음 글에서는 이 코드와 스타일을 브라우저가 읽을 수 있는 산출물로 바꾸는 빌드 도구와 번들링을 살펴보겠습니다.
 
-<!-- toc:begin -->
-- [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
-- [HTML과 CSS 기본](./02-html-and-css-basics.md)
-- [JavaScript 기본](./03-javascript-basics.md)
-- [컴포넌트와 상태](./04-components-and-state.md)
-- [라우팅과 페이지](./05-routing-and-pages.md)
-- [API 호출과 비동기](./06-api-calls-and-async.md)
-- [폼과 유효성 검사](./07-forms-and-validation.md)
-- **스타일링과 디자인 시스템 (현재 글)**
+## 처음 질문으로 돌아가기
 
+- **글로벌 CSS, CSS Modules, CSS-in-JS, Tailwind는 어떤 차이를 가질까요?**
+  - 본문의 기준은 스타일링과 디자인 시스템를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **디자인 토큰은 왜 프로젝트가 커질수록 더 중요해질까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **컴포넌트 라이브러리는 어떤 구조로 운영되는 편이 좋을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Frontend Development 101 (1/10): 프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML과 CSS 기본](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript 기본](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): 컴포넌트와 상태](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): 라우팅과 페이지](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API 호출과 비동기](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): 폼과 유효성 검사](./07-forms-and-validation.md)
+- **스타일링과 디자인 시스템 (현재 글)**
 - 빌드 도구와 번들링 (예정)
 - 작은 프론트엔드 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

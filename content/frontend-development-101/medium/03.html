@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>JavaScript Basics</title>
+<title>Frontend Development 101 (3/10): JavaScript Basics</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>JavaScript Basics</h1>
+<h1>Frontend Development 101 (3/10): JavaScript Basics</h1>
 <p>JavaScript feels endless when you first meet it. There are many array methods, multiple ways to declare functions, and a long list of DOM APIs that all look important. Many beginners lose momentum because they try to memorize the whole language before building anything real.</p>
 <p>This is post 3 in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying JavaScript Basics?</li>
+<li>Which signal should the example or diagram make visible for JavaScript Basics?</li>
+<li>What failure should be prevented first when JavaScript Basics reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 3 flow overview</em></p>
+<p>This picture places JavaScript Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of JavaScript Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>
@@ -74,8 +87,6 @@
 <p>Good JavaScript is a sum of <em>small, separated functions</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>The core JavaScript flow from variables and functions to DOM updates and events</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong><code>const</code></strong>: cannot be reassigned. Use it <em>by default</em>.</li>
@@ -177,15 +188,21 @@ const doubled = arr.map(n =&gt; n * 2);
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Plain JavaScript can build small apps on its own. As the screen grows, you need a tool that <em>binds state to rendering</em> automatically. Next up: components and state.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li>
-<p><strong>JavaScript Basics (current)</strong></p>
-</li>
-<li>
-<p>Components and State (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying JavaScript Basics?</strong></li>
+<li>The article treats JavaScript Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for JavaScript Basics?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when JavaScript Basics reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><strong>JavaScript Basics (current)</strong></li>
+<li>Components and State (upcoming)</li>
 <li>Routing and Pages (upcoming)</li>
 <li>API Calls and Async (upcoming)</li>
 <li>Forms and Validation (upcoming)</li>

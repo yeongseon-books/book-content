@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 7
-title: Forms and Validation
+title: "Frontend Development 101 (7/10): Forms and Validation"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Controlled inputs, validation, error messages, and accessibilit
 last_reviewed: '2026-05-04'
 ---
 
-# Forms and Validation
+# Frontend Development 101 (7/10): Forms and Validation
 
 Forms are where products have their longest conversation with users. Sign-up, login, payment, search, and settings changes all pass through fields, buttons, and validation messages. When that conversation is awkward, users feel it immediately.
 
 This is post 7 in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Forms and Validation?
+- Which signal should the example or diagram make visible for Forms and Validation?
+- What failure should be prevented first when Forms and Validation reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 7 flow overview*
+
+This picture places Forms and Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Forms and Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -41,10 +57,6 @@ Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkw
 > Great forms *ask less*, *catch typos early*, and *submit fast*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
-
-*The form-validation flow from input and format checks to business rules and server validation*
 
 ## Key Terms
 
@@ -174,18 +186,29 @@ Most React apps use *React Hook Form + Zod*. State, validation, submission, and 
 
 Forms are *the longest conversation with the user*. Next, we look at how the form — and the rest of the screen — gets *its appearance* via styling and design systems.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- [Routing and Pages](./05-routing-and-pages.md)
-- [API Calls and Async](./06-api-calls-and-async.md)
-- **Forms and Validation (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying Forms and Validation?**
+  - The article treats Forms and Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Forms and Validation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Forms and Validation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): Routing and Pages](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API Calls and Async](./06-api-calls-and-async.md)
+- **Forms and Validation (current)**
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

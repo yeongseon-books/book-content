@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 5
-title: Routing and Pages
+title: "Frontend Development 101 (5/10): Routing and Pages"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: SPA routing, URL-to-component mapping, nested routes, and lazy 
 last_reviewed: '2026-05-04'
 ---
 
-# Routing and Pages
+# Frontend Development 101 (5/10): Routing and Pages
 
 A one-screen app is easy to reason about. Real products are not. As soon as you add a home page, detail page, settings, and search results, users expect refresh, back navigation, and shareable links to work as if those screens were always separate places. Routing is the layer that makes that expectation feel natural.
 
 This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Routing and Pages?
+- Which signal should the example or diagram make visible for Routing and Pages?
+- What failure should be prevented first when Routing and Pages reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 5 flow overview*
+
+This picture places Routing and Pages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Routing and Pages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -41,10 +57,6 @@ Routing makes *refresh-safe screens*, *shareable links*, and *back-button behavi
 > Good routing makes the screen *guessable from the URL alone*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*The SPA routing flow in which the router reads the URL and selects the screen component*
 
 ## Key Terms
 
@@ -175,18 +187,29 @@ Most teams use *file-based routing* via Next.js, Remix, or Nuxt. `pages/users/[i
 
 URLs decide what users see. Next, we look at how those screens *fetch data from a server*.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- [JavaScript Basics](./03-javascript-basics.md)
-- [Components and State](./04-components-and-state.md)
-- **Routing and Pages (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying Routing and Pages?**
+  - The article treats Routing and Pages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Routing and Pages?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Routing and Pages reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript Basics](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): Components and State](./04-components-and-state.md)
+- **Routing and Pages (current)**
 - API Calls and Async (upcoming)
 - Forms and Validation (upcoming)
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

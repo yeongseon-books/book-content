@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 3
-title: JavaScript Basics
+title: "Frontend Development 101 (3/10): JavaScript Basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Variables, functions, DOM manipulation, events — the twelve e
 last_reviewed: '2026-05-04'
 ---
 
-# JavaScript Basics
+# Frontend Development 101 (3/10): JavaScript Basics
 
 JavaScript feels endless when you first meet it. There are many array methods, multiple ways to declare functions, and a long list of DOM APIs that all look important. Many beginners lose momentum because they try to memorize the whole language before building anything real.
 
 This is post 3 in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying JavaScript Basics?
+- Which signal should the example or diagram make visible for JavaScript Basics?
+- What failure should be prevented first when JavaScript Basics reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 3 flow overview*
+
+This picture places JavaScript Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of JavaScript Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ JavaScript stays the same *across frameworks*. Inside React components, inside V
 > Good JavaScript is a sum of *small, separated functions*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)
-
-*The core JavaScript flow from variables and functions to DOM updates and events*
 
 ## Key Terms
 
@@ -175,11 +187,21 @@ Most teams standardize on *TypeScript*, *ESLint*, and *Prettier*. JavaScript's f
 
 Plain JavaScript can build small apps on its own. As the screen grows, you need a tool that *binds state to rendering* automatically. Next up: components and state.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- [HTML and CSS Basics](./02-html-and-css-basics.md)
-- **JavaScript Basics (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying JavaScript Basics?**
+  - The article treats JavaScript Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for JavaScript Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when JavaScript Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML and CSS Basics](./02-html-and-css-basics.md)
+- **JavaScript Basics (current)**
 - Components and State (upcoming)
 - Routing and Pages (upcoming)
 - API Calls and Async (upcoming)
@@ -187,6 +209,7 @@ Plain JavaScript can build small apps on its own. As the screen grows, you need 
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

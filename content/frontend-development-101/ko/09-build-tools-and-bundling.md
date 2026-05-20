@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 9
-title: 빌드 도구와 번들링
+title: "Frontend Development 101 (9/10): 빌드 도구와 번들링"
 status: publish-ready
 targets:
   tistory: true
@@ -20,21 +20,27 @@ seo_description: Vite와 번들링 최적화 전략을 익힙니다. Tree shakin
 last_reviewed: '2026-05-12'
 ---
 
-# 빌드 도구와 번들링
+# Frontend Development 101 (9/10): 빌드 도구와 번들링
 
 프론트엔드 코드는 개발할 때는 수십, 수백 개 파일로 흩어져 있습니다. 그런데 사용자의 브라우저는 그 모든 구조를 그대로 이해하지 않습니다. 결국 누군가는 import 그래프를 따라가고, 필요한 코드를 변환하고, 묶고, 쪼개고, 캐시 가능한 형태로 내보내야 합니다. 그 역할을 맡는 것이 빌드 도구입니다.
 
 이 글은 Frontend Development 101 시리즈의 아홉 번째 글입니다. 여기서는 빌드 도구를 단순한 개발 편의 기능이 아니라 사용자 경험을 결정하는 성능 계층으로 설명합니다. 번들의 모양은 사용자가 첫 화면을 얼마나 빨리 보는지를 좌우합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 번들러는 import 그래프를 따라 어떤 일을 할까요?
 - Vite와 esbuild는 왜 빠르다고 평가될까요?
 - tree shaking과 dead code elimination은 어떤 비용을 줄여 줄까요?
-- 번들 분석은 왜 최적화의 출발점일까요?
-- 개발 환경과 프로덕션 환경을 빌드 단계에서 왜 분리해야 할까요?
 
-> 빌드 도구는 모듈을 모으고, 압축하고, 필요하면 나눕니다. 그 결과물이 얼마나 작고 잘 쪼개졌는지가 사용자 경험을 결정합니다.
+## 큰 그림
+
+![Frontend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
+
+*Frontend Development 101 9장 흐름 개요*
+
+이 그림에서는 빌드 도구와 번들링를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 빌드 도구와 번들링의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 
@@ -43,10 +49,6 @@ last_reviewed: '2026-05-12'
 좋은 번들은 작고, 캐시 가능하고, 적절히 분할되어 있습니다. 이 세 가지를 만족시키는 방향으로 빌드 파이프라인을 설계해야 합니다.
 
 ## 개념 한눈에 보기
-
-![개념 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
-
-*소스 코드가 모듈 해석, 변환, 번들링을 거쳐 배포 산출물로 바뀌는 흐름*
 
 소스 코드는 그대로 배포되지 않습니다. 모듈 해석, 변환, 번들링을 거쳐 브라우저가 이해할 수 있는 최종 산출물로 바뀝니다.
 
@@ -187,18 +189,29 @@ const url = import.meta.env.VITE_API_URL;
 
 다음 글에서는 지금까지의 개념을 모두 모아 작은 프론트엔드 앱을 직접 구성하고 배포해 보겠습니다.
 
-<!-- toc:begin -->
-- [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
-- [HTML과 CSS 기본](./02-html-and-css-basics.md)
-- [JavaScript 기본](./03-javascript-basics.md)
-- [컴포넌트와 상태](./04-components-and-state.md)
-- [라우팅과 페이지](./05-routing-and-pages.md)
-- [API 호출과 비동기](./06-api-calls-and-async.md)
-- [폼과 유효성 검사](./07-forms-and-validation.md)
-- [스타일링과 디자인 시스템](./08-styling-and-design-system.md)
-- **빌드 도구와 번들링 (현재 글)**
+## 처음 질문으로 돌아가기
 
+- **번들러는 import 그래프를 따라 어떤 일을 할까요?**
+  - 본문의 기준은 빌드 도구와 번들링를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **Vite와 esbuild는 왜 빠르다고 평가될까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **tree shaking과 dead code elimination은 어떤 비용을 줄여 줄까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Frontend Development 101 (1/10): 프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
+- [Frontend Development 101 (2/10): HTML과 CSS 기본](./02-html-and-css-basics.md)
+- [Frontend Development 101 (3/10): JavaScript 기본](./03-javascript-basics.md)
+- [Frontend Development 101 (4/10): 컴포넌트와 상태](./04-components-and-state.md)
+- [Frontend Development 101 (5/10): 라우팅과 페이지](./05-routing-and-pages.md)
+- [Frontend Development 101 (6/10): API 호출과 비동기](./06-api-calls-and-async.md)
+- [Frontend Development 101 (7/10): 폼과 유효성 검사](./07-forms-and-validation.md)
+- [Frontend Development 101 (8/10): 스타일링과 디자인 시스템](./08-styling-and-design-system.md)
+- **빌드 도구와 번들링 (현재 글)**
 - 작은 프론트엔드 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

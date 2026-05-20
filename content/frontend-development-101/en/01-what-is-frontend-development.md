@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 1
-title: What Is Frontend Development?
+title: "Frontend Development 101 (1/10): What Is Frontend Development?"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Browsers, rendering, and JavaScript — a complete picture of f
 last_reviewed: '2026-05-04'
 ---
 
-# What Is Frontend Development?
+# Frontend Development 101 (1/10): What Is Frontend Development?
 
 Most people enter frontend development through the visual door. They see buttons, colors, and layouts, so the work looks like "making screens pretty." That is part of the job, but it is not the whole job. In production, frontend work also includes understanding how the browser renders, how user input becomes state changes, and where the boundary with the backend actually lives.
 
 This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying What Is Frontend Development??
+- Which signal should the example or diagram make visible for What Is Frontend Development??
+- What failure should be prevented first when What Is Frontend Development? reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 1 flow overview*
+
+This picture places What Is Frontend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of What Is Frontend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ This is the first post in the Frontend Development 101 series. In this chapter, 
 > A great frontend is *invisible*: users just *use it* without thinking.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
-
-*How the browser, HTML, CSS, JavaScript, and API calls combine into one user-facing flow*
 
 The browser *combines* the three languages to draw the screen.
 
@@ -169,9 +181,19 @@ Most teams use *React/Vue/Svelte* with *TypeScript* and *Vite/Next.js*. Don't tr
 
 The frontend is *the layer where the product meets the user inside the browser*. Next, we dig into the *foundation* of that layer: HTML and CSS.
 
-<!-- toc:begin -->
-- **What Is Frontend Development? (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying What Is Frontend Development??**
+  - The article treats What Is Frontend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for What Is Frontend Development??**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when What Is Frontend Development? reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- **What Is Frontend Development? (current)**
 - HTML and CSS Basics (upcoming)
 - JavaScript Basics (upcoming)
 - Components and State (upcoming)
@@ -181,6 +203,7 @@ The frontend is *the layer where the product meets the user inside the browser*.
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

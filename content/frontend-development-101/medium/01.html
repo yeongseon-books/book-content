@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Frontend Development?</title>
+<title>Frontend Development 101 (1/10): What Is Frontend Development?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>What Is Frontend Development?</h1>
+<h1>Frontend Development 101 (1/10): What Is Frontend Development?</h1>
 <p>Most people enter frontend development through the visual door. They see buttons, colors, and layouts, so the work looks like "making screens pretty." That is part of the job, but it is not the whole job. In production, frontend work also includes understanding how the browser renders, how user input becomes state changes, and where the boundary with the backend actually lives.</p>
 <p>This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Frontend Development??</li>
+<li>Which signal should the example or diagram make visible for What Is Frontend Development??</li>
+<li>What failure should be prevented first when What Is Frontend Development? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Frontend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Frontend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>clear boundary</em> between frontend and backend</li>
@@ -74,8 +87,6 @@
 <p>A great frontend is <em>invisible</em>: users just <em>use it</em> without thinking.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>How the browser, HTML, CSS, JavaScript, and API calls combine into one user-facing flow</em></p>
 <p>The browser <em>combines</em> the three languages to draw the screen.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -171,13 +182,19 @@ button { padding: .5rem 1rem; cursor: pointer; }
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>The frontend is <em>the layer where the product meets the user inside the browser</em>. Next, we dig into the <em>foundation</em> of that layer: HTML and CSS.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li>
-<p><strong>What Is Frontend Development? (current)</strong></p>
-</li>
-<li>
-<p>HTML and CSS Basics (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying What Is Frontend Development??</strong></li>
+<li>The article treats What Is Frontend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Frontend Development??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Frontend Development? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><strong>What Is Frontend Development? (current)</strong></li>
+<li>HTML and CSS Basics (upcoming)</li>
 <li>JavaScript Basics (upcoming)</li>
 <li>Components and State (upcoming)</li>
 <li>Routing and Pages (upcoming)</li>

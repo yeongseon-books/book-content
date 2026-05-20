@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Routing and Pages</title>
+<title>Frontend Development 101 (5/10): Routing and Pages</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Routing and Pages</h1>
+<h1>Frontend Development 101 (5/10): Routing and Pages</h1>
 <p>A one-screen app is easy to reason about. Real products are not. As soon as you add a home page, detail page, settings, and search results, users expect refresh, back navigation, and shareable links to work as if those screens were always separate places. Routing is the layer that makes that expectation feel natural.</p>
 <p>This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Routing and Pages?</li>
+<li>Which signal should the example or diagram make visible for Routing and Pages?</li>
+<li>What failure should be prevented first when Routing and Pages reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 5 flow overview</em></p>
+<p>This picture places Routing and Pages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Routing and Pages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>principle</em> behind SPA routing</li>
@@ -70,8 +83,6 @@
 <p>Good routing makes the screen <em>guessable from the URL alone</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
-<p><em>The SPA routing flow in which the router reads the URL and selects the screen component</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Route</strong>: a <em>mapping</em> from URL pattern to component.</li>
@@ -174,17 +185,23 @@ const Settings = lazy(() =&gt; import(&quot;./Settings&quot;));
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>URLs decide what users see. Next, we look at how those screens <em>fetch data from a server</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
-<li>
-<p><strong>Routing and Pages (current)</strong></p>
-</li>
-<li>
-<p>API Calls and Async (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying Routing and Pages?</strong></li>
+<li>The article treats Routing and Pages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Routing and Pages?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Routing and Pages reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">Frontend Development 101 (3/10): JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Frontend Development 101 (4/10): Components and State</a></li>
+<li><strong>Routing and Pages (current)</strong></li>
+<li>API Calls and Async (upcoming)</li>
 <li>Forms and Validation (upcoming)</li>
 <li>Styling and Design Systems (upcoming)</li>
 <li>Build Tools and Bundling (upcoming)</li>

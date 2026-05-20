@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Build Tools and Bundling</title>
+<title>Frontend Development 101 (9/10): Build Tools and Bundling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Build Tools and Bundling</h1>
+<h1>Frontend Development 101 (9/10): Build Tools and Bundling</h1>
 <p>During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.</p>
 <p>This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Build Tools and Bundling?</li>
+<li>Which signal should the example or diagram make visible for Build Tools and Bundling?</li>
+<li>What failure should be prevented first when Build Tools and Bundling reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 9 flow overview</em></p>
+<p>This picture places Build Tools and Bundling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Build Tools and Bundling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>role</em> of a bundler (module graph, transform, split)</li>
@@ -70,8 +83,6 @@
 <p>A good bundle is <em>small, cacheable, and split</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png"></p>
-<p><em>How source files move through resolve, transform, bundle, and output stages</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Module bundler</strong>: a tool that <em>follows the import graph</em> and merges files.</li>
@@ -171,21 +182,27 @@ const url = import.meta.env.VITE_API_URL;
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Build tools decide <em>how fast the first screen the user sees becomes interactive</em>. In the final post we will pull every concept so far into <em>a small frontend app</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/08-styling-and-design-system.md">Styling and Design Systems</a></li>
-<li>
-<p><strong>Build Tools and Bundling (current)</strong></p>
-</li>
-<li>
-<p>Building a Small Frontend App (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying Build Tools and Bundling?</strong></li>
+<li>The article treats Build Tools and Bundling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Build Tools and Bundling?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Build Tools and Bundling reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">Frontend Development 101 (3/10): JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Frontend Development 101 (4/10): Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Frontend Development 101 (5/10): Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">Frontend Development 101 (6/10): API Calls and Async</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Frontend Development 101 (7/10): Forms and Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/08-styling-and-design-system.md">Frontend Development 101 (8/10): Styling and Design Systems</a></li>
+<li><strong>Build Tools and Bundling (current)</strong></li>
+<li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
 <p><strong>Official Docs</strong><br>

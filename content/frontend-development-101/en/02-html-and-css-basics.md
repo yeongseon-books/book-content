@@ -1,7 +1,7 @@
 ---
 series: frontend-development-101
 episode: 2
-title: HTML and CSS Basics
+title: "Frontend Development 101 (2/10): HTML and CSS Basics"
 status: content-ready
 targets:
   tistory: false
@@ -20,11 +20,27 @@ seo_description: Semantic HTML, the box model, Flexbox and Grid — the long-liv
 last_reviewed: '2026-05-04'
 ---
 
-# HTML and CSS Basics
+# Frontend Development 101 (2/10): HTML and CSS Basics
 
 One lesson shows up quickly when you study frontend work: building a screen fast and building a screen that survives real product growth are not the same thing. You can ship something quickly with random tags and one-off styles, but maintenance gets expensive as soon as the layout changes, accessibility matters, or another teammate joins the codebase.
 
 This is post 2 in the Frontend Development 101 series. Here we treat HTML as the page skeleton and CSS as the rule system layered on top of that skeleton. Keeping meaning in HTML and appearance in CSS is what makes layout, accessibility, and SEO improve together instead of fighting each other later.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying HTML and CSS Basics?
+- Which signal should the example or diagram make visible for HTML and CSS Basics?
+- What failure should be prevented first when HTML and CSS Basics reaches a real system?
+
+## Big Picture
+
+![frontend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
+
+*frontend development 101 chapter 2 flow overview*
+
+This picture places HTML and CSS Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of HTML and CSS Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What You Will Learn
 
@@ -42,10 +58,6 @@ HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *s
 > Semantic HTML is code that *search engines and screen readers can read together*.
 
 ## Concept at a Glance
-
-![Concept at a Glance](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
-
-*The learning sequence from semantic structure to layout, responsiveness, and accessibility*
 
 ## Key Terms
 
@@ -181,10 +193,20 @@ Most companies adopt a *design system* (Tailwind, Material UI, custom tokens) fo
 
 HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, behavior — JavaScript — slots in cleanly. We tackle JavaScript fundamentals next.
 
-<!-- toc:begin -->
-- [What Is Frontend Development?](./01-what-is-frontend-development.md)
-- **HTML and CSS Basics (current)**
+## Answering the Opening Questions
 
+- **What boundary should you inspect first when applying HTML and CSS Basics?**
+  - The article treats HTML and CSS Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for HTML and CSS Basics?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when HTML and CSS Basics reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Frontend Development 101 (1/10): What Is Frontend Development?](./01-what-is-frontend-development.md)
+- **HTML and CSS Basics (current)**
 - JavaScript Basics (upcoming)
 - Components and State (upcoming)
 - Routing and Pages (upcoming)
@@ -193,6 +215,7 @@ HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, be
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
+
 <!-- toc:end -->
 
 ## References

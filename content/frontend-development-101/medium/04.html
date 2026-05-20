@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Components and State</title>
+<title>Frontend Development 101 (4/10): Components and State</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,9 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Components and State</h1>
+<h1>Frontend Development 101 (4/10): Components and State</h1>
 <p>A small screen can survive on a few lines of JavaScript and direct DOM manipulation. As the screen grows, that approach collapses under its own weight. Logic piles into one file, every change feels risky, and reading the code becomes harder than writing the next feature.</p>
 <p>This is post 4 in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Components and State?</li>
+<li>Which signal should the example or diagram make visible for Components and State?</li>
+<li>What failure should be prevented first when Components and State reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="frontend development 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>frontend development 101 chapter 4 flow overview</em></p>
+<p>This picture places Components and State inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Components and State is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>
@@ -74,8 +87,6 @@
 <p>Well-split components exist for <em>readability</em>, not for <em>reuse</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>A component tree where state flows down and events travel back up</em></p>
 <p>State flows <em>down</em>, events flow <em>up</em>.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -186,16 +197,22 @@ function Counter({ initial = 0 }) {
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Components and state make screens <em>composable</em>. Next, we connect multiple screens via <em>URLs and routers</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
-<li>
-<p><strong>Components and State (current)</strong></p>
-</li>
-<li>
-<p>Routing and Pages (upcoming)</p>
-</li>
+<li><strong>What boundary should you inspect first when applying Components and State?</strong></li>
+<li>The article treats Components and State as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Components and State?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Components and State reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">Frontend Development 101 (1/10): What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">Frontend Development 101 (2/10): HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">Frontend Development 101 (3/10): JavaScript Basics</a></li>
+<li><strong>Components and State (current)</strong></li>
+<li>Routing and Pages (upcoming)</li>
 <li>API Calls and Async (upcoming)</li>
 <li>Forms and Validation (upcoming)</li>
 <li>Styling and Design Systems (upcoming)</li>
