@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 9
-title: Result Interpretation
+title: "Data Science 101 (9/10): Result Interpretation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A 5-step interpretation framework for turning model output and 
 last_reviewed: '2026-05-15'
 ---
 
-# Result Interpretation
+# Data Science 101 (9/10): Result Interpretation
 
 The model score is not the finish line. Someone still has to explain what changed, how certain that change is, who it applies to, and what action the team should take next. That translation step is where strong technical work often becomes weak communication.
 
 Interpretation is not about making numbers sound impressive. It is about adding context, uncertainty, and practical significance until the result is honest enough to trust and clear enough to act on.
 
 This is post 9 in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Result Interpretation?
+- Which signal should the example or diagram make visible for Result Interpretation?
+- What failure should be prevented first when Result Interpretation reaches a real system?
+
+## Big Picture
+
+![data science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
+
+*data science 101 chapter 9 flow overview*
+
+This picture places Result Interpretation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Result Interpretation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -53,9 +69,6 @@ When interpretation is *exaggerated*, it leads to *bad decisions*; when it is *u
 
 ## Concept at a Glance
 
-![How numbers gain context and uncertainty before they become a decision](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
-
-*How numbers gain context and uncertainty before they become a decision*
 ## Key Terms
 
 - **Confidence Interval**: an *uncertainty range* around an estimate.
@@ -148,17 +161,29 @@ Data team weekly reviews follow a *number → context → confidence interval �
 
 Interpretation is the *final bridge* that carries *analysis into decisions*. The next episode follows a single *data project end to end*, pulling everything in this series together.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Result Interpretation?**
+  - The article treats Result Interpretation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Result Interpretation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Result Interpretation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
-- [Exploratory Data Analysis](./05-exploratory-data-analysis.md)
-- [Visualization](./06-visualization.md)
-- [Modeling](./07-modeling.md)
-- [Evaluation](./08-evaluation.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
+- [Data Science 101 (5/10): Exploratory Data Analysis](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): Visualization](./06-visualization.md)
+- [Data Science 101 (7/10): Modeling](./07-modeling.md)
+- [Data Science 101 (8/10): Evaluation](./08-evaluation.md)
 - **Result Interpretation (current)**
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

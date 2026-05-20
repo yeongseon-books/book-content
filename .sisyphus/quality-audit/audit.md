@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:25:23+00:00
+Generated: 2026-05-20T11:25:42+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -29,11 +29,11 @@ Warnings:
 - Series audited: **92**
 - Series with any issue: **56**
 - Series at or above 5 issues: **42**
-- Total issues: **540**
+- Total issues: **539**
   - BadImg: **532**
   - Synt: **0**
   - BrkLink: **0**
-  - Shrt: **8**
+  - Shrt: **7**
   - NoEn: **0**
 - Repo existence check method: **gh**
 
@@ -52,7 +52,7 @@ Warnings:
 | 9 | `ai-web-dev-101` | 14 | 14 | 0 | 0 | 0 | 0 |
 | 10 | `software-engineering-101` | 14 | 14 | 0 | 0 | 0 | 0 |
 | 11 | `testing-101` | 14 | 14 | 0 | 0 | 0 | 0 |
-| 12 | `data-science-101` | 13 | 12 | 0 | 0 | 1 | 0 |
+| 12 | `data-science-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 13 | `docker-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 14 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 15 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
@@ -230,9 +230,9 @@ Warnings:
 - `assets/testing-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 69px <= 100px (size=572x69)
 - ... 9 more
 
-## data-science-101 — Total 13
+## data-science-101 — Total 12
 
-- BadImg=12 Synt=0 BrkLink=0 Shrt=1 NoEn=0
+- BadImg=12 Synt=0 BrkLink=0 Shrt=0 NoEn=0
 
 ### BadImg
 - `assets/data-science-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=702x67)
@@ -241,9 +241,6 @@ Warnings:
 - `assets/data-science-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=858x67)
 - `assets/data-science-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1118x67)
 - ... 7 more
-
-### Shrt
-- `content/data-science-101/en/02-problem-to-data-problem.md:22` — markdown body has 149 lines (< 150)
 
 ## docker-101 — Total 12
 

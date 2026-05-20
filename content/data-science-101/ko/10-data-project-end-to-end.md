@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 10
-title: 데이터 프로젝트 전체 흐름
+title: "Data Science 101 (10/10): 데이터 프로젝트 전체 흐름"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 이탈 예측 예제로 문제 정의부터 결정까지 데이
 last_reviewed: '2026-05-15'
 ---
 
-# 데이터 프로젝트 전체 흐름
+# Data Science 101 (10/10): 데이터 프로젝트 전체 흐름
 
 이 글은 Data Science 101 시리즈의 마지막 글입니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 마지막 글인 이번 편에서는 이탈 예측 예제를 중심으로, 문제를 정의하고 데이터를 모으고 모델을 만들고 의사결정으로 닫는 과정을 한 번에 훑어 보겠습니다. 핵심은 모든 단계를 외우는 것이 아니라, 하나의 루프가 어떻게 닫히는지 체감하는 것입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 앞선 아홉 단계가 하나의 프로젝트 안에서 어떻게 연결될까요?
 - 문제 정의, 수집, 정제, EDA, 모델링, 평가, 해석은 각각 어떤 산출물을 남길까요?
 - 이탈 예측 같은 실전 예제에서는 무엇이 결정 시점이 될까요?
-- 왜 복잡한 모델보다 짧은 문제-결정 루프가 더 중요할까요?
-- 프로젝트가 끝난 뒤에도 모니터링을 설계해야 하는 이유는 무엇일까요?
 
-> 마지막 글의 핵심은 새로운 기술이 아니라, 지금까지 배운 조각들을 하나의 프로젝트로 조립하는 감각입니다.
+## 큰 그림
+
+![Data Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
+
+*Data Science 101 10장 흐름 개요*
+
+이 그림에서는 데이터 프로젝트 전체 흐름를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 데이터 프로젝트 전체 흐름의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -56,9 +62,6 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
-
-*문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프*
 ## 핵심 용어
 
 - **Churn Prediction**: 곧 이탈할 사용자를 예측하는 문제입니다.
@@ -178,17 +181,29 @@ Owner: Growth team / Review: in 2 weeks
 
 이 시리즈는 문제 → 데이터 → 모델 → 결정으로 이어지는 하나의 흐름을 조립하는 과정이었습니다. 각 단계를 따로 배우는 것도 중요하지만, 결국 실무에서는 이 단계를 하나의 프로젝트 안에서 닫아야 합니다. 다음 학습 단계로는 Statistics 101, Machine Learning 101, MLOps 101처럼 각 부분을 더 깊게 파고드는 시리즈가 자연스럽게 이어질 것입니다.
 
+## 처음 질문으로 돌아가기
+
+- **앞선 아홉 단계가 하나의 프로젝트 안에서 어떻게 연결될까요?**
+  - 본문의 기준은 데이터 프로젝트 전체 흐름를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **문제 정의, 수집, 정제, EDA, 모델링, 평가, 해석은 각각 어떤 산출물을 남길까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **이탈 예측 같은 실전 예제에서는 무엇이 결정 시점이 될까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Data Science란 무엇인가?](./01-what-is-data-science.md)
-- [문제를 데이터 문제로 바꾸기](./02-problem-to-data-problem.md)
-- [데이터 수집](./03-data-collection.md)
-- [데이터 정제](./04-data-cleaning.md)
-- [탐색적 데이터 분석](./05-exploratory-data-analysis.md)
-- [시각화](./06-visualization.md)
-- [모델링](./07-modeling.md)
-- [평가](./08-evaluation.md)
-- [결과 해석](./09-result-interpretation.md)
+## 시리즈 목차
+
+- [Data Science 101 (1/10): Data Science란 무엇인가?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): 문제를 데이터 문제로 바꾸기](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): 데이터 수집](./03-data-collection.md)
+- [Data Science 101 (4/10): 데이터 정제](./04-data-cleaning.md)
+- [Data Science 101 (5/10): 탐색적 데이터 분석](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): 시각화](./06-visualization.md)
+- [Data Science 101 (7/10): 모델링](./07-modeling.md)
+- [Data Science 101 (8/10): 평가](./08-evaluation.md)
+- [Data Science 101 (9/10): 결과 해석](./09-result-interpretation.md)
 - **데이터 프로젝트 전체 흐름 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

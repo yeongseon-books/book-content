@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>What Is Data Science?</title>
+<title>Data Science 101 (1/10): What Is Data Science?</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>What Is Data Science?</h1>
+<h1>Data Science 101 (1/10): What Is Data Science?</h1>
 <p>People usually enter data science through tools. They install pandas, copy a scikit-learn tutorial, and learn a dashboard product. A few weeks later, the vocabulary gets blurry. Analytics, experimentation, forecasting, ML engineering, and BI all sound adjacent, but not identical.</p>
 <p>That confusion matters because the field only starts to make sense when you see the job as a decision pipeline rather than a pile of techniques. If you cannot explain how a question becomes data, how data becomes evidence, and how evidence changes an action, every later chapter feels like isolated syntax.</p>
 <p>This is the first post in the Data Science 101 series. Here we build the mental model for the rest of the series: data science is the work of turning a fuzzy business question into a repeatable decision loop.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying What Is Data Science??</li>
+<li>Which signal should the example or diagram make visible for What Is Data Science??</li>
+<li>What failure should be prevented first when What Is Data Science? reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 1 flow overview</em></p>
+<p>This picture places What Is Data Science? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of What Is Data Science? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>What practical definition keeps data science from collapsing into a vague umbrella term?</li>
@@ -81,8 +94,6 @@
 <p><em>Learning without a </em>big picture<em> is just a pile of fragments.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The core data science loop from problem framing to data, insight, and decision" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.en.png"></p>
-<p><em>The core data science loop from problem framing to data, insight, and decision</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Data Analyst</strong>: answers <em>business questions</em> through <em>metrics and dashboards</em>.</li>
@@ -160,6 +171,16 @@ print(df[&quot;days_since_login&quot;].describe())
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Data science is the <em>job of bridging</em> problems and data. Next, we will see how to <em>turn a problem</em> into a <em>data problem</em> you can actually work on.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What boundary should you inspect first when applying What Is Data Science??</strong></li>
+<li>The article treats What Is Data Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for What Is Data Science??</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when What Is Data Science? reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>What Is Data Science? (current)</strong></li>
 <li>Turning a Problem into a Data Problem (upcoming)</li>

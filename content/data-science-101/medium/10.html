@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>End-to-End Data Project Flow</title>
+<title>Data Science 101 (10/10): End-to-End Data Project Flow</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>End-to-End Data Project Flow</h1>
+<h1>Data Science 101 (10/10): End-to-End Data Project Flow</h1>
 <p>After learning each stage in isolation, the hardest remaining step is orchestration. Problem framing, collection, cleaning, EDA, modeling, evaluation, and interpretation all make sense individually, but real work rarely arrives one chapter at a time. It arrives as one messy project that has to move from question to action.</p>
 <p>That is why the capstone matters. The value of the series is not that you can name every stage. It is that you can connect them into a loop with a deliverable, an owner, and a follow-up review.</p>
 <p>This is the final post in the Data Science 101 series. In this chapter, we turn the earlier episodes into one churn-prediction project so the full workflow feels operational, not just conceptual.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying End-to-End Data Project Flow?</li>
+<li>Which signal should the example or diagram make visible for End-to-End Data Project Flow?</li>
+<li>What failure should be prevented first when End-to-End Data Project Flow reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 10 flow overview</em></p>
+<p>This picture places End-to-End Data Project Flow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of End-to-End Data Project Flow is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>How do the earlier chapters connect inside one real project?</li>
@@ -81,8 +94,6 @@
 <p><em>Whoever has built the whole once builds the next project faster.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.en.png"></p>
-<p><em>The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Churn Prediction</strong>: predicting which users are <em>about to leave</em>.</li>
@@ -168,16 +179,26 @@ Owner: Growth team / Review: in 2 weeks
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>This series was an assembly journey through the <em>problem → data → model → decision</em> flow. Next, the <em>Statistics 101</em>, <em>Machine Learning 101</em>, and <em>MLOps 101</em> series go <em>deeper into each step</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Modeling</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/08-evaluation.md">Evaluation</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/09-result-interpretation.md">Result Interpretation</a></li>
+<li><strong>What boundary should you inspect first when applying End-to-End Data Project Flow?</strong></li>
+<li>The article treats End-to-End Data Project Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for End-to-End Data Project Flow?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when End-to-End Data Project Flow reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Science 101 (3/10): Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Science 101 (4/10): Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Data Science 101 (5/10): Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Data Science 101 (6/10): Visualization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Data Science 101 (7/10): Modeling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/08-evaluation.md">Data Science 101 (8/10): Evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/09-result-interpretation.md">Data Science 101 (9/10): Result Interpretation</a></li>
 <li><strong>End-to-End Data Project Flow (current)</strong></li>
 </ul>
 <h2>References</h2>

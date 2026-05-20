@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Modeling</title>
+<title>Data Science 101 (7/10): Modeling</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Modeling</h1>
+<h1>Data Science 101 (7/10): Modeling</h1>
 <p>Modeling gets the spotlight, but it is easiest to misuse precisely because it looks sophisticated. A first model can produce a clean metric and still teach you nothing if you do not know what baseline it beat, whether preprocessing leaked information, or whether a different data split would change the story.</p>
 <p>The safe way to start modeling is to reduce the room for self-deception. Build the simplest reference first, keep training and evaluation cleanly separated, and only then ask whether a more capable model is actually earning its complexity.</p>
 <p>This is post 7 in the Data Science 101 series. Here we build that safer path: baseline first, pipeline second, and only then a model you can compare and trust.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Modeling?</li>
+<li>Which signal should the example or diagram make visible for Modeling?</li>
+<li>What failure should be prevented first when Modeling reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 7 flow overview</em></p>
+<p>This picture places Modeling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Modeling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Why is the baseline the real starting point of modeling?</li>
@@ -81,8 +94,6 @@
 <p><em>Every model competes against a </em>baseline<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="How cleaned data splits into train and test so a baseline and a model can be compared fairly" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.en.png"></p>
-<p><em>How cleaned data splits into train and test so a baseline and a model can be compared fairly</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Baseline</strong>: the <em>simplest possible</em> prediction (e.g., always majority class).</li>
@@ -178,13 +189,23 @@ print(scores.mean(), &quot;+/-&quot;, scores.std())
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Modeling is a <em>conversation with the baseline</em>. Next we step into the world of <em>evaluation metrics</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
+<li><strong>What boundary should you inspect first when applying Modeling?</strong></li>
+<li>The article treats Modeling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Modeling?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Modeling reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Science 101 (3/10): Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Science 101 (4/10): Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Data Science 101 (5/10): Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Data Science 101 (6/10): Visualization</a></li>
 <li><strong>Modeling (current)</strong></li>
 <li>Evaluation (upcoming)</li>
 <li>Result Interpretation (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Visualization</title>
+<title>Data Science 101 (6/10): Visualization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Visualization</h1>
+<h1>Data Science 101 (6/10): Visualization</h1>
 <p>Charts are not the decorative end of analysis. They are the moment when your conclusions become fast enough for other people to consume. A good chart compresses a page of explanation into one glance. A bad chart makes a bad decision look reasonable.</p>
 <p>That is why visualization is really about judgment, not software. The core skill is picking a visual form that matches the message, then removing the distortions that exaggerate or hide what the data is actually saying.</p>
 <p>This is post 6 in the Data Science 101 series. In this chapter, we connect common analytical messages to chart choices, and we treat axes, color, labels, and annotations as decision-support tools rather than styling details.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Visualization?</li>
+<li>Which signal should the example or diagram make visible for Visualization?</li>
+<li>What failure should be prevented first when Visualization reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 6 flow overview</em></p>
+<p>This picture places Visualization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Visualization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>How do you choose a chart from the message instead of from habit?</li>
@@ -81,8 +94,6 @@
 <p><em>Visualization is the </em>last line<em> of an analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png"></p>
-<p><em>A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Encoding</strong>: mapping data to <em>position, length, color</em>.</li>
@@ -168,12 +179,22 @@ ax.legend()
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Visualization is the <em>bridge from analysis to decision</em>. Next we move into <em>modeling</em> — using data to <em>predict</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><strong>What boundary should you inspect first when applying Visualization?</strong></li>
+<li>The article treats Visualization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Visualization?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Visualization reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Science 101 (3/10): Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Science 101 (4/10): Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Data Science 101 (5/10): Exploratory Data Analysis</a></li>
 <li><strong>Visualization (current)</strong></li>
 <li>Modeling (upcoming)</li>
 <li>Evaluation (upcoming)</li>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Cleaning</title>
+<title>Data Science 101 (4/10): Data Cleaning</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Data Cleaning</h1>
+<h1>Data Science 101 (4/10): Data Cleaning</h1>
 <p>Cleaning is where data projects quietly win or lose. Most teams do not fail because the final model was mathematically weak. They fail because dates were still strings, duplicates were silently kept, or a fill rule changed the distribution without anybody noticing.</p>
 <p>That is why cleaning should feel less like “tidying up” and more like quality control. You are not polishing data for presentation. You are deciding which evidence is safe enough to carry into EDA, metrics, and models.</p>
 <p>This is post 4 in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Cleaning?</li>
+<li>Which signal should the example or diagram make visible for Data Cleaning?</li>
+<li>What failure should be prevented first when Data Cleaning reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 4 flow overview</em></p>
+<p>This picture places Data Cleaning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Cleaning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Which quality problems should you inspect first in tabular data?</li>
@@ -81,8 +94,6 @@
 <p><em>Cleaning is the </em>insurance policy<em> of analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png"></p>
-<p><em>A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Missing</strong>: a value is <em>empty</em> (<code>NaN</code>, <code>None</code>, <code>''</code>).</li>
@@ -169,10 +180,20 @@ print(report)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Cleaning is <em>quiet labor</em> that holds up <em>every conclusion</em> you will draw. Next we move to <em>EDA</em> — exploring the cleaned data.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><strong>What boundary should you inspect first when applying Data Cleaning?</strong></li>
+<li>The article treats Data Cleaning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Cleaning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Cleaning reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Science 101 (3/10): Data Collection</a></li>
 <li><strong>Data Cleaning (current)</strong></li>
 <li>Exploratory Data Analysis (upcoming)</li>
 <li>Visualization (upcoming)</li>

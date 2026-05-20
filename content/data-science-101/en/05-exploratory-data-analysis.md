@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 5
-title: Exploratory Data Analysis
+title: "Data Science 101 (5/10): Exploratory Data Analysis"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A 5-step EDA workflow that quickly reveals shape, distribution,
 last_reviewed: '2026-05-15'
 ---
 
-# Exploratory Data Analysis
+# Data Science 101 (5/10): Exploratory Data Analysis
 
 Exploratory data analysis is the stage where the dataset stops being an abstraction and starts behaving like evidence. Before EDA, you mostly have assumptions: which variables matter, what “typical” looks like, and whether the data is even shaped the way the problem statement implied.
 
 EDA is how you replace those assumptions with observations. If you skip it, you often build a model that is technically correct for the wrong picture of the data. If you do it well, you discover the distributions, gaps, and relationships that should shape every later decision.
 
 This is post 5 in the Data Science 101 series. Here we walk through a compact but production-friendly EDA loop that helps you read the dataset before you try to optimize it.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Exploratory Data Analysis?
+- Which signal should the example or diagram make visible for Exploratory Data Analysis?
+- What failure should be prevented first when Exploratory Data Analysis reaches a real system?
+
+## Big Picture
+
+![data science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
+
+*data science 101 chapter 5 flow overview*
+
+This picture places Exploratory Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Exploratory Data Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -53,9 +69,6 @@ Weak EDA produces *the wrong model*. Skipping the *data's self-introduction* and
 
 ## Concept at a Glance
 
-![The EDA reading order from dataset shape through distributions, missingness, and correlation](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
-
-*The EDA reading order from dataset shape through distributions, missingness, and correlation*
 ## Key Terms
 
 - **Skewness**: how *asymmetric* a distribution is.
@@ -155,17 +168,29 @@ Teams keep an *EDA notebook* next to the model code. Key distributions live in *
 
 EDA is *time spent listening to the data*. Next we will look at *visualization* — showing what we heard.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Exploratory Data Analysis?**
+  - The article treats Exploratory Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Exploratory Data Analysis?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Exploratory Data Analysis reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
 - **Exploratory Data Analysis (current)**
 - Visualization (upcoming)
 - Modeling (upcoming)
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

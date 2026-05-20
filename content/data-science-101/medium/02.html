@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Turning a Problem into a Data Problem</title>
+<title>Data Science 101 (2/10): Turning a Problem into a Data Problem</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Turning a Problem into a Data Problem</h1>
+<h1>Data Science 101 (2/10): Turning a Problem into a Data Problem</h1>
 <p>Most analytics requests arrive as loose complaints, not well-formed questions. “Revenue feels down.” “Churn seems worse.” “Did that campaign work?” The problem is not that these questions are unimportant. The problem is that data cannot answer them until someone pins down the metric, the time window, and the population.</p>
 <p>Strong data work starts before SQL, notebooks, or models. It starts when the team rewrites a vague request into a sentence that could be proven wrong. That single rewrite usually decides whether the rest of the project is fast and reliable or slow and argumentative.</p>
 <p>This is post 2 in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Turning a Problem into a Data Problem?</li>
+<li>Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?</li>
+<li>What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 2 flow overview</em></p>
+<p>This picture places Turning a Problem into a Data Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Turning a Problem into a Data Problem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Why are business questions usually too vague for data to answer directly?</li>
@@ -81,8 +94,6 @@
 <p><em>One precise sentence saves </em>three weeks<em> of analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="How a vague business request becomes a metric, window, population, and falsifiable hypothesis" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png"></p>
-<p><em>How a vague business request becomes a metric, window, population, and falsifiable hypothesis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a <em>number</em> you can measure (DAU, conversion rate, revenue).</li>
@@ -150,8 +161,18 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Only <em>answerable questions</em> are the start of analysis. Next, we will look at <em>how to collect</em> the data behind those questions.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><strong>What boundary should you inspect first when applying Turning a Problem into a Data Problem?</strong></li>
+<li>The article treats Turning a Problem into a Data Problem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
 <li><strong>Turning a Problem into a Data Problem (current)</strong></li>
 <li>Data Collection (upcoming)</li>
 <li>Data Cleaning (upcoming)</li>

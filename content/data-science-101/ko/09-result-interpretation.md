@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 9
-title: 결과 해석
+title: "Data Science 101 (9/10): 결과 해석"
 status: publish-ready
 targets:
   tistory: true
@@ -20,7 +20,7 @@ seo_description: 숫자 결과에 맥락과 불확실성을 더해 과장 없는
 last_reviewed: '2026-05-15'
 ---
 
-# 결과 해석
+# Data Science 101 (9/10): 결과 해석
 
 이 글은 Data Science 101 시리즈의 아홉 번째 글입니다.
 
@@ -28,15 +28,21 @@ last_reviewed: '2026-05-15'
 
 좋은 해석은 숫자를 더 크게 보이게 만드는 일이 아닙니다. 숫자 위에 맥락과 불확실성을 겹쳐서, 팀이 과신하지도 않고 주저앉지도 않게 만드는 일입니다. 이 글에서는 결과를 결정으로 옮기는 기본 흐름을 정리하겠습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 숫자 결과를 어떻게 의사결정 문장으로 바꿀 수 있을까요?
 - 왜 숫자와 맥락은 항상 함께 적어야 할까요?
 - 효과 크기와 불확실성은 왜 동시에 보고해야 할까요?
-- cherry-picking, survivorship bias 같은 함정은 어떻게 결과 해석을 왜곡할까요?
-- 좋은 보고서는 왜 반드시 결정 문장으로 끝나야 할까요?
 
-> 해석은 숫자 위에 맥락을 덧씌우고, 그 맥락 위에 결정을 올리는 작업입니다.
+## 큰 그림
+
+![Data Science 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.ko.png)
+
+*Data Science 101 9장 흐름 개요*
+
+이 그림에서는 결과 해석를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 결과 해석의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -56,9 +62,6 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-![숫자에 맥락과 불확실성을 더해 의사결정으로 닫는 해석 흐름](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.ko.png)
-
-*숫자에 맥락과 불확실성을 더해 의사결정으로 닫는 해석 흐름*
 ## 핵심 용어
 
 - **Confidence Interval**: 추정치 주변의 불확실성 범위입니다.
@@ -161,17 +164,29 @@ Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 
 결과 해석은 분석을 의사결정으로 옮기는 마지막 다리입니다. 숫자를 더 크게 말하는 것이 아니라, 숫자와 맥락과 불확실성을 함께 보여 준 뒤 행동 가능한 문장으로 닫는 일이 핵심입니다. 다음 글에서는 시리즈 전체를 묶어 하나의 데이터 프로젝트를 처음부터 끝까지 따라가 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **숫자 결과를 어떻게 의사결정 문장으로 바꿀 수 있을까요?**
+  - 본문의 기준은 결과 해석를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **왜 숫자와 맥락은 항상 함께 적어야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **효과 크기와 불확실성은 왜 동시에 보고해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
-- [Data Science란 무엇인가?](./01-what-is-data-science.md)
-- [문제를 데이터 문제로 바꾸기](./02-problem-to-data-problem.md)
-- [데이터 수집](./03-data-collection.md)
-- [데이터 정제](./04-data-cleaning.md)
-- [탐색적 데이터 분석](./05-exploratory-data-analysis.md)
-- [시각화](./06-visualization.md)
-- [모델링](./07-modeling.md)
-- [평가](./08-evaluation.md)
+## 시리즈 목차
+
+- [Data Science 101 (1/10): Data Science란 무엇인가?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): 문제를 데이터 문제로 바꾸기](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): 데이터 수집](./03-data-collection.md)
+- [Data Science 101 (4/10): 데이터 정제](./04-data-cleaning.md)
+- [Data Science 101 (5/10): 탐색적 데이터 분석](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): 시각화](./06-visualization.md)
+- [Data Science 101 (7/10): 모델링](./07-modeling.md)
+- [Data Science 101 (8/10): 평가](./08-evaluation.md)
 - **결과 해석 (현재 글)**
 - 데이터 프로젝트 전체 흐름 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

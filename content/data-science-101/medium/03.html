@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Data Collection</title>
+<title>Data Science 101 (3/10): Data Collection</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Data Collection</h1>
+<h1>Data Science 101 (3/10): Data Collection</h1>
 <p>The easiest way to lose trust in an analysis is to lose the origin story of the data. A CSV arrives in Slack, an API export gets copied into a notebook, or someone hand-edits an Excel file “just for now.” Weeks later the team still has charts, but nobody can explain where the rows came from or whether the result is reproducible.</p>
 <p>Collection is where reliability starts. Before cleaning or modeling ever matter, someone has to decide which source is authoritative, which copy is disposable, and what metadata must be recorded so the same dataset can be reconstructed later.</p>
 <p>This is post 3 in the Data Science 101 series. Here we treat collection as an engineering discipline: source selection, provenance, and repeatability come first, and the code that fetches the rows comes second.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Data Collection?</li>
+<li>Which signal should the example or diagram make visible for Data Collection?</li>
+<li>What failure should be prevented first when Data Collection reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 3 flow overview</em></p>
+<p>This picture places Data Collection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Data Collection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>Which collection paths are most common in analytics and ML projects?</li>
@@ -81,8 +94,6 @@
 <p><em>Only </em>traceable<em> data is </em>trustworthy<em> data.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png"></p>
-<p><em>Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Source of truth</strong>: the <em>authoritative origin</em> of the data.</li>
@@ -174,9 +185,19 @@ print(meta)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Collection is the <em>recording step</em>. Next, we will look at how to <em>clean</em> the data we have collected.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><strong>What boundary should you inspect first when applying Data Collection?</strong></li>
+<li>The article treats Data Collection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Data Collection?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Data Collection reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
 <li><strong>Data Collection (current)</strong></li>
 <li>Data Cleaning (upcoming)</li>
 <li>Exploratory Data Analysis (upcoming)</li>

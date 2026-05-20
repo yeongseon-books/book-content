@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Evaluation</title>
+<title>Data Science 101 (8/10): Evaluation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,10 +53,23 @@
 </style>
 </head>
 <body>
-<h1>Evaluation</h1>
+<h1>Data Science 101 (8/10): Evaluation</h1>
 <p>Evaluation is where teams discover whether a model is useful for the problem they actually have, not the benchmark they wish they had. Accuracy feels satisfying because it is easy to explain, but in imbalanced or asymmetric problems it can reward exactly the wrong behavior.</p>
 <p>Good evaluation therefore starts with the cost of being wrong. If missing a positive case is expensive, the metric has to show that. If a false alarm is the real operational pain, the metric has to show that instead.</p>
 <p>This is post 8 in the Data Science 101 series. In this chapter, we connect classification and regression metrics back to business cost so that model scores line up with real decisions.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Evaluation?</li>
+<li>Which signal should the example or diagram make visible for Evaluation?</li>
+<li>What failure should be prevented first when Evaluation reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="data science 101 chapter 8 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>data science 101 chapter 8 flow overview</em></p>
+<p>This picture places Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>Questions This Post Answers</h2>
 <ul>
 <li>When does accuracy become the wrong summary of model quality?</li>
@@ -81,8 +94,6 @@
 <p><em>Metrics are </em>what you optimize<em> — choose them carefully.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<p><img alt="The main evaluation branches for classification metrics and regression metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png"></p>
-<p><em>The main evaluation branches for classification metrics and regression metrics</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Confusion matrix</strong>: TP / FP / FN / TN table.</li>
@@ -164,14 +175,24 @@ print(&quot;expected cost:&quot;, cost)
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Evaluation is the <em>conversation</em> between problem and model. Next we look at how to <em>interpret</em> the results into a <em>decision</em>.</p>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Modeling</a></li>
+<li><strong>What boundary should you inspect first when applying Evaluation?</strong></li>
+<li>The article treats Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Evaluation?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Evaluation reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">Data Science 101 (1/10): What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Data Science 101 (2/10): Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Science 101 (3/10): Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Science 101 (4/10): Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Data Science 101 (5/10): Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Data Science 101 (6/10): Visualization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Data Science 101 (7/10): Modeling</a></li>
 <li><strong>Evaluation (current)</strong></li>
 <li>Result Interpretation (upcoming)</li>
 <li>End-to-End Data Project Flow (upcoming)</li>

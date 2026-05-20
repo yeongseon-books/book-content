@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 3
-title: Data Collection
+title: "Data Science 101 (3/10): Data Collection"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Four common paths for collecting data — files, APIs, database
 last_reviewed: '2026-05-15'
 ---
 
-# Data Collection
+# Data Science 101 (3/10): Data Collection
 
 The easiest way to lose trust in an analysis is to lose the origin story of the data. A CSV arrives in Slack, an API export gets copied into a notebook, or someone hand-edits an Excel file “just for now.” Weeks later the team still has charts, but nobody can explain where the rows came from or whether the result is reproducible.
 
 Collection is where reliability starts. Before cleaning or modeling ever matter, someone has to decide which source is authoritative, which copy is disposable, and what metadata must be recorded so the same dataset can be reconstructed later.
 
 This is post 3 in the Data Science 101 series. Here we treat collection as an engineering discipline: source selection, provenance, and repeatability come first, and the code that fetches the rows comes second.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Data Collection?
+- Which signal should the example or diagram make visible for Data Collection?
+- What failure should be prevented first when Data Collection reaches a real system?
+
+## Big Picture
+
+![data science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
+
+*data science 101 chapter 3 flow overview*
+
+This picture places Data Collection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Data Collection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -53,9 +69,6 @@ A missing record at the *collection step* haunts you all the way to the final re
 
 ## Concept at a Glance
 
-![Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
-
-*Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis*
 ## Key Terms
 
 - **Source of truth**: the *authoritative origin* of the data.
@@ -171,9 +184,20 @@ Data teams run collection scripts in *Airflow / dbt*. Every load adds *load_id, 
 
 Collection is the *recording step*. Next, we will look at how to *clean* the data we have collected.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Data Collection?**
+  - The article treats Data Collection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Data Collection?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Data Collection reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
 - **Data Collection (current)**
 - Data Cleaning (upcoming)
 - Exploratory Data Analysis (upcoming)
@@ -182,6 +206,7 @@ Collection is the *recording step*. Next, we will look at how to *clean* the dat
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 2
-title: Turning a Problem into a Data Problem
+title: "Data Science 101 (2/10): Turning a Problem into a Data Problem"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: A 5-step framing technique for turning vague business questions
 last_reviewed: '2026-05-15'
 ---
 
-# Turning a Problem into a Data Problem
+# Data Science 101 (2/10): Turning a Problem into a Data Problem
 
 Most analytics requests arrive as loose complaints, not well-formed questions. “Revenue feels down.” “Churn seems worse.” “Did that campaign work?” The problem is not that these questions are unimportant. The problem is that data cannot answer them until someone pins down the metric, the time window, and the population.
 
 Strong data work starts before SQL, notebooks, or models. It starts when the team rewrites a vague request into a sentence that could be proven wrong. That single rewrite usually decides whether the rest of the project is fast and reliable or slow and argumentative.
 
 This is post 2 in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Turning a Problem into a Data Problem?
+- Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?
+- What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?
+
+## Big Picture
+
+![data science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
+
+*data science 101 chapter 2 flow overview*
+
+This picture places Turning a Problem into a Data Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Turning a Problem into a Data Problem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -53,9 +69,6 @@ A *fuzzy question* gives you *no way to choose* the right data. *Framing* is *ha
 
 ## Concept at a Glance
 
-![How a vague business request becomes a metric, window, population, and falsifiable hypothesis](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
-
-*How a vague business request becomes a metric, window, population, and falsifiable hypothesis*
 ## Key Terms
 
 - **Metric**: a *number* you can measure (DAU, conversion rate, revenue).
@@ -147,8 +160,19 @@ When PMs send a *fuzzy request*, the data team *rewrites* it through the 5-step 
 
 Only *answerable questions* are the start of analysis. Next, we will look at *how to collect* the data behind those questions.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Turning a Problem into a Data Problem?**
+  - The article treats Turning a Problem into a Data Problem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
 - **Turning a Problem into a Data Problem (current)**
 - Data Collection (upcoming)
 - Data Cleaning (upcoming)
@@ -158,6 +182,7 @@ Only *answerable questions* are the start of analysis. Next, we will look at *ho
 - Evaluation (upcoming)
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References

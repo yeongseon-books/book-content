@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T11:25:23+00:00",
+  "generated_at": "2026-05-20T11:25:42+00:00",
   "series_count": 92,
   "problem_series_count": 56,
   "series_with_5_plus": 42,
@@ -11,9 +11,9 @@
     "BadImg": 532,
     "Synt": 0,
     "BrkLink": 0,
-    "Shrt": 8,
+    "Shrt": 7,
     "NoEn": 0,
-    "all": 540
+    "all": 539
   },
   "results": [
     {
@@ -4518,28 +4518,13 @@
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
-        "Shrt": 1,
+        "Shrt": 0,
         "NoEn": 0,
         "BadImg": 12
       },
-      "total": 13,
+      "total": 12,
       "max_issue_kind": "BadImg",
       "examples": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/data-science-101/en/02-problem-to-data-problem.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "02-problem-to-data-problem.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
         "BadImg": [
           {
             "kind": "BadImg",
@@ -4674,21 +4659,6 @@
         ]
       },
       "items": {
-        "Shrt": [
-          {
-            "kind": "Shrt",
-            "path": "content/data-science-101/en/02-problem-to-data-problem.md",
-            "line": 22,
-            "message": "markdown body has 149 lines (< 150)",
-            "article": "02-problem-to-data-problem.md",
-            "lang": "en",
-            "code": null,
-            "image": null,
-            "width": null,
-            "height": null,
-            "repo": null
-          }
-        ],
         "BadImg": [
           {
             "kind": "BadImg",

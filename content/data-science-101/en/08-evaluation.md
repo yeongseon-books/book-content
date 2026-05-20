@@ -1,7 +1,7 @@
 ---
 series: data-science-101
 episode: 8
-title: Evaluation
+title: "Data Science 101 (8/10): Evaluation"
 status: publish-ready
 targets:
   tistory: false
@@ -20,13 +20,29 @@ seo_description: Why accuracy can lie, plus a practical tour of precision, recal
 last_reviewed: '2026-05-15'
 ---
 
-# Evaluation
+# Data Science 101 (8/10): Evaluation
 
 Evaluation is where teams discover whether a model is useful for the problem they actually have, not the benchmark they wish they had. Accuracy feels satisfying because it is easy to explain, but in imbalanced or asymmetric problems it can reward exactly the wrong behavior.
 
 Good evaluation therefore starts with the cost of being wrong. If missing a positive case is expensive, the metric has to show that. If a false alarm is the real operational pain, the metric has to show that instead.
 
 This is post 8 in the Data Science 101 series. In this chapter, we connect classification and regression metrics back to business cost so that model scores line up with real decisions.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Evaluation?
+- Which signal should the example or diagram make visible for Evaluation?
+- What failure should be prevented first when Evaluation reaches a real system?
+
+## Big Picture
+
+![data science 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
+
+*data science 101 chapter 8 flow overview*
+
+This picture places Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions This Post Answers
 
@@ -53,9 +69,6 @@ If the metric *misaligns with the problem*, the model learns the *wrong directio
 
 ## Concept at a Glance
 
-![The main evaluation branches for classification metrics and regression metrics](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
-
-*The main evaluation branches for classification metrics and regression metrics*
 ## Key Terms
 
 - **Confusion matrix**: TP / FP / FN / TN table.
@@ -161,17 +174,29 @@ Teams pair a *primary metric* with *guardrail metrics*. Example: primary = *reca
 
 Evaluation is the *conversation* between problem and model. Next we look at how to *interpret* the results into a *decision*.
 
+## Answering the Opening Questions
+
+- **What boundary should you inspect first when applying Evaluation?**
+  - The article treats Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Evaluation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Evaluation reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-- [What Is Data Science?](./01-what-is-data-science.md)
-- [Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
-- [Data Collection](./03-data-collection.md)
-- [Data Cleaning](./04-data-cleaning.md)
-- [Exploratory Data Analysis](./05-exploratory-data-analysis.md)
-- [Visualization](./06-visualization.md)
-- [Modeling](./07-modeling.md)
+## In this series
+
+- [Data Science 101 (1/10): What Is Data Science?](./01-what-is-data-science.md)
+- [Data Science 101 (2/10): Turning a Problem into a Data Problem](./02-problem-to-data-problem.md)
+- [Data Science 101 (3/10): Data Collection](./03-data-collection.md)
+- [Data Science 101 (4/10): Data Cleaning](./04-data-cleaning.md)
+- [Data Science 101 (5/10): Exploratory Data Analysis](./05-exploratory-data-analysis.md)
+- [Data Science 101 (6/10): Visualization](./06-visualization.md)
+- [Data Science 101 (7/10): Modeling](./07-modeling.md)
 - **Evaluation (current)**
 - Result Interpretation (upcoming)
 - End-to-End Data Project Flow (upcoming)
+
 <!-- toc:end -->
 
 ## References
