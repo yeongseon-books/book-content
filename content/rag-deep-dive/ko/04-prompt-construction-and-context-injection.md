@@ -1,5 +1,5 @@
 ---
-title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+title: "RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부"
 series: rag-deep-dive
 episode: 4
 language: ko
@@ -18,24 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 
-# 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+# RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 
 PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는 실제 입력 형식으로 바꿉니다. 여기서는 그 변환 경로를 코드로 추적합니다.
 
-이 글은 RAG Deep Dive 시리즈의 4번째 글입니다.
+이 글은 RAG Deep Dive 시리즈의 네 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- `PromptTemplate`는 문자열 치환 외에 무엇을 검증할까요?
-- `ChatPromptTemplate.from_messages()`는 입력 구조를 어떻게 유지할까요?
-- 검색된 `Document` 객체는 언제 `{context}` 문자열로 접힐까요?
-- `partial()`로 변수를 바인딩하면 무엇이 달라질까요?
+- 프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?
+- 검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?
+- RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?
+
+## 큰 그림
+
+![문자열 프롬프트와 채팅 프롬프트 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
+
+*문자열 프롬프트와 채팅 프롬프트 계층 구조*
+
+이 그림에서는 PromptTemplate과 ChatPromptTemplate이 입력 변수를 검증하고, 검색된 context와 사용자 질문을 메시지 구조로 조립하는 흐름을 봅니다. RAG 프롬프트는 문장 품질보다 근거와 질문의 경계를 명확히 유지하는 일이 먼저입니다.
 
 > 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽는 입력 계약으로 바뀌는 곳입니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -116,10 +119,6 @@ if __name__ == "__main__":
 ## 1. `PromptTemplate` 내부 동작과 입력 변수 검증
 
 소스에서 `PromptTemplate`는 `langchain_core.prompts.prompt.PromptTemplate`에 있지만, 실제 성격은 상속 구조를 같이 봐야 분명해집니다. `PromptTemplate`는 `StringPromptTemplate`를 상속하고, 그 위에는 다시 `BasePromptTemplate`가 있습니다. 이 구조 때문에 LangChain의 프롬프트는 “문자열 한 장”이 아닙니다. 필요한 입력 이름을 `input_variables`로 갖고, 미리 채워 둘 값은 `partial_variables`로 들고, `invoke()`로 runnable처럼 실행되며, `format_prompt()`를 호출하면 최종 문자열을 `StringPromptValue`로 감싼 결과를 돌려줍니다.
-
-![문자열 프롬프트와 채팅 프롬프트 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
-
-*문자열 프롬프트와 채팅 프롬프트 계층 구조*
 
 가장 흔한 생성 경로는 `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`입니다. 구현은 생각보다 짧습니다. 먼저 `get_template_variables(template, template_format)`로 템플릿 안의 변수 이름을 뽑아 냅니다. 그다음 `partial_variables`에 이미 들어 있는 이름을 제외한 뒤 `PromptTemplate(...)`를 생성합니다. 그런데 여기서 끝이 아닙니다. `prompt.py`와 `base.py`의 validator가 두 가지를 더 강제합니다. 첫째, `stop`이라는 이름은 입력 변수나 partial 변수로 쓸 수 없습니다. 내부 예약 이름이기 때문입니다. 둘째, `input_variables`와 `partial_variables`가 겹치면 예외를 냅니다. LangChain은 변수 바인딩을 느슨한 문자열 치환이 아니라, 충돌을 미리 막아야 하는 계약으로 취급하는 셈입니다.
 
@@ -400,15 +399,26 @@ if __name__ == "__main__":
 
 이 시리즈의 관점으로 정리하면 결국 같은 결론에 닿습니다. retrieval 품질은 retrieval에서 끝나지 않습니다. 검색된 증거가 메모리에 있다는 사실과, 모델이 그 증거를 올바른 형태로 본다는 사실 사이에는 프롬프트 구성이라는 마지막 변환층이 있습니다. 이 층이 허술하면 retriever는 맞았는데 답은 틀릴 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?**
+  프롬프트 템플릿은 필요한 변수 이름, 입력 누락, 부분 변수, 메시지 역할처럼 모델 호출 전의 입력 계약을 검증합니다.
+
+- **검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?**
+  context가 빠지거나 순서가 바뀌거나 system/user 역할이 섞이면 모델이 근거를 잘못 해석하거나 지시와 데이터를 혼동할 수 있습니다.
+
+- **RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?**
+  질문과 근거가 섞이면 검색이 문제인지 프롬프트가 문제인지 분리하기 어렵습니다. 로그에도 두 값을 따로 남겨야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
-- [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
-- **프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (현재 글)**
-- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- **RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (현재 글)**
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

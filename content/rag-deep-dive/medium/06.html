@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</title>
+<title>RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</h1>
+<h1>RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</h1>
 <p>RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer quality without rereading every output by hand. This post shows how to turn those signals into a quality gate.</p>
 <p>This is the final post in the RAG Deep Dive series.</p>
-<!-- a-grade-intro:begin -->
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why can’t RAGAS start from an answer string alone?</li>
-<li>How does faithfulness decompose and verify an answer?</li>
-<li>What does answer relevancy measure if not truth?</li>
-<li>What needs to stay fixed before these scores become a CI gate?</li>
+<li>Why do RAGAS dataset columns define what can actually be evaluated?</li>
+<li>What does Faithfulness compare against evidence instead of judging whether the answer sounds plausible?</li>
+<li>Which failures should a quality gate block in CI or production?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Sample fields controlling metric eligibility" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png"></p>
+<p><em>Sample fields controlling metric eligibility</em></p>
+<p>This picture shows question, answer, context, and ground-truth columns feeding RAGAS metrics that produce different quality signals. A RAG quality gate starts with reproducible columns and failure thresholds, not subjective impressions.</p>
 <blockquote>
 <p>Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<!-- a-grade-intro:end -->
-
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/06-evaluation-and-quality-gates/main.py</code></p>
@@ -156,8 +154,6 @@ if __name__ == &quot;__main__&quot;:
 <h2>1. RAGAS overview and <code>datasets.Dataset</code>: the input columns define what can be measured</h2>
 <p>The first important thing to understand about RAGAS is that it is not a generic “grade this answer” box. Each metric requires a specific set of fields, and without those fields the metric cannot even run. That is why the real starting point is not the evaluator function but the dataset schema. In <code>ragas==0.1.22</code>, <code>evaluate()</code> takes a Hugging Face <code>datasets.Dataset</code>, and the default columns are <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code>.</p>
 <p>Those four columns form the core frame for RAG evaluation. <code>question</code> is the user query. <code>contexts</code> is the ordered list of retrieved chunks. <code>answer</code> is the model output. <code>ground_truth</code> is the human reference answer. If you do not keep the original question, you cannot compute answer relevancy. If you do not keep retrieved context, you cannot check faithfulness. If you do not keep a reference answer, you lose metrics that need a target outcome.</p>
-<p><img alt="Sample fields controlling metric eligibility" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png"></p>
-<p><em>Sample fields controlling metric eligibility</em></p>
 <p>The schema is also your failure taxonomy. An answer can drift away from the question, inject unsupported claims, or retrieve useful evidence too late in the ranking. The row shape decides which of those failures you can measure.</p>
 <p>It also explains why metrics have different contracts. Faithfulness needs <code>question</code>, <code>answer</code>, and <code>contexts</code>. Answer relevancy also requires all three because <code>evaluation_mode = qac</code>. Its <code>_create_question_gen_prompt()</code> method reads both <code>row["answer"]</code> and <code>row["contexts"]</code>, so if <code>contexts</code> is missing, <code>evaluate()</code> validation fails before scoring starts. Context precision needs <code>question</code>, <code>contexts</code>, and an answer target from <code>ground_truth</code>.</p>
 <p>It is worth building rows explicitly rather than trying to reconstruct them later from partial logs. Once a production system stores <code>question</code>, <code>contexts</code>, <code>answer</code>, and <code>ground_truth</code> together, you can compare chunking or retrieval changes on the same sample set over time. If your internal column names differ, <code>evaluate(..., column_map={...})</code> can remap them by pointing each canonical RAGAS name to the existing dataset column.</p>
@@ -378,6 +374,21 @@ def test_rag_quality_gate() -&gt; None:
 <p>LangChain’s evaluation layer is helpful here as a complement, not a replacement. <code>EvaluatorType</code> and <code>load_evaluator()</code> are useful for final-answer grading, criteria checks, or exact-match style comparisons. They do not natively compute retrieval-grounded faithfulness. That is the gap RAGAS fills.</p>
 <p>That gives the series a clean ending. Episodes 1 through 5 explained how chunks are created, retrieved, injected, and assembled. Episode 6 adds the final layer: a repeatable way to prove that a change made the system better rather than merely different. A production-ready RAG stack is complete only when it can fail a build before it fails a user.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why do RAGAS dataset columns define what can actually be evaluated?</strong><br>
+  A metric can only run when required columns such as question, answer, contexts, or ground truth exist, so the schema defines the measurable quality surface.</p>
+</li>
+<li>
+<p><strong>What does Faithfulness compare against evidence instead of judging whether the answer sounds plausible?</strong><br>
+  Faithfulness decomposes the answer into claims and checks whether each claim is supported by the supplied context; fluency is not enough.</p>
+</li>
+<li>
+<p><strong>Which failures should a quality gate block in CI or production?</strong><br>
+  Block unsupported answers, low faithfulness, retrieval regressions, and score drops below the agreed threshold in CI or release gates.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>

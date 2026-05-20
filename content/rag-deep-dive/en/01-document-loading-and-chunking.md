@@ -1,5 +1,5 @@
 ---
-title: Document Loading and Chunking — Inside LangChain TextSplitter
+title: "RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter"
 series: rag-deep-dive
 episode: 1
 language: en
@@ -18,26 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: How PyPDFLoader and RecursiveCharacterTextSplitter break documents into semantically meaningful chunks, walked through with runnable code.
 ---
 
-# Document Loading and Chunking — Inside LangChain TextSplitter
+# RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter
 
 PyPDFLoader and RecursiveCharacterTextSplitter decide where a document becomes retrievable context. This post breaks that path down with runnable examples.
 
 This is the first post in the RAG Deep Dive series.
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Why does loader boundary design matter before similarity search starts?
+- Before similarity search starts, why do loader and splitter boundaries control retrieval quality?
 - How do Character, Recursive, and Token splitters cut the same text differently?
-- Why does `chunk_overlap` often feel less exact than the configured number?
-- When is token-aware splitting safer than character counting?
+- When `chunk_overlap` looks less exact than configured, where should you inspect first?
+
+## Big Picture
+
+![Loader metadata flow into documents](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
+
+*Loader metadata flow into documents*
+
+This picture follows a loader turning source text and metadata into Documents, then a splitter freezing the boundaries retrieval will later recover. RAG quality is shaped heavily at this document-boundary stage, before the vector index is involved.
 
 > Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-<!-- a-grade-intro:end -->
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -162,10 +163,6 @@ The operating principle for this post is simple: **chunking is a meaning-preserv
 ## 1. Document loaders decide the first boundary
 
 In LangChain, a loader does two things. First, it reads bytes from somewhere. Second, it emits one or more `Document(page_content=..., metadata=...)` objects. That second step matters more than it first appears to. The splitter, vector store, retriever, and often the citation layer all inherit the loader's original decision about document boundaries and metadata.
-
-![Loader metadata flow into documents](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
-
-*Loader metadata flow into documents*
 
 Start with the simplest case. In [`text.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/community/langchain_community/document_loaders/text.py), `TextLoader.lazy_load()` opens the file, reads it into one string, and yields a single `Document` with `metadata = {"source": str(self.file_path)}`. If decoding fails and `autodetect_encoding=True`, it retries the candidate encodings returned by `detect_file_encodings`. The source-level quirk in 0.2.17 is that exhausting those candidates is not surfaced cleanly as an error in every path. The method can fall through with `text` still empty and then yield a `Document` with empty `page_content`. In other words, the default metadata surface for plain text is basically just `source`, and the default boundary is “the whole file.”
 
@@ -475,15 +472,26 @@ The first part of a RAG pipeline is built from relatively small pieces of code. 
 
 That baseline matters because the vector index is not neutral. It geometrizes the document units produced by the loader and the splitter. In episode 2, we will follow that geometry into embeddings and `FAISS IndexFlatL2`, and look at how chunk boundaries become retrieval behavior.
 
+## Answering the Opening Questions
+
+- **Before similarity search starts, why do loader and splitter boundaries control retrieval quality?**
+  The document units created by the loader and splitter are what get embedded and retrieved, so broken boundaries make good evidence hard to recover.
+
+- **How do Character, Recursive, and Token splitters cut the same text differently?**
+  Character splitting follows separators and character counts, Recursive splitting tries prioritized separators, and Token splitting follows token windows, so the same text can produce different chunks.
+
+- **When `chunk_overlap` looks less exact than configured, where should you inspect first?**
+  Inspect the actual chunk output, merge behavior, separator choice, and token lengths first. Overlap is a result of the split-and-merge path, not a guarantee that exactly N characters repeat.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Document Loading and Chunking — Inside LangChain TextSplitter (current)**
-- Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (upcoming)
-- Retriever Design — VectorStoreRetriever and MMR (upcoming)
-- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
-- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
-- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+- **RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter (current)**
+- RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (upcoming)
+- RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR (upcoming)
+- RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

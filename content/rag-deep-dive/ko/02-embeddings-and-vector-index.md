@@ -1,5 +1,5 @@
 ---
-title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
+title: "RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리"
 series: rag-deep-dive
 episode: 2
 language: ko
@@ -18,24 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: HuggingFaceEmbeddings와 FAISS IndexFlatL2가 텍스트를 벡터로 바꾸고 검색하는 내부 동작을 코드와 함께 분해합니다.
 ---
 
-# 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
+# RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
 
 HuggingFaceEmbeddings와 FAISS IndexFlatL2는 텍스트를 벡터로 바꾸고 검색 순서를 정하는 핵심 계층입니다. 여기서는 그 내부 동작을 코드와 함께 분해합니다.
 
-이 글은 RAG Deep Dive 시리즈의 2번째 글입니다.
+이 글은 RAG Deep Dive 시리즈의 두 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- `embed_documents()`와 `embed_query()`는 왜 개념적으로 분리해서 봐야 할까요?
-- `IndexFlatL2`는 실제로 어떤 거리를 계산할까요?
-- 시스템은 벡터 ID를 원본 문서와 어디에서 다시 연결할까요?
-- exact flat search가 여전히 올바른 baseline인 때는 언제일까요?
+- 문서 임베딩과 질의 임베딩은 왜 같은 모델을 쓰면서도 호출 경로를 분리해서 봐야 할까요?
+- FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?
+- 인덱스가 빠르게 답해도 메타데이터 매핑이 틀리면 어떤 문제가 생길까요?
+
+## 큰 그림
+
+![문서와 질의 임베딩 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.ko.png)
+
+*문서와 질의 임베딩 호출 흐름*
+
+이 그림에서는 문서와 질의가 임베딩 모델을 지나 벡터가 되고, FAISS 인덱스가 그 벡터 사이의 거리를 계산하는 흐름을 봅니다. 벡터 검색은 저장과 계산만큼이나 ID와 메타데이터 연결이 중요합니다.
 
 > 임베딩은 청크를 좌표로 바꾸고, 벡터 인덱스는 좌표 사이 거리를 검색 순위로 바꿉니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -135,10 +138,6 @@ Operators inspect the exception chain before replaying the message.
 ## 1. `OpenAIEmbeddings`는 어떤 벡터를 만들고 무엇을 분리하는가
 
 LangChain 0.2.17에서 우리가 흔히 쓰는 `OpenAIEmbeddings`는 `langchain_community.embeddings.openai`에 있습니다. 먼저 짚고 넘어갈 점이 하나 있습니다. 이 클래스는 이미 deprecated이며 새 코드에서는 `langchain_openai.OpenAIEmbeddings`가 권장됩니다. 그래도 0.2.17 소스를 읽는 이유는 RAG 튜토리얼과 운영 코드 상당수가 이 계층을 아직 기준선으로 삼고 있기 때문입니다.
-
-![문서와 질의 임베딩 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.ko.png)
-
-*문서와 질의 임베딩 호출 흐름*
 
 소스를 보면 `embed_documents()`와 `embed_query()`의 표면적 차이는 아주 얇습니다. `embed_documents()`는 `self._get_len_safe_embeddings(texts, engine=engine)`를 호출하고, `embed_query()`는 결국 `self.embed_documents([text])[0]`을 돌려줍니다. 즉 0.2.17의 이 구현만 놓고 보면 쿼리와 문서가 같은 경로를 탑니다. 하지만 인터페이스가 둘로 나뉘어 있는 것은 우연이 아닙니다. LangChain은 애초에 query embedding과 document embedding이 다를 수 있다는 가정을 인터페이스에 심어 두었습니다. 비대칭 검색 모델에서는 문서 쪽에는 더 긴 설명과 배경을 보존하도록 학습하고, 질문 쪽에는 짧은 질의를 더 날카롭게 쏘도록 따로 최적화하는 경우가 있기 때문입니다.
 
@@ -409,15 +408,26 @@ if __name__ == "__main__":
 
 이 기준선을 잡아 두면 다음 화의 retriever 이야기가 훨씬 선명해집니다. retriever는 단순히 top-k를 가져오는 얇은 래퍼가 아닙니다. 어떤 거리 결과를 몇 개나 가져오고, diversity를 넣을지, metadata filter를 언제 적용할지를 결정하는 조정기이기 때문입니다. 3화에서는 `VectorStoreRetriever`와 MMR이 바로 이 벡터 공간 위에서 어떤 선택을 하는지 이어서 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **문서 임베딩과 질의 임베딩은 왜 같은 모델을 쓰면서도 호출 경로를 분리해서 봐야 할까요?**
+  문서 임베딩은 ingest 시점에 대량으로 만들고, 질의 임베딩은 요청 시점에 만들기 때문에 캐시, 모델 버전, 정규화 실패 지점이 다릅니다.
+
+- **FAISS `IndexFlatL2`는 검색할 때 실제로 어떤 계산을 반복할까요?**
+  `IndexFlatL2`는 쿼리 벡터와 저장된 모든 벡터의 L2 거리를 계산해 가까운 순서로 정렬합니다. Flat 인덱스라 근사 생략 없이 전체를 봅니다.
+
+- **인덱스가 빠르게 답해도 메타데이터 매핑이 틀리면 어떤 문제가 생길까요?**
+  반환된 row id가 원문 메타데이터와 어긋나면 빠른 검색 결과도 잘못된 문서나 출처로 연결되어 답변 전체를 망칩니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- **임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리 (현재 글)**
-- Retriever 설계 — VectorStoreRetriever와 MMR (예정)
-- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
-- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- **RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리 (현재 글)**
+- RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR (예정)
+- RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

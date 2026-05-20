@@ -1,5 +1,5 @@
 ---
-title: Assembling the RAG Chain — RetrievalQA vs LCEL
+title: "RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL"
 series: rag-deep-dive
 episode: 5
 language: en
@@ -18,26 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: Why RetrievalQA falls short and how LCEL pipelines express the same RAG flow more clearly.
 ---
 
-# Assembling the RAG Chain — RetrievalQA vs LCEL
+# RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL
 
 RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.
 
 This is post 5 in the RAG Deep Dive series.
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Which steps does `RetrievalQA` hide behind its classic interface?
-- How does LCEL expose the RAG graph more directly?
-- Why is `RunnablePassthrough()` useful for preserving the original question?
-- Where do you attach source-return logic in each approach?
+- Which boundaries do classic APIs like `RetrievalQA` hide, and which boundaries does LCEL expose?
+- What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?
+- Where should the result shape be fixed so source documents are not lost after assembly?
+
+## Big Picture
+
+![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
+
+*RetrievalQA chain-type dispatch path*
+
+This picture compares `RetrievalQA` choosing an internal assembly path with LCEL exposing the runnable sequence explicitly. In RAG chain assembly, observability of boundaries can matter more than convenience.
 
 > A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-<!-- a-grade-intro:end -->
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -171,10 +172,6 @@ This episode traces both paths from the source. We will first walk through `Retr
 ## 1. The classic `RetrievalQA` API: what `from_chain_type()` actually selects
 
 The first file to read is `langchain/chains/retrieval_qa/base.py`. `BaseRetrievalQA` holds four pieces of state that define the public surface: `combine_documents_chain`, `input_key`, `output_key`, and `return_source_documents`. The defaults are `input_key="query"` and `output_key="result"`, so the classic call shape is `qa.invoke({"query": "..."})`, returning `{"result": "..."}`. If `return_source_documents=True`, the `output_keys` property appends `"source_documents"`, which changes the output contract to `{"result": "...", "source_documents": [...]}`.
-
-![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
-
-*RetrievalQA chain-type dispatch path*
 
 The popular constructor was `from_chain_type()`. Its implementation is intentionally small. It takes an LLM, a `chain_type`, optional `chain_type_kwargs`, calls `load_qa_chain(llm, chain_type=chain_type, **kwargs)`, and stores the returned combine-documents chain in `combine_documents_chain`. In other words, `RetrievalQA` does not itself implement stuffing, map-reduce, or refinement. It delegates document combination to a separate factory and acts as the glue between retriever output and that factory-produced answer chain.
 
@@ -563,15 +560,26 @@ Episodes 1 through 4 decomposed the layers and showed where information can be l
 
 ---
 
+## Answering the Opening Questions
+
+- **Which boundaries do classic APIs like `RetrievalQA` hide, and which boundaries does LCEL expose?**
+  Classic APIs assemble quickly but can hide prompt and combine-chain choices; LCEL is more verbose but makes every boundary visible in code.
+
+- **What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?**
+  Direct wiring lets you log retrieved documents, prompt inputs, model output, and parser output separately.
+
+- **Where should the result shape be fixed so source documents are not lost after assembly?**
+  Fix the final result shape—such as a dictionary or Pydantic model containing both answer and source_documents—so citations survive the chain.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
-- [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
-- [Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
-- [Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
-- **Assembling the RAG Chain — RetrievalQA vs LCEL (current)**
-- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate](./04-prompt-construction-and-context-injection.md)
+- **RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (current)**
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

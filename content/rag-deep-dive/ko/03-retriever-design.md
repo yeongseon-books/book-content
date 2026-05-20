@@ -1,5 +1,5 @@
 ---
-title: Retriever 설계 — VectorStoreRetriever와 MMR
+title: "RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR"
 series: rag-deep-dive
 episode: 3
 language: ko
@@ -18,24 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻게 균형잡는지 LangChain 내부 구현으로 살펴봅니다.
 ---
 
-# Retriever 설계 — VectorStoreRetriever와 MMR
+# RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR
 
 VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrieval 정책으로 구현합니다. 여기서는 LangChain 내부 구현을 기준으로 그 갈림길을 살펴봅니다.
 
-이 글은 RAG Deep Dive 시리즈의 3번째 글입니다.
+이 글은 RAG Deep Dive 시리즈의 세 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- `BaseRetriever`는 문서를 돌려주는 것 외에 어떤 호출 규약을 강제할까요?
-- `VectorStoreRetriever`는 어디에서 `similarity`, `mmr`, threshold 모드로 갈라질까요?
-- MMR이 의미 있으려면 `fetch_k`가 왜 `k`보다 더 넓어야 할까요?
-- `lambda_mult`는 중복과 커버리지를 어떻게 바꿀까요?
+- `BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?
+- `similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?
+- 검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?
+
+## 큰 그림
+
+![invoke와 callback이 이어지는 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
+
+*invoke와 callback이 이어지는 호출 흐름*
+
+이 그림에서는 retriever 호출이 공통 `invoke()` 경계로 들어가고, 내부에서 search type별로 다른 검색 경로가 선택되는 흐름을 봅니다. Retriever 설계의 핵심은 검색 알고리즘을 바꾸더라도 체인 바깥의 호출 계약을 유지하는 것입니다.
 
 > Retriever는 최근접 이웃 몇 개를 가져오는 도구가 아닙니다. 후보 근거를 최종 컨텍스트로 바꾸는 정책 계층입니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -128,10 +131,6 @@ Retriever는 바로 그 규칙을 담당합니다. 같은 vector store라도 `si
 ## 1. `BaseRetriever`는 어떤 호출 규약을 강제하는가
 
 LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.retrievers.BaseRetriever`입니다. 이 클래스는 “문자열 질의를 받아 `Document` 리스트를 돌려준다”는 단순 추상처럼 보이지만, 실제로는 Runnable 체계 위에 올라가 있습니다. 그래서 권장 진입점은 예전의 `get_relevant_documents()`가 아니라 `invoke()`와 `ainvoke()`입니다. 이 차이가 중요한 이유는 retriever 호출이 이제 단순 함수 실행이 아니라, callback과 tracing metadata를 포함한 runnable run으로 취급되기 때문입니다.
-
-![invoke와 callback이 이어지는 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
-
-*invoke와 callback이 이어지는 호출 흐름*
 
 소스를 보면 `invoke()`는 먼저 `ensure_config(config)`로 실행 설정을 정리하고, 그다음 `CallbackManager.configure(...)`를 호출해 callback manager를 만듭니다. 이때 `config`에 들어온 `callbacks`, `tags`, `metadata`와 retriever 인스턴스가 가진 `self.tags`, `self.metadata`, 그리고 `_get_ls_params()`가 돌려주는 LangSmith용 추적 메타데이터가 함께 합쳐집니다. 이후 `callback_manager.on_retriever_start(...)`가 실행되면서 `run_manager`가 생성되고, 실제 검색 로직은 이 `run_manager`를 받은 `_get_relevant_documents()`로 넘어갑니다. 검색이 성공하면 `run_manager.on_retriever_end(result)`, 실패하면 `run_manager.on_retriever_error(e)`가 호출됩니다. 즉 retriever는 검색 결과만 돌려주는 것이 아니라, 그 검색을 하나의 관측 가능한 run으로 감쌉니다.
 
@@ -476,15 +475,26 @@ if __name__ == "__main__":
 
 이 기준선을 잡아 두면 다음 화가 자연스럽게 이어집니다. retriever가 뽑아 온 문서들은 아직 답변이 아닙니다. 그 문서들을 어떤 순서로 붙이고, 얼마나 압축하고, 어떤 프롬프트 슬롯에 주입하느냐가 다음 실패 지점입니다. 4화에서는 retrieval 이후 단계인 prompt construction과 context injection을 소스와 실제 체인 형태에 맞춰 이어서 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?**
+  `BaseRetriever`는 질의 입력을 받아 Document 목록을 반환하는 호출 규약과 callback 경계를 표준화합니다.
+
+- **`similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?**
+  `similarity`는 가까운 순위, threshold는 약한 근거 차단, MMR은 비슷한 결과 반복을 줄여 다양성을 확보하는 선택입니다.
+
+- **검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?**
+  callback, search_type, k, score threshold, fetch_k 같은 로그를 보면 검색 전략 문제인지 입력 질의 문제인지 더 빨리 분리할 수 있습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
-- **Retriever 설계 — VectorStoreRetriever와 MMR (현재 글)**
-- 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
-- RAG Chain 조립 — RetrievalQA vs LCEL (예정)
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- **RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR (현재 글)**
+- RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부 (예정)
+- RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (예정)
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: Prompt Construction and Context Injection — Inside PromptTemplate
+title: "RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate"
 series: rag-deep-dive
 episode: 4
 language: en
@@ -18,26 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved context into LLM input, traced in code.
 ---
 
-# Prompt Construction and Context Injection — Inside PromptTemplate
+# RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate
 
 PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.
 
 This is post 4 in the RAG Deep Dive series.
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+## Questions to Keep in Mind
 
-- What does `PromptTemplate` validate beyond string interpolation?
-- How does `ChatPromptTemplate.from_messages()` keep inputs structured?
-- When do retrieved `Document` objects collapse into a `{context}` string?
-- What changes once you bind variables with `partial()`?
+- What input contract does a prompt template validate beyond string formatting?
+- Why do missing variables, message order, and roles matter when injecting retrieved context?
+- What debugging problem appears when a RAG prompt does not separate question and evidence?
+
+## Big Picture
+
+![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
+
+*String and chat prompt hierarchy*
+
+This picture shows PromptTemplate and ChatPromptTemplate validating input variables, then assembling retrieved context and the user question into structured messages. A RAG prompt must preserve the boundary between evidence and question before optimizing wording.
 
 > The prompt layer is where structured retrieval output becomes the exact contract the model will read.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-<!-- a-grade-intro:end -->
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -116,10 +117,6 @@ That is why prompt construction is not presentation glue. In RAG, it is the last
 ## 1. `PromptTemplate` internals: where a string becomes a runnable prompt
 
 At the source level, `PromptTemplate` lives in `langchain_core.prompts.prompt.PromptTemplate`, but most of the important behavior comes from its parent classes. `PromptTemplate` inherits from `StringPromptTemplate`, which itself inherits from `BasePromptTemplate`. That class stack explains why a prompt in LangChain is more than a formatted string. It has declared `input_variables`, optional `partial_variables`, validation logic, a runnable `invoke()` entry point, and a `format_prompt()` method that wraps the final string into a `StringPromptValue` object.
-
-![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
-
-*String and chat prompt hierarchy*
 
 The most common constructor is `PromptTemplate.from_template(template, template_format="f-string", partial_variables=None)`. It calls `get_template_variables(...)`, subtracts any pre-filled partial variables, and stores the remainder in `input_variables`. The validators in `prompt.py` and `base.py` then enforce two guardrails: `stop` cannot be used as a variable name, and `input_variables` cannot overlap with `partial_variables`.
 
@@ -397,15 +394,26 @@ The broader lesson is the same one that has repeated through this series. Retrie
 
 ---
 
+## Answering the Opening Questions
+
+- **What input contract does a prompt template validate beyond string formatting?**
+  Prompt templates validate required variable names, missing inputs, partial variables, and message roles before the model call.
+
+- **Why do missing variables, message order, and roles matter when injecting retrieved context?**
+  If context is missing, ordered incorrectly, or placed under the wrong role, the model can confuse evidence with instructions or user data.
+
+- **What debugging problem appears when a RAG prompt does not separate question and evidence?**
+  When question and evidence are blended together, it becomes hard to tell whether retrieval or prompting failed; log them separately.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
-- [Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
-- [Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
-- **Prompt Construction and Context Injection — Inside PromptTemplate (current)**
-- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
-- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR](./03-retriever-design.md)
+- **RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate (current)**
+- RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 

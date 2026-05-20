@@ -1,5 +1,5 @@
 ---
-title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+title: "RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness"
 series: rag-deep-dive
 episode: 6
 language: ko
@@ -18,24 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 
-# 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+# RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
 
 RAGAS의 faithfulness와 answer_relevancy는 RAG 답변 품질을 사람이 매번 읽지 않고도 점검하게 해 주는 기준입니다. 여기서는 이 메트릭을 품질 게이트로 연결하는 방법을 정리합니다.
 
 이 글은 RAG Deep Dive 시리즈의 마지막 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- RAGAS는 왜 답변 문자열 하나만으로 시작할 수 없을까요?
-- faithfulness는 답변을 어떻게 분해하고 검증할까요?
-- answer relevancy는 사실 여부가 아니라 무엇을 측정할까요?
-- 이 점수를 CI 게이트로 쓰기 전에 무엇을 고정해야 할까요?
+- RAGAS 평가는 왜 데이터셋 열 설계가 곧 평가 가능 범위를 결정할까요?
+- Faithfulness는 답변이 그럴듯한지가 아니라 무엇을 근거와 대조할까요?
+- 품질 게이트를 CI나 운영에 넣을 때 어떤 실패를 차단해야 할까요?
+
+## 큰 그림
+
+![평가 샘플이 메트릭 입력을 결정하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.ko.png)
+
+*평가 샘플이 메트릭 입력을 결정하는 구조*
+
+이 그림에서는 평가 샘플의 질문, 답변, 근거, 정답 열이 RAGAS 메트릭 입력으로 들어가고, 각 메트릭이 다른 품질 신호를 만드는 흐름을 봅니다. RAG 품질 게이트는 감상이 아니라 재현 가능한 입력 열과 실패 기준에서 시작합니다.
 
 > 평가는 RAG 답 하나를 질문, 근거, 답변, 기준 진실의 관계로 다시 펼친 뒤, 그 관계를 점수로 바꾸는 과정입니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -134,10 +137,6 @@ RAG 파이프라인이 질문에 대답한다는 사실과, 그 대답을 올바
 RAGAS를 처음 볼 때 가장 중요한 오해 하나를 먼저 걷어내야 합니다. RAGAS는 “답변 문자열 하나를 받아 좋은지 나쁜지 말해 주는 채점기”가 아닙니다. 메트릭마다 필요한 입력 열이 다르고, 그 열이 없으면 아예 계산 자체가 불가능합니다. 그래서 출발점은 늘 데이터셋 스키마입니다. `ragas==0.1.22`의 `evaluate()`는 Hugging Face `datasets.Dataset`를 받고, 기본 입력 열은 `question`, `contexts`, `answer`, `ground_truth`입니다.
 
 이 네 열이 사실상 평가의 중심축입니다. `question`은 사용자 질문, `contexts`는 retriever가 돌려준 컨텍스트 조각 목록, `answer`는 모델 답변, `ground_truth`는 사람이 준비한 기준 답입니다. 질문이 없으면 answer relevancy처럼 “원래 질문과 얼마나 맞닿아 있는가”를 계산할 수 없고, `contexts`가 없으면 faithfulness처럼 “이 답이 근거에 기대고 있는가”를 따질 수 없으며, `ground_truth`가 없으면 context precision이나 answer correctness처럼 기준 답을 축으로 삼는 메트릭은 설 자리가 줄어듭니다.
-
-![평가 샘플이 메트릭 입력을 결정하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.ko.png)
-
-*평가 샘플이 메트릭 입력을 결정하는 구조*
 
 이 점이 중요한 이유는 평가 스키마가 곧 실패 분류 체계이기 때문입니다. 답이 질문과 동떨어졌다면 answer relevancy 문제이고, 근거 문맥에 없는 사실을 섞었다면 faithfulness 문제이며, 유용한 chunk가 뒤로 밀렸다면 context precision 문제입니다. 스키마가 넓을수록 “어디서 망가졌는가”를 더 선명하게 분리할 수 있습니다.
 
@@ -423,15 +422,26 @@ LangChain의 `EvaluatorType`과 `load_evaluator()`는 QA, criteria, exact match 
 
 시리즈의 마지막 결론은 단순합니다. **좋은 RAG는 조립으로 끝나지 않고, 평가를 통해 계약을 수치로 고정할 때 비로소 운영 가능한 시스템이 됩니다.**
 
+## 처음 질문으로 돌아가기
+
+- **RAGAS 평가는 왜 데이터셋 열 설계가 곧 평가 가능 범위를 결정할까요?**
+  질문, 답변, contexts, ground truth 같은 열이 있어야 특정 메트릭을 계산할 수 있으므로, 열 설계가 곧 평가 가능한 품질 범위를 정합니다.
+
+- **Faithfulness는 답변이 그럴듯한지가 아니라 무엇을 근거와 대조할까요?**
+  Faithfulness는 답변을 주장 단위로 쪼개고 각 주장이 제공된 근거에서 지지되는지 확인합니다. 문장이 자연스러운지는 별도 문제가 아닙니다.
+
+- **품질 게이트를 CI나 운영에 넣을 때 어떤 실패를 차단해야 할까요?**
+  근거 없는 답변, 낮은 faithfulness, 회귀된 retrieval 품질, 기준 이하 점수 변동은 CI나 운영 배포 게이트에서 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
-- [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
-- [프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
-- [RAG Chain 조립 — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
-- **평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (현재 글)**
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
+- [RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL](./05-rag-chain-assembly.md)
+- **RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (현재 글)**
 
 <!-- toc:end -->
 

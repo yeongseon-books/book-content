@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Assembling the RAG Chain — RetrievalQA vs LCEL</title>
+<title>RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Assembling the RAG Chain — RetrievalQA vs LCEL</h1>
+<h1>RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL</h1>
 <p>RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.</p>
 <p>This is post 5 in the RAG Deep Dive series.</p>
-<!-- a-grade-intro:begin -->
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Which steps does <code>RetrievalQA</code> hide behind its classic interface?</li>
-<li>How does LCEL expose the RAG graph more directly?</li>
-<li>Why is <code>RunnablePassthrough()</code> useful for preserving the original question?</li>
-<li>Where do you attach source-return logic in each approach?</li>
+<li>Which boundaries do classic APIs like <code>RetrievalQA</code> hide, and which boundaries does LCEL expose?</li>
+<li>What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?</li>
+<li>Where should the result shape be fixed so source documents are not lost after assembly?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="RetrievalQA chain-type dispatch path" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png"></p>
+<p><em>RetrievalQA chain-type dispatch path</em></p>
+<p>This picture compares <code>RetrievalQA</code> choosing an internal assembly path with LCEL exposing the runnable sequence explicitly. In RAG chain assembly, observability of boundaries can matter more than convenience.</p>
 <blockquote>
 <p>A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<!-- a-grade-intro:end -->
-
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/05-rag-chain-assembly/main.py</code></p>
@@ -191,8 +189,6 @@ if __name__ == &quot;__main__&quot;:
 <hr>
 <h2>1. The classic <code>RetrievalQA</code> API: what <code>from_chain_type()</code> actually selects</h2>
 <p>The first file to read is <code>langchain/chains/retrieval_qa/base.py</code>. <code>BaseRetrievalQA</code> holds four pieces of state that define the public surface: <code>combine_documents_chain</code>, <code>input_key</code>, <code>output_key</code>, and <code>return_source_documents</code>. The defaults are <code>input_key="query"</code> and <code>output_key="result"</code>, so the classic call shape is <code>qa.invoke({"query": "..."})</code>, returning <code>{"result": "..."}</code>. If <code>return_source_documents=True</code>, the <code>output_keys</code> property appends <code>"source_documents"</code>, which changes the output contract to <code>{"result": "...", "source_documents": [...]}</code>.</p>
-<p><img alt="RetrievalQA chain-type dispatch path" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png"></p>
-<p><em>RetrievalQA chain-type dispatch path</em></p>
 <p>The popular constructor was <code>from_chain_type()</code>. Its implementation is intentionally small. It takes an LLM, a <code>chain_type</code>, optional <code>chain_type_kwargs</code>, calls <code>load_qa_chain(llm, chain_type=chain_type, **kwargs)</code>, and stores the returned combine-documents chain in <code>combine_documents_chain</code>. In other words, <code>RetrievalQA</code> does not itself implement stuffing, map-reduce, or refinement. It delegates document combination to a separate factory and acts as the glue between retriever output and that factory-produced answer chain.</p>
 <p>The real dispatch lives in <code>langchain/chains/question_answering/chain.py</code>. In 0.2.17, <code>load_qa_chain()</code> exposes a <code>loader_mapping</code> with <code>"stuff"</code>, <code>"map_reduce"</code>, <code>"refine"</code>, and <code>"map_rerank"</code>. The three options most relevant to the mental model are <code>stuff</code>, <code>map_reduce</code>, and <code>refine</code>.</p>
 <ul>
@@ -520,6 +516,21 @@ if __name__ == &quot;__main__&quot;:
 <p>That is why the practical recommendation in 0.2.x is fairly clear. <code>RetrievalQA</code> remains useful for understanding the older assembly model and for reading a compact source path. But once you care about richer outputs, schema-aware chaining, streaming UX, or large-scale evaluation, LCEL is the better default.</p>
 <p>Episodes 1 through 4 decomposed the layers and showed where information can be lost. Episode 5 puts those layers back together and shows that chain structure is not an implementation detail. The way documents are routed, preserved, flattened, streamed, and returned determines how trustworthy and operable the final RAG application will be. In Episode 6, we will move from assembly to evaluation: how to measure whether this chain is actually good, where to place quality gates, and how to catch failure before users do.</p>
 <hr>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Which boundaries do classic APIs like <code>RetrievalQA</code> hide, and which boundaries does LCEL expose?</strong><br>
+  Classic APIs assemble quickly but can hide prompt and combine-chain choices; LCEL is more verbose but makes every boundary visible in code.</p>
+</li>
+<li>
+<p><strong>What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?</strong><br>
+  Direct wiring lets you log retrieved documents, prompt inputs, model output, and parser output separately.</p>
+</li>
+<li>
+<p><strong>Where should the result shape be fixed so source documents are not lost after assembly?</strong><br>
+  Fix the final result shape—such as a dictionary or Pydantic model containing both answer and source_documents—so citations survive the chain.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>

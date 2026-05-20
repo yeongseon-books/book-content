@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Embeddings and the Vector Index — Inside FAISS IndexFlatL2</title>
+<title>RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Embeddings and the Vector Index — Inside FAISS IndexFlatL2</h1>
+<h1>RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2</h1>
 <p>HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.</p>
 <p>This is post 2 in the RAG Deep Dive series.</p>
-<!-- a-grade-intro:begin -->
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>Why should <code>embed_documents()</code> and <code>embed_query()</code> stay conceptually separate?</li>
-<li>What distance does <code>IndexFlatL2</code> actually compute?</li>
-<li>Where does the system map vector ids back to source documents?</li>
-<li>When is exact flat search still the right baseline?</li>
+<li>Why should document embedding and query embedding be inspected as separate paths even with the same model?</li>
+<li>What calculation does FAISS <code>IndexFlatL2</code> actually repeat during search?</li>
+<li>What breaks when the index is fast but the metadata mapping is wrong?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Document and query embedding flow" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png"></p>
+<p><em>Document and query embedding flow</em></p>
+<p>This picture shows documents and queries becoming vectors, then FAISS computing distances between those vectors. Vector search depends not only on storage and math but also on stable ids and metadata mapping.</p>
 <blockquote>
 <p>Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<!-- a-grade-intro:end -->
-
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/02-embeddings-and-vector-index/main.py</code></p>
@@ -154,8 +152,6 @@ Operators inspect the exception chain before replaying the message.
 <hr>
 <h2>1. How <code>OpenAIEmbeddings</code> works and why query/document paths are separate</h2>
 <p>In LangChain 0.2.17, the familiar <code>OpenAIEmbeddings</code> class lives in <code>langchain_community.embeddings.openai</code>. One source-level detail matters immediately: the class is already deprecated in favor of <code>langchain_openai.OpenAIEmbeddings</code>. It is still a useful baseline because a lot of existing tutorials and pipelines in this release line still follow this code path.</p>
-<p><img alt="Document and query embedding flow" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png"></p>
-<p><em>Document and query embedding flow</em></p>
 <p>If you read the source closely, the implementation difference between <code>embed_documents()</code> and <code>embed_query()</code> is almost nonexistent. <code>embed_documents()</code> calls <code>_get_len_safe_embeddings(texts, engine=engine)</code>. <code>embed_query()</code> simply returns <code>self.embed_documents([text])[0]</code>. So in this pinned implementation, both flows converge on the same machinery.</p>
 <p>That does <strong>not</strong> mean they are conceptually interchangeable. The interface is split on purpose because retrieval models do not always treat documents and queries the same way. In asymmetric retrieval setups, document embeddings are optimized to preserve broad evidence, while query embeddings are optimized to point sharply toward the relevant region of the space. Some providers implement that by routing to different projections, by injecting different instructions, or by using different tuning objectives for query and document representations. That is why LangChain keeps <code>embed_query()</code> and <code>embed_documents()</code> distinct even when a specific provider implementation happens to delegate one to the other.</p>
 <p>This is the practical lesson: in 0.2.17 <code>OpenAIEmbeddings</code>, query and document embedding share the same code path, but you should not bake that assumption into your application architecture. If you later switch to a provider or model family with stronger query/document asymmetry, collapsing those two entry points will quietly distort retrieval quality.</p>
@@ -385,6 +381,21 @@ if __name__ == &quot;__main__&quot;:
 <h2>The baseline to carry into episode 3</h2>
 <p>This episode established the geometry layer of the pipeline. <code>OpenAIEmbeddings</code> may currently route <code>embed_query()</code> through <code>embed_documents()</code>, but LangChain still models them as distinct interfaces because retrieval systems may be asymmetric. <code>IndexFlatL2</code> is exact search over squared L2 distance, which makes it a strong baseline and an expensive one at scale. <code>FAISS.from_documents()</code> hides a three-layer reconstruction path made of FAISS row ids, a LangChain docstore, and <code>index_to_docstore_id</code>. <code>IndexIVFFlat</code> introduces approximation and turns <code>nprobe</code> into a real operating knob. And persistence is split between <code>.faiss</code> and <code>.pkl</code>, with the latter carrying explicit deserialization risk.</p>
 <p>That baseline matters because the next layer is not just “top-k retrieval.” The retriever decides how many candidates to pull, whether to diversify them, and how those vector scores are turned into context. In episode 3, we will stay on the same foundation and follow it into <code>VectorStoreRetriever</code> and MMR.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>Why should document embedding and query embedding be inspected as separate paths even with the same model?</strong><br>
+  Document embeddings are produced during ingestion, while query embeddings are produced at request time, so caching, model versioning, normalization, and failure points differ.</p>
+</li>
+<li>
+<p><strong>What calculation does FAISS <code>IndexFlatL2</code> actually repeat during search?</strong><br>
+<code>IndexFlatL2</code> computes L2 distance from the query vector to every stored vector and sorts by nearest distance. As a flat index, it does not skip candidates.</p>
+</li>
+<li>
+<p><strong>What breaks when the index is fast but the metadata mapping is wrong?</strong><br>
+  If returned row ids no longer align with source metadata, a fast result points to the wrong document or citation and corrupts the answer path.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>

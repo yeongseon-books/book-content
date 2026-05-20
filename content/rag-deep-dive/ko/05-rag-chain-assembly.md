@@ -1,5 +1,5 @@
 ---
-title: RAG Chain 조립 — RetrievalQA vs LCEL
+title: "RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL"
 series: rag-deep-dive
 episode: 5
 language: ko
@@ -18,24 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: RetrievalQA의 한계와 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 표현하는지 비교합니다.
 ---
 
-# RAG Chain 조립 — RetrievalQA vs LCEL
+# RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL
 
 RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 드러내는지 비교합니다.
 
-이 글은 RAG Deep Dive 시리즈의 5번째 글입니다.
+이 글은 RAG Deep Dive 시리즈의 다섯 번째 글입니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
-- `RetrievalQA`는 전통적인 인터페이스 뒤에 어떤 단계를 숨길까요?
-- LCEL은 RAG 그래프를 어떻게 더 직접적으로 드러낼까요?
-- 원래 질문을 유지할 때 `RunnablePassthrough()`는 왜 유용할까요?
-- 각 접근에서는 source 반환 로직을 어디에 붙일까요?
+- `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
+- retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
+- 체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?
+
+## 큰 그림
+
+![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
+
+*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
+
+이 그림에서는 `RetrievalQA`가 내부에서 조립 경로를 고르는 방식과 LCEL이 runnable 순서를 명시적으로 드러내는 방식을 비교합니다. RAG 체인 조립에서는 편의성보다 경계 관찰성이 더 중요해지는 순간이 있습니다.
 
 > RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
-
-![이 글에서 답할 질문](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -169,10 +172,6 @@ if __name__ == "__main__":
 ## 1. `RetrievalQA` 고전 API: `from_chain_type()`는 무엇을 고르는가
 
 `langchain/chains/retrieval_qa/base.py`를 먼저 보면 `BaseRetrievalQA`가 눈에 들어옵니다. 이 클래스는 `combine_documents_chain`, `input_key`, `output_key`, `return_source_documents`를 핵심 상태로 들고 있습니다. 기본 `input_key`는 `"query"`, 기본 `output_key`는 `"result"`입니다. 그래서 `qa.invoke({"query": "..."})`의 결과는 기본적으로 `{"result": "..."}` 모양이 됩니다. 여기에 `return_source_documents=True`를 주면 `output_keys` 프로퍼티가 `source_documents`를 추가해서 `{"result": "...", "source_documents": [...]}`를 반환합니다. 이름만 보면 사소해 보이지만, 이 규약이 중요한 이유는 `RetrievalQA`가 처음부터 “질문 한 개를 받아 답 하나를 돌려주는 봉인된 체인”으로 설계됐기 때문입니다. 입력 표면과 출력 표면이 좁고 고정적입니다.
-
-![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
-
-*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
 
 이 클래스에서 가장 자주 쓰이던 생성 경로가 `from_chain_type()`입니다. 구현은 짧습니다. `chain_type`과 `chain_type_kwargs`를 받아 `load_qa_chain(llm, chain_type=chain_type, **kwargs)`를 호출하고, 그 결과를 `combine_documents_chain`에 넣은 뒤 자신을 생성합니다. 즉 `RetrievalQA`가 직접 `stuff`나 `map_reduce`를 구현하는 것은 아닙니다. 문서를 어떻게 합칠지는 `load_qa_chain()`에 위임하고, 자신은 retriever와 combine-documents 체인을 접착하는 얇은 래퍼에 가깝습니다.
 
@@ -561,15 +560,26 @@ if __name__ == "__main__":
 
 이 시리즈의 흐름으로 보면 이 결론은 자연스럽습니다. 1화부터 4화까지는 각 층을 따로 읽으며 어디서 정보가 손실되는지 봤습니다. 이제 5화에서는 그 층들을 하나의 실행 그래프로 묶었습니다. 결국 좋은 RAG는 “좋은 retriever를 고른다”에서 끝나지 않습니다. **검색 결과가 어떤 체인 구조를 통과해 어떤 타입으로 모델에 전달되고, 답과 출처가 어떤 인터페이스로 밖으로 나오느냐**까지 포함해 설계해야 합니다. 다음 6화에서는 이 조립된 체인을 어떻게 평가하고, 실패를 어떻게 측정하고, 품질 게이트를 어디에 둘지로 넘어가겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **`RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?**
+  고전 API는 빠르게 조립해 주지만 내부 prompt와 combine 전략을 숨길 수 있고, LCEL은 단계가 길어지는 대신 각 경계를 코드에서 볼 수 있게 합니다.
+
+- **retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?**
+  각 단계를 직접 이으면 검색 결과, 프롬프트 입력, 모델 출력, parser 결과를 따로 찍어 실패 위치를 좁히기 쉽습니다.
+
+- **체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?**
+  최종 출력 dict나 Pydantic 모델처럼 answer와 source_documents를 함께 담는 형태를 체인 끝에서 고정해야 출처가 사라지지 않습니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
-- [임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
-- [Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
-- [프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
-- **RAG Chain 조립 — RetrievalQA vs LCEL (현재 글)**
-- 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
+- [RAG Deep Dive (1/6): 문서 로딩과 청크 전략 — LangChain TextSplitter 내부](./01-document-loading-and-chunking.md)
+- [RAG Deep Dive (2/6): 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리](./02-embeddings-and-vector-index.md)
+- [RAG Deep Dive (3/6): Retriever 설계 — VectorStoreRetriever와 MMR](./03-retriever-design.md)
+- [RAG Deep Dive (4/6): 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부](./04-prompt-construction-and-context-injection.md)
+- **RAG Deep Dive (5/6): RAG Chain 조립 — RetrievalQA vs LCEL (현재 글)**
+- RAG Deep Dive (6/6): 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness (예정)
 
 <!-- toc:end -->
 

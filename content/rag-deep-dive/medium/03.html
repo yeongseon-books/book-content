@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Retriever Design — VectorStoreRetriever and MMR</title>
+<title>RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,24 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Retriever Design — VectorStoreRetriever and MMR</h1>
+<h1>RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR</h1>
 <p>VectorStoreRetriever and MMR define how a retriever trades off relevance against coverage. This post walks that policy layer through LangChain internals.</p>
 <p>This is post 3 in the RAG Deep Dive series.</p>
-<!-- a-grade-intro:begin -->
-<h2>Questions this post answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
-<li>What contract does <code>BaseRetriever</code> enforce beyond returning documents?</li>
-<li>Where does <code>VectorStoreRetriever</code> branch into <code>similarity</code>, <code>mmr</code>, and threshold mode?</li>
-<li>Why does <code>fetch_k</code> need to be wider than <code>k</code> for MMR to matter?</li>
-<li>How does <code>lambda_mult</code> change redundancy versus coverage?</li>
+<li>What call contract does <code>BaseRetriever</code> standardize across retrieval implementations?</li>
+<li>Which retrieval failure does <code>similarity</code>, <code>similarity_score_threshold</code>, or <code>mmr</code> try to reduce?</li>
+<li>What clues do callbacks and parameter logs give when retrieval results look wrong?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Invoke path into retriever callbacks" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png"></p>
+<p><em>Invoke path into retriever callbacks</em></p>
+<p>This picture shows a retriever call entering through a common <code>invoke()</code> boundary and dispatching internally by search type. Retriever design keeps the outer chain contract stable while allowing the retrieval strategy to change.</p>
 <blockquote>
 <p>A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.</p>
 </blockquote>
-<p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-questions-this-post-answers.en.png"></p>
-<p><em>Questions this post answers</em></p>
-<!-- a-grade-intro:end -->
-
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/03-retriever-design/main.py</code></p>
@@ -149,8 +147,6 @@ if __name__ == &quot;__main__&quot;:
 <hr>
 <h2>1. What <code>BaseRetriever</code> actually standardizes</h2>
 <p>In LangChain 0.2.17, the foundational retriever interface is <code>langchain_core.retrievers.BaseRetriever</code>. At first glance it looks simple: take a string query, return a list of <code>Document</code> objects. In source, though, it is already part of the Runnable system. That design choice is the reason the recommended entry points are <code>invoke()</code> and <code>ainvoke()</code> rather than the older <code>get_relevant_documents()</code> methods.</p>
-<p><img alt="Invoke path into retriever callbacks" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png"></p>
-<p><em>Invoke path into retriever callbacks</em></p>
 <p><code>invoke()</code> is worth reading line by line. It starts with <code>ensure_config(config)</code>, then builds a <code>CallbackManager</code> through <code>CallbackManager.configure(...)</code>. At that stage LangChain merges together several sources of execution metadata: callbacks from the run config, retriever-level tags and metadata, config-level tags and metadata, and the tracing payload from <code>_get_ls_params()</code>. After that, <code>callback_manager.on_retriever_start(...)</code> creates a <code>run_manager</code>. Only then does the retriever call the implementation hook that actually performs retrieval.</p>
 <p>That implementation hook is <code>_get_relevant_documents()</code>. If the subclass supports the newer signature, <code>invoke()</code> passes in <code>run_manager</code>. Success triggers <code>run_manager.on_retriever_end(result)</code>, and failure triggers <code>run_manager.on_retriever_error(e)</code>. So retrieval is executed as a traced run, not as an unstructured helper call.</p>
 <p><code>run_manager</code> exists so custom retrievers can emit intermediate callback events or tracing text while they work. <code>BaseRetriever.__init_subclass__()</code> also uses signature inspection to detect support for <code>run_manager</code> and to patch older retrievers that implemented <code>get_relevant_documents()</code> directly. Those legacy retrievers still work in 0.2.17, but the intended implementation point is clearly <code>_get_relevant_documents()</code>.</p>
@@ -429,6 +425,21 @@ if __name__ == &quot;__main__&quot;:
 <h2>The baseline to carry into episode 4</h2>
 <p>This episode established the retriever layer as a policy boundary rather than a passive wrapper. <code>BaseRetriever</code> standardizes lifecycle, tracing, and async fallback under the Runnable model. <code>VectorStoreRetriever</code> then chooses among plain similarity, thresholded relevance retrieval, and MMR-based diversification. MMR only helps if the candidate pool is widened first, which is why <code>fetch_k</code> must usually be much larger than <code>k</code>. Threshold mode depends on relevance-score conversion, with FAISS falling back to a distance-strategy-specific default when no explicit <code>relevance_score_fn</code> is supplied. And custom retrievers matter when the main optimization is not a different ranking formula but a different search boundary.</p>
 <p>That baseline leads directly into episode 4. Retrieval output is still not final context. The next failure point is how those documents are packed and injected into the prompt.</p>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li>
+<p><strong>What call contract does <code>BaseRetriever</code> standardize across retrieval implementations?</strong><br>
+<code>BaseRetriever</code> standardizes the call shape: take a query, return Documents, and expose callback boundaries around retrieval.</p>
+</li>
+<li>
+<p><strong>Which retrieval failure does <code>similarity</code>, <code>similarity_score_threshold</code>, or <code>mmr</code> try to reduce?</strong><br>
+<code>similarity</code> prioritizes nearest matches, thresholds block weak evidence, and MMR reduces repeated near-duplicates by adding diversity.</p>
+</li>
+<li>
+<p><strong>What clues do callbacks and parameter logs give when retrieval results look wrong?</strong><br>
+  Logs for callbacks, search_type, k, score threshold, and fetch_k help separate strategy problems from query problems.</p>
+</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/rag-deep-dive/en/01-document-loading-and-chunking.md">Document Loading and Chunking — Inside LangChain TextSplitter</a></li>

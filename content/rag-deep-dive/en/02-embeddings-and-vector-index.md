@@ -1,5 +1,5 @@
 ---
-title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
+title: "RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2"
 series: rag-deep-dive
 episode: 2
 language: en
@@ -18,26 +18,27 @@ last_reviewed: '2026-05-15'
 seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into vectors and search them, decomposed step by step.
 ---
 
-# Embeddings and the Vector Index — Inside FAISS IndexFlatL2
+# RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2
 
 HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.
 
 This is post 2 in the RAG Deep Dive series.
 
-<!-- a-grade-intro:begin -->
-## Questions this post answers
+## Questions to Keep in Mind
 
-- Why should `embed_documents()` and `embed_query()` stay conceptually separate?
-- What distance does `IndexFlatL2` actually compute?
-- Where does the system map vector ids back to source documents?
-- When is exact flat search still the right baseline?
+- Why should document embedding and query embedding be inspected as separate paths even with the same model?
+- What calculation does FAISS `IndexFlatL2` actually repeat during search?
+- What breaks when the index is fast but the metadata mapping is wrong?
+
+## Big Picture
+
+![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
+
+*Document and query embedding flow*
+
+This picture shows documents and queries becoming vectors, then FAISS computing distances between those vectors. Vector search depends not only on storage and math but also on stable ids and metadata mapping.
 
 > Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
-
-![Questions this post answers](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-questions-this-post-answers.en.png)
-
-*Questions this post answers*
-<!-- a-grade-intro:end -->
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -137,10 +138,6 @@ That is why embeddings and indexing have to be read together. A production retri
 ## 1. How `OpenAIEmbeddings` works and why query/document paths are separate
 
 In LangChain 0.2.17, the familiar `OpenAIEmbeddings` class lives in `langchain_community.embeddings.openai`. One source-level detail matters immediately: the class is already deprecated in favor of `langchain_openai.OpenAIEmbeddings`. It is still a useful baseline because a lot of existing tutorials and pipelines in this release line still follow this code path.
-
-![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
-
-*Document and query embedding flow*
 
 If you read the source closely, the implementation difference between `embed_documents()` and `embed_query()` is almost nonexistent. `embed_documents()` calls `_get_len_safe_embeddings(texts, engine=engine)`. `embed_query()` simply returns `self.embed_documents([text])[0]`. So in this pinned implementation, both flows converge on the same machinery.
 
@@ -437,15 +434,26 @@ This episode established the geometry layer of the pipeline. `OpenAIEmbeddings` 
 
 That baseline matters because the next layer is not just “top-k retrieval.” The retriever decides how many candidates to pull, whether to diversify them, and how those vector scores are turned into context. In episode 3, we will stay on the same foundation and follow it into `VectorStoreRetriever` and MMR.
 
+## Answering the Opening Questions
+
+- **Why should document embedding and query embedding be inspected as separate paths even with the same model?**
+  Document embeddings are produced during ingestion, while query embeddings are produced at request time, so caching, model versioning, normalization, and failure points differ.
+
+- **What calculation does FAISS `IndexFlatL2` actually repeat during search?**
+  `IndexFlatL2` computes L2 distance from the query vector to every stored vector and sorts by nearest distance. As a flat index, it does not skip candidates.
+
+- **What breaks when the index is fast but the metadata mapping is wrong?**
+  If returned row ids no longer align with source metadata, a fast result points to the wrong document or citation and corrupts the answer path.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
-- **Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (current)**
-- Retriever Design — VectorStoreRetriever and MMR (upcoming)
-- Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
-- Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
-- Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
+- [RAG Deep Dive (1/6): Document Loading and Chunking — Inside LangChain TextSplitter](./01-document-loading-and-chunking.md)
+- **RAG Deep Dive (2/6): Embeddings and the Vector Index — Inside FAISS IndexFlatL2 (current)**
+- RAG Deep Dive (3/6): Retriever Design — VectorStoreRetriever and MMR (upcoming)
+- RAG Deep Dive (4/6): Prompt Construction and Context Injection — Inside PromptTemplate (upcoming)
+- RAG Deep Dive (5/6): Assembling the RAG Chain — RetrievalQA vs LCEL (upcoming)
+- RAG Deep Dive (6/6): Evaluation and Quality Gates — RAGAS Metrics and Faithfulness (upcoming)
 
 <!-- toc:end -->
 
