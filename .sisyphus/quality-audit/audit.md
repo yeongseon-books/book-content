@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:49:29+00:00
+Generated: 2026-05-20T11:49:49+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **37**
-- Series at or above 5 issues: **28**
-- Total issues: **300**
-  - BadImg: **300**
+- Series with any issue: **36**
+- Series at or above 5 issues: **27**
+- Total issues: **290**
+  - BadImg: **290**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -50,34 +50,33 @@ Warnings:
 | 7 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 8 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 9 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 10 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 11 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 14 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 16 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 17 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 18 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 19 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 20 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 21 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 23 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 24 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 25 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 26 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 27 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 28 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 29 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 30 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 31 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 32 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 33 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 34 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 35 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 36 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 37 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 10 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 13 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 14 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 15 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 16 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 17 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 18 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 19 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 20 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 22 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 23 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 24 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 25 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 26 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 27 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 28 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 29 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 30 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 31 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 32 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 33 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 34 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 35 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 36 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -185,18 +184,6 @@ Warnings:
 - `assets/api-design-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=731x67)
-- ... 5 more
-
-## clean-code-101 — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/clean-code-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=638x67)
-- `assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=638x67)
-- `assets/clean-code-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=921x67)
-- `assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=921x67)
-- `assets/clean-code-101/04/04-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=884x67)
 - ... 5 more
 
 ## containers-101 — Total 10
