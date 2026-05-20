@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:53:44+00:00
+Generated: 2026-05-20T11:54:03+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **29**
+- Series with any issue: **28**
 - Series at or above 5 issues: **21**
-- Total issues: **218**
-  - BadImg: **218**
+- Total issues: **214**
+  - BadImg: **214**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -64,12 +64,11 @@ Warnings:
 | 21 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
 | 22 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 23 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 24 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 25 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 26 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 27 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 28 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 29 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 24 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 25 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 26 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 27 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 28 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## open-source-101 — Total 16
 
@@ -340,16 +339,6 @@ Warnings:
 - `assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=794x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1148x67)
 - `assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1148x67)
-
-## calculus-for-ml-101 — Total 4
-
-- BadImg=4 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=780x67)
-- `assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=673x67)
-- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=612x67)
-- `assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=612x67)
 
 ## design-patterns-101 — Total 4
 
