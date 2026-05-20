@@ -1,5 +1,5 @@
 ---
-title: AI API first steps — sending your first request with the OpenAI API
+title: "AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API"
 series: ai-web-dev-101
 episode: 1
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Build your first OpenAI API call and learn the request-response contract, failure modes, and token cost basics.
 ---
 
-# AI API first steps — sending your first request with the OpenAI API
+# AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API
 
 Using ChatGPT in a browser and calling a model from your own service are two different experiences. One is a finished product. The other is application development: authentication, request shape, response parsing, timeouts, and cost tracking all become your responsibility.
 
@@ -27,25 +27,27 @@ This is the first post in the AI Web Development 101 series.
 
 Here, we will build the smallest successful OpenAI API call and turn it into a practical mental model you can reuse in later chapters.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What is different between using ChatGPT on the web and integrating an AI API into my own service?
 - What is the minimum setup for the OpenAI API?
 - What does the first request look like, and where do I read the response?
-- Which fields matter most in the response JSON?
-- When the first call fails, should I suspect authentication, the model id, or prompt design first?
 
-> An AI API is not a ready-made chatbot. It is an interface that lets your application call a remote model as one component inside your system. That is why the first skill is not “asking better questions.” It is reading the request-response contract clearly.
+## Big Picture
+
+![AI Web Development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
+
+*AI Web Development 101 chapter 1 flow overview*
+
+This picture places AI API first steps — sending your first request with the OpenAI API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of AI API first steps — sending your first request with the OpenAI API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why the first call matters more than it seems
 
 At the beginning, the blurry part is rarely model quality. The blurry part is the service boundary. A chat UI hides it. Runtime code does not. Your application sends an HTTP request with authentication headers and a JSON body, and the model service sends a JSON response back.
 
 If that structure is clear, later topics become easier. Token accounting, prompt design, streaming responses, RAG context injection, and evaluation workflows all build on the same first round trip. If the structure stays fuzzy, every later feature feels like “it works somehow, but I do not really know why.”
-
-![Overview of a basic AI API call](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
-
-*Overview of a basic AI API call*
 
 ## Minimum setup
 
@@ -166,7 +168,6 @@ from openai import APIConnectionError, APIStatusError, RateLimitError
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=20.0)
 
-
 def ask_model(user_text: str) -> dict:
     try:
         response = client.chat.completions.create(
@@ -279,7 +280,6 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-
 def translate_ko_to_en(text: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -296,7 +296,6 @@ def translate_ko_to_en(text: str) -> str:
         ],
     )
     return response.choices[0].message.content
-
 
 print(translate_ko_to_en("오늘은 API 응답 구조를 먼저 이해하는 것이 중요합니다."))
 ```
@@ -329,8 +328,17 @@ The important part of the first call is not “I talked to a model.” It is “
 
 The next chapter builds directly on this. Once the request-response shape is clear, prompt engineering stops feeling mysterious.
 
+## Answering the Opening Questions
+
+- **What is different between using ChatGPT on the web and integrating an AI API into my own service?**
+  - The article treats AI API first steps — sending your first request with the OpenAI API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What is the minimum setup for the OpenAI API?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What does the first request look like, and where do I read the response?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-## Series table of contents
+## In this series
 
 - **AI API first steps — sending your first request with the OpenAI API (current)**
 - Prompt engineering basics — getting the answer you actually want (upcoming)

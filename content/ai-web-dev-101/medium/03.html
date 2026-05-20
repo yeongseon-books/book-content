@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</title>
+<title>AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</h1>
+<h1>AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</h1>
 <p>Once a terminal call works, the next step is building something a user can actually touch. That is where browser state, streaming responses, server routes, and user experience start interacting.</p>
 <p>This is post 3 in the AI Web Development 101 series.</p>
 <p>Here, we will build a browser chatbot and focus on the boundary between client UI state and the server route that talks to the model.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What changes when you move a terminal example into a browser UI?</li>
 <li>Why is the Next.js plus Vercel AI SDK combination a strong beginner path?</li>
 <li>What should <code>/api/chat</code> actually do?</li>
-<li>How does streaming text arrive in the browser?</li>
-<li>Where should system prompts and UI state live?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 3 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png"></p>
+<p><em>AI Web Development 101 chapter 3 flow overview</em></p>
+<p>This picture places Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A web chatbot is not just “an input box plus a model.” It is a two-layer system: the client owns the interaction experience, and the server owns the model call and the response stream.</p>
+<p>The core of Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why Next.js and the Vercel AI SDK work well here</h2>
 <p>The first friction point in AI web features is not intelligence. It is perceived latency and state handling. If a long answer appears only after full completion, the UI feels slower than it really is.</p>
@@ -76,8 +78,6 @@
 <li><code>useChat</code> gives you a structured state layer for messages and request status</li>
 <li>Next.js App Router fits naturally with server routes and client components</li>
 </ul>
-<p><img alt="High-level architecture of the chatbot service" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png"></p>
-<p><em>High-level architecture of the chatbot service</em></p>
 <h2>Initial project setup</h2>
 <pre><code class="language-bash">npx create-next-app@latest my-ai-chatbot --typescript --tailwind --eslint
 cd my-ai-chatbot
@@ -212,10 +212,19 @@ export default function Chat() {
 <li>System prompts define behavior, not just tone.</li>
 </ul>
 <p>The next chapter moves from chat UI to retrieval, where your app answers from your own documents instead of model memory alone.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
+<li><strong>What changes when you move a terminal example into a browser UI?</strong></li>
+<li>The article treats Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is the Next.js plus Vercel AI SDK combination a strong beginner path?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What should <code>/api/chat</code> actually do?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</a></li>
 <li><strong>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (current)</strong></li>
 <li>RAG introduction — answering with your own data (upcoming)</li>
 <li>First steps with AI agents — making the model use tools (upcoming)</li>
@@ -224,10 +233,12 @@ export default function Chat() {
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot">Vercel AI SDK docs: Chatbot guide</a></li>
-<li><a href="https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat">Vercel AI SDK docs: useChat</a></li>
-<li><a href="https://nextjs.org/docs/app/building-your-application/routing/route-handlers">Next.js docs: Route Handlers</a></li>
-<li><a href="https://github.com/vercel/ai/tree/main/examples">Vercel AI SDK examples repository</a></li>
+<li><a href="https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot">Vercel AI SDK: Chatbot guide</a> — canonical walkthrough of <code>useChat</code> + route handler</li>
+<li><a href="https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat">Vercel AI SDK: <code>useChat</code> reference</a> — message state and <code>status</code> semantics</li>
+<li><a href="https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text">Vercel AI SDK: <code>streamText</code> reference</a> — server-side streaming API used in this chapter</li>
+<li><a href="https://nextjs.org/docs/app/building-your-application/routing/route-handlers">Next.js: Route Handlers</a> — App Router conventions that <code>app/api/chat/route.ts</code> follows</li>
+<li><a href="https://nextjs.org/docs/app/api-reference/edge">Next.js: Edge Runtime</a> — what <code>export const runtime = "edge"</code> actually changes</li>
+<li><a href="https://github.com/vercel/ai/tree/main/examples">Vercel AI SDK examples repository</a> — additional chatbot and tool-use patterns</li>
 </ul>
 <p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
 </body>

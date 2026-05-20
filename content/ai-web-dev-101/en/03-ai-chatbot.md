@@ -1,5 +1,5 @@
 ---
-title: Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK
+title: "AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK"
 series: ai-web-dev-101
 episode: 3
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Build a streaming chat UI with Next.js and the Vercel AI SDK, and understand the client-server split behind the chatbot experience.
 ---
 
-# Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK
+# AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK
 
 Once a terminal call works, the next step is building something a user can actually touch. That is where browser state, streaming responses, server routes, and user experience start interacting.
 
@@ -27,15 +27,21 @@ This is post 3 in the AI Web Development 101 series.
 
 Here, we will build a browser chatbot and focus on the boundary between client UI state and the server route that talks to the model.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What changes when you move a terminal example into a browser UI?
 - Why is the Next.js plus Vercel AI SDK combination a strong beginner path?
 - What should `/api/chat` actually do?
-- How does streaming text arrive in the browser?
-- Where should system prompts and UI state live?
 
-> A web chatbot is not just “an input box plus a model.” It is a two-layer system: the client owns the interaction experience, and the server owns the model call and the response stream.
+## Big Picture
+
+![AI Web Development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
+
+*AI Web Development 101 chapter 3 flow overview*
+
+This picture places Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why Next.js and the Vercel AI SDK work well here
 
@@ -46,10 +52,6 @@ The Vercel AI SDK helps with that in three ways:
 - streaming responses arrive incrementally
 - `useChat` gives you a structured state layer for messages and request status
 - Next.js App Router fits naturally with server routes and client components
-
-![High-level architecture of the chatbot service](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
-
-*High-level architecture of the chatbot service*
 
 ## Initial project setup
 
@@ -216,11 +218,20 @@ The heart of a browser chatbot is not the model call by itself. It is the connec
 
 The next chapter moves from chat UI to retrieval, where your app answers from your own documents instead of model memory alone.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
-- [Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
+- **What changes when you move a terminal example into a browser UI?**
+  - The article treats Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is the Next.js plus Vercel AI SDK combination a strong beginner path?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should `/api/chat` actually do?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
 - **Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (current)**
 - RAG introduction — answering with your own data (upcoming)
 - First steps with AI agents — making the model use tools (upcoming)

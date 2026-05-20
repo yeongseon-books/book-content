@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prompt engineering basics — getting the answer you actually want</title>
+<title>AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Prompt engineering basics — getting the answer you actually want</h1>
+<h1>AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</h1>
 <p>Two developers can use the same model and get very different results. In practice, the difference usually comes from request structure rather than model intelligence. The model does not read your mind. You have to supply context, role, constraints, and output expectations explicitly.</p>
 <p>This is post 2 in the AI Web Development 101 series.</p>
 <p>Here, we will treat prompts as executable contracts, not clever sentences.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>How is a prompt different from just asking a question?</li>
 <li>What responsibilities belong to <code>system</code> and <code>user</code> messages?</li>
 <li>Which ingredients make prompts stable enough for application code?</li>
-<li>When should you adjust <code>temperature</code> and <code>max_tokens</code>?</li>
-<li>What should you debug first when the answer is not good enough?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png"></p>
+<p><em>AI Web Development 101 chapter 2 flow overview</em></p>
+<p>This picture places Prompt engineering basics — getting the answer you actually want inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>A prompt is not a persuasive paragraph. It is a task contract for the model. That is why strong prompts make role, context, output shape, and constraints obvious before they try to sound elegant.</p>
+<p>The core of Prompt engineering basics — getting the answer you actually want is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why prompt engineering deserves separate attention</h2>
 <p>In the previous chapter, the main question was how to call the API at all. From here on, the important question becomes how to shape the request so the answer is useful. A vague request tends to produce a generic answer. A structured request tends to produce something closer to the actual job you want done.</p>
@@ -78,8 +80,6 @@
 <li><code>user</code>: the concrete task and input values for the current turn</li>
 </ul>
 <p>That split keeps application prompts easier to reason about. If quality changes, you can ask whether the failure came from the role layer or the task layer.</p>
-<p><img alt="How the system prompt and user prompt play different roles" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png"></p>
-<p><em>How the system prompt and user prompt play different roles</em></p>
 <h2>Compare a weak prompt and a better one</h2>
 <p>The fastest way to learn prompt quality is to run the same task twice.</p>
 <pre><code class="language-python">import os
@@ -108,21 +108,15 @@ better = run_prompt(
         &quot;You write concise ecommerce copy for practical buyers. Avoid hype and keep the tone clear.&quot;
     ),
     user_prompt=(
-        &quot;Product: silent mechanical keyboard
-&quot;
-        &quot;Audience: developers working from home
-&quot;
-        &quot;Highlights: low noise, soft typing feel, pastel blue color
-&quot;
+        &quot;Product: silent mechanical keyboard\n&quot;
+        &quot;Audience: developers working from home\n&quot;
+        &quot;Highlights: low noise, soft typing feel, pastel blue color\n&quot;
         &quot;Output: exactly 3 bullet points, 1 sentence each&quot;
     ),
 )
 
-print(&quot;[bad]
-&quot;, bad)
-print(&quot;
-[better]
-&quot;, better)
+print(&quot;[bad]\n&quot;, bad)
+print(&quot;\n[better]\n&quot;, better)
 </code></pre>
 <p>A better prompt is not “more beautiful.” It simply makes the contract tighter.</p>
 <p><img alt="How to improve a vague prompt into a concrete one" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-improvement-example.en.png"></p>
@@ -215,9 +209,7 @@ system_prompt = &quot;You summarize support information briefly and precisely.&q
 
 for case in test_cases:
     answer = run_prompt(system_prompt, case[&quot;user&quot;])
-    print(f&quot;
-[{case['name']}]
-{answer}&quot;)
+    print(f&quot;\n[{case['name']}]\n{answer}&quot;)
 </code></pre>
 <h2>Common failure modes in real services</h2>
 <ul>
@@ -246,9 +238,18 @@ for case in test_cases:
 <li>Stable prompt work comes from repeatable testing and debugging loops.</li>
 </ul>
 <p>The next chapter moves from prompt structure to a browser UI, where streaming and state management become part of the experience.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><strong>How is a prompt different from just asking a question?</strong></li>
+<li>The article treats Prompt engineering basics — getting the answer you actually want as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What responsibilities belong to <code>system</code> and <code>user</code> messages?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>Which ingredients make prompts stable enough for application code?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
 <li><strong>Prompt engineering basics — getting the answer you actually want (current)</strong></li>
 <li>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (upcoming)</li>
 <li>RAG introduction — answering with your own data (upcoming)</li>

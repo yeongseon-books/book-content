@@ -1,5 +1,5 @@
 ---
-title: Deploying an AI web app — shipping to Vercel and Azure
+title: "AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure"
 series: ai-web-dev-101
 episode: 6
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Deploy a local AI app to Vercel and Azure App Service while handling startup commands, environment variables, logs, and cost guardrails.
 ---
 
-# Deploying an AI web app — shipping to Vercel and Azure
+# AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure
 
 An AI app that only works on your laptop is still a local experiment. Once other people need to access it, deployment turns secrets, startup commands, logging, and budget control into real operational concerns.
 
@@ -27,15 +27,21 @@ This is post 6 in the AI Web Development 101 series.
 
 Here, we will walk through the first deployment path for a frontend-heavy app on Vercel and a Python backend on Azure App Service.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is deployment more than uploading source code?
 - When does Vercel fit better, and when does Azure App Service fit better?
 - What should you verify first in Vercel?
-- Where do Python deployments often fail on App Service?
-- How should you handle API keys, logs, and budget alerts?
 
-> Deployment means making your code start correctly on someone else's infrastructure. That is why the real contract is not “did I push the files?” but “did I define dependencies, environment variables, startup behavior, and logs clearly enough?”
+## Big Picture
+
+![AI Web Development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
+
+*AI Web Development 101 chapter 6 flow overview*
+
+This picture places Deploying an AI web app — shipping to Vercel and Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Deploying an AI web app — shipping to Vercel and Azure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What to prepare before deployment
 
@@ -45,10 +51,6 @@ Before you deploy, verify four things:
 - secrets are injected through environment variables, not source code
 - the application entry point is explicit
 - the app can bind to the platform-provided port
-
-![From local development to live deployment](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
-
-*From local development to live deployment*
 
 ## Picking a platform
 
@@ -192,14 +194,23 @@ Deployment is not the final coding step. It is the first real operating step.
 
 The final chapter focuses on what happens after deployment: how to measure response quality, catch regressions, and improve an AI app over time.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
-- [Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
-- [Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
-- [RAG introduction — answering with your own data](./04-rag-intro.md)
-- [First steps with AI agents — making the model use tools](./05-ai-agent.md)
+- **Why is deployment more than uploading source code?**
+  - The article treats Deploying an AI web app — shipping to Vercel and Azure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When does Vercel fit better, and when does Azure App Service fit better?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should you verify first in Vercel?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
+- [AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
+- [AI Web Development 101 (4/7): RAG introduction — answering with your own data](./04-rag-intro.md)
+- [AI Web Development 101 (5/7): First steps with AI agents — making the model use tools](./05-ai-agent.md)
 - **Deploying an AI web app — shipping to Vercel and Azure (current)**
 - Evaluating and improving an AI app — measuring quality over time (upcoming)
 

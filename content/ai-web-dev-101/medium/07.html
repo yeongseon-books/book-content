@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Evaluating and improving an AI app — measuring quality over time</title>
+<title>AI Web Development 101 (7/7): Evaluating and improving an AI app — measuring quality over time</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Evaluating and improving an AI app — measuring quality over time</h1>
+<h1>AI Web Development 101 (7/7): Evaluating and improving an AI app — measuring quality over time</h1>
 <p>An AI app is not finished when it is deployed. That is when users begin surfacing the real issues: strange answers, regressions after prompt changes, unnecessary verbosity, and brittle retrieval behavior.</p>
 <p>This is the final post in the AI Web Development 101 series.</p>
 <p>Here, we will turn “it feels better” into a repeatable evaluation and improvement loop.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is evaluation part of operations rather than an optional extra?</li>
 <li>Which quality axes should you measure first?</li>
 <li>How do you start with the smallest automatic evaluation?</li>
-<li>When is LLM-as-Judge useful, and what are its limits?</li>
-<li>How do you turn evaluation results into better prompts and retrieval behavior?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 7 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png"></p>
+<p><em>AI Web Development 101 chapter 7 flow overview</em></p>
+<p>This picture places Evaluating and improving an AI app — measuring quality over time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>AI evaluation converts “looks good to me” into numbers and concrete failure cases. Because models are probabilistic, you need separate input sets and scoring rules if you want to know whether a change really improved the system.</p>
+<p>The core of Evaluating and improving an AI app — measuring quality over time is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why evaluation is necessary</h2>
 <p>Traditional software usually aims for deterministic outputs from fixed inputs. AI systems often do not. The same prompt can vary slightly, and a change that improves one question can silently hurt another.</p>
@@ -76,8 +78,6 @@
 <li>it catches regressions after model or prompt changes</li>
 <li>it helps you compare quality against cost and latency</li>
 </ol>
-<p><img alt="Why evaluation matters for regression, accuracy, and cost" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png"></p>
-<p><em>Why evaluation matters for regression, accuracy, and cost</em></p>
 <h2>Start by choosing quality axes</h2>
 <p>For a first evaluation framework, three axes are enough:</p>
 <ul>
@@ -182,10 +182,8 @@ def judge_answer(question: str, rubric_context: str, answer: str) -&gt; dict:
             {
                 &quot;role&quot;: &quot;user&quot;,
                 &quot;content&quot;: (
-                    f&quot;Question: {question}
-&quot;
-                    f&quot;Reference context: {rubric_context}
-&quot;
+                    f&quot;Question: {question}\n&quot;
+                    f&quot;Reference context: {rubric_context}\n&quot;
                     f&quot;Answer: {answer}&quot;
                 ),
             },
@@ -242,14 +240,23 @@ def judge_answer(question: str, rubric_context: str, answer: str) -&gt; dict:
 <li>Good improvement loops compare the same inputs before and after each change.</li>
 </ul>
 <p>This closes the series. You have now walked through API calls, prompt design, browser chat UI, RAG, tool use, deployment, and evaluation—the full beginner path for AI web applications.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">First steps with AI agents — making the model use tools</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/06-deploy.md">Deploying an AI web app — shipping to Vercel and Azure</a></li>
+<li><strong>Why is evaluation part of operations rather than an optional extra?</strong></li>
+<li>The article treats Evaluating and improving an AI app — measuring quality over time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which quality axes should you measure first?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do you start with the smallest automatic evaluation?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">AI Web Development 101 (4/7): RAG introduction — answering with your own data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">AI Web Development 101 (5/7): First steps with AI agents — making the model use tools</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/06-deploy.md">AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure</a></li>
 <li><strong>Evaluating and improving an AI app — measuring quality over time (current)</strong></li>
 </ul>
 <h2>References</h2>

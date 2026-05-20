@@ -1,5 +1,5 @@
 ---
-title: Prompt engineering basics — getting the answer you actually want
+title: "AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want"
 series: ai-web-dev-101
 episode: 2
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how role, context, output format, and validation routines change model behavior even when the model stays the same.
 ---
 
-# Prompt engineering basics — getting the answer you actually want
+# AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want
 
 Two developers can use the same model and get very different results. In practice, the difference usually comes from request structure rather than model intelligence. The model does not read your mind. You have to supply context, role, constraints, and output expectations explicitly.
 
@@ -27,15 +27,21 @@ This is post 2 in the AI Web Development 101 series.
 
 Here, we will treat prompts as executable contracts, not clever sentences.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - How is a prompt different from just asking a question?
 - What responsibilities belong to `system` and `user` messages?
 - Which ingredients make prompts stable enough for application code?
-- When should you adjust `temperature` and `max_tokens`?
-- What should you debug first when the answer is not good enough?
 
-> A prompt is not a persuasive paragraph. It is a task contract for the model. That is why strong prompts make role, context, output shape, and constraints obvious before they try to sound elegant.
+## Big Picture
+
+![AI Web Development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
+
+*AI Web Development 101 chapter 2 flow overview*
+
+This picture places Prompt engineering basics — getting the answer you actually want inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Prompt engineering basics — getting the answer you actually want is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why prompt engineering deserves separate attention
 
@@ -52,10 +58,6 @@ In Chat Completions, the most important split is between `system` and `user`.
 
 That split keeps application prompts easier to reason about. If quality changes, you can ask whether the failure came from the role layer or the task layer.
 
-![How the system prompt and user prompt play different roles](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
-
-*How the system prompt and user prompt play different roles*
-
 ## Compare a weak prompt and a better one
 
 The fastest way to learn prompt quality is to run the same task twice.
@@ -65,7 +67,6 @@ import os
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
 
 def run_prompt(system_prompt: str, user_prompt: str) -> str:
     response = client.chat.completions.create(
@@ -77,7 +78,6 @@ def run_prompt(system_prompt: str, user_prompt: str) -> str:
         ],
     )
     return response.choices[0].message.content
-
 
 bad = run_prompt(
     system_prompt="You are a helpful assistant.",
@@ -251,10 +251,19 @@ Prompt engineering is not about sounding clever. It is about designing a task co
 
 The next chapter moves from prompt structure to a browser UI, where streaming and state management become part of the experience.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- **How is a prompt different from just asking a question?**
+  - The article treats Prompt engineering basics — getting the answer you actually want as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What responsibilities belong to `system` and `user` messages?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Which ingredients make prompts stable enough for application code?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
 - **Prompt engineering basics — getting the answer you actually want (current)**
 - Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (upcoming)
 - RAG introduction — answering with your own data (upcoming)

@@ -1,5 +1,5 @@
 ---
-title: AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
+title: "AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현"
 series: ai-web-dev-101
 episode: 3
 language: ko
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며 브라우저와 모델 API를 연결하는 기본 구조를 익힙니다.
 ---
 
-# AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
+# AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
 
 터미널에서 AI를 호출하는 단계까지 왔다면, 이제 사용자가 직접 만질 수 있는 화면이 필요합니다. 여기서부터는 단순 API 호출을 넘어 입력 상태, 스트리밍 응답, 서버 경로, 사용자 경험이 함께 얽히기 시작합니다.
 
@@ -27,15 +27,21 @@ seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며
 
 여기서는 브라우저에서 AI와 실시간으로 대화하는 챗봇 UI를 구현해 보겠습니다. 이 편은 시리즈 안에서 잠시 프론트엔드로 이동하는 글이므로 Node.js, npm, React 기본기와 Next.js App Router 구조를 안다는 전제로 설명합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?
 - 왜 Next.js와 Vercel AI SDK 조합이 입문에 잘 맞을까요?
 - `/api/chat` 경로는 어떤 역할을 맡아야 할까요?
-- 스트리밍 응답은 브라우저에서 어떻게 이어 붙일까요?
-- 시스템 프롬프트와 UI 상태 관리는 어디에서 다루는 편이 좋을까요?
 
-> 웹 챗봇은 “입력창 + 모델”이 아니라, 브라우저 상태와 서버 스트리밍 경로가 맞물린 두 층 구조입니다. 클라이언트는 대화 경험을 만들고, 서버는 모델 호출과 응답 스트림을 책임진다고 생각하면 전체 흐름이 단순해집니다.
+## 큰 그림
+
+![AI Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
+
+*AI Web Development 101 3장 흐름 개요*
+
+이 그림에서는 AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 Next.js와 Vercel AI SDK인가
 
@@ -48,10 +54,6 @@ Vercel AI SDK는 이 지점을 꽤 잘 줄여 줍니다.
 - Next.js App Router와의 궁합: 서버 경로와 클라이언트 컴포넌트를 자연스럽게 연결할 수 있습니다.
 
 직접 Fetch와 Server-Sent Events를 조립해도 되지만, 입문 단계에서는 먼저 안정적인 추상화를 타고 전체 그림을 보는 편이 좋습니다.
-
-![브라우저와 모델 API를 잇는 챗봇 서비스 구조](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
-
-*브라우저와 모델 API를 잇는 챗봇 서비스 구조*
 
 ## 프로젝트 초기 설정
 
@@ -324,11 +326,20 @@ export default function Chat() {
 
 다음 글에서는 대화 UI를 넘어, 우리 문서를 근거로 답하는 RAG 구조를 붙여 보겠습니다.
 
+## 처음 질문으로 돌아가기
+
+- **터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?**
+  - 본문의 기준은 AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **왜 Next.js와 Vercel AI SDK 조합이 입문에 잘 맞을까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **`/api/chat` 경로는 어떤 역할을 맡아야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
-- [프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술](./02-prompt-engineering.md)
+- [AI Web Development 101 (1/7): AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술](./02-prompt-engineering.md)
 - **AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현 (현재 글)**
 - RAG 입문 — 내 데이터로 답하는 AI 만들기 (예정)
 - AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기 (예정)

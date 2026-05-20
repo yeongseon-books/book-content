@@ -1,5 +1,5 @@
 ---
-title: First steps with AI agents — making the model use tools
+title: "AI Web Development 101 (5/7): First steps with AI agents — making the model use tools"
 series: ai-web-dev-101
 episode: 5
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how tool use works, how function calls are structured, and how to build a small multi-tool agent loop safely.
 ---
 
-# First steps with AI agents — making the model use tools
+# AI Web Development 101 (5/7): First steps with AI agents — making the model use tools
 
 So far, the AI features in this series only exchanged text. They could answer questions, but they could not actually fetch live weather, run a calculator, or query an external system. To move beyond text-only answers, you need a loop where the model can request tools.
 
@@ -27,15 +27,21 @@ This is post 5 in the AI Web Development 101 series.
 
 Here, we will focus on tool use, function calling, and the boundary between model judgment and application execution.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - What makes an agent different from a normal chatbot?
 - How does function calling work as a contract?
 - How does the model ask for a function invocation?
-- How do you build a loop that can use more than one tool?
-- What safety rules matter as soon as tool use is enabled?
 
-> An agent is not “a smarter chatbot.” It is a system where the model decides when external actions are needed, while the application validates and executes those actions.
+## Big Picture
+
+![AI Web Development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
+
+*AI Web Development 101 chapter 5 flow overview*
+
+This picture places First steps with AI agents — making the model use tools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of First steps with AI agents — making the model use tools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Chatbot versus agent
 
@@ -43,10 +49,6 @@ A normal chatbot generates text from the information already available in the pr
 
 - chatbot: answer from existing context
 - agent: ask for tools such as APIs, databases, calculators, or search systems
-
-![Difference between a chatbot and an AI agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
-
-*Difference between a chatbot and an AI agent*
 
 ## The basic tool-use loop
 
@@ -96,14 +98,12 @@ from openai import OpenAI
 
 client = OpenAI()
 
-
 def get_weather(location: str) -> str:
     if "Seoul" in location:
         return json.dumps({"location": "Seoul", "temperature": "25C", "condition": "Sunny"})
     if "Busan" in location:
         return json.dumps({"location": "Busan", "temperature": "22C", "condition": "Partly cloudy"})
     return json.dumps({"location": location, "temperature": "Unknown", "condition": "No data"})
-
 
 messages = [{"role": "user", "content": "What is the weather in Seoul today?"}]
 
@@ -158,7 +158,6 @@ ALLOWED_OPERATORS = {
     ast.USub: op.neg,
 }
 
-
 def safe_eval(node):
     if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
         return node.value
@@ -168,12 +167,10 @@ def safe_eval(node):
         return ALLOWED_OPERATORS[type(node.op)](safe_eval(node.operand))
     raise ValueError("Unsupported expression")
 
-
 def get_exchange_rate(from_currency, to_currency):
     rates = {"USD_KRW": 1350}
     pair = f"{from_currency}_{to_currency}"
     return json.dumps({"pair": pair, "rate": rates.get(pair, 1300)})
-
 
 def calculate(expression):
     tree = ast.parse(expression, mode="eval")
@@ -303,13 +300,22 @@ An agent is not “the model doing everything by itself.” It is a controlled l
 
 The next chapter shifts from tool use to deployment, where these AI features have to run in real environments with logs, secrets, and cost limits.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
-- [Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
-- [Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
-- [RAG introduction — answering with your own data](./04-rag-intro.md)
+- **What makes an agent different from a normal chatbot?**
+  - The article treats First steps with AI agents — making the model use tools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does function calling work as a contract?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How does the model ask for a function invocation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
+- [AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
+- [AI Web Development 101 (4/7): RAG introduction — answering with your own data](./04-rag-intro.md)
 - **First steps with AI agents — making the model use tools (current)**
 - Deploying an AI web app — shipping to Vercel and Azure (upcoming)
 - Evaluating and improving an AI app — measuring quality over time (upcoming)

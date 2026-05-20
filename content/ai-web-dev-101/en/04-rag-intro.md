@@ -1,5 +1,5 @@
 ---
-title: RAG introduction — answering with your own data
+title: "AI Web Development 101 (4/7): RAG introduction — answering with your own data"
 series: ai-web-dev-101
 episode: 4
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Learn the retrieval-augmentation-generation pipeline and build a tiny FAQ bot that answers from your own documents.
 ---
 
-# RAG introduction — answering with your own data
+# AI Web Development 101 (4/7): RAG introduction — answering with your own data
 
 No matter how capable a model is, it does not automatically know your latest policy docs, internal manuals, or yesterday's product changes. In real services, the critical question is often not “Is the model smart enough?” but “Can we attach the right evidence at the right moment?”
 
@@ -27,15 +27,21 @@ This is post 4 in the AI Web Development 101 series.
 
 Here, we will build the mental model for retrieval-augmented generation and implement the smallest useful FAQ-style RAG flow.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why can a strong model still fail on company-specific or newly updated information?
 - Why is RAG often a better first step than fine-tuning?
 - What exactly do embeddings and vector search do?
-- How can a tiny FAQ bot already demonstrate the full RAG loop?
-- If retrieval looks right but the answer is still wrong, what should you inspect first?
 
-> RAG does not retrain the model. It finds relevant evidence first, injects that evidence into the prompt, and asks the model to answer from that material. The key is not “teaching the model everything.” It is designing the evidence path.
+## Big Picture
+
+![AI Web Development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
+
+*AI Web Development 101 chapter 4 flow overview*
+
+This picture places RAG introduction — answering with your own data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of RAG introduction — answering with your own data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why RAG exists
 
@@ -50,10 +56,6 @@ RAG is easier to understand if you compare it to human work. Even a very capable
 1. retrieve relevant documents
 2. augment the prompt with the retrieved evidence
 3. generate the answer using that evidence
-
-![Plain model memory versus retrieval-based answering](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
-
-*Plain model memory versus retrieval-based answering*
 
 ## Why RAG often comes before fine-tuning
 
@@ -106,14 +108,12 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-
 def get_embedding(text: str) -> list[float]:
     response = client.embeddings.create(
         model="text-embedding-3-small",
         input=text,
     )
     return response.data[0].embedding
-
 
 chunk_embeddings = [get_embedding(chunk) for chunk in faq_chunks]
 print("embedded chunks:", len(chunk_embeddings))
@@ -130,13 +130,11 @@ embedded chunks: 5
 ```python
 import math
 
-
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))
     norm_a = math.sqrt(sum(x * x for x in a))
     norm_b = math.sqrt(sum(y * y for y in b))
     return dot / (norm_a * norm_b)
-
 
 def retrieve(query: str, top_k: int = 2) -> list[tuple[float, str]]:
     query_embedding = get_embedding(query)
@@ -147,7 +145,6 @@ def retrieve(query: str, top_k: int = 2) -> list[tuple[float, str]]:
 
     scored.sort(reverse=True, key=lambda item: item[0])
     return scored[:top_k]
-
 
 hits = retrieve("I want my money back")
 for score, chunk in hits:
@@ -191,7 +188,6 @@ End the answer with a short citation of the evidence you used.
         messages=[{"role": "user", "content": prompt}],
     )
     return response.choices[0].message.content
-
 
 print(answer_with_rag("How do I get a refund?"))
 ```
@@ -259,12 +255,21 @@ RAG is not about teaching the model everything. It is about finding the right ev
 
 The next chapter moves from evidence retrieval to tool use, where the model requests external actions instead of only reading text.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
-- [Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
-- [Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
+- **Why can a strong model still fail on company-specific or newly updated information?**
+  - The article treats RAG introduction — answering with your own data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is RAG often a better first step than fine-tuning?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What exactly do embeddings and vector search do?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
+- [AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
 - **RAG introduction — answering with your own data (current)**
 - First steps with AI agents — making the model use tools (upcoming)
 - Deploying an AI web app — shipping to Vercel and Azure (upcoming)

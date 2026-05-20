@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>AI API first steps — sending your first request with the OpenAI API</title>
+<title>AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,26 +53,26 @@
 </style>
 </head>
 <body>
-<h1>AI API first steps — sending your first request with the OpenAI API</h1>
+<h1>AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</h1>
 <p>Using ChatGPT in a browser and calling a model from your own service are two different experiences. One is a finished product. The other is application development: authentication, request shape, response parsing, timeouts, and cost tracking all become your responsibility.</p>
 <p>This is the first post in the AI Web Development 101 series.</p>
 <p>Here, we will build the smallest successful OpenAI API call and turn it into a practical mental model you can reuse in later chapters.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What is different between using ChatGPT on the web and integrating an AI API into my own service?</li>
 <li>What is the minimum setup for the OpenAI API?</li>
 <li>What does the first request look like, and where do I read the response?</li>
-<li>Which fields matter most in the response JSON?</li>
-<li>When the first call fails, should I suspect authentication, the model id, or prompt design first?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 1 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png"></p>
+<p><em>AI Web Development 101 chapter 1 flow overview</em></p>
+<p>This picture places AI API first steps — sending your first request with the OpenAI API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An AI API is not a ready-made chatbot. It is an interface that lets your application call a remote model as one component inside your system. That is why the first skill is not “asking better questions.” It is reading the request-response contract clearly.</p>
+<p>The core of AI API first steps — sending your first request with the OpenAI API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why the first call matters more than it seems</h2>
 <p>At the beginning, the blurry part is rarely model quality. The blurry part is the service boundary. A chat UI hides it. Runtime code does not. Your application sends an HTTP request with authentication headers and a JSON body, and the model service sends a JSON response back.</p>
 <p>If that structure is clear, later topics become easier. Token accounting, prompt design, streaming responses, RAG context injection, and evaluation workflows all build on the same first round trip. If the structure stays fuzzy, every later feature feels like “it works somehow, but I do not really know why.”</p>
-<p><img alt="Overview of a basic AI API call" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png"></p>
-<p><em>Overview of a basic AI API call</em></p>
 <h2>Minimum setup</h2>
 <p>The setup is short. Create an OpenAI account, issue an API key, check billing, and load the key through an environment variable.</p>
 <pre><code class="language-bash">export OPENAI_API_KEY=&quot;your-issued-key&quot;
@@ -297,7 +297,16 @@ print(translate_ko_to_en(&quot;오늘은 API 응답 구조를 먼저 이해하�
 <li>Early debugging becomes much easier when you separate authentication, model id, rate-limit, and prompt-structure failures.</li>
 </ul>
 <p>The next chapter builds directly on this. Once the request-response shape is clear, prompt engineering stops feeling mysterious.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
+<ul>
+<li><strong>What is different between using ChatGPT on the web and integrating an AI API into my own service?</strong></li>
+<li>The article treats AI API first steps — sending your first request with the OpenAI API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>What is the minimum setup for the OpenAI API?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What does the first request look like, and where do I read the response?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
 <ul>
 <li><strong>AI API first steps — sending your first request with the OpenAI API (current)</strong></li>
 <li>Prompt engineering basics — getting the answer you actually want (upcoming)</li>

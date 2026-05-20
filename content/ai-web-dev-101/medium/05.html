@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>First steps with AI agents — making the model use tools</title>
+<title>AI Web Development 101 (5/7): First steps with AI agents — making the model use tools</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>First steps with AI agents — making the model use tools</h1>
+<h1>AI Web Development 101 (5/7): First steps with AI agents — making the model use tools</h1>
 <p>So far, the AI features in this series only exchanged text. They could answer questions, but they could not actually fetch live weather, run a calculator, or query an external system. To move beyond text-only answers, you need a loop where the model can request tools.</p>
 <p>This is post 5 in the AI Web Development 101 series.</p>
 <p>Here, we will focus on tool use, function calling, and the boundary between model judgment and application execution.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>What makes an agent different from a normal chatbot?</li>
 <li>How does function calling work as a contract?</li>
 <li>How does the model ask for a function invocation?</li>
-<li>How do you build a loop that can use more than one tool?</li>
-<li>What safety rules matter as soon as tool use is enabled?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 5 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png"></p>
+<p><em>AI Web Development 101 chapter 5 flow overview</em></p>
+<p>This picture places First steps with AI agents — making the model use tools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An agent is not “a smarter chatbot.” It is a system where the model decides when external actions are needed, while the application validates and executes those actions.</p>
+<p>The core of First steps with AI agents — making the model use tools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Chatbot versus agent</h2>
 <p>A normal chatbot generates text from the information already available in the prompt or the model weights. An agent goes one step further. It can decide that a tool is needed, request the tool call, read the result, and then continue.</p>
@@ -74,8 +76,6 @@
 <li>chatbot: answer from existing context</li>
 <li>agent: ask for tools such as APIs, databases, calculators, or search systems</li>
 </ul>
-<p><img alt="Difference between a chatbot and an AI agent" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png"></p>
-<p><em>Difference between a chatbot and an AI agent</em></p>
 <h2>The basic tool-use loop</h2>
 <ol>
 <li>the application tells the model which tools exist</li>
@@ -297,21 +297,33 @@ def calculate(expression):
 <li>Safety controls are not optional once tools can cause side effects.</li>
 </ul>
 <p>The next chapter shifts from tool use to deployment, where these AI features have to run in real environments with logs, secrets, and cost limits.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
+<li><strong>What makes an agent different from a normal chatbot?</strong></li>
+<li>The article treats First steps with AI agents — making the model use tools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How does function calling work as a contract?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How does the model ask for a function invocation?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">AI Web Development 101 (4/7): RAG introduction — answering with your own data</a></li>
 <li><strong>First steps with AI agents — making the model use tools (current)</strong></li>
 <li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>
 <li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI function calling guide</a></li>
-<li><a href="https://json-schema.org/">JSON Schema</a></li>
-<li><a href="https://cookbook.openai.com/">OpenAI Cookbook: tool calling examples</a></li>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI: Function calling guide</a> — canonical spec for <code>tools</code>, <code>tool_choice</code>, and the <code>tool_calls</code> response flow</li>
+<li><a href="https://platform.openai.com/docs/guides/structured-outputs">OpenAI: Structured Outputs</a> — enforcing tool and response schemas with JSON Schema</li>
+<li><a href="https://cookbook.openai.com/topic/tools">OpenAI Cookbook: function calling and tools</a> — runnable examples of the tool-calling loop</li>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use">Anthropic: Tool use</a> — how a different provider defines the same tool-use pattern, useful for cross-checking</li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/">LangGraph: Agent runtime</a> — what a framework-managed agent loop looks like when you stop hand-rolling it</li>
+<li><a href="https://json-schema.org/specification.html">JSON Schema specification</a> — keywords and validation rules behind the <code>parameters</code> schema</li>
 </ul>
 <p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
 </body>

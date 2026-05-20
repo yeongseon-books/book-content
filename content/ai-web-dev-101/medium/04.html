@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>RAG introduction — answering with your own data</title>
+<title>AI Web Development 101 (4/7): RAG introduction — answering with your own data</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>RAG introduction — answering with your own data</h1>
+<h1>AI Web Development 101 (4/7): RAG introduction — answering with your own data</h1>
 <p>No matter how capable a model is, it does not automatically know your latest policy docs, internal manuals, or yesterday's product changes. In real services, the critical question is often not “Is the model smart enough?” but “Can we attach the right evidence at the right moment?”</p>
 <p>This is post 4 in the AI Web Development 101 series.</p>
 <p>Here, we will build the mental model for retrieval-augmented generation and implement the smallest useful FAQ-style RAG flow.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why can a strong model still fail on company-specific or newly updated information?</li>
 <li>Why is RAG often a better first step than fine-tuning?</li>
 <li>What exactly do embeddings and vector search do?</li>
-<li>How can a tiny FAQ bot already demonstrate the full RAG loop?</li>
-<li>If retrieval looks right but the answer is still wrong, what should you inspect first?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png"></p>
+<p><em>AI Web Development 101 chapter 4 flow overview</em></p>
+<p>This picture places RAG introduction — answering with your own data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>RAG does not retrain the model. It finds relevant evidence first, injects that evidence into the prompt, and asks the model to answer from that material. The key is not “teaching the model everything.” It is designing the evidence path.</p>
+<p>The core of RAG introduction — answering with your own data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why RAG exists</h2>
 <p>Ask a general-purpose model about your internal refund policy or a product update from yesterday and it may hedge, guess, or simply not know. That is expected. The information may not have existed at training time, or the current version may no longer match what the model saw.</p>
@@ -78,8 +80,6 @@
 <li>augment the prompt with the retrieved evidence</li>
 <li>generate the answer using that evidence</li>
 </ol>
-<p><img alt="Plain model memory versus retrieval-based answering" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png"></p>
-<p><em>Plain model memory versus retrieval-based answering</em></p>
 <h2>Why RAG often comes before fine-tuning</h2>
 <p><strong>Best for</strong><br>
 - Fine-tuning: behavior/style adjustments<br>
@@ -161,9 +161,7 @@ for score, chunk in hits:
 <p><strong>Step 5: answer only from retrieved evidence</strong></p>
 <pre><code class="language-python">def answer_with_rag(question: str) -&gt; str:
     top_docs = retrieve(question, top_k=2)
-    context = &quot;
-
-&quot;.join(
+    context = &quot;\n\n&quot;.join(
         f&quot;[score={score:.4f}] {chunk}&quot; for score, chunk in top_docs
     )
 
@@ -243,11 +241,20 @@ print(answer_with_rag(&quot;How do I get a refund?&quot;))
 <li>Debugging gets much easier when you separate retrieval failures from generation failures.</li>
 </ul>
 <p>The next chapter moves from evidence retrieval to tool use, where the model requests external actions instead of only reading text.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><strong>Why can a strong model still fail on company-specific or newly updated information?</strong></li>
+<li>The article treats RAG introduction — answering with your own data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Why is RAG often a better first step than fine-tuning?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What exactly do embeddings and vector search do?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
 <li><strong>RAG introduction — answering with your own data (current)</strong></li>
 <li>First steps with AI agents — making the model use tools (upcoming)</li>
 <li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>

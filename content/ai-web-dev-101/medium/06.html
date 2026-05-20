@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Deploying an AI web app — shipping to Vercel and Azure</title>
+<title>AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Deploying an AI web app — shipping to Vercel and Azure</h1>
+<h1>AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure</h1>
 <p>An AI app that only works on your laptop is still a local experiment. Once other people need to access it, deployment turns secrets, startup commands, logging, and budget control into real operational concerns.</p>
 <p>This is post 6 in the AI Web Development 101 series.</p>
 <p>Here, we will walk through the first deployment path for a frontend-heavy app on Vercel and a Python backend on Azure App Service.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is deployment more than uploading source code?</li>
 <li>When does Vercel fit better, and when does Azure App Service fit better?</li>
 <li>What should you verify first in Vercel?</li>
-<li>Where do Python deployments often fail on App Service?</li>
-<li>How should you handle API keys, logs, and budget alerts?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="AI Web Development 101 chapter 6 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png"></p>
+<p><em>AI Web Development 101 chapter 6 flow overview</em></p>
+<p>This picture places Deploying an AI web app — shipping to Vercel and Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>Deployment means making your code start correctly on someone else's infrastructure. That is why the real contract is not “did I push the files?” but “did I define dependencies, environment variables, startup behavior, and logs clearly enough?”</p>
+<p>The core of Deploying an AI web app — shipping to Vercel and Azure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>What to prepare before deployment</h2>
 <p>Before you deploy, verify four things:</p>
@@ -76,8 +78,6 @@
 <li>the application entry point is explicit</li>
 <li>the app can bind to the platform-provided port</li>
 </ul>
-<p><img alt="From local development to live deployment" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png"></p>
-<p><em>From local development to live deployment</em></p>
 <h2>Picking a platform</h2>
 <p><strong>Best fit</strong><br>
 - Vercel: frontend-heavy Next.js apps<br>
@@ -174,13 +174,22 @@ node_modules/
 <li>Logs and budget alerts should be in place before real user traffic arrives.</li>
 </ul>
 <p>The final chapter focuses on what happens after deployment: how to measure response quality, catch regressions, and improve an AI app over time.</p>
-<h2>Series table of contents</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">First steps with AI agents — making the model use tools</a></li>
+<li><strong>Why is deployment more than uploading source code?</strong></li>
+<li>The article treats Deploying an AI web app — shipping to Vercel and Azure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When does Vercel fit better, and when does Azure App Service fit better?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What should you verify first in Vercel?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">AI Web Development 101 (4/7): RAG introduction — answering with your own data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">AI Web Development 101 (5/7): First steps with AI agents — making the model use tools</a></li>
 <li><strong>Deploying an AI web app — shipping to Vercel and Azure (current)</strong></li>
 <li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
 </ul>

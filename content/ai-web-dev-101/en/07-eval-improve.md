@@ -1,5 +1,5 @@
 ---
-title: Evaluating and improving an AI app — measuring quality over time
+title: "AI Web Development 101 (7/7): Evaluating and improving an AI app — measuring quality over time"
 series: ai-web-dev-101
 episode: 7
 language: en
@@ -19,7 +19,7 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how to evaluate accuracy, relevance, and safety, then turn those results into a repeatable improvement loop.
 ---
 
-# Evaluating and improving an AI app — measuring quality over time
+# AI Web Development 101 (7/7): Evaluating and improving an AI app — measuring quality over time
 
 An AI app is not finished when it is deployed. That is when users begin surfacing the real issues: strange answers, regressions after prompt changes, unnecessary verbosity, and brittle retrieval behavior.
 
@@ -27,15 +27,21 @@ This is the final post in the AI Web Development 101 series.
 
 Here, we will turn “it feels better” into a repeatable evaluation and improvement loop.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is evaluation part of operations rather than an optional extra?
 - Which quality axes should you measure first?
 - How do you start with the smallest automatic evaluation?
-- When is LLM-as-Judge useful, and what are its limits?
-- How do you turn evaluation results into better prompts and retrieval behavior?
 
-> AI evaluation converts “looks good to me” into numbers and concrete failure cases. Because models are probabilistic, you need separate input sets and scoring rules if you want to know whether a change really improved the system.
+## Big Picture
+
+![AI Web Development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
+
+*AI Web Development 101 chapter 7 flow overview*
+
+This picture places Evaluating and improving an AI app — measuring quality over time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Evaluating and improving an AI app — measuring quality over time is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why evaluation is necessary
 
@@ -46,10 +52,6 @@ That is why evaluation matters for three reasons:
 1. it gives you an objective comparison point
 2. it catches regressions after model or prompt changes
 3. it helps you compare quality against cost and latency
-
-![Why evaluation matters for regression, accuracy, and cost](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
-
-*Why evaluation matters for regression, accuracy, and cost*
 
 ## Start by choosing quality axes
 
@@ -100,7 +102,6 @@ def evaluate_response(response: str, expected_keywords: list[str]) -> float:
             hits += 1
     return hits / len(expected_keywords)
 
-
 user_query = "Tell me the price"
 ai_response = "The service costs 9,900 KRW per month and includes a free trial for the first month."
 expected = ["9,900 KRW", "free trial"]
@@ -123,7 +124,6 @@ test_cases = [
         "expected_keywords": ["email verification", "password reset"],
     },
 ]
-
 
 def run_batch(responder):
     report = []
@@ -169,7 +169,6 @@ import os
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
 
 def judge_answer(question: str, rubric_context: str, answer: str) -> dict:
     response = client.chat.completions.create(
@@ -253,15 +252,24 @@ Evaluation is not a luxury feature for AI applications. It is part of keeping th
 
 This closes the series. You have now walked through API calls, prompt design, browser chat UI, RAG, tool use, deployment, and evaluation—the full beginner path for AI web applications.
 
-<!-- toc:begin -->
-## Series table of contents
+## Answering the Opening Questions
 
-- [AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
-- [Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
-- [Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
-- [RAG introduction — answering with your own data](./04-rag-intro.md)
-- [First steps with AI agents — making the model use tools](./05-ai-agent.md)
-- [Deploying an AI web app — shipping to Vercel and Azure](./06-deploy.md)
+- **Why is evaluation part of operations rather than an optional extra?**
+  - The article treats Evaluating and improving an AI app — measuring quality over time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which quality axes should you measure first?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you start with the smallest automatic evaluation?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API](./01-hello-ai-api.md)
+- [AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want](./02-prompt-engineering.md)
+- [AI Web Development 101 (3/7): Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK](./03-ai-chatbot.md)
+- [AI Web Development 101 (4/7): RAG introduction — answering with your own data](./04-rag-intro.md)
+- [AI Web Development 101 (5/7): First steps with AI agents — making the model use tools](./05-ai-agent.md)
+- [AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure](./06-deploy.md)
 - **Evaluating and improving an AI app — measuring quality over time (current)**
 
 <!-- toc:end -->
