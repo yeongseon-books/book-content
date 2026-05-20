@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:45:16+00:00",
+  "generated_at": "2026-05-20T11:46:30+00:00",
   "series_count": 92,
-  "problem_series_count": 44,
-  "series_with_5_plus": 33,
+  "problem_series_count": 43,
+  "series_with_5_plus": 32,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 351,
+    "BadImg": 341,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 351
+    "all": 341
   },
   "results": [
     {
@@ -2921,286 +2921,6 @@
             "image": "10-01-concept-at-a-glance.ko.png",
             "width": 881,
             "height": 67,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
-      "series": "azure-aks-deep-dive",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 10
-      },
-      "total": 10,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-kubelet-talks-to-a-unix-socket.en.png",
-            "width": 1158,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-kubelet-talks-to-a-unix-socket.ko.png",
-            "width": 1158,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-filter-and-score.en.png",
-            "width": 1241,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-filter-and-score.ko.png",
-            "width": 1241,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png",
-            "line": 1,
-            "message": "PNG height 65px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-put-both-loops-in-one-diagram.en.png",
-            "width": 1384,
-            "height": 65,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 65px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-put-both-loops-in-one-diagram.ko.png",
-            "width": 1384,
-            "height": 65,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png",
-            "line": 1,
-            "message": "PNG height 57px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-keda-structure.en.png",
-            "width": 1384,
-            "height": 57,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-01-the-keda-structure.ko.png",
-            "line": 1,
-            "message": "PNG height 57px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-keda-structure.ko.png",
-            "width": 1384,
-            "height": 57,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png",
-            "line": 1,
-            "message": "PNG height 92px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-the-scale-to-zero-boundary.en.png",
-            "width": 1384,
-            "height": 92,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.ko.png",
-            "line": 1,
-            "message": "PNG height 92px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-the-scale-to-zero-boundary.ko.png",
-            "width": 1384,
-            "height": 92,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-kubelet-talks-to-a-unix-socket.en.png",
-            "width": 1158,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-02-kubelet-talks-to-a-unix-socket.ko.png",
-            "width": 1158,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-filter-and-score.en.png",
-            "width": 1241,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png",
-            "line": 1,
-            "message": "PNG height 67px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "04-02-filter-and-score.ko.png",
-            "width": 1241,
-            "height": 67,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png",
-            "line": 1,
-            "message": "PNG height 65px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-put-both-loops-in-one-diagram.en.png",
-            "width": 1384,
-            "height": 65,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.ko.png",
-            "line": 1,
-            "message": "PNG height 65px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "05-01-put-both-loops-in-one-diagram.ko.png",
-            "width": 1384,
-            "height": 65,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png",
-            "line": 1,
-            "message": "PNG height 57px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-keda-structure.en.png",
-            "width": 1384,
-            "height": 57,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-01-the-keda-structure.ko.png",
-            "line": 1,
-            "message": "PNG height 57px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-01-the-keda-structure.ko.png",
-            "width": 1384,
-            "height": 57,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.en.png",
-            "line": 1,
-            "message": "PNG height 92px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-the-scale-to-zero-boundary.en.png",
-            "width": 1384,
-            "height": 92,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/azure-aks-deep-dive/06/06-03-the-scale-to-zero-boundary.ko.png",
-            "line": 1,
-            "message": "PNG height 92px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "06-03-the-scale-to-zero-boundary.ko.png",
-            "width": 1384,
-            "height": 92,
             "repo": null
           }
         ]
@@ -9746,6 +9466,20 @@
     },
     {
       "series": "azure-aca-deep-dive",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "azure-aks-deep-dive",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

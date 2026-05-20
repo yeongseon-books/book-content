@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:45:16+00:00
+Generated: 2026-05-20T11:46:30+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **44**
-- Series at or above 5 issues: **33**
-- Total issues: **351**
-  - BadImg: **351**
+- Series with any issue: **43**
+- Series at or above 5 issues: **32**
+- Total issues: **341**
+  - BadImg: **341**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -50,41 +50,40 @@ Warnings:
 | 7 | `incident-response-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 8 | `llm-apps-ops-101` | 12 | 12 | 0 | 0 | 0 | 0 |
 | 9 | `api-design-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 10 | `azure-aks-deep-dive` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 11 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 12 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 13 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 14 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 15 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 16 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 17 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
-| 18 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 19 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 20 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 21 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 22 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 23 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 24 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 25 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 26 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 27 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
-| 28 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 29 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 30 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 31 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
-| 32 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 33 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
-| 34 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 35 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 36 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 37 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 38 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 39 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 40 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 41 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 42 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 43 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 44 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 10 | `clean-code-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 11 | `containers-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 12 | `github-actions-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 13 | `linear-algebra-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 14 | `pandas-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 15 | `python-package-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 16 | `secure-coding-101` | 10 | 10 | 0 | 0 | 0 | 0 |
+| 17 | `computer-networks-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 18 | `devops-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 19 | `frontend-development-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 20 | `kubernetes-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 21 | `llm-from-scratch-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 22 | `probability-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 23 | `rag-benchmark-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 24 | `software-design-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 25 | `sql-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 26 | `sre-101` | 8 | 8 | 0 | 0 | 0 | 0 |
+| 27 | `cloud-computing-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 28 | `machine-learning-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 29 | `mlops-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 30 | `observability-101` | 6 | 6 | 0 | 0 | 0 | 0 |
+| 31 | `azure-functions-deep-dive` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 32 | `git-github-101` | 5 | 5 | 0 | 0 | 0 | 0 |
+| 33 | `alembic-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 34 | `azure-aca-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 35 | `backend-development-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 36 | `calculus-for-ml-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 37 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 38 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 39 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
+| 40 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
+| 41 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 42 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 43 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -192,18 +191,6 @@ Warnings:
 - `assets/api-design-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 82px <= 100px (size=501x82)
 - `assets/api-design-101/03/03-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=731x67)
-- ... 5 more
-
-## azure-aks-deep-dive — Total 10
-
-- BadImg=10 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.en.png:1` — PNG height 67px <= 100px (size=1158x67)
-- `assets/azure-aks-deep-dive/02/02-02-kubelet-talks-to-a-unix-socket.ko.png:1` — PNG height 67px <= 100px (size=1158x67)
-- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.en.png:1` — PNG height 67px <= 100px (size=1241x67)
-- `assets/azure-aks-deep-dive/04/04-02-filter-and-score.ko.png:1` — PNG height 67px <= 100px (size=1241x67)
-- `assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png:1` — PNG height 65px <= 100px (size=1384x65)
 - ... 5 more
 
 ## clean-code-101 — Total 10
