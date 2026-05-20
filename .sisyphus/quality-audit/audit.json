@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-20T11:47:29+00:00",
+  "generated_at": "2026-05-20T11:48:03+00:00",
   "series_count": 92,
-  "problem_series_count": 40,
+  "problem_series_count": 39,
   "series_with_5_plus": 30,
   "gate": null,
   "gate_failed_series": [],
   "repo_check_method": "gh",
   "warnings": [],
   "totals": {
-    "BadImg": 319,
+    "BadImg": 316,
     "Synt": 0,
     "BrkLink": 0,
     "Shrt": 0,
     "NoEn": 0,
-    "all": 319
+    "all": 316
   },
   "results": [
     {
@@ -8407,104 +8407,6 @@
       }
     },
     {
-      "series": "multimodal-ai-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 3
-      },
-      "total": 3,
-      "max_issue_kind": "BadImg",
-      "examples": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model-multimodal-expands-the-reas.en.png",
-            "width": 1355,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model-multimodal-expands-the-reas.ko.png",
-            "width": 1138,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-mental-model-encode-first-decide-later.en.png",
-            "width": 1325,
-            "height": 88,
-            "repo": null
-          }
-        ]
-      },
-      "items": {
-        "BadImg": [
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model-multimodal-expands-the-reas.en.png",
-            "width": 1355,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.ko.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "01-01-mental-model-multimodal-expands-the-reas.ko.png",
-            "width": 1138,
-            "height": 88,
-            "repo": null
-          },
-          {
-            "kind": "BadImg",
-            "path": "assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png",
-            "line": 1,
-            "message": "PNG height 88px <= 100px",
-            "article": null,
-            "lang": null,
-            "code": null,
-            "image": "02-01-mental-model-encode-first-decide-later.en.png",
-            "width": 1325,
-            "height": 88,
-            "repo": null
-          }
-        ]
-      }
-    },
-    {
       "series": "azure-aks-101",
       "counts": {
         "Synt": 0,
@@ -9254,6 +9156,20 @@
     },
     {
       "series": "model-evaluation-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 0,
+      "max_issue_kind": "Synt",
+      "examples": {},
+      "items": {}
+    },
+    {
+      "series": "multimodal-ai-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

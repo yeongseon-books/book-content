@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T11:47:29+00:00
+Generated: 2026-05-20T11:48:03+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **40**
+- Series with any issue: **39**
 - Series at or above 5 issues: **30**
-- Total issues: **319**
-  - BadImg: **319**
+- Total issues: **316**
+  - BadImg: **316**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -77,10 +77,9 @@ Warnings:
 | 34 | `data-warehouse-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 35 | `design-patterns-101` | 4 | 4 | 0 | 0 | 0 | 0 |
 | 36 | `programming-languages-101` | 4 | 4 | 0 | 0 | 0 | 0 |
-| 37 | `multimodal-ai-101` | 3 | 3 | 0 | 0 | 0 | 0 |
-| 38 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 39 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-| 40 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 37 | `azure-aks-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 38 | `azure-functions-101` | 2 | 2 | 0 | 0 | 0 | 0 |
+| 39 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## developer-career-101 — Total 18
 
@@ -499,15 +498,6 @@ Warnings:
 - `assets/programming-languages-101/01/01-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1042x67)
 - `assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png:1` — PNG height 67px <= 100px (size=1140x67)
 - `assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png:1` — PNG height 67px <= 100px (size=1140x67)
-
-## multimodal-ai-101 — Total 3
-
-- BadImg=3 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png:1` — PNG height 88px <= 100px (size=1355x88)
-- `assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.ko.png:1` — PNG height 88px <= 100px (size=1138x88)
-- `assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png:1` — PNG height 88px <= 100px (size=1325x88)
 
 ## azure-aks-101 — Total 2
 
