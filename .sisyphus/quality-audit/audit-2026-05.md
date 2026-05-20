@@ -1,6 +1,6 @@
 # Cross-Series Quality Audit
 
-Generated: 2026-05-20T12:05:17+00:00
+Generated: 2026-05-20T12:05:37+00:00
 
 Signals:
 - `BadImg`: PNG height <= 100px under `assets/<series>/`
@@ -27,10 +27,10 @@ Warnings:
 ## Summary
 
 - Series audited: **92**
-- Series with any issue: **1**
+- Series with any issue: **0**
 - Series at or above 5 issues: **0**
-- Total issues: **2**
-  - BadImg: **2**
+- Total issues: **0**
+  - BadImg: **0**
   - Synt: **0**
   - BrkLink: **0**
   - Shrt: **0**
@@ -41,12 +41,3 @@ Warnings:
 
 | Rank | Series | Total | BadImg | Synt | BrkLink | Shrt | NoEn |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | `operating-systems-101` | 2 | 2 | 0 | 0 | 0 | 0 |
-
-## operating-systems-101 — Total 2
-
-- BadImg=2 Synt=0 BrkLink=0 Shrt=0 NoEn=0
-
-### BadImg
-- `assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png:1` — PNG height 67px <= 100px (size=979x67)
-- `assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png:1` — PNG height 67px <= 100px (size=1019x67)
