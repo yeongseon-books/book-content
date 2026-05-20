@@ -1,5 +1,5 @@
 ---
-title: Building sentence similarity search with KoSimCSE
+title: "Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE"
 series: korean-ai-stack-101
 episode: 2
 language: en
@@ -20,22 +20,27 @@ last_reviewed: '2026-05-01'
 seo_description: Build a Korean sentence similarity search using KoSimCSE and FAISS. Learn about embedding normalization, indexing, and retrieval metrics.
 ---
 
-# Building sentence similarity search with KoSimCSE
+# Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE
 
 The first working retrieval loop should be small enough to inspect with your own eyes. In Korean FAQ search, a single bad choice around normalization or indexing is enough to make every later LLM step look smarter than it really is.
 
 This is the second post in the Korean AI Stack 101 series. Here, we build a minimal Korean sentence-similarity search flow with KoSimCSE and make the retrieval mechanics explicit.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Where does KoSimCSE usually pay off first in Korean retrieval work?
 - Why is indexing FAQ questions alone a clean first version of search?
 - Why do normalized embeddings pair so well with `IndexFlatIP`?
-- How can a high similarity score still return the wrong result?
 
-> The first useful sentence-similarity system comes from clean embeddings plus a transparent index, not from a complicated orchestration layer.
+## Big Picture
 
-> Korean AI Stack 101 (2/6)
+![Korean AI Stack 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
+
+*Korean AI Stack 101 chapter 2 flow overview*
+
+This picture places Building sentence similarity search with KoSimCSE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Building sentence similarity search with KoSimCSE is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -97,10 +102,6 @@ query = '로그인 비밀번호를 다시 설정하고 싶어요.'  # "I want to
 What matters is (1) queries without the exact keyword "재설정" still match, (2) there is a large score gap between top-1 and top-2, and (3) you can manually inspect candidate meanings.
 
 ## Core flow
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
-
-*Core flow*
 
 ## Why index only the questions first
 
@@ -231,15 +232,24 @@ The KoSimCSE example is valuable because it keeps the retrieval loop visible. Th
 
 The next article (episode 3) covers BGE-M3. We will see where it surpasses KoSimCSE on mixed Korean-English corpora, and what dense + sparse multi-vector retrieval means in code.
 
+## Answering the Opening Questions
+
+- **Where does KoSimCSE usually pay off first in Korean retrieval work?**
+  - The article treats Building sentence similarity search with KoSimCSE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is indexing FAQ questions alone a clean first version of search?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why do normalized embeddings pair so well with `IndexFlatIP`?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- **Building sentence similarity search with KoSimCSE (current)**
-- BGE-M3 multilingual embedding in practice (upcoming)
-- Document text extraction with CLOVA OCR API (upcoming)
-- Using HyperCLOVA X and Solar API (upcoming)
-- Assembling a Korean RAG pipeline (upcoming)
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- **Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE (current)**
+- Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice (upcoming)
+- Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API (upcoming)
+- Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (upcoming)
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 

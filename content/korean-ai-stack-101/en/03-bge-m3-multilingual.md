@@ -1,5 +1,5 @@
 ---
-title: BGE-M3 multilingual embedding in practice
+title: "Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice"
 series: korean-ai-stack-101
 episode: 3
 language: en
@@ -20,22 +20,27 @@ last_reviewed: '2026-05-01'
 seo_description: Implement multilingual search with BGE-M3. Learn to create a dense-only baseline for mixed Korean-English corpora using FAISS and normalization.
 ---
 
-# BGE-M3 multilingual embedding in practice
+# Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice
 
 Many Korean teams search across a corpus where the query is Korean but half the documents are English. That is the point where a Korean-only retrieval baseline starts to look clean in tests and brittle in production.
 
 This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to measure a dense multilingual baseline over mixed Korean-English corpora before adding more complex retrieval signals.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?
 - What does it mean for a single model to emit dense, sparse, and multi-vector representations at once?
 - Why is the dense-only baseline often enough for the first version of multilingual search?
-- Why can the score distribution differ between languages even for the same query meaning?
 
-> The first thing to do when starting multilingual retrieval is not to combine fancy multi-vector signals, but to measure the dense baseline cleanly.
+## Big Picture
 
-> Korean AI Stack 101 (3/6)
+![Korean AI Stack 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
+
+*Korean AI Stack 101 chapter 3 flow overview*
+
+This picture places BGE-M3 multilingual embedding in practice inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of BGE-M3 multilingual embedding in practice is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -99,10 +104,6 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 What matters: (1) a Korean query lifts an English runbook to top-1, (2) the equivalent Korean document still ranks closely as top-2, and (3) the score gap to top-3 is wide enough to make a cutoff threshold meaningful.
 
 ## Core flow
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
-
-*Core flow*
 
 ## Why start from a dense-only baseline
 
@@ -246,15 +247,24 @@ The value of the BGE-M3 dense example is that it draws a clear baseline for mult
 
 The next article (episode 4) covers the CLOVA OCR API. We will reliably pull text out of Korean document images and shape the result into the form a BGE-M3 corpus expects, with code.
 
+## Answering the Opening Questions
+
+- **Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?**
+  - The article treats BGE-M3 multilingual embedding in practice as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does it mean for a single model to emit dense, sparse, and multi-vector representations at once?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why is the dense-only baseline often enough for the first version of multilingual search?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-- **BGE-M3 multilingual embedding in practice (current)**
-- Document text extraction with CLOVA OCR API (upcoming)
-- Using HyperCLOVA X and Solar API (upcoming)
-- Assembling a Korean RAG pipeline (upcoming)
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+- **Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice (current)**
+- Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API (upcoming)
+- Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (upcoming)
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: 한국어 RAG 파이프라인 조합하기
+title: "Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기"
 series: korean-ai-stack-101
 episode: 6
 language: ko
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-15'
 seo_description: RAG 품질은 한 번의 마법 같은 호출이 아니라, 청크 경계와 검색 후보와 문맥 전달 방식이 함께 만드는 결과입니다.
 ---
 
-# 한국어 RAG 파이프라인 조합하기
+# Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기
 
 RAG는 어느 단계에서 실패했는지 눈에 보이기 시작하면 갑자기 덜 신비롭게 느껴집니다. 한국어 워크플로에서는 청킹, 검색, 생성이 각자 다른 종류의 오류를 만들기 때문에, 가장 현실적인 방법은 각 단계를 따로 들여다볼 수 있게 연결하는 것입니다.
 
 이 글은 Korean AI Stack 101 시리즈의 마지막 글입니다. 여기서는 앞서 다룬 임베딩, OCR, 생성 조각을 하나의 최소 한국어 RAG 파이프라인으로 묶습니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 최소한의 한국어 RAG 파이프라인에서 빠질 수 없는 단계는 무엇일까요?
 - 품질 병목은 보통 청킹, 임베딩, 검색, 생성 중 어디에서 가장 자주 생길까요?
 - 검색된 문맥은 LLM에 들어가기 전에 어떤 형태로 정리해야 할까요?
-- KoSimCSE, BGE-M3, CLOVA OCR, HyperCLOVA/Solar는 하나의 파이프라인 안에서 어떻게 이어질까요?
 
-> RAG 품질은 한 번의 마법 같은 호출에서 나오지 않습니다. 청크 경계, 검색 후보, 그리고 문맥을 모델에 건네는 방식이 함께 만든 결과입니다.
+## 큰 그림
 
-> Korean AI Stack 101 (6/6)
+![Korean AI Stack 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 
----
+*Korean AI Stack 101 6장 흐름 개요*
+
+이 그림에서는 한국어 RAG 파이프라인 조합하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> 한국어 RAG 파이프라인 조합하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글에서 배울 것
 
@@ -65,10 +68,6 @@ RAG가 어려운 이유는 단계 수가 많아서가 아니라, **단계별 책
 ---
 
 ## 멘탈 모델 — 4단계 파이프라인
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
-
-*Core flow*
 
 RAG는 네 개의 독립 단계로 분해됩니다.
 
@@ -452,15 +451,24 @@ print(json.dumps(audit_log, ensure_ascii=False))
 
 작은 평가 세트와 네 단계 파이프라인만 손에 익혀도 더 큰 RAG 시스템으로 훨씬 안정적으로 확장할 수 있습니다.
 
+## 처음 질문으로 돌아가기
+
+- **최소한의 한국어 RAG 파이프라인에서 빠질 수 없는 단계는 무엇일까요?**
+  - 본문의 기준은 한국어 RAG 파이프라인 조합하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **품질 병목은 보통 청킹, 임베딩, 검색, 생성 중 어디에서 가장 자주 생길까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **검색된 문맥은 LLM에 들어가기 전에 어떤 형태로 정리해야 할까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
-- [BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
-- [CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
-- [HyperCLOVA X와 Solar API 사용하기](./05-hyperclova-solar-api.md)
-- **한국어 RAG 파이프라인 조합하기 (현재 글)**
+- [Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
+- [Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
+- [Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기](./05-hyperclova-solar-api.md)
+- **Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (현재 글)**
 
 <!-- toc:end -->
 

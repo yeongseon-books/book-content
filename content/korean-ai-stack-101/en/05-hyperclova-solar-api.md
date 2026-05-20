@@ -1,5 +1,5 @@
 ---
-title: Using HyperCLOVA X and Solar API
+title: "Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API"
 series: korean-ai-stack-101
 episode: 5
 language: en
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-01'
 seo_description: Learn to use HyperCLOVA X and Solar APIs for Korean LLM applications. Master API contracts, prompts, and response validation for production.
 ---
 
-# Using HyperCLOVA X and Solar API
+# Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API
 
 Once you introduce a Korean-first generation model, the hard part is not the model name. The hard part is locking down the call contract so authentication, prompting, output shape, and validation stay predictable in production.
 
 This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe calling patterns for Korean LLM APIs such as HyperCLOVA X and Solar.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What API contract should you lock down before you start prompt tuning?
 - What should you validate first when introducing Korean-first generation APIs such as HyperCLOVA X or Solar?
 - Why does the runnable example use Groq `llama-3.1-8b-instant` as a stand-in?
-- How should you separate Korean fluency from retrieval-grounded factual control?
 
-> Switching generation providers is not just a model-name change. It also changes authentication, request shape, prompt contracts, and response validation.
+## Big Picture
 
-> Korean AI Stack 101 (5/6)
+![Korean AI Stack 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
 
-The title points to HyperCLOVA X and Solar because they matter in the Korean model landscape, but the runnable example uses Groq's `llama-3.1-8b-instant`. The reason is practical: the repository example must run immediately in a reader's environment.
+*Korean AI Stack 101 chapter 5 flow overview*
+
+This picture places Using HyperCLOVA X and Solar API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Using HyperCLOVA X and Solar API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why this matters
 
@@ -102,10 +105,6 @@ Two more facts:
 What matters: (1) the same key concepts ("의미", "임베딩", "토큰") appear every time, (2) wording varies but facts stay consistent, (3) length stays predictable so post-processing cost is bounded.
 
 ## Core flow
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
-
-*Core flow*
 
 ## Why a provider-substitution exercise still helps
 
@@ -286,15 +285,24 @@ The core idea is operating Korean generation APIs as a 4-layer contract — call
 
 The next article (episode 6, the final one) assembles a Korean RAG pipeline. We will combine BGE-M3 retrieval, CLOVA OCR text, and this post's LLM call into one flow that produces fact-grounded Korean responses — a minimum viable RAG, in code.
 
+## Answering the Opening Questions
+
+- **What API contract should you lock down before you start prompt tuning?**
+  - The article treats Using HyperCLOVA X and Solar API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What should you validate first when introducing Korean-first generation APIs such as HyperCLOVA X or Solar?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Why does the runnable example use Groq `llama-3.1-8b-instant` as a stand-in?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-- [BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
-- [Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
-- **Using HyperCLOVA X and Solar API (current)**
-- Assembling a Korean RAG pipeline (upcoming)
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
+- [Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
+- **Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (current)**
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 

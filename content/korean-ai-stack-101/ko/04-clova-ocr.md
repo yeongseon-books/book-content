@@ -1,5 +1,5 @@
 ---
-title: CLOVA OCR API로 문서 텍스트 추출
+title: "Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출"
 series: korean-ai-stack-101
 episode: 4
 language: ko
@@ -20,22 +20,27 @@ last_reviewed: '2026-05-12'
 seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄로 다시 조립한 구조화된 추출 결과입니다.
 ---
 
-# CLOVA OCR API로 문서 텍스트 추출
+# Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출
 
 한국어 검색과 RAG 파이프라인은 검색 단계보다 훨씬 앞에서 무너지는 경우가 많습니다. 시작점이 스캔 문서, 영수증, 휴대폰 사진인 경우가 많기 때문입니다. OCR이 의미 있는 한 줄을 잘못 쪼개면, 뒤의 임베딩과 랭킹도 그 손상을 그대로 물려받습니다.
 
 이 글은 Korean AI Stack 101 시리즈의 4번째 글입니다. 여기서는 CLOVA OCR 응답을 줄 단위 텍스트로 재구성해, 검색 코퍼스에 안전하게 넣을 수 있는 형태로 만드는 과정을 다룹니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?
 - bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?
 - 실제 API 키가 없어도 OCR 파이프라인의 대부분을 왜 검증할 수 있을까요?
-- OCR 출력은 왜 임베딩이나 RAG 단계에 들어가기 전에 반드시 다시 정리되어야 할까요?
 
-> 처음으로 쓸 만한 OCR 결과는 평문이 아닙니다. 의미 있는 줄로 다시 조립해야 하는 구조화된 추출 payload가 먼저 나옵니다.
+## 큰 그림
 
-> Korean AI Stack 101 (4/6)
+![Korean AI Stack 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
+
+*Korean AI Stack 101 4장 흐름 개요*
+
+이 그림에서는 CLOVA OCR API로 문서 텍스트 추출를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> CLOVA OCR API로 문서 텍스트 추출의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 단계가 중요한가
 
@@ -102,10 +107,6 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 중요한 점은 세 가지입니다. 첫째, 줄이 의미 단위로 묶여 있어 BGE-M3가 올바른 줄을 검색할 수 있습니다. 둘째, 줄별 최소 confidence를 보존하면 후속 검토 우선순위를 만들 수 있습니다. 셋째, raw payload를 남겨 두면 나중에 OCR 모델을 교체해도 재처리가 단순합니다.
 
 ## 핵심 흐름
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
-
-*Core flow*
 
 ## 왜 mock payload부터 시작할까
 
@@ -265,15 +266,24 @@ CLOVA OCR 예제의 가치는 텍스트 정확도보다 먼저 응답 구조를 
 
 다음 글에서는 5편 HyperCLOVA X와 Solar API를 다룹니다. OCR 텍스트나 BGE-M3 검색 결과를 한국어 LLM에 넘길 때 어떤 호출 계약과 프롬프트 패턴이 안전한지 구체적인 API 코드와 함께 봅니다.
 
+## 처음 질문으로 돌아가기
+
+- **OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?**
+  - 본문의 기준은 CLOVA OCR API로 문서 텍스트 추출를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **실제 API 키가 없어도 OCR 파이프라인의 대부분을 왜 검증할 수 있을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
-- [BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
-- **CLOVA OCR API로 문서 텍스트 추출 (현재 글)**
-- HyperCLOVA X와 Solar API 사용하기 (예정)
-- 한국어 RAG 파이프라인 조합하기 (예정)
+- [Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
+- **Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출 (현재 글)**
+- Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기 (예정)
+- Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (예정)
 
 <!-- toc:end -->
 

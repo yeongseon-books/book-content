@@ -1,5 +1,5 @@
 ---
-title: Assembling a Korean RAG pipeline
+title: "Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline"
 series: korean-ai-stack-101
 episode: 6
 language: en
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-15'
 seo_description: Assemble a minimal Korean RAG pipeline by connecting embedding, OCR, and generation. Learn chunking, retrieval metrics, and prompt engineering.
 ---
 
-# Assembling a Korean RAG pipeline
+# Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline
 
 RAG stops feeling mystical once you can see where each failure comes from. In Korean workflows, chunking, retrieval, and generation each introduce their own class of mistakes, so the only sane approach is to wire them together in a way you can inspect stage by stage.
 
 This is the final post in the Korean AI Stack 101 series. Here, we connect the earlier embedding, OCR, and generation pieces into one minimal Korean RAG pipeline.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - What stages are non-negotiable in a minimal Korean RAG pipeline?
 - Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?
 - How should retrieved context be formatted before it reaches the LLM?
-- How do the earlier pieces of this series (KoSimCSE, BGE-M3, CLOVA OCR, HyperCLOVA/Solar) connect into one working pipeline?
 
-> RAG quality is not produced by one magical call. It emerges from the combined behavior of chunk boundaries, retrieval candidates, and the way context is handed to the model.
+## Big Picture
 
-> Korean AI Stack 101 (6/6)
+![Korean AI Stack 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
 
----
+*Korean AI Stack 101 chapter 6 flow overview*
+
+This picture places Assembling a Korean RAG pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Assembling a Korean RAG pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What you will learn
 
@@ -65,10 +68,6 @@ The code in this post deliberately prints intermediate state and logs retrieval 
 ---
 
 ## Mental Model — the four-stage pipeline
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
-
-*Core flow*
 
 RAG decomposes into four independent stages.
 
@@ -450,15 +449,24 @@ This post closes the series. Recommended next series:
 
 A small evaluation set and a four-stage pipeline are the only two habits you really need to scale into much larger RAG systems with confidence.
 
+## Answering the Opening Questions
+
+- **What stages are non-negotiable in a minimal Korean RAG pipeline?**
+  - The article treats Assembling a Korean RAG pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should retrieved context be formatted before it reaches the LLM?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- [Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
-- [BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
-- [Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
-- [Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
-- **Assembling a Korean RAG pipeline (current)**
+- [Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice](./03-bge-m3-multilingual.md)
+- [Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API](./04-clova-ocr.md)
+- [Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API](./05-hyperclova-solar-api.md)
+- **Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (current)**
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: HyperCLOVA X와 Solar API 사용하기
+title: "Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기"
 series: korean-ai-stack-101
 episode: 5
 language: ko
@@ -20,24 +20,27 @@ last_reviewed: '2026-05-15'
 seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라 인증, 메시지, 샘플링, 응답 계약을 함께 바꾸는 일입니다.
 ---
 
-# HyperCLOVA X와 Solar API 사용하기
+# Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기
 
 한국어 중심 생성 모델을 붙이기 시작하면 어려운 지점은 모델 이름이 아닙니다. 인증, 프롬프트, 출력 형식, 검증이 운영에서 흔들리지 않도록 호출 계약을 먼저 고정하는 일이 훨씬 중요합니다.
 
 이 글은 Korean AI Stack 101 시리즈의 5번째 글입니다. 여기서는 HyperCLOVA X와 Solar 같은 한국어 LLM API를 안전하게 호출하는 패턴을 정리합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 프롬프트 튜닝보다 먼저 고정해야 할 API 계약은 무엇일까요?
 - HyperCLOVA X나 Solar 같은 한국어 생성 API를 도입할 때는 무엇부터 검증해야 할까요?
 - 실행 예제가 왜 Groq `llama-3.1-8b-instant`를 대체 모델로 쓰는 걸까요?
-- 한국어 유창성과 검색 기반 사실 제어는 어떻게 분리해서 봐야 할까요?
 
-> 생성 모델 공급자를 바꾸는 일은 모델 이름만 바꾸는 작업이 아닙니다. 인증, 요청 형태, 프롬프트 계약, 응답 검증까지 함께 바뀝니다.
+## 큰 그림
 
-> Korean AI Stack 101 (5/6)
+![Korean AI Stack 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
 
-제목에는 HyperCLOVA X와 Solar가 들어가지만, 실행 예제는 Groq의 `llama-3.1-8b-instant`를 사용합니다. 이유는 실용적입니다. 저장소 예제가 독자의 환경에서 바로 실행되어야, 프롬프트와 검증 패턴을 몸으로 익힐 수 있기 때문입니다.
+*Korean AI Stack 101 5장 흐름 개요*
+
+이 그림에서는 HyperCLOVA X와 Solar API 사용하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> HyperCLOVA X와 Solar API 사용하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 단계가 중요한가
 
@@ -104,10 +107,6 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 중요한 점은 세 가지입니다. 첫째, “의미”, “임베딩”, “토큰” 같은 핵심 개념이 매번 유지됩니다. 둘째, 표현은 달라도 사실은 안정적으로 유지됩니다. 셋째, 응답 길이가 예측 가능해 후처리 비용을 통제할 수 있습니다.
 
 ## 핵심 흐름
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
-
-*Core flow*
 
 ## 왜 공급자 대체 실습도 충분히 도움이 될까
 
@@ -288,15 +287,24 @@ Solar는 `base_url`만 바꾸면 Groq 예제 대부분이 그대로 옮겨집니
 
 다음 글에서는 6편이자 마지막 글인 한국어 RAG 파이프라인을 조합합니다. BGE-M3 검색, CLOVA OCR 텍스트, 이 글의 LLM 호출을 하나의 흐름으로 묶어 사실 기반 한국어 응답을 만드는 최소 RAG를 코드로 완성합니다.
 
+## 처음 질문으로 돌아가기
+
+- **프롬프트 튜닝보다 먼저 고정해야 할 API 계약은 무엇일까요?**
+  - 본문의 기준은 HyperCLOVA X와 Solar API 사용하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **HyperCLOVA X나 Solar 같은 한국어 생성 API를 도입할 때는 무엇부터 검증해야 할까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **실행 예제가 왜 Groq `llama-3.1-8b-instant`를 대체 모델로 쓰는 걸까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
-- [KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
-- [BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
-- [CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
-- **HyperCLOVA X와 Solar API 사용하기 (현재 글)**
-- 한국어 RAG 파이프라인 조합하기 (예정)
+- [Korean AI Stack 101 (1/6): 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar](./01-korean-embedding-models.md)
+- [Korean AI Stack 101 (2/6): KoSimCSE로 문장 유사도 구현하기](./02-kosimcse-similarity.md)
+- [Korean AI Stack 101 (3/6): BGE-M3 다국어 임베딩 실전](./03-bge-m3-multilingual.md)
+- [Korean AI Stack 101 (4/6): CLOVA OCR API로 문서 텍스트 추출](./04-clova-ocr.md)
+- **Korean AI Stack 101 (5/6): HyperCLOVA X와 Solar API 사용하기 (현재 글)**
+- Korean AI Stack 101 (6/6): 한국어 RAG 파이프라인 조합하기 (예정)
 
 <!-- toc:end -->
 

@@ -1,5 +1,5 @@
 ---
-title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
+title: "Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar"
 series: korean-ai-stack-101
 episode: 1
 language: en
@@ -19,34 +19,29 @@ seo_description: Comparing embedding models is less about headline scores and mo
   about how consistently they pull similar sentences together while pushing…
 ---
 
-# Korean embedding models compared — KoSimCSE, BGE-M3, Solar
+# Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar
 
 Choosing a Korean embedding model is rarely about chasing the prettiest benchmark score. The practical question is which model stays more stable on your actual mix of Korean FAQs, Korean-English documents, and threshold-based retrieval decisions.
 
 This is the first post in the Korean AI Stack 101 series. Here, we build a reproducible comparison frame for Korean embedding models so later retrieval decisions have a clear baseline.
 
-## Questions this post answers
+## Questions to Keep in Mind
 
 - Where do English-first embedding models usually fail on Korean-heavy data?
 - Why is a separation gap between similar and unrelated pairs more useful than one pretty cosine score?
 - What should you test first when Korean text regularly mixes with English technical terms?
-- How does a reproducible baseline help you choose between a general multilingual model and a Korean-oriented one?
 
-> Comparing embedding models is less about headline scores and more about how consistently they pull similar sentences together while pushing unrelated ones apart.
+## Big Picture
 
-> Korean AI Stack 101 (1/6)
+![Korean AI Stack 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
 
-This post starts with a comparison frame you can rerun locally. It first establishes the smallest baseline with `all-MiniLM-L6-v2` and `jhgan/ko-sbert-nli`, then reuses the same sentence pairs to compare KoSimCSE, BGE-M3, and Solar directly. That decision is deliberate: if readers cannot run `python main.py` immediately, the comparison stays abstract.
+*Korean AI Stack 101 chapter 1 flow overview*
 
-In practice, the real question is not “which model wins the benchmark?” It is “which model fails less often on our data?” Korean-only FAQ traffic, Korean sentences with English product names, and threshold-based retrieval all stress models differently. So the first post focuses on a repeatable comparison setup before moving deeper into Korean-first retrieval.
+This picture places Korean embedding models compared — KoSimCSE, BGE-M3, Solar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
----
+> The core of Korean embedding models compared — KoSimCSE, BGE-M3, Solar is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Core flow
-
-![Core flow](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
-
-*Core flow*
 
 ---
 
@@ -446,15 +441,24 @@ In short: model selection is less a matter of preference and more a matter of cl
 
 The first post is really about comparison discipline, not model fandom. Once you can measure separation on your own data, the later design choices become easier. The next post moves from comparison into an actual sentence similarity search flow with KoSimCSE.
 
+## Answering the Opening Questions
+
+- **Where do English-first embedding models usually fail on Korean-heavy data?**
+  - The article treats Korean embedding models compared — KoSimCSE, BGE-M3, Solar as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why is a separation gap between similar and unrelated pairs more useful than one pretty cosine score?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What should you test first when Korean text regularly mixes with English technical terms?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
 ## In this series
 
-- **Korean embedding models compared — KoSimCSE, BGE-M3, Solar (current)**
-- Building sentence similarity search with KoSimCSE (upcoming)
-- BGE-M3 multilingual embedding in practice (upcoming)
-- Document text extraction with CLOVA OCR API (upcoming)
-- Using HyperCLOVA X and Solar API (upcoming)
-- Assembling a Korean RAG pipeline (upcoming)
+- **Korean AI Stack 101 (1/6): Korean embedding models compared — KoSimCSE, BGE-M3, Solar (current)**
+- Korean AI Stack 101 (2/6): Building sentence similarity search with KoSimCSE (upcoming)
+- Korean AI Stack 101 (3/6): BGE-M3 multilingual embedding in practice (upcoming)
+- Korean AI Stack 101 (4/6): Document text extraction with CLOVA OCR API (upcoming)
+- Korean AI Stack 101 (5/6): Using HyperCLOVA X and Solar API (upcoming)
+- Korean AI Stack 101 (6/6): Assembling a Korean RAG pipeline (upcoming)
 
 <!-- toc:end -->
 
