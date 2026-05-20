@@ -1,5 +1,5 @@
 ---
-title: Diffusion으로 Text-to-Image 생성
+title: "Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성"
 series: multimodal-ai-101
 episode: 7
 language: ko
@@ -20,7 +20,7 @@ last_reviewed: '2026-05-12'
 seo_description: 2014~2020년 image generation의 default는 GAN이었습니다.
 ---
 
-# Diffusion으로 Text-to-Image 생성
+# Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성
 
 텍스트에서 이미지를 생성하는 모델은 한동안 데모의 영역에 머무는 듯 보였습니다. GAN 시절에는 품질이 불안정했고, 프롬프트 제어도 까다로웠습니다. 그런데 diffusion 계열이 자리 잡으면서 분위기가 완전히 바뀌었습니다. 이제는 한 장의 멋진 이미지를 넘어서, 제품 목업, 광고 시안, 게임 콘셉트, 인페인팅, 이미지 편집까지 production 워크플로에 직접 연결되는 수준이 됐습니다.
 
@@ -34,13 +34,21 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 
 생성 품질을 올리는 일과 운영 위험을 낮추는 일은 항상 함께 가야 합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?
 - forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?
 - Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요?
-- CFG, negative prompt, ControlNet, inpainting은 어떻게 생성 제어력을 높일까요?
-- GPU 메모리, safety filter, 저작권, latency-step trade-off는 어디서 운영 이슈로 번질까요?
+
+## 큰 그림
+
+![Multimodal AI 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.ko.png)
+
+*Multimodal AI 101 7장 흐름 개요*
+
+이 그림에서는 Diffusion으로 Text-to-Image 생성를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Diffusion으로 Text-to-Image 생성의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -50,7 +58,7 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 
 반대로 운영 감각 없이 도입하면 비용과 위험이 빠르게 커집니다. 품질이 좋아 보이는 데모와 production 워크플로 사이에는 safety, latency, 저작권, 사용자 기대치 관리라는 큰 간격이 있습니다.
 
-## Diffusion을 이해하는 가장 좋은 방법: 이미지를 한 번에 그리는 모델이 아니라 노이즈를 점진적으로 되돌리는 제어 시스템으로 보는 것입니다
+## 핵심 관점
 
 Diffusion 모델의 직관은 surprisingly 단순합니다. 학습 단계에서는 이미지를 조금씩 망가뜨리는 법을 배우고, 추론 단계에서는 그 망가짐을 역방향으로 되돌리는 법을 배웁니다. 그래서 생성 과정 전체가 여러 step의 반복 제어 문제로 보입니다.
 
@@ -258,19 +266,29 @@ Stable Diffusion 계열을 이해하면 text-to-image뿐 아니라 inpainting, i
 
 실무에서 중요한 것은 품질 지표만이 아닙니다. 비용, safety, 저작권, latency를 함께 설계해야 실제 제품에 넣을 수 있습니다. 생성형 멀티모달은 기술보다 운영이 먼저 무너지기 쉬운 영역입니다.
 
-<!-- toc:begin -->
-## Multimodal AI 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
-- [Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model 아키텍처](./03-vlm-architecture.md)
-- [Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
-- [Multimodal RAG: 이미지와 텍스트를 함께 검색하기](./05-multimodal-rag.md)
-- [오디오 처리와 Whisper STT](./06-audio-whisper.md)
+- **왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?**
+  - 본문의 기준은 Diffusion으로 Text-to-Image 생성를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Multimodal AI 101 (1/10): Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model 아키텍처](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): 오디오 처리와 Whisper STT](./06-audio-whisper.md)
 - **Diffusion으로 Text-to-Image 생성 (현재 글)**
-- [Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
-- [Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
-- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
+- Multimodal Embedding과 Cross-modal 검색 (예정)
+- Video 이해 - Frame Sampling에서 Video-LLaVA까지 (예정)
+- Production Multimodal Application 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

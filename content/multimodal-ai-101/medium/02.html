@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Image Encoders: CLIP and ViT</title>
+<title>Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,29 +53,29 @@
 </style>
 </head>
 <body>
-<h1>Image Encoders: CLIP and ViT</h1>
+<h1>Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT</h1>
 <p>Many teams jump straight to GPT-4o, Qwen2-VL, or LLaVA because that is where the user-visible magic happens. But most multimodal quality issues start lower in the stack. If the image encoder loses the wrong detail, every downstream classifier, retriever, and VLM adapter inherits the mistake.</p>
 <p>This is post 2 in the Multimodal AI 101 series.</p>
 <p>Here we focus on the layer that turns pixels into something searchable and comparable: ViT as the tokenization scheme for images, and CLIP as the shared space that lets text and images meet.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?</li>
 <li>How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?</li>
 <li>What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?</li>
-<li>Which production patterns can you build with CLIP before you ever fine-tune a VLM?</li>
-<li>Where do preprocessing, normalization, prompt templates, and evaluation most often go wrong?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Multimodal AI 101 chapter 2 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png"></p>
+<p><em>Multimodal AI 101 chapter 2 flow overview</em></p>
+<p>This picture places Image Encoders: CLIP and ViT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>An image encoder is not trying to solve the task directly. Its job is to preserve the visual evidence in a representation that later search and reasoning layers can still use.</p>
+<p>The core of Image Encoders: CLIP and ViT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>Why start with the image encoder</h2>
 <p>The quality of any multimodal system ultimately rides on the quality of the representation produced by the image encoder. CLIP and ViT (Vision Transformer) are the two pillars on the image side of nearly every modern VLM, and BLIP-2, LLaVA, and GPT-4V all use ViT-family backbones. Episode 1 covered hybrid fusion; this episode looks directly at the vision encoder that feeds it.</p>
 <h2>Mental model: encode first, decide later</h2>
-<p><img alt="Mental model: encode first, decide later" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png"><br>
-<em>Good image encoders do not answer the question by themselves. They produce a reusable representation that later retrieval, classification, and reasoning stages can trust.</em></p>
 <h2>ViT: looking at images as a token sequence</h2>
 <p>CNNs process images by growing receptive fields from small to large. ViT does the opposite. It cuts the image into 16x16 patches, treats each patch as a token, and feeds the sequence straight into a Transformer.</p>
-<pre><code>[224x224 image] -&gt; 14x14 = 196 patches -&gt; linear projection -&gt; 196 tokens (+ CLS)
+<pre><code class="language-text">[224x224 image] -&gt; 14x14 = 196 patches -&gt; linear projection -&gt; 196 tokens (+ CLS)
                                                                 |
                                                                 v
                                           Transformer Encoder (12 layers)
@@ -275,9 +275,18 @@ print(&quot;top-3:&quot;, [paths[i] for i in I[0]])
 <li>Verify processor preprocessing, normalization, prompt diversification, fine-tuning policy, and resolution match before going to production.</li>
 </ul>
 <hr>
-<h2>Multimodal AI 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><strong>Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?</strong></li>
+<li>The article treats Image Encoders: CLIP and ViT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Multimodal AI 101 (1/10): Why Multimodal AI Matters</a></li>
 <li><strong>Image Encoders: CLIP and ViT (current)</strong></li>
 <li>Vision-Language Model Architecture (upcoming)</li>
 <li>Image Captioning and OCR Pipelines (upcoming)</li>
@@ -285,7 +294,7 @@ print(&quot;top-3:&quot;, [paths[i] for i in I[0]])
 <li>Audio Processing and Whisper STT (upcoming)</li>
 <li>Text-to-Image with Diffusion (upcoming)</li>
 <li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
-<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)</li>
 <li>Building a Production Multimodal Application (upcoming)</li>
 </ul>
 <h2>References</h2>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Image Captioning and OCR Pipelines</title>
+<title>Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,22 @@
 </style>
 </head>
 <body>
-<h1>Image Captioning and OCR Pipelines</h1>
+<h1>Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines</h1>
 <p>Teams new to document and screenshot understanding often think OCR is the whole problem. In practice, OCR gives you strings, but it does not preserve scene meaning, emphasis, layout hierarchy, or the fact that two nearby labels belonged to the same visual unit.</p>
 <p>This is post 4 in the Multimodal AI 101 series.</p>
 <p>Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.</p>
-<h2>Questions this chapter answers</h2>
+<h2>Questions to Keep in Mind</h2>
 <ul>
 <li>Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?</li>
 <li>When should you use a lightweight captioner, and when does a full VLM call earn its cost?</li>
 <li>How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?</li>
-<li>What does a pragmatic OCR-plus-VLM hybrid look like?</li>
-<li>Where do rotation, confidence thresholds, accessibility, and PII controls most often break?</li>
 </ul>
+<h2>Big Picture</h2>
+<p><img alt="Multimodal AI 101 chapter 4 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png"></p>
+<p><em>Multimodal AI 101 chapter 4 flow overview</em></p>
+<p>This picture places Image Captioning and OCR Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
 <blockquote>
-<p>OCR compresses an image into strings. Captioning compresses it into scene meaning. Production document understanding needs both because each one throws away information the other one needs.</p>
+<p>The core of Image Captioning and OCR Pipelines is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
 </blockquote>
 <h2>"Doesn't pulling text out of an image cover it?"</h2>
 <p>Two requests show up constantly in production multimodal systems:</p>
@@ -218,7 +220,7 @@ def extract_tables(img_path: str) -&gt; list:
 <p>Cost runs around USD 0.05-0.065 per page. At 1M pages per month, self-hosted PaddleOCR plus post-processing is cheaper.</p>
 <h2>OCR + VLM hybrid pipeline</h2>
 <p>The pattern that works in practice has five stages.</p>
-<pre><code>[Image]
+<pre><code class="language-text">[Image]
    |
    v
 1. Image preprocessing (deskew, denoise, rotation)
@@ -235,8 +237,6 @@ def extract_tables(img_path: str) -&gt; list:
    v
 [Structured output]
 </code></pre>
-<p><img alt="OCR + VLM hybrid pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png"><br>
-<em>OCR recovers exact strings and locations. Captioning and VLM description recover scene meaning. The fusion stage is where production quality is decided.</em></p>
 <p>Below is a minimal implementation of that hybrid.</p>
 <pre><code class="language-python">from PIL import Image
 from paddleocr import PaddleOCR
@@ -301,17 +301,26 @@ def auto_rotate(path: str) -&gt; Image.Image:
 <li>Episode 5 covers how to index OCR/caption output into a vector DB for multimodal RAG.</li>
 </ul>
 <hr>
-<h2>Multimodal AI 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><strong>Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?</strong></li>
+<li>The article treats Image Captioning and OCR Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>When should you use a lightweight captioner, and when does a full VLM call earn its cost?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Multimodal AI 101 (1/10): Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Multimodal AI 101 (3/10): Vision-Language Model Architecture</a></li>
 <li><strong>Image Captioning and OCR Pipelines (current)</strong></li>
 <li>Multimodal RAG: Searching Images and Text Together (upcoming)</li>
 <li>Audio Processing and Whisper STT (upcoming)</li>
 <li>Text-to-Image with Diffusion (upcoming)</li>
 <li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
-<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)</li>
 <li>Building a Production Multimodal Application (upcoming)</li>
 </ul>
 <h2>References</h2>

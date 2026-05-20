@@ -1,5 +1,5 @@
 ---
-title: Multimodal Embeddings and Cross-modal Search
+title: "Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search"
 series: multimodal-ai-101
 episode: 8
 language: en
@@ -22,7 +22,7 @@ seo_description: 'Episode 5 covered the big picture of multimodal RAG. This epis
   goes deeper into the heart of that system: the multimodal embedding.'
 ---
 
-# Multimodal Embeddings and Cross-modal Search
+# Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search
 
 This is post 8 in the Multimodal AI 101 series.
 
@@ -33,6 +33,22 @@ This is post 8 in the Multimodal AI 101 series.
 Episode 5 covered the big picture of multimodal RAG. This episode goes deeper into the heart of that system: the multimodal embedding. Pulling text, image, and audio into the same vector space is what makes "search text with an image" or "search audio with text" actually work.
 
 We will cover how multimodal embeddings are produced, compare OpenCLIP, SigLIP, ImageBind, and Jina CLIP, build a cross-modal index with FAISS, and walk through five production pitfalls.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?
+- Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?
+- What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?
+
+## Big Picture
+
+![Multimodal AI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.en.png)
+
+*Multimodal AI 101 chapter 8 flow overview*
+
+This picture places Multimodal Embeddings and Cross-modal Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Multimodal Embeddings and Cross-modal Search is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## 1. What Is a Multimodal Embedding
 
@@ -219,19 +235,29 @@ Pretrained models assume a specific resize, crop, and normalization. ViT-B/32 ex
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
-- [Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model Architecture](./03-vlm-architecture.md)
-- [Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
-- [Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
-- [Audio Processing and Whisper STT](./06-audio-whisper.md)
-- [Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
+- **What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?**
+  - The article treats Multimodal Embeddings and Cross-modal Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
 - **Multimodal Embeddings and Cross-modal Search (current)**
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

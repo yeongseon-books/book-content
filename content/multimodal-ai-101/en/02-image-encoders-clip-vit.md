@@ -1,5 +1,5 @@
 ---
-title: 'Image Encoders: CLIP and ViT'
+title: "Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT"
 series: multimodal-ai-101
 episode: 2
 language: en
@@ -21,7 +21,7 @@ seo_description: The quality of any multimodal system ultimately rides on the qu
   of the representation produced by the image encoder.
 ---
 
-# Image Encoders: CLIP and ViT
+# Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT
 
 Many teams jump straight to GPT-4o, Qwen2-VL, or LLaVA because that is where the user-visible magic happens. But most multimodal quality issues start lower in the stack. If the image encoder loses the wrong detail, every downstream classifier, retriever, and VLM adapter inherits the mistake.
 
@@ -29,24 +29,27 @@ This is post 2 in the Multimodal AI 101 series.
 
 Here we focus on the layer that turns pixels into something searchable and comparable: ViT as the tokenization scheme for images, and CLIP as the shared space that lets text and images meet.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?
 - How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?
 - What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?
-- Which production patterns can you build with CLIP before you ever fine-tune a VLM?
-- Where do preprocessing, normalization, prompt templates, and evaluation most often go wrong?
 
-> An image encoder is not trying to solve the task directly. Its job is to preserve the visual evidence in a representation that later search and reasoning layers can still use.
+## Big Picture
+
+![Multimodal AI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
+
+*Multimodal AI 101 chapter 2 flow overview*
+
+This picture places Image Encoders: CLIP and ViT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Image Encoders: CLIP and ViT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why start with the image encoder
 
 The quality of any multimodal system ultimately rides on the quality of the representation produced by the image encoder. CLIP and ViT (Vision Transformer) are the two pillars on the image side of nearly every modern VLM, and BLIP-2, LLaVA, and GPT-4V all use ViT-family backbones. Episode 1 covered hybrid fusion; this episode looks directly at the vision encoder that feeds it.
 
 ## Mental model: encode first, decide later
-
-![Mental model: encode first, decide later](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
-*Good image encoders do not answer the question by themselves. They produce a reusable representation that later retrieval, classification, and reasoning stages can trust.*
 
 ## ViT: looking at images as a token sequence
 
@@ -254,10 +257,19 @@ Feeding 224 inputs to a CLIP-336 model (or vice versa) breaks positional embeddi
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- **Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?**
+  - The article treats Image Encoders: CLIP and ViT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
 - **Image Encoders: CLIP and ViT (current)**
 - Vision-Language Model Architecture (upcoming)
 - Image Captioning and OCR Pipelines (upcoming)
@@ -265,8 +277,9 @@ Feeding 224 inputs to a CLIP-336 model (or vice versa) breaks positional embeddi
 - Audio Processing and Whisper STT (upcoming)
 - Text-to-Image with Diffusion (upcoming)
 - Multimodal Embeddings and Cross-modal Search (upcoming)
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

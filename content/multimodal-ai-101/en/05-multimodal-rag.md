@@ -1,5 +1,5 @@
 ---
-title: 'Multimodal RAG: Searching Images and Text Together'
+title: "Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together"
 series: multimodal-ai-101
 episode: 5
 language: en
@@ -21,7 +21,7 @@ seo_description: A typical RAG system splits documents into chunks, embeds them 
   a vector DB, and retrieves the nearest chunks for a query embedding.
 ---
 
-# Multimodal RAG: Searching Images and Text Together
+# Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together
 
 Classic text RAG starts to wobble the moment the answer depends on layout, iconography, or visual resemblance. Asking for "the slide where the red warning icon appears" or "the invoice that looks like this photo" is not a chunking problem. It is a representation problem.
 
@@ -29,15 +29,21 @@ This is post 5 in the Multimodal AI 101 series.
 
 Here we treat multimodal RAG as a retrieval redesign: what to index, what to keep out of the prompt, and how to keep image-aware search from becoming an expensive latency trap.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?
 - What are the trade-offs between image-only, text-only, and hybrid indexing strategies?
 - How should retrieval outputs be packaged before a VLM sees them?
-- Which metrics tell you whether failure came from retrieval or generation?
-- Why do score mixing, base64 overuse, and missing metadata filters keep recurring in production?
 
-> Multimodal RAG is not mainly about attaching a VLM to the end of a RAG stack. It is about deciding which representations become searchable evidence in the first place.
+## Big Picture
+
+![Multimodal AI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
+
+*Multimodal AI 101 chapter 5 flow overview*
+
+This picture places Multimodal RAG: Searching Images and Text Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Multimodal RAG: Searching Images and Text Together is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions text RAG cannot answer
 
@@ -152,9 +158,6 @@ class HybridIndex:
 
 Pick `alpha` dynamically by query intent: 0.7 for visual queries, 0.2 for fact/numeric queries.
 
-![Strategy 3: hybrid (both image and text vectors)](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
-*The production win in multimodal RAG usually comes from separating evidence by modality first, then fusing scores and prompt context deliberately rather than treating every artifact as one giant index.*
-
 ## Generation: feeding retrieval into a VLM
 
 RAG rarely stops at retrieval. The retrieved images go into a VLM for the final answer.
@@ -266,19 +269,29 @@ Multimodal RAG must be evaluated on text queries, image-by-image search, and ima
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
-- [Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model Architecture](./03-vlm-architecture.md)
-- [Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- **Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?**
+  - The article treats Multimodal RAG: Searching Images and Text Together as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What are the trade-offs between image-only, text-only, and hybrid indexing strategies?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should retrieval outputs be packaged before a VLM sees them?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
 - **Multimodal RAG: Searching Images and Text Together (current)**
 - Audio Processing and Whisper STT (upcoming)
 - Text-to-Image with Diffusion (upcoming)
 - Multimodal Embeddings and Cross-modal Search (upcoming)
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

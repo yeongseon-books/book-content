@@ -1,5 +1,5 @@
 ---
-title: Text-to-Image with Diffusion
+title: "Multimodal AI 101 (7/10): Text-to-Image with Diffusion"
 series: multimodal-ai-101
 episode: 7
 language: en
@@ -21,13 +21,27 @@ seo_description: From 2014 to around 2020, GANs were the default for image gener
   StyleGAN produced eerily realistic faces, but it had two persistent…
 ---
 
-# Text-to-Image with Diffusion
+# Multimodal AI 101 (7/10): Text-to-Image with Diffusion
 
 This is post 7 in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (7/10)
 
----
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Text-to-Image with Diffusion?
+- Which signal should the example or diagram make visible for Text-to-Image with Diffusion?
+- What failure should be prevented first when Text-to-Image with Diffusion reaches a real system?
+
+## Big Picture
+
+![Multimodal AI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.en.png)
+
+*Multimodal AI 101 chapter 7 flow overview*
+
+This picture places Text-to-Image with Diffusion inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Text-to-Image with Diffusion is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Why diffusion replaced GANs
 
@@ -230,19 +244,29 @@ A 30-step SDXL generation takes about 5 seconds on an RTX 4090. User-facing serv
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
-- [Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model Architecture](./03-vlm-architecture.md)
-- [Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
-- [Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
-- [Audio Processing and Whisper STT](./06-audio-whisper.md)
+- **What boundary should you inspect first when applying Text-to-Image with Diffusion?**
+  - The article treats Text-to-Image with Diffusion as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Text-to-Image with Diffusion?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Text-to-Image with Diffusion reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
 - **Text-to-Image with Diffusion (current)**
 - Multimodal Embeddings and Cross-modal Search (upcoming)
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

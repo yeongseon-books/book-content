@@ -1,5 +1,5 @@
 ---
-title: Why Multimodal AI Matters
+title: "Multimodal AI 101 (1/10): Why Multimodal AI Matters"
 series: multimodal-ai-101
 episode: 1
 language: en
@@ -21,7 +21,7 @@ seo_description: 'After ChatGPT shipped in late 2022, a quiet assumption took ho
   a single text LLM could solve almost any problem worth solving.'
 ---
 
-# Why Multimodal AI Matters
+# Multimodal AI 101 (1/10): Why Multimodal AI Matters
 
 For a brief moment after ChatGPT broke into the mainstream, many teams assumed a strong text LLM was enough. That assumption held only until real user input showed up. Receipts arrived as photos, support tickets arrived as screenshots, slide decks arrived as PDFs, and product search stopped being "find this sentence" and became "find something that looks like this."
 
@@ -31,15 +31,21 @@ This is the first post in the Multimodal AI 101 series.
 
 Here we set the mental model for the rest of the series: where text-only systems break, what multimodal systems really add, and which operating constraints you should lock down before you scale usage.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Where do text-only LLM pipelines break first once real document and image input arrives?
 - Which product problems genuinely improve with multimodal models, rather than just looking better in demos?
 - How should you think about early fusion, late fusion, and cross-attention without getting lost in paper terminology?
-- What does a first practical multimodal call look like in production-adjacent code?
-- Which adoption traps show up first around token cost, evaluation, policy, and privacy?
 
-> Multimodal AI is not just "an LLM that also accepts images." It is a shift from text-normalized pipelines to systems that preserve raw visual evidence long enough for retrieval and reasoning to use it.
+## Big Picture
+
+![Multimodal AI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
+
+*Multimodal AI 101 chapter 1 flow overview*
+
+This picture places Why Multimodal AI Matters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Why Multimodal AI Matters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## What multimodal AI actually solves
 
@@ -56,9 +62,6 @@ We are moving from an era of one specialized model per task (ResNet for classifi
 ## Mental model: multimodal expands the reasoning boundary
 
 The cleanest way to understand multimodal AI is to stop thinking in terms of input channels and start thinking in terms of evidence preservation. A text-only pipeline asks, "How quickly can I compress everything into text?" A multimodal pipeline asks, "What information becomes unrecoverable if I compress too early?"
-
-![Mental model: multimodal expands the reasoning boundary](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
-*A multimodal pipeline is valuable when it preserves visual evidence long enough for retrieval and reasoning to use it instead of discarding it up front.*
 
 That shift immediately changes engineering priorities. Resolution policy matters because cost now depends on pixels. OCR is no longer the whole story because layout and iconography may carry the meaning. Privacy review changes because PII may live inside screenshots, IDs, and scanned forms rather than inside typed text.
 
@@ -235,8 +238,17 @@ ID cards, business cards, and screen captures with email addresses are invisible
 
 ---
 
+## Answering the Opening Questions
+
+- **Where do text-only LLM pipelines break first once real document and image input arrives?**
+  - The article treats Why Multimodal AI Matters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which product problems genuinely improve with multimodal models, rather than just looking better in demos?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How should you think about early fusion, late fusion, and cross-attention without getting lost in paper terminology?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
 <!-- toc:begin -->
-## Multimodal AI 101 series
+## In this series
 
 - **Why Multimodal AI Matters (current)**
 - Image Encoders: CLIP and ViT (upcoming)
@@ -246,8 +258,9 @@ ID cards, business cards, and screen captures with email addresses are invisible
 - Audio Processing and Whisper STT (upcoming)
 - Text-to-Image with Diffusion (upcoming)
 - Multimodal Embeddings and Cross-modal Search (upcoming)
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

@@ -1,5 +1,5 @@
 ---
-title: 'Multimodal RAG: 이미지와 텍스트를 함께 검색하기'
+title: "Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기"
 series: multimodal-ai-101
 episode: 5
 language: ko
@@ -20,7 +20,7 @@ last_reviewed: '2026-05-12'
 seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query…
 ---
 
-# Multimodal RAG: 이미지와 텍스트를 함께 검색하기
+# Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기
 
 텍스트 RAG는 많은 문제를 해결했지만, 이미지와 문서 레이아웃이 중요한 순간부터 한계가 또렷해집니다. 사용자가 “표 오른쪽 아래 수치가 무엇인가요?”, “이 제품 사진과 가장 비슷한 항목을 찾아 주세요”, “스크린샷 속 경고 아이콘이 의미하는 바가 뭔가요?”라고 묻는 순간 텍스트 청크만으로는 답이 흔들립니다.
 
@@ -34,13 +34,21 @@ seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, 
 
 검색 대상이 넓어질수록 인덱싱과 평가 전략을 먼저 고정하는 편이 훨씬 안전합니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - 텍스트 RAG는 왜 이미지, 표, 레이아웃 정보가 중요한 질문에서 곧바로 성능 한계를 드러낼까요?
 - 멀티모달 검색을 위해 원본 이미지, caption/OCR, dual index를 쓰는 세 가지 전략은 어떻게 다를까요?
 - 검색 결과를 최종 답변 단계에서 VLM에 넘길 때 어떤 입력 조합이 가장 실용적일까요?
-- retrieval과 generation 품질을 멀티모달 환경에서는 어떤 지표와 데이터셋으로 봐야 할까요?
-- 인덱스 혼합, base64 전달, lazy captioning, 메타데이터 누락 같은 실수는 왜 자주 반복될까요?
+
+## 큰 그림
+
+![Multimodal AI 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-big-picture.ko.png)
+
+*Multimodal AI 101 5장 흐름 개요*
+
+이 그림에서는 Multimodal RAG: 이미지와 텍스트를 함께 검색하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Multimodal RAG: 이미지와 텍스트를 함께 검색하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -50,7 +58,7 @@ seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, 
 
 반대로 성급하게 붙이면 비용과 복잡도가 빠르게 증가합니다. 어떤 representation을 저장하고, 어떤 것을 프롬프트에 직접 넣을지에 대한 원칙이 없으면 멀티모달 RAG는 금세 느리고 비싼 시스템이 됩니다.
 
-## Multimodal RAG를 이해하는 가장 좋은 방법: 새로운 모델 문제가 아니라 검색 표현을 다시 설계하는 문제로 보는 것입니다
+## 핵심 관점
 
 많은 팀이 multimodal RAG를 “VLM을 붙인 RAG”라고만 생각합니다. 하지만 실제 병목은 대개 generation보다 retrieval에서 먼저 생깁니다. 텍스트만 검색하면 이미지 의미를 놓치고, 원본 이미지만 검색하면 정밀 텍스트를 잃기 때문입니다.
 
@@ -251,19 +259,29 @@ ai-evaluation-101 시리즈에서 이 평가 프레임워크를 자세히 다뤘
 
 다음 주제들로 넘어가더라도 오늘의 기준은 계속 유효합니다. 멀티모달 시스템의 품질은 결국 좋은 표현을 인덱싱하고, 그 표현을 비용 안에서 적절히 조합하는 능력에 달려 있습니다.
 
-<!-- toc:begin -->
-## Multimodal AI 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
-- [Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model 아키텍처](./03-vlm-architecture.md)
-- [Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
+- **텍스트 RAG는 왜 이미지, 표, 레이아웃 정보가 중요한 질문에서 곧바로 성능 한계를 드러낼까요?**
+  - 본문의 기준은 Multimodal RAG: 이미지와 텍스트를 함께 검색하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **멀티모달 검색을 위해 원본 이미지, caption/OCR, dual index를 쓰는 세 가지 전략은 어떻게 다를까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **검색 결과를 최종 답변 단계에서 VLM에 넘길 때 어떤 입력 조합이 가장 실용적일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Multimodal AI 101 (1/10): Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model 아키텍처](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
 - **Multimodal RAG: 이미지와 텍스트를 함께 검색하기 (현재 글)**
-- [오디오 처리와 Whisper STT](./06-audio-whisper.md)
-- [Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
-- [Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
-- [Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
-- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
+- 오디오 처리와 Whisper STT (예정)
+- Diffusion으로 Text-to-Image 생성 (예정)
+- Multimodal Embedding과 Cross-modal 검색 (예정)
+- Video 이해 - Frame Sampling에서 Video-LLaVA까지 (예정)
+- Production Multimodal Application 구축 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료

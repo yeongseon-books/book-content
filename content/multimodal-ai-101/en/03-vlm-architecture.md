@@ -1,5 +1,5 @@
 ---
-title: Vision-Language Model Architecture
+title: "Multimodal AI 101 (3/10): Vision-Language Model Architecture"
 series: multimodal-ai-101
 episode: 3
 language: en
@@ -21,7 +21,7 @@ seo_description: Episode 2 covered CLIP, which aligns image and text in the same
   To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and…
 ---
 
-# Vision-Language Model Architecture
+# Multimodal AI 101 (3/10): Vision-Language Model Architecture
 
 Most VLM discussions get lost in model names too early. The useful question is simpler: once an image encoder has emitted visual features, how do those features enter the LLM without blowing up context length, training cost, or multilingual behavior?
 
@@ -29,15 +29,21 @@ This is post 3 in the Multimodal AI 101 series.
 
 Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.
 
-## Questions this chapter answers
+## Questions to Keep in Mind
 
 - Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?
 - Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?
 - When is the simplest adapter good enough, and when does token compression become mandatory?
-- Why does fine-tuning policy matter as much as model family?
-- Which evaluation slices expose the wrong architecture choice fastest?
 
-> A VLM is not an LLM with magic vision added. It is a token contract that decides how much visual information can enter the language model, in what shape, and at what cost.
+## Big Picture
+
+![Multimodal AI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
+
+*Multimodal AI 101 chapter 3 flow overview*
+
+This picture places Vision-Language Model Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Vision-Language Model Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## How VLMs give an LLM "eyes"
 
@@ -60,9 +66,6 @@ Every VLM is a combination of three parts.
 ```
 
 The Adapter is where schools differ. It is the module that converts visual features into a token sequence the LLM can understand.
-
-![Common skeleton: Vision Encoder + Adapter + LLM](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
-*Most architectural trade-offs in a VLM come from the adapter contract: how many visual tokens survive, how often they interact with text, and where the cost lands.*
 
 ## School 1: LLaVA - simple MLP projection
 
@@ -239,19 +242,29 @@ VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, docume
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
-- [Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- **Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?**
+  - The article treats Vision-Language Model Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **When is the simplest adapter good enough, and when does token compression become mandatory?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
 - **Vision-Language Model Architecture (current)**
 - Image Captioning and OCR Pipelines (upcoming)
 - Multimodal RAG: Searching Images and Text Together (upcoming)
 - Audio Processing and Whisper STT (upcoming)
 - Text-to-Image with Diffusion (upcoming)
 - Multimodal Embeddings and Cross-modal Search (upcoming)
-- Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)
+- Video Understanding - From Frame Sampling to Video-LLaVA (upcoming)
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

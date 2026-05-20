@@ -1,5 +1,5 @@
 ---
-title: Video Understanding - From Frame Sampling to Video-LLaVA
+title: "Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA"
 series: multimodal-ai-101
 episode: 9
 language: en
@@ -22,7 +22,7 @@ seo_description: An image is a single frame; a video is a frame sequence with a 
   axis.
 ---
 
-# Video Understanding - From Frame Sampling to Video-LLaVA
+# Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA
 
 This is post 9 in the Multimodal AI 101 series.
 
@@ -33,6 +33,22 @@ This is post 9 in the Multimodal AI 101 series.
 An image is a single frame; a video is a frame sequence with a time axis. A one-minute clip at 30fps is 1,800 frames, and feeding all of them into a VLM blows up the token budget and the GPU at the same time. Ninety percent of video understanding is the sampling and aggregation question: which frames do we pick, and which model do we feed them to?
 
 This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.
+
+## Questions to Keep in Mind
+
+- What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?
+- Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?
+- What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?
+
+## Big Picture
+
+![Multimodal AI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/09/09-01-big-picture.en.png)
+
+*Multimodal AI 101 chapter 9 flow overview*
+
+This picture places Video Understanding - From Frame Sampling to Video-LLaVA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
+
+> The core of Video Understanding - From Frame Sampling to Video-LLaVA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
 
 ## Questions this article answers
 
@@ -241,19 +257,29 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 
 ---
 
-<!-- toc:begin -->
-## Multimodal AI 101 series
+## Answering the Opening Questions
 
-- [Why Multimodal AI Matters](./01-why-multimodal-matters.md)
-- [Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model Architecture](./03-vlm-architecture.md)
-- [Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
-- [Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
-- [Audio Processing and Whisper STT](./06-audio-whisper.md)
-- [Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
-- [Multimodal Embeddings and Cross-modal Search](./08-multimodal-embeddings.md)
+- **What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?**
+  - The article treats Video Understanding - From Frame Sampling to Video-LLaVA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?**
+  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?**
+  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+
+<!-- toc:begin -->
+## In this series
+
+- [Multimodal AI 101 (1/10): Why Multimodal AI Matters](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model Architecture](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): Audio Processing and Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Text-to-Image with Diffusion](./07-text-to-image-diffusion.md)
+- [Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search](./08-multimodal-embeddings.md)
 - **Video Understanding - From Frame Sampling to Video-LLaVA (current)**
 - Building a Production Multimodal Application (upcoming)
+
 <!-- toc:end -->
 
 ## References

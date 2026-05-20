@@ -1,5 +1,5 @@
 ---
-title: Production Multimodal Application 구축
+title: "Multimodal AI 101 (10/10): Production Multimodal Application 구축"
 series: multimodal-ai-101
 episode: 10
 language: ko
@@ -21,7 +21,7 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
   audio…
 ---
 
-# Production Multimodal Application 구축
+# Multimodal AI 101 (10/10): Production Multimodal Application 구축
 
 멀티모달 데모를 한 번 띄우는 것과 production 애플리케이션을 운영하는 것은 완전히 다른 문제입니다. 데모에서는 한 장의 이미지와 한 번의 응답이 전부지만, 실제 서비스에서는 업로드, 전처리, 모델 선택, 캐싱, 비동기 처리, 보안, 관측성, 비용 회수가 모두 한 흐름 안에서 이어집니다. 사용자에게는 “이미지 한 장 올렸다”는 단순한 동작이지만, 서버 안에서는 여러 modality별 파이프라인이 동시에 움직입니다.
 
@@ -35,13 +35,21 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 
 좋은 production 시스템은 모델 성능보다 먼저 요청 흐름과 실패 경로를 명확히 보여 줍니다.
 
-## 이 글에서 다룰 문제
+## 먼저 던지는 질문
 
 - production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?
 - FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?
 - 동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?
-- 모델 warm-up, cache hit, image upload, streaming 종료 처리는 어디서 병목을 만들까요?
-- 비용, 개인정보, 롤아웃, 피드백 루프를 운영 체계 안에 어떻게 넣어야 할까요?
+
+## 큰 그림
+
+![Multimodal AI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.ko.png)
+
+*Multimodal AI 101 10장 흐름 개요*
+
+이 그림에서는 Production Multimodal Application 구축를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+
+> Production Multimodal Application 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 
@@ -51,7 +59,7 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 
 반대로 이 계층을 소홀히 하면 데모에서는 보이지 않던 문제가 한꺼번에 드러납니다. timeout, queue 적체, PII 누출, warm-up 지연, 캐시 불일치가 대표적입니다.
 
-## Production Multimodal App을 이해하는 가장 좋은 방법: 모델 호출 모음이 아니라 입구·비동기·정책·관측이 결합된 서비스로 보는 것입니다
+## 핵심 관점
 
 production 아키텍처를 볼 때 가장 먼저 분리해야 할 것은 요청 입구와 추론 실행 계층입니다. FastAPI 같은 API 레이어는 인증, 요청 검증, 업로드 관리, 응답 스트리밍을 담당하고, 실제 모델 추론은 별도 worker가 맡는 편이 훨씬 안정적입니다.
 
@@ -275,19 +283,29 @@ img = ImageOps.exif_transpose(Image.open(path))
 
 좋은 멀티모달 제품은 화려한 데모보다 boring한 운영 설계를 더 많이 담고 있습니다. 그 boring한 부분을 제대로 만들수록 모델 성능도 실제 사용자 경험으로 이어집니다.
 
-<!-- toc:begin -->
-## Multimodal AI 101 시리즈
+## 처음 질문으로 돌아가기
 
-- [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
-- [Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
-- [Vision-Language Model 아키텍처](./03-vlm-architecture.md)
-- [Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
-- [Multimodal RAG: 이미지와 텍스트를 함께 검색하기](./05-multimodal-rag.md)
-- [오디오 처리와 Whisper STT](./06-audio-whisper.md)
-- [Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
-- [Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
-- [Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
+- **production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?**
+  - 본문의 기준은 Production Multimodal Application 구축를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+- **FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?**
+  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+- **동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?**
+  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [Multimodal AI 101 (1/10): Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)
+- [Multimodal AI 101 (2/10): Image Encoder: CLIP과 ViT](./02-image-encoders-clip-vit.md)
+- [Multimodal AI 101 (3/10): Vision-Language Model 아키텍처](./03-vlm-architecture.md)
+- [Multimodal AI 101 (4/10): Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
+- [Multimodal AI 101 (5/10): Multimodal RAG: 이미지와 텍스트를 함께 검색하기](./05-multimodal-rag.md)
+- [Multimodal AI 101 (6/10): 오디오 처리와 Whisper STT](./06-audio-whisper.md)
+- [Multimodal AI 101 (7/10): Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
+- [Multimodal AI 101 (8/10): Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
+- [Multimodal AI 101 (9/10): Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
 - **Production Multimodal Application 구축 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료

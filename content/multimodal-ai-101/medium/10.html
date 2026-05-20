@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Building a Production Multimodal Application</title>
+<title>Multimodal AI 101 (10/10): Building a Production Multimodal Application</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Building a Production Multimodal Application</h1>
+<h1>Multimodal AI 101 (10/10): Building a Production Multimodal Application</h1>
 <p>This is the final post in the Multimodal AI 101 series.</p>
 <blockquote>
 <p>Multimodal AI 101 series (10/10)</p>
@@ -61,6 +61,19 @@
 <hr>
 <p>The first nine episodes covered image encoders, VLM architecture, captioning, multimodal RAG, audio, diffusion, embeddings, and video. This finale ties all the pieces into one production system. The point is not the model but the system: with the same model, how you serve, cache, and bill it decides the user experience.</p>
 <p>This episode covers a FastAPI-based multimodal API design, step-by-step inference pipeline optimization, caching strategy, cost control, and rollout pitfalls.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Building a Production Multimodal Application?</li>
+<li>Which signal should the example or diagram make visible for Building a Production Multimodal Application?</li>
+<li>What failure should be prevented first when Building a Production Multimodal Application reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Multimodal AI 101 chapter 10 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.en.png"></p>
+<p><em>Multimodal AI 101 chapter 10 flow overview</em></p>
+<p>This picture places Building a Production Multimodal Application inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Building a Production Multimodal Application is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
 <h2>1. End-to-End System Overview</h2>
 <p>We will assume a multimodal Q&amp;A service:</p>
 <ul>
@@ -264,17 +277,26 @@ img = ImageOps.exif_transpose(Image.open(path))
 </ul>
 <p>Across ten episodes we covered the models, data, and systems behind multimodal AI. Build a multimodal app of your own, and let's go deeper in the next series.</p>
 <hr>
-<h2>Multimodal AI 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal RAG: Searching Images and Text Together</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Audio Processing and Whisper STT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Text-to-Image with Diffusion</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal Embeddings and Cross-modal Search</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/09-video-understanding.md">Video Understanding - From Frame Sampling to Video-LLaVA</a></li>
+<li><strong>What boundary should you inspect first when applying Building a Production Multimodal Application?</strong></li>
+<li>The article treats Building a Production Multimodal Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Building a Production Multimodal Application?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Building a Production Multimodal Application reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Multimodal AI 101 (1/10): Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Multimodal AI 101 (3/10): Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Multimodal AI 101 (6/10): Audio Processing and Whisper STT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Multimodal AI 101 (7/10): Text-to-Image with Diffusion</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/09-video-understanding.md">Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA</a></li>
 <li><strong>Building a Production Multimodal Application (current)</strong></li>
 </ul>
 <h2>References</h2>

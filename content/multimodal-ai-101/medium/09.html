@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Video Understanding - From Frame Sampling to Video-LLaVA</title>
+<title>Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h1>Video Understanding - From Frame Sampling to Video-LLaVA</h1>
+<h1>Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA</h1>
 <p>This is post 9 in the Multimodal AI 101 series.</p>
 <blockquote>
 <p>Multimodal AI 101 series (9/10)</p>
@@ -61,6 +61,27 @@
 <hr>
 <p>An image is a single frame; a video is a frame sequence with a time axis. A one-minute clip at 30fps is 1,800 frames, and feeding all of them into a VLM blows up the token budget and the GPU at the same time. Ninety percent of video understanding is the sampling and aggregation question: which frames do we pick, and which model do we feed them to?</p>
 <p>This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.</p>
+<h2>Questions to Keep in Mind</h2>
+<ul>
+<li>What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?</li>
+<li>Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?</li>
+<li>What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?</li>
+</ul>
+<h2>Big Picture</h2>
+<p><img alt="Multimodal AI 101 chapter 9 flow overview" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/09/09-01-big-picture.en.png"></p>
+<p><em>Multimodal AI 101 chapter 9 flow overview</em></p>
+<p>This picture places Video Understanding - From Frame Sampling to Video-LLaVA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.</p>
+<blockquote>
+<p>The core of Video Understanding - From Frame Sampling to Video-LLaVA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.</p>
+</blockquote>
+<h2>Questions this article answers</h2>
+<ul>
+<li>Why is frame sampling the first key decision in video understanding?</li>
+<li>When are PyAV and scene-change-based keyframe extraction each useful?</li>
+<li>What trade-offs do video encoders like VideoMAE, TimeSformer, and X-CLIP make?</li>
+<li>What frame grouping is most practical for Video-LLaVA Q&amp;A?</li>
+<li>Why do fps confusion, codec dependence, ignoring audio, and memory management often become operational issues?</li>
+</ul>
 <h2>1. Why Frame Sampling Is the Core Decision</h2>
 <p>Suppose we want to process a 10-minute 1080p clip at 30fps end-to-end:</p>
 <ul>
@@ -262,16 +283,25 @@ print(processor.batch_decode(out, skip_special_tokens=True)[0])
 <li>fps, codec, short events, audio cues, and memory are the most common production pitfalls.</li>
 </ul>
 <hr>
-<h2>Multimodal AI 101 series</h2>
+<h2>Answering the Opening Questions</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal RAG: Searching Images and Text Together</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Audio Processing and Whisper STT</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Text-to-Image with Diffusion</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal Embeddings and Cross-modal Search</a></li>
+<li><strong>What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?</strong></li>
+<li>The article treats Video Understanding - From Frame Sampling to Video-LLaVA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.</li>
+<li><strong>Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?</strong></li>
+<li>The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.</li>
+<li><strong>What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?</strong></li>
+<li>In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.</li>
+</ul>
+<h2>In this series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Multimodal AI 101 (1/10): Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Multimodal AI 101 (2/10): Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Multimodal AI 101 (3/10): Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Multimodal AI 101 (4/10): Image Captioning and OCR Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal AI 101 (5/10): Multimodal RAG: Searching Images and Text Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Multimodal AI 101 (6/10): Audio Processing and Whisper STT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Multimodal AI 101 (7/10): Text-to-Image with Diffusion</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal AI 101 (8/10): Multimodal Embeddings and Cross-modal Search</a></li>
 <li><strong>Video Understanding - From Frame Sampling to Video-LLaVA (current)</strong></li>
 <li>Building a Production Multimodal Application (upcoming)</li>
 </ul>
