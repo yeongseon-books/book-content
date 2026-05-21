@@ -128,7 +128,7 @@ print('sources:', [c['id'] for c in chunks])
 
 ## 단계별 실습
 
-### Step 1 — chunking and indexing
+### 단계 1 — 청킹과 인덱싱
 
 ```python
 import faiss
@@ -204,7 +204,7 @@ answer = generate(question, hits)
 print(answer)
 ```
 
-### Step 4 — a minimal evaluation set
+### 단계 4 — 최소 평가 세트
 
 ```python
 eval_set = [

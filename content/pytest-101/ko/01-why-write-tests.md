@@ -111,7 +111,7 @@ pip install pytest
 pytest --version
 ```
 
-### Step 3: Write the Function Under Test
+### 단계 3: 테스트 대상 함수 작성하기
 
 Create `calculator.py`:
 
@@ -126,7 +126,7 @@ def divide(a: int, b: int) -> float:
     return a / b
 ```
 
-### Step 4: Write the Test File
+### 단계 4: 테스트 파일 작성하기
 
 Create `test_calculator.py`:
 
@@ -149,7 +149,7 @@ def test_divide_by_zero():
         divide(1, 0)
 ```
 
-### Step 5: Run the Tests
+### 단계 5: 테스트 실행하기
 
 ```bash
 pytest test_calculator.py -v

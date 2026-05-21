@@ -106,7 +106,7 @@ Schema 설계는 네 가지 영역을 다룹니다:
 
 ## 실습: schema를 따라가는 다섯 단계
 
-### Step 1 — JSON body and headers
+### 단계 1 — JSON 본문과 헤더
 
 ```python
 # 1_json.py
@@ -147,7 +147,7 @@ class UserOut(BaseModel):
 
 입력과 출력은 다른 schema입니다. `In`과 `Out`으로 분리하는 관례가 널리 쓰입니다.
 
-### Step 4 — Dates and time zones
+### 단계 4 — 날짜와 시간대
 
 ```python
 # 4_time.py

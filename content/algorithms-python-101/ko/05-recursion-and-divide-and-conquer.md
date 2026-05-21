@@ -94,7 +94,7 @@ def sum_list(data):
 
 ## 단계별 실습
 
-### Step 1: Basic Recursion — Factorial and Fibonacci
+### 단계 1: 기본 재귀 — 팩토리얼과 피보나치
 
 ```python
 def factorial(n: int) -> int:
@@ -117,7 +117,7 @@ print(fibonacci(10))  # 55
 
 팩토리얼은 재귀의 기본 구조를 보여 주고, 피보나치는 재귀만으로는 중복 계산이 얼마나 쉽게 폭증하는지를 보여 줍니다.
 
-### Step 2: Visualizing the Call Stack
+### 단계 2: 호출 스택 시각화
 
 ```python
 def factorial_trace(n: int, depth: int = 0) -> int:
@@ -146,7 +146,7 @@ factorial_trace(4)
 
 재귀가 어렵게 느껴지는 이유는 호출이 내려가는 과정과 결과가 올라오는 과정을 동시에 머릿속에 그려야 하기 때문입니다. 호출 스택을 출력해 보면 그 흐름이 훨씬 선명해집니다.
 
-### Step 3: Divide and Conquer — Fast Exponentiation
+### 단계 3: 분할 정복 — 빠른 거듭제곱
 
 ```python
 def power(base: int, exp: int) -> int:
@@ -167,7 +167,7 @@ print(power(3, 5))    # 243
 
 문제를 반씩 줄이면 반복 횟수가 크게 줄어든다는 점을 잘 보여 주는 예시입니다. 분할 정복이 단순한 설명이 아니라 실제 성능 개선으로 이어진다는 사실이 중요합니다.
 
-### Step 4: Divide and Conquer — Find Max and Tower of Hanoi
+### 단계 4: 분할 정복 — 최댓값 찾기와 하노이 탑
 
 ```python
 def find_max(data: list[int], left: int, right: int) -> int:
@@ -203,7 +203,7 @@ hanoi(3, "A", "C", "B")
 
 하노이 탑은 재귀 구조를 이해하기에 아주 좋은 문제입니다. 작은 문제를 먼저 해결해야 큰 문제를 풀 수 있다는 분할 정복 감각도 분명하게 드러납니다.
 
-### Step 5: Converting Recursion to Iteration
+### 단계 5: 재귀를 반복으로 변환하기
 
 ```python
 # Recursive factorial → iterative factorial

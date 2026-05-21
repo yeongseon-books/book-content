@@ -114,7 +114,7 @@ def build_readme(project):
         ## Demo Evidence
         {demo_lines}
 
-        ## Setup and Run
+        ## 설정과 실행
         {run_lines}
 
         ## Tech Stack
@@ -123,7 +123,7 @@ def build_readme(project):
         ## License
         {project['license_note']}
 
-        ## What I Learned
+        ## 배운 점
         {learned_lines}
         """
     ).strip()
@@ -143,7 +143,7 @@ print(build_readme(project))
 - Demo video (recorded walkthrough): docs/demo-walkthrough.mp4
 - Local demo GIF: docs/demo.gif
 
-## Setup and Run
+## 설정과 실행
 1. python -m venv .venv
 2. source .venv/bin/activate
 3. pip install -r requirements.txt
@@ -155,7 +155,7 @@ Python, Flask, SQLite, Bootstrap
 ## License
 MIT License
 
-## What I Learned
+## 배운 점
 - CSV 입력 검증이 UI보다 먼저 안정화되어야 한다는 점
 - 시간표 충돌 규칙을 테스트 케이스로 먼저 고정하는 편이 디버깅이 빠르다는 점
 ```
@@ -197,7 +197,7 @@ MIT License
 1. pip install -r requirements.txt
 2. flask --app app run
 
-## What I Learned
+## 배운 점
 - 충돌 탐지 규칙을 테스트로 먼저 고정했습니다.
 ```
 

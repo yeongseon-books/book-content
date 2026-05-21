@@ -111,7 +111,7 @@ heapq.heappush(data, 0)
 print(data[0])  # 0
 ```
 
-### Step 2: Implement a max-heap (negate values)
+### 단계 2: 최대 힙 구현하기 (값 부호 반전)
 
 ```python
 import heapq
@@ -144,7 +144,7 @@ bottom3 = heapq.nsmallest(3, scores)
 print(f"bottom 3: {bottom3}")  # [76, 78, 80]
 ```
 
-### Step 4: Implement a priority queue
+### 단계 4: 우선순위 큐 구현하기
 
 ```python
 import heapq

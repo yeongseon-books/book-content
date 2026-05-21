@@ -84,7 +84,7 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 | Stop sequence | 생성을 멈추는 토큰 시퀀스. JSON 강제에 유용 |
 | Output validation | JSON 스키마, 정규식, 길이 검사 같은 후처리 |
 
-## Before vs. After
+## 적용 전후 비교
 
 **Before** — system 메시지 없이 영어 사용자 프롬프트로 호출하면 한국어 답변에 영어 단어가 섞이고, 기본 temperature(대개 1.0 전후) 때문에 같은 질문에도 매번 다른 답이 나옵니다.
 
@@ -111,7 +111,7 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 ## 단계별 실습
 
-### Step 1 — Basic Groq call with a Korean system message
+### 단계 1 — 한국어 시스템 메시지로 기본 Groq 호출
 
 ```python
 import os
@@ -158,7 +158,7 @@ print(data)
 
 `response_format='json_object'`와 system 메시지 안의 명시적 스키마는 한 쌍입니다. 둘 중 하나라도 빠지면 JSON이 아닌 응답이 새어 나옵니다.
 
-### Step 3 — Timeout and retry
+### 단계 3 — 타임아웃과 재시도
 
 ```python
 import time
@@ -183,7 +183,7 @@ def call_with_retry(messages, max_retries=3):
 
 지수 백오프와 timeout은 항상 같이 가야 합니다. timeout이 없으면 hang된 호출 앞에서 재시도도 영원히 기다릴 수 있습니다.
 
-### Step 4 — Response validation and masking
+### 단계 4 — 응답 검증과 마스킹
 
 ```python
 import re
@@ -206,7 +206,7 @@ clean = sanitize(validate(raw))
 
 검증은 생성 직후, 사용자에게 보여 주기 전에 바로 돌려야 합니다. 마스킹은 로그나 캐시에 넣기 직전에 한 번 더 거치면 됩니다.
 
-### Step 5 — Switching to HyperCLOVA / Solar (concept)
+### 단계 5 — HyperCLOVA / Solar 전환 (개념)
 
 ![엔지니어가 헷갈리는 지점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.ko.png)
 

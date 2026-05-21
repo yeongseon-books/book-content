@@ -332,7 +332,7 @@ __init__.py 실행
 호출자 네임스페이스에 'mylib' 바인딩
 ```
 
-## Namespace Package vs Regular Package
+## 네임스페이스 패키지 대 일반 패키지
 
 Python 3.3부터 `__init__.py`가 없어도 디렉터리를 패키지로 인식하는 namespace package가 도입되었습니다. 하지만 두 방식은 동작이 다릅니다.
 

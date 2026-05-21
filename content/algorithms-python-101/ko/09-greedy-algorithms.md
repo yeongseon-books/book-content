@@ -183,7 +183,7 @@ print(fractional_knapsack(items, 50))  # 240.0
 
 분할 가능한 배낭은 가치 대비 무게 비율이 높은 것부터 고르면 됩니다. 물건을 쪼갤 수 있다는 조건이 그리디를 가능하게 합니다.
 
-### Step 4: Meeting Rooms and Interval Scheduling
+### 단계 4: 회의실 배정과 구간 스케줄링
 
 ```python
 def min_meeting_rooms(meetings: list[tuple[int, int]]) -> int:

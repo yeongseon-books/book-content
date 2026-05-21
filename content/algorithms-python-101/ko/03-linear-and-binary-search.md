@@ -140,7 +140,7 @@ print(binary_search(data, 10))   # -1
 
 이진 탐색의 핵심 전제는 정렬입니다. 이 조건이 맞으면 비교 횟수를 급격히 줄일 수 있지만, 정렬되지 않은 데이터에 적용하면 결과가 틀립니다.
 
-### Step 3: Use the bisect Module
+### 단계 3: bisect 모듈 사용하기
 
 ```python
 import bisect
@@ -169,7 +169,7 @@ print(scores)  # [70, 80, 85, 90]
 
 실무와 코딩 테스트 모두에서, 직접 이진 탐색을 매번 작성하기보다 `bisect`를 적절히 활용하는 편이 안전하고 빠른 경우가 많습니다.
 
-### Step 4: Lower Bound and Upper Bound
+### 단계 4: 하한과 상한
 
 ```python
 import bisect

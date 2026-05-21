@@ -88,7 +88,7 @@ first = queue.popleft()   # dequeue — O(1)
 
 ## 단계별 실습
 
-### Step 1: Implement a stack with list
+### 단계 1: 리스트로 스택 구현하기
 
 ```python
 class Stack:
@@ -123,7 +123,7 @@ print(stack.peek())  # "b"
 print(len(stack))    # 2
 ```
 
-### Step 2: Implement a queue with deque
+### 단계 2: deque로 큐 구현하기
 
 ```python
 from collections import deque
@@ -178,7 +178,7 @@ print(is_balanced("({[})"))    # False
 print(is_balanced("((()"))     # False
 ```
 
-### Step 4: BFS with a queue
+### 단계 4: 큐로 BFS 구현하기
 
 ```python
 from collections import deque

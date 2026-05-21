@@ -100,7 +100,7 @@ for item in data:
 
 ## 단계별 실습
 
-### Step 1: Review the time complexity comparison table
+### 단계 1: 시간 복잡도 비교표 살펴보기
 
 ```python
 # Time complexity by data structure and operation
@@ -122,7 +122,7 @@ complexity = """
 print(complexity)
 ```
 
-### Step 2: Implement a decision function
+### 단계 2: 선택 함수 구현하기
 
 ```python
 def suggest_data_structure(
@@ -155,7 +155,7 @@ print(suggest_data_structure(
 # set (hash set)
 ```
 
-### Step 3: Run a real benchmark
+### 단계 3: 실제 벤치마크 실행하기
 
 ```python
 import time

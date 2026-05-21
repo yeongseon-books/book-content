@@ -74,7 +74,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 다섯 가지 시니어 행동
 
-### Step 1 — Define the Problem
+### 단계 1 — 문제 정의하기
 
 ```text
 Write the "problem", not the "symptom".

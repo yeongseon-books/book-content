@@ -92,7 +92,7 @@ pytest --cov=src --cov-report=term-missing
 pip install pytest-cov
 ```
 
-### Step 2: Prepare the Code Under Test
+### 단계 2: 테스트 대상 코드 준비하기
 
 ```python
 # src/myapp/validator.py
@@ -147,7 +147,7 @@ pytest --cov=src/myapp --cov-report=term-missing
 # TOTAL                          16      6    63%
 ```
 
-### Step 5: Fill the Gaps
+### 단계 5: 빈틈 채우기
 
 ```python
 # tests/test_validator.py — additional tests

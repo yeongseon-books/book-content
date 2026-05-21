@@ -172,7 +172,7 @@ print(f"Kinetics-400 label: {model.config.id2label[pred_id]}")
 
 VideoMAE는 Kinetics-400 (400개 동작) classification을 baseline으로 잘 해줍니다. custom domain은 head만 fine-tune하면 빠릅니다.
 
-### 5. Video Q&A with Video-LLaVA
+### 5. Video-LLaVA를 활용한 비디오 Q&A
 
 ```python
 from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration

@@ -71,7 +71,7 @@ one fine-tune  =  │ ② With what? (dataset)                 │
 | Target module | LoRA를 주입하는 선형 레이어입니다. `q_proj`, `v_proj` 같은 이름으로 지정합니다. |
 | Adapter weight | 학습 후 따로 저장하고 배포하는 작은 가중치 파일입니다. 추론 시 베이스 모델과 함께 사용합니다. |
 
-## Before vs. After
+## 적용 전후 비교
 
 **Before**
 

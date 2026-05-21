@@ -126,7 +126,7 @@ def build_brief(spec):
         ### MVP features
         {feature_lines}
 
-        ### Out of scope
+        ### 범위 밖 주제
         {scope_lines}
 
         ### Week-by-week schedule
@@ -151,7 +151,7 @@ Problem statement: Campus Schedule Checker helps students, academic advisors by 
 - Detect overlapping classes
 - Show conflict summary by day
 
-### Out of scope
+### 범위 밖 주제
 - Mobile app
 - Automatic enrollment
 - Professor recommendation engine

@@ -73,7 +73,7 @@ LoRA forward:      y = W · x + (alpha / r) · B · A · x
 | `bias` | bias 학습 정책입니다. `"none"`, `"all"`, `"lora_only"` 중에서 고릅니다. |
 | `task_type` | `CAUSAL_LM`, `SEQ_CLS` 같은 태스크 유형입니다. PEFT가 헤드를 올바르게 해석하게 합니다. |
 
-## Before vs. After
+## 적용 전후 비교
 
 **Before**
 

@@ -86,7 +86,7 @@ data.pop(2)  # removes 30 — 40 and 50 shift left
 
 ## 단계별 실습
 
-### Step 1: Define the Node class
+### 단계 1: Node 클래스 정의하기
 
 ```python
 class Node:
@@ -98,7 +98,7 @@ class Node:
         return f"Node({self.data})"
 ```
 
-### Step 2: Implement a singly linked list
+### 단계 2: 단일 연결 리스트 구현하기
 
 ```python
 class SinglyLinkedList:
@@ -161,7 +161,7 @@ print(sll)          # Z -> A -> C
 print(len(sll))     # 3
 ```
 
-### Step 3: Reverse a linked list
+### 단계 3: 연결 리스트 뒤집기
 
 ```python
 def reverse_linked_list(head: Node) -> Node:
@@ -182,7 +182,7 @@ sll.head = reverse_linked_list(sll.head)
 print(f"reversed: {sll}")  # D -> C -> B -> A
 ```
 
-### Step 4: Implement a doubly linked list
+### 단계 4: 이중 연결 리스트 구현하기
 
 ```python
 class DNode:

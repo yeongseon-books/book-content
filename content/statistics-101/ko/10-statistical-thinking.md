@@ -261,7 +261,7 @@ print(f"상대 향상률: {relative_lift * 100:.1f}%")
 ### 7단계: 문서화
 
 ```markdown
-## A/B Test: Checkout Button Redesign
+## A/B 테스트: 결제 버튼 리디자인
 
 **기간:** 2026-05-01 ~ 2026-05-14
 **표본:** A=5,000, B=5,000

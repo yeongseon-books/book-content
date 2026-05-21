@@ -158,7 +158,7 @@ print(all_pairs(list(range(100))))    # 4950
 
 중첩 반복문이 들어가면 가장 먼저 `O(n^2)` 가능성을 의심해야 합니다. 입력이 커질수록 선형 알고리즘과의 차이가 매우 빠르게 벌어집니다.
 
-### Step 4: O(log n) and O(n log n)
+### 단계 4: O(log n)과 O(n log n)
 
 ```python
 def binary_search(sorted_data: list[int], target: int) -> int:

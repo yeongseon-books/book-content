@@ -208,7 +208,7 @@ def v1_get_user(uid: int):
     )
 ```
 
-## Semver vs Calver
+## Semver 대 Calver
 
 | 방식 | 형식 | 의미 |
 |---|---|---|

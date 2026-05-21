@@ -145,7 +145,7 @@ def test_youngest_user(sample_users):
     assert youngest["name"] == "Bob"
 ```
 
-### Step 3: Yield Fixtures for Resource Management
+### 단계 3: 리소스 관리를 위한 yield 픽스처
 
 ```python
 # conftest.py

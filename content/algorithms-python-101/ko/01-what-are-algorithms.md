@@ -94,7 +94,7 @@ for x in data[1:]:
 
 ## 단계별 실습
 
-### Step 1: Find the Maximum Value
+### 단계 1: 최댓값 찾기
 
 ```python
 def find_max(numbers: list[int]) -> int:
@@ -143,7 +143,7 @@ print(stats)
 
 한 번의 반복으로 여러 값을 함께 계산할 수 있다는 점을 보여 줍니다. 알고리즘을 설계할 때는 같은 순회 안에서 무엇을 같이 처리할 수 있는지 보는 습관이 중요합니다.
 
-### Step 3: Reverse a String
+### 단계 3: 문자열 뒤집기
 
 ```python
 def reverse_string(text: str) -> str:
@@ -195,7 +195,7 @@ print(f"Set-based:   {set_time:.6f}s")
 
 같은 문제라도 알고리즘 선택에 따라 실행 시간이 얼마나 달라지는지 직접 체감할 수 있는 예제입니다. 알고리즘 학습이 추상적인 이유가 아니라, 실제 비용 차이 때문이라는 점을 보여 줍니다.
 
-### Step 5: Verify the Five Properties
+### 단계 5: 다섯 가지 속성 검증하기
 
 ```python
 def is_palindrome(text: str) -> bool:

@@ -170,7 +170,7 @@ def delete_user(uid):
 
 본문이 없는 성공 삭제는 204가 잘 맞습니다.
 
-### Step 5 — Validation failure and conflict
+### 단계 5 — 유효성 검사 실패와 충돌
 
 ```python
 # 5_errors.py

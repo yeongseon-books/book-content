@@ -160,7 +160,7 @@ print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E', 'F']
 
 BFS는 시작점에서 가까운 노드부터 한 층씩 넓혀 갑니다. 그래서 가중치가 없는 그래프의 최단 경로 문제에 특히 적합합니다.
 
-### Step 3: DFS Implementation (Recursive and Iterative)
+### 단계 3: DFS 구현 (재귀와 반복)
 
 ```python
 def dfs_recursive(
@@ -236,7 +236,7 @@ print(bfs_shortest_path(graph, "D", "E"))  # ['D', 'B', 'A', 'C', 'E']
 
 가중치가 없는 그래프에서는 BFS가 먼저 도착한 경로가 곧 최단 경로입니다. 이 성질이 BFS를 아주 실용적으로 만듭니다.
 
-### Step 5: Connected Components and Cycle Detection
+### 단계 5: 연결 요소와 사이클 탐지
 
 ```python
 def find_connected_components(

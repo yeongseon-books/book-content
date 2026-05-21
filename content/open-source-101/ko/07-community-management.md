@@ -93,7 +93,7 @@ curl -O https://www.contributor-covenant.org/version/2/1/code_of_conduct.md
 
 ````markdown
 ```markdown
-## How to contribute
+## 기여 방법
 
 1. Fork
 2. Branch

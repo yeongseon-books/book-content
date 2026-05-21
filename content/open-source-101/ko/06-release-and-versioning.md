@@ -253,7 +253,7 @@ jobs:
 ```markdown
 # Release v2.0.0
 
-## What's New
+## 변경 사항
 
 - **Async API**: All network calls now return Promises
 - **Type safety**: Full TypeScript support with strict mode

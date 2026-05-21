@@ -116,7 +116,7 @@ def shortest(graph, start, end):
 
 ## 단계별 실습
 
-### Step 1: Representing a Weighted Graph
+### 단계 1: 가중 그래프 표현하기
 
 ```python
 graph: dict[str, list[tuple[str, int]]] = {

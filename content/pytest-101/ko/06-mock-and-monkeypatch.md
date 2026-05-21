@@ -129,7 +129,7 @@ def test_get_temperature():
     )
 ```
 
-### Step 2: Replacing a Function with monkeypatch
+### 단계 2: monkeypatch로 함수 교체하기
 
 ```python
 # notification.py
@@ -168,7 +168,7 @@ def test_send_email(monkeypatch):
     assert sent_emails[0]["to"] == "user@test.com"
 ```
 
-### Step 3: Simulating Exceptions with side_effect
+### 단계 3: side_effect로 예외 시뮬레이션하기
 
 ```python
 # test_error_handling.py
@@ -196,7 +196,7 @@ def test_invalid_json():
             pass
 ```
 
-### Step 4: Setting Environment Variables with monkeypatch
+### 단계 4: monkeypatch로 환경 변수 설정하기
 
 ```python
 # config.py

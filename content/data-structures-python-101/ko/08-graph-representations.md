@@ -92,7 +92,7 @@ graph = {
 
 ## 단계별 실습
 
-### Step 1: Implement a graph with an adjacency list
+### 단계 1: 인접 리스트로 그래프 구현하기
 
 ```python
 from collections import defaultdict
@@ -128,7 +128,7 @@ print(g)
 # D: ['B']
 ```
 
-### Step 2: Implement a graph with an adjacency matrix
+### 단계 2: 인접 행렬로 그래프 구현하기
 
 ```python
 class GraphMatrix:
@@ -185,7 +185,7 @@ print(f"BFS from A: {bfs(g, 'A')}")
 # BFS from A: ['A', 'B', 'C', 'D', 'E']
 ```
 
-### Step 4: Implement DFS (recursive and iterative)
+### 단계 4: DFS 구현하기 (재귀와 반복)
 
 ```python
 def dfs_recursive(graph, node, visited=None):
@@ -216,7 +216,7 @@ print(f"DFS recursive: {dfs_recursive(g, 'A')}")
 print(f"DFS iterative: {dfs_iterative(g, 'A')}")
 ```
 
-### Step 5: Weighted graph and shortest path
+### 단계 5: 가중 그래프와 최단 경로
 
 ```python
 import heapq

@@ -110,7 +110,7 @@ Stripe의 에러 객체(`type`, `code`, `param`, `message`)가 사실상 업계 
 
 ## Error response envelope 설계
 
-### RFC 7807 — Problem Details for HTTP APIs
+### RFC 7807 — HTTP API 문제 상세 형식
 
 RFC 7807(2023년에 RFC 9457로 개정)은 에러 응답의 표준 스키마를 정의합니다.
 

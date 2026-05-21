@@ -138,7 +138,7 @@ components:
             status: {type: string, enum: [pending, paid, shipped]}
             total_amount: {type: integer}
 ```
-## Code-first vs Schema-first
+## Code-first 대 Schema-first
 
 API spec을 만드는 두 가지 접근법이 있습니다. 어느 쪽이든 "spec이 존재하고 코드와 동기화된다"는 결과는 같아야 합니다.
 
@@ -201,7 +201,7 @@ openapi-generator-cli generate -i openapi.yaml -g typescript-axios -o ./client
 
 
 팀 내에서 한 번 선택하면 모든 서비스에 동일하게 적용합니다. 혼용하면 "이 spec은 코드에서 나온 건가, 수동으로 쓴 건가?"를 파악할 수 없어서 어느 쪽도 신뢰할 수 없게 됩니다. 참고로 Django REST Framework는 `drf-spectacular`, Spring Boot는 `springdoc-openapi`, NestJS는 `@nestjs/swagger`가 code-first를 지원합니다. Go 생태계에서는 `oapi-codegen`이 schema-first를 지원합니다.
-## Swagger UI vs Redoc
+## Swagger UI 대 Redoc
 
 | 기능 | Swagger UI | Redoc |
 |---|---|---|

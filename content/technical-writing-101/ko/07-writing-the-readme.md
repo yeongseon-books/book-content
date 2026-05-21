@@ -251,14 +251,14 @@ FAQ는 3-5개를 권장하며, 각 질문은 Q&A 형식으로 적습니다.
 
 We welcome contributions! Here's how you can help:
 
-### 1. Fork the repository
+### 1. 저장소 포크하기
 
 ```bash
 git clone https://github.com/username/my-api-project.git
 cd my-api-project
 ```
 
-### 2. Create a branch
+### 2. 브랜치 생성하기
 
 ```bash
 git checkout -b feature/your-feature-name
@@ -276,13 +276,13 @@ git checkout -b feature/your-feature-name
 pytest tests/
 ```
 
-### 5. Submit a pull request
+### 5. 풀 리퀘스트 제출하기
 
 - Describe what you changed and why
 - Link related issues
 - Wait for review
 
-## Code of Conduct
+## 행동 강령
 
 Please be respectful and constructive in all interactions. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 ```

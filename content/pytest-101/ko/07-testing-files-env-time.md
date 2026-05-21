@@ -92,7 +92,7 @@ def test_write_file(tmp_path):
 
 ## 단계별 실습
 
-### Step 1: File Testing with tmp_path
+### 단계 1: tmp_path로 파일 테스트하기
 
 ```python
 # file_processor.py

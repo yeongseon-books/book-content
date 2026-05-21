@@ -76,7 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 다섯 단계 도메인 학습
 
-### Step 1 — Build a Glossary
+### 단계 1 — 용어집 만들기
 
 ```text
 - 30 words

@@ -158,7 +158,7 @@ We accept no new issues or pull requests.
 프로젝트를 완전히 닫기 전에 후임자를 찾아보는 것도 좋습니다. 정기 기여자 중에서 메인테이너 역할을 넘길 사람을 물어볼 수 있습니다.
 
 ```markdown
-## Looking for New Maintainer
+## 새 메인테이너 모집
 
 I can no longer maintain this project.
 If you are a regular contributor and interested in taking over,
